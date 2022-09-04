@@ -109,11 +109,11 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                 useCustomFileBrowserProperty.getValue(),
                 customFileBrowserCommandProperty.getValue()));
 
-        preferences.storePushToApplicationPreferences(new PushToApplicationPreferences(
-                selectedPushToApplicationProperty.getValue().getDisplayName(),
-                workingPushToApplicationPreferences.get().getPushToApplicationCommandPaths(),
-                workingPushToApplicationPreferences.get().getEmacsArguments(),
-                workingPushToApplicationPreferences.get().getVimServer()));
+        PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
+        pushPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());
+        pushPreferences.setCommandPaths(workingPushToApplicationPreferences.get().getCommandPaths());
+        pushPreferences.setEmacsArguments(workingPushToApplicationPreferences.get().getEmacsArguments());
+        pushPreferences.setVimServer(workingPushToApplicationPreferences.get().getVimServer());
 
         stateManager.getPushToApplicationCommand().setApplication(selectedPushToApplicationProperty.getValue());
     }

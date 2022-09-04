@@ -2,47 +2,69 @@ package org.jabref.preferences;
 
 import java.util.Map;
 
-public class PushToApplicationPreferences {
-    private String activeApplicationName;
-    private Map<String, String> pushToApplicationCommandPaths;
-    private String emacsArguments;
-    private String vimServer;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 
-    public PushToApplicationPreferences(String activeApplicationName, Map<String, String> pushToApplicationCommandPaths, String emacsArguments, String vimServer) {
-        this.activeApplicationName = activeApplicationName;
-        this.pushToApplicationCommandPaths = pushToApplicationCommandPaths;
-        this.emacsArguments = emacsArguments;
-        this.vimServer = vimServer;
+public class PushToApplicationPreferences {
+    private final StringProperty activeApplicationName;
+    private final ObservableMap<String, String> commandPaths;
+    private final StringProperty emacsArguments;
+    private final StringProperty vimServer;
+
+    public PushToApplicationPreferences(String activeApplicationName,
+                                        Map<String, String> commandPaths,
+                                        String emacsArguments,
+                                        String vimServer) {
+        this.activeApplicationName = new SimpleStringProperty(activeApplicationName);
+        this.commandPaths = FXCollections.observableMap(commandPaths);
+        this.emacsArguments = new SimpleStringProperty(emacsArguments);
+        this.vimServer = new SimpleStringProperty(vimServer);
     }
 
     public String getActiveApplicationName() {
+        return activeApplicationName.getValue();
+    }
+
+    public StringProperty activeApplicationNameProperty() {
         return activeApplicationName;
     }
 
-    public Map<String, String> getPushToApplicationCommandPaths() {
-        return pushToApplicationCommandPaths;
+    public void setActiveApplicationName(String activeApplicationName) {
+        this.activeApplicationName.set(activeApplicationName);
     }
 
-    public PushToApplicationPreferences withPushToApplicationCommandPaths(Map<String, String> commandPaths) {
-        this.pushToApplicationCommandPaths = commandPaths;
-        return this;
+    public ObservableMap<String, String> getCommandPaths() {
+        return commandPaths;
+    }
+
+    public void setCommandPaths(Map<String, String> commandPaths) {
+        this.commandPaths.clear();
+        this.commandPaths.putAll(commandPaths);
     }
 
     public String getEmacsArguments() {
+        return emacsArguments.get();
+    }
+
+    public StringProperty emacsArgumentsProperty() {
         return emacsArguments;
     }
 
-    public PushToApplicationPreferences withEmacsArguments(String emacsArguments) {
-        this.emacsArguments = emacsArguments;
-        return this;
+    public void setEmacsArguments(String emacsArguments) {
+        this.emacsArguments.set(emacsArguments);
     }
 
     public String getVimServer() {
+        return vimServer.get();
+    }
+
+    public StringProperty vimServerProperty() {
         return vimServer;
     }
 
-    public PushToApplicationPreferences withVimServer(String vimServer) {
-        this.vimServer = vimServer;
-        return this;
+    public void setVimServer(String vimServer) {
+        this.vimServer.set(vimServer);
     }
 }

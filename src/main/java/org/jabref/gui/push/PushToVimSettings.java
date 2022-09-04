@@ -27,6 +27,6 @@ public class PushToVimSettings extends PushToApplicationSettings {
     @Override
     public void storeSettings() {
         super.storeSettings();
-        preferences.setValue(preferences.get().withVimServer(vimServer.getText()));
+        preferences.get().setVimServer(vimServer.getText());
     }
 }

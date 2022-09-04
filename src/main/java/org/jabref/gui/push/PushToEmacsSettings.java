@@ -27,6 +27,6 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
     @Override
     public void storeSettings() {
         super.storeSettings();
-        preferences.setValue(preferences.getValue().withEmacsArguments(additionalParams.getText()));
+        preferences.get().setEmacsArguments(additionalParams.getText());
     }
 }

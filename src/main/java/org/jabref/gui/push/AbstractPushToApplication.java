@@ -63,7 +63,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getPushToApplicationCommandPaths().get(this.getDisplayName());
+        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if ((commandPath == null) || commandPath.trim().isEmpty()) {

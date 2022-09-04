@@ -57,7 +57,7 @@ public class PushToApplicationSettings {
         commandLabel.setText(commandLine.toString());
         settingsPane.add(commandLabel, 0, 0);
 
-        path.setText(preferences.get().getPushToApplicationCommandPaths().get(this.application.getDisplayName()));
+        path.setText(preferences.get().getCommandPaths().get(this.application.getDisplayName()));
         settingsPane.add(path, 1, 0);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -80,9 +80,9 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
-        Map<String, String> commandPaths = preferences.get().getPushToApplicationCommandPaths();
+        Map<String, String> commandPaths = preferences.get().getCommandPaths();
         commandPaths.put(application.getDisplayName(), path.getText());
-        preferences.setValue(preferences.get().withPushToApplicationCommandPaths(commandPaths));
+        preferences.get().setCommandPaths(commandPaths);
     }
 
     public GridPane getSettingsPane() {

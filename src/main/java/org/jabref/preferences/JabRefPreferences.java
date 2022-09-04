@@ -454,6 +454,7 @@ public class JabRefPreferences implements PreferencesService {
     private XmpPreferences xmpPreferences;
     private AutoCompletePreferences autoCompletePreferences;
     private CleanupPreferences cleanupPreferences;
+    private PushToApplicationPreferences pushToApplicationPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1737,6 +1738,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public PushToApplicationPreferences getPushToApplicationPreferences() {
+        if (Objects.nonNull(pushToApplicationPreferences)) {
+            return pushToApplicationPreferences;
+        }
+
         Map<String, String> applicationCommands = new HashMap<>();
         applicationCommands.put(PushToApplications.EMACS, get(PUSH_EMACS_PATH));
         applicationCommands.put(PushToApplications.LYX, get(PUSH_LYXPIPE));
@@ -1745,27 +1750,30 @@ public class JabRefPreferences implements PreferencesService {
         applicationCommands.put(PushToApplications.VIM, get(PUSH_VIM));
         applicationCommands.put(PushToApplications.WIN_EDT, get(PUSH_WINEDT_PATH));
 
-        return new PushToApplicationPreferences(
+        pushToApplicationPreferences = new PushToApplicationPreferences(
                 get(PUSH_TO_APPLICATION),
                 applicationCommands,
                 get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
                 get(PUSH_VIM_SERVER)
         );
-    }
 
-    @Override
-    public void storePushToApplicationPreferences(PushToApplicationPreferences preferences) {
-        put(PUSH_TO_APPLICATION, preferences.getActiveApplicationName());
+        EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -> put(PUSH_TO_APPLICATION, newValue));
 
-        put(PUSH_EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplications.EMACS));
-        put(PUSH_LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToApplications.LYX));
-        put(PUSH_TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplications.TEXMAKER));
-        put(PUSH_TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplications.TEXSTUDIO));
-        put(PUSH_VIM, preferences.getPushToApplicationCommandPaths().get(PushToApplications.VIM));
-        put(PUSH_WINEDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplications.WIN_EDT));
+        // TODO: Empty command paths
 
-        put(PUSH_EMACS_ADDITIONAL_PARAMETERS, preferences.getEmacsArguments());
-        put(PUSH_VIM_SERVER, preferences.getVimServer());
+        pushToApplicationPreferences.getCommandPaths().addListener((InvalidationListener) listener -> {
+            put(PUSH_EMACS_PATH, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.EMACS));
+            put(PUSH_LYXPIPE, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.LYX));
+            put(PUSH_TEXMAKER_PATH, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.TEXMAKER));
+            put(PUSH_TEXSTUDIO_PATH, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.TEXSTUDIO));
+            put(PUSH_VIM, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.VIM));
+            put(PUSH_WINEDT_PATH, pushToApplicationPreferences.getCommandPaths().get(PushToApplications.WIN_EDT));
+        });
+
+        EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
+        EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));
+
+        return pushToApplicationPreferences;
     }
 
     @Override

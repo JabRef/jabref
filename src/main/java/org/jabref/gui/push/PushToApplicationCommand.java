@@ -20,7 +20,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PushToApplicationPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,15 +73,7 @@ public class PushToApplicationCommand extends SimpleCommand {
     public void setApplication(PushToApplication application) {
         final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
-        PushToApplicationPreferences pushPreferences = preferencesService.getPushToApplicationPreferences();
-
-        this.preferencesService.storePushToApplicationPreferences(
-                new PushToApplicationPreferences(
-                        application.getDisplayName(),
-                        pushPreferences.getPushToApplicationCommandPaths(),
-                        pushPreferences.getEmacsArguments(),
-                        pushPreferences.getVimServer()));
-
+        preferencesService.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
         this.application = Objects.requireNonNull(application);
 
         reconfigurableControls.forEach(object -> {
