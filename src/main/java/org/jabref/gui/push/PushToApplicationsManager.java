@@ -18,7 +18,7 @@ public class PushToApplicationsManager {
     private final List<PushToApplication> applications;
     private final List<Object> reconfigurableControls = new ArrayList<>();
 
-    private final PushToApplicationAction action;
+    private final PushToApplicationCommand action;
 
     public PushToApplicationsManager(DialogService dialogService,
                                      StateManager stateManager,
@@ -33,7 +33,7 @@ public class PushToApplicationsManager {
                 new PushToVim(dialogService, preferencesService),
                 new PushToWinEdt(dialogService, preferencesService));
 
-        this.action = new PushToApplicationAction(
+        this.action = new PushToApplicationCommand(
                 getApplicationByName(preferencesService.getExternalApplicationsPreferences().getPushToApplicationName())
                         .orElse(new PushToEmacs(dialogService, preferencesService)),
                 stateManager,
@@ -44,7 +44,7 @@ public class PushToApplicationsManager {
         return applications;
     }
 
-    public PushToApplicationAction getPushToApplicationAction() {
+    public PushToApplicationCommand getPushToApplicationAction() {
         return action;
     }
 
@@ -61,13 +61,13 @@ public class PushToApplicationsManager {
     public void updateApplicationAction(PushToApplication application) {
         final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
-        this.action.updateApplication(application);
+        this.action.setApplication(application);
 
         reconfigurableControls.forEach(object -> {
             if (object instanceof MenuItem) {
-                factory.configureMenuItem(action.getActionInformation(), action, (MenuItem) object);
+                factory.configureMenuItem(action.getAction(), action, (MenuItem) object);
             } else if (object instanceof ButtonBase) {
-                factory.configureIconButton(action.getActionInformation(), action, (ButtonBase) object);
+                factory.configureIconButton(action.getAction(), action, (ButtonBase) object);
             }
         });
     }

@@ -101,7 +101,7 @@ import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
-import org.jabref.gui.push.PushToApplicationAction;
+import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
@@ -534,8 +534,8 @@ public class JabRefFrame extends BorderPane {
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();
 
-        final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
-        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
+        final PushToApplicationCommand pushToApplicationCommand = getPushToApplicationsManager().getPushToApplicationAction();
+        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
         pushToApplicationsManager.registerReconfigurable(pushToApplicationButton);
 
         // Setup Toolbar
@@ -861,8 +861,8 @@ public class JabRefFrame extends BorderPane {
         );
 
         // PushToApplication
-        final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
-        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
+        final PushToApplicationCommand pushToApplicationCommand = pushToApplicationsManager.getPushToApplicationAction();
+        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
         pushToApplicationsManager.registerReconfigurable(pushToApplicationMenuItem);
 
         tools.getItems().addAll(

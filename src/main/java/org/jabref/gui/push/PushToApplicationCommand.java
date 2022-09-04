@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
@@ -24,27 +28,28 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
  */
-public class PushToApplicationAction extends SimpleCommand {
+public class PushToApplicationCommand extends SimpleCommand {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
 
-    private PushToApplication application;
+    private final ObjectProperty<PushToApplication> application = new SimpleObjectProperty<>();
 
-    public PushToApplicationAction(PushToApplication application, StateManager stateManager, DialogService dialogService) {
-        this.application = application;
+    public PushToApplicationCommand(PushToApplication application, StateManager stateManager, DialogService dialogService) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
+
+        this.application.setValue(Objects.requireNonNull(application));
 
         this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(this.executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
     }
 
-    public void updateApplication(PushToApplication application) {
-        this.application = Objects.requireNonNull(application);
+    public void setApplication(PushToApplication application) {
+        this.application.setValue(Objects.requireNonNull(application));
     }
 
-    public Action getActionInformation() {
+    public ReadOnlyObjectProperty<Action> getAction() {
         return new Action() {
             @Override
             public Optional<JabRefIcon> getIcon() {

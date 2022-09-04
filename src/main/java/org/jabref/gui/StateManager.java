@@ -21,6 +21,7 @@ import javafx.scene.Node;
 import javafx.util.Pair;
 
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -66,6 +67,7 @@ public class StateManager {
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
 
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
+    private final ObjectProperty<PushToApplicationCommand> pushToApplicationCommand = new SimpleObjectProperty<>();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -188,5 +190,17 @@ public class StateManager {
 
     public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
         lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
+    }
+
+    public ObjectProperty<PushToApplicationCommand> pushToApplicationCommandProperty() {
+        return pushToApplicationCommand;
+    }
+
+    public PushToApplicationCommand getPushToApplicationCommand() {
+        return pushToApplicationCommand.get();
+    }
+
+    public void setPushToApplicationCommand(PushToApplicationCommand pushToApplicationCommand) {
+        this.pushToApplicationCommand.set(pushToApplicationCommand);
     }
 }
