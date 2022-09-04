@@ -2,11 +2,11 @@ package org.jabref.logic.cleanup;
 
 import java.util.Optional;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -21,13 +21,15 @@ public class ISSNCleanupTest {
 
     @BeforeEach
     public void setUp() {
-        worker = new CleanupWorker(mock(BibDatabaseContext.class),
-                new CleanupPreferences(mock(LayoutFormatterPreferences.class), mock(FilePreferences.class)), mock(TimestampPreferences.class));
+        worker = new CleanupWorker(
+                mock(BibDatabaseContext.class),
+                mock(FilePreferences.class),
+                mock(TimestampPreferences.class));
     }
 
     @Test
     public void cleanupISSNReturnsCorrectISSN() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.ISSN, "0123-4567");
 
@@ -37,7 +39,7 @@ public class ISSNCleanupTest {
 
     @Test
     public void cleanupISSNAddsMissingDash() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.ISSN, "01234567");
 
@@ -47,7 +49,7 @@ public class ISSNCleanupTest {
 
     @Test
     public void cleanupISSNJunkStaysJunk() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.ISSN, "Banana");
 
