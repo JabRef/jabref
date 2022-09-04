@@ -375,6 +375,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // GroupViewMode
     private static final String GROUP_VIEW_INTERSECTION = "groupIntersection";
+    private static final String GROUP_VIEW_FILTER = "groupFilter";
 
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
@@ -599,6 +600,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
         defaults.put(GROUP_VIEW_INTERSECTION, Boolean.TRUE);
+        defaults.put(GROUP_VIEW_FILTER, Boolean.TRUE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
@@ -1420,6 +1422,7 @@ public class JabRefPreferences implements PreferencesService {
 
         groupsPreferences = new GroupsPreferences(
                 getBoolean(GROUP_VIEW_INTERSECTION),
+                getBoolean(GROUP_VIEW_FILTER),
                 getBoolean(AUTO_ASSIGN_GROUP),
                 getBoolean(DISPLAY_GROUP_COUNT),
                 getInternalPreferences().keywordSeparatorProperty()
@@ -1429,6 +1432,7 @@ public class JabRefPreferences implements PreferencesService {
             @Override
             public void onChanged(Change<? extends GroupViewMode> change) {
                 putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
+                putBoolean(GROUP_VIEW_FILTER, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
             }
         });
         EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));

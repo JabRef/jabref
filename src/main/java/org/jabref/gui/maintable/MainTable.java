@@ -36,6 +36,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
@@ -56,6 +57,8 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,6 +142,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         Globals.TASK_EXECUTOR,
                         Globals.entryTypesManager))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search"), entry -> stateManager.activeSearchQueryProperty().isPresent().and(entry.searchScoreProperty().isEqualTo(0)))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-groups"), entry -> {
+                    EasyBinding<Boolean> matchesGroup = EasyBind.combine(
+                            stateManager.activeGroupProperty(),
+                            preferencesService.getGroupsPreferences().groupViewModeProperty(),
+                            (groups, viewMode) -> {
+                                if (viewMode.contains(GroupViewMode.FILTER)) {
+                                    return Boolean.valueOf(false);
+                                }
+                                MainTableDataModel.updateSearchGroups(stateManager, database);
+                                return Boolean.valueOf(!MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences()).map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true));
+                            });
+                    return matchesGroup;
+                })
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)

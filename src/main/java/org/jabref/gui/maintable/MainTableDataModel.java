@@ -56,7 +56,7 @@ public class MainTableDataModel {
                         (groups, query, groupViewMode) -> {
                             doSearch(query);
                             return entry -> {
-                                updateSearchGroups();
+                                updateSearchGroups(stateManager, bibDatabaseContext);
                                 return isMatched(groups, query, entry);
                             };
                         })
@@ -66,8 +66,8 @@ public class MainTableDataModel {
         entriesSorted = new SortedList<>(entriesFiltered);
     }
 
-    private void updateSearchGroups() {
-        stateManager.getSelectedGroup(bibDatabaseContext).stream().map(GroupTreeNode::getGroup).filter(g -> g instanceof SearchGroup).map(g -> ((SearchGroup) g)).forEach(g -> g.updateMatches(bibDatabaseContext));
+    public static void updateSearchGroups(StateManager stateManager, BibDatabaseContext bibDatabaseContext) {
+        stateManager.getSelectedGroups(bibDatabaseContext).stream().map(GroupTreeNode::getGroup).filter(g -> g instanceof SearchGroup).map(g -> ((SearchGroup) g)).forEach(g -> g.updateMatches(bibDatabaseContext));
     }
 
     private void doSearch(Optional<SearchQuery> query) {
@@ -100,12 +100,15 @@ public class MainTableDataModel {
     }
 
     private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {
-        return createGroupMatcher(groups)
+        if (!preferencesService.getGroupsPreferences().groupViewModeProperty().contains(GroupViewMode.FILTER)) {
+            return true;
+        }
+        return createGroupMatcher(groups, groupsPreferences)
                 .map(matcher -> matcher.isMatch(entry.getEntry()))
                 .orElse(true);
     }
 
-    private Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups) {
+    public static Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups, GroupsPreferences groupsPreferences) {
         if ((selectedGroups == null) || selectedGroups.isEmpty()) {
             // No selected group, show all entries
             return Optional.empty();

@@ -188,7 +188,7 @@ public class ImportHandler {
         }
 
         // Add to group
-        addToGroups(entries, stateManager.getSelectedGroup(bibDatabaseContext));
+        addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -227,7 +227,7 @@ public class ImportHandler {
                                        preferencesService.getOwnerPreferences(),
                                        preferencesService.getTimestampPreferences());
 
-        addToGroups(List.of(entry), stateManager.getSelectedGroup(this.bibDatabaseContext));
+        addToGroups(List.of(entry), stateManager.getSelectedGroups(this.bibDatabaseContext));
     }
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {

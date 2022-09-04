@@ -4,6 +4,8 @@ import java.util.EnumSet;
 
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
@@ -17,6 +19,7 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
     private final GroupsPreferences groupsPreferences;
     private final DialogService dialogService;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
+    private final ToggleButton filterToggle = IconTheme.JabRefIcons.FILTER.asToggleButton();
 
     public GroupsSidePaneComponent(SimpleCommand closeCommand,
                                    SimpleCommand moveUpCommand,
@@ -28,6 +31,7 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
         setupIntersectionUnionToggle();
+        setupFilterToggle();
 
         groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
             GroupModeViewModel modeViewModel = new GroupModeViewModel(groupsPreferences.groupViewModeProperty());
@@ -37,8 +41,15 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
     }
 
     private void setupIntersectionUnionToggle() {
-        addExtraButtonToHeader(intersectionUnionToggle, 0);
+        addExtraNodeToHeader(intersectionUnionToggle, 0);
         intersectionUnionToggle.setOnAction(event -> new ToggleUnionIntersectionAction().execute());
+    }
+
+    private void setupFilterToggle() {
+        addExtraNodeToHeader(filterToggle, 0);
+        filterToggle.setSelected(groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
+        filterToggle.selectedProperty().addListener((observable, oldValue, newValue) -> groupsPreferences.setGroupViewMode(GroupViewMode.FILTER, newValue));
+        filterToggle.setTooltip(new Tooltip(Localization.lang("Filter by groups")));
     }
 
     private class ToggleUnionIntersectionAction extends SimpleCommand {

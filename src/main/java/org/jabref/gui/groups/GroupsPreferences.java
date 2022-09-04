@@ -17,6 +17,7 @@ public class GroupsPreferences {
     private final ObjectProperty<Character> keywordSeparator;
 
     public GroupsPreferences(boolean viewModeIntersection,
+                             boolean viewModeFilter,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
                              ObjectProperty<Character> keywordSeparator) {
@@ -24,6 +25,9 @@ public class GroupsPreferences {
         this.groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());
         if (viewModeIntersection) {
             this.groupViewMode.add(GroupViewMode.INTERSECTION);
+        }
+        if (viewModeFilter) {
+            this.groupViewMode.add(GroupViewMode.FILTER);
         }
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);

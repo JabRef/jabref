@@ -107,7 +107,7 @@ public class StateManager {
         selectedGroups.put(database, FXCollections.observableArrayList(newSelectedGroups));
     }
 
-    public ObservableList<GroupTreeNode> getSelectedGroup(BibDatabaseContext database) {
+    public ObservableList<GroupTreeNode> getSelectedGroups(BibDatabaseContext database) {
         ObservableList<GroupTreeNode> selectedGroupsForDatabase = selectedGroups.get(database);
         return selectedGroupsForDatabase != null ? selectedGroupsForDatabase : FXCollections.observableArrayList();
     }

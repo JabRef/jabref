@@ -40,6 +40,10 @@
     -fx-opacity: 35%;
 }
 
+.table-row-cell:entry-not-matching-groups {
+    -fx-background-color: -jr-gray-2;
+}
+
 .rating > .container {
     -fx-spacing: 2;
 }

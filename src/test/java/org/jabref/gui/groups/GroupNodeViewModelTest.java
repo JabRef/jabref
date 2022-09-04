@@ -49,6 +49,7 @@ class GroupNodeViewModelTest {
                 false,
                 true,
                 true,
+                true,
                 new SimpleObjectProperty<>(',')
         ));
 

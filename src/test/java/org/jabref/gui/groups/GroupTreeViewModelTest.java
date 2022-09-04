@@ -43,6 +43,7 @@ class GroupTreeViewModelTest {
                 false,
                 true,
                 true,
+                true,
                 new SimpleObjectProperty<>(',')
         ));
         groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
@@ -56,7 +57,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void rootGroupIsSelectedByDefault() {
-        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroup(databaseContext).get(0));
+        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroups(databaseContext).get(0));
     }
 
     @Test
