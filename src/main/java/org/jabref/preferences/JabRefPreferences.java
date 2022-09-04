@@ -2171,11 +2171,11 @@ public class JabRefPreferences implements PreferencesService {
      * @param originalDirectory the directory as configured
      */
     private String determineMainFileDirectory(String originalDirectory) {
-        if (!originalDirectory.isEmpty()) {
+        if ((originalDirectory != null) && !originalDirectory.isEmpty()) {
             // A non-empty directory is kept
             return originalDirectory;
         }
-        return Path.of(JabRefDesktop.getDefaultFileChooserDirectory(), "JabRef").toString();
+        return JabRefDesktop.getDefaultFileChooserDirectory().toString();
     }
 
     @Override
