@@ -190,6 +190,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     private boolean checkGroupFieldsForModificationsDialogNecessary(AbstractGroup oldGroup, AbstractGroup newGroup) {
+
+        // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
         if (oldGroup.getClass() == WordKeywordGroup.class) {
             WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;
             WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;
@@ -203,21 +205,28 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             return oldRegexKeywordGroup.getSearchField().getName().equals(newRegexKeywordGroup.getSearchField().getName())
                    || oldRegexKeywordGroup.getSearchExpression().equals(newRegexKeywordGroup.getSearchExpression())
-                   ||  (oldRegexKeywordGroup.isCaseSensitive() == newRegexKeywordGroup.isCaseSensitive());
+                   || (oldRegexKeywordGroup.isCaseSensitive() == newRegexKeywordGroup.isCaseSensitive());
         } else if ((oldGroup.getClass() == SearchGroup.class)) {
             SearchGroup oldSearchGroup = (SearchGroup) oldGroup;
             SearchGroup newSearchGroup = (SearchGroup) newGroup;
 
             return oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression()) ||
                 oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags());
-        } else if (oldGroup instanceof AutomaticKeywordGroup oldAutomaticKeywordGroup && newGroup instanceof AutomaticKeywordGroup newAutomaticKeywordGroup) {
-            return oldAutomaticKeywordGroup.getKeywordDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordDelimiter().toString()) ||
-                oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())
-                || oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName());
+        } else if (oldGroup.getClass() ==  AutomaticKeywordGroup.class) {
+            AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
+            AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
 
-        } else if (oldGroup instanceof AutomaticPersonsGroup oldAutomaticPersonsGroup && newGroup instanceof AutomaticPersonsGroup newAutomaticPersonsGroup) {
+            return oldAutomaticKeywordGroup.getKeywordDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordDelimiter().toString())
+                || oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())
+                || oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName());
+        } else if (oldGroup.getClass() == AutomaticPersonsGroup.class) {
+            AutomaticPersonsGroup oldAutomaticPersonsGroup = (AutomaticPersonsGroup) oldGroup;
+            AutomaticPersonsGroup newAutomaticPersonsGroup = (AutomaticPersonsGroup) newGroup;
+
             return oldAutomaticPersonsGroup.getField().getName().equals(newAutomaticPersonsGroup.getField().getName());
-        } else if (oldGroup instanceof TexGroup oldTexGroup && newGroup instanceof TexGroup newTexGroup) {
+        } else if (oldGroup.getClass() ==  TexGroup.class) {
+                TexGroup oldTexGroup = (TexGroup) oldGroup;
+                TexGroup newTexGroup = (TexGroup) newGroup;
             return oldTexGroup.getFilePath().toString().equals(newTexGroup.getFilePath().toString());
         }
         return true;
