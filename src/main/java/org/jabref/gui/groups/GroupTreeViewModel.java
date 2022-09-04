@@ -268,6 +268,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             newGroup.ifPresent(group -> {
 
                 if(this.compareGroupType(oldGroup.getGroupNode().getGroup(), group) && this.compareGroupFields(oldGroup.getGroupNode().getGroup(), group)) {
+                    writeGroupChangesToMetaData();
                     return ;
                 }
 
