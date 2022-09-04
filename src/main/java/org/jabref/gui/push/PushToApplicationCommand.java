@@ -1,26 +1,29 @@
 package org.jabref.gui.push;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.ButtonBase;
+import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.actions.Action;
+import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.PushToApplicationPreferences;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -30,47 +33,69 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
  */
 public class PushToApplicationCommand extends SimpleCommand {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToApplicationCommand.class);
+
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
 
-    private final ObjectProperty<PushToApplication> application = new SimpleObjectProperty<>();
+    private final List<Object> reconfigurableControls = new ArrayList<>();
 
-    public PushToApplicationCommand(PushToApplication application, StateManager stateManager, DialogService dialogService) {
+    private PushToApplication application;
+
+    public PushToApplicationCommand(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
 
-        this.application.setValue(Objects.requireNonNull(application));
+        this.application = PushToApplications.getApplicationByName(
+                                                     preferencesService.getPushToApplicationPreferences()
+                                                                       .getActiveApplicationName(),
+                                                     dialogService,
+                                                     preferencesService)
+                                             .orElse(new PushToEmacs(dialogService, preferencesService));
 
         this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
-        this.statusMessage.bind(BindingsHelper.ifThenElse(this.executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
+        this.statusMessage.bind(BindingsHelper.ifThenElse(
+                this.executable,
+                "",
+                Localization.lang("This operation requires one or more entries to be selected.")));
+    }
+
+    public void registerReconfigurable(Object node) {
+        if (!(node instanceof MenuItem) && !(node instanceof ButtonBase)) {
+            LOGGER.error("Node must be either a MenuItem or a ButtonBase");
+            return;
+        }
+
+        this.reconfigurableControls.add(node);
     }
 
     public void setApplication(PushToApplication application) {
-        this.application.setValue(Objects.requireNonNull(application));
+        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+
+        PushToApplicationPreferences pushPreferences = preferencesService.getPushToApplicationPreferences();
+
+        this.preferencesService.storePushToApplicationPreferences(
+                new PushToApplicationPreferences(
+                        application.getDisplayName(),
+                        pushPreferences.getPushToApplicationCommandPaths(),
+                        pushPreferences.getEmacsArguments(),
+                        pushPreferences.getVimServer()));
+
+        this.application = Objects.requireNonNull(application);
+
+        reconfigurableControls.forEach(object -> {
+            if (object instanceof MenuItem) {
+                factory.configureMenuItem(application.getAction(), this, (MenuItem) object);
+            } else if (object instanceof ButtonBase) {
+                factory.configureIconButton(application.getAction(), this, (ButtonBase) object);
+            }
+        });
     }
 
-    public ReadOnlyObjectProperty<Action> getAction() {
-        return new Action() {
-            @Override
-            public Optional<JabRefIcon> getIcon() {
-                return Optional.of(application.getIcon());
-            }
-
-            @Override
-            public Optional<KeyBinding> getKeyBinding() {
-                return Optional.of(KeyBinding.PUSH_TO_APPLICATION);
-            }
-
-            @Override
-            public String getText() {
-                return Localization.lang("Push entries to external application (%0)", application.getDisplayName());
-            }
-
-            @Override
-            public String getDescription() {
-                return "";
-            }
-        };
+    public PushToApplication getApplication() {
+        return application;
     }
 
     private static String getKeyString(List<BibEntry> entries) {
@@ -102,7 +127,6 @@ public class PushToApplicationCommand extends SimpleCommand {
                     dialogService.showErrorDialogAndWait(
                             application.getDisplayName(),
                             Localization.lang("This operation requires all selected entries to have citation keys defined."));
-
                     return;
                 }
             }

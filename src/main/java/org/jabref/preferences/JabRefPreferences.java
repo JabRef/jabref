@@ -54,6 +54,7 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.DiffMode;
+import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
@@ -110,7 +111,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
-import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
@@ -1738,14 +1738,15 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public PushToApplicationPreferences getPushToApplicationPreferences() {
         Map<String, String> applicationCommands = new HashMap<>();
-        applicationCommands.put(PushToApplicationConstants.EMACS, get(PUSH_EMACS_PATH));
-        applicationCommands.put(PushToApplicationConstants.LYX, get(PUSH_LYXPIPE));
-        applicationCommands.put(PushToApplicationConstants.TEXMAKER, get(PUSH_TEXMAKER_PATH));
-        applicationCommands.put(PushToApplicationConstants.TEXSTUDIO, get(PUSH_TEXSTUDIO_PATH));
-        applicationCommands.put(PushToApplicationConstants.VIM, get(PUSH_VIM));
-        applicationCommands.put(PushToApplicationConstants.WIN_EDT, get(PUSH_WINEDT_PATH));
+        applicationCommands.put(PushToApplications.EMACS, get(PUSH_EMACS_PATH));
+        applicationCommands.put(PushToApplications.LYX, get(PUSH_LYXPIPE));
+        applicationCommands.put(PushToApplications.TEXMAKER, get(PUSH_TEXMAKER_PATH));
+        applicationCommands.put(PushToApplications.TEXSTUDIO, get(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(PushToApplications.VIM, get(PUSH_VIM));
+        applicationCommands.put(PushToApplications.WIN_EDT, get(PUSH_WINEDT_PATH));
 
         return new PushToApplicationPreferences(
+                get(PUSH_TO_APPLICATION),
                 applicationCommands,
                 get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
                 get(PUSH_VIM_SERVER)
@@ -1754,12 +1755,14 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storePushToApplicationPreferences(PushToApplicationPreferences preferences) {
-        put(PUSH_EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.EMACS));
-        put(PUSH_LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.LYX));
-        put(PUSH_TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.TEXMAKER));
-        put(PUSH_TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.TEXSTUDIO));
-        put(PUSH_VIM, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.VIM));
-        put(PUSH_WINEDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplicationConstants.WIN_EDT));
+        put(PUSH_TO_APPLICATION, preferences.getActiveApplicationName());
+
+        put(PUSH_EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplications.EMACS));
+        put(PUSH_LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToApplications.LYX));
+        put(PUSH_TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplications.TEXMAKER));
+        put(PUSH_TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplications.TEXSTUDIO));
+        put(PUSH_VIM, preferences.getPushToApplicationCommandPaths().get(PushToApplications.VIM));
+        put(PUSH_WINEDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToApplications.WIN_EDT));
 
         put(PUSH_EMACS_ADDITIONAL_PARAMETERS, preferences.getEmacsArguments());
         put(PUSH_VIM_SERVER, preferences.getVimServer());
@@ -1770,7 +1773,6 @@ public class JabRefPreferences implements PreferencesService {
         return new ExternalApplicationsPreferences(
                 get(EMAIL_SUBJECT),
                 getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES),
-                get(PUSH_TO_APPLICATION),
                 get(CITE_COMMAND),
                 !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION), // mind the !
                 get(CONSOLE_COMMAND),
@@ -1782,7 +1784,6 @@ public class JabRefPreferences implements PreferencesService {
     public void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences) {
         put(EMAIL_SUBJECT, preferences.getEmailSubject());
         putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, preferences.shouldAutoOpenEmailAttachmentsFolder());
-        put(PUSH_TO_APPLICATION, preferences.getPushToApplicationName());
         put(CITE_COMMAND, preferences.getCiteCommand());
         putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !preferences.useCustomTerminal()); // mind the !
         put(CONSOLE_COMMAND, preferences.getCustomTerminalCommand());

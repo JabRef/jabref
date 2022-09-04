@@ -3,14 +3,20 @@ package org.jabref.preferences;
 import java.util.Map;
 
 public class PushToApplicationPreferences {
+    private String activeApplicationName;
     private Map<String, String> pushToApplicationCommandPaths;
     private String emacsArguments;
     private String vimServer;
 
-    public PushToApplicationPreferences(Map<String, String> pushToApplicationCommandPaths, String emacsArguments, String vimServer) {
+    public PushToApplicationPreferences(String activeApplicationName, Map<String, String> pushToApplicationCommandPaths, String emacsArguments, String vimServer) {
+        this.activeApplicationName = activeApplicationName;
         this.pushToApplicationCommandPaths = pushToApplicationCommandPaths;
         this.emacsArguments = emacsArguments;
         this.vimServer = vimServer;
+    }
+
+    public String getActiveApplicationName() {
+        return activeApplicationName;
     }
 
     public Map<String, String> getPushToApplicationCommandPaths() {

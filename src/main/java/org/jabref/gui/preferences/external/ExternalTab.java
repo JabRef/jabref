@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.external;
 
+import javax.inject.Inject;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -7,10 +9,10 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.push.PushToApplication;
-import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -31,13 +33,11 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     @FXML private TextField customFileBrowserCommand;
     @FXML private Button customFileBrowserBrowse;
 
-    private final PushToApplicationsManager pushToApplicationsManager;
+    @Inject private StateManager stateManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public ExternalTab(PushToApplicationsManager pushToApplicationsManager) {
-        this.pushToApplicationsManager = pushToApplicationsManager;
-
+    public ExternalTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -49,11 +49,11 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     }
 
     public void initialize() {
-        this.viewModel = new ExternalTabViewModel(dialogService, preferencesService, pushToApplicationsManager);
+        this.viewModel = new ExternalTabViewModel(stateManager, dialogService, preferencesService);
 
         new ViewModelListCellFactory<PushToApplication>()
                 .withText(PushToApplication::getDisplayName)
-                .withIcon(PushToApplication::getIcon)
+                .withIcon(PushToApplication::getApplicationIcon)
                 .install(pushToApplicationCombo);
 
         eMailReferenceSubject.textProperty().bindBidirectional(viewModel.eMailReferenceSubjectProperty());

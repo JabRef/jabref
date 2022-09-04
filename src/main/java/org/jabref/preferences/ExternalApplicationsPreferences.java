@@ -4,7 +4,6 @@ public class ExternalApplicationsPreferences {
 
     private final String eMailSubject;
     private final boolean shouldAutoOpenEmailAttachmentsFolder;
-    private final String pushToApplicationName;
     private final String citeCommand;
     private final boolean useCustomTerminal;
     private final String customTerminalCommand;
@@ -13,7 +12,6 @@ public class ExternalApplicationsPreferences {
 
     public ExternalApplicationsPreferences(String eMailSubject,
                                            boolean shouldAutoOpenEmailAttachmentsFolder,
-                                           String pushToApplicationName,
                                            String citeCommand,
                                            boolean useCustomTerminal,
                                            String customTerminalCommand,
@@ -22,7 +20,6 @@ public class ExternalApplicationsPreferences {
 
         this.eMailSubject = eMailSubject;
         this.shouldAutoOpenEmailAttachmentsFolder = shouldAutoOpenEmailAttachmentsFolder;
-        this.pushToApplicationName = pushToApplicationName;
         this.citeCommand = citeCommand;
         this.useCustomTerminal = useCustomTerminal;
         this.customTerminalCommand = customTerminalCommand;
@@ -36,10 +33,6 @@ public class ExternalApplicationsPreferences {
 
     public boolean shouldAutoOpenEmailAttachmentsFolder() {
         return shouldAutoOpenEmailAttachmentsFolder;
-    }
-
-    public String getPushToApplicationName() {
-        return pushToApplicationName;
     }
 
     public String getCiteCommand() {

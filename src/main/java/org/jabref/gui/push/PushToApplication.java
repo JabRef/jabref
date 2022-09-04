@@ -4,6 +4,7 @@ import java.util.List;
 
 import javafx.beans.property.ObjectProperty;
 
+import org.jabref.gui.actions.Action;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -18,7 +19,7 @@ public interface PushToApplication {
 
     String getTooltip();
 
-    JabRefIcon getIcon();
+    JabRefIcon getApplicationIcon();
 
     /**
      * The actual operation. This method will not be called on the event dispatch thread, so it should not do GUI
@@ -38,6 +39,8 @@ public interface PushToApplication {
      * @return true if citation keys are required for this operation.
      */
     boolean requiresCitationKeys();
+
+    Action getAction();
 
     PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences);
 }

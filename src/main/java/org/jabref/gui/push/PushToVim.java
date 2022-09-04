@@ -13,16 +13,15 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PushToVim extends AbstractPushToApplication implements PushToApplication {
+public class PushToVim extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplicationConstants.VIM;
+    public static final String NAME = PushToApplications.VIM;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
@@ -36,7 +35,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public JabRefIcon getIcon() {
+    public JabRefIcon getApplicationIcon() {
         return IconTheme.JabRefIcons.APPLICATION_VIM;
     }
 
