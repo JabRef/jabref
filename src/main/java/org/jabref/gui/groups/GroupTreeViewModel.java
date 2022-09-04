@@ -150,14 +150,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
         } else {
             rootGroup.setValue(null);
         }
-
         currentDatabase = newDatabase;
     }
 
     /**
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
-
     public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
@@ -191,43 +189,28 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return oldGroup.getClass().equals(newGroup.getClass());
     }
 
-    private boolean compareGroupFields(AbstractGroup oldGroup, AbstractGroup newGroup) {
-
+    private boolean checkGroupFieldsForModificationsDialogNecessary(AbstractGroup oldGroup, AbstractGroup newGroup) {
         if (oldGroup instanceof WordKeywordGroup oldWordKeywordGroup && newGroup instanceof WordKeywordGroup newWordKeywordGroup) {
-            if (!oldWordKeywordGroup.getSearchField().getName().equals(newWordKeywordGroup.getSearchField().getName())) {
-                return false;
-            } else if (!oldWordKeywordGroup.getSearchExpression().equals(newWordKeywordGroup.getSearchExpression())) {
-                return false;
-            } else {
-                return oldWordKeywordGroup.isCaseSensitive() == newWordKeywordGroup.isCaseSensitive();
-            }
+            return oldWordKeywordGroup.getSearchField().getName().equals(newWordKeywordGroup.getSearchField().getName())
+                                                                         || oldWordKeywordGroup.getSearchExpression().equals(newWordKeywordGroup.getSearchExpression())
+                                                                         || (oldWordKeywordGroup.isCaseSensitive() == newWordKeywordGroup.isCaseSensitive());
 
         } else if (oldGroup instanceof RegexKeywordGroup oldRegexKeywordGroup && newGroup instanceof RegexKeywordGroup newRegexKeywordGroup) {
+            return oldRegexKeywordGroup.getSearchField().getName().equals(newRegexKeywordGroup.getSearchField().getName())
+                   || oldRegexKeywordGroup.getSearchExpression().equals(newRegexKeywordGroup.getSearchExpression())
+                   ||  (oldRegexKeywordGroup.isCaseSensitive() == newRegexKeywordGroup.isCaseSensitive());
 
-            if (!oldRegexKeywordGroup.getSearchField().getName().equals(newRegexKeywordGroup.getSearchField().getName())) {
-                return false;
-            } else if (!oldRegexKeywordGroup.getSearchExpression().equals(newRegexKeywordGroup.getSearchExpression())) {
-                return false;
-            } else {
-                return oldRegexKeywordGroup.isCaseSensitive() == newRegexKeywordGroup.isCaseSensitive();
-            }
         } else if ((oldGroup instanceof SearchGroup oldSearchGroup) && newGroup instanceof SearchGroup newSearchGroup) {
-            if (!oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression())) {
-                return false;
-            } else {
-                return oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags());
-            }
-        } else if (oldGroup.getClass() == ExplicitGroup.class) {
-            return true;
-        } else if (oldGroup instanceof AutomaticKeywordGroup oldAutomaticKeywordGroup && newGroup instanceof AutomaticKeywordGroup newAutomaticKeywordGroup) {
+            return oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression()) ||
+                oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags());
 
-            if (!oldAutomaticKeywordGroup.getKeywordDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordDelimiter().toString())) {
-                return false;
-            } else if (!oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())) {
-                return false;
-            } else {
-                return oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName());
-            }
+        } else if (oldGroup.getClass() == ExplicitGroup.class) {
+            return true; //TOOD unsure
+        } else if (oldGroup instanceof AutomaticKeywordGroup oldAutomaticKeywordGroup && newGroup instanceof AutomaticKeywordGroup newAutomaticKeywordGroup) {
+            return oldAutomaticKeywordGroup.getKeywordDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordDelimiter().toString()) ||
+                oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())
+                || oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName());
+
         } else if (oldGroup instanceof AutomaticPersonsGroup oldAutomaticPersonsGroup && newGroup instanceof AutomaticPersonsGroup newAutomaticPersonsGroup) {
             return oldAutomaticPersonsGroup.getField().getName().equals(newAutomaticPersonsGroup.getField().getName());
         } else if (oldGroup instanceof TexGroup oldTexGroup && newGroup instanceof TexGroup newTexGroup) {
@@ -235,7 +218,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
         return true;
     }
-
     /**
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
@@ -249,7 +231,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                                                                                          GroupDialogHeader.SUBGROUP));
 
             newGroup.ifPresent(group -> {
-                if (this.compareGroupType(oldGroup.getGroupNode().getGroup(), group) && this.compareGroupFields(oldGroup.getGroupNode().getGroup(), group)) {
+                if (this.compareGroupType(oldGroup.getGroupNode().getGroup(), group) && this.checkGroupFieldsForModificationsDialogNecessary(oldGroup.getGroupNode().getGroup(), group)) {
                     oldGroup.getGroupNode().setGroup(
                          group,
                          true,
@@ -292,16 +274,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES)) {
                     oldGroup.getGroupNode().setGroup(
-                                                     group,
-                                                     true,
-                                                     removePreviousAssignments,
-                                                     database.getEntries());
+                                 group,
+                                 true,
+                                 removePreviousAssignments,
+                                 database.getEntries());
                 } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.NO)) {
                     oldGroup.getGroupNode().setGroup(
-                                                     group,
-                                                     false,
-                                                     removePreviousAssignments,
-                                                     database.getEntries());
+                                 group,
+                                 false,
+                                 removePreviousAssignments,
+                                 database.getEntries());
                 } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE)) {
                     return;
                 }
