@@ -48,6 +48,7 @@ class GroupNodeViewModelTest {
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 false,
                 true,
+                false,
                 true,
                 true,
                 new SimpleObjectProperty<>(',')

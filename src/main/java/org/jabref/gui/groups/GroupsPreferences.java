@@ -18,6 +18,7 @@ public class GroupsPreferences {
 
     public GroupsPreferences(boolean viewModeIntersection,
                              boolean viewModeFilter,
+                             boolean viewModeInvert,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
                              ObjectProperty<Character> keywordSeparator) {
@@ -28,6 +29,9 @@ public class GroupsPreferences {
         }
         if (viewModeFilter) {
             this.groupViewMode.add(GroupViewMode.FILTER);
+        }
+        if (viewModeInvert) {
+            this.groupViewMode.add(GroupViewMode.INVERT);
         }
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);

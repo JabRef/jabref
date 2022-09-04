@@ -20,6 +20,7 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
     private final DialogService dialogService;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
     private final ToggleButton filterToggle = IconTheme.JabRefIcons.FILTER.asToggleButton();
+    private final ToggleButton invertToggle = IconTheme.JabRefIcons.INVERT.asToggleButton();
 
     public GroupsSidePaneComponent(SimpleCommand closeCommand,
                                    SimpleCommand moveUpCommand,
@@ -30,8 +31,9 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
         super(SidePaneType.GROUPS, closeCommand, moveUpCommand, moveDownCommand, contentFactory);
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
-        setupIntersectionUnionToggle();
+        setupInvertToggle();
         setupFilterToggle();
+        setupIntersectionUnionToggle();
 
         groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
             GroupModeViewModel modeViewModel = new GroupModeViewModel(groupsPreferences.groupViewModeProperty());
@@ -50,6 +52,13 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
         filterToggle.setSelected(groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
         filterToggle.selectedProperty().addListener((observable, oldValue, newValue) -> groupsPreferences.setGroupViewMode(GroupViewMode.FILTER, newValue));
         filterToggle.setTooltip(new Tooltip(Localization.lang("Filter by groups")));
+    }
+
+    private void setupInvertToggle() {
+        addExtraNodeToHeader(invertToggle, 0);
+        invertToggle.setSelected(groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INVERT));
+        invertToggle.selectedProperty().addListener((observable, oldValue, newValue) -> groupsPreferences.setGroupViewMode(GroupViewMode.INVERT, newValue));
+        invertToggle.setTooltip(new Tooltip(Localization.lang("Invert groups")));
     }
 
     private class ToggleUnionIntersectionAction extends SimpleCommand {

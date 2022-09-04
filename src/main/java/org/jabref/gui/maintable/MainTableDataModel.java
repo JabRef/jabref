@@ -104,7 +104,7 @@ public class MainTableDataModel {
             return true;
         }
         return createGroupMatcher(groups, groupsPreferences)
-                .map(matcher -> matcher.isMatch(entry.getEntry()))
+                .map(matcher -> preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^ matcher.isMatch(entry.getEntry()))
                 .orElse(true);
     }
 

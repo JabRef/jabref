@@ -151,7 +151,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     return Boolean.valueOf(false);
                                 }
                                 MainTableDataModel.updateSearchGroups(stateManager, database);
-                                return Boolean.valueOf(!MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences()).map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true));
+                                return Boolean.valueOf(preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^ !MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences()).map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true));
                             });
                     return matchesGroup;
                 })

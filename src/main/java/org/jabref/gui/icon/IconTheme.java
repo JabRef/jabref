@@ -282,6 +282,7 @@ public class IconTheme {
         REG_EX(MaterialDesignR.REGEX),
         FULLTEXT(MaterialDesignF.FILE_EYE),
         FILTER(MaterialDesignF.FILTER),
+        INVERT(MaterialDesignI.INVERT_COLORS),
         SORT_BY_SCORE(MaterialDesignS.SORT_VARIANT),
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),
