@@ -3,6 +3,7 @@ package org.jabref.gui.slr;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.when;
 class ManageStudyDefinitionViewModelTest {
     private ImportFormatPreferences importFormatPreferences;
     private ImporterPreferences importerPreferences;
+    private DialogService dialogService;
 
     @BeforeEach
     void setUp() {
@@ -29,11 +31,12 @@ class ManageStudyDefinitionViewModelTest {
         importerPreferences = mock(ImporterPreferences.class);
         FieldContentFormatterPreferences fieldContentFormatterPreferences = mock(FieldContentFormatterPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
+        dialogService = mock(DialogService.class);
     }
 
     @Test
     public void emptyStudyConstructorFillsDatabasesCorrectly() {
-        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences);
+        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, dialogService);
         assertEquals(List.of(
                 new StudyDatabaseItem("ACM Portal", true),
                 new StudyDatabaseItem("ArXiv", false),
@@ -72,7 +75,8 @@ class ManageStudyDefinitionViewModelTest {
                 study,
                 tempDir,
                 importFormatPreferences,
-                importerPreferences);
+                importerPreferences,
+                dialogService);
         assertEquals(List.of(
                 new StudyDatabaseItem("ACM Portal", true),
                 new StudyDatabaseItem("ArXiv", false),

@@ -46,10 +46,10 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     public void operationCompleted() {
         if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
-                    Localization.lang("verify that LyX is running and that the lyxpipe is valid")
-                            + ". [" + commandPath + "]");
+                    Localization.lang("Verify that LyX is running and that the lyxpipe is valid.")
+                            + "[" + commandPath + "]");
         } else if (couldNotCall) {
-            dialogService.showErrorDialogAndWait(Localization.lang("unable to write to") + " " + commandPath + ".in");
+            dialogService.showErrorDialogAndWait(Localization.lang("Unable to write to %0.", commandPath + ".in"));
         } else {
             super.operationCompleted();
         }

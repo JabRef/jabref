@@ -13,6 +13,7 @@ import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
@@ -30,6 +31,11 @@ public class ActionHelper {
 
     public static BooleanExpression needsSharedDatabase(StateManager stateManager) {
         EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getLocation() == DatabaseLocation.SHARED).isPresent());
+        return BooleanExpression.booleanExpression(binding);
+    }
+
+    public static BooleanExpression needsStudyDatabase(StateManager stateManager) {
+        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(BibDatabaseContext::isStudy).isPresent());
         return BooleanExpression.booleanExpression(binding);
     }
 
