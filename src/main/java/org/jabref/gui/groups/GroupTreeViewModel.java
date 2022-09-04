@@ -266,6 +266,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     GroupDialogHeader.SUBGROUP));
 
             newGroup.ifPresent(group -> {
+
+                if(this.compareGroupType(oldGroup.getGroupNode().getGroup(), group) && this.compareGroupFields(oldGroup.getGroupNode().getGroup(), group)) {
+                    return ;
+                }
+
                 // TODO: Keep assignments
                 String content = Localization.lang("Assign the original group's entries to this group?");
                 ButtonType keepAssignments = new ButtonType(Localization.lang("Assign"), ButtonBar.ButtonData.YES);
