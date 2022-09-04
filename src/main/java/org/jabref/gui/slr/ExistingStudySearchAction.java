@@ -160,6 +160,5 @@ public class ExistingStudySearchAction extends SimpleCommand {
         // We hard close the tab
         // Future work: Properly close the tab (with saving, ...)
         frame.closeCurrentTab();
-
     }
 }
