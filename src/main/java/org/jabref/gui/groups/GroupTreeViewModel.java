@@ -192,6 +192,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /**
      * Check if it is necessary to show a group modified, reassign entry dialog <br>
      * Although group name change is relevant, we silently take it as a rename and do not bother the user
+     *
      * @param oldGroup Original Group
      * @param newGroup Edited group
      * @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
