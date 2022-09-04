@@ -41,7 +41,7 @@ public class EditExistingStudyAction extends SimpleCommand {
         // The saving is ensured at creation of a study library
         // Thus, this check is only existing to check this assumption
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-            LOGGER.error("Database path is not available");
+            LOGGER.error("Library path is not available");
             return;
         }
 
