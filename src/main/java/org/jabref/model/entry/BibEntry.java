@@ -1002,22 +1002,34 @@ public class BibEntry implements Cloneable {
         return new Observable[] {fields, type};
     }
 
-    public void addLinkedFile(BibEntry entry, LinkedFile linkedFile, LinkedFile newLinkedFile, List<LinkedFile> linkedFiles) {
+    /**
+     * Helper method to add a downloaded file to the entry.
+     * <p>
+     * Use-case: URL is contained in the file, the file is downloaded and should then replace the url.
+     * This method. adds the given path (as file) to the entry and removes the url.
+     *
+     * @param linkToDownloadedFile the link to the file, which was downloaded
+     * @param downloadedFile the path to be added to the entry
+     */
+    public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
+        List<LinkedFile> linkedFiles = this.getFiles();
+
         int oldFileIndex = -1;
         int i = 0;
         while ((i < linkedFiles.size()) && (oldFileIndex == -1)) {
             LinkedFile file = linkedFiles.get(i);
             // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
-            if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
+            if (file.getLink().equalsIgnoreCase(linkToDownloadedFile)) {
                 oldFileIndex = i;
             }
             i++;
         }
         if (oldFileIndex == -1) {
-            linkedFiles.add(0, newLinkedFile);
+            linkedFiles.add(0, downloadedFile);
         } else {
-            linkedFiles.set(oldFileIndex, newLinkedFile);
+            linkedFiles.set(oldFileIndex, downloadedFile);
         }
-        entry.setFiles(linkedFiles);
+
+        this.setFiles(linkedFiles);
     }
 }

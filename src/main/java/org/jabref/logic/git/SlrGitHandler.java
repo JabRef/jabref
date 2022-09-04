@@ -12,6 +12,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.jabref.logic.crawler.StudyRepository;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -101,7 +103,7 @@ public class SlrGitHandler extends GitHandler {
             if (currentToken.startsWith("diff --git a/")) {
                 // If the diff is related to a different file, save the diff for the previous file
                 if (!(Objects.isNull(relativePath) || Objects.isNull(joiner))) {
-                    if (!relativePath.contains("study.yml")) {
+                    if (!relativePath.contains(StudyRepository.STUDY_DEFINITION_FILE_NAME)) {
                         diffsPerFile.put(Path.of(repositoryPath.toString(), relativePath), joiner.toString());
                     }
                 }
