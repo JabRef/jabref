@@ -17,7 +17,7 @@ From the user perspective, the combination of the pull request needs to be teste
 
 
 
-## [Unreleased] - version 5.7 - not yet released
+## [Unreleased] - version 5.8 - not yet released
 
 ### Added
 
@@ -904,8 +904,7 @@ The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
 [version6]: https://github.com/JabRef/jabref/compare/main...version6
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.6...HEAD
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.7...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.8...HEAD
 [5.7]: https://github.com/JabRef/jabref/compare/v5.6...v5.7
 [5.6]: https://github.com/JabRef/jabref/compare/v5.5...v5.6
 [5.5]: https://github.com/JabRef/jabref/compare/v5.4...v5.5
