@@ -1,7 +1,7 @@
 package org.jabref.gui.slr;
 
 import java.nio.file.Path;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 
@@ -50,8 +50,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TextField addResearchQuestion;
     @FXML private TextField addQuery;
     @FXML private TextField studyDirectory;
+    @FXML private Button selectStudyDirectory;
 
-    @FXML private ButtonType saveButtonType;
+    @FXML private ButtonType saveSurveyButtonType;
     @FXML private Label helpIcon;
 
     @FXML private TableView<String> authorTableView;
@@ -75,42 +76,70 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @Inject private ThemeManager themeManager;
 
     private ManageStudyDefinitionViewModel viewModel;
-    private final Study study;
 
-    private final Path workingDirectory;
+    // not present if new study is created;
+    // present if existing study is edited
+    private final Optional<Study> study;
+
+    // Either the proposed directory (on new study creation)
+    // or the "real" directory of the study
+    private final Path pathToStudyDataDirectory;
 
     /**
-     * This can be used to either create new study objects or edit existing ones.
+     * This is used to create a new study
      *
-     * @param study          null if a new study is created. Otherwise, the study object to edit.
-     * @param studyDirectory the directory where the study to edit is located (null if a new study is created)
+     * @param pathToStudyDataDirectory This directory is proposed in the file chooser
      */
-    public ManageStudyDefinitionView(Study study, Path studyDirectory, Path workingDirectory) {
-        // If an existing study is edited, open the directory dialog at the directory the study is stored
-        this.workingDirectory = Objects.isNull(studyDirectory) ? workingDirectory : studyDirectory;
-        this.setTitle(Objects.isNull(studyDirectory) ? Localization.lang("Define study parameters") : Localization.lang("Manage study definition"));
-        this.study = study;
+    public ManageStudyDefinitionView(Path pathToStudyDataDirectory) {
+        this.pathToStudyDataDirectory = pathToStudyDataDirectory;
+        this.setTitle("Define study parameters");
+        this.study = Optional.empty();
 
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
-        setupSaveButton();
+        setupSaveSurveyButton(false);
 
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
-    private void setupSaveButton() {
-        Button saveButton = ((Button) this.getDialogPane().lookupButton(saveButtonType));
+    /**
+     * This is used to edit an existing study.
+     *
+     * @param study          the study to edit
+     * @param studyDirectory the directory of the study
+     */
+    public ManageStudyDefinitionView(Study study, Path studyDirectory) {
+        this.pathToStudyDataDirectory = studyDirectory;
+        this.setTitle(Localization.lang("Manage study definition"));
+        this.study = Optional.of(study);
 
-        saveButton.disableProperty().bind(Bindings.or(Bindings.or(
-                Bindings.or(
-                        Bindings.or(Bindings.isEmpty(viewModel.getQueries()), Bindings.isEmpty(viewModel.getDatabases())),
-                        Bindings.isEmpty(viewModel.getAuthors())),
-                viewModel.getTitle().isEmpty()), viewModel.getDirectory().isEmpty()));
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
+
+        setupSaveSurveyButton(true);
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
+    }
+
+    private void setupSaveSurveyButton(boolean isEdit) {
+        Button saveSurveyButton = ((Button) this.getDialogPane().lookupButton(saveSurveyButtonType));
+
+        if (!isEdit) {
+            saveSurveyButton.setText(Localization.lang("Start survey"));
+        }
+
+        saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
+                                Bindings.isEmpty(viewModel.getQueries()),
+                                Bindings.isEmpty(viewModel.getDatabases())),
+                                Bindings.isEmpty(viewModel.getAuthors())),
+                                viewModel.getTitle().isEmpty()),
+                                viewModel.getDirectory().isEmpty()));
 
         setResultConverter(button -> {
-            if (button == saveButtonType) {
+            if (button == saveSurveyButtonType) {
                 return viewModel.saveStudy();
             }
             // Cancel button will return null
@@ -120,13 +149,22 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     @FXML
     private void initialize() {
-        if (Objects.isNull(study)) {
+        if (study.isEmpty()) {
             viewModel = new ManageStudyDefinitionViewModel(
                     prefs.getImportFormatPreferences(),
-                    prefs.getImporterPreferences());
+                    prefs.getImporterPreferences(),
+                    dialogService);
         } else {
-            LOGGER.error("Not yet implemented");
-            return;
+            viewModel = new ManageStudyDefinitionViewModel(
+                    study.get(),
+                    pathToStudyDataDirectory,
+                    prefs.getImportFormatPreferences(),
+                    prefs.getImporterPreferences(),
+                    dialogService);
+
+            // The directory of the study cannot be changed
+            studyDirectory.setEditable(false);
+            selectStudyDirectory.setDisable(true);
         }
 
         // Listen whether any databases are removed from selection -> Add back to the database selector
@@ -238,7 +276,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML
     public void selectStudyDirectory() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(workingDirectory)
+                .withInitialDirectory(pathToStudyDataDirectory)
                 .build();
 
         viewModel.setStudyDirectory(dialogService.showDirectorySelectionDialog(directoryDialogConfiguration));
