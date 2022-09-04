@@ -67,7 +67,6 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
             dialogService.showErrorDialogAndWait(Localization.lang("Must not be empty!"));
             return;
         }
-
         studyDirectory = studyAndDirectory.get().getStudyDirectory();
 
         // set variable for #setupRepository

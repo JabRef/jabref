@@ -19,8 +19,6 @@ import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
-import org.jabref.logic.cleanup.CleanupPreferences;
-import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -102,11 +100,9 @@ public interface PreferencesService {
 
     void clearBibEntryTypes(BibDatabaseMode mode);
 
-    CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository repository);
+    CleanupPreferences getCleanupPreferences();
 
-    CleanupPreset getCleanupPreset();
-
-    void setCleanupPreset(CleanupPreset cleanupPreset);
+    CleanupPreferences getDefaultCleanupPreset();
 
     @Deprecated
     String getDefaultsDefaultCitationKeyPattern();
@@ -221,7 +217,7 @@ public interface PreferencesService {
 
     FileLinkPreferences getFileLinkPreferences();
 
-    void storeFileDirforDatabase(List<Path> dirs);
+    void storeFileDirForDatabase(List<Path> dirs);
 
     //*************************************************************************************************************
     // Import/Export preferences

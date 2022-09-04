@@ -2,7 +2,6 @@ package org.jabref.gui.slr;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Objects;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
