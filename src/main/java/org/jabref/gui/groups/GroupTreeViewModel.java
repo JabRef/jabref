@@ -193,10 +193,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     private boolean compareGroupFields(AbstractGroup oldGroup, AbstractGroup newGroup) {
-        if (oldGroup.getClass() == WordKeywordGroup.class) {
-            WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;
-            WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;
 
+        if (oldGroup instanceof WordKeywordGroup oldWordKeywordGroup && newGroup instanceof WordKeywordGroup newWordKeywordGroup) {
             if (!oldWordKeywordGroup.getSearchField().getName().equals(newWordKeywordGroup.getSearchField().getName())) {
                 return false;
             } else if (!oldWordKeywordGroup.getSearchExpression().equals(newWordKeywordGroup.getSearchExpression())) {
@@ -204,6 +202,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             } else {
                 return oldWordKeywordGroup.isCaseSensitive() == newWordKeywordGroup.isCaseSensitive();
             }
+
         } else if (oldGroup.getClass() == RegexKeywordGroup.class) {
             RegexKeywordGroup oldRegexKeywordGroup = (RegexKeywordGroup) oldGroup;
             RegexKeywordGroup newRegexKeywordGroup = (RegexKeywordGroup) newGroup;
@@ -280,7 +279,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     return ;
                 }
 
-                // TODO: Keep assignments
                 String content = Localization.lang("Assign the original group's entries to this group?");
                 ButtonType keepAssignments = new ButtonType(Localization.lang("Assign"), ButtonBar.ButtonData.YES);
                 ButtonType removeAssignments = new ButtonType(Localization.lang("Do not assign"), ButtonBar.ButtonData.NO);
