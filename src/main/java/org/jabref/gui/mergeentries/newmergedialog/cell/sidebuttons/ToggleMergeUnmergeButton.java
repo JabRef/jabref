@@ -72,7 +72,6 @@ public class ToggleMergeUnmergeButton extends Button {
     }
 
     private class ToggleMergeCommand extends SimpleCommand {
-
         private final Action mergeAction = new Action() {
             @Override
             public Optional<JabRefIcon> getIcon() {
