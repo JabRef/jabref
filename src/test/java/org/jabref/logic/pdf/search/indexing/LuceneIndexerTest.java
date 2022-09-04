@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,15 +26,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PdfIndexerTest {
+public class LuceneIndexerTest {
 
-    private PdfIndexer indexer;
+    private LuceneIndexer indexer;
     private BibDatabase database;
     private BibDatabaseContext context = mock(BibDatabaseContext.class);
 
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
+        when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
         this.database = new BibDatabase();
 
         this.context = mock(BibDatabaseContext.class);
@@ -42,7 +44,7 @@ public class PdfIndexerTest {
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
-        this.indexer = PdfIndexer.of(context, filePreferences);
+        this.indexer = LuceneIndexer.of(context, filePreferences);
     }
 
     @Test
@@ -54,11 +56,14 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
+            assertEquals(34, reader.numDocs());
         }
     }
 
@@ -71,11 +76,14 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(0, reader.numDocs());
+            assertEquals(1, reader.numDocs());
         }
     }
 
@@ -88,11 +96,14 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(0, reader.numDocs());
+            assertEquals(1, reader.numDocs());
         }
     }
 
@@ -106,11 +117,14 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
+            assertEquals(34, reader.numDocs());
         }
     }
 
@@ -124,11 +138,14 @@ public class PdfIndexerTest {
 
         // when
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
+        }
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(1, reader.numDocs());
+            assertEquals(2, reader.numDocs());
         }
     }
 
@@ -141,10 +158,13 @@ public class PdfIndexerTest {
         database.insertEntry(entry);
 
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
+        }
         // index actually exists
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
+            assertEquals(34, reader.numDocs());
         }
 
         // when
@@ -164,11 +184,14 @@ public class PdfIndexerTest {
         exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(exampleThesis);
         indexer.createIndex();
-        indexer.addToIndex(context);
+        for (BibEntry bibEntry : context.getEntries()) {
+            indexer.addBibFieldsToIndex(bibEntry);
+            indexer.addLinkedFilesToIndex(bibEntry);
+        }
 
         // index with first entry
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(33, reader.numDocs());
+            assertEquals(34, reader.numDocs());
         }
 
         BibEntry metadata = new BibEntry(StandardEntryType.Article);
@@ -176,11 +199,12 @@ public class PdfIndexerTest {
         metadata.setFiles(Collections.singletonList(new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
 
         // when
-        indexer.addToIndex(metadata, null);
+        indexer.addBibFieldsToIndex(metadata);
+        indexer.addLinkedFilesToIndex(metadata);
 
         // then
         try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
-            assertEquals(34, reader.numDocs());
+            assertEquals(36, reader.numDocs());
         }
     }
 }

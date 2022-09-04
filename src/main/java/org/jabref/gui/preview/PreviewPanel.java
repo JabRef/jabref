@@ -24,8 +24,8 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -59,7 +59,7 @@ public class PreviewPanel extends VBox {
         this.stateManager = stateManager;
         this.previewPreferences = preferences.getPreviewPreferences();
         this.indexingTaskManager = indexingTaskManager;
-        this.fileLinker = new ExternalFilesEntryLinker(preferences.getFilePreferences(), database);
+        this.fileLinker = new ExternalFilesEntryLinker(preferences, preferences.getFilePreferences(), database);
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         previewView = new PreviewViewer(database, dialogService, stateManager, themeManager);

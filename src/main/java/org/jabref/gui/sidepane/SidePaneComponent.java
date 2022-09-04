@@ -68,7 +68,7 @@ public class SidePaneComponent extends BorderPane {
         return headerView;
     }
 
-    protected void addExtraButtonToHeader(Button button, int position) {
+    protected void addExtraNodeToHeader(Node button, int position) {
         this.buttonContainer.getChildren().add(position, button);
     }
 }

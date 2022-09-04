@@ -36,12 +36,12 @@ public class SearchResultsTableDataModel {
         ObservableList<BibEntryTableViewModel> entriesViewModel = FXCollections.observableArrayList();
         for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
             ObservableList<BibEntry> entriesForDb = context.getDatabase().getEntries();
-            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter));
+            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter, stateManager));
             entriesViewModel.addAll(viewModelForDb);
         }
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
-        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQueryProperty(), (query) -> entry -> isMatchedBySearch(query, entry)));
+        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQueryProperty(), (query) -> entry -> stateManager.getSearchResults().containsKey(entry.getEntry())));
 
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);

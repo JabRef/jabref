@@ -78,8 +78,9 @@ public class ImportHandler {
         this.dialogService = dialogService;
         this.importFormatReader = importFormatReader;
 
-        this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database);
-        this.contentImporter = new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences());
+        this.linker = new ExternalFilesEntryLinker(preferencesService, preferencesService.getFilePreferences(), database);
+        this.contentImporter = new ExternalFilesContentImporter(
+                preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 
@@ -185,7 +186,7 @@ public class ImportHandler {
         }
 
         // Add to group
-        addToGroups(entries, stateManager.getSelectedGroup(bibDatabaseContext));
+        addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -224,7 +225,7 @@ public class ImportHandler {
                                        preferencesService.getOwnerPreferences(),
                                        preferencesService.getTimestampPreferences());
 
-        addToGroups(List.of(entry), stateManager.getSelectedGroup(this.bibDatabaseContext));
+        addToGroups(List.of(entry), stateManager.getSelectedGroups(this.bibDatabaseContext));
     }
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {

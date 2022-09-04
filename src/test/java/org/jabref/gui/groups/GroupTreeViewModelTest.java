@@ -40,7 +40,9 @@ class GroupTreeViewModelTest {
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
-                GroupViewMode.UNION,
+                false,
+                true,
+                false,
                 true,
                 true,
                 new SimpleObjectProperty<>(',')
@@ -56,7 +58,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void rootGroupIsSelectedByDefault() {
-        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroup(databaseContext).get(0));
+        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroups(databaseContext).get(0));
     }
 
     @Test

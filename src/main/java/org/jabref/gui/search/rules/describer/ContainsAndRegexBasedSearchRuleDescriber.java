@@ -40,18 +40,8 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
             }
         }
 
-        textList.add(getCaseSensitiveDescription());
-
         TextFlow searchDescription = new TextFlow();
         searchDescription.getChildren().setAll(textList);
         return searchDescription;
-    }
-
-    private Text getCaseSensitiveDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-            return TooltipTextUtil.createText(String.format(" (%s). ", Localization.lang("case sensitive")), TooltipTextUtil.TextType.NORMAL);
-        } else {
-            return TooltipTextUtil.createText(String.format(" (%s). ", Localization.lang("case insensitive")), TooltipTextUtil.TextType.NORMAL);
-        }
     }
 }

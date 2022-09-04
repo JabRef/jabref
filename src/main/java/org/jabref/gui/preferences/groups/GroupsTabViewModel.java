@@ -28,15 +28,12 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        switch (groupsPreferences.getGroupViewMode()) {
-            case INTERSECTION -> {
-                groupViewModeIntersectionProperty.setValue(true);
-                groupViewModeUnionProperty.setValue(false);
-            }
-            case UNION -> {
-                groupViewModeIntersectionProperty.setValue(false);
-                groupViewModeUnionProperty.setValue(true);
-            }
+        if (groupsPreferences.getGroupViewMode().contains(GroupViewMode.INTERSECTION)) {
+            groupViewModeIntersectionProperty.setValue(true);
+            groupViewModeUnionProperty.setValue(false);
+        } else {
+            groupViewModeIntersectionProperty.setValue(false);
+            groupViewModeUnionProperty.setValue(true);
         }
         autoAssignGroupProperty.setValue(groupsPreferences.shouldAutoAssignGroup());
         displayGroupCountProperty.setValue(groupsPreferences.shouldDisplayGroupCount());
@@ -45,7 +42,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        groupsPreferences.setGroupViewMode(groupViewModeIntersectionProperty.getValue() ? GroupViewMode.INTERSECTION : GroupViewMode.UNION);
+        groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION, groupViewModeIntersectionProperty.getValue());
         groupsPreferences.setAutoAssignGroup(autoAssignGroupProperty.getValue());
         groupsPreferences.setDisplayGroupCount(displayGroupCountProperty.getValue());
         groupsPreferences.keywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue().charAt(0));

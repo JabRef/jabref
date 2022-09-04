@@ -11,13 +11,14 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.search.indexing.IndexingTaskManager;
+import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +27,14 @@ public class ExternalFilesEntryLinker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFilesEntryLinker.class);
 
+    private final PreferencesService preferencesService;
     private final FilePreferences filePreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final MoveFilesCleanup moveFilesCleanup;
     private final RenamePdfCleanup renameFilesCleanup;
 
-    public ExternalFilesEntryLinker(FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext) {
+    public ExternalFilesEntryLinker(PreferencesService preferencesService, FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext) {
+        this.preferencesService = preferencesService;
         this.filePreferences = filePreferences;
         this.bibDatabaseContext = bibDatabaseContext;
         this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
@@ -79,7 +82,7 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, filePreferences), entry, bibDatabaseContext);
+            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, filePreferences), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }
@@ -97,7 +100,7 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, filePreferences), entry, bibDatabaseContext);
+            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, filePreferences), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }

@@ -1,8 +1,13 @@
 package org.jabref.model.groups;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 
+import org.jabref.logic.search.retrieval.LuceneSearcher;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
@@ -17,6 +22,7 @@ import org.slf4j.LoggerFactory;
 public class SearchGroup extends AbstractGroup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
+    private Set<BibEntry> matches = Set.of();
     private final GroupSearchQuery query;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
@@ -45,7 +51,7 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
-        return query.isMatch(entry);
+        return matches.contains(entry);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
@@ -78,5 +84,13 @@ public class SearchGroup extends AbstractGroup {
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
+    }
+
+    public void updateMatches(BibDatabaseContext context) {
+        try {
+            this.matches = LuceneSearcher.of(context).search(query).keySet();
+        } catch (IOException e) {
+            LOGGER.warn("Could not open Index for: '{}'!\n{}", context.getDatabasePath().orElse(Path.of("unsaved")).toAbsolutePath(), e.getMessage());
+        }
     }
 }

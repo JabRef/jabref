@@ -9,9 +9,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +26,18 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GetCurrentLibraryTab currentLibraryTab;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
     private final FilePreferences filePreferences;
 
     private BibDatabaseContext databaseContext;
 
     private boolean shouldContinue = true;
 
-    public RebuildFulltextSearchIndexAction(StateManager stateManager, GetCurrentLibraryTab currentLibraryTab, DialogService dialogService, FilePreferences filePreferences) {
+    public RebuildFulltextSearchIndexAction(StateManager stateManager, GetCurrentLibraryTab currentLibraryTab, DialogService dialogService, PreferencesService preferences, FilePreferences filePreferences) {
         this.stateManager = stateManager;
         this.currentLibraryTab = currentLibraryTab;
         this.dialogService = dialogService;
+        this.preferencesService = preferences;
         this.filePreferences = filePreferences;
 
         this.executable.bind(needsDatabase(stateManager));
@@ -68,8 +71,8 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             return;
         }
         try {
-            currentLibraryTab.get().getIndexingTaskManager().createIndex(PdfIndexer.of(databaseContext, filePreferences));
-            currentLibraryTab.get().getIndexingTaskManager().updateIndex(PdfIndexer.of(databaseContext, filePreferences), databaseContext);
+            currentLibraryTab.get().getIndexingTaskManager().createIndex(LuceneIndexer.of(databaseContext, preferencesService, filePreferences));
+            currentLibraryTab.get().getIndexingTaskManager().updateIndex(LuceneIndexer.of(databaseContext, preferencesService, filePreferences));
         } catch (IOException e) {
             dialogService.notify(Localization.lang("Failed to access fulltext search index"));
             LOGGER.error("Failed to access fulltext search index", e);

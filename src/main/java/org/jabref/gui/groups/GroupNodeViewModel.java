@@ -254,7 +254,7 @@ public class GroupNodeViewModel {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             updateMatchedEntries(); // Update the entries matched by the group
             // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
-            ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
+            ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroups(this.databaseContext);
             if (selectedGroups.remove(this.groupNode)) {
                 selectedGroups.add(this.groupNode);
             }

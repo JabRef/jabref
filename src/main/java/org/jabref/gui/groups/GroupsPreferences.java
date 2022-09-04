@@ -1,38 +1,60 @@
 package org.jabref.gui.groups;
 
+import java.util.EnumSet;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleSetProperty;
+import javafx.collections.FXCollections;
 
 public class GroupsPreferences {
 
-    private final ObjectProperty<GroupViewMode> groupViewMode;
+    private final SetProperty<GroupViewMode> groupViewMode;
     private final BooleanProperty shouldAutoAssignGroup;
     private final BooleanProperty shouldDisplayGroupCount;
     private final ObjectProperty<Character> keywordSeparator;
 
-    public GroupsPreferences(GroupViewMode groupViewMode,
+    public GroupsPreferences(boolean viewModeIntersection,
+                             boolean viewModeFilter,
+                             boolean viewModeInvert,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
                              ObjectProperty<Character> keywordSeparator) {
 
-        this.groupViewMode = new SimpleObjectProperty<>(groupViewMode);
+        this.groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());
+        if (viewModeIntersection) {
+            this.groupViewMode.add(GroupViewMode.INTERSECTION);
+        }
+        if (viewModeFilter) {
+            this.groupViewMode.add(GroupViewMode.FILTER);
+        }
+        if (viewModeInvert) {
+            this.groupViewMode.add(GroupViewMode.INVERT);
+        }
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
         this.keywordSeparator = keywordSeparator;
     }
 
-    public GroupViewMode getGroupViewMode() {
-        return groupViewMode.getValue();
+    public EnumSet<GroupViewMode> getGroupViewMode() {
+        if (groupViewMode.isEmpty()) {
+            return EnumSet.noneOf(GroupViewMode.class);
+        }
+        return EnumSet.copyOf(groupViewMode);
     }
 
-    public ObjectProperty<GroupViewMode> groupViewModeProperty() {
+    public SetProperty<GroupViewMode> groupViewModeProperty() {
         return groupViewMode;
     }
 
-    public void setGroupViewMode(GroupViewMode groupViewMode) {
-        this.groupViewMode.set(groupViewMode);
+    public void setGroupViewMode(GroupViewMode mode, boolean value) {
+        if (groupViewMode.contains(mode) && !value) {
+            groupViewMode.remove(mode);
+        } else if (!groupViewMode.contains(mode) && value) {
+            groupViewMode.add(mode);
+        }
     }
 
     public boolean shouldAutoAssignGroup() {

@@ -28,7 +28,7 @@ import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.pdf.search.PdfSearchResults;
+import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
@@ -83,7 +83,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             documentViewerView = new DocumentViewerView();
         }
         this.entry = entry;
-        PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
+        LuceneSearchResults searchResults = stateManager.getSearchResults().get(entry);
 
         content.getChildren().clear();
 

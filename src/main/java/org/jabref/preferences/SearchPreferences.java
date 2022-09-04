@@ -3,29 +3,21 @@ package org.jabref.preferences;
 import java.util.EnumSet;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
-import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 public class SearchPreferences {
 
-    private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop) {
-        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
+    public SearchPreferences(boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFilteringMode, boolean isSortByScore, boolean keepWindowOnTop) {
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
         searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
-        if (isCaseSensitive) {
-            searchFlags.add(SearchFlags.CASE_SENSITIVE);
-        }
         if (isRegularExpression) {
             searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }
@@ -35,10 +27,15 @@ public class SearchPreferences {
         if (isKeepSearchString) {
             searchFlags.add(SearchFlags.KEEP_SEARCH_STRING);
         }
+        if (isFilteringMode) {
+            searchFlags.add(SearchFlags.FILTERING_SEARCH);
+        }
+        if (isSortByScore) {
+            searchFlags.add(SearchFlags.SORT_BY_SCORE);
+        }
     }
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
-        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
+    public SearchPreferences(EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
         this.searchFlags = FXCollections.observableSet(searchFlags);
@@ -52,24 +49,8 @@ public class SearchPreferences {
         return EnumSet.copyOf(searchFlags);
     }
 
-    protected ObservableSet<SearchFlags> getObservableSearchFlags() {
+    public ObservableSet<SearchFlags> getObservableSearchFlags() {
         return searchFlags;
-    }
-
-    public SearchDisplayMode getSearchDisplayMode() {
-        return searchDisplayMode.get();
-    }
-
-    public ObjectProperty<SearchDisplayMode> searchDisplayModeProperty() {
-        return searchDisplayMode;
-    }
-
-    public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
-        this.searchDisplayMode.set(searchDisplayMode);
-    }
-
-    public boolean isCaseSensitive() {
-        return searchFlags.contains(SearchFlags.CASE_SENSITIVE);
     }
 
     public void setSearchFlag(SearchFlags flag, boolean value) {
@@ -90,6 +71,14 @@ public class SearchPreferences {
 
     public boolean shouldKeepSearchString() {
         return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
+    }
+
+    public boolean isFilteringMode() {
+        return searchFlags.contains(SearchFlags.FILTERING_SEARCH);
+    }
+
+    public boolean isSortByScore() {
+        return searchFlags.contains(SearchFlags.SORT_BY_SCORE);
     }
 
     public boolean shouldKeepWindowOnTop() {
