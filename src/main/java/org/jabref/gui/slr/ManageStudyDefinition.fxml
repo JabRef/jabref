@@ -278,9 +278,9 @@
         </BorderPane>
     </content>
     <ButtonType
-            fx:id="saveButtonType"
+            fx:id="saveSurveyButtonType"
             buttonData="FINISH"
-            text="%Start survey"/>
+            text="%Save"/>
     <ButtonType
             buttonData="CANCEL_CLOSE"
             text="%Cancel"/>
