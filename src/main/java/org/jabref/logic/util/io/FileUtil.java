@@ -93,7 +93,6 @@ public class FileUtil {
      * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
      *
      * For "real" cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
-     * See also {@link FileHelper#detectBadFileName(String)}.
      */
     public static String getValidFileName(String fileName) {
         String nameWithoutExtension = getBaseName(fileName);
