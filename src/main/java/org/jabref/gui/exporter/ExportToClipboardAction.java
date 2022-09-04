@@ -103,7 +103,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        preferences.storeFileDirforDatabase(stateManager.getActiveDatabase()
+        preferences.storeFileDirForDatabase(stateManager.getActiveDatabase()
                                                         .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
                                                         .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory())));
 

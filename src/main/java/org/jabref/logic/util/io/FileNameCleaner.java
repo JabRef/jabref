@@ -6,6 +6,8 @@ import org.jabref.model.util.FileHelper;
  * This class is based on http://stackoverflow.com/a/5626340/873282
  * extended with LEFT CURLY BRACE and RIGHT CURLY BRACE
  * Replaces illegal characters in given file paths.
+ *
+ * Regarding the maximum length, see {@link FileUtil#getValidFileName(String)}
  */
 public class FileNameCleaner {
 

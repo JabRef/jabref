@@ -115,15 +115,20 @@ public class BibDatabaseContext {
 
     /**
      * Look up the directories set up for this database.
-     * There can be up to three directory definitions for these files: the database's
-     * metadata can specify a general directory and/or a user-specific directory, or the preferences can specify one.
+     * There can be up to four directories definitions for these files:
+     * <ol>
+     * <li>next to the .bib file.</li>
+     * <li>the preferences can specify a default one.</li>
+     * <li>the database's metadata can specify a general directory.</li>
+     * <li>the database's metadata can specify a user-specific directory.</li>
+     * </ol>
      * <p>
      * The settings are prioritized in the following order, and the first defined setting is used:
      * <ol>
      *     <li>user-specific metadata directory</li>
      *     <li>general metadata directory</li>
-     *     <li>preferences directory</li>
-     *     <li>BIB file directory</li>
+     *     <li>BIB file directory (if configured in the preferences AND none of the two above directories are configured)</li>
+     *     <li>preferences directory (if .bib file directory should not be used according to the preferences)</li>
      * </ol>
      *
      * @param preferences The fileDirectory preferences
@@ -140,7 +145,7 @@ public class BibDatabaseContext {
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
         // 3. BIB file directory or Main file directory
-        if (preferences.shouldStoreFilesRelativeToBibFile()) {
+        if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
@@ -160,8 +165,7 @@ public class BibDatabaseContext {
     /**
      * Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}
      *
-     * @param preferences The FilePreferences
-     * @return Optional of Path
+     * @return the path - or an empty optional, if none of the directories exists
      */
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
         return getFileDirectories(preferences).stream().filter(Files::exists).findFirst();

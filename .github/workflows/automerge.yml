@@ -16,7 +16,7 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Auto approve
-        uses: hmarr/auto-approve-action@v2.2.1
+        uses: hmarr/auto-approve-action@v2.4.0
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"

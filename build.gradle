@@ -128,12 +128,12 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.71'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.71.1'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.3.5'
-    implementation 'org.libreoffice:unoloader:7.3.5'
+    implementation 'org.libreoffice:libreoffice:7.4.0'
+    implementation 'org.libreoffice:unoloader:7.4.0'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -148,7 +148,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.6'
 
-    implementation 'org.postgresql:postgresql:42.4.1'
+    implementation 'org.postgresql:postgresql:42.5.0'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -174,13 +174,13 @@ dependencies {
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.1'
 
-    implementation 'org.jsoup:jsoup:1.15.1'
-    implementation 'com.konghq:unirest-java:3.13.10'
+    implementation 'org.jsoup:jsoup:1.15.3'
+    implementation 'com.konghq:unirest-java:3.13.11'
 
-    implementation 'org.slf4j:slf4j-api:2.0.0-beta1'
-    implementation "org.tinylog:tinylog-api:2.4.1"
-    implementation "org.tinylog:slf4j-tinylog:2.4.1"
-    implementation "org.tinylog:tinylog-impl:2.4.1"
+    implementation 'org.slf4j:slf4j-api:2.0.0'
+    implementation "org.tinylog:tinylog-api:2.5.0"
+    implementation "org.tinylog:slf4j-tinylog:2.5.0"
+    implementation "org.tinylog:tinylog-impl:2.5.0"
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
 
@@ -216,7 +216,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.3.2'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.3.3'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'

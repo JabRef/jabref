@@ -3,16 +3,21 @@ package org.jabref.gui.mergeentries;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-public class MergeEntriesDialog extends BaseDialog<MergeResult> {
+public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
     private final ThreeWayMergeView threeWayMergeView;
+    private final BibEntry one;
+    private final BibEntry two;
 
     public MergeEntriesDialog(BibEntry one, BibEntry two) {
         threeWayMergeView = new ThreeWayMergeView(one, two);
+        this.one = one;
+        this.two = two;
 
         init();
     }
@@ -31,7 +36,7 @@ public class MergeEntriesDialog extends BaseDialog<MergeResult> {
         this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, replaceEntries);
         this.setResultConverter(buttonType -> {
             if (buttonType.equals(replaceEntries)) {
-                return new MergeResult(threeWayMergeView.getLeftEntry(), threeWayMergeView.getRightEntry(), threeWayMergeView.getMergedEntry());
+                return new EntriesMergeResult(one, two, threeWayMergeView.getLeftEntry(), threeWayMergeView.getRightEntry(), threeWayMergeView.getMergedEntry());
             } else {
                 return null;
             }
@@ -44,5 +49,9 @@ public class MergeEntriesDialog extends BaseDialog<MergeResult> {
 
     public void setRightHeaderText(String rightHeaderText) {
         threeWayMergeView.setRightHeader(rightHeaderText);
+    }
+
+    public void configureDiff(ShowDiffConfig diffConfig) {
+        threeWayMergeView.showDiff(diffConfig);
     }
 }

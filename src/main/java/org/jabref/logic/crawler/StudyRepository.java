@@ -6,7 +6,6 @@ import java.io.Writer;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -49,9 +48,10 @@ import org.slf4j.LoggerFactory;
  * the structured persistence of the crawling results for the study within the file based repository,
  * as well as the sharing, and versioning of results using git.
  */
-class StudyRepository {
+public class StudyRepository {
     // Tests work with study.yml
-    private static final String STUDY_DEFINITION_FILE_NAME = "study.yml";
+    public static final String STUDY_DEFINITION_FILE_NAME = "study.yml";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyRepository.class);
     private static final Pattern MATCHCOLON = Pattern.compile(":");
     private static final Pattern MATCHILLEGALCHARACTERS = Pattern.compile("[^A-Za-z0-9_.\\s=-]");
@@ -119,7 +119,7 @@ class StudyRepository {
             gitHandler.createCommitOnCurrentBranch("Setup/Update Repository Structure", false);
             gitHandler.checkoutBranch(SEARCH_BRANCH);
             // If study definition does not exist on this branch or was changed on work branch, copy it from work
-            boolean studyDefinitionDoesNotExistOrChanged = !(Files.exists(studyDefinitionFile) && new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile).equalsBesideLastSearchDate(study));
+            boolean studyDefinitionDoesNotExistOrChanged = !(Files.exists(studyDefinitionFile) && new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile).equals(study));
             if (studyDefinitionDoesNotExistOrChanged) {
                 new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
             }
@@ -218,15 +218,10 @@ class StudyRepository {
      */
     public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException {
         updateWorkAndSearchBranch();
-        study.setLastSearchDate(LocalDate.now());
-        persistStudy();
-        gitHandler.createCommitOnCurrentBranch("Update search date", true);
         gitHandler.checkoutBranch(SEARCH_BRANCH);
         persistResults(crawlResults);
-        study.setLastSearchDate(LocalDate.now());
-        persistStudy();
         try {
-            // First commit changes to search branch branch and update remote
+            // First commit changes to search branch and update remote
             String commitMessage = "Conducted search: " + LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
             boolean newSearchResults = gitHandler.createCommitOnCurrentBranch(commitMessage, false);
             gitHandler.checkoutBranch(WORK_BRANCH);
@@ -248,10 +243,15 @@ class StudyRepository {
      */
     private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
+
+        // update remote search branch
         gitHandler.checkoutBranch(SEARCH_BRANCH);
         gitHandler.pushCommitsToRemoteRepository();
+
+        // update remote work branch
         gitHandler.checkoutBranch(WORK_BRANCH);
         gitHandler.pushCommitsToRemoteRepository();
+
         gitHandler.checkoutBranch(currentBranch);
     }
 
@@ -261,15 +261,16 @@ class StudyRepository {
      */
     private void updateWorkAndSearchBranch() throws IOException, GitAPIException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
+
+        // update search branch
         gitHandler.checkoutBranch(SEARCH_BRANCH);
         gitHandler.pullOnCurrentBranch();
+
+        // update work branch
         gitHandler.checkoutBranch(WORK_BRANCH);
         gitHandler.pullOnCurrentBranch();
-        gitHandler.checkoutBranch(currentBranch);
-    }
 
-    private void persistStudy() throws IOException {
-        new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
+        gitHandler.checkoutBranch(currentBranch);
     }
 
     /**

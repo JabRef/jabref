@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 
 public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
+    public static final String FETCHER_NAME = "SearchAll";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 
     private final Set<SearchBasedFetcher> fetchers;
@@ -36,7 +38,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
     @Override
     public String getName() {
-        return "SearchAll";
+        return FETCHER_NAME;
     }
 
     @Override
