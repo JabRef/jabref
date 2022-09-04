@@ -173,8 +173,6 @@ public interface PreferencesService {
 
     ExternalApplicationsPreferences getExternalApplicationsPreferences();
 
-    void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences);
-
     //*************************************************************************************************************
     // MainTablePreferences
     //*************************************************************************************************************

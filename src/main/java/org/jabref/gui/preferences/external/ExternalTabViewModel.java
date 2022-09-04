@@ -106,14 +106,14 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void storeSettings() {
-        preferences.storeExternalApplicationsPreferences(new ExternalApplicationsPreferences(
-                eMailReferenceSubjectProperty.getValue(),
-                autoOpenAttachedFoldersProperty.getValue(),
-                citeCommandProperty.getValue(),
-                useCustomTerminalProperty.getValue(),
-                customTerminalCommandProperty.getValue(),
-                useCustomFileBrowserProperty.getValue(),
-                customFileBrowserCommandProperty.getValue()));
+        ExternalApplicationsPreferences externalPreferences = preferences.getExternalApplicationsPreferences();
+        externalPreferences.setEMailSubject(eMailReferenceSubjectProperty.getValue());
+        externalPreferences.setAutoOpenEmailAttachmentsFolder(autoOpenAttachedFoldersProperty.getValue());
+        externalPreferences.setCiteCommand(citeCommandProperty.getValue());
+        externalPreferences.setUseCustomTerminal(useCustomTerminalProperty.getValue());
+        externalPreferences.setCustomTerminalCommand(customTerminalCommandProperty.getValue());
+        externalPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());
+        externalPreferences.setCustomFileBrowserCommand(customFileBrowserCommandProperty.getValue());
 
         PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
         pushPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());

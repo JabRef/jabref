@@ -455,6 +455,7 @@ public class JabRefPreferences implements PreferencesService {
     private AutoCompletePreferences autoCompletePreferences;
     private CleanupPreferences cleanupPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
+    private ExternalApplicationsPreferences externalApplicationsPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1785,7 +1786,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
-        return new ExternalApplicationsPreferences(
+        if (Objects.nonNull(externalApplicationsPreferences)) {
+            return externalApplicationsPreferences;
+        }
+
+        externalApplicationsPreferences = new ExternalApplicationsPreferences(
                 get(EMAIL_SUBJECT),
                 getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES),
                 get(CITE_COMMAND),
@@ -1793,17 +1798,23 @@ public class JabRefPreferences implements PreferencesService {
                 get(CONSOLE_COMMAND),
                 !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION), // mind the !
                 get(FILE_BROWSER_COMMAND));
-    }
 
-    @Override
-    public void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences) {
-        put(EMAIL_SUBJECT, preferences.getEmailSubject());
-        putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, preferences.shouldAutoOpenEmailAttachmentsFolder());
-        put(CITE_COMMAND, preferences.getCiteCommand());
-        putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !preferences.useCustomTerminal()); // mind the !
-        put(CONSOLE_COMMAND, preferences.getCustomTerminalCommand());
-        putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !preferences.useCustomFileBrowser()); // mind the !
-        put(FILE_BROWSER_COMMAND, preferences.getCustomFileBrowserCommand());
+        EasyBind.listen(externalApplicationsPreferences.eMailSubjectProperty(),
+                (obs, oldValue, newValue) -> put(EMAIL_SUBJECT, newValue));
+        EasyBind.listen(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(),
+                (obs, oldValue, newValue) -> putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, newValue));
+        EasyBind.listen(externalApplicationsPreferences.citeCommandProperty(),
+                (obs, oldValue, newValue) -> put(CITE_COMMAND, newValue));
+        EasyBind.listen(externalApplicationsPreferences.useCustomTerminalProperty(),
+                (obs, oldValue, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue)); // mind the !
+        EasyBind.listen(externalApplicationsPreferences.customTerminalCommandProperty(),
+                (obs, oldValue, newValue) -> put(CONSOLE_COMMAND, newValue));
+        EasyBind.listen(externalApplicationsPreferences.useCustomFileBrowserProperty(),
+                (obs, oldValue, newValue) -> putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !newValue)); // mind the !
+        EasyBind.listen(externalApplicationsPreferences.customFileBrowserCommandProperty(),
+                (obs, oldValue, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
+
+        return externalApplicationsPreferences;
     }
 
     //*************************************************************************************************************
