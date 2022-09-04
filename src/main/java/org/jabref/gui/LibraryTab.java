@@ -213,6 +213,14 @@ public class LibraryTab extends Tab {
 
         feedData(context);
 
+        if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+            try {
+                indexingTaskManager.updateIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+            } catch (IOException e) {
+                LOGGER.error("Cannot access lucene index", e);
+            }
+        }
+
         // a temporary workaround to update groups pane
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(frame.getTabbedPane().getSelectionModel().selectedItemProperty(),
