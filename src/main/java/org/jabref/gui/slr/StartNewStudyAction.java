@@ -7,12 +7,10 @@ import java.util.Optional;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -62,7 +60,6 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
             dialogService.showErrorDialogAndWait(Localization.lang("Must not be empty!"));
             return;
         }
-
         studyDirectory = studyAndDirectory.get().getStudyDirectory();
 
         // set variable for #setupRepository
