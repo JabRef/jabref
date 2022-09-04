@@ -1,5 +1,7 @@
 package org.jabref.gui.mergeentries.newmergedialog.cell.sidebuttons;
 
+import java.util.Optional;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
@@ -9,6 +11,7 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -16,18 +19,27 @@ public class InfoButton extends Button {
     private final StringProperty infoMessage = new SimpleStringProperty();
     private final ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
 
+    private final Action mergeAction = new Action() {
+        @Override
+        public Optional<JabRefIcon> getIcon() {
+            return Optional.of(IconTheme.JabRefIcons.INTEGRITY_INFO);
+        }
+
+        @Override
+        public String getText() {
+            return infoMessage.get();
+        }
+    };
+
     public InfoButton(String infoMessage) {
-        setInfoMessage(infoMessage);
+        this.infoMessage.setValue(infoMessage);
         configureButton();
-        EasyBind.subscribe(infoMessageProperty(), newWarningMessage -> {
-            configureButton();
-        });
+        EasyBind.subscribe(this.infoMessage, newWarningMessage -> configureButton());
     }
 
     private void configureButton() {
         setMaxHeight(Double.MAX_VALUE);
         setFocusTraversable(false);
-        Action mergeAction = new Action.Builder(getInfoMessage()).setIcon(IconTheme.JabRefIcons.INTEGRITY_INFO);
 
         actionFactory.configureIconButton(mergeAction, new SimpleCommand() {
             @Override
@@ -35,17 +47,5 @@ public class InfoButton extends Button {
                 // The info button is not meant to be clickable that's why this is empty
             }
         }, this);
-    }
-
-    private void setInfoMessage(String infoMessage) {
-        infoMessageProperty().set(infoMessage);
-    }
-
-    public StringProperty infoMessageProperty() {
-        return infoMessage;
-    }
-
-    public String getInfoMessage() {
-        return infoMessage.get();
     }
 }
