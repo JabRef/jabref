@@ -109,6 +109,7 @@ import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.slr.EditExistingStudyAction;
 import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
@@ -541,7 +542,6 @@ public class JabRefFrame extends BorderPane {
         // Setup Toolbar
 
         ToolBar toolBar = new ToolBar(
-
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(this, prefs)),
                         factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager)),
@@ -641,12 +641,7 @@ public class JabRefFrame extends BorderPane {
         openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
         EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
 
-        stateManager.activeDatabaseProperty().bind(
-                EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
-                        selectedTab -> Optional.ofNullable(selectedTab)
-                                               .filter(tab -> tab instanceof LibraryTab)
-                                               .map(tab -> (LibraryTab) tab)
-                                               .map(LibraryTab::getBibDatabaseContext)));
+        // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
@@ -665,10 +660,11 @@ public class JabRefFrame extends BorderPane {
         // Wait for the scene to be created, otherwise focusOwnerProperty is not provided
         Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
                 EasyBind.map(mainStage.getScene().focusOwnerProperty(), Optional::ofNullable)));
+
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
-         * cut/paste/copy operations would some times occur in the wrong tab.
+         * cut/paste/copy operations would sometimes occur in the wrong tab.
          */
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
             if (!(tab instanceof LibraryTab libraryTab)) {
@@ -878,9 +874,13 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, this.prefs, stateManager)),
                 pushToApplicationMenuItem,
+
                 new SeparatorMenuItem(),
+
+                // Systematic Literature Review (SLR)
                 factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
-                factory.createMenuItem(StandardActions.SEARCH_FOR_EXISTING_STUDY, new ExistingStudySearchAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
+                factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(this.dialogService, this.stateManager)),
+                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(this, this.getOpenDatabaseAction(), this.getDialogService(), Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
 
                 new SeparatorMenuItem(),
 

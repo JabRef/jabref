@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class handles the updating of the local and remote git repository that is located at the repository path
- * This provides an easy to use interface to manage a git repository
+ * This provides an easy-to-use interface to manage a git repository
  */
 public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
@@ -44,14 +44,20 @@ public class GitHandler {
             try {
                 Git.init()
                    .setDirectory(repositoryPathAsFile)
+                   .setInitialBranch("main")
                    .call();
-                try (Git git = Git.open(repositoryPathAsFile)) {
-                    git.commit()
-                       .setAllowEmpty(true)
-                       .setMessage("Initial commit")
-                       .call();
-                }
                 setupGitIgnore();
+                String initialCommit = "Initial commit";
+                if (!createCommitOnCurrentBranch(initialCommit, false)) {
+                    // Maybe, setupGitIgnore failed and did not add something
+                    // Then, we create an empty commit
+                    try (Git git = Git.open(repositoryPathAsFile)) {
+                        git.commit()
+                           .setAllowEmpty(true)
+                           .setMessage(initialCommit)
+                           .call();
+                    }
+                }
             } catch (GitAPIException | IOException e) {
                 LOGGER.error("Initialization failed");
             }
@@ -81,7 +87,7 @@ public class GitHandler {
     /**
      * Checkout the branch with the specified name, if it does not exist create it
      *
-     * @param branchToCheckout Name of the branch to checkout
+     * @param branchToCheckout Name of the branch to check out
      */
     public void checkoutBranch(String branchToCheckout) throws IOException, GitAPIException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
