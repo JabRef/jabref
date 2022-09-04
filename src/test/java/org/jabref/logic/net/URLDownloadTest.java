@@ -7,6 +7,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.support.DisabledOnCIServer;
 
 import kong.unirest.UnirestException;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class URLDownloadTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
 
     @Test
@@ -119,5 +122,21 @@ public class URLDownloadTest {
 
         urlDownload.setConnectTimeout(null);
         assertNotNull(urlDownload.getConnectTimeout(), "no null value can be set");
+    }
+
+    @Test
+    public void test503ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+        URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
+
+        Exception exception = assertThrows(IOException.class, () -> urlDownload.asString());
+        assertTrue(exception.getCause() instanceof FetcherServerException);
+    }
+
+    @Test
+    public void test429ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+        URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
+
+        Exception exception = assertThrows(IOException.class, () -> urlDownload.asString());
+        assertTrue(exception.getCause() instanceof FetcherClientException);
     }
 }

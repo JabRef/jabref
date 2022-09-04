@@ -15,7 +15,6 @@ import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
@@ -525,19 +524,21 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
             SavePreferences savePreferences = preferencesService.getSavePreferences();
-            AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8);
-            BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
-            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
-                    bibWriter,
-                    generalPreferences,
-                    savePreferences,
-                    Globals.entryTypesManager);
-            databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
+            try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
+                BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
 
-            // Show just a warning message if encoding did not work for all characters:
-            if (fileWriter.hasEncodingProblems()) {
-                System.err.println(Localization.lang("Warning") + ": "
-                                   + Localization.lang("UTF-8 could not be used to encode the following characters: %0", fileWriter.getEncodingProblems()));
+                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+                                                                            bibWriter,
+                                                                            generalPreferences,
+                                                                            savePreferences,
+                                                                            Globals.entryTypesManager);
+                databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
+
+                // Show just a warning message if encoding did not work for all characters:
+                if (fileWriter.hasEncodingProblems()) {
+                    System.err.println(Localization.lang("Warning") + ": "
+                                       + Localization.lang("UTF-8 could not be used to encode the following characters: %0", fileWriter.getEncodingProblems()));
+                }
             }
         } catch (IOException ex) {
             System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
@@ -640,8 +641,7 @@ public class ArgumentProcessor {
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                     parserResult.getDatabaseContext(),
                     preferencesService.getFilePreferences(),
-                    preferencesService.getAutoLinkPreferences(),
-                    ExternalFileTypes.getInstance());
+                    preferencesService.getAutoLinkPreferences());
             util.linkAssociatedFiles(database.getEntries(), new NamedCompound(""));
         }
     }

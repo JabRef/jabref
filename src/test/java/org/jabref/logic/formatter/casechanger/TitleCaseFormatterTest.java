@@ -45,6 +45,18 @@ public class TitleCaseFormatterTest {
                         "bibliographic software. a comparison."),
                 Arguments.of("Bibliographic Software. {A COMPARISON.}",
                         "bibliographic software. {A COMPARISON.}"),
+                Arguments.of("--Test~Ing Dash--Like Characters",
+                        "--test~ing dash--like characters"),
+                Arguments.of("-⸗Test⸗Ing Dash〰Like Cha᐀᐀Racters",
+                        "-⸗test⸗ing dash〰like cha᐀᐀racters"),
+                Arguments.of("︲︲Test־Ing Dash⁓⁓Like Characters",
+                        "︲︲test־ing dash⁓⁓like characters"),
+                Arguments.of("⁻⁻Test−Ing Dash⸻Like Characters",
+                        "⁻⁻test−ing dash⸻like characters"),
+                Arguments.of("--Test〰Ing M-U~L゠T︱I⁓P︲L--~~︲E Dash⸻-Like Characters",
+                        "--test〰ing M-u~l゠t︱i⁓p︲l--~~︲e dASH⸻-likE charACTErs"),
+                Arguments.of("Kinetic Studies on Enzyme-Catalyzed Reactions: Oxidation of Glucose, Decomposition of Hydrogen Peroxide and Their Combination",
+                        "kinetic studies on enzyme-catalyzed reactions: oxidation of glucose, decomposition of hydrogen peroxide and their combination"),
                 Arguments.of("{BPMN} Conformance in Open Source Engines",
                         new TitleCaseFormatter().getExampleInput()));
     }

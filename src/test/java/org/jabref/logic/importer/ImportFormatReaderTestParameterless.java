@@ -1,12 +1,11 @@
 package org.jabref.logic.importer;
 
 import java.nio.file.Path;
-import java.util.Set;
 
-import org.jabref.logic.xmp.XmpPreferences;
+import javafx.collections.FXCollections;
+
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,10 +23,11 @@ class ImportFormatReaderTestParameterless {
     @BeforeEach
     void setUp() {
         reader = new ImportFormatReader();
-        GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
+
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
-        reader.resetImportFormats(mock(ImporterPreferences.class), generalPreferences, importFormatPreferences, mock(XmpPreferences.class), fileMonitor);
+        reader.resetImportFormats(importerPreferences, importFormatPreferences, fileMonitor);
     }
 
     @Test
@@ -37,17 +37,17 @@ class ImportFormatReaderTestParameterless {
     }
 
     @Test
-    void importUnknownFormatThrowsExceptionIfPathIsNull() throws Exception {
+    void importUnknownFormatThrowsExceptionIfPathIsNull() {
         assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null, fileMonitor));
     }
 
     @Test
-    void importUnknownFormatThrowsExceptionIfDataIsNull() throws Exception {
+    void importUnknownFormatThrowsExceptionIfDataIsNull() {
         assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null));
     }
 
     @Test
-    void importFromFileWithUnknownFormatThrowsException() throws Exception {
+    void importFromFileWithUnknownFormatThrowsException() {
         assertThrows(ImportException.class, () -> reader.importFromFile("someunknownformat", Path.of("somepath")));
     }
 }

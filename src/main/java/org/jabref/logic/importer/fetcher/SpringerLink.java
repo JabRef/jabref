@@ -27,12 +27,13 @@ import org.slf4j.LoggerFactory;
  * Uses Springer API, see <a href="https://dev.springer.com">https://dev.springer.com</a>
  */
 public class SpringerLink implements FulltextFetcher {
+    public static final String FETCHER_NAME = "Springer";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
 
     private static final String API_URL = "https://api.springer.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     private static final String CONTENT_HOST = "link.springer.com";
-    private static final String FETCHER_NAME = "Springer";
 
     private final ImporterPreferences importerPreferences;
 

@@ -36,13 +36,12 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL">
-        <choose>
-          <if type="webpage dataset entry-dictionary entry-encyclopedia post post-weblog" match="any">
-            <text variable="URL"/>
-          </if>
-        </choose>
+      <if match="any" variable="DOI">
+        <text variable="DOI"/>
       </if>
+      <else-if match="any" type="webpage dataset entry-dictionary entry-encyclopedia post post-weblog">
+        <text variable="URL"/>
+      </else-if>
     </choose>
   </macro>
   <macro name="title">

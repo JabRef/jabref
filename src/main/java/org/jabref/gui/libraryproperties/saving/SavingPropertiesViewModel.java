@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -14,7 +13,6 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
-import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseContext;
@@ -23,6 +21,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class SavingPropertiesViewModel implements PropertiesTabViewModel {
@@ -44,9 +43,11 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
     private final SaveOrderConfig initialSaveOrderConfig;
+    private final PreferencesService preferencesService;
 
     public SavingPropertiesViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService) {
         this.databaseContext = databaseContext;
+        this.preferencesService = preferencesService;
         this.initialMetaData = databaseContext.getMetaData();
         this.initialSaveOrderConfig = initialMetaData.getSaveOrderConfig().orElseGet(preferencesService::getExportSaveOrder);
     }
@@ -69,7 +70,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         sortableFieldsProperty.addAll(fieldNames);
         sortCriteriaProperty.addAll(initialSaveOrderConfig.getSortCriteria().stream()
                                                           .map(SortCriterionViewModel::new)
-                                                          .collect(Collectors.toList()));
+                                                          .toList());
 
         // FieldFormatterCleanupsPanel
 
@@ -78,8 +79,9 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             cleanupsDisableProperty.setValue(!value.isEnabled());
             cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
-            cleanupsDisableProperty.setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
-            cleanupsProperty.setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
+            CleanupPreferences defaultPreset = preferencesService.getDefaultCleanupPreset();
+            cleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
+            cleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
         });
     }
 
@@ -97,7 +99,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
                 !cleanupsDisableProperty().getValue(),
                 cleanupsProperty());
 
-        if (Cleanups.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanups)) {
+        if (FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanups.getConfiguredActions())) {
             newMetaData.clearSaveActions();
         } else {
             // if all actions have been removed, remove the save actions from the MetaData

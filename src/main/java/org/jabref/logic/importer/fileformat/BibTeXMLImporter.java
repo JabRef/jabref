@@ -184,7 +184,7 @@ public class BibTeXMLImporter extends Importer {
                 } else if (isMethodToIgnore(method.getName())) {
                     continue;
                 } else if (method.getName().startsWith("get")) {
-                    putIfValueNotNull(fields, FieldFactory.parseField(method.getName().replace("get", "")), (String) method.invoke(entryType));
+                    putIfValueNotNull(fields, FieldFactory.parseField(entryType, method.getName().replace("get", "")), (String) method.invoke(entryType));
                 }
             } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
                 LOGGER.error("Could not invoke method", e);

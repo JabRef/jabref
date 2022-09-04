@@ -29,46 +29,33 @@ public class PersonNamesCheckerTest {
         checkerb = new PersonNamesChecker(database);
     }
 
-    @Test
-    public void validNameFirstnameAuthor() throws Exception {
-        assertEquals(Optional.empty(), checker.checkValue("Kolb, Stefan"));
+    @ParameterizedTest
+    @MethodSource("provideValidNames")
+    public void validNames(String name) {
+        assertEquals(Optional.empty(), checker.checkValue(name));
+    }
+
+    private static Stream<String> provideValidNames() {
+        return Stream.of(
+                "Kolb, Stefan",                     // single [Name, Firstname]
+                "Kolb, Stefan and Harrer, Simon",   // multiple [Name, Firstname]
+                "Stefan Kolb",                      // single [Firstname Name]
+                "Stefan Kolb and Simon Harrer",     // multiple [Firstname Name]
+
+                "M. J. Gotay",                      // second name in front
+
+                "{JabRef}",                         // corporate name in brackets
+                "{JabRef} and Stefan Kolb",         // mixed corporate name with name
+                "{JabRef} and Kolb, Stefan",
+
+                "hugo Para{\\~n}os"                 // tilde in name
+        );
     }
 
     @Test
-    public void validNameFirstnameAuthors() throws Exception {
-        assertEquals(Optional.empty(), checker.checkValue("Kolb, Stefan and Harrer, Simon"));
-    }
-
-    @Test
-    public void validFirstnameNameAuthor() throws Exception {
-        assertEquals(Optional.empty(), checker.checkValue("Stefan Kolb"));
-    }
-
-    @Test
-    public void validFirstnameNameAuthors() throws Exception {
-        assertEquals(Optional.empty(), checker.checkValue("Stefan Kolb and Simon Harrer"));
-    }
-
-    @Test
-    public void complainAboutPersonStringWithTwoManyCommas() throws Exception {
+    public void complainAboutPersonStringWithTwoManyCommas() {
         assertEquals(Optional.of("Names are not in the standard BibTeX format."),
                 checker.checkValue("Test1, Test2, Test3, Test4, Test5, Test6"));
-    }
-
-    @Test
-    public void doNotComplainAboutSecondNameInFront() throws Exception {
-        assertEquals(Optional.empty(), checker.checkValue("M. J. Gotay"));
-    }
-
-    @Test
-    public void validCorporateNameInBrackets() throws Exception {
-        assertEquals(Optional.empty(), checker.checkValue("{JabRef}"));
-    }
-
-    @Test
-    public void validCorporateNameAndPerson() throws Exception {
-        assertEquals(Optional.empty(), checker.checkValue("{JabRef} and Stefan Kolb"));
-        assertEquals(Optional.empty(), checker.checkValue("{JabRef} and Kolb, Stefan"));
     }
 
     @ParameterizedTest
@@ -84,13 +71,19 @@ public class PersonNamesCheckerTest {
     }
 
     private static Stream<String> provideCorrectFormats() {
-        return Stream.of("", "Knuth", "Donald E. Knuth and Kurt Cobain and A. Einstein");
+        return Stream.of(
+                "",
+                "Knuth",
+                "Donald E. Knuth and Kurt Cobain and A. Einstein");
     }
 
     private static Stream<String> provideIncorrectFormats() {
-        return Stream.of("   Knuth, Donald E. ",
-                         "Knuth, Donald E. and Kurt Cobain and A. Einstein",
-                                      ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
-                         "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
+        return Stream.of(
+                "   Knuth, Donald E. ",
+                "Knuth, Donald E. and Kurt Cobain and A. Einstein",
+                ", and Kurt Cobain and A. Einstein",
+                "Donald E. Knuth and Kurt Cobain and ,",
+                "and Kurt Cobain and A. Einstein",
+                "Donald E. Knuth and Kurt Cobain and");
     }
 }

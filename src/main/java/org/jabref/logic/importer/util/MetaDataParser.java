@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.FieldFactory;
@@ -65,6 +65,7 @@ public class MetaDataParser {
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, getSingleItem(value));
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
+                // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + "Latex-")) {
                 // The user name comes directly after "FILE_DIRECTORYLatex-"
@@ -72,7 +73,7 @@ public class MetaDataParser {
                 Path path = Path.of(getSingleItem(value)).normalize();
                 metaData.setLatexFileDirectory(user, path);
             } else if (entry.getKey().equals(MetaData.SAVE_ACTIONS)) {
-                metaData.setSaveActions(Cleanups.parse(value));
+                metaData.setSaveActions(FieldFormatterCleanups.parse(value));
             } else if (entry.getKey().equals(MetaData.DATABASE_TYPE)) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)));
             } else if (entry.getKey().equals(MetaData.KEYPATTERNDEFAULT)) {
@@ -110,15 +111,12 @@ public class MetaDataParser {
     /**
      * Returns the first item in the list.
      * If the specified list does not contain exactly one item, then a {@link ParseException} will be thrown.
-     *
-     * @param value
-     * @return
      */
     private static String getSingleItem(List<String> value) throws ParseException {
         if (value.size() == 1) {
             return value.get(0);
         } else {
-            throw new ParseException("Expected a single item but received " + value.toString());
+            throw new ParseException("Expected a single item but received " + value);
         }
     }
 

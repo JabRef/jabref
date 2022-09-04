@@ -447,7 +447,7 @@ public class AuthorListParser {
             if (c == '\\') {
                 currentBackslash = tokenEnd;
             }
-            if ((bracesLevel == 0) && ((",;~-".indexOf(c) != -1) || Character.isWhitespace(c))) {
+            if ((bracesLevel == 0) && ((",;-".indexOf(c) != -1) || Character.isWhitespace(c))) {
                 break;
             }
             tokenEnd++;

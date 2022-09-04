@@ -33,6 +33,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  * @see <a href="https://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
  */
 public class DBLPFetcher implements SearchBasedParserFetcher {
+    public static final String FETCHER_NAME = "DBLP";
 
     private static final String BASIC_SEARCH_URL = "https://dblp.org/search/publ/api";
 
@@ -76,7 +77,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     @Override
     public String getName() {
-        return "DBLP";
+        return FETCHER_NAME;
     }
 
     @Override

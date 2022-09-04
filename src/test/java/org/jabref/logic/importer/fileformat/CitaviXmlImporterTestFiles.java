@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 public class CitaviXmlImporterTestFiles {
 
     private static final String FILE_ENDING = ".ctv6bak";
+    private final CitaviXmlImporter citaviXmlImporter = new CitaviXmlImporter();
 
     private ImportFormatPreferences preferences;
 
@@ -38,18 +39,18 @@ public class CitaviXmlImporterTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new CitaviXmlImporter(), fileName);
+        ImporterTestEngine.testIsRecognizedFormat(citaviXmlImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
     void testIsNotRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsNotRecognizedFormat(new CitaviXmlImporter(), fileName);
+        ImporterTestEngine.testIsNotRecognizedFormat(citaviXmlImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(new CitaviXmlImporter(), fileName, FILE_ENDING);
+        ImporterTestEngine.testImportEntries(citaviXmlImporter, fileName, FILE_ENDING);
     }
 }
