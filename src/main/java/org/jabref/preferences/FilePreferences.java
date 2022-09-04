@@ -52,7 +52,7 @@ public class FilePreferences {
         this.externalFileTypes.addAll(externalFileTypes);
     }
 
-    public String getUser() { // Read only
+    public String getUser() {
         return user.getValue();
     }
 
