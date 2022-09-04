@@ -189,7 +189,14 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return oldGroup.getClass().equals(newGroup.getClass());
     }
 
-    private boolean checkGroupFieldsForModificationsDialogNecessary(AbstractGroup oldGroup, AbstractGroup newGroup) {
+    /**
+     * Check if it is necessary to show a group modified, reassign entry dialog </br>
+     * Although group name change is relevant, we silently take it as a rename and do not bother the user
+     * @param oldGroup Original Group
+     * @param newGroup Edited group
+     * @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
+     */
+    boolean checkGroupFieldsForModificationsDialogNotNecessary(AbstractGroup oldGroup, AbstractGroup newGroup) {
 
         // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
         if (oldGroup.getClass() == WordKeywordGroup.class) {
@@ -197,28 +204,28 @@ public class GroupTreeViewModel extends AbstractViewModel {
             WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;
 
             return oldWordKeywordGroup.getSearchField().getName().equals(newWordKeywordGroup.getSearchField().getName())
-                                                                         || oldWordKeywordGroup.getSearchExpression().equals(newWordKeywordGroup.getSearchExpression())
-                                                                         || (oldWordKeywordGroup.isCaseSensitive() == newWordKeywordGroup.isCaseSensitive());
+                                                                         && oldWordKeywordGroup.getSearchExpression().equals(newWordKeywordGroup.getSearchExpression())
+                                                                         && (oldWordKeywordGroup.isCaseSensitive() == newWordKeywordGroup.isCaseSensitive());
         } else if (oldGroup.getClass() == RegexKeywordGroup.class) {
             RegexKeywordGroup oldRegexKeywordGroup = (RegexKeywordGroup) oldGroup;
             RegexKeywordGroup newRegexKeywordGroup = (RegexKeywordGroup) newGroup;
 
             return oldRegexKeywordGroup.getSearchField().getName().equals(newRegexKeywordGroup.getSearchField().getName())
-                   || oldRegexKeywordGroup.getSearchExpression().equals(newRegexKeywordGroup.getSearchExpression())
-                   || (oldRegexKeywordGroup.isCaseSensitive() == newRegexKeywordGroup.isCaseSensitive());
+                   && oldRegexKeywordGroup.getSearchExpression().equals(newRegexKeywordGroup.getSearchExpression())
+                   && (oldRegexKeywordGroup.isCaseSensitive() == newRegexKeywordGroup.isCaseSensitive());
         } else if ((oldGroup.getClass() == SearchGroup.class)) {
             SearchGroup oldSearchGroup = (SearchGroup) oldGroup;
             SearchGroup newSearchGroup = (SearchGroup) newGroup;
 
-            return oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression()) ||
-                oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags());
+            return oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression())
+                && oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags());
         } else if (oldGroup.getClass() ==  AutomaticKeywordGroup.class) {
             AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
             AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
 
             return oldAutomaticKeywordGroup.getKeywordDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordDelimiter().toString())
-                || oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())
-                || oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName());
+                && oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())
+                && oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName());
         } else if (oldGroup.getClass() == AutomaticPersonsGroup.class) {
             AutomaticPersonsGroup oldAutomaticPersonsGroup = (AutomaticPersonsGroup) oldGroup;
             AutomaticPersonsGroup newAutomaticPersonsGroup = (AutomaticPersonsGroup) newGroup;
@@ -244,7 +251,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                                                                                          oldGroup.getGroupNode().getGroup(),
                                                                                          GroupDialogHeader.SUBGROUP));
             newGroup.ifPresent(group -> {
-                if (this.compareGroupType(oldGroup.getGroupNode().getGroup(), group) && this.checkGroupFieldsForModificationsDialogNecessary(oldGroup.getGroupNode().getGroup(), group)) {
+                if (this.compareGroupType(oldGroup.getGroupNode().getGroup(), group) && this.checkGroupFieldsForModificationsDialogNotNecessary(oldGroup.getGroupNode().getGroup(), group)) {
                     oldGroup.getGroupNode().setGroup(
                          group,
                          true,
