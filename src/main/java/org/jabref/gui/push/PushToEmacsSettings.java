@@ -1,6 +1,5 @@
 package org.jabref.gui.push;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -16,17 +15,17 @@ public class PushToEmacsSettings extends PushToApplicationSettings {
     public PushToEmacsSettings(PushToApplication application,
                                DialogService dialogService,
                                FilePreferences filePreferences,
-                               ObjectProperty<PushToApplicationPreferences> preferences) {
+                               PushToApplicationPreferences preferences) {
         super(application, dialogService, filePreferences, preferences);
 
         settingsPane.add(new Label(Localization.lang("Additional parameters") + ":"), 0, 1);
         settingsPane.add(additionalParams, 1, 1);
-        additionalParams.setText(preferences.get().getEmacsArguments());
+        additionalParams.setText(preferences.getEmacsArguments());
     }
 
     @Override
     public void storeSettings() {
         super.storeSettings();
-        preferences.setValue(preferences.getValue().withEmacsArguments(additionalParams.getText()));
+        preferences.setEmacsArguments(additionalParams.getText());
     }
 }
