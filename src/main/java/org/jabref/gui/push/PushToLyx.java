@@ -40,7 +40,7 @@ public class PushToLyx extends AbstractPushToApplication {
     }
 
     @Override
-    public void operationCompleted() {
+    public void onOperationCompleted() {
         if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Verify that LyX is running and that the lyxpipe is valid.")
@@ -48,7 +48,7 @@ public class PushToLyx extends AbstractPushToApplication {
         } else if (couldNotCall) {
             dialogService.showErrorDialogAndWait(Localization.lang("Unable to write to %0.", commandPath + ".in"));
         } else {
-            super.operationCompleted();
+            super.onOperationCompleted();
         }
     }
 

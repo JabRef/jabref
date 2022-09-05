@@ -90,7 +90,7 @@ public class PushToVim extends AbstractPushToApplication {
     }
 
     @Override
-    public void operationCompleted() {
+    public void onOperationCompleted() {
         if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to Vim server. Make sure that Vim is running with correct server name."));
@@ -98,7 +98,7 @@ public class PushToVim extends AbstractPushToApplication {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not run the 'vim' program."));
         } else {
-            super.operationCompleted();
+            super.onOperationCompleted();
         }
     }
 }

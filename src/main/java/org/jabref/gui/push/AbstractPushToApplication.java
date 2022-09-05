@@ -98,7 +98,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
-    public void operationCompleted() {
+    public void onOperationCompleted() {
         if (notDefined) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),

@@ -11,6 +11,7 @@ import javafx.scene.control.MenuItem;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
@@ -70,18 +71,13 @@ public class PushToApplicationCommand extends SimpleCommand {
         this.reconfigurableControls.add(node);
     }
 
-    public void setApplication(String applicationName) {
+    private void setApplication(String applicationName) {
+        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
         PushToApplication application = PushToApplications.getApplicationByName(
                                                                   applicationName,
                                                                   dialogService,
                                                                   preferencesService)
                                                           .orElse(new PushToEmacs(dialogService, preferencesService));
-
-        setApplication(application);
-    }
-
-    public void setApplication(PushToApplication application) {
-        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
         preferencesService.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
         this.application = Objects.requireNonNull(application);
@@ -95,8 +91,8 @@ public class PushToApplicationCommand extends SimpleCommand {
         });
     }
 
-    public PushToApplication getApplication() {
-        return application;
+    public Action getAction() {
+        return application.getAction();
     }
 
     private static String getKeyString(List<BibEntry> entries) {
@@ -135,7 +131,7 @@ public class PushToApplicationCommand extends SimpleCommand {
 
         // All set, call the operation in a new thread:
         BackgroundTask.wrap(this::pushEntries)
-                      .onSuccess(s -> application.operationCompleted())
+                      .onSuccess(s -> application.onOperationCompleted())
                       .executeWith(Globals.TASK_EXECUTOR);
     }
 

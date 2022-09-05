@@ -106,7 +106,7 @@ public class PushToEmacs extends AbstractPushToApplication {
     }
 
     @Override
-    public void operationCompleted() {
+    public void onOperationCompleted() {
         if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to a running gnuserv process. Make sure that "
@@ -117,7 +117,7 @@ public class PushToEmacs extends AbstractPushToApplication {
                     Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
                             + "the emacsclient/gnuclient program installed and available in the PATH."));
         } else {
-            super.operationCompleted();
+            super.onOperationCompleted();
         }
     }
 

@@ -534,7 +534,7 @@ public class JabRefFrame extends BorderPane {
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();
 
-        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getApplication().getAction(), pushToApplicationCommand);
+        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
         pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
 
         // Setup Toolbar
@@ -854,7 +854,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))
         );
 
-        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getApplication().getAction(), pushToApplicationCommand);
+        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
         pushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
 
         tools.getItems().addAll(

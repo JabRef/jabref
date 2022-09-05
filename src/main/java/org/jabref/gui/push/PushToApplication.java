@@ -28,7 +28,7 @@ public interface PushToApplication {
     /**
      * Reporting etc., this method is called on the event dispatch thread after pushEntries() returns.
      */
-    void operationCompleted();
+    void onOperationCompleted();
 
     /**
      * Check whether this operation requires citation keys to be set for the entries. If true is returned an error message
