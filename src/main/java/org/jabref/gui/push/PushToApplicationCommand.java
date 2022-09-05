@@ -21,6 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,12 +48,11 @@ public class PushToApplicationCommand extends SimpleCommand {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
 
-        this.application = PushToApplications.getApplicationByName(
-                                                     preferencesService.getPushToApplicationPreferences()
-                                                                       .getActiveApplicationName(),
-                                                     dialogService,
-                                                     preferencesService)
-                                             .orElse(new PushToEmacs(dialogService, preferencesService));
+        setApplication(preferencesService.getPushToApplicationPreferences()
+                                                            .getActiveApplicationName());
+
+        EasyBind.subscribe(preferencesService.getPushToApplicationPreferences().activeApplicationNameProperty(),
+                this::setApplication);
 
         this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(
@@ -68,6 +68,16 @@ public class PushToApplicationCommand extends SimpleCommand {
         }
 
         this.reconfigurableControls.add(node);
+    }
+
+    public void setApplication(String applicationName) {
+        PushToApplication application = PushToApplications.getApplicationByName(
+                                                                  applicationName,
+                                                                  dialogService,
+                                                                  preferencesService)
+                                                          .orElse(new PushToEmacs(dialogService, preferencesService));
+
+        setApplication(application);
     }
 
     public void setApplication(PushToApplication application) {

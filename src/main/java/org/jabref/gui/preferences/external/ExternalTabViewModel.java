@@ -15,7 +15,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationSettings;
@@ -51,7 +50,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final StateManager stateManager;
 
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().build();
 
@@ -59,10 +57,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final PushToApplicationPreferences initialPushToApplicationPreferences;
     private final PushToApplicationPreferences workingPushToApplicationPreferences;
 
-    public ExternalTabViewModel(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService) {
+    public ExternalTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferences = preferencesService;
-        this.stateManager = stateManager;
         this.initialExternalApplicationPreferences = preferences.getExternalApplicationsPreferences();
         this.initialPushToApplicationPreferences = preferences.getPushToApplicationPreferences();
         this.workingPushToApplicationPreferences = new PushToApplicationPreferences(
@@ -120,8 +117,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         pushPreferences.setCommandPaths(workingPushToApplicationPreferences.getCommandPaths());
         pushPreferences.setEmacsArguments(workingPushToApplicationPreferences.getEmacsArguments());
         pushPreferences.setVimServer(workingPushToApplicationPreferences.getVimServer());
-
-        stateManager.getPushToApplicationCommand().setApplication(selectedPushToApplicationProperty.getValue());
     }
 
     public ValidationStatus terminalCommandValidationStatus() {

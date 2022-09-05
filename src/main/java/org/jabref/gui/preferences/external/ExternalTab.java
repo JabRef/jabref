@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.external;
 
-import javax.inject.Inject;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -9,7 +7,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.push.PushToApplication;
@@ -33,8 +30,6 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     @FXML private TextField customFileBrowserCommand;
     @FXML private Button customFileBrowserBrowse;
 
-    @Inject private StateManager stateManager;
-
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public ExternalTab() {
@@ -49,7 +44,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     }
 
     public void initialize() {
-        this.viewModel = new ExternalTabViewModel(stateManager, dialogService, preferencesService);
+        this.viewModel = new ExternalTabViewModel(dialogService, preferencesService);
 
         new ViewModelListCellFactory<PushToApplication>()
                 .withText(PushToApplication::getDisplayName)

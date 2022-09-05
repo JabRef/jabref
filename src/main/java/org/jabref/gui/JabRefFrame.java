@@ -173,6 +173,7 @@ public class JabRefFrame extends BorderPane {
     private final ThemeManager themeManager;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
+    private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
     private PopOver progressViewPopOver;
@@ -190,6 +191,7 @@ public class JabRefFrame extends BorderPane {
         this.dialogService = new JabRefDialogService(mainStage, this, themeManager);
         this.undoManager = Globals.undoManager;
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager);
+        this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
         this.importFormatReader = Globals.IMPORT_FORMAT_READER;
@@ -200,8 +202,6 @@ public class JabRefFrame extends BorderPane {
                 }
             }
         });
-
-        stateManager.setPushToApplicationCommand(new PushToApplicationCommand(stateManager, dialogService, prefs));
     }
 
     private void initDragAndDrop() {
@@ -534,7 +534,6 @@ public class JabRefFrame extends BorderPane {
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();
 
-        final PushToApplicationCommand pushToApplicationCommand = stateManager.getPushToApplicationCommand();
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getApplication().getAction(), pushToApplicationCommand);
         pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
 
@@ -855,7 +854,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))
         );
 
-        final PushToApplicationCommand pushToApplicationCommand = stateManager.getPushToApplicationCommand();
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getApplication().getAction(), pushToApplicationCommand);
         pushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
 
