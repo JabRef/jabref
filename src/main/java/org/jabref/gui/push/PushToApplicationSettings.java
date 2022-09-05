@@ -1,5 +1,6 @@
 package org.jabref.gui.push;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javafx.scene.control.Button;
@@ -79,7 +80,7 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
-        Map<String, String> commandPaths = preferences.getCommandPaths();
+        Map<String, String> commandPaths = new HashMap<>(preferences.getCommandPaths());
         commandPaths.put(application.getDisplayName(), path.getText());
         preferences.setCommandPaths(commandPaths);
     }
