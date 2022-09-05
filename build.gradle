@@ -138,7 +138,7 @@ dependencies {
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
-    antlr4 'org.antlr:antlr4:4.9.3'
+    antlr4 'org.antlr:antlr4:4.11.1'
     implementation 'org.antlr:antlr4-runtime:4.9.3'
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.2.0.202206071550-r'
