@@ -14,6 +14,7 @@ import org.jabref.preferences.PreferencesService;
 
 import org.jbibtex.ParseException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,6 +28,8 @@ public class FieldRowViewModelTest {
 
     BibEntry leftEntry;
     BibEntry rightEntry;
+
+    BibEntry extraEntry;
 
     BibEntry mergedEntry;
 
@@ -63,6 +66,14 @@ public class FieldRowViewModelTest {
                 .withMonth(Month.DECEMBER)
                 .withField(StandardField.KEYWORDS, "a, b, c")
                 .withField(StandardField.YEAR, "2012");
+
+        extraEntry = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("BoopalGarridoGustafsson2013")
+                .withField(StandardField.AUTHOR, "Padma Prasad Boopal and Mario Garrido and Oscar Gustafsson")
+                .withField(StandardField.BOOKTITLE, "2013 {IEEE} International Symposium on Circuits and Systems (ISCAS2013), Beijing, China, May 19-23, 2013")
+                .withField(StandardField.TITLE, "A reconfigurable {FFT} architecture for variable-length and multi-streaming {OFDM} standards")
+                .withField(StandardField.KEYWORDS, "b, c, a")
+                .withField(StandardField.YEAR, "2013");
 
         mergedEntry = new BibEntry();
         fieldMergerFactory = new FieldMergerFactory(mockedPrefs);
@@ -107,14 +118,13 @@ public class FieldRowViewModelTest {
         assertTrue(yearFieldViewModel.hasEqualLeftAndRightValues());
     }
 
-    /*
-// TODO: Fix this test
+
     @Test
+    @Disabled("This test is kept as a reminder to implement a different comparison logic based on the given field.")
     public void hasEqualLeftAndRightValuesShouldReturnTrueIfKeywordsAreEqual() {
-        var keywordsFieldViewModel = createViewModelForField(StandardField.KEYWORDS);
-        keywordsFieldViewModel.selectNonEmptyValue();
-        assertTrue(keywordsFieldViewModel.hasEqualLeftAndRightValues());
-    }*/
+        FieldRowViewModel keywordsField = new FieldRowViewModel(StandardField.KEYWORDS, rightEntry, extraEntry, mergedEntry, fieldMergerFactory);
+        assertTrue(keywordsField.hasEqualLeftAndRightValues());
+    }
 
     @Test
     public void selectLeftValueShouldBeCorrect() {
