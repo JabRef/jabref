@@ -6,6 +6,7 @@ import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
+
 public class TitleCaseFormatter extends Formatter {
 
     @Override
@@ -33,8 +34,8 @@ public class TitleCaseFormatter extends Formatter {
                     title.getWords().stream().filter(Word::isSmallerWord).forEach(Word::toLowerCase);
                     title.getWords().stream().filter(Word::isLargerWord).forEach(Word::toUpperFirst);
 
-                    title.getFirstWord().ifPresent(Word::toUpperFirst);
-                    title.getLastWord().ifPresent(Word::toUpperFirst);
+                    title.getFirstWord().ifPresent(Word::toUpperFirstTitle);
+                    title.getLastWord().ifPresent(Word::toUpperFirstTitle);
 
                     for (int i = 0; i < (title.getWords().size() - 2); i++) {
                         if (title.getWords().get(i).endsWithColon()) {
