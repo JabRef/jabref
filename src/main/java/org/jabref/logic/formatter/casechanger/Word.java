@@ -100,10 +100,11 @@ public final class Word {
             }
         }
     }
+
     public void toUpperFirstTitle() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
-                chars[i] = (i == 0 || (DASHES.contains(chars[i - 1]) && isConjunction(chars,i))) ?
+                chars[i] = (i == 0 || (DASHES.contains(chars[i - 1]) && isConjunction(chars, i))) ?
                         Character.toUpperCase(chars[i]) :
                         Character.toLowerCase(chars[i]);
             }
@@ -111,15 +112,14 @@ public final class Word {
     }
 
     private boolean isConjunction(char[] chars, int i) {
-        String word="";
+        String word = "";
             while (i < chars.length && !DASHES.contains(chars[i])) {
                 word += chars[i];
                 i++;
             }
-        if (CONJUNCTIONS.contains(word)){
+        if (CONJUNCTIONS.contains(word)) {
             return false;
-        }
-        else{
+        } else {
             return true;
         }
     }
@@ -133,6 +133,7 @@ public final class Word {
             }
         }
     }
+
     public boolean isSmallerWord() {
         // "word:" is still a small "word"
         return SMALLER_WORDS.contains(this.toString().replace(":", "").toLowerCase(Locale.ROOT));
