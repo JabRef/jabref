@@ -25,7 +25,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     public enum DuplicateResolverType {
         DUPLICATE_SEARCH,
         IMPORT_CHECK,
-        INSPECTION,
         DUPLICATE_SEARCH_WITH_EXACT
     }
 
@@ -69,13 +68,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge = new ThreeWayMergeView(one, two);
-            }
-            case INSPECTION -> {
-                first = new ButtonType(Localization.lang("Keep imported"), ButtonData.LEFT);
-                second = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
-                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
-                threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"));
             }
             case DUPLICATE_SEARCH_WITH_EXACT -> {
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
