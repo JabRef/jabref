@@ -1,6 +1,6 @@
 ---
 parent: Getting into the code
-nav_order: 1
+nav_order: 2
 ---
 # Set up a local workspace
 
@@ -70,7 +70,7 @@ Eclipse JEE 2022-03 or newer is required.
 
 ### Other Tooling
 
-See our [tool recommendations](../readings-on-coding/tools.md).
+See our [tool recommendations](../code-howtos/tools.md).
 
 ## Get the code
 

@@ -48,9 +48,9 @@ import org.slf4j.LoggerFactory;
  */
 public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
+    public static final String FETCHER_NAME = "IEEEXplore";
 
-    private static final String FETCHER_NAME = "IEEEXplore";
+    private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
 
     private static final String STAMP_BASE_STRING_DOCUMENT = "/stamp/stamp.jsp?tp=&arnumber=";
     private static final Pattern STAMP_PATTERN = Pattern.compile("(/stamp/stamp.jsp\\?t?p?=?&?arnumber=[0-9]+)");

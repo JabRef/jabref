@@ -2,9 +2,6 @@ package org.jabref.gui.errorconsole;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,8 +27,6 @@ import org.slf4j.LoggerFactory;
 public class ErrorConsoleViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);
 
-    private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-    private final Date date = new Date();
     private final DialogService dialogService;
     private final ClipBoardManager clipBoardManager;
     private final BuildInfo buildInfo;

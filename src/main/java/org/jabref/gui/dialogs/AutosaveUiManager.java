@@ -16,16 +16,16 @@ import org.slf4j.LoggerFactory;
 public class AutosaveUiManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveUiManager.class);
 
-    private final LibraryTab libraryTab;
+    private SaveDatabaseAction saveDatabaseAction;
 
     public AutosaveUiManager(LibraryTab libraryTab) {
-        this.libraryTab = libraryTab;
+        this.saveDatabaseAction = new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager);
     }
 
     @Subscribe
     public void listen(AutosaveEvent event) {
         try {
-            new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager).save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
+            this.saveDatabaseAction.save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
         } catch (Throwable e) {
             LOGGER.error("Problem occurred while saving.", e);
         }

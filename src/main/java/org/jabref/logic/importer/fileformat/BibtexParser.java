@@ -288,14 +288,13 @@ public class BibtexParser implements Parser {
     }
 
     private void parseJabRefComment(Map<String, String> meta) {
-        StringBuilder buffer = null;
+        StringBuilder buffer;
         try {
             buffer = parseBracketedTextExactly();
         } catch (IOException e) {
-            /* if we get an IO Exception here, than we have an unbracketed comment,
-             * which means that we should just return and the comment will be picked up as arbitrary text
-             *  by the parser
-             */
+            // if we get an IO Exception here, then we have an unbracketed comment,
+            // which means that we should just return and the comment will be picked up as arbitrary text
+            // by the parser
             LOGGER.info("Found unbracketed comment");
             return;
         }
@@ -634,7 +633,7 @@ public class BibtexParser implements Parser {
                 value.append(fieldContentFormatter.format(text, field));
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
-                // of brackets inside of a field, so we need to count the
+                // of brackets inside a field, so we need to count the
                 // brackets to know when the string is finished.
                 StringBuilder text = parseBracketedTextExactly();
                 value.append(fieldContentFormatter.format(text, field));

@@ -29,7 +29,6 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
@@ -44,6 +43,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
@@ -83,13 +83,13 @@ public class LibraryTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final JabRefFrame frame;
     private final CountingUndoManager undoManager;
-    private final ExternalFileTypes externalFileTypes;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
     private final ThemeManager themeManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
+
     private BibDatabaseContext bibDatabaseContext;
     private MainTableDataModel tableModel;
     private CitationStyleCache citationStyleCache;
@@ -99,36 +99,42 @@ public class LibraryTab extends Tab {
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
-
     private boolean saving;
     private PersonNameSuggestionProvider searchAutoCompleter;
+
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
+
     private SuggestionProviders suggestionProviders;
+
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
+
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
+
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
+
     // initializing it so we prevent NullPointerException
     private BackgroundTask<ParserResult> dataLoadingTask = BackgroundTask.wrap(() -> null);
 
     private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
+    private final ImportFormatReader importFormatReader;
 
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,
                       StateManager stateManager,
                       ThemeManager themeManager,
                       BibDatabaseContext bibDatabaseContext,
-                      ExternalFileTypes externalFileTypes) {
+                      ImportFormatReader importFormatReader) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
         this.dialogService = frame.getDialogService();
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.themeManager = Objects.requireNonNull(themeManager);
+        this.importFormatReader = importFormatReader;
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -152,7 +158,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
-        this.entryEditor = new EntryEditor(this, externalFileTypes);
+        this.entryEditor = new EntryEditor(this);
 
         // set LibraryTab ID for drag'n'drop
         // ID content doesn't matter, we only need different tabs to have different ID
@@ -212,6 +218,15 @@ public class LibraryTab extends Tab {
         OpenDatabaseAction.performPostOpenActions(this, result);
 
         feedData(context);
+
+        if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+            try {
+                indexingTaskManager.updateIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+            } catch (IOException e) {
+                LOGGER.error("Cannot access lucene index", e);
+            }
+        }
+
         // a temporary workaround to update groups pane
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(frame.getTabbedPane().getSelectionModel().selectedItemProperty(),
@@ -253,7 +268,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
-        this.entryEditor = new EntryEditor(this, externalFileTypes);
+        this.entryEditor = new EntryEditor(this);
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -261,12 +276,17 @@ public class LibraryTab extends Tab {
                     updateTabTitle(changedProperty.getValue()));
         });
 
-        if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
-            AutosaveManager autoSaver = AutosaveManager.start(bibDatabaseContext);
-            autoSaver.registerListener(new AutosaveUiManager(this));
-        }
+        installAutosaveManagerAndBackupManager();
+    }
 
-        BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, preferencesService);
+    public void installAutosaveManagerAndBackupManager() {
+        if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
+            AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
+            autosaveManager.registerListener(new AutosaveUiManager(this));
+        }
+        if (isDatabaseReadyForBackup(bibDatabaseContext)) {
+            BackupManager.start(bibDatabaseContext, Globals.entryTypesManager, preferencesService);
+        }
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -274,6 +294,10 @@ public class LibraryTab extends Tab {
                 || ((context.getLocation() == DatabaseLocation.LOCAL)
                 && preferencesService.getImportExportPreferences().shouldAutoSave()))
                 && context.getDatabasePath().isPresent();
+    }
+
+    private boolean isDatabaseReadyForBackup(BibDatabaseContext context) {
+        return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabasePath().isPresent();
     }
 
     /**
@@ -484,8 +508,9 @@ public class LibraryTab extends Tab {
                 preferencesService,
                 dialogService,
                 stateManager,
-                externalFileTypes,
-                Globals.getKeyPrefs());
+                Globals.getKeyPrefs(),
+                Globals.getClipboardManager(),
+                Globals.IMPORT_FORMAT_READER);
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -798,11 +823,11 @@ public class LibraryTab extends Tab {
     }
 
     public static class Factory {
-        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, ThemeManager themeManager, Path file, BackgroundTask<ParserResult> dataLoadingTask) {
+        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, ThemeManager themeManager, Path file, BackgroundTask<ParserResult> dataLoadingTask, ImportFormatReader importFormatReader) {
             BibDatabaseContext context = new BibDatabaseContext();
             context.setDatabasePath(file);
 
-            LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, themeManager, context, ExternalFileTypes.getInstance());
+            LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, themeManager, context, importFormatReader);
             newTab.setDataLoadingTask(dataLoadingTask);
 
             dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
@@ -938,7 +963,7 @@ public class LibraryTab extends Tab {
             this.setText(text);
             this.getActions().setAll(actions);
             this.show();
-            if (duration != null && !duration.equals(Duration.ZERO)) {
+            if ((duration != null) && !duration.equals(Duration.ZERO)) {
                 PauseTransition delay = new PauseTransition(duration);
                 delay.setOnFinished(e -> this.hide());
                 delay.play();

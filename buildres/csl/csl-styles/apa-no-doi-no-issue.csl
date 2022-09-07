@@ -903,7 +903,7 @@
   </macro>
   <macro name="event">
     <choose>
-      <if variable="event">
+      <if variable="event event-title" match="any">
         <!-- To prevent Zotero from printing event-place due to its double-mapping of all 'place' to
              both publisher-place and event-place. Remove this 'choose' when that is changed. -->
         <choose>

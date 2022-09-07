@@ -120,8 +120,8 @@ class CrawlerTest {
     }
 
     private void setUpTestStudyDefinitionFile() throws Exception {
-        Path destination = tempRepositoryDirectory.resolve("study.yml");
-        URL studyDefinition = this.getClass().getResource("study.yml");
+        Path destination = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+        URL studyDefinition = this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 }
