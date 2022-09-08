@@ -49,6 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed issues with save actions not correctly loaded when opening the library. [#9122](https://github.com/JabRef/jabref/pull/9122)
 - We fixed an issue where title case didn't capitalize words after en-dash characters. [#9068](https://github.com/JabRef/jabref/pull/9068)
 - We fixed an issue where JabRef would not exit when a connection to a LibreOffice document was established previously and the document is still open. [#9075](https://github.com/JabRef/jabref/issues/9075)
+- We fixed an issue about selecting the save order in the preferences. [#9175](https://github.com/JabRef/jabref/issues/9147)
 
 ### Removed
 
