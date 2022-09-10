@@ -414,7 +414,6 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Cache variables
      */
-    private Language language;
     private GeneralPreferences generalPreferences;
     private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
@@ -1254,31 +1253,6 @@ public class JabRefPreferences implements PreferencesService {
     // GeneralPreferences
     //*************************************************************************************************************
 
-    private Language getLanguage() {
-        if (language == null) {
-            updateLanguage();
-        }
-        return language;
-    }
-
-    private void updateLanguage() {
-        String languageId = get(LANGUAGE);
-        language = Stream.of(Language.values())
-                         .filter(language -> language.getId().equalsIgnoreCase(languageId))
-                         .findFirst()
-                         .orElse(Language.ENGLISH);
-    }
-
-    private void setLanguage(Language language) {
-        Language oldLanguage = getLanguage();
-        put(LANGUAGE, language.getId());
-        if (language != oldLanguage) {
-            // Update any defaults that might be language dependent:
-            setLanguageDependentDefaultValues();
-        }
-        updateLanguage();
-    }
-
     @Override
     public GeneralPreferences getGeneralPreferences() {
         if (Objects.nonNull(generalPreferences)) {
@@ -1293,6 +1267,12 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
 
+        EasyBind.listen(generalPreferences.languageProperty(), (obs, oldValue, newValue) -> {
+            put(LANGUAGE, newValue.getId());
+            if (oldValue != newValue) {
+                setLanguageDependentDefaultValues();
+            }
+        });
         EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
         EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
@@ -1300,6 +1280,13 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(generalPreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
 
         return generalPreferences;
+    }
+
+    private Language getLanguage() {
+        return Stream.of(Language.values())
+                     .filter(language -> language.getId().equalsIgnoreCase(get(LANGUAGE)))
+                     .findFirst()
+                     .orElse(Language.ENGLISH);
     }
 
     @Override
@@ -1311,7 +1298,7 @@ public class JabRefPreferences implements PreferencesService {
         telemetryPreferences = new TelemetryPreferences(
                 getBoolean(COLLECT_TELEMETRY),
                 !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY), // mind the !
-                getOrCreateUserId()
+                getTelemetryUserId()
         );
 
         EasyBind.listen(telemetryPreferences.collectTelemetryProperty(), (obs, oldValue, newValue) -> putBoolean(COLLECT_TELEMETRY, newValue));
@@ -1320,7 +1307,7 @@ public class JabRefPreferences implements PreferencesService {
         return telemetryPreferences;
     }
 
-    private String getOrCreateUserId() {
+    private String getTelemetryUserId() {
         Optional<String> userId = getAsOptional(USER_ID);
         if (userId.isPresent()) {
             return userId.get();
