@@ -3,6 +3,8 @@ package org.jabref.model.study;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.crawler.StudyYamlParser;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -11,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * This class represents a scientific study.
  *
  * This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
+ *
+ * The file is parsed using by {@link StudyYamlParser}
  */
 @JsonPropertyOrder({"authors", "title", "research-questions", "queries", "databases"})
 // The user might add arbitrary content to the YAML

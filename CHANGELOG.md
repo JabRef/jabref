@@ -16,6 +16,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We integrated a new three-way merge UI for merging entries in the Entries Merger Dialog, the Duplicate Resolver Dialog, the Entry Importer Dialog, and the External Changes Resolver Dialog. [#8945](https://github.com/JabRef/jabref/pull/8945)
 - We added the ability to merge groups, keywords, comments and files when merging entries. [#9022](https://github.com/JabRef/jabref/pull/9022)
 - We added a warning message next to the authors field in the merge dialog to warn users when the authors are the same but formatted differently. [#8745](https://github.com/JabRef/jabref/issues/8745)
+- The properties of an existing systematic literature review can be edited. [koppor#604](https://github.com/koppor/jabref/issues/604)
+- An SLR can now be started from the SLR itself. [#9131](https://github.com/JabRef/jabref/pull/9131), [koppor#601](https://github.com/koppor/jabref/issues/601)
 
 ### Changed
 
@@ -31,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The global default directory for storing PDFs is now the subdirectory "JabRef" in the user's home.
 - We reworked the Define study parameters dialog. [#9123](https://github.com/JabRef/jabref/pull/9123)
 
+
 ### Fixed
 
 - We fixed an issue where author names with tilde accents (for example ñ) were marked as "Names are not in the standard BibTex format" [#8071](https://github.com/JabRef/jabref/issues/8071)
@@ -44,8 +47,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed several bugs regarding the manual and the autosave of library files that sometimes lead to exceptions or data loss. [#9067](https://github.com/JabRef/jabref/pull/9067), [#8448](https://github.com/JabRef/jabref/issues/8484), [#8746](https://github.com/JabRef/jabref/issues/8746), [#6684](https://github.com/JabRef/jabref/issues/6684), [#6644](https://github.com/JabRef/jabref/issues/6644), [#6102](https://github.com/JabRef/jabref/issues/6102), [#6002](https://github.com/JabRef/jabref/issues/6000)
 - We fixed an issue where applied save actions on saving the library file would lead to the dialog "The library has been modified by another program" popping up [#4877](https://github.com/JabRef/jabref/issues/4877)
 - We fixed issues with save actions not correctly loaded when opening the library. [#9122](https://github.com/JabRef/jabref/pull/9122)
-- We fixed an issue where title case didn't capitalize words after en-dash characters. [#9068](https://github.com/JabRef/jabref/pull/9068)
+- We fixed an issue where title case didn't capitalize words after en-dash characters and skip capitalization of conjunctions that comes after en-dash characters. [#9068](https://github.com/JabRef/jabref/pull/9068),[#9142](https://github.com/JabRef/jabref/pull/9142)
 - We fixed an issue where JabRef would not exit when a connection to a LibreOffice document was established previously and the document is still open. [#9075](https://github.com/JabRef/jabref/issues/9075)
+- We fixed an issue about selecting the save order in the preferences. [#9175](https://github.com/JabRef/jabref/issues/9147)
 
 ### Removed
 

@@ -1,5 +1,6 @@
 package org.jabref.gui.slr;
 
+import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
@@ -14,6 +15,10 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.DialogService;
+import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.crawler.StudyYamlParser;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -23,6 +28,7 @@ import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
@@ -43,7 +49,6 @@ public class ManageStudyDefinitionViewModel {
             SpringerFetcher.FETCHER_NAME,
             DBLPFetcher.FETCHER_NAME);
 
-
     private final StringProperty title = new SimpleStringProperty();
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
@@ -53,11 +58,14 @@ public class ManageStudyDefinitionViewModel {
     // Hold the complement of databases for the selector
     private final SimpleStringProperty directory = new SimpleStringProperty();
 
+    private final DialogService dialogService;
+
     /**
      * Constructor for a new study
      */
     public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
-                                          ImporterPreferences importerPreferences) {
+                                          ImporterPreferences importerPreferences,
+                                          DialogService dialogService) {
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
                                     .map(SearchBasedFetcher::getName)
@@ -69,18 +77,20 @@ public class ManageStudyDefinitionViewModel {
                                         return new StudyDatabaseItem(name, enabled);
                                     })
                                     .toList());
+        this.dialogService = Objects.requireNonNull(dialogService);
     }
 
     /**
      * Constructor for an existing study
      *
-     * @param study The study to initialize the UI from
+     * @param study          The study to initialize the UI from
      * @param studyDirectory The path where the study resides
      */
     public ManageStudyDefinitionViewModel(Study study,
                                           Path studyDirectory,
                                           ImportFormatPreferences importFormatPreferences,
-                                          ImporterPreferences importerPreferences) {
+                                          ImporterPreferences importerPreferences,
+                                          DialogService dialogService) {
         // copy the content of the study object into the UI fields
         authors.addAll(Objects.requireNonNull(study).getAuthors());
         title.setValue(study.getTitle());
@@ -100,6 +110,7 @@ public class ManageStudyDefinitionViewModel {
                                     .toList());
 
         this.directory.set(Objects.requireNonNull(studyDirectory).toString());
+        this.dialogService = Objects.requireNonNull(dialogService);
     }
 
     public StringProperty getTitle() {
@@ -154,13 +165,36 @@ public class ManageStudyDefinitionViewModel {
                 researchQuestions,
                 queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
                 databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
-        Path studyDirectory = null;
+        Path studyDirectory;
+        final String studyDirectoryAsString = directory.getValueSafe();
         try {
-            studyDirectory = Path.of(directory.getValueSafe());
-        } catch (
-                InvalidPathException e) {
-            LOGGER.error("Invalid path was provided: {}", directory);
+            studyDirectory = Path.of(studyDirectoryAsString);
+        } catch (InvalidPathException e) {
+            LOGGER.error("Invalid path was provided: {}", studyDirectoryAsString);
+            dialogService.notify(Localization.lang("Unable to write to %0.", studyDirectoryAsString));
+            // We do not assume another path - we return that there is an invalid object.
+            return null;
         }
+        Path studyDefinitionFile = studyDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+        try {
+            new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
+        } catch (IOException e) {
+            LOGGER.error("Could not write study file {}", studyDefinitionFile, e);
+            dialogService.notify(Localization.lang("Please enter a valid file path.") +
+                    ": " + studyDirectoryAsString);
+            // We do not assume another path - we return that there is an invalid object.
+            return null;
+        }
+
+        try {
+            new GitHandler(studyDirectory).createCommitOnCurrentBranch("Update study definition", false);
+        } catch (Exception e) {
+            LOGGER.error("Could not commit study definition file in directory {}", studyDirectory, e);
+            dialogService.notify(Localization.lang("Please enter a valid file path.") +
+                    ": " + studyDirectory);
+            // We continue nevertheless as the directory itself could be valid
+        }
+
         return new SlrStudyAndDirectory(study, studyDirectory);
     }
 
