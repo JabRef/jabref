@@ -1,5 +1,10 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.CompoundEdit;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -9,6 +14,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMerger;
+import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
@@ -49,11 +56,16 @@ public class FieldRowViewModel {
 
     private final BooleanBinding hasEqualLeftAndRight;
 
-    public FieldRowViewModel(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry) {
+    private final FieldMergerFactory fieldMergerFactory;
+
+    private final CompoundEdit fieldsMergedEdit = new CompoundEdit();
+
+    public FieldRowViewModel(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory) {
         this.field = field;
         this.leftEntry = leftEntry;
         this.rightEntry = rightEntry;
         this.mergedEntry = mergedEntry;
+        this.fieldMergerFactory = fieldMergerFactory;
 
         if (field.equals(InternalField.TYPE_HEADER)) {
             setLeftFieldValue(leftEntry.getType().getDisplayName());
@@ -125,7 +137,7 @@ public class FieldRowViewModel {
     }
 
     public void selectRightValue() {
-        if (isIsFieldsMerged()) {
+        if (isFieldsMerged()) {
             selectLeftValue();
         } else {
             setSelection(Selection.RIGHT);
@@ -148,8 +160,33 @@ public class FieldRowViewModel {
         return mergedFieldValue.get();
     }
 
-    public void merge() {
-        setIsFieldsMerged(true);
+    public void mergeFields() {
+        assert !hasEqualLeftAndRightValues();
+
+        if (!FieldMergerFactory.canMerge(field)) {
+            throw new UnsupportedOperationException();
+        }
+
+        String oldLeftFieldValue = getLeftFieldValue();
+        String oldRightFieldValue = getRightFieldValue();
+
+        FieldMerger fieldMerger = fieldMergerFactory.create(field);
+        String mergedFields = fieldMerger.merge(getLeftFieldValue(), getRightFieldValue());
+        setLeftFieldValue(mergedFields);
+        setRightFieldValue(mergedFields);
+
+        if (fieldsMergedEdit.canRedo()) {
+            fieldsMergedEdit.redo();
+        } else {
+            fieldsMergedEdit.addEdit(new MergeFieldsUndo(oldLeftFieldValue, oldRightFieldValue, mergedFields));
+            fieldsMergedEdit.end();
+        }
+    }
+
+    public void unmergeFields() {
+        if (fieldsMergedEdit.canUndo()) {
+            fieldsMergedEdit.undo();
+        }
     }
 
     public BooleanBinding hasEqualLeftAndRightBinding() {
@@ -168,7 +205,7 @@ public class FieldRowViewModel {
         return selectionProperty().get();
     }
 
-    public boolean isIsFieldsMerged() {
+    public boolean isFieldsMerged() {
         return isFieldsMerged.get();
     }
 
@@ -218,5 +255,31 @@ public class FieldRowViewModel {
 
     public BibEntry getMergedEntry() {
         return mergedEntry;
+    }
+
+    class MergeFieldsUndo extends AbstractUndoableEdit {
+        private final String oldLeft;
+        private final String oldRight;
+        private final String mergedFields;
+
+        MergeFieldsUndo(String oldLeft, String oldRight, String mergedFields) {
+            this.oldLeft = oldLeft;
+            this.oldRight = oldRight;
+            this.mergedFields = mergedFields;
+        }
+
+        @Override
+        public void undo() throws CannotUndoException {
+            super.undo();
+            setLeftFieldValue(oldLeft);
+            setRightFieldValue(oldRight);
+        }
+
+        @Override
+        public void redo() throws CannotRedoException {
+            super.redo();
+            setLeftFieldValue(mergedFields);
+            setRightFieldValue(mergedFields);
+        }
     }
 }
