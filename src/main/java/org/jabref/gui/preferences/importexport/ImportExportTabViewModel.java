@@ -115,7 +115,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
-                SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInTableOrderProperty.getValue()),
+                SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInOriginalProperty.getValue()),
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
         preferencesService.storeExportSaveOrder(newSaveOrderConfig);
 

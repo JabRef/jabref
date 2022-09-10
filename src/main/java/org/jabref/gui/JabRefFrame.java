@@ -101,8 +101,7 @@ import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
-import org.jabref.gui.push.PushToApplicationAction;
-import org.jabref.gui.push.PushToApplicationsManager;
+import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
@@ -173,8 +172,8 @@ public class JabRefFrame extends BorderPane {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
     private final CountingUndoManager undoManager;
-    private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
+    private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
     private PopOver progressViewPopOver;
@@ -190,9 +189,9 @@ public class JabRefFrame extends BorderPane {
         this.stateManager = Globals.stateManager;
         this.themeManager = Globals.getThemeManager();
         this.dialogService = new JabRefDialogService(mainStage, this, themeManager);
-        this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
         this.undoManager = Globals.undoManager;
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager);
+        this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
         this.importFormatReader = Globals.IMPORT_FORMAT_READER;
@@ -535,9 +534,8 @@ public class JabRefFrame extends BorderPane {
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();
 
-        final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
-        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
-        pushToApplicationsManager.registerReconfigurable(pushToApplicationButton);
+        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
+        pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
 
         // Setup Toolbar
 
@@ -856,10 +854,8 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))
         );
 
-        // PushToApplication
-        final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
-        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
-        pushToApplicationsManager.registerReconfigurable(pushToApplicationMenuItem);
+        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
+        pushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
 
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),
@@ -1284,10 +1280,6 @@ public class JabRefFrame extends BorderPane {
 
     public OpenDatabaseAction getOpenDatabaseAction() {
         return new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager);
-    }
-
-    public PushToApplicationsManager getPushToApplicationsManager() {
-        return pushToApplicationsManager;
     }
 
     public GlobalSearchBar getGlobalSearchBar() {

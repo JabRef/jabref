@@ -33,8 +33,6 @@ import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
-import org.jabref.gui.push.PushToApplicationsManager;
-import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -44,7 +42,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.PreferencesFilter;
 import org.jabref.preferences.PreferencesService;
 
@@ -72,7 +69,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new TableTab(),
                 new PreviewTab(),
                 new ProtectedTermsTab(),
-                new ExternalTab(frame.getPushToApplicationsManager()),
+                new ExternalTab(),
                 new ExternalFileTypesTab(),
                 new JournalAbbreviationsTab(),
                 new GroupsTab(),
@@ -176,11 +173,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         XmpPreferences xmpPreferences = preferences.getXmpPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences,
                 xmpPreferences, preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager);
-
-        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
-        PushToApplicationsManager manager = frame.getPushToApplicationsManager();
-        manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName())
-                                               .orElse(new PushToEmacs(dialogService, preferences)));
 
         frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
