@@ -27,13 +27,13 @@ public final class Word {
         Set<Character> dashes = new HashSet<>();
         Set<String> conjunctions = new HashSet<>();
 
-        // Conjunctions
+        // Conjunctions used as part of Title case capitalisation to specifically check if word is conjunction or not
         conjunctions.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
         // Articles
         smallerWords.addAll(Arrays.asList("a", "an", "the"));
         // Prepositions
         smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
-        // Conjunctions
+        // Conjunctions used as part of all case capitalisation to check if it is a small word or not
         smallerWords.addAll(conjunctions);
         // Dashes
         dashes.addAll(Arrays.asList(
