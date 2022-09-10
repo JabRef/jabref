@@ -1254,8 +1254,7 @@ public class JabRefPreferences implements PreferencesService {
     // GeneralPreferences
     //*************************************************************************************************************
 
-    @Override
-    public Language getLanguage() {
+    private Language getLanguage() {
         if (language == null) {
             updateLanguage();
         }
@@ -1270,8 +1269,7 @@ public class JabRefPreferences implements PreferencesService {
                          .orElse(Language.ENGLISH);
     }
 
-    @Override
-    public void setLanguage(Language language) {
+    private void setLanguage(Language language) {
         Language oldLanguage = getLanguage();
         put(LANGUAGE, language.getId());
         if (language != oldLanguage) {
@@ -1288,6 +1286,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         generalPreferences = new GeneralPreferences(
+                getLanguage(),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
