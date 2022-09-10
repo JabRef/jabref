@@ -251,6 +251,72 @@ public class GroupTreeViewModel extends AbstractViewModel {
                                                                                          oldGroup.getGroupNode().getGroup(),
                                                                                          GroupDialogHeader.SUBGROUP));
             newGroup.ifPresent(group -> {
+
+                AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
+                String oldGroupName = oldGroupDef.getName();
+
+                // we changed the name.
+                // dialog already warns us about this if we name it like another existing group
+                 // So can simply check if we have more than 1 group
+                if (compareGroupType(oldGroupDef, group) && !group.getName().equals(oldGroupName)) {
+
+                    //  We check if we still have the same group type, apparently this is only allowed for Explicit groups?
+                    boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
+                                                        && (group instanceof ExplicitGroup);
+
+                    int groupsWithSameName = 0;
+                    Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
+                    if (databaseRootGroup.isPresent()) {
+                        String name = oldGroup.getGroupNode().getGroup().getName();
+                        groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
+                    }
+                    // We found more than 2 groups, so we cannot simply remove old assignment
+                    if (groupsWithSameName >= 2) {
+                        removePreviousAssignments = false;
+                    }
+                    //Dialog seems to be superflous in this case
+
+                    String content = Localization.lang("Assign the original group's entries to this group?");
+                    ButtonType keepAssignments = new ButtonType(Localization.lang("Assign"), ButtonBar.ButtonData.YES);
+                    ButtonType removeAssignments = new ButtonType(Localization.lang("Do not assign"), ButtonBar.ButtonData.NO);
+                    ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+
+                    if (newGroup.get().getClass() == WordKeywordGroup.class) {
+                        content = content + "\n\n" +
+                                  Localization.lang("(Note: If original entries lack keywords to qualify for the new group configuration, confirming here will add them)");
+                    }
+
+                    Optional<ButtonType> previousAssignments = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.WARNING,
+                                                                                                           Localization.lang("Group name change"),
+                                                                                                           content,
+                                                                                                           keepAssignments,
+                                                                                                           removeAssignments,
+                                                                                                           cancel);
+                    if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES)) {
+                        oldGroup.getGroupNode().setGroup(
+                                     group,
+                                     true,
+                                     removePreviousAssignments,
+                                     database.getEntries());
+                    } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.NO)) {
+                        oldGroup.getGroupNode().setGroup(
+                                     group,
+                                     false,
+                                     removePreviousAssignments,
+                                     database.getEntries());
+                    } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE)) {
+                        return;
+                    }
+                    dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
+                    writeGroupChangesToMetaData();
+                    // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+                    refresh();
+
+                    return;
+                    //
+                }
+
                 if (this.compareGroupType(oldGroup.getGroupNode().getGroup(), group) && this.checkGroupFieldsForModificationsDialogNotNecessary(oldGroup.getGroupNode().getGroup(), group)) {
                     oldGroup.getGroupNode().setGroup(
                          group,
@@ -288,6 +354,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     String name = oldGroup.getGroupNode().getGroup().getName();
                     groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
                 }
+                // okay we found more than 2 groups with the same name
+                // If we only found one we can still do it
                 if (groupsWithSameName >= 2) {
                     removePreviousAssignments = false;
                 }
@@ -332,6 +400,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 refresh();
             });
         });
+    }
+
+    private void showGroupChangeDialog() {
+
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {
