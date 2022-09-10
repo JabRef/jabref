@@ -118,7 +118,6 @@ public class FieldRowViewModelTest {
         assertTrue(yearFieldViewModel.hasEqualLeftAndRightValues());
     }
 
-
     @Test
     @Disabled("This test is kept as a reminder to implement a different comparison logic based on the given field.")
     public void hasEqualLeftAndRightValuesShouldReturnTrueIfKeywordsAreEqual() {
