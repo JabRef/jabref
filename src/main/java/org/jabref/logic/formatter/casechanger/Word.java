@@ -18,20 +18,23 @@ public final class Word {
      */
     public static final Set<String> SMALLER_WORDS;
     public static final Set<Character> DASHES;
+    public static final Set<String> CONJUNCTIONS;
     private final char[] chars;
     private final boolean[] protectedChars;
 
     static {
         Set<String> smallerWords = new HashSet<>();
         Set<Character> dashes = new HashSet<>();
+        Set<String> conjunctions = new HashSet<>();
 
+        // Conjunctions used as part of Title case capitalisation to specifically check if word is conjunction or not
+        conjunctions.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
         // Articles
         smallerWords.addAll(Arrays.asList("a", "an", "the"));
         // Prepositions
         smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
-        // Conjunctions
-        smallerWords.addAll(Arrays.asList("and", "but", "for", "nor", "or", "so", "yet"));
-
+        // Conjunctions used as part of all case capitalisation to check if it is a small word or not
+        smallerWords.addAll(conjunctions);
         // Dashes
         dashes.addAll(Arrays.asList(
                 '-', '~', '⸗', '〰', '᐀', '֊', '־', '‐', '‑', '‒',
@@ -41,6 +44,9 @@ public final class Word {
 
         // unmodifiable for thread safety
         DASHES = dashes;
+
+        // unmodifiable for thread safety
+        CONJUNCTIONS = conjunctions;
 
         // unmodifiable for thread safety
         SMALLER_WORDS = smallerWords.stream()
@@ -87,6 +93,39 @@ public final class Word {
     }
 
     public void toUpperFirst() {
+        for (int i = 0; i < chars.length; i++) {
+            if (!protectedChars[i]) {
+                chars[i] = (i == 0) ?
+                        Character.toUpperCase(chars[i]) :
+                        Character.toLowerCase(chars[i]);
+            }
+        }
+    }
+
+    public void toUpperFirstTitle() {
+        for (int i = 0; i < chars.length; i++) {
+            if (!protectedChars[i]) {
+                chars[i] = (i == 0 || (DASHES.contains(chars[i - 1]) && isConjunction(chars, i))) ?
+                        Character.toUpperCase(chars[i]) :
+                        Character.toLowerCase(chars[i]);
+            }
+        }
+    }
+
+    private boolean isConjunction(char[] chars, int i) {
+        String word = "";
+            while (i < chars.length && !DASHES.contains(chars[i])) {
+                word += chars[i];
+                i++;
+            }
+        if (CONJUNCTIONS.contains(word)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public void stripConsonants() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] = (i == 0 || DASHES.contains(chars[i - 1])) ?

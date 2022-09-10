@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javafx.beans.property.ObjectProperty;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
@@ -14,16 +12,15 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
+public class PushToEmacs extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplicationConstants.EMACS;
+    public static final String NAME = PushToApplications.EMACS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 
@@ -37,7 +34,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     }
 
     @Override
-    public JabRefIcon getIcon() {
+    public JabRefIcon getApplicationIcon() {
         return IconTheme.JabRefIcons.APPLICATION_EMACS;
     }
 
@@ -47,14 +44,14 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getPushToApplicationCommandPaths().get(this.getDisplayName());
+        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
             return;
         }
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getPushToApplicationCommandPaths().get(this.getDisplayName());
+        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         String[] addParams = preferencesService.getPushToApplicationPreferences().getEmacsArguments().split(" ");
         try {
@@ -109,7 +106,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     }
 
     @Override
-    public void operationCompleted() {
+    public void onOperationCompleted() {
         if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to a running gnuserv process. Make sure that "
@@ -120,7 +117,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                     Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
                             + "the emacsclient/gnuclient program installed and available in the PATH."));
         } else {
-            super.operationCompleted();
+            super.onOperationCompleted();
         }
     }
 
@@ -130,7 +127,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     }
 
     @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
+    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToEmacsSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 }
