@@ -101,14 +101,14 @@ import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
-import org.jabref.gui.push.PushToApplicationAction;
-import org.jabref.gui.push.PushToApplicationsManager;
+import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.slr.EditExistingStudyAction;
 import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
@@ -172,8 +172,8 @@ public class JabRefFrame extends BorderPane {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
     private final CountingUndoManager undoManager;
-    private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
+    private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
     private PopOver progressViewPopOver;
@@ -189,9 +189,9 @@ public class JabRefFrame extends BorderPane {
         this.stateManager = Globals.stateManager;
         this.themeManager = Globals.getThemeManager();
         this.dialogService = new JabRefDialogService(mainStage, this, themeManager);
-        this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
         this.undoManager = Globals.undoManager;
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
+        this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
         this.importFormatReader = Globals.IMPORT_FORMAT_READER;
@@ -534,14 +534,12 @@ public class JabRefFrame extends BorderPane {
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();
 
-        final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
-        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
-        pushToApplicationsManager.registerReconfigurable(pushToApplicationButton);
+        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
+        pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
 
         // Setup Toolbar
 
         ToolBar toolBar = new ToolBar(
-
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(this, prefs)),
                         factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager)),
@@ -641,12 +639,7 @@ public class JabRefFrame extends BorderPane {
         openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
         EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
 
-        stateManager.activeDatabaseProperty().bind(
-                EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
-                        selectedTab -> Optional.ofNullable(selectedTab)
-                                               .filter(tab -> tab instanceof LibraryTab)
-                                               .map(tab -> (LibraryTab) tab)
-                                               .map(LibraryTab::getBibDatabaseContext)));
+        // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
@@ -665,10 +658,11 @@ public class JabRefFrame extends BorderPane {
         // Wait for the scene to be created, otherwise focusOwnerProperty is not provided
         Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
                 EasyBind.map(mainStage.getScene().focusOwnerProperty(), Optional::ofNullable)));
+
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
-         * cut/paste/copy operations would some times occur in the wrong tab.
+         * cut/paste/copy operations would sometimes occur in the wrong tab.
          */
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
             if (!(tab instanceof LibraryTab libraryTab)) {
@@ -860,10 +854,8 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))
         );
 
-        // PushToApplication
-        final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
-        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
-        pushToApplicationsManager.registerReconfigurable(pushToApplicationMenuItem);
+        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
+        pushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
 
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),
@@ -878,9 +870,13 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, this.prefs, stateManager)),
                 pushToApplicationMenuItem,
+
                 new SeparatorMenuItem(),
+
+                // Systematic Literature Review (SLR)
                 factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
-                factory.createMenuItem(StandardActions.SEARCH_FOR_EXISTING_STUDY, new ExistingStudySearchAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
+                factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(this.dialogService, this.stateManager)),
+                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(this, this.getOpenDatabaseAction(), this.getDialogService(), Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
 
                 new SeparatorMenuItem(),
 
@@ -1284,10 +1280,6 @@ public class JabRefFrame extends BorderPane {
 
     public OpenDatabaseAction getOpenDatabaseAction() {
         return new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager);
-    }
-
-    public PushToApplicationsManager getPushToApplicationsManager() {
-        return pushToApplicationsManager;
     }
 
     public GlobalSearchBar getGlobalSearchBar() {

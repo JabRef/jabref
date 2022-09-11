@@ -89,8 +89,10 @@ public class FileUtil {
 
     /**
      * Returns a valid filename for most operating systems.
-     * <p>
+     *
      * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
+     *
+     * For "real" cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
      */
     public static String getValidFileName(String fileName) {
         String nameWithoutExtension = getBaseName(fileName);
@@ -388,7 +390,7 @@ public class FileUtil {
     }
 
     /**
-     * @return Path of current panel database directory or the standard working directory in case the datbase was not saved yet
+     * @return Path of current panel database directory or the standard working directory in case the database was not saved yet
      */
     public static Path getInitialDirectory(BibDatabaseContext databaseContext, Path workingDirectory) {
         return databaseContext.getDatabasePath().map(Path::getParent).orElse(workingDirectory);

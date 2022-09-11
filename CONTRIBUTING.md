@@ -3,8 +3,9 @@
 When contributing to this repository, please first discuss the change you wish to make via issue,
 email, or any other method with the owners of this repository before making a change.
 
-Support on code contribution is available at <https://devdocs.jabref.org/contributing>.
-General overview on contributing is available at <https://contribute.jabref.org>.
+Support on **code contribution** is available at <https://devdocs.jabref.org/contributing>.
+
+General overview about contributing for programmers and non-programmers is available at <https://contribute.jabref.org>.
 
 ## Pull Request Process
 
