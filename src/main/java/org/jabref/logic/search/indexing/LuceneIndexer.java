@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.StandardFileType;
@@ -261,26 +262,45 @@ public class LuceneIndexer {
     }
 
     /**
-     * Lists the paths of all the files that are stored in the index
+     * Lists all values of a given field stored in the index
      *
-     * @return all file paths
+     * @param field the field to get the values for
+     * @return all values for this field
      */
-    public Set<String> getListOfFilePaths() {
-        Set<String> paths = new HashSet<>();
+    private Set<String> getListOfField(String field) {
+        Set<String> values = new HashSet<>();
         try (IndexReader reader = DirectoryReader.open(directoryToIndex)) {
             IndexSearcher searcher = new IndexSearcher(reader);
             MatchAllDocsQuery query = new MatchAllDocsQuery();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
                 Document doc = reader.document(scoreDoc.doc);
-                if (doc.getField(SearchFieldConstants.PATH) != null) {
-                    paths.add(doc.getField(SearchFieldConstants.PATH).stringValue());
+                if (doc.getField(field) != null) {
+                    values.add(doc.getField(field).stringValue());
                 }
             }
         } catch (IOException e) {
-            return paths;
+            return values;
         }
-        return paths;
+        return values;
+    }
+
+    /**
+     * Lists the paths of all the files that are stored in the index
+     *
+     * @return all file paths
+     */
+    public Set<String> getListOfFilePaths() {
+        return getListOfField(SearchFieldConstants.PATH);
+    }
+
+    /**
+     * Lists the hashes of all the entries that are stored in the index
+     *
+     * @return all entry hashes
+     */
+    public Set<Integer> getListOfHashes() {
+        return getListOfField(SearchFieldConstants.BIB_ENTRY_ID_HASH).stream().map(Integer::valueOf).collect(Collectors.toSet());
     }
 
     public void deleteLinkedFilesIndex() {

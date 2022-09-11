@@ -3,7 +3,6 @@ package org.jabref.logic.search.indexing;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.stream.Collectors;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -106,7 +105,8 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     public void updateIndex(LuceneIndexer indexer) {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
-        Set<Integer> hashesOfEntriesToRemove = indexer.getDatabaseContext().getEntries().stream().map(BibEntry::updateAndGetIndexHash).collect(Collectors.toSet());
+        Set<Integer> hashesOfEntriesToRemove = indexer.getListOfHashes();
+        indexer.getDatabaseContext().getEntries().stream().forEach(BibEntry::updateAndGetIndexHash);
         for (BibEntry entry : indexer.getDatabaseContext().getEntries()) {
             enqueueTask(() -> indexer.addBibFieldsToIndex(entry), true);
             enqueueTask(() -> indexer.addLinkedFilesToIndex(entry), false);
