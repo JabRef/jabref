@@ -885,15 +885,6 @@ public class LibraryTab extends Tab {
 
     private class IndexUpdateListener {
 
-        public IndexUpdateListener() {
-            try {
-                indexingTaskManager.manageFulltextIndexAccordingToPrefs(LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences()));
-                indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences()));
-            } catch (IOException e) {
-                LOGGER.error("Cannot access lucene index", e);
-            }
-        }
-
         @Subscribe
         public void listen(EntriesAddedEvent addedEntryEvent) {
             try {
