@@ -268,6 +268,7 @@ public class IconTheme {
         FILE_TEXT(MaterialDesignF.FILE_DOCUMENT),
         FILE_MULTIPLE(MaterialDesignF.FILE_MULTIPLE),
         FILE_OPENOFFICE(JabRefMaterialDesignIcon.OPEN_OFFICE),
+        APPLICATION_GENERIC(MaterialDesignA.APPLICATION),
         APPLICATION_EMACS(JabRefMaterialDesignIcon.EMACS),
         APPLICATION_LYX(JabRefMaterialDesignIcon.LYX),
         APPLICATION_TEXSTUDIO(JabRefMaterialDesignIcon.TEX_STUDIO),
