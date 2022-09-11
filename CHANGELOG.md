@@ -96,6 +96,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where linked fails containing parts of the main file directory could not be opened. [#8991](https://github.com/JabRef/jabref/issues/8991)
+- Linked files with an absolute path can be opened again. [#8991](https://github.com/JabRef/jabref/issues/8991)
 - We fixed an issue where the user could not rate an entry in the main table when an entry was not yet ranked. [#5842](https://github.com/JabRef/jabref/issues/5842)
 - We fixed an issue that caused JabRef to sometimes open multiple instances when "Remote Operation" is enabled. [#8653](https://github.com/JabRef/jabref/issues/8653)
 - We fixed an issue where linked files with the filetype "application/pdf" in an entry were not shown with the correct PDF-Icon in the main table [8930](https://github.com/JabRef/jabref/issues/8930)
