@@ -55,11 +55,10 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         ButtonType cancel = ButtonType.CANCEL;
         ButtonType merge = new ButtonType(Localization.lang("Keep merged"), ButtonData.OK_DONE);
 
-        ButtonBar options = new ButtonBar();
         ButtonType both;
         ButtonType second;
         ButtonType first;
-        ButtonType removeExact = new ButtonType(Localization.lang("Automatically remove exact duplicates"), ButtonData.APPLY);
+        ButtonType removeExact = new ButtonType(Localization.lang("Automatically remove exact duplicates"), ButtonData.LEFT);
         boolean removeExactVisible = false;
 
         switch (type) {
@@ -85,12 +84,19 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             }
             default -> throw new IllegalStateException("Switch expression should be exhaustive");
         }
-        if (removeExactVisible) {
-            this.getDialogPane().getButtonTypes().add(removeExact);
-        }
 
         this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel);
         this.getDialogPane().setFocusTraversable(false);
+
+        if (removeExactVisible) {
+            this.getDialogPane().getButtonTypes().add(removeExact);
+
+            // This will prevent all dialog buttons from having the same size
+            // Read more: https://stackoverflow.com/questions/45866249/javafx-8-alert-different-button-sizes
+            getDialogPane().getButtonTypes().stream()
+                           .map(getDialogPane()::lookupButton)
+                           .forEach(btn-> ButtonBar.setButtonUniformSize(btn, false));
+        }
 
         // Retrieves the previous window state and sets the new dialog window size and position to match it
         DialogWindowState state = stateManager.getDialogWindowState(getClass().getSimpleName());
@@ -101,7 +107,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         }
 
         BorderPane borderPane = new BorderPane(threeWayMerge);
-        borderPane.setBottom(options);
 
         this.setResultConverter(button -> {
             // Updates the window state on button press
