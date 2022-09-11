@@ -100,6 +100,7 @@ public class SharedDatabaseUIManager {
 
         if (response.isPresent() && response.get().equals(merge)) {
             MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry);
+            dialog.setTitle(Localization.lang("Update refused"));
             Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog).map(EntriesMergeResult::mergedEntry);
 
             mergedEntry.ifPresent(mergedBibEntry -> {

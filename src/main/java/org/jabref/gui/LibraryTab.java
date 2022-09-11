@@ -89,6 +89,7 @@ public class LibraryTab extends Tab {
     private final ThemeManager themeManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
+
     private BibDatabaseContext bibDatabaseContext;
     private MainTableDataModel tableModel;
     private CitationStyleCache citationStyleCache;
@@ -98,17 +99,22 @@ public class LibraryTab extends Tab {
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
-
     private boolean saving;
     private PersonNameSuggestionProvider searchAutoCompleter;
+
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
+
     private SuggestionProviders suggestionProviders;
+
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
+
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
+
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
+
     // initializing it so we prevent NullPointerException
     private BackgroundTask<ParserResult> dataLoadingTask = BackgroundTask.wrap(() -> null);
 
@@ -212,6 +218,14 @@ public class LibraryTab extends Tab {
         OpenDatabaseAction.performPostOpenActions(this, result);
 
         feedData(context);
+
+        if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
+            try {
+                indexingTaskManager.updateIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
+            } catch (IOException e) {
+                LOGGER.error("Cannot access lucene index", e);
+            }
+        }
 
         // a temporary workaround to update groups pane
         stateManager.activeDatabaseProperty().bind(

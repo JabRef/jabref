@@ -42,5 +42,5 @@
         </AnchorPane>
 
     </content>
-    <ButtonType fx:id="close" text="%Close" buttonData="CANCEL_CLOSE"/>
+    <ButtonType fx:constant="CANCEL"/>
 </DialogPane>
