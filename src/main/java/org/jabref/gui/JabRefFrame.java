@@ -191,7 +191,7 @@ public class JabRefFrame extends BorderPane {
         this.dialogService = new JabRefDialogService(mainStage, this, themeManager);
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
         this.undoManager = Globals.undoManager;
-        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager);
+        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
         this.importFormatReader = Globals.IMPORT_FORMAT_READER;
