@@ -247,7 +247,7 @@ public class BibDatabaseContext {
 
         if (getDatabasePath().isPresent()) {
             Path databasePath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), databasePath);
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), databasePath);
             return databasePath;
         }
 
