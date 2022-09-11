@@ -1,5 +1,6 @@
 package org.jabref.gui.duplicationFinder;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -7,6 +8,8 @@ import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
@@ -16,6 +19,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
@@ -39,19 +43,18 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
     private ThreeWayMergeView threeWayMerge;
     private final DialogService dialogService;
+    private final ActionFactory actionFactory;
 
-    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager, DialogService dialogService) {
+    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager, DialogService dialogService, PreferencesService prefs) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
         this.database = database;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
+        this.actionFactory = new ActionFactory(prefs.getKeyBindingRepository());
         init(one, two, type);
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
-        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService);
-        ButtonType help = new ButtonType(Localization.lang("Help"), ButtonData.HELP);
-
         ButtonType cancel = ButtonType.CANCEL;
         ButtonType merge = new ButtonType(Localization.lang("Keep merged"), ButtonData.OK_DONE);
 
@@ -126,9 +129,11 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             return null;
         });
 
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService);
+        Button helpButton = actionFactory.createIconButton(StandardActions.HELP, helpCommand);
+        borderPane.setRight(helpButton);
+
         getDialogPane().setContent(borderPane);
-/*        Button helpButton = (Button) this.getDialogPane().lookupButton(help);
-        helpButton.setOnAction(evt -> helpCommand.execute());*/
     }
 
     public BibEntry getMergedEntry() {
