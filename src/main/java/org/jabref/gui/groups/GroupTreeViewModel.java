@@ -263,7 +263,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     int groupsWithSameName = 0;
                     Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
                     if (databaseRootGroup.isPresent()) {
-                        String name = oldGroup.getGroupNode().getGroup().getName();
+                        String name = group.getName();
                         groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
                     }
                     boolean removePreviousAssignments = true;
@@ -369,10 +369,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 refresh();
             });
         });
-    }
-
-    private void showGroupChangeDialog() {
-
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {
