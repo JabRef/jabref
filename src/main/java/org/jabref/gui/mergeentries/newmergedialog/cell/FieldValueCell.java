@@ -1,9 +1,7 @@
 package org.jabref.gui.mergeentries.newmergedialog.cell;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -47,36 +45,26 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     public static final String SELECTION_BOX_STYLE_CLASS = "selection-box";
 
     private static final PseudoClass SELECTED_PSEUDO_CLASS = PseudoClass.getPseudoClass("selected");
-    private final ObjectProperty<ToggleGroup> toggleGroup = new SimpleObjectProperty<>();
+
     private final StyleClassedTextArea label = new StyleClassedTextArea();
 
     private final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
     private final VirtualizedScrollPane<StyleClassedTextArea> scrollPane = new VirtualizedScrollPane<>(label);
     HBox labelBox = new HBox(scrollPane);
-    private final BooleanProperty selected = new BooleanPropertyBase() {
-        @Override
-        public Object getBean() {
-            return FieldValueCell.class;
-        }
 
-        @Override
-        public String getName() {
-            return "selected";
-        }
-
-        @Override
-        protected void invalidated() {
-            pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, get());
-
-            getToggleGroup().selectToggle(FieldValueCell.this);
-        }
-    };
     private final HBox selectionBox = new HBox();
     private final HBox actionsContainer = new HBox();
+    private final FieldValueCellViewModel viewModel;
 
     public FieldValueCell(String text, int rowIndex) {
         super(text, rowIndex);
+        viewModel = new FieldValueCellViewModel(text);
+        EasyBind.listen(viewModel.selectedProperty(), (observable, old, isSelected) -> {
+            pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, isSelected);
+            getToggleGroup().selectToggle(FieldValueCell.this);
+        });
+        viewModel.fieldValueProperty().bind(textProperty());
         initialize();
     }
 
@@ -86,7 +74,6 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         initializeLabel();
         initializeSelectionBox();
         initializeActions();
-        textProperty().addListener(invalidated -> setUserData(getText()));
         setOnMouseClicked(e -> {
             if (!isDisabled()) {
                 setSelected(true);
@@ -180,42 +167,32 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
     @Override
     public ToggleGroup getToggleGroup() {
-        return toggleGroupProperty().get();
+        return viewModel.getToggleGroup();
     }
 
     @Override
     public void setToggleGroup(ToggleGroup toggleGroup) {
-        toggleGroupProperty().set(toggleGroup);
+        viewModel.setToggleGroup(toggleGroup);
     }
 
     @Override
     public ObjectProperty<ToggleGroup> toggleGroupProperty() {
-        return toggleGroup;
+        return viewModel.toggleGroupProperty();
     }
 
     @Override
     public boolean isSelected() {
-        return selectedProperty().get();
+        return viewModel.isSelected();
     }
 
     @Override
     public void setSelected(boolean selected) {
-        selectedProperty().set(selected);
+        viewModel.setSelected(selected);
     }
 
     @Override
     public BooleanProperty selectedProperty() {
-        return selected;
-    }
-
-    @Override
-    public void setUserData(Object value) {
-        super.setText((String) value);
-    }
-
-    @Override
-    public Object getUserData() {
-        return super.getText();
+        return viewModel.selectedProperty();
     }
 
     public StyleClassedTextArea getStyleClassedLabel() {
