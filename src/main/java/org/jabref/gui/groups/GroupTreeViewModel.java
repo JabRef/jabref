@@ -320,6 +320,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 int groupsWithSameName = 0;
                 Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
                 if (databaseRootGroup.isPresent()) {
+                    //TODO Old Group or new group?
                     String name = oldGroup.getGroupNode().getGroup().getName();
                     groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
                 }
