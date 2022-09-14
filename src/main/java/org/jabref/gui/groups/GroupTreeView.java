@@ -263,8 +263,8 @@ public class GroupTreeView extends BorderPane {
             // Add context menu (only for non-null items)
             row.contextMenuProperty().bind(
                     EasyBind.wrapNullable(row.itemProperty())
-                            .map(this::createContextMenuForGroup)
-                            .orElse((ContextMenu) null));
+                            .mapOpt(this::createContextMenuForGroup)
+                            .orElseOpt((ContextMenu) null));
             row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
                 if (event.getButton() == MouseButton.SECONDARY) {
                     // Prevent right-click to select group
@@ -357,7 +357,7 @@ public class GroupTreeView extends BorderPane {
         if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
-            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> model != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem::getValue).collect(Collectors.toList());
+            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> (model != null) && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem::getValue).collect(Collectors.toList());
             viewModel.selectedGroupsProperty().setAll(list);
         }
     }
@@ -500,7 +500,7 @@ public class GroupTreeView extends BorderPane {
                 return;
             }
 
-            if (System.currentTimeMillis() - this.dragStarted > DRAG_TIME_BEFORE_EXPANDING_MS) {
+            if ((System.currentTimeMillis() - this.dragStarted) > DRAG_TIME_BEFORE_EXPANDING_MS) {
                 // expand or collapse the tree item and reset the time
                 this.dragStarted = System.currentTimeMillis();
                 this.draggedItem.setExpanded(!this.draggedItem.isExpanded());
