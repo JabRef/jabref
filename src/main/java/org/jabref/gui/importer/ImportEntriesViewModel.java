@@ -197,7 +197,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         Optional<BibEntry> other = new DuplicateCheck(entryTypesManager).containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode());
         if (other.isPresent()) {
             DuplicateResolverDialog dialog = new DuplicateResolverDialog(other.get(),
-                    entry, DuplicateResolverDialog.DuplicateResolverType.INSPECTION, databaseContext, stateManager, dialogService);
+                    entry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, databaseContext, stateManager, dialogService, preferences);
 
             DuplicateResolverDialog.DuplicateResolverResult result = dialogService.showCustomDialogAndWait(dialog)
                                                                                   .orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
@@ -228,7 +228,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         other = findInternalDuplicate(entry);
         if (other.isPresent()) {
             DuplicateResolverDialog diag = new DuplicateResolverDialog(entry,
-                    other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH, databaseContext, stateManager, dialogService);
+                    other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH, databaseContext, stateManager, dialogService, preferences);
 
             DuplicateResolverDialog.DuplicateResolverResult answer = dialogService.showCustomDialogAndWait(diag)
                                                                                   .orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
