@@ -68,7 +68,7 @@ public class StateManager {
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
 
     public StateManager() {
-        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
+        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
     }
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
