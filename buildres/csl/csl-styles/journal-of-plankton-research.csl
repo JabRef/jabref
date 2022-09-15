@@ -14,7 +14,7 @@
     <category field="biology"/>
     <issn>0142-7873</issn>
     <eissn>1464-3774</eissn>
-    <updated>2020-02-25T14:41:53+00:00</updated>
+    <updated>2022-08-03T14:00:21+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -81,6 +81,10 @@
     </choose>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year">
+    <sort>
+      <key macro="year-date"/>
+      <key macro="author"/>
+    </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <text macro="author-short"/>
@@ -89,7 +93,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" et-al-min="3" et-al-use-first="1" entry-spacing="0">
+  <bibliography et-al-min="9" et-al-use-first="8" entry-spacing="0" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key variable="title"/>
