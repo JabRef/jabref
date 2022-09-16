@@ -56,7 +56,7 @@ public class BibEntryTableViewModel {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
 
-        this.linkedFiles = getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
+        this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
@@ -122,7 +122,7 @@ public class BibEntryTableViewModel {
         if (value != null) {
             return value;
         } else {
-            value = getField(field).flatMap(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
+            value = getField(field).flatMapOpt(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
             specialFieldValues.put(field, value);
             return value;
         }

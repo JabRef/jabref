@@ -40,6 +40,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -104,16 +105,18 @@ public class GlobalSearchBar extends HBox {
     private final UndoManager undoManager;
 
     private final SearchPreferences searchPreferences;
+    private final DialogService dialogService;
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
-    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
+    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.searchPreferences = preferencesService.getSearchPreferences();
         this.undoManager = undoManager;
+        this.dialogService = dialogService;
 
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
@@ -255,7 +258,7 @@ public class GlobalSearchBar extends HBox {
             globalSearchActive.setValue(true);
             globalSearchResultDialog = new GlobalSearchResultDialog(undoManager);
             performSearch();
-            globalSearchResultDialog.showAndWait();
+            dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);
         });
     }
