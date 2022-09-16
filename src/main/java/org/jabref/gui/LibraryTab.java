@@ -245,7 +245,9 @@ public class LibraryTab extends Tab {
     public void feedData(BibDatabaseContext bibDatabaseContext) {
         cleanUp();
 
+        stateManager.getOpenDatabases().remove(this.bibDatabaseContext);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+        stateManager.getOpenDatabases().add(this.bibDatabaseContext);
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);

@@ -74,11 +74,9 @@ public class MainTableDataModel {
         if (query.isPresent()) {
             try {
                 stateManager.getSearchResults().clear();
-                /** These are now all empty. Why?
                 for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
                     stateManager.getSearchResults().putAll(LuceneSearcher.of(context).search(query.get()));
-                }*/
-                stateManager.getSearchResults().putAll(LuceneSearcher.of(stateManager.getActiveDatabase().get()).search(query.get()));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
