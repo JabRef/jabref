@@ -190,7 +190,7 @@ public class JabRefFrame extends BorderPane {
         this.themeManager = Globals.getThemeManager();
         this.dialogService = new JabRefDialogService(mainStage, this, themeManager);
         this.undoManager = Globals.undoManager;
-        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager);
+        this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
@@ -820,7 +820,7 @@ public class JabRefFrame extends BorderPane {
         );
 
         quality.getItems().addAll(
-                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager, prefs)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this, stateManager, Globals.TASK_EXECUTOR)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, this.prefs, dialogService, stateManager)),
