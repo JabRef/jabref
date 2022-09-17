@@ -17,6 +17,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
@@ -166,7 +167,7 @@ public class JabRefFrame extends BorderPane {
 
     private final FileHistoryMenu fileHistory;
 
-    @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<BibDatabaseContext> openDatabaseList;
+    @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<ObjectProperty<BibDatabaseContext>> openDatabaseList;
 
     private final Stage mainStage;
     private final StateManager stateManager;
@@ -636,7 +637,7 @@ public class JabRefFrame extends BorderPane {
         filteredTabs.setPredicate(tab -> tab instanceof LibraryTab);
 
         // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
-        openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
+        openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContextProperty());
         EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed

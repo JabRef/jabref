@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
@@ -266,8 +267,8 @@ public class OpenOfficePanel {
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
         if (openOfficePreferences.getUseAllDatabases()) {
-            for (BibDatabaseContext database : stateManager.getOpenDatabases()) {
-                databases.add(database.getDatabase());
+            for (ObjectProperty<BibDatabaseContext> database : stateManager.getOpenDatabases()) {
+                databases.add(database.get().getDatabase());
             }
         } else {
             databases.add(stateManager.getActiveDatabase()

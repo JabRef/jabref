@@ -34,9 +34,9 @@ public class SearchResultsTableDataModel {
         this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
 
         ObservableList<BibEntryTableViewModel> entriesViewModel = FXCollections.observableArrayList();
-        for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
-            ObservableList<BibEntry> entriesForDb = context.getDatabase().getEntries();
-            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter, stateManager));
+        for (ObjectProperty<BibDatabaseContext> context : stateManager.getOpenDatabases()) {
+            ObservableList<BibEntry> entriesForDb = context.get().getDatabase().getEntries();
+            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context.get(), fieldValueFormatter, stateManager));
             entriesViewModel.addAll(viewModelForDb);
         }
 

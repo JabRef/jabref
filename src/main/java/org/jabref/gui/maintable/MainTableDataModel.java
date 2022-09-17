@@ -74,8 +74,8 @@ public class MainTableDataModel {
         if (query.isPresent()) {
             try {
                 stateManager.getSearchResults().clear();
-                for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
-                    stateManager.getSearchResults().putAll(LuceneSearcher.of(context).search(query.get()));
+                for (ObjectProperty<BibDatabaseContext> context : stateManager.getOpenDatabases()) {
+                    stateManager.getSearchResults().putAll(LuceneSearcher.of(context.get()).search(query.get()));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
