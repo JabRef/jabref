@@ -101,7 +101,7 @@ class GroupTreeViewModelTest {
         databaseContext.getDatabase().insertEntry(entry);
 
         GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
-        assertTrue(model.checkGroupFieldsForModificationsDialogNotNecessary(oldGroup, newGroup));
+        assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
     @Test
@@ -113,7 +113,7 @@ class GroupTreeViewModelTest {
         databaseContext.getDatabase().insertEntry(entry);
 
         GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
-        assertTrue(model.checkGroupFieldsForModificationsDialogNotNecessary(oldGroup, newGroup));
+        assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
     @Test
@@ -125,7 +125,7 @@ class GroupTreeViewModelTest {
         databaseContext.getDatabase().insertEntry(entry);
 
         GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
-        assertFalse(model.checkGroupFieldsForModificationsDialogNotNecessary(oldGroup, newGroup));
+        assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 
     @Test
@@ -137,6 +137,6 @@ class GroupTreeViewModelTest {
         databaseContext.getDatabase().insertEntry(entry);
 
         GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
-        assertFalse(model.checkGroupFieldsForModificationsDialogNotNecessary(oldGroup, newGroup));
+        assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
 }

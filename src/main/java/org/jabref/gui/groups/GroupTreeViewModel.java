@@ -185,56 +185,56 @@ public class GroupTreeViewModel extends AbstractViewModel {
         currentDatabase.ifPresent(database -> database.getMetaData().setGroups(rootGroup.get().getGroupNode()));
     }
 
-    private boolean compareGroupType(AbstractGroup oldGroup, AbstractGroup newGroup) {
+    private boolean isGroupTypeEqual(AbstractGroup oldGroup, AbstractGroup newGroup) {
         return oldGroup.getClass().equals(newGroup.getClass());
     }
 
     /**
      * Check if it is necessary to show a group modified, reassign entry dialog <br>
-     * Although group name change is relevant, we silently take it as a rename and do not bother the user
+     * Group name change is handled separately
      *
      * @param oldGroup Original Group
      * @param newGroup Edited group
      * @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
      */
-    boolean checkGroupFieldsForModificationsDialogNotNecessary(AbstractGroup oldGroup, AbstractGroup newGroup) {
+    boolean onlyMinorChanges(AbstractGroup oldGroup, AbstractGroup newGroup) {
         // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
         if (oldGroup.getClass() == WordKeywordGroup.class) {
             WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;
             WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;
 
-            return oldWordKeywordGroup.getSearchField().getName().equals(newWordKeywordGroup.getSearchField().getName())
-                                                                         && oldWordKeywordGroup.getSearchExpression().equals(newWordKeywordGroup.getSearchExpression())
-                                                                         && (oldWordKeywordGroup.isCaseSensitive() == newWordKeywordGroup.isCaseSensitive());
+            return Objects.equals(oldWordKeywordGroup.getSearchField().getName(), newWordKeywordGroup.getSearchField().getName())
+                   && Objects.equals(oldWordKeywordGroup.getSearchExpression(), newWordKeywordGroup.getSearchExpression())
+                   && Objects.equals(oldWordKeywordGroup.isCaseSensitive(), newWordKeywordGroup.isCaseSensitive());
         } else if (oldGroup.getClass() == RegexKeywordGroup.class) {
             RegexKeywordGroup oldRegexKeywordGroup = (RegexKeywordGroup) oldGroup;
             RegexKeywordGroup newRegexKeywordGroup = (RegexKeywordGroup) newGroup;
 
-            return oldRegexKeywordGroup.getSearchField().getName().equals(newRegexKeywordGroup.getSearchField().getName())
-                   && oldRegexKeywordGroup.getSearchExpression().equals(newRegexKeywordGroup.getSearchExpression())
-                   && (oldRegexKeywordGroup.isCaseSensitive() == newRegexKeywordGroup.isCaseSensitive());
+            return Objects.equals(oldRegexKeywordGroup.getSearchField().getName(), newRegexKeywordGroup.getSearchField().getName())
+                   && Objects.equals(oldRegexKeywordGroup.getSearchExpression(), newRegexKeywordGroup.getSearchExpression())
+                   && Objects.equals(oldRegexKeywordGroup.isCaseSensitive(), newRegexKeywordGroup.isCaseSensitive());
         } else if ((oldGroup.getClass() == SearchGroup.class)) {
             SearchGroup oldSearchGroup = (SearchGroup) oldGroup;
             SearchGroup newSearchGroup = (SearchGroup) newGroup;
 
-            return oldSearchGroup.getSearchExpression().equals(newSearchGroup.getSearchExpression())
-                && oldSearchGroup.getSearchFlags().equals(newSearchGroup.getSearchFlags());
+            return Objects.equals(oldSearchGroup.getSearchExpression(), newSearchGroup.getSearchExpression())
+                   && Objects.equals(oldSearchGroup.getSearchFlags(), newSearchGroup.getSearchFlags());
         } else if (oldGroup.getClass() == AutomaticKeywordGroup.class) {
             AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
             AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
 
-            return oldAutomaticKeywordGroup.getKeywordDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordDelimiter().toString())
-                && oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString().equals(newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter().toString())
-                && oldAutomaticKeywordGroup.getField().getName().equals(newAutomaticKeywordGroup.getField().getName());
+            return Objects.equals(oldAutomaticKeywordGroup.getKeywordDelimiter(), newAutomaticKeywordGroup.getKeywordDelimiter())
+                   && Objects.equals(oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter(), newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter())
+                   && Objects.equals(oldAutomaticKeywordGroup.getField().getName(), newAutomaticKeywordGroup.getField().getName());
         } else if (oldGroup.getClass() == AutomaticPersonsGroup.class) {
             AutomaticPersonsGroup oldAutomaticPersonsGroup = (AutomaticPersonsGroup) oldGroup;
             AutomaticPersonsGroup newAutomaticPersonsGroup = (AutomaticPersonsGroup) newGroup;
 
-            return oldAutomaticPersonsGroup.getField().getName().equals(newAutomaticPersonsGroup.getField().getName());
+            return Objects.equals(oldAutomaticPersonsGroup.getField().getName(), newAutomaticPersonsGroup.getField().getName());
         } else if (oldGroup.getClass() == TexGroup.class) {
             TexGroup oldTexGroup = (TexGroup) oldGroup;
             TexGroup newTexGroup = (TexGroup) newGroup;
-            return oldTexGroup.getFilePath().toString().equals(newTexGroup.getFilePath().toString());
+            return Objects.equals(oldTexGroup.getFilePath().toString(), newTexGroup.getFilePath().toString());
         }
         return true;
     }
@@ -255,16 +255,18 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
                 String oldGroupName = oldGroupDef.getName();
 
-                // dialog already warns us about this if we name it like another existing group
-                // We need to check if the name change and not any other thing as well
-                //
-                if (compareGroupType(oldGroupDef, group) && !group.getName().equals(oldGroupName) && this.checkGroupFieldsForModificationsDialogNotNecessary(oldGroupDef, group)) {
+                boolean groupTypeEqual = isGroupTypeEqual(oldGroupDef, group);
+                boolean onlyMinorModifications = this.onlyMinorChanges(oldGroupDef, group);
+
+                // dialog already warns us about this if the new group is named like another existing group
+                // We need to check if only the name changed as this is relevant for the entry's group field
+                if (groupTypeEqual && !group.getName().equals(oldGroupName) && onlyMinorModifications) {
 
                     int groupsWithSameName = 0;
                     Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
                     if (databaseRootGroup.isPresent()) {
-                        String name = group.getName();
-                        groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
+                        // we need to check the old name for duplicates. If the new group name occurs more than once, it won't matter
+                        groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(oldGroupName)).size();
                     }
                     boolean removePreviousAssignments = true;
                     // We found more than 2 groups, so we cannot simply remove old assignment
@@ -282,21 +284,22 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     writeGroupChangesToMetaData();
                     // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
                     refresh();
-
                     return;
                 }
 
-                if (this.compareGroupType(oldGroup.getGroupNode().getGroup(), group) && this.checkGroupFieldsForModificationsDialogNotNecessary(oldGroup.getGroupNode().getGroup(), group)) {
+                if (groupTypeEqual && onlyMinorChanges(oldGroup.getGroupNode().getGroup(), group)) {
                     oldGroup.getGroupNode().setGroup(
-                         group,
-                         true,
-                         true, // TODO Not sure
-                         database.getEntries());
+                                     group,
+                                     true,
+                                     true, // TODO Not sure
+                                     database.getEntries());
 
                     writeGroupChangesToMetaData();
                     refresh();
                     return;
                 }
+
+                // Major modifications
 
                 String content = Localization.lang("Assign the original group's entries to this group?");
                 ButtonType keepAssignments = new ButtonType(Localization.lang("Assign"), ButtonBar.ButtonData.YES);
@@ -313,14 +316,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
                                                                                                        keepAssignments,
                                                                                                        removeAssignments,
                                                                                                        cancel);
-                //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
                 boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
                                                     && (group instanceof ExplicitGroup);
 
                 int groupsWithSameName = 0;
                 Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
                 if (databaseRootGroup.isPresent()) {
-                    //TODO Old Group or new group?
                     String name = oldGroup.getGroupNode().getGroup().getName();
                     groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
                 }
