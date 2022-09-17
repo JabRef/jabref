@@ -27,7 +27,7 @@
     </contributor>
     <category citation-format="note"/>
     <category field="law"/>
-    <updated>2020-10-21T23:45:43+00:00</updated>
+    <updated>2022-08-29T23:45:43+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -172,7 +172,7 @@ all the other tests should have been done... -->
       <text macro="editor" strip-periods="true" suffix=","/>
       <text macro="container-title" font-style="italic"/>
     </group>
-    <text macro="series-info" prefix=" "/>
+    <text macro="series-info" prefix=", "/>
     <text macro="edition" prefix=", "/>
     <text macro="publisher-place-year"/>
     <text variable="page-first" prefix=" "/>
@@ -229,7 +229,10 @@ all the other tests should have been done... -->
       <text variable="archive"/>
       <text variable="title" font-style="italic"/>
       <text variable="genre"/>
-      <text macro="author-note" strip-periods="true" prefix="by "/>
+      <group delimiter=" ">
+        <text term="by"/>
+        <text macro="author-note" strip-periods="true"/>
+      </group>
       <text variable="source"/>
       <text variable="call-number"/>
       <group delimiter=" ">
@@ -245,7 +248,7 @@ all the other tests should have been done... -->
       <text variable="title" font-style="italic"/>
       <text macro="genre" prefix="(" suffix=","/>
       <text variable="publisher" suffix=","/>
-      <date form="text" variable="issued" date-parts="year" suffix=") [unpublished]"/>
+      <date form="text" variable="issued" date-parts="year" suffix=") [non publiée]"/>
     </group>
   </macro>
   <macro name="render-article-newspaper">
@@ -479,60 +482,60 @@ all the other tests should have been done... -->
         </else-if>
         <else>
           <group>
-            <group delimiter=" ">
-              <choose>
-                <if type="legislation" match="any">
-                  <choose>
-                    <if variable="references" match="any">
-                      <group delimiter=" ">
-                        <text macro="pinpoint"/>
-                        <text macro="render-legislation"/>
-                        <text variable="note" prefix=", "/>
-                      </group>
-                    </if>
-                    <else>
-                      <group delimiter="">
-                        <text macro="render-legislation"/>
-                        <text macro="pinpoint"/>
-                        <text variable="note" prefix=", "/>
-                      </group>
-                    </else>
-                  </choose>
-                </if>
-                <else-if type="bill" match="any">
-                  <text macro="render-bill"/>
+            <choose>
+              <if type="legislation" match="any">
+                <choose>
+                  <if variable="references" match="any">
+                    <group delimiter=" ">
+                      <text macro="pinpoint"/>
+                      <text macro="render-legislation"/>
+                      <text variable="note" prefix=", "/>
+                    </group>
+                  </if>
+                  <else>
+                    <group delimiter="">
+                      <text macro="render-legislation"/>
+                      <text macro="pinpoint"/>
+                      <text variable="note" prefix=", "/>
+                    </group>
+                  </else>
+                </choose>
+              </if>
+              <else-if type="bill" match="any">
+                <text macro="render-bill"/>
+                <text macro="pinpoint"/>
+                <text variable="note" prefix=", "/>
+              </else-if>
+              <else-if type="song" match="any">
+                <text macro="render-song"/>
+                <text macro="pinpoint"/>
+                <text variable="note" prefix=", "/>
+              </else-if>
+              <else-if type="patent" match="any">
+                <text macro="render-patent"/>
+                <text macro="pinpoint"/>
+                <text variable="note" prefix=", "/>
+              </else-if>
+              <else-if type="manuscript" match="any">
+                <text macro="render-manuscript"/>
+                <text macro="pinpoint"/>
+                <text variable="note" prefix=", "/>
+              </else-if>
+              <else-if type="legal_case">
+                <group delimiter="">
+                  <text macro="render-case"/>
                   <text macro="pinpoint"/>
                   <text variable="note" prefix=", "/>
-                </else-if>
-                <else-if type="song" match="any">
-                  <text macro="render-song"/>
-                  <text macro="pinpoint"/>
-                  <text variable="note" prefix=", "/>
-                </else-if>
-                <else-if type="patent" match="any">
-                  <text macro="render-patent"/>
-                  <text macro="pinpoint"/>
-                  <text variable="note" prefix=", "/>
-                </else-if>
-                <else-if type="manuscript" match="any">
-                  <text macro="render-manuscript"/>
-                  <text macro="pinpoint"/>
-                  <text variable="note" prefix=", "/>
-                </else-if>
-                <else-if type="legal_case">
-                  <group delimiter="">
-                    <text macro="render-case"/>
-                    <text macro="pinpoint"/>
-                    <text variable="note" prefix=", "/>
-                  </group>
-                </else-if>
-                <else-if type="report">
-                  <text macro="render-report"/>
-                  <text macro="pinpoint"/>
-                  <text variable="note" prefix=", "/>
-                </else-if>
-                <else>
-                  <text macro="author-note" strip-periods="true" suffix=", "/>
+                </group>
+              </else-if>
+              <else-if type="report">
+                <text macro="render-report"/>
+                <text macro="pinpoint"/>
+                <text variable="note" prefix=", "/>
+              </else-if>
+              <else>
+                <group delimiter=", ">
+                  <text macro="author-note" strip-periods="true"/>
                   <choose>
                     <if type="article-journal">
                       <text macro="render-article-journal"/>
@@ -589,12 +592,12 @@ all the other tests should have been done... -->
                         <text macro="publisher-place-year"/>
                       </group>
                       <text macro="pinpoint"/>
-                      <text variable="note" prefix=", "/>
+                      <text variable="note"/>
                     </else>
                   </choose>
-                </else>
-              </choose>
-            </group>
+                </group>
+              </else>
+            </choose>
             <choose>
               <if type="legal_case" match="any">
                 <text variable="references" prefix=", "/>

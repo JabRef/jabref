@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" initialize-with-hyphen="true" page-range-format="expanded" default-locale="it-IT">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" initialize-with-hyphen="true" page-range-format="expanded" initialize-with="." default-locale="it-IT">
   <info>
     <title>Rassegna degli Archivi di Stato (citazioni estese, italiano)</title>
     <title-short>RAS (citazioni estese, italiano)</title-short>
     <id>http://www.zotero.org/styles/rassegna-degli-archivi-di-stato</id>
     <link href="http://www.zotero.org/styles/rassegna-degli-archivi-di-stato" rel="self"/>
     <link href="http://www.zotero.org/styles/civilta-italiana" rel="template"/>
-    <link href="http://www.archivi.beniculturali.it/index.php/strumenti/norme-editoriali" rel="documentation"/>
+    <link href="https://archivi.cultura.gov.it/fileadmin/risorse/Files_in_evidenza/norme_editoriali_DGA.pdf" rel="documentation"/>
     <author>
       <name>Giovanni Ricci</name>
     </author>
     <category citation-format="note"/>
     <category field="humanities"/>
+    <category field="history"/>
     <issn>0037-2781</issn>
-    <summary>Italian General Archives Direction ("Direzione generale degli Archivi", DGA) style used in "Rassegna degli Archivi di Stato" and all other publications of the Italian State archives. Based on the "Civiltà Italiana" style. For manuscripts, use the book type in Zotero, for archive documents, the manuscript type. Short titles of journal will be shown in the citations whenever possible; to avoid this, leave the short title field blank. The indication of an unabridged reprint (chapter I, § 6) can be achieved by writing the information in the date field.
+    <summary>Italian General Archives Direction ("Direzione generale degli Archivi", DGA) style used in "Rassegna degli Archivi di Stato" and all other publications of the Italian State archives. Based on the "Civiltà Italiana" style. For manuscripts, use the book type in Zotero, for archive documents, the manuscript type. Short titles of journals will be shown in the citations whenever possible; to avoid this, leave the short title field blank. The indication of an unabridged reprint (chapter I, § 6) can be achieved by writing the information in the date field. For conference papers, do not use the conference name field (CSL "event" type), but rather write the name of the proceedings of the conference in the proceedings title field (Italian: titolo degli atti), with the place and date of the conference as prescribed in chapter I, § 4c
     This stile will not handle: 
     the use of "e" instead of "-" to separate two authors because one of them has a "-" in the surname (chapter I, § 1 c); 
     the citation of prefaces (I, 3); 
@@ -25,9 +26,12 @@
     citations of the acts of the Italian parliament (VIII). 
     Regarding archive documents, the citation of the sender's and recipient's name (4 b) can be obtained by abusing the page field, while citations with document's name before the archive's name cannot be achieved.</summary>
     <published>2021-06-27T14:00:00+01:00</published>
-    <updated>2021-06-27T14:00:00+01:00</updated>
+    <updated>2022-08-30T03:07:42+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale>
+    <style-options limit-day-ordinals-to-day-1="true"/>
+  </locale>
   <locale xml:lang="it">
     <terms>
       <term name="editor" form="verb">
@@ -122,7 +126,7 @@
     <!--Cfr norme, I, 2-->
     <names variable="editor">
       <label form="verb" text-case="lowercase" suffix=" " strip-periods="true"/>
-      <name delimiter=" - " delimiter-precedes-last="always" font-variant="small-caps" initialize-with=". " initialize="true"/>
+      <name delimiter=" - " delimiter-precedes-last="always" font-variant="small-caps"/>
     </names>
   </macro>
   <!-- da usare solo per la bibliografia estesa
@@ -131,7 +135,7 @@
   <macro name="translator">
     <names variable="translator">
       <label form="short" text-case="lowercase" suffix=" "/>
-      <name delimiter=" - " delimiter-precedes-last="always" initialize-with=". " initialize="true"/>
+      <name delimiter=" - " delimiter-precedes-last="always"/>
     </names>
   </macro>
   <!-- da usare solo per la bibliografia estesa
@@ -207,7 +211,7 @@
       </if>
       <else-if variable="issued">
         <date variable="issued">
-          <date-part name="day" form="numeric" suffix=" " range-delimiter="-"/>
+          <date-part name="day" form="ordinal" suffix=" " range-delimiter="-"/>
           <date-part name="month" form="long" suffix=" "/>
           <date-part name="year" range-delimiter="-"/>
         </date>
@@ -374,8 +378,8 @@
               </if>
             </choose>
             <text macro="pageref"/>
-            <text macro="urlref"/>
           </group>
+          <text macro="urlref"/>
         </else-if>
         <else-if type="article-journal">
           <group delimiter=", ">
@@ -419,6 +423,11 @@
             <text macro="title"/>
             <text macro="editor-container-title"/>
           </group>
+          <choose>
+            <if variable="event" match="none">
+              <text value=", "/>
+            </if>
+          </choose>
           <group delimiter=", ">
             <text macro="event"/>
             <text macro="volume-book"/>
@@ -453,7 +462,7 @@
           <text macro="urlref"/>
         </else-if>
         <else-if type="thesis">
-          <group delimiter=", " suffix=", ">
+          <group delimiter=", " suffix="">
             <text macro="author"/>
             <text macro="title"/>
             <text variable="genre"/>
@@ -537,7 +546,7 @@
   <!--"========================="-->
   <!-- BIBLIOGRAFIA-->
   <!--"========================="-->
-  <bibliography hanging-indent="true" entry-spacing="0">
+  <bibliography hanging-indent="true" entry-spacing="0" initialize="false">
     <sort>
       <key macro="author-bibliography"/>
       <key variable="title"/>
@@ -579,8 +588,8 @@
               </if>
             </choose>
             <text macro="pageref"/>
-            <text macro="urlref"/>
           </group>
+          <text macro="urlref"/>
         </if>
         <else-if type="article-journal">
           <group delimiter=", ">
@@ -624,6 +633,11 @@
             <text macro="title"/>
             <text macro="editor-container-title"/>
           </group>
+          <choose>
+            <if variable="event" match="none">
+              <text value=", "/>
+            </if>
+          </choose>
           <group delimiter=", ">
             <text macro="event"/>
             <text macro="volume-book"/>
@@ -658,7 +672,7 @@
           <text macro="urlref"/>
         </else-if>
         <else-if type="thesis">
-          <group delimiter=", " suffix=", ">
+          <group delimiter=", " suffix="">
             <text macro="author"/>
             <text macro="title"/>
             <text variable="genre"/>

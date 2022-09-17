@@ -298,7 +298,7 @@ public class BibEntry implements Cloneable {
             }
         }
 
-        return (database == null || result.isEmpty()) ?
+        return ((database == null) || result.isEmpty()) ?
                 result :
                 Optional.of(database.resolveForStrings(result.get()));
     }
@@ -970,7 +970,7 @@ public class BibEntry implements Cloneable {
 
     public OptionalBinding<String> getFieldBinding(Field field) {
         if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
-            return EasyBind.wrapNullable(type).map(EntryType::getDisplayName);
+            return EasyBind.wrapNullable(type).mapOpt(EntryType::getDisplayName);
         }
         return EasyBind.valueAt(fields, field);
     }

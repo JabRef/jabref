@@ -32,6 +32,7 @@
       <term name="month-10" form="short">out.</term>
       <term name="month-11" form="short">nov.</term>
       <term name="month-12" form="short">dez.</term>
+      <term name="in">in</term>
       <term name="editor" form="short">org.</term>
       <term name="collection-editor" form="short">ed.</term>
     </terms>
@@ -142,12 +143,12 @@
   <macro name="access">
     <choose>
       <if type="book chapter" variable="URL" match="all">
-        <text value="E-book" font-style="italic" suffix="."/>
+        <text value="E-book" font-style="italic" suffix=". "/>
       </if>
     </choose>
     <choose>
       <if variable="DOI" match="any">
-        <text variable="DOI" prefix=" Disponível em: https://doi.org/"/>
+        <text variable="DOI" prefix="Disponível em: https://doi.org/"/>
         <group prefix=". Acesso em: " suffix=".">
           <date variable="accessed">
             <date-part name="day" suffix=" "/>
@@ -157,7 +158,7 @@
         </group>
       </if>
       <else-if variable="URL">
-        <text variable="URL" prefix=" Disponível em: "/>
+        <text variable="URL" prefix="Disponível em: "/>
         <group prefix=". Acesso em: " suffix=".">
           <date variable="accessed">
             <date-part name="day" suffix=" "/>
@@ -363,10 +364,8 @@
       </else-if>
       <else-if match="any" type="book chapter">
         <group delimiter=", ">
-          <group>
-            <text variable="volume" prefix="v. "/>
-            <text variable="page" prefix="p. "/>
-          </group>
+          <text variable="volume" prefix="v. "/>
+          <text variable="page" prefix="p. "/>
         </group>
       </else-if>
       <else-if type="article-newspaper" match="any">
@@ -476,8 +475,8 @@
             <text macro="edition" suffix=". "/>
             <text variable="version" prefix="Versão " suffix=". "/>
             <text macro="publisher" suffix=". "/>
-            <text macro="collection-title" prefix="(" suffix=")."/>
-            <text macro="locators"/>
+            <text macro="collection-title" prefix="(" suffix="). "/>
+            <text macro="locators" suffix=". "/>
             <text variable="medium" suffix=". "/>
             <text macro="access"/>
           </group>
@@ -492,7 +491,7 @@
             <text macro="translator" suffix=". "/>
             <text macro="edition" suffix=". "/>
             <text macro="publisher" suffix=". "/>
-            <text macro="collection-title" prefix="(" suffix=")."/>
+            <text macro="collection-title" prefix="(" suffix="). "/>
             <text macro="locators" suffix=". "/>
             <text macro="access"/>
           </group>

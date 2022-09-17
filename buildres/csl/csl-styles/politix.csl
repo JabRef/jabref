@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="fr-FR" version="1.0">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" default-locale="fr-FR">
   <info>
     <title>Politix (Français)</title>
     <id>http://www.zotero.org/styles/politix</id>
     <link href="http://www.zotero.org/styles/politix" rel="self"/>
     <link href="http://www.zotero.org/styles/centre-de-recherche-sur-les-civilisations-de-l-asie-orientale" rel="template"/>
-    <link href="http://politix.cairn.info/recommandations-aux-auteurs/" rel="documentation"/>
+    <link href="http://politix.cairn.info/recommandations-aux-auteur%e2%8b%85e%e2%8b%85s/politix-mise-aux-normes-a-lattention-des-auteur-es-2022/" rel="documentation"/>
+    <link href="http://politix.cairn.info/wp-content/uploads/sites/2/2016/11/Politix-Mise-aux-normes-a-lattention-des-auteur.es-2022.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien, PhD</name>
     </author>
@@ -14,7 +15,7 @@
     <category field="social_science"/>
     <issn>0295-2319</issn>
     <eissn>1953-8286</eissn>
-    <updated>2018-07-19T15:25:44+00:00</updated>
+    <updated>2022-08-30T12:13:12+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -131,35 +132,21 @@
   <macro name="yearpage">
     <choose>
       <if type="bill book graphic legal_case motion_picture paper-conference manuscript report song thesis map" match="any">
-        <group delimiter=", ">
-          <date variable="issued">
-            <date-part name="year"/>
-          </date>
-          <choose>
-            <if variable="locator" match="any">
-              <group delimiter=" ">
-                <label variable="locator" form="short"/>
-                <text variable="locator"/>
-              </group>
-            </if>
-          </choose>
-        </group>
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
       </if>
       <else-if type="chapter entry-dictionary entry-encyclopedia" match="any">
         <group delimiter=" ">
           <date variable="issued">
             <date-part name="year"/>
           </date>
-          <group>
+          <group delimiter=". ">
             <text term="volume" form="short" suffix="."/>
-            <group prefix=". " delimiter="/">
+            <group delimiter="/">
               <text variable="volume"/>
               <text variable="number-of-volumes"/>
             </group>
-          </group>
-          <group delimiter=" ">
-            <label variable="locator" form="short"/>
-            <text variable="locator"/>
           </group>
         </group>
       </else-if>
@@ -168,26 +155,13 @@
           <label variable="page" form="short"/>
           <text variable="page"/>
         </group>
-        <group delimiter=" ">
-          <choose>
-            <if variable="locator" match="any">
-              <group delimiter=" ">
-                <label variable="locator" form="short"/>
-                <text variable="locator"/>
-              </group>
-            </if>
-            <else-if variable="locator" match="none">
-              <label variable="page" form="short"/>
-            </else-if>
-          </choose>
-        </group>
       </else-if>
       <else-if type="article-journal" match="any">
         <date variable="issued">
           <date-part name="year"/>
         </date>
       </else-if>
-      <else-if type="webpage" match="any">
+      <else-if type="webpage post post-weblog" match="any">
         <group delimiter=" ">
           <text value="consulté le" prefix=" "/>
           <date variable="accessed" form="text">
@@ -265,16 +239,19 @@
       </if>
     </choose>
   </macro>
+  <macro name="locator">
+    <group delimiter=" ">
+      <label variable="locator" form="short"/>
+      <text variable="locator"/>
+    </group>
+  </macro>
   <citation et-al-min="5" et-al-use-first="1">
     <layout prefix="" suffix="." delimiter=" ; ">
       <choose>
         <if position="ibid-with-locator">
           <group delimiter=", ">
             <text term="ibid" text-case="capitalize-first" font-style="italic"/>
-            <group delimiter=" ">
-              <label variable="locator" form="short"/>
-              <text variable="locator"/>
-            </group>
+            <text macro="locator"/>
           </group>
         </if>
         <else-if position="ibid">
@@ -299,10 +276,7 @@
                 <text value="op. cit."/>
               </else>
             </choose>
-            <group delimiter=" ">
-              <label variable="locator" form="short"/>
-              <text variable="locator"/>
-            </group>
+            <text macro="locator"/>
           </group>
         </else-if>
         <else>
@@ -315,6 +289,7 @@
             <text macro="publisher"/>
             <text macro="collection"/>
             <text macro="yearpage"/>
+            <text macro="locator"/>
           </group>
         </else>
       </choose>

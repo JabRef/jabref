@@ -13,8 +13,12 @@
       <name>Camilla K. Andresen</name>
       <email>ckan1@ucl.dk</email>
     </contributor>
+    <contributor>
+      <name>Simon S. Hansen</name>
+      <email>ssha2@ucl.dk</email>
+    </contributor>
     <category citation-format="author-date"/>
-    <updated>2015-03-26T09:00:00+00:00</updated>
+    <updated>2021-02-10T05:28:52+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="da">
@@ -148,9 +152,11 @@ Outputs the publication year. If no publication date is present, it outputs the 
         <date variable="issued">
           <date-part name="year"/>
         </date>
+        <text variable="year-suffix"/>
       </if>
       <else>
         <text term="no date" form="short"/>
+        <text variable="year-suffix" prefix=" "/>
       </else>
     </choose>
   </macro>
