@@ -261,7 +261,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 // dialog already warns us about this if the new group is named like another existing group
                 // We need to check if only the name changed as this is relevant for the entry's group field
                 if (groupTypeEqual && !group.getName().equals(oldGroupName) && onlyMinorModifications) {
-
                     int groupsWithSameName = 0;
                     Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
                     if (databaseRootGroup.isPresent()) {
