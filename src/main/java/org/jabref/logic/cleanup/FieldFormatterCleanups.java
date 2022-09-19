@@ -206,4 +206,26 @@ public class FieldFormatterCleanups {
         }
         return new IdentityFormatter();
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(actions, enabled);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof FieldFormatterCleanups)) {
+            return false;
+        }
+        FieldFormatterCleanups other = (FieldFormatterCleanups) obj;
+        return Objects.equals(actions, other.actions) && (enabled == other.enabled);
+    }
+
+    @Override
+    public String toString() {
+        return "FieldFormatterCleanups [enabled=" + enabled + ", actions=" + actions + "]";
+    }
 }

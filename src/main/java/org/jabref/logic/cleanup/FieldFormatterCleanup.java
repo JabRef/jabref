@@ -105,15 +105,15 @@ public class FieldFormatterCleanup implements CleanupJob {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o instanceof FieldFormatterCleanup) {
-            FieldFormatterCleanup that = (FieldFormatterCleanup) o;
-            return Objects.equals(field, that.field) && Objects.equals(formatter, that.formatter);
+        if (!(obj instanceof FieldFormatterCleanup)) {
+            return false;
         }
-        return false;
+        FieldFormatterCleanup other = (FieldFormatterCleanup) obj;
+        return Objects.equals(field, other.field) && Objects.equals(formatter, other.formatter);
     }
 
     @Override
