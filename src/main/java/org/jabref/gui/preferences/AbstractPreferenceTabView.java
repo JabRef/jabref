@@ -2,7 +2,7 @@ package org.jabref.gui.preferences;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;

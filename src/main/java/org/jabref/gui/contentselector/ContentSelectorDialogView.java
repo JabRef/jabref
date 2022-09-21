@@ -3,7 +3,7 @@ package org.jabref.gui.contentselector;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;

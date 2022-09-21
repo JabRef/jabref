@@ -1,6 +1,6 @@
 package org.jabref.gui.preferences.journals;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;

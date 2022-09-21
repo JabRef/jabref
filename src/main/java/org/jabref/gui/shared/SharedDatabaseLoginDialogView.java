@@ -1,6 +1,6 @@
 package org.jabref.gui.shared;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;

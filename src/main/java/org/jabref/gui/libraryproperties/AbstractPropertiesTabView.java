@@ -1,6 +1,6 @@
 package org.jabref.gui.libraryproperties;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;

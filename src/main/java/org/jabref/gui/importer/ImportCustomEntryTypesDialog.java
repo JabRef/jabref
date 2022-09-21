@@ -2,7 +2,7 @@ package org.jabref.gui.importer;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;

@@ -2,7 +2,7 @@ package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;

@@ -1,6 +1,6 @@
 package org.jabref.gui.libraryproperties.saving;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;

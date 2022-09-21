@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;

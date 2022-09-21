@@ -1,6 +1,6 @@
 package org.jabref.gui.preferences.customexporter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.SelectionMode;

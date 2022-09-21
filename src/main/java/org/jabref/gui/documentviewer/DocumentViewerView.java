@@ -1,6 +1,6 @@
 package org.jabref.gui.documentviewer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

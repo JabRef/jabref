@@ -1,6 +1,6 @@
 package org.jabref.gui.texparser;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;

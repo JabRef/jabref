@@ -2,7 +2,7 @@ package org.jabref.gui.importer;
 
 import java.util.EnumSet;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;

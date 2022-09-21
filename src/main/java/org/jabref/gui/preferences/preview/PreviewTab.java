@@ -3,7 +3,7 @@ package org.jabref.gui.preferences.preview;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;

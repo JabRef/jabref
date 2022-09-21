@@ -2,7 +2,7 @@ package org.jabref.gui.libraryproperties.constants;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

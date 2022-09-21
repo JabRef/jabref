@@ -2,7 +2,7 @@ package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.nio.file.Path;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;

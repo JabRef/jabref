@@ -1,6 +1,6 @@
 package org.jabref.gui.errorconsole;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;

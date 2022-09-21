@@ -2,7 +2,7 @@ package org.jabref.gui.commonfxcontrols;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;

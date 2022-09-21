@@ -1,6 +1,6 @@
 package org.jabref.gui.preferences.protectedterms;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.fxml.FXML;

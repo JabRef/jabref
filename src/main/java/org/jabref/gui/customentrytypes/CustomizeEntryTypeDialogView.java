@@ -2,7 +2,7 @@ package org.jabref.gui.customentrytypes;
 
 import java.util.EnumSet;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
