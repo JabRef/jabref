@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
@@ -1031,5 +1033,19 @@ public class BibEntry implements Cloneable {
         }
 
         this.setFiles(linkedFiles);
+    }
+
+    public BibEntry merge(BibEntry other) {
+        BibEntry result = (BibEntry) other.clone();
+        Set<Field> ownFields = new TreeSet<>(Comparator.comparing(Field::getName));
+        ownFields.addAll(this.getFields());
+
+        result.setType(this.getType());
+        for (Field field : ownFields) {
+            // Original field is always present
+            result.setField(field, this.getField(field).orElse(null));
+        }
+
+        return result;
     }
 }
