@@ -3,8 +3,6 @@ package org.jabref.gui.contentselector;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import jakarta.inject.Inject;
-
 import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -23,6 +21,7 @@ import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class ContentSelectorDialogView extends BaseDialog<Void> {
 
