@@ -560,7 +560,6 @@ jlink {
         requires 'java.transaction.xa'
         requires 'java.rmi'
         requires 'java.xml'
-        requires 'jdk.jfr'
         requires 'jdk.jsobject'
         requires 'jdk.unsupported'
         requires 'jdk.unsupported.desktop'
