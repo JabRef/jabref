@@ -1272,6 +1272,7 @@ public class JabRefPreferences implements PreferencesService {
             put(LANGUAGE, newValue.getId());
             if (oldValue != newValue) {
                 setLanguageDependentDefaultValues();
+                Localization.setLanguage(newValue);
             }
         });
         EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
