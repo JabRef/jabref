@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.protectedterms;
 
-import jakarta.inject.Inject;
-
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
@@ -24,6 +22,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 /**
  * Dialog for managing term list files.

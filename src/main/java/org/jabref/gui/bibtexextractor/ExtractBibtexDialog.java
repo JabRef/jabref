@@ -1,6 +1,5 @@
 package org.jabref.gui.bibtexextractor;
 
-import jakarta.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -20,6 +19,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 /**
  * GUI Dialog for the feature "Extract BibTeX from plain text".

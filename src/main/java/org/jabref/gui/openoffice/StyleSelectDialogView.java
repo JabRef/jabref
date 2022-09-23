@@ -1,7 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import jakarta.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -30,6 +28,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 

@@ -2,8 +2,6 @@ package org.jabref.gui.importer;
 
 import java.util.List;
 
-import jakarta.inject.Inject;
-
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -17,6 +15,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
 
 public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {

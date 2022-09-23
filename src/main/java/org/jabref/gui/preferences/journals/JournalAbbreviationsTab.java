@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.journals;
 
-import jakarta.inject.Inject;
-
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -34,6 +32,7 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
 /**

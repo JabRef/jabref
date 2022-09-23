@@ -1,7 +1,5 @@
 package org.jabref.gui.errorconsole;
 
-import jakarta.inject.Inject;
-
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -30,6 +28,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class ErrorConsoleView extends BaseDialog<Void> {
 

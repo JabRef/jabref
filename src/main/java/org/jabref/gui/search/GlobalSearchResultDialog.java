@@ -1,6 +1,5 @@
 package org.jabref.gui.search;
 
-import jakarta.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -21,6 +20,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class GlobalSearchResultDialog extends BaseDialog<Void> {
 

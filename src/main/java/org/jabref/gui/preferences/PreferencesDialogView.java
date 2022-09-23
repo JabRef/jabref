@@ -2,8 +2,6 @@ package org.jabref.gui.preferences;
 
 import java.util.Locale;
 
-import jakarta.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
@@ -21,6 +19,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
 /**

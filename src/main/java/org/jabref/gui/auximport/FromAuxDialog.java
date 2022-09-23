@@ -2,8 +2,6 @@ package org.jabref.gui.auximport;
 
 import java.nio.file.Path;
 
-import jakarta.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -27,6 +25,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 /**
  * A wizard dialog for generating a new sub database from existing TeX AUX file

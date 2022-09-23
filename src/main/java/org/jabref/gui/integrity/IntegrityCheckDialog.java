@@ -2,8 +2,6 @@ package org.jabref.gui.integrity;
 
 import java.util.List;
 
-import jakarta.inject.Inject;
-
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
@@ -21,6 +19,7 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import org.controlsfx.control.table.TableFilter;
 
 public class IntegrityCheckDialog extends BaseDialog<Void> {

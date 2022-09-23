@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.customexporter;
 
-import jakarta.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -15,6 +13,7 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterTabViewModel> implements PreferencesTab {
 

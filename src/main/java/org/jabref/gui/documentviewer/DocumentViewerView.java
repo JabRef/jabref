@@ -1,7 +1,5 @@
 package org.jabref.gui.documentviewer;
 
-import jakarta.inject.Inject;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonBar;
@@ -24,6 +22,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class DocumentViewerView extends BaseDialog<Void> {
 

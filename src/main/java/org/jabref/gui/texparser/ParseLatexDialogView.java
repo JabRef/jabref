@@ -1,7 +1,5 @@
 package org.jabref.gui.texparser;
 
-import jakarta.inject.Inject;
-
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -28,6 +26,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.CheckTreeView;
 
 public class ParseLatexDialogView extends BaseDialog<Void> {
