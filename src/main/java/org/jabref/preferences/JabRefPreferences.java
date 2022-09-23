@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
@@ -2188,7 +2189,7 @@ public class JabRefPreferences implements PreferencesService {
             // A non-empty directory is kept
             return originalDirectory;
         }
-        return JabRefDesktop.getDefaultFileChooserDirectory().toString();
+        return JabRefDesktop.getDefaultFileChooserDirectory();
     }
 
     @Override
@@ -2560,8 +2561,13 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
-        guiPreferences.getLastFilesOpened().addListener((InvalidationListener) change ->
-                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened()));
+        guiPreferences.getLastFilesOpened().addListener((ListChangeListener<String>) change -> {
+            if (change.getList().isEmpty()) {
+                prefs.remove(LAST_EDITED);
+            } else {
+                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened());
+            }
+        });
         EasyBind.listen(guiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
             if (newValue != null) {
                 put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
@@ -2569,7 +2575,7 @@ public class JabRefPreferences implements PreferencesService {
                 remove(LAST_EDITED);
             }
         });
-        guiPreferences.getFileHistory().getHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
+        guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
@@ -2578,24 +2584,16 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_DATABASES).stream()
-                                                              .map(Path::of)
-                                                              .collect(Collectors.toList()));
+        return FileHistory.of(getStringList(RECENT_DATABASES).stream()
+                                                             .map(Path::of)
+                                                             .toList());
     }
 
     private void storeFileHistory(FileHistory history) {
-        if (!history.isEmpty()) {
-            putStringList(RECENT_DATABASES, history.getHistory()
-                                                   .stream()
-                                                   .map(Path::toAbsolutePath)
-                                                   .map(Path::toString)
-                                                   .collect(Collectors.toList()));
-        }
-    }
-
-    @Override
-    public void clearEditedFiles() {
-        prefs.remove(LAST_EDITED);
+        putStringList(RECENT_DATABASES, history.stream()
+                                               .map(Path::toAbsolutePath)
+                                               .map(Path::toString)
+                                               .toList());
     }
 
     //*************************************************************************************************************
