@@ -1,7 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
@@ -19,6 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class ManageCitationsDialogView extends BaseDialog<Void> {
 

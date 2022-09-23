@@ -2,8 +2,6 @@ package org.jabref.gui.libraryproperties.constants;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -23,6 +21,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class ConstantsPropertiesView extends AbstractPropertiesTabView<ConstantsPropertiesViewModel> implements PropertiesTab {
 
