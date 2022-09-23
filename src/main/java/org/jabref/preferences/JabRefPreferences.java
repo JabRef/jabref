@@ -231,6 +231,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ADD_MODIFICATION_DATE = "addModificationDate";
 
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
+    public static final String ADDITIONAL_DOI_SEARCH_ON_ARXIV_ENTRY = "additionalDoiSearchOnArXivEntry";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String RESOLVE_STRINGS_FOR_FIELDS = "resolveStringsForFields";
     public static final String DO_NOT_RESOLVE_STRINGS = "doNotResolveStrings";
@@ -650,6 +651,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DO_NOT_RESOLVE_STRINGS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
+        defaults.put(ADDITIONAL_DOI_SEARCH_ON_ARXIV_ENTRY, Boolean.TRUE);
         defaults.put(ADD_CREATION_DATE, Boolean.FALSE);
         defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
 
@@ -2815,11 +2817,13 @@ public class JabRefPreferences implements PreferencesService {
 
         importerPreferences = new ImporterPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT),
+                getBoolean(ADDITIONAL_DOI_SEARCH_ON_ARXIV_ENTRY),
                 getCustomImportFormats(),
                 getFetcherKeys()
         );
 
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
+        EasyBind.listen(importerPreferences.useArXivDoiForMoreInfoProperty(), (obs, oldValue, newValue) -> putBoolean(ADDITIONAL_DOI_SEARCH_ON_ARXIV_ENTRY, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImportList().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImportList()));
 

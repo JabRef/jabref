@@ -13,6 +13,7 @@ import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -41,10 +42,12 @@ public class ArXivWithDoi implements FulltextFetcher, PagedSearchBasedFetcher, I
 
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
+    private final ImporterPreferences importerPreferences;
 
-    public ArXivWithDoi(ImportFormatPreferences importFormatPreferences) {
+    public ArXivWithDoi(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         this.arXiv = new ArXiv(importFormatPreferences);
         this.doiFetcher = new DoiFetcher(importFormatPreferences);
+        this.importerPreferences = importerPreferences;
     }
 
     @Override
@@ -103,6 +106,10 @@ public class ArXivWithDoi implements FulltextFetcher, PagedSearchBasedFetcher, I
 
         Page<BibEntry> originalResult = arXiv.performSearchPaged(luceneQuery, pageNumber);
 
+        if (!this.importerPreferences.shouldUseArXivDoiForMoreInfo()) {
+            return originalResult;
+        }
+
         Collection<BibEntry> modifiedSearchResult = new ArrayList<>();
         for (BibEntry arXivEntry : originalResult.getContent()) {
             try {
@@ -118,6 +125,11 @@ public class ArXivWithDoi implements FulltextFetcher, PagedSearchBasedFetcher, I
 
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<BibEntry> originalResult = arXiv.performSearchById(identifier);
+
+        if (!this.importerPreferences.shouldUseArXivDoiForMoreInfo()) {
+            return originalResult;
+        }
+
         if (originalResult.isEmpty()) {
             return originalResult;
         }

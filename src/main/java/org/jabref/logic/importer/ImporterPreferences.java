@@ -13,13 +13,16 @@ import org.jabref.logic.preferences.FetcherApiKey;
 public class ImporterPreferences {
 
     private final BooleanProperty generateNewKeyOnImport;
+    private final BooleanProperty useArXivDoiForMoreInfo;
     private final ObservableSet<FetcherApiKey> apiKeys;
     private final ObservableSet<CustomImporter> customImportList;
 
     public ImporterPreferences(boolean generateNewKeyOnImport,
+                               boolean useArXivDoiForMoreInfo,
                                Set<CustomImporter> customImportList,
                                Set<FetcherApiKey> apiKeys) {
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
+        this.useArXivDoiForMoreInfo = new SimpleBooleanProperty(useArXivDoiForMoreInfo);
         this.customImportList = FXCollections.observableSet(customImportList);
         this.apiKeys = FXCollections.observableSet(apiKeys);
     }
@@ -34,6 +37,18 @@ public class ImporterPreferences {
 
     public void setGenerateNewKeyOnImport(boolean generateNewKeyOnImport) {
         this.generateNewKeyOnImport.set(generateNewKeyOnImport);
+    }
+
+    public boolean shouldUseArXivDoiForMoreInfo() {
+        return useArXivDoiForMoreInfo.get();
+    }
+
+    public BooleanProperty useArXivDoiForMoreInfoProperty() {
+        return useArXivDoiForMoreInfo;
+    }
+
+    public void setUseArXivDoiForMoreInfo(boolean useArXivDoiForMoreInfo) {
+        this.useArXivDoiForMoreInfo.set(useArXivDoiForMoreInfo);
     }
 
     public ObservableSet<FetcherApiKey> getApiKeys() {

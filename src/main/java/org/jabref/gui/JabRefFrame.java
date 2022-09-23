@@ -840,7 +840,7 @@ public class JabRefFrame extends BorderPane {
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
-        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(prefs.getImportFormatPreferences())) {
+        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(prefs.getImportFormatPreferences(), prefs.getImporterPreferences())) {
             LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(this, fetcher, stateManager, undoManager);
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }

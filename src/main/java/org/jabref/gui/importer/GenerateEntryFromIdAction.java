@@ -93,7 +93,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                     return Optional.empty();
                 }
                 updateMessage(Localization.lang("Searching..."));
-                return new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
+                return new CompositeIdFetcher(preferencesService.getImportFormatPreferences(), preferencesService.getImporterPreferences()).performSearchById(identifier);
             }
         };
     }

@@ -33,6 +33,7 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     @FXML private TextField grobidURL;
 
     @FXML private CheckBox warnAboutDuplicatesOnImport;
+    @FXML private CheckBox useArXivDoiForMoreInfo;
 
     public ImportExportTab() {
         ViewLoader.view(this)
@@ -89,6 +90,7 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> apiKeySelector.getSelectionModel().selectFirst());
 
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
+        useArXivDoiForMoreInfo.selectedProperty().bindBidirectional(viewModel.useArXivDoiForMoreInfoProperty());
     }
 
     private void updateFetcherApiKey(FetcherApiKey apiKey) {
