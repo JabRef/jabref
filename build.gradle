@@ -569,8 +569,6 @@ jlink {
         requires 'com.google.gson'
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
-        uses 'com.airhacks.afterburner.views.ResourceLocator'
-        uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
