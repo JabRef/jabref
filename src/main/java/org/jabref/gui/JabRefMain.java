@@ -191,9 +191,9 @@ public class JabRefMain extends Application {
     }
 
     private static void configureSSL(SSLPreferences sslPreferences) {
-        TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
-        System.setProperty("javax.net.ssl.trustStore", sslPreferences.getTruststorePath());
-        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+        // TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
+        // System.setProperty("javax.net.ssl.trustStore", sslPreferences.getTruststorePath());
+        // System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
     }
 
     private static void clearOldSearchIndices() {
