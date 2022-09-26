@@ -160,7 +160,7 @@ dependencies {
         exclude module: "jsr305"
     }
 
-    implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '1.3.5'
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
     // JavaFX stuff
@@ -567,6 +567,8 @@ jlink {
         requires 'jdk.xml.dom'
         requires 'com.google.gson'
         requires 'org.slf4j'
+        requires 'jakarta.inject'
+        requires 'jakarta.annotation'
         requires 'jakarta.xml.bind'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'

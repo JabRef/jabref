@@ -54,7 +54,7 @@ open module org.jabref {
     requires jdk.xml.dom;
 
     // Annotations (@PostConstruct)
-    requires java.annotation;
+    requires jakarta.annotation;
 
     // Microsoft application insights
     requires applicationinsights.core;
