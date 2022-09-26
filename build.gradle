@@ -205,7 +205,7 @@ dependencies {
 
     testImplementation 'io.github.classgraph:classgraph:4.8.149'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.9.0'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.9.1'
 
     testImplementation 'org.mockito:mockito-core:4.8.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
