@@ -567,8 +567,6 @@ jlink {
         requires 'jdk.xml.dom'
         requires 'com.google.gson'
         requires 'org.slf4j'
-        requires 'jakarta.inject'
-        requires 'jakarta.annotation'
         requires 'jakarta.xml.bind'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
