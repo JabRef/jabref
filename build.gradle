@@ -569,6 +569,7 @@ jlink {
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
         requires 'jakarta.inject'
+        requires 'jakarta.annotation'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
