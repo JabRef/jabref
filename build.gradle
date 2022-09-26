@@ -164,7 +164,7 @@ dependencies {
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
 
-    implementation 'com.github.JabRef:afterburner.fx:testmoduleinfo-SNAPSHOT'    // JavaFX stuff
+    implementation 'com.github.JabRef:afterburner.fx:testmoduleinfo-SNAPSHOT'
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
