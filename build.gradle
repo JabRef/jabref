@@ -163,6 +163,8 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
+
+    implementation 'com.github.JabRef:afterburner.fx:testmoduleinfo-SNAPSHOT' 
     // JavaFX stuff
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
@@ -568,8 +570,6 @@ jlink {
         requires 'com.google.gson'
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
-        requires 'jakarta.inject'
-        requires 'jakarta.annotation'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
