@@ -11,7 +11,7 @@ queries:
   - query: '"Software Engineering"'
 databases:
   - name: Springer
-  - name: ArXiv
+  - name: ArXivFetcher
   - name: Medline/PubMed
   - name: IEEEXplore
     enabled: false

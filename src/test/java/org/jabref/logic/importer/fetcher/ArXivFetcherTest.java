@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -27,7 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
+class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
     private ArXivFetcher fetcher;
     private BibEntry entry;
     private BibEntry sliceTheoremPaper;
@@ -35,10 +34,8 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
     @BeforeEach
     void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
-
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        fetcher = new ArXivFetcher(importFormatPreferences, importerPreferences);
+        fetcher = new ArXivFetcher(importFormatPreferences);
         entry = new BibEntry();
         sliceTheoremPaper = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Tobias Diez")

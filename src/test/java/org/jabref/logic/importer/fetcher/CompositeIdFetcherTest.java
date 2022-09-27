@@ -7,7 +7,6 @@ import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -93,10 +92,9 @@ class CompositeIdFetcherTest {
     @BeforeEach
     void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         FieldContentFormatterPreferences fieldContentFormatterPreferences = mock(FieldContentFormatterPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
-        compositeIdFetcher = new CompositeIdFetcher(importFormatPreferences, importerPreferences);
+        compositeIdFetcher = new CompositeIdFetcher(importFormatPreferences);
     }
 
     @ParameterizedTest

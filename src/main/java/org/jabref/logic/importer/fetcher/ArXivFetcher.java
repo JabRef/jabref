@@ -7,11 +7,13 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,13 +27,13 @@ import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
@@ -54,6 +56,7 @@ import org.xml.sax.SAXException;
  *     <li>Merges fields from arXiv-issued DOIs to get more information overall.</li>
  * </ul>
  *<p>
+ *
  * @see <a href="https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/">arXiv.org blog </a> for more info about arXiv-issued DOIs
  * @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
  * @see <a href="https://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
@@ -66,16 +69,17 @@ import org.xml.sax.SAXException;
 public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivFetcher.class);
+    // See https://github.com/JabRef/jabref/issues/9092#issuecomment-1251093262
     private static final String DOI_PREFIX = "10.48550/arXiv.";
+    // See https://github.com/JabRef/jabref/pull/9170 discussion
+    private static final Set<Field> CHOSEN_DOI_FIELDS = Set.of(StandardField.KEYWORDS, StandardField.AUTHOR);
 
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
-    private final ImporterPreferences importerPreferences;
 
-    public ArXivFetcher(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+    public ArXivFetcher(ImportFormatPreferences importFormatPreferences) {
         this.arXiv = new ArXiv(importFormatPreferences);
         this.doiFetcher = new DoiFetcher(importFormatPreferences);
-        this.importerPreferences = importerPreferences;
     }
 
     @Override
@@ -102,22 +106,39 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         return DOI_PREFIX + arXivId;
     }
 
+    // When using ArXiv-issued DOIs, it seems as though there is always a problem with the "KEYWORDS" field: it include the "FOS" ("Field of Specialization", I assume) entry TWICE,
+    // which, when placed on the final BibEntry, seems the prompt "The library has been modified by another program.", even though no such thing has happened. I don't know the exact eeason why,
+    // but removing the duplication seems to fix it
+    // You can see this is imported from DOI fetcher by making a GET to "https://doi.org/10.48550/arXiv.2201.00023" with header "Accept=application/x-bibtex"
+    private static void addaptKeywordsFrom(BibEntry doiBibEntry) {
+        Optional<String> originalKeywords = doiBibEntry.getField(StandardField.KEYWORDS);
+        if (originalKeywords.isPresent()) {
+            String filteredKeywords = Arrays.stream(originalKeywords.get().split(","))
+                                            .map(String::trim).distinct()
+                                            .collect(Collectors.joining(", "));
+            doiBibEntry.setField(StandardField.KEYWORDS, filteredKeywords);
+        }
+    }
+
     /**
      * Fuse ArXiv bib entry with the ArXiv-issued DOI bib entry
      *
      * @param arXivBibEntry A BibEntry from ArXiv
-     * @return A new BibEntry with (possibly) more fields
+     * @return arXivBibEntry, but (possibly) merged with its auto-assigned DOI
      */
-    private BibEntry getFusedBibEntry(BibEntry arXivBibEntry) throws FetcherException, MalformedParametersException {
+    private BibEntry enfuseArXivWithDoi(BibEntry arXivBibEntry) throws FetcherException, MalformedParametersException {
 
         String arXivId = findIdentifier(arXivBibEntry).orElseThrow(
-                () -> new MalformedParametersException(String.format("Provided BibEntry with id '%s' is not from arXiv", arXivBibEntry.getId())))
-                .getNormalizedWithoutVersion();
+                                                              () -> new MalformedParametersException(String.format("Provided BibEntry with id '%s' is not from arXiv", arXivBibEntry.getId())))
+                                                      .getNormalizedWithoutVersion();
 
         BibEntry doiEntry = doiFetcher.performSearchById(getGeneratedArXivDoi(arXivId)).orElseThrow(
                 () -> new FetcherException(String.format("Failed to retrieve entry from ArXiv-issued DOI '%s'", getGeneratedArXivDoi(arXivId))));
 
-        return arXivBibEntry.merge(doiEntry);
+        addaptKeywordsFrom(doiEntry);
+        arXivBibEntry.mergeWith(doiEntry, CHOSEN_DOI_FIELDS);
+
+        return arXivBibEntry;
     }
 
     /**
@@ -132,14 +153,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
         Page<BibEntry> originalResult = arXiv.performSearchPaged(luceneQuery, pageNumber);
 
-        if (!this.importerPreferences.shouldUseArXivDoiForMoreInfo()) {
-            return originalResult;
-        }
-
         Collection<BibEntry> modifiedSearchResult = new ArrayList<>();
         for (BibEntry arXivEntry : originalResult.getContent()) {
             try {
-                modifiedSearchResult.add(getFusedBibEntry(arXivEntry));
+                modifiedSearchResult.add(enfuseArXivWithDoi(arXivEntry));
             } catch (MalformedParametersException | FetcherException e) {
                 LOGGER.error(e.getMessage());
                 modifiedSearchResult.add(arXivEntry);
@@ -152,16 +169,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<BibEntry> originalResult = arXiv.performSearchById(identifier);
 
-        if (!this.importerPreferences.shouldUseArXivDoiForMoreInfo()) {
-            return originalResult;
-        }
-
         if (originalResult.isEmpty()) {
             return originalResult;
         }
 
         try {
-            return Optional.of(getFusedBibEntry(originalResult.get()));
+            return Optional.of(enfuseArXivWithDoi(originalResult.get()));
         } catch (MalformedParametersException | FetcherException e) {
             LOGGER.error(e.getMessage());
             return originalResult;
@@ -189,7 +202,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
      * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
      */
-    private class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
+    protected class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.logic.importer.fetcher.ArXivFetcher.ArXiv.class);
 

@@ -58,7 +58,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
-    private final BooleanProperty useArXivDoiForMoreInfoProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -84,7 +83,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
         warnAboutDuplicatesOnImportProperty.setValue(importExportPreferences.shouldWarnAboutDuplicatesOnImport());
-        useArXivDoiForMoreInfoProperty.setValue(importerPreferences.shouldUseArXivDoiForMoreInfo());
 
         switch (initialExportOrder.getOrderType()) {
             case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
@@ -122,7 +120,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         preferencesService.storeExportSaveOrder(newSaveOrderConfig);
 
         importExportPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
-        importerPreferences.setUseArXivDoiForMoreInfo(useArXivDoiForMoreInfoProperty.getValue());
 
         // API keys
         preferencesService.getImporterPreferences().getApiKeys().clear();
@@ -181,10 +178,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty warnAboutDuplicatesOnImportProperty() {
         return warnAboutDuplicatesOnImportProperty;
-    }
-
-    public BooleanProperty useArXivDoiForMoreInfoProperty() {
-        return useArXivDoiForMoreInfoProperty;
     }
 
     public void checkCustomApiKey() {

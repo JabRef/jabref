@@ -124,7 +124,7 @@ class WebFetchersTest {
 
     @Test
     void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() {
-        Set<IdFetcher<?>> idFetchers = WebFetchers.getIdFetchers(importFormatPreferences, importerPreferences);
+        Set<IdFetcher<?>> idFetchers = WebFetchers.getIdFetchers(importFormatPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(IdFetcher.class.getCanonicalName());

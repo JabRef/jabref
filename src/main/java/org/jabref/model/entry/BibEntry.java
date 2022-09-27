@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -141,11 +142,11 @@ public class BibEntry implements Cloneable {
     private Optional<Field> getSourceField(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
         //// 1. Sort out forbidden fields
         if ((targetField == StandardField.IDS) ||
-            (targetField == StandardField.CROSSREF) ||
-            (targetField == StandardField.XREF) ||
-            (targetField == StandardField.ENTRYSET) ||
-            (targetField == StandardField.RELATED) ||
-            (targetField == StandardField.SORTKEY)) {
+                (targetField == StandardField.CROSSREF) ||
+                (targetField == StandardField.XREF) ||
+                (targetField == StandardField.ENTRYSET) ||
+                (targetField == StandardField.RELATED) ||
+                (targetField == StandardField.SORTKEY)) {
             return Optional.empty();
         }
 
@@ -187,8 +188,8 @@ public class BibEntry implements Cloneable {
 
             // those fields are no more available for the same-name inheritance strategy
             if ((targetField == StandardField.TITLE) ||
-                (targetField == StandardField.SUBTITLE) ||
-                (targetField == StandardField.TITLEADDON)) {
+                    (targetField == StandardField.SUBTITLE) ||
+                    (targetField == StandardField.TITLEADDON)) {
                 return Optional.empty();
             }
 
@@ -199,12 +200,12 @@ public class BibEntry implements Cloneable {
         }
 
         if (((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.InBook)) ||
-            ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.BookInBook)) ||
-            ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.SuppBook)) ||
-            ((sourceEntry == StandardEntryType.Collection) && (targetEntry == StandardEntryType.InCollection)) ||
-            ((sourceEntry == StandardEntryType.Collection) && (targetEntry == StandardEntryType.SuppCollection)) ||
-            ((sourceEntry == StandardEntryType.Reference) && (targetEntry == StandardEntryType.InReference)) ||
-            ((sourceEntry == StandardEntryType.Proceedings) && (targetEntry == StandardEntryType.InProceedings))) {
+                ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.BookInBook)) ||
+                ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.SuppBook)) ||
+                ((sourceEntry == StandardEntryType.Collection) && (targetEntry == StandardEntryType.InCollection)) ||
+                ((sourceEntry == StandardEntryType.Collection) && (targetEntry == StandardEntryType.SuppCollection)) ||
+                ((sourceEntry == StandardEntryType.Reference) && (targetEntry == StandardEntryType.InReference)) ||
+                ((sourceEntry == StandardEntryType.Proceedings) && (targetEntry == StandardEntryType.InProceedings))) {
             if (targetField == StandardField.BOOKTITLE) {
                 return Optional.of(StandardField.TITLE);
             }
@@ -217,8 +218,8 @@ public class BibEntry implements Cloneable {
 
             // those fields are no more available for the same-name inheritance strategy
             if ((targetField == StandardField.TITLE) ||
-                (targetField == StandardField.SUBTITLE) ||
-                (targetField == StandardField.TITLEADDON)) {
+                    (targetField == StandardField.SUBTITLE) ||
+                    (targetField == StandardField.TITLEADDON)) {
                 return Optional.empty();
             }
 
@@ -229,7 +230,7 @@ public class BibEntry implements Cloneable {
         }
 
         if (((sourceEntry == IEEETranEntryType.Periodical) && (targetEntry == StandardEntryType.Article)) ||
-            ((sourceEntry == IEEETranEntryType.Periodical) && (targetEntry == StandardEntryType.SuppPeriodical))) {
+                ((sourceEntry == IEEETranEntryType.Periodical) && (targetEntry == StandardEntryType.SuppPeriodical))) {
             if (targetField == StandardField.JOURNALTITLE) {
                 return Optional.of(StandardField.TITLE);
             }
@@ -239,7 +240,7 @@ public class BibEntry implements Cloneable {
 
             // those fields are no more available for the same-name inheritance strategy
             if ((targetField == StandardField.TITLE) ||
-                (targetField == StandardField.SUBTITLE)) {
+                    (targetField == StandardField.SUBTITLE)) {
                 return Optional.empty();
             }
 
@@ -563,9 +564,9 @@ public class BibEntry implements Cloneable {
         fields.put(field, value.intern());
 
         FieldChange change = new FieldChange(this, field, oldValue, value);
-        if (isNewField) {
+        if (isNewField && eventSource != null) {
             eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
-        } else {
+        } else if (eventSource != null) {
             eventBus.post(new FieldChangedEvent(change, eventSource));
         }
         return Optional.of(change);
@@ -1035,17 +1036,29 @@ public class BibEntry implements Cloneable {
         this.setFiles(linkedFiles);
     }
 
-    public BibEntry merge(BibEntry other) {
-        BibEntry result = (BibEntry) other.clone();
-        Set<Field> ownFields = new TreeSet<>(Comparator.comparing(Field::getName));
-        ownFields.addAll(this.getFields());
+    public void mergeWith(BibEntry other) {
+        mergeWith(other, Set.of());
+    }
 
-        result.setType(this.getType());
-        for (Field field : ownFields) {
-            // Original field is always present
-            result.setField(field, this.getField(field).orElse(null));
+    public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {
+        Set<Field> thisFields = new TreeSet<>(Comparator.comparing(Field::getName));
+        Set<Field> otherFields = new TreeSet<>(Comparator.comparing(Field::getName));
+
+        thisFields.addAll(this.getFields());
+        otherFields.addAll(other.getFields());
+
+        Set<String> thisFieldsNames = thisFields.stream().map(Field::getName).collect(Collectors.toSet());
+        Set<String> otherPrioritizedFieldsNames = otherPrioritizedFields.stream().map(Field::getName).collect(Collectors.toSet());
+
+        for (Field otherField : otherFields) {
+
+            // As iterator only goes through non-null fields from OTHER, the value below can never be null
+            String otherFieldValue = other.getField(otherField).orElse(null);
+            if (!thisFieldsNames.contains(otherField.getName())) {
+                this.setField(otherField, otherFieldValue);
+            } else if (otherPrioritizedFieldsNames.contains(otherField.getName())) {
+                this.setField(otherField, otherFieldValue);
+            }
         }
-
-        return result;
     }
 }

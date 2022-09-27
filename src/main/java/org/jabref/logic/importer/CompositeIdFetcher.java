@@ -13,11 +13,9 @@ import org.jabref.model.entry.identifier.ISBN;
 public class CompositeIdFetcher {
 
     private final ImportFormatPreferences importFormatPreferences;
-    private final ImporterPreferences importerPreferences;
 
-    public CompositeIdFetcher(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+    public CompositeIdFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-        this.importerPreferences = importerPreferences;
     }
 
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
@@ -27,7 +25,7 @@ public class CompositeIdFetcher {
         }
         Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
         if (arXivIdentifier.isPresent()) {
-            return new ArXivFetcher(importFormatPreferences, importerPreferences).performSearchById(arXivIdentifier.get().getNormalized());
+            return new ArXivFetcher(importFormatPreferences).performSearchById(arXivIdentifier.get().getNormalized());
         }
         Optional<ISBN> isbn = ISBN.parse(identifier);
         if (isbn.isPresent()) {

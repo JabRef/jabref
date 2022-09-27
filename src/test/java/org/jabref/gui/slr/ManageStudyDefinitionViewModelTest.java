@@ -39,7 +39,7 @@ class ManageStudyDefinitionViewModelTest {
         ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, dialogService);
         assertEquals(List.of(
                 new StudyDatabaseItem("ACM Portal", true),
-                new StudyDatabaseItem("ArXiv", false),
+                new StudyDatabaseItem("ArXivFetcher", false),
                 new StudyDatabaseItem("Biodiversity Heritage", false),
                 new StudyDatabaseItem("CiteSeerX", false),
                 new StudyDatabaseItem("Collection of Computer Science Bibliographies", false),
@@ -79,7 +79,7 @@ class ManageStudyDefinitionViewModelTest {
                 dialogService);
         assertEquals(List.of(
                 new StudyDatabaseItem("ACM Portal", true),
-                new StudyDatabaseItem("ArXiv", false),
+                new StudyDatabaseItem("ArXivFetcher", false),
                 new StudyDatabaseItem("Biodiversity Heritage", false),
                 new StudyDatabaseItem("CiteSeerX", false),
                 new StudyDatabaseItem("Collection of Computer Science Bibliographies", false),

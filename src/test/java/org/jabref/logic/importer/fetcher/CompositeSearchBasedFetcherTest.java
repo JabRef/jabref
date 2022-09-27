@@ -94,14 +94,13 @@ public class CompositeSearchBasedFetcherTest {
     static Stream<Arguments> performSearchParameters() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
-
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
 
         List<SearchBasedFetcher> list = List.of(
-                new ArXivFetcher(importFormatPreferences, importerPreferences),
+                new ArXivFetcher(importFormatPreferences),
                 new INSPIREFetcher(importFormatPreferences),
                 new GvkFetcher(),
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),

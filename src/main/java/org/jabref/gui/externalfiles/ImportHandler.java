@@ -301,8 +301,7 @@ public class ImportHandler {
 
     private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) throws FetcherException {
         LOGGER.info("Found arxiv identifier in clipboard");
-        Optional<BibEntry> entry = new ArXivFetcher(preferencesService.getImportFormatPreferences(), preferencesService.getImporterPreferences())
-                .performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
+        Optional<BibEntry> entry = new ArXivFetcher(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
         return OptionalUtil.toList(entry);
     }
 }
