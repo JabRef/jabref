@@ -1,7 +1,6 @@
 package org.jabref.logic.bibtex.comparator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -45,8 +44,8 @@ public class MetaDataDiff {
     /**
      * @implNote Should be kept in sync with {@link MetaData#equals(Object)}
      */
-    public List<Difference> getDifferences(PreferencesService preferences) {
-        List<Difference> changes = new ArrayList<>();
+    public EnumSet<Difference> getDifferences(PreferencesService preferences) {
+        EnumSet<Difference> changes = EnumSet.noneOf(Difference.class);
 
         if (originalMetaData.isProtected() != newMetaData.isProtected()) {
             changes.add(Difference.PROTECTED);
