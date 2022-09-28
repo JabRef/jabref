@@ -74,7 +74,7 @@ public class MetaDataDiff {
         if (!Objects.equals(originalMetaData.getSaveActions(), newMetaData.getSaveActions())) {
             changes.add(Difference.SAVE_ACTIONS);
         }
-        if (originalMetaData.getMode() != newMetaData.getMode()) {
+        if (!originalMetaData.getMode().equals(newMetaData.getMode())) {
             changes.add(Difference.MODE);
         }
         if (!Objects.equals(originalMetaData.getDefaultFileDirectory(), newMetaData.getDefaultFileDirectory())) {
