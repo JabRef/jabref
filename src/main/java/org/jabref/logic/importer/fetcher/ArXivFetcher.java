@@ -72,7 +72,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     // See https://github.com/JabRef/jabref/issues/9092#issuecomment-1251093262
     private static final String DOI_PREFIX = "10.48550/arXiv.";
     // See https://github.com/JabRef/jabref/pull/9170 discussion
-    private static final Set<Field> CHOSEN_DOI_FIELDS = Set.of(StandardField.KEYWORDS, StandardField.AUTHOR);
+    private static final Set<Field> CHOSEN_AUTOMATIC_DOI_FIELDS = Set.of(StandardField.KEYWORDS, StandardField.AUTHOR);
+    // As user-issued DOIs can point to an arbitrary archive / link, the subset of chosen fields should be small
+    private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI);
 
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
@@ -107,38 +109,72 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     // When using ArXiv-issued DOIs, it seems as though there is always a problem with the "KEYWORDS" field: it include the "FOS" ("Field of Specialization", I assume) entry TWICE,
-    // which, when placed on the final BibEntry, seems the prompt "The library has been modified by another program.", even though no such thing has happened. I don't know the exact eeason why,
-    // but removing the duplication seems to fix it
+    // which, when placed on the final BibEntry, seems the prompt "The library has been modified by another program.", even though no such thing has happened. I don't know the exact reason why,
+    // but removing the duplication seems to fix it.
     // You can see this is imported from DOI fetcher by making a GET to "https://doi.org/10.48550/arXiv.2201.00023" with header "Accept=application/x-bibtex"
-    private static void addaptKeywordsFrom(BibEntry doiBibEntry) {
-        Optional<String> originalKeywords = doiBibEntry.getField(StandardField.KEYWORDS);
+    /**
+     * Remove duplicate values on "KEYWORD" field, if any.
+     *
+     * @param bibEntry A BibEntry to modify
+     * @return the same BibEntry received, but possibly with a modified KEYWORDS field
+     */
+    private static BibEntry addaptKeywordsFrom(BibEntry bibEntry) {
+        Optional<String> originalKeywords = bibEntry.getField(StandardField.KEYWORDS);
         if (originalKeywords.isPresent()) {
             String filteredKeywords = Arrays.stream(originalKeywords.get().split(","))
                                             .map(String::trim).distinct()
                                             .collect(Collectors.joining(", "));
-            doiBibEntry.setField(StandardField.KEYWORDS, filteredKeywords);
+            bibEntry.setField(StandardField.KEYWORDS, filteredKeywords);
+        }
+
+        return bibEntry;
+    }
+
+    private void infuseArXivWithAutomaticDoi(BibEntry arXivBibEntry) throws FetcherException, MalformedParametersException {
+        String arXivId = findIdentifier(arXivBibEntry).orElseThrow(
+                                                              () -> new MalformedParametersException(String.format("Provided BibEntry with id '%s' is not from ArXiv", arXivBibEntry.getId())))
+                                                      .getNormalizedWithoutVersion();
+        String automaticDoi = getGeneratedArXivDoi(arXivId);
+        Optional<BibEntry> automaticDoiEntry = doiFetcher.performSearchById(automaticDoi);
+
+        if (automaticDoiEntry.isPresent()) {
+            arXivBibEntry.mergeWith(addaptKeywordsFrom(automaticDoiEntry.get()), CHOSEN_AUTOMATIC_DOI_FIELDS);
+        } else {
+            LOGGER.warn(String.format("Failed to retrieve entry from ArXiv-issued DOI '%s'. It probably is not assigned yet", getGeneratedArXivDoi(arXivId)));
+        }
+    }
+
+    private void infuseArXivWithManualDoi(BibEntry arXivBibEntry) throws FetcherException {
+        Optional<String> manualDoi = arXivBibEntry.getField(StandardField.DOI);
+        Optional<BibEntry> manualDoiEntry = manualDoi.isPresent() ? doiFetcher.performSearchById(manualDoi.get()) : Optional.empty();
+
+        if (manualDoiEntry.isPresent()) {
+            arXivBibEntry.mergeWith(addaptKeywordsFrom(manualDoiEntry.get()), CHOSEN_MANUAL_DOI_FIELDS);
+        } else if (manualDoi.isPresent()) {
+            LOGGER.info(String.format("Failed to retrieve entry from user-issued DOI '%s'. Service pointed by DOI may be unavailable", manualDoi.get()));
         }
     }
 
     /**
-     * Fuse ArXiv bib entry with the ArXiv-issued DOI bib entry
+     * (Possibly) infuse ArXiv bib entry (in-place) with additional information from ArXiv-assigned and/or user-assigned DOIs
      *
      * @param arXivBibEntry A BibEntry from ArXiv
-     * @return arXivBibEntry, but (possibly) merged with its auto-assigned DOI
      */
-    private BibEntry enfuseArXivWithDoi(BibEntry arXivBibEntry) throws FetcherException, MalformedParametersException {
+    private void infuseArXivWithDoi(BibEntry arXivBibEntry) {
+        // Because the ArXiv-assigned DOI is more generic, merge first
+        try {
+            infuseArXivWithAutomaticDoi(arXivBibEntry);
+        } catch (FetcherException e) {
+            LOGGER.error("Could not fetch additional information from ArXiv-assigned DOI");
+        } catch (MalformedParametersException e) {
+            LOGGER.error(e.getMessage());
+        }
 
-        String arXivId = findIdentifier(arXivBibEntry).orElseThrow(
-                                                              () -> new MalformedParametersException(String.format("Provided BibEntry with id '%s' is not from arXiv", arXivBibEntry.getId())))
-                                                      .getNormalizedWithoutVersion();
-
-        BibEntry doiEntry = doiFetcher.performSearchById(getGeneratedArXivDoi(arXivId)).orElseThrow(
-                () -> new FetcherException(String.format("Failed to retrieve entry from ArXiv-issued DOI '%s'", getGeneratedArXivDoi(arXivId))));
-
-        addaptKeywordsFrom(doiEntry);
-        arXivBibEntry.mergeWith(doiEntry, CHOSEN_DOI_FIELDS);
-
-        return arXivBibEntry;
+        try {
+            infuseArXivWithManualDoi(arXivBibEntry);
+        } catch (FetcherException e) {
+            LOGGER.error("Could not fetch additional information from user-assigned DOI");
+        }
     }
 
     /**
@@ -155,12 +191,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
         Collection<BibEntry> modifiedSearchResult = new ArrayList<>();
         for (BibEntry arXivEntry : originalResult.getContent()) {
-            try {
-                modifiedSearchResult.add(enfuseArXivWithDoi(arXivEntry));
-            } catch (MalformedParametersException | FetcherException e) {
-                LOGGER.error(e.getMessage());
-                modifiedSearchResult.add(arXivEntry);
-            }
+            infuseArXivWithDoi(arXivEntry);
+            modifiedSearchResult.add(arXivEntry);
         }
 
         return new Page<>(originalResult.getQuery(), originalResult.getPageNumber(), modifiedSearchResult);
@@ -173,12 +205,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             return originalResult;
         }
 
-        try {
-            return Optional.of(enfuseArXivWithDoi(originalResult.get()));
-        } catch (MalformedParametersException | FetcherException e) {
-            LOGGER.error(e.getMessage());
-            return originalResult;
-        }
+        infuseArXivWithDoi(originalResult.get());
+        return originalResult;
     }
 
     @Override
