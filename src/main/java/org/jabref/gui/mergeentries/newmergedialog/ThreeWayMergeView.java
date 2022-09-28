@@ -106,7 +106,7 @@ public class ThreeWayMergeView extends VBox {
     private void initializeMergeGridPane() {
         mergeGridPane.getColumnConstraints().addAll(fieldNameColumnConstraints, leftEntryColumnConstraints, rightEntryColumnConstraints, mergedEntryColumnConstraints);
 
-        for (int fieldIndex = 0; fieldIndex < viewModel.allFieldsSize(); fieldIndex++) {
+        for (int fieldIndex = 0; fieldIndex < viewModel.numberOfVisibleFields(); fieldIndex++) {
             addRow(fieldIndex);
 
             mergeGridPane.getRowConstraints().add(new RowConstraints());
@@ -114,7 +114,7 @@ public class ThreeWayMergeView extends VBox {
     }
 
     private Field getFieldAtIndex(int index) {
-        return viewModel.allFields().get(index);
+        return viewModel.getVisibleFields().get(index);
     }
 
     private void addRow(int fieldIndex) {

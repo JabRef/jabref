@@ -2,8 +2,6 @@ package org.jabref.gui.commonfxcontrols;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
@@ -22,6 +20,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class CitationKeyPatternPanel extends TableView<CitationKeyPatternPanelItemModel> {
 

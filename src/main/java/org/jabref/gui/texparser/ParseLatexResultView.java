@@ -2,8 +2,6 @@ package org.jabref.gui.texparser;
 
 import java.nio.file.Path;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -20,6 +18,7 @@ import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class ParseLatexResultView extends BaseDialog<Void> {
 
