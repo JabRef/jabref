@@ -57,7 +57,7 @@ public class FieldFormatterCleanup implements CleanupJob {
         // Run formatter
         String newValue = formatter.format(oldValue);
 
-        if (oldValue.equals(newValue)) {
+        if (newValue.equals(oldValue)) {
             return Collections.emptyList();
         } else {
             if (newValue.isEmpty()) {
@@ -86,7 +86,7 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupAllTextFields(BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
         Set<Field> fields = new HashSet<>(entry.getFields());
-        fields.removeAll(FieldFactory.getNotTextFieldNames());
+        FieldFactory.getNotTextFieldNames().forEach(fields::remove);
         for (Field fieldKey : fields) {
             if (!fieldKey.equals(InternalField.KEY_FIELD)) {
                 fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
@@ -109,11 +109,10 @@ public class FieldFormatterCleanup implements CleanupJob {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof FieldFormatterCleanup)) {
-            return false;
+        if (obj instanceof FieldFormatterCleanup that) {
+            return Objects.equals(field, that.field) && Objects.equals(formatter, that.formatter);
         }
-        FieldFormatterCleanup other = (FieldFormatterCleanup) obj;
-        return Objects.equals(field, other.field) && Objects.equals(formatter, other.formatter);
+        return false;
     }
 
     @Override
