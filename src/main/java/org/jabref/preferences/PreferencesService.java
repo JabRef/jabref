@@ -26,7 +26,6 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
@@ -110,10 +109,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // GeneralPreferences
     //*************************************************************************************************************
-
-    Language getLanguage();
-
-    void setLanguage(Language language);
 
     GeneralPreferences getGeneralPreferences();
 
@@ -246,8 +241,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     GuiPreferences getGuiPreferences();
-
-    void clearEditedFiles();
 
     //*************************************************************************************************************
     // Misc preferences

@@ -1,28 +1,43 @@
 package org.jabref.logic.util.io;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.collections.ModifiableObservableListBase;
 
-public class FileHistory {
+public class FileHistory extends ModifiableObservableListBase<Path> {
 
     private static final int HISTORY_SIZE = 8;
 
-    private final ObservableList<Path> history;
+    private final List<Path> history;
 
-    public FileHistory(List<Path> files) {
-        history = FXCollections.observableList(Objects.requireNonNull(files));
+    private FileHistory(List<Path> list) {
+        history = new ArrayList<>(list);
+    }
+
+    @Override
+    public Path get(int index) {
+        return history.get(index);
     }
 
     public int size() {
         return history.size();
     }
 
-    public boolean isEmpty() {
-        return history.isEmpty();
+    @Override
+    protected void doAdd(int index, Path element) {
+        history.add(index, element);
+    }
+
+    @Override
+    protected Path doSet(int index, Path element) {
+        return history.set(index, element);
+    }
+
+    @Override
+    protected Path doRemove(int index) {
+        return history.remove(index);
     }
 
     /**
@@ -30,21 +45,17 @@ public class FileHistory {
      */
     public void newFile(Path file) {
         removeItem(file);
-        history.add(0, file);
+        this.add(0, file);
         while (size() > HISTORY_SIZE) {
             history.remove(HISTORY_SIZE);
         }
     }
 
-    public Path getFileAt(int index) {
-        return history.get(index);
-    }
-
     public void removeItem(Path file) {
-        history.remove(file);
+        this.remove(file);
     }
 
-    public ObservableList<Path> getHistory() {
-        return history;
+    public static FileHistory of(List<Path> list) {
+        return new FileHistory(new ArrayList<>(list));
     }
 }
