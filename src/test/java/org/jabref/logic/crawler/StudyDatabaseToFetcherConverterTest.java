@@ -77,7 +77,7 @@ class StudyDatabaseToFetcherConverterTest {
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         Assertions.assertEquals(
-                List.of("Springer", "ArXivFetcher", "Medline/PubMed"),
+                List.of("Springer", "ArXiv", "Medline/PubMed"),
                 result.stream().map(SearchBasedFetcher::getName).collect(Collectors.toList())
         );
     }

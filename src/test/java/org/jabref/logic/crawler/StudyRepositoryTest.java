@@ -118,9 +118,9 @@ class StudyRepositoryTest {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "ArXivFetcher.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "ArXivFetcher.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "ArXivFetcher.bib")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "ArXiv.bib")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "ArXiv.bib")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "ArXiv.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "Springer.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "Springer.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "Springer.bib")));
@@ -135,7 +135,7 @@ class StudyRepositoryTest {
     @Test
     void bibEntriesCorrectlyStored() throws Exception {
         setUpTestResultFile();
-        List<BibEntry> result = studyRepository.getFetcherResultEntries("Quantum", "ArXivFetcher").getEntries();
+        List<BibEntry> result = studyRepository.getFetcherResultEntries("Quantum", "ArXiv").getEntries();
         assertEquals(getArXivQuantumMockResults(), result);
     }
 
@@ -145,7 +145,7 @@ class StudyRepositoryTest {
 
         studyRepository.persist(mockResults);
 
-        assertEquals(getArXivQuantumMockResults(), getTestStudyRepository().getFetcherResultEntries("Quantum", "ArXivFetcher").getEntries());
+        assertEquals(getArXivQuantumMockResults(), getTestStudyRepository().getFetcherResultEntries("Quantum", "ArXiv").getEntries());
         assertEquals(getSpringerQuantumMockResults(), getTestStudyRepository().getFetcherResultEntries("Quantum", "Springer").getEntries());
         assertEquals(getSpringerCloudComputingMockResults(), getTestStudyRepository().getFetcherResultEntries("Cloud Computing", "Springer").getEntries());
     }
@@ -201,7 +201,7 @@ class StudyRepositoryTest {
      */
     private void setUpTestResultFile() throws Exception {
         Path queryDirectory = Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum");
-        Path resultFileLocation = Path.of(queryDirectory.toString(), "ArXivFetcher" + ".bib");
+        Path resultFileLocation = Path.of(queryDirectory.toString(), "ArXiv" + ".bib");
         URL resultFile = this.getClass().getResource("ArXivQuantumMock.bib");
         FileUtil.copyFile(Path.of(resultFile.toURI()), resultFileLocation, true);
         resultFileLocation = Path.of(queryDirectory.toString(), "Springer" + ".bib");
@@ -220,7 +220,7 @@ class StudyRepositoryTest {
     private List<QueryResult> getMockResults() {
         QueryResult resultQuantum =
                 new QueryResult("Quantum", List.of(
-                        new FetchResult("ArXivFetcher", new BibDatabase(stripCitationKeys(getArXivQuantumMockResults()))),
+                        new FetchResult("ArXiv", new BibDatabase(stripCitationKeys(getArXivQuantumMockResults()))),
                         new FetchResult("Springer", new BibDatabase(stripCitationKeys(getSpringerQuantumMockResults())))));
         QueryResult resultCloudComputing = new QueryResult("Cloud Computing", List.of(new FetchResult("Springer", new BibDatabase(getSpringerCloudComputingMockResults()))));
         return List.of(resultQuantum, resultCloudComputing);
@@ -255,7 +255,7 @@ class StudyRepositoryTest {
     }
 
     private List<BibEntry> getSpringerQuantumMockResults() {
-        // This is a duplicate of entry 1 of ArXivFetcher
+        // This is a duplicate of entry 1 of ArXiv
         BibEntry entry1 = new BibEntry()
                 .withCitationKey("Blaha")
                 .withField(StandardField.AUTHOR, "Stephen Blaha")
