@@ -2,24 +2,36 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -27,26 +39,161 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
+    private static ImportFormatPreferences importFormatPreferences;
+
     private ArXivFetcher fetcher;
     private BibEntry entry;
     private BibEntry sliceTheoremPaper;
 
-    @BeforeEach
-    void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+    private BibEntry mainOriginalPaper;
+    private BibEntry mainResultPaper;
+
+    private BibEntry completePaper;
+
+    @BeforeAll
+    static void setUp() {
+        importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        // Used during DOI fetch process
+        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+                new FieldContentFormatterPreferences(
+                        Arrays.stream("pdf;ps;url;doi;file;isbn;issn".split(";"))
+                              .map(fieldName -> StandardField.fromName(fieldName).isPresent() ? StandardField.fromName(fieldName).get() : new UnknownField(fieldName))
+                              .collect(Collectors.toList())));
+    }
+
+    @BeforeEach
+    void eachSetUp() {
         fetcher = new ArXivFetcher(importFormatPreferences);
         entry = new BibEntry();
+
+        // A BibEntry with information only from ArXiv API
+        mainOriginalPaper = new BibEntry(StandardEntryType.Article)
+                // ArXiv-original fields
+                .withField(StandardField.AUTHOR, "Joeran Beel and Andrew Collins and Akiko Aizawa")
+                .withField(StandardField.TITLE, "The Architecture of Mr. DLib's Scientific Recommender-System API")
+                .withField(StandardField.DATE, "2018-11-26")
+                .withField(StandardField.ABSTRACT, "Recommender systems in academia are not widely available. This may be in part due to the difficulty and cost of developing and maintaining recommender systems. Many operators of academic products such as digital libraries and reference managers avoid this effort, although a recommender system could provide significant benefits to their users. In this paper, we introduce Mr. DLib's \"Recommendations as-a-Service\" (RaaS) API that allows operators of academic products to easily integrate a scientific recommender system into their products. Mr. DLib generates recommendations for research articles but in the future, recommendations may include call for papers, grants, etc. Operators of academic products can request recommendations from Mr. DLib and display these recommendations to their users. Mr. DLib can be integrated in just a few hours or days; creating an equivalent recommender system from scratch would require several months for an academic operator. Mr. DLib has been used by GESIS Sowiport and by the reference manager JabRef. Mr. DLib is open source and its goal is to facilitate the application of, and research on, scientific recommender systems. In this paper, we present the motivation for Mr. DLib, the architecture and details about the effectiveness. Mr. DLib has delivered 94m recommendations over a span of two years with an average click-through rate of 0.12%.")
+                .withField(StandardField.EPRINT, "1811.10364")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1811.10364v1:PDF")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINTCLASS, "cs.IR")
+                .withField(StandardField.KEYWORDS, "cs.IR, cs.AI, cs.DL, cs.LG");
+
+        mainResultPaper = new BibEntry(StandardEntryType.Article)
+                // ArXiv-original fields
+//              .withField(StandardField.AUTHOR, "Joeran Beel and Andrew Collins and Akiko Aizawa")
+                .withField(StandardField.TITLE, "The Architecture of Mr. DLib's Scientific Recommender-System API")
+                .withField(StandardField.DATE, "2018-11-26")
+                .withField(StandardField.ABSTRACT, "Recommender systems in academia are not widely available. This may be in part due to the difficulty and cost of developing and maintaining recommender systems. Many operators of academic products such as digital libraries and reference managers avoid this effort, although a recommender system could provide significant benefits to their users. In this paper, we introduce Mr. DLib's \"Recommendations as-a-Service\" (RaaS) API that allows operators of academic products to easily integrate a scientific recommender system into their products. Mr. DLib generates recommendations for research articles but in the future, recommendations may include call for papers, grants, etc. Operators of academic products can request recommendations from Mr. DLib and display these recommendations to their users. Mr. DLib can be integrated in just a few hours or days; creating an equivalent recommender system from scratch would require several months for an academic operator. Mr. DLib has been used by GESIS Sowiport and by the reference manager JabRef. Mr. DLib is open source and its goal is to facilitate the application of, and research on, scientific recommender systems. In this paper, we present the motivation for Mr. DLib, the architecture and details about the effectiveness. Mr. DLib has delivered 94m recommendations over a span of two years with an average click-through rate of 0.12%.")
+                .withField(StandardField.EPRINT, "1811.10364")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1811.10364v1:PDF")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINTCLASS, "cs.IR")
+//              .withField(StandardField.KEYWORDS, "cs.IR, cs.AI, cs.DL, cs.LG")
+                // Unavailable info:
+                // StandardField.JOURNALTITLE // INFO NOT APPLICABLE TO THIS ENTRY
+                // ArXiv-issue DOI fields
+                .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license")
+                .withField((InternalField.KEY_FIELD), "https://doi.org/10.48550/arxiv.1811.10364")
+                .withField(StandardField.YEAR, "2018")
+                .withField(StandardField.KEYWORDS, "Information Retrieval (cs.IR), Artificial Intelligence (cs.AI), Digital Libraries (cs.DL), Machine Learning (cs.LG), FOS: Computer and information sciences")
+                .withField(StandardField.AUTHOR, "Beel, Joeran and Collins, Andrew and Aizawa, Akiko")
+                .withField(StandardField.PUBLISHER, "arXiv")
+                .withField(StandardField.DOI, "10.48550/ARXIV.1811.10364");
+
+        // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
+        completePaper = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
+                .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
+                .withField(StandardField.DATE, "2020-03-10")
+                .withField(StandardField.YEAR, "2020")
+                .withField(StandardField.MONTH, "aug")
+                .withField(StandardField.NUMBER, "8")
+                .withField(StandardField.VOLUME, "22")
+                .withField(StandardField.PAGES, "083005")
+                .withField(StandardField.PUBLISHER, "{IOP} Publishing")
+                .withField(StandardField.JOURNAL, "New Journal of Physics")
+                .withField(StandardField.ABSTRACT, "Interfaces in tissues are ubiquitous, both between tissue and environment as well as between populations of different cell types. The propagation of an interface can be driven mechanically. % e.g. by a difference in the respective homeostatic stress of the different cell types. Computer simulations of growing tissues are employed to study the stability of the interface between two tissues on a substrate. From a mechanical perspective, the dynamics and stability of this system is controlled mainly by four parameters of the respective tissues: (i) the homeostatic stress (ii) cell motility (iii) tissue viscosity and (iv) substrate friction. For propagation driven by a difference in homeostatic stress, the interface is stable for tissue-specific substrate friction even for very large differences of homeostatic stress; however, it becomes unstable above a critical stress difference when the tissue with the larger homeostatic stress has a higher viscosity. A small difference in directed bulk motility between the two tissues suffices to result in propagation with a stable interface, even for otherwise identical tissues. Larger differences in motility force, however, result in a finite-wavelength instability of the interface. Interestingly, the instability is apparently bound by nonlinear effects and the amplitude of the interface undulations only grows to a finite value in time.")
+                .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
+                .withField(StandardField.EPRINT, "2003.04601")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2003.04601v1:PDF")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINTCLASS, "q-bio.TO")
+                .withField(StandardField.KEYWORDS, "Tissues and Organs (q-bio.TO), FOS: Biological sciences")
+                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2003.04601")
+                .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
+
         sliceTheoremPaper = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "Tobias Diez")
+                .withField(StandardField.AUTHOR, "Diez, Tobias")
                 .withField(StandardField.TITLE, "Slice theorem for Fréchet group actions and covariant symplectic field theory")
                 .withField(StandardField.DATE, "2014-05-09")
+                .withField(StandardField.YEAR, "2014")
+                .withField(StandardField.PUBLISHER, "arXiv")
                 .withField(StandardField.ABSTRACT, "A general slice theorem for the action of a Fr\\'echet Lie group on a Fr\\'echet manifolds is established. The Nash-Moser theorem provides the fundamental tool to generalize the result of Palais to this infinite-dimensional setting. The presented slice theorem is illustrated by its application to gauge theories: the action of the gauge transformation group admits smooth slices at every point and thus the gauge orbit space is stratified by Fr\\'echet manifolds. Furthermore, a covariant and symplectic formulation of classical field theory is proposed and extensively discussed. At the root of this novel framework is the incorporation of field degrees of freedom F and spacetime M into the product manifold F * M. The induced bigrading of differential forms is used in order to carry over the usual symplectic theory to this new setting. The examples of the Klein-Gordon field and general Yang-Mills theory illustrate that the presented approach conveniently handles the occurring symmetries.")
+                .withField(StandardField.DOI, "10.48550/ARXIV.1405.2249")
                 .withField(StandardField.EPRINT, "1405.2249")
-                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1405.2249v1:PDF")
-                .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "math-ph")
-                .withField(StandardField.KEYWORDS, "math-ph, math.DG, math.MP, math.SG, 58B99, 58Z05, 58B25, 22E65, 58D19, 53D20, 53D42");
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1405.2249v1:PDF")
+                .withField(StandardField.KEYWORDS, "Mathematical Physics (math-ph), Differential Geometry (math.DG), Symplectic Geometry (math.SG), FOS: Physical sciences, FOS: Mathematics, 58B99, 58Z05, 58B25, 22E65, 58D19, 53D20, 53D42")
+                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.1405.2249")
+                .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
+    }
+
+    @Override
+    public SearchBasedFetcher getFetcher() {
+        return fetcher;
+    }
+
+    public List<String> getInputTestAuthors() {
+        return Arrays.stream(mainOriginalPaper.getField(StandardField.AUTHOR).get()
+                                              .split("and")).map(String::trim).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getTestAuthors() {
+        return Arrays.stream(mainResultPaper.getField(StandardField.AUTHOR).get()
+                                            .split("and")).map(String::trim).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getTestJournal() {
+        return "Journal of Geometry and Physics (2013)";
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return fetcher;
+    }
+
+    @Test
+    @Override
+    public void supportsAuthorSearch() throws FetcherException {
+        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
+        getInputTestAuthors().forEach(queryBuilder::add);
+
+        List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
+        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+
+        assertFalse(result.isEmpty());
+        result.forEach(bibEntry -> {
+            String author = bibEntry.getField(StandardField.AUTHOR).orElse("");
+
+            // The co-authors differ, thus we check for the author present at all papers
+            getTestAuthors().forEach(expectedAuthor -> Assertions.assertTrue(author.contains(expectedAuthor.replace("\"", ""))));
+        });
+    }
+
+    @Test
+    public void noSupportsAuthorSearchWithLastFirstName() throws FetcherException {
+        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
+        getTestAuthors().forEach(queryBuilder::add);
+
+        List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
+        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -165,8 +312,8 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
     @Test
     void searchEntryByPartOfTitle() throws Exception {
-        assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("title:\"slice theorem for Frechet\""));
+        assertEquals(Collections.singletonList(mainResultPaper),
+                fetcher.performSearch("title:\"the architecture of mr. dLib's\""));
     }
 
     @Test
@@ -178,17 +325,25 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void searchEntryByOldId() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "H1 Collaboration")
+                .withField(StandardField.AUTHOR, "{H1 Collaboration}")
                 .withField(StandardField.TITLE, "Multi-Electron Production at High Transverse Momenta in ep Collisions at HERA")
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.VOLUME, "31")
+                .withField(StandardField.PAGES, "17--29")
                 .withField(StandardField.DATE, "2003-07-07")
+                .withField(StandardField.YEAR, "2003")
+                .withField(StandardField.MONTH, "oct")
                 .withField(StandardField.ABSTRACT, "Multi-electron production is studied at high electron transverse momentum in positron- and electron-proton collisions using the H1 detector at HERA. The data correspond to an integrated luminosity of 115 pb-1. Di-electron and tri-electron event yields are measured. Cross sections are derived in a restricted phase space region dominated by photon-photon collisions. In general good agreement is found with the Standard Model predictions. However, for electron pair invariant masses above 100 GeV, three di-electron events and three tri-electron events are observed, compared to Standard Model expectations of 0.30 \\pm 0.04 and 0.23 \\pm 0.04, respectively.")
+                .withField(StandardField.PUBLISHER, "Springer Science and Business Media {LLC}")
                 .withField(StandardField.EPRINT, "hep-ex/0307015")
                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/hep-ex/0307015v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "hep-ex")
-                .withField(StandardField.KEYWORDS, "hep-ex")
+                .withField(StandardField.KEYWORDS, "High Energy Physics - Experiment (hep-ex), FOS: Physical sciences")
                 .withField(StandardField.DOI, "10.1140/epjc/s2003-01326-x")
-                .withField(StandardField.JOURNALTITLE, "Eur.Phys.J.C31:17-29,2003");
+                .withField(StandardField.JOURNAL, "Eur.Phys.J.C31:17-29,2003")
+                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.hep-ex/0307015")
+                .withField(new UnknownField("copyright"), "Assumed arXiv.org perpetual, non-exclusive license to distribute this article for submissions made before January 2004");
 
         assertEquals(Optional.of(expected), fetcher.performSearchById("hep-ex/0307015"));
     }
@@ -221,7 +376,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    void searchWithMalformedIdThrowsException() throws Exception {
+    void searchWithMalformedIdReturnsEmpty() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById("123412345"));
     }
 
@@ -252,16 +407,6 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("https : // arxiv . org / abs / 1405 . 2249 "));
     }
 
-    @Override
-    public SearchBasedFetcher getFetcher() {
-        return fetcher;
-    }
-
-    @Override
-    public List<String> getTestAuthors() {
-        return List.of("Tobias Diez");
-    }
-
     @Disabled("Is not supported by the current API")
     @Test
     @Override
@@ -272,11 +417,6 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     @Override
     public void supportsYearRangeSearch() throws Exception {
-    }
-
-    @Override
-    public String getTestJournal() {
-        return "Journal of Geometry and Physics (2013)";
     }
 
     /**
@@ -298,15 +438,20 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     public void supportsPhraseSearchAndMatchesExact() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "Fauzi Adi Rafrastara and Qi Deyu")
+                .withField(StandardField.AUTHOR, "Rafrastara, Fauzi Adi and Deyu, Qi")
                 .withField(StandardField.TITLE, "A Survey and Taxonomy of Distributed Data Mining Research Studies: A Systematic Literature Review")
                 .withField(StandardField.DATE, "2020-09-14")
+                .withField(StandardField.YEAR, "2020")
+                .withField(StandardField.PUBLISHER, "arXiv")
                 .withField(StandardField.ABSTRACT, "Context: Data Mining (DM) method has been evolving year by year and as of today there is also the enhancement of DM technique that can be run several times faster than the traditional one, called Distributed Data Mining (DDM). It is not a new field in data processing actually, but in the recent years many researchers have been paying more attention on this area. Problems: The number of publication regarding DDM in high reputation journals and conferences has increased significantly. It makes difficult for researchers to gain a comprehensive view of DDM that require further research. Solution: We conducted a systematic literature review to map the previous research in DDM field. Our objective is to provide the motivation for new research by identifying the gap in DDM field as well as the hot area itself. Result: Our analysis came up with some conclusions by answering 7 research questions proposed in this literature review. In addition, the taxonomy of DDM research area is presented in this paper. Finally, this systematic literature review provides the statistic of development of DDM since 2000 to 2015, in which this will help the future researchers to have a comprehensive overview of current situation of DDM.")
                 .withField(StandardField.EPRINT, "2009.10618")
+                .withField(StandardField.DOI, "10.48550/ARXIV.2009.10618")
                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2009.10618v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "cs.DC")
-                .withField(StandardField.KEYWORDS, "cs.DC, cs.LG");
+                .withField(StandardField.KEYWORDS, "Distributed, Parallel, and Cluster Computing (cs.DC), Machine Learning (cs.LG), FOS: Computer and information sciences")
+                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2009.10618")
+                .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
 
@@ -314,25 +459,28 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         assertEquals(Collections.singletonList(expected), resultWithPhraseSearch);
     }
 
-    @Override
-    public PagedSearchBasedFetcher getPagedFetcher() {
-        return fetcher;
-    }
-
     @Test
     public void supportsBooleanANDSearch() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "Tobias Büscher and Angel L. Diez and Gerhard Gompper and Jens Elgeti")
+                .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
                 .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
                 .withField(StandardField.DATE, "2020-03-10")
+                .withField(StandardField.YEAR, "2020")
+                .withField(StandardField.MONTH, "aug")
+                .withField(StandardField.NUMBER, "8")
+                .withField(StandardField.VOLUME, "22")
+                .withField(StandardField.PAGES, "083005")
+                .withField(StandardField.PUBLISHER, "{IOP} Publishing")
+                .withField(StandardField.JOURNAL, "New Journal of Physics")
                 .withField(StandardField.ABSTRACT, "Interfaces in tissues are ubiquitous, both between tissue and environment as well as between populations of different cell types. The propagation of an interface can be driven mechanically. % e.g. by a difference in the respective homeostatic stress of the different cell types. Computer simulations of growing tissues are employed to study the stability of the interface between two tissues on a substrate. From a mechanical perspective, the dynamics and stability of this system is controlled mainly by four parameters of the respective tissues: (i) the homeostatic stress (ii) cell motility (iii) tissue viscosity and (iv) substrate friction. For propagation driven by a difference in homeostatic stress, the interface is stable for tissue-specific substrate friction even for very large differences of homeostatic stress; however, it becomes unstable above a critical stress difference when the tissue with the larger homeostatic stress has a higher viscosity. A small difference in directed bulk motility between the two tissues suffices to result in propagation with a stable interface, even for otherwise identical tissues. Larger differences in motility force, however, result in a finite-wavelength instability of the interface. Interestingly, the instability is apparently bound by nonlinear effects and the amplitude of the interface undulations only grows to a finite value in time.")
                 .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
                 .withField(StandardField.EPRINT, "2003.04601")
-                .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2003.04601v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
-                .withField(StandardField.KEYWORDS, "q-bio.TO");
+                .withField(StandardField.KEYWORDS, "Tissues and Organs (q-bio.TO), FOS: Biological sciences")
+                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2003.04601")
+                .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
         List<BibEntry> result = fetcher.performSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
 

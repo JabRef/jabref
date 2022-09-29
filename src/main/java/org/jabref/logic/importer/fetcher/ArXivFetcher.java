@@ -72,9 +72,19 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     // See https://github.com/JabRef/jabref/issues/9092#issuecomment-1251093262
     private static final String DOI_PREFIX = "10.48550/arXiv.";
     // See https://github.com/JabRef/jabref/pull/9170 discussion
+    /*
+    * Reason behind choice of these fields:
+    *   - KEYWORDS: More descriptive
+    *   - AUTHOR: Better formatted (last name, rest of name)
+    * */
     private static final Set<Field> CHOSEN_AUTOMATIC_DOI_FIELDS = Set.of(StandardField.KEYWORDS, StandardField.AUTHOR);
-    // As user-issued DOIs can point to an arbitrary archive / link, the subset of chosen fields should be small
-    private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI);
+    /*
+     * Reason behind choice of these fields:
+     *   - DOI: give preference to DOIs manually inputted by users, instead of automatic ones
+     *   - PUBLISHER: ArXiv-issued DOIs give 'ArXiv' as entry publisher. While this can be true, prefer using one from external sources,
+     *      if applicable
+     * */
+    private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER);
 
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
@@ -118,6 +128,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * @param bibEntry A BibEntry to modify
      * @return the same BibEntry received, but possibly with a modified KEYWORDS field
      */
+    // TODO: FInd out what to do in the case of keywords like "Distributed, Parallel, and Cluster Computing (cs.DC)", with commas in their names
     private static BibEntry addaptKeywordsFrom(BibEntry bibEntry) {
         Optional<String> originalKeywords = bibEntry.getField(StandardField.KEYWORDS);
         if (originalKeywords.isPresent()) {
@@ -187,15 +198,15 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     @Override
     public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
 
-        Page<BibEntry> originalResult = arXiv.performSearchPaged(luceneQuery, pageNumber);
+        Page<BibEntry> result = arXiv.performSearchPaged(luceneQuery, pageNumber);
 
         Collection<BibEntry> modifiedSearchResult = new ArrayList<>();
-        for (BibEntry arXivEntry : originalResult.getContent()) {
+        for (BibEntry arXivEntry : result.getContent()) {
             infuseArXivWithDoi(arXivEntry);
             modifiedSearchResult.add(arXivEntry);
         }
 
-        return new Page<>(originalResult.getQuery(), originalResult.getPageNumber(), modifiedSearchResult);
+        return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
     }
 
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
@@ -306,15 +317,20 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             // 2. DOI and other fields
-            String query = entry.getField(StandardField.DOI)
-                                .flatMap(DOI::parse)
-                                .map(DOI::getNormalized)
-                                .map(doiString -> "doi:" + doiString)
-                                .orElseGet(() -> {
-                                    Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
-                                    Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
-                                    return String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
-                                });
+            String query;
+            Optional<String> doiString = entry.getField(StandardField.DOI)
+                                              .flatMap(DOI::parse)
+                                              .map(DOI::getNormalized);
+
+            // ArXiv-issued DOIs seem to be unsearchable from ArXiv API's "query string", so ignore it
+            if (doiString.isPresent() && !(doiString.get().toLowerCase().contains(DOI_PREFIX.toLowerCase()))) {
+                query = "doi:" + doiString.get();
+            } else {
+                Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
+                Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
+                query = String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
+            }
+
             Optional<ArXivEntry> arxivEntry = searchForEntry(query);
             if (arxivEntry.isPresent()) {
                 // Check if entry is a match
@@ -590,7 +606,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 abstractText.ifPresent(abstractContent -> bibEntry.setField(StandardField.ABSTRACT, abstractContent));
                 getDate().ifPresent(date -> bibEntry.setField(StandardField.DATE, date));
                 primaryCategory.ifPresent(category -> bibEntry.setField(StandardField.EPRINTCLASS, category));
-                journalReferenceText.ifPresent(journal -> bibEntry.setField(StandardField.JOURNALTITLE, journal));
+                journalReferenceText.ifPresent(journal -> bibEntry.setField(StandardField.JOURNAL, journal));
                 getPdfUrl().ifPresent(url -> bibEntry.setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
                 return bibEntry;
             }
