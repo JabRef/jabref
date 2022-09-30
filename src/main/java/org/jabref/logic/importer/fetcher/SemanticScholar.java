@@ -190,8 +190,8 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
             JSONObject externalIds = item.optJSONObject("externalIds");
             entry.setField(StandardField.DOI, externalIds.optString("DOI"));
-            if (externalIds.has("ArXivFetcher")) {
-                entry.setField(StandardField.EPRINT, externalIds.getString("ArXivFetcher"));
+            if (externalIds.has("ArXiv")) {
+                entry.setField(StandardField.EPRINT, externalIds.getString("ArXiv"));
                 entry.setField(StandardField.EPRINTTYPE, "arXiv");
             }
             entry.setField(StandardField.PMID, externalIds.optString("PubMed"));
