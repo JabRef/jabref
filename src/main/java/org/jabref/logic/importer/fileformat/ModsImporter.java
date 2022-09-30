@@ -167,7 +167,7 @@ public class ModsImporter extends Importer implements Parser {
             abstractDefinition
                     .ifPresent(abstractDef -> putIfValueNotNull(fields, StandardField.ABSTRACT, abstractDef.getValue()));
 
-            genreDefinition.ifPresent(genre -> entry.setType(EntryTypeFactory.parse(genre.getValue())));
+            genreDefinition.ifPresent(genre -> entry.setType(EntryTypeFactory.parse(mapGenre(genre.getValue()))));
 
             languageDefinition.ifPresent(
                     languageDef -> languageDef.getLanguageTerm().stream().map(LanguageTermDefinition::getValue)
@@ -201,6 +201,16 @@ public class ModsImporter extends Importer implements Parser {
         // same goes for authors and notes
         putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, StandardField.NOTE, ", ");
+    }
+
+    private String mapGenre(String genre) {
+        return switch (genre) {
+            case "conference publication" -> "proceedings";
+            case "database" -> "dataset";
+            case "yearbook", "handbook" -> "book";
+            case "law report or digest", "technical report", "reporting" -> "report";
+            default -> genre;
+        };
     }
 
     private void parseTitle(Map<Field, String> fields, List<Object> titleOrSubTitleOrPartNumber) {
