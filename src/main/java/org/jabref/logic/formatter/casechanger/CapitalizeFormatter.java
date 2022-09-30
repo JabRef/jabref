@@ -22,7 +22,7 @@ public class CapitalizeFormatter extends Formatter {
     public String format(String input) {
         Title title = new Title(input);
 
-        title.getWords().stream().forEach(Word::toUpperFirst);
+        title.getWords().stream().forEach(Word::toUpperFirstIgnoreHyphen);
 
         return title.toString();
     }

@@ -68,7 +68,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public void setValues() {
         languagesListProperty.setValue(new SortedList<>(FXCollections.observableArrayList(Language.values()), Comparator.comparing(Language::getDisplayName)));
-        selectedLanguageProperty.setValue(preferencesService.getLanguage());
+        selectedLanguageProperty.setValue(preferencesService.getGeneralPreferences().getLanguage());
 
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
 
@@ -91,8 +91,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public void storeSettings() {
         Language newLanguage = selectedLanguageProperty.getValue();
-        if (newLanguage != preferencesService.getLanguage()) {
-            preferencesService.setLanguage(newLanguage);
+        if (newLanguage != preferencesService.getGeneralPreferences().getLanguage()) {
+            preferencesService.getGeneralPreferences().setLanguage(newLanguage);
             Localization.setLanguage(newLanguage);
             restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
         }

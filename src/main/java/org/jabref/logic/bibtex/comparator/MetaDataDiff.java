@@ -1,15 +1,27 @@
 package org.jabref.logic.bibtex.comparator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
 public class MetaDataDiff {
+    public enum Difference {
+        PROTECTED,
+        GROUPS_ALTERED,
+        ENCODING,
+        SAVE_SORT_ORDER,
+        KEY_PATTERNS,
+        USER_FILE_DIRECTORY,
+        LATEX_FILE_DIRECTORY,
+        DEFAULT_KEY_PATTERN,
+        SAVE_ACTIONS,
+        MODE,
+        GENERAL_FILE_DIRECTORY,
+        CONTENT_SELECTOR
+    }
 
     private final Optional<GroupDiff> groupDiff;
     private final MetaData originalMetaData;
@@ -32,44 +44,44 @@ public class MetaDataDiff {
     /**
      * @implNote Should be kept in sync with {@link MetaData#equals(Object)}
      */
-    public List<String> getDifferences(PreferencesService preferences) {
-        List<String> changes = new ArrayList<>();
+    public EnumSet<Difference> getDifferences(PreferencesService preferences) {
+        EnumSet<Difference> changes = EnumSet.noneOf(Difference.class);
 
         if (originalMetaData.isProtected() != newMetaData.isProtected()) {
-            changes.add(Localization.lang("Library protection"));
+            changes.add(Difference.PROTECTED);
         }
         if (!Objects.equals(originalMetaData.getGroups(), newMetaData.getGroups())) {
-            changes.add(Localization.lang("Modified groups tree"));
+            changes.add(Difference.GROUPS_ALTERED);
         }
         if (!Objects.equals(originalMetaData.getEncoding(), newMetaData.getEncoding())) {
-            changes.add(Localization.lang("Library encoding"));
+            changes.add(Difference.ENCODING);
         }
         if (!Objects.equals(originalMetaData.getSaveOrderConfig(), newMetaData.getSaveOrderConfig())) {
-            changes.add(Localization.lang("Save sort order"));
+            changes.add(Difference.SAVE_SORT_ORDER);
         }
         if (!Objects.equals(originalMetaData.getCiteKeyPattern(preferences.getGlobalCitationKeyPattern()), newMetaData.getCiteKeyPattern(preferences.getGlobalCitationKeyPattern()))) {
-            changes.add(Localization.lang("Key patterns"));
+            changes.add(Difference.KEY_PATTERNS);
         }
         if (!Objects.equals(originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories())) {
-            changes.add(Localization.lang("User-specific file directory"));
+            changes.add(Difference.USER_FILE_DIRECTORY);
         }
         if (!Objects.equals(originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories())) {
-            changes.add(Localization.lang("LaTeX file directory"));
+            changes.add(Difference.LATEX_FILE_DIRECTORY);
         }
         if (!Objects.equals(originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern())) {
-            changes.add(Localization.lang("Default pattern"));
+            changes.add(Difference.DEFAULT_KEY_PATTERN);
         }
         if (!Objects.equals(originalMetaData.getSaveActions(), newMetaData.getSaveActions())) {
-            changes.add(Localization.lang("Save actions"));
+            changes.add(Difference.SAVE_ACTIONS);
         }
-        if (originalMetaData.getMode() != newMetaData.getMode()) {
-            changes.add(Localization.lang("Library mode"));
+        if (!originalMetaData.getMode().equals(newMetaData.getMode())) {
+            changes.add(Difference.MODE);
         }
         if (!Objects.equals(originalMetaData.getDefaultFileDirectory(), newMetaData.getDefaultFileDirectory())) {
-            changes.add(Localization.lang("General file directory"));
+            changes.add(Difference.GENERAL_FILE_DIRECTORY);
         }
         if (!Objects.equals(originalMetaData.getContentSelectors(), newMetaData.getContentSelectors())) {
-            changes.add(Localization.lang("Content selectors"));
+            changes.add(Difference.CONTENT_SELECTOR);
         }
         return changes;
     }

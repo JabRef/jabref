@@ -1,8 +1,8 @@
 package org.jabref.logic.util.io;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,14 @@ class FileHistoryTest {
 
     @BeforeEach
     void setUp() {
-        history = new FileHistory(new ArrayList<>());
+        history = FileHistory.of(Collections.emptyList());
     }
 
     @Test
     void newItemsAreAddedInRightOrder() {
         history.newFile(Path.of("aa"));
         history.newFile(Path.of("bb"));
-        assertEquals(Arrays.asList(Path.of("bb"), Path.of("aa")), history.getHistory());
+        assertEquals(Arrays.asList(Path.of("bb"), Path.of("aa")), history);
     }
 
     @Test
@@ -31,7 +31,7 @@ class FileHistoryTest {
         history.newFile(Path.of("aa"));
         history.newFile(Path.of("bb"));
         history.newFile(Path.of("aa"));
-        assertEquals(Arrays.asList(Path.of("aa"), Path.of("bb")), history.getHistory());
+        assertEquals(Arrays.asList(Path.of("aa"), Path.of("bb")), history);
     }
 
     @Test
@@ -42,7 +42,7 @@ class FileHistoryTest {
 
         history.removeItem(Path.of("bb"));
 
-        assertEquals(Arrays.asList(Path.of("cc"), Path.of("aa")), history.getHistory());
+        assertEquals(Arrays.asList(Path.of("cc"), Path.of("aa")), history);
     }
 
     @Test
@@ -66,7 +66,7 @@ class FileHistoryTest {
         history.newFile(Path.of("aa"));
         history.newFile(Path.of("bb"));
         history.newFile(Path.of("cc"));
-        assertEquals(Path.of("bb"), history.getFileAt(1));
+        assertEquals(Path.of("bb"), history.get(1));
     }
 }
 
