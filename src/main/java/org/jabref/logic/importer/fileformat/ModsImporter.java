@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -204,7 +205,7 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     private String mapGenre(String genre) {
-        return switch (genre) {
+        return switch (genre.toLowerCase(Locale.ROOT)) {
             case "conference publication" -> "proceedings";
             case "database" -> "dataset";
             case "yearbook", "handbook" -> "book";
