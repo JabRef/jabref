@@ -1,33 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" initialize-with-hyphen="false" default-locale="en-US">
   <info>
-    <title>American Medical Association 11th edition</title>
-    <title-short>AMA (11th ed.)</title-short>
-    <id>http://www.zotero.org/styles/american-medical-association</id>
-    <link href="http://www.zotero.org/styles/american-medical-association" rel="self"/>
-    <link href="http://www.zotero.org/styles/american-medical-association-10th-edition" rel="template"/>
-    <link href="https://westlibrary.txwes.edu/sites/default/files/pdf/AMACitationStyle.pdf" rel="documentation"/>
-    <link href="https://www.amamanualofstyle.com/fileasset/AMAMOS/aaaAMWA%20presentation%20Nov%202019%20FULL.pdf" rel="documentation"/>
+    <title>Taylor &amp; Francis - AMA</title>
+    <id>http://www.zotero.org/styles/taylor-and-francis-ama</id>
+    <link href="http://www.zotero.org/styles/taylor-and-francis-ama" rel="self"/>
+    <link href="http://www.zotero.org/styles/american-medical-association" rel="template"/>
+    <link href="https://www.tandfonline.com/action/authorSubmission?show=instructions&amp;journalCode=ytsr20#submitting-your-paper" rel="documentation"/>
     <author>
-      <name>Julian Onions</name>
-      <email>julian.onions@gmail.com</email>
-    </author>
-    <contributor>
-      <name>Christian Pietsch</name>
-      <uri>http://purl.org/net/pietsch</uri>
-    </contributor>
-    <contributor>
-      <name>Daniel W Chan</name>
-      <email>danwchan@protonmail.com</email>
-    </contributor>
-    <contributor>
       <name>Patrick O'Brien</name>
-      <email>obrienpat86@gmail.com</email>
-    </contributor>
+    </author>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <summary>The American Medical Association style as used in JAMA. Version 11 as per November-2019.</summary>
-    <updated>2022-03-17T08:48:24+00:00</updated>
+    <updated>2022-09-11T09:34:43+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -69,6 +54,7 @@
                   <date variable="issued" prefix="Published " form="text"/>
                 </if>
               </choose>
+              <text variable="URL"/>
               <group>
                 <text term="accessed" text-case="capitalize-first" suffix=" "/>
                 <date variable="accessed">
@@ -77,7 +63,6 @@
                   <date-part name="year"/>
                 </date>
               </group>
-              <text variable="URL"/>
             </group>
           </else-if>
         </choose>
@@ -122,9 +107,9 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="false" et-al-min="7" et-al-use-first="3" second-field-align="flush">
+  <bibliography et-al-min="7" et-al-use-first="6" second-field-align="flush">
     <layout>
-      <text variable="citation-number" suffix="."/>
+      <text variable="citation-number" prefix="[" suffix="]"/>
       <text macro="author"/>
       <text macro="title" prefix=" " suffix="."/>
       <choose>
