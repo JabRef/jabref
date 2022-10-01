@@ -19,7 +19,7 @@
         }
     },
 
-    "onCreateCommand": "yes | sdk install java 18.0.2-tem && gradle assemble",
+    "onCreateCommand": "gradle assemble",
 
     // Need to connect as root otherwise we run into issues with gradle.
     // default option is "vscode". More info: https://aka.ms/vscode-remote/containers/non-root.
@@ -28,10 +28,11 @@
         // Adds a lightweight desktop that can be accessed using a VNC viewer or the web
         "desktop-lite": "latest",
 
-        // Install java 17 (java 18 is not yet available from ms)
+        // Install java
         "java": {
-            "version": "17",
-            "installGradle": true
+            "version": "18",
+            "installGradle": true,
+            "jdkDistro": "sem"
         }
     }
 }
