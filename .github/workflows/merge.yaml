@@ -12,8 +12,13 @@ on:
         description: Commit message
         required: true
 
+permissions: {}
 jobs:
   release:
+    permissions:
+      contents: write # to create a release
+      pull-requests: read # to read pull requests (dorny/paths-filter)
+
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
