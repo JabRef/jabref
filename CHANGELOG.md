@@ -37,6 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed the display of the "Customize Entry Types" dialogue title [#9198](https://github.com/JabRef/jabref/issues/9198)
 - We fixed an issue where author names with tilde accents (for example ñ) were marked as "Names are not in the standard BibTex format" [#8071](https://github.com/JabRef/jabref/issues/8071)
 - We fixed an issue where the possibility to generate a subdatabase from an aux file was writing empty files when called from the commandline [#9115](https://github.com/JabRef/jabref/issues/9115), [forum#3516](https://discourse.jabref.org/t/export-subdatabase-from-aux-file-on-macos-command-line/3516)
 - We fixed the display of issue, number, eid and pages fields in the entry preview. [#8607](https://github.com/JabRef/jabref/pull/8607), [#8372](https://github.com/JabRef/jabref/issues/8372), [Koppor#514](https://github.com/koppor/jabref/issues/514), [forum#2390](https://discourse.jabref.org/t/unable-to-edit-my-bibtex-file-that-i-used-before-vers-5-1/2390), [forum#3462](https://discourse.jabref.org/t/jabref-5-6-need-help-with-export-from-jabref-to-microsoft-word-entry-preview-of-apa-7-not-rendering-correctly/3462)
