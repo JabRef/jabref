@@ -62,6 +62,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
             CustomMenuItem menuItem = new CustomMenuItem(new Label(converter.getName()));
             Tooltip toolTip = new Tooltip(converter.getDescription());
             Tooltip.install(menuItem.getContent(), toolTip);
+            menuItem.setDisable(textInputControl.textProperty().get() == null);
             menuItem.setOnAction(event ->
                     textInputControl.textProperty().set(converter.format(textInputControl.textProperty().get())));
             submenu.getItems().add(menuItem);
