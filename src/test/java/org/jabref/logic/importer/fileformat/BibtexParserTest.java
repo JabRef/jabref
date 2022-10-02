@@ -1923,4 +1923,17 @@ class BibtexParserTest {
 
         assertEquals(Optional.of("#apr#"), result.get().getField(StandardField.MONTH));
     }
+
+    @Test
+    void parseDuplicateKeywords() throws ParseException {
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{,\n"
+            + "  keywords     = {asdf, asdf, asdf},\n"
+            + "}\n"
+            + "");
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
+            .withField(StandardField.KEYWORDS, "asdf, asdf, asdf");
+
+        assertEquals(expectedEntry, result);
+    }
 }

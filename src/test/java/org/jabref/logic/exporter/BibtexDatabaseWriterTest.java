@@ -158,6 +158,21 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
+    void writeEntryWithDuplicateKeywords() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setType(StandardEntryType.Article);
+        entry.setField(StandardField.KEYWORDS, "asdf,asdf,asdf");
+        database.insertEntry(entry);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
+
+        assertEquals("@Article{," + OS.NEWLINE
+                     + "  keywords = {asdf,asdf,asdf}," + OS.NEWLINE
+                     + "}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
     void writeEncodingAndEntry() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
@@ -239,6 +254,7 @@ public class BibtexDatabaseWriterTest {
                 +
                 "@Comment{jabref-meta: keypatterndefault:test;}" + OS.NEWLINE, stringWriter.toString());
     }
+
 
     @Test
     void writeGroups() throws Exception {

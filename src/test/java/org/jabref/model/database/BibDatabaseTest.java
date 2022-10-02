@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BibDatabaseTest {
 
     private BibDatabase database;
-    private BibtexString bibtexString = new BibtexString("DSP", "Digital Signal Processing");
+    private final BibtexString bibtexString = new BibtexString("DSP", "Digital Signal Processing");
 
     @BeforeEach
     void setUp() {
@@ -478,4 +478,5 @@ class BibDatabaseTest {
         database.setPreamble("Oh yeah!");
         assertEquals(Optional.of("Oh yeah!"), database.getPreamble());
     }
+
 }
