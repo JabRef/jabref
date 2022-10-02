@@ -200,11 +200,11 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
         Page<BibEntry> result = arXiv.performSearchPaged(luceneQuery, pageNumber);
 
-        Collection<BibEntry> modifiedSearchResult = new ArrayList<>();
-        for (BibEntry arXivEntry : result.getContent()) {
-            infuseArXivWithDoi(arXivEntry);
-            modifiedSearchResult.add(arXivEntry);
-        }
+        Collection<BibEntry> modifiedSearchResult = (Collection<BibEntry>) Arrays.asList(
+                result.getContent()
+                        .parallelStream()
+                        .peek(this::infuseArXivWithDoi)
+                        .toArray(BibEntry[]::new));
 
         return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
     }
