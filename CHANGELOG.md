@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a warning message next to the authors field in the merge dialog to warn users when the authors are the same but formatted differently. [#8745](https://github.com/JabRef/jabref/issues/8745)
 - The properties of an existing systematic literature review can be edited. [koppor#604](https://github.com/koppor/jabref/issues/604)
 - An SLR can now be started from the SLR itself. [#9131](https://github.com/JabRef/jabref/pull/9131), [koppor#601](https://github.com/koppor/jabref/issues/601)
+- Genres are now mapped correctly when importing MODS files. [#9193](https://github.com/JabRef/jabref/pull/9193)
 
 ### Changed
 
