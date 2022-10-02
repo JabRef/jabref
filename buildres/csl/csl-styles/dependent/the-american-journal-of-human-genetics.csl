@@ -2,16 +2,15 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
   <!-- Cell Press - Research Journals, generated from "cell-press-research" metadata at https://github.com/citation-style-language/journals -->
   <info>
-    <title>Cell Metabolism</title>
-    <id>http://www.zotero.org/styles/cell-metabolism</id>
-    <link href="http://www.zotero.org/styles/cell-metabolism" rel="self"/>
+    <title>The American Journal of Human Genetics</title>
+    <id>http://www.zotero.org/styles/the-american-journal-of-human-genetics</id>
+    <link href="http://www.zotero.org/styles/the-american-journal-of-human-genetics" rel="self"/>
     <link href="http://www.zotero.org/styles/cell" rel="independent-parent"/>
-    <link href="http://www.cell.com/cell-metabolism/authors" rel="documentation"/>
+    <link href="https://www.cell.com/ajhg/authors" rel="documentation"/>
     <category citation-format="numeric"/>
     <category field="biology"/>
-    <category field="medicine"/>
-    <issn>1550-4131</issn>
-    <eissn>1932-7420</eissn>
+    <issn>0002-9297</issn>
+    <eissn>1537-6605</eissn>
     <updated>2017-10-20T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>

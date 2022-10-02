@@ -148,7 +148,7 @@
   </citation>
   <bibliography second-field-align="flush" entry-spacing="0">
     <layout suffix=".">
-      <text variable="citation-number" prefix="(" suffix=") "/>
+      <text variable="citation-number" prefix="(" suffix=")"/>
       <text macro="author" suffix=" "/>
       <choose>
         <if type="article-journal review" match="any">
