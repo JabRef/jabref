@@ -25,7 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
   Thus, the now created search index cannot be read from older versions of JabRef anylonger.
   ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
   Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
-  [#8868](https://github.com/JabRef/jabref/pull/8868)
+  [#9213](https://github.com/JabRef/jabref/pull/9213)
 - Genres are now mapped correctly to entry types when importing MODS files. [#9185](https://github.com/JabRef/jabref/issues/9185)
 - We improved the Citavi Importer to also import so called Knowledge-items into the field `comment` of the corresponding entry [#9025](https://github.com/JabRef/jabref/issues/9025)
 - We removed wrapping of string constants when writing to a `.bib` file.
