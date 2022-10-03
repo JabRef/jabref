@@ -4,8 +4,13 @@ on:
   pull_request_target:
     types: [ opened, synchronize, workflow_dispatch]
 
+permissions: {}
 jobs:
   test:
+    permissions:
+      contents: write # to push code in repo (stefanzweifel/git-auto-commit-action)
+      pull-requests: write # to comment on pull requests
+
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

@@ -135,7 +135,7 @@ public class JabRefGUI {
         // Remove invalid databases
         List<ParserResult> invalidDatabases = bibDatabases.stream()
                                                           .filter(ParserResult::isInvalid)
-                                                          .collect(Collectors.toList());
+                                                          .toList();
         failed.addAll(invalidDatabases);
         bibDatabases.removeAll(invalidDatabases);
 
