@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -57,6 +59,16 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_DOI);
+    }
+
+    public CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(String identifier) throws CompletionException {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return performSearchById(identifier);
+            } catch (FetcherException e) {
+                throw new CompletionException(e);
+            }
+        });
     }
 
     @Override
