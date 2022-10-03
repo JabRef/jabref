@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- We disabled the conversion menu for empty fields [#9200](https://github.com/JabRef/jabref/issues/9200)
 - We upgraded to Lucene 9.4 for the fulltext search.
   Thus, the now created search index cannot be read from older versions of JabRef anylonger.
   ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
