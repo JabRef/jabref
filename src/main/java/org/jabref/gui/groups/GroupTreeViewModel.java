@@ -245,18 +245,18 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void editGroup(GroupNodeViewModel oldGroup) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
-                                                                                         dialogService,
-                                                                                         database,
-                                                                                         preferences,
-                                                                                         oldGroup.getGroupNode().getGroup(),
-                                                                                         GroupDialogHeader.SUBGROUP));
+                     dialogService,
+                     database,
+                     preferences,
+                     oldGroup.getGroupNode().getGroup(),
+                     GroupDialogHeader.SUBGROUP));
             newGroup.ifPresent(group -> {
 
                 AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
                 String oldGroupName = oldGroupDef.getName();
 
                 boolean groupTypeEqual = isGroupTypeEqual(oldGroupDef, group);
-                boolean onlyMinorModifications = this.onlyMinorChanges(oldGroupDef, group);
+                boolean onlyMinorModifications = groupTypeEqual && onlyMinorChanges(oldGroupDef, group);
 
                 // dialog already warns us about this if the new group is named like another existing group
                 // We need to check if only the name changed as this is relevant for the entry's group field
@@ -290,7 +290,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     oldGroup.getGroupNode().setGroup(
                                      group,
                                      true,
-                                     true, // TODO Not sure
+                                     true,
                                      database.getEntries());
 
                     writeGroupChangesToMetaData();
