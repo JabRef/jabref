@@ -1,10 +1,11 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.AbstractIsbnFetcherTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-public class OpenLibraryFetcherTest extends AbstractIsbnFetcherTest {
+public class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     @BeforeEach
     public void setUp() {
@@ -29,7 +30,7 @@ public class OpenLibraryFetcherTest extends AbstractIsbnFetcherTest {
                 .withField(StandardField.ISBN, "9780321356680")
                 .withField(StandardField.PAGES, "256");
 
-        fetcher = new OpenLibraryFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        fetcher = new OpenLibraryIsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test

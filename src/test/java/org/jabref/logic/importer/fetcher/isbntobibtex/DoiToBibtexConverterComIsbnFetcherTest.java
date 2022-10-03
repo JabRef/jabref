@@ -44,14 +44,14 @@ public class DoiToBibtexConverterComIsbnFetcherTest extends AbstractIsbnFetcherT
     @Disabled
     @Override
     public void searchByIdSuccessfulWithShortISBN() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Test
     @Disabled
     @Override
     public void searchByIdSuccessfulWithLongISBN() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Test
