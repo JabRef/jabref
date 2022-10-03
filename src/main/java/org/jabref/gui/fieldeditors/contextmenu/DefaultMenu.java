@@ -15,6 +15,9 @@ import javafx.scene.control.Tooltip;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.strings.StringUtil;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 public class DefaultMenu implements Supplier<List<MenuItem>> {
 
@@ -62,7 +65,7 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
             CustomMenuItem menuItem = new CustomMenuItem(new Label(converter.getName()));
             Tooltip toolTip = new Tooltip(converter.getDescription());
             Tooltip.install(menuItem.getContent(), toolTip);
-            menuItem.setDisable(textInputControl.textProperty().get() == null);
+            EasyBind.subscribe(textInputControl.textProperty(), value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value)));
             menuItem.setOnAction(event ->
                     textInputControl.textProperty().set(converter.format(textInputControl.textProperty().get())));
             submenu.getItems().add(menuItem);
