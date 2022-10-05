@@ -38,7 +38,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
 
-    private StringProperty message;
+    private final StringProperty message;
     private final TaskExecutor taskExecutor;
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
