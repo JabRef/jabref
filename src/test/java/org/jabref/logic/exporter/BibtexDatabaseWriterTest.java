@@ -271,7 +271,6 @@ public class BibtexDatabaseWriterTest {
                 "@Comment{jabref-meta: keypatterndefault:test;}" + OS.NEWLINE, stringWriter.toString());
     }
 
-
     @Test
     void writeGroups() throws Exception {
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));

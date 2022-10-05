@@ -478,5 +478,4 @@ class BibDatabaseTest {
         database.setPreamble("Oh yeah!");
         assertEquals(Optional.of("Oh yeah!"), database.getPreamble());
     }
-
 }
