@@ -1925,15 +1925,38 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseDuplicateKeywords() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{,\n"
-            + "  keywords     = {asdf, asdf, asdf},\n"
+    void parseDuplicateKeywordsWithOnlyOneEntry() throws ParseException {
+        Optional<BibEntry> result = parser.parseSingleEntry("@Article{,\n"
+            + "Keywords={asdf,asdf,asdf},\n"
             + "}\n"
             + "");
 
-        BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
-            .withField(StandardField.KEYWORDS, "asdf, asdf, asdf");
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
 
-        assertEquals(expectedEntry, result);
+        assertEquals(Optional.of(expectedEntry), result);
+    }
+
+    @Test
+    void parseDuplicateKeywordsWithTwoEntries() throws Exception {
+
+        BibEntry expectedEntryFirst = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.KEYWORDS, "bbb")
+            .withCitationKey("Test2017");
+
+        BibEntry expectedEntrySecond = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
+
+        String entries = """
+            @Article{Test2017,
+              keywords = {bbb},
+            }
+
+            @Article{,
+              keywords = {asdf,asdf,asdf},
+            },
+            """;
+        ParserResult result = parser.parse(new StringReader(entries));
+        assertEquals(List.of(expectedEntryFirst, expectedEntrySecond), result.getDatabase().getEntries());
     }
 }
