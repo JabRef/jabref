@@ -29,7 +29,7 @@ public class GuiWriter extends AbstractFormatPatternWriter {
 
     @Override
     public void write(LogEntry logEntry) throws Exception {
-        DefaultTaskExecutor.runInJavaFXThread(() -> LogMessages.getInstance().add(logEntry));
+        LogMessages.getInstance().add(logEntry);
     }
 
     @Override

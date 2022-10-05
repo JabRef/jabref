@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.cli;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,13 +9,9 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Map;
 
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.stage.Stage;
-
-import org.jabref.cli.ArgumentProcessor;
-import org.jabref.cli.JabRefCLI;
-import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.apache.commons.cli.ParseException;
+import org.jabref.gui.Globals;
+import org.jabref.gui.MainApplication;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -34,40 +30,70 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
-
-import net.harawata.appdirs.AppDirsFactory;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tinylog.configuration.Configuration;
 
-/**
- * JabRef's main class to process command line options and to start the UI
- */
-public class JabRefMain extends Application {
-    private static Logger LOGGER;
+import net.harawata.appdirs.AppDirsFactory;
 
-    private static String[] arguments;
+/**
+ * The main entry point for the JabRef application.
+ * <p>
+ * It has two main functions:
+ * - Handle the command line arguments
+ * - Start the JavaFX application (if not in cli mode)
+ */
+public class Launcher {
+    private static Logger LOGGER;
 
     public static void main(String[] args) {
         addLogToDisk();
-        arguments = args;
-        launch(arguments);
-    }
+        try {
+            // Init preferences
+            final JabRefPreferences preferences = JabRefPreferences.getInstance();
+            Globals.prefs = preferences;
+            PreferencesMigrations.runMigrations();
 
-    private static void initializeLogger() {
-         LOGGER = LoggerFactory.getLogger(JabRefMain.class);
+            // Early exit in case another instance is already running
+            if (!handleMultipleAppInstances(args, preferences)) {
+                return;
+            }
+
+            // Init rest of preferences
+            configureProxy(preferences.getProxyPreferences());
+            configureSSL(preferences.getSSLPreferences());
+            applyPreferences(preferences);
+            clearOldSearchIndices();
+
+            try {
+                // Process arguments
+                ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START,
+                        preferences);
+                if (argumentProcessor.shouldShutDown()) {
+                    LOGGER.debug("JabRef shut down after processing command line arguments");
+                    return;
+                }
+
+                MainApplication.create(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences);
+            } catch (ParseException e) {
+                LOGGER.error("Problem parsing arguments", e);
+                JabRefCLI.printUsage();
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Unexpected exception", ex);
+        }
     }
 
     /**
-     * This needs to be called as early as possible. After the first log write, it is not possible to alter
+     * This needs to be called as early as possible. After the first log write, it
+     * is not possible to alter
      * the log configuration programmatically anymore.
      */
     private static void addLogToDisk() {
         Path directory = Path.of(AppDirsFactory.getInstance().getUserLogDir(
-                                     "jabref",
-                                     new BuildInfo().version.toString(),
-                                     "org.jabref"));
+                "jabref",
+                new BuildInfo().version.toString(),
+                "org.jabref"));
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -75,7 +101,8 @@ public class JabRefMain extends Application {
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
-        // The "Shared File Writer" is explained at https://tinylog.org/v2/configuration/#shared-file-writer
+        // The "Shared File Writer" is explained at
+        // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
                 "writerFile", "shared file",
                 "writerFile.level", "info",
@@ -86,55 +113,8 @@ public class JabRefMain extends Application {
         initializeLogger();
     }
 
-    @Override
-    public void start(Stage mainStage) {
-        try {
-            FallbackExceptionHandler.installExceptionHandler();
-
-            // Init preferences
-            final JabRefPreferences preferences = JabRefPreferences.getInstance();
-            Globals.prefs = preferences;
-            // Perform migrations
-            PreferencesMigrations.runMigrations();
-
-            configureProxy(preferences.getProxyPreferences());
-
-            configureSSL(preferences.getSSLPreferences());
-
-            Globals.startBackgroundTasks();
-
-            applyPreferences(preferences);
-
-            clearOldSearchIndices();
-
-            try {
-                // Process arguments
-                ArgumentProcessor argumentProcessor = new ArgumentProcessor(arguments, ArgumentProcessor.Mode.INITIAL_START, preferences);
-                // Check for running JabRef
-                if (!handleMultipleAppInstances(arguments, preferences) || argumentProcessor.shouldShutDown()) {
-                    Platform.exit();
-                    return;
-                }
-
-                // If not, start GUI
-                new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences);
-            } catch (ParseException e) {
-                LOGGER.error("Problem parsing arguments", e);
-
-                JabRefCLI.printUsage();
-                Platform.exit();
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Unexpected exception", ex);
-            Platform.exit();
-        }
-    }
-
-    @Override
-    public void stop() {
-        OOBibBaseConnect.closeOfficeConnection();
-        Globals.stopBackgroundTasks();
-        Globals.shutdownThreadPools();
+    private static void initializeLogger() {
+        LOGGER = LoggerFactory.getLogger(MainApplication.class);
     }
 
     private static boolean handleMultipleAppInstances(String[] args, PreferencesService preferences) {
@@ -143,7 +123,8 @@ public class JabRefMain extends Application {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
             if (remoteClient.ping()) {
-                // We are not alone, there is already a server out there, send command line arguments to other instance
+                // We are not alone, there is already a server out there, send command line
+                // arguments to other instance
                 if (remoteClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
@@ -153,7 +134,8 @@ public class JabRefMain extends Application {
                 }
             } else {
                 // We are alone, so we start the server
-                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(), preferences);
+                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(),
+                        preferences);
             }
         }
         return true;
@@ -161,7 +143,8 @@ public class JabRefMain extends Application {
 
     private static void applyPreferences(PreferencesService preferences) {
         // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+        Globals.journalAbbreviationRepository = JournalAbbreviationLoader
+                .loadRepository(preferences.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(
@@ -208,16 +191,18 @@ public class JabRefMain extends Application {
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene") && !path.equals(currentIndexPath)) {
+                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene")
+                        && !path.equals(currentIndexPath)) {
                     LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
                     Files.walk(path)
-                         .sorted(Comparator.reverseOrder())
-                         .map(Path::toFile)
-                         .forEach(File::delete);
+                            .sorted(Comparator.reverseOrder())
+                            .map(Path::toFile)
+                            .forEach(File::delete);
                 }
             }
         } catch (IOException e) {
             LOGGER.error("Could not access app-directory at {}", appData, e);
         }
     }
+
 }
