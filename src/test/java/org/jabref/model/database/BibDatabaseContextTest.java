@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.MetaData;
@@ -94,13 +93,12 @@ class BibDatabaseContextTest {
     @Test
     void getUserFileDirectoryIfAllAreEmpty() {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        Path userDirGlobal = Path.of("some random path").toAbsolutePath();
+        when(fileDirPrefs.getFileDirectory()).thenReturn(Optional.of(userDirGlobal));
 
-        Path userDirJabRef = Path.of(JabRefDesktop.getDefaultFileChooserDirectory(), "JabRef");
-
-        when(fileDirPrefs.getFileDirectory()).thenReturn(Optional.of(userDirJabRef));
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(Path.of("biblio.bib"));
-        assertEquals(Collections.singletonList(userDirJabRef), database.getFileDirectories(fileDirPrefs));
+        assertEquals(Collections.singletonList(userDirGlobal), database.getFileDirectories(fileDirPrefs));
     }
 
     @Test

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
@@ -135,7 +136,7 @@ class LayoutTest {
     @Test
     void wrapFileLinksExpandFile() throws IOException {
         when(layoutFormatterPreferences.getFileLinkPreferences()).thenReturn(
-                new FileLinkPreferences("", Collections.singletonList(Path.of("src/test/resources/pdfs/"))));
+                new FileLinkPreferences(Optional.empty(), Collections.singletonList(Path.of("src/test/resources/pdfs/"))));
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.addFile(new LinkedFile("Test file", Path.of("encrypted.pdf"), "PDF"));
 

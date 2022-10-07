@@ -1109,7 +1109,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                getFilePreferences().mainFileDirectoryProperty().get(),
+                getFilePreferences().getFileDirectory(),
                 fileDirForDatabase);
     }
 
@@ -2179,20 +2179,6 @@ public class JabRefPreferences implements PreferencesService {
                 getFieldContentParserPreferences());
     }
 
-    /**
-     * Ensures that the main file directory is a non-empty String.
-     * The directory is <emph>NOT</emph> created, because creation of the directory is the task of the respective methods.
-     *
-     * @param originalDirectory the directory as configured
-     */
-    private String determineMainFileDirectory(String originalDirectory) {
-        if ((originalDirectory != null) && !originalDirectory.isEmpty()) {
-            // A non-empty directory is kept
-            return originalDirectory;
-        }
-        return JabRefDesktop.getDefaultFileChooserDirectory();
-    }
-
     @Override
     public FilePreferences getFilePreferences() {
         if (Objects.nonNull(filePreferences)) {
@@ -2201,7 +2187,7 @@ public class JabRefPreferences implements PreferencesService {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUser(),
-                determineMainFileDirectory(get(MAIN_FILE_DIRECTORY)),
+                get(MAIN_FILE_DIRECTORY),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
@@ -2211,7 +2197,7 @@ public class JabRefPreferences implements PreferencesService {
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES))
         );
 
-        EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
+        EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue.map(Path::toString).orElse("")));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
         EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
