@@ -14,9 +14,10 @@
             
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
-				"vscjava.vscode-java-pack",
-				"vscjava.vscode-gradle"
-			]
+                "vscjava.vscode-java-pack",
+                "vscjava.vscode-gradle",
+                "shengchen.vscode-checkstyle"
+            ]
         }
     },
 
