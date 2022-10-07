@@ -41,7 +41,7 @@ However, this still requires to send quite a bit of data. Instead we will use th
 #### Pulling
 
 The clients asks the server for a list of documents that changed since the last checkpoint. (Creating a checkpoint is explained further below.) 
-The server responses with a batched list of these entries together with their `Revision` information. Each batch includes also a checkpoint `To` that has the meaning "all changes to this point in time are included in the current batch.
+The server responses with a batched list of these entries together with their `Revision` information. These entries could also be tombstones. Each batch includes also a checkpoint `To` that has the meaning "all changes to this point in time are included in the current batch.
 
 Once the pull doesn't give any further changes, the client switches to a event-based strategy and observes new changes by subscribing to the event bus provided by the server. (This is more an implementation detail than a conceptual difference.)
 
@@ -54,6 +54,11 @@ Based on the `Revision` of server and client, the following cases can occur:
 - The server's `Revision` is equal to the client's `Revision`: Both entries are up-to-date and nothing has to be done. This case may happen if the library is synchronized by other means.
 - The server's `Revision` is lower than the client's `Revision`: This should never be the case, as revisions are only increased on the server. Show error message to user.
 
+If the entry returned by the server is a tombstone, then:
+- If the client's entry is also a tombstone, then we don't have to do anything.
+- If the client's entry is dirty, then the user is shown a message to resolve the conflict (see conflict handling below);
+- Otherwise the client's entry is deleted. There is no need to keep track of this as a local tombstone. 
+
 *Conflict handling*: If the user chooses to overwrite the local entry with the server entry, then the entry's `Revision` is updated as well and it is no longer marked as dirty. Otherwise, its `Revision` is updated to the one provided by the server, but it is still marked as dirty.
 
 After the merging is done, the client sets its local checkpoint to the value of `To`.
@@ -62,8 +67,9 @@ After the merging is done, the client sets its local checkpoint to the value of 
 
 The client sends the following information back to the client:
 
-- a list of entries that are marked dirty (along with their `Revision` data).
-- a list of entries that are new, i.e., that don't have an `ID`.
+- the list of entries that are marked dirty (along with their `Revision` data).
+- the list of entries that are new, i.e., that don't have an `ID`.
+- the list of tombstones, i.e., entries that have been deleted.
 
 The server accepts only changes if the provided `Revision` coincides with the `Revision` stored on the server. If this is not the case, then the entry has been modified on the server since the last pull operation, and then the user needs to go through a new pull-merge-push cycle.
 
@@ -95,22 +101,49 @@ The dirty flag is only cleared after a successful synchronization process.
 There is no need to serialize the dirty flags on the client's side since they are recomputed upon loading.
 
 #### Handling of deleted items
-TODO
+
+Deleted items are persisted as [tombstones](https://docs.couchbase.com/sync-gateway/current/managing-tombstones.html), which only contain the metadata `ID` and `Revision`.
+Tombstones ensure that all synchronizing devices can identify that a previously existing entry has now been deleted.
+On the client, a tombstone is created whenever an entry is deleted. Moreover, the client keeps a list of all entries in the library so that external deletions can be recognized when loading the library into memory. The local list of tombstones is cleared after it is sent to the server and the server acknowledged it.
+On the server, tombstones are kept for a certain time span that is strictly larger then the time devices are allowed to not sign-in before removed as registered devices.
 
 ### Scenarios
 
 #### Sync stops after Pull
-TODO
+
+1. Client pulls changes since `T = 0`
+2. Client starts with the merge but meanwhile closes JabRef without saving changes.
+3. Client opens JabRef again.
+4. Client pulls changes again from `T = 0` (since the checkpoint is still `T = 0`) and has to redo the conflict resolution.
+
+This is the best we can do, since the user decided to not save its previous work.
+
+However, consider the same steps but now in 2. the user decided to save its work. But the locally stored checkpoint is still `T = 0`, so that the user has to redo the conflict resolution again, with the difference that now the local version is the previously merge result.
+*Future improvement:* We could send checkpoints for every entry and after each conflict resolution set the local checkpoint to the checkpoint of the entry.
+
 #### Sync stops after Merge
-TODO
+1. Client pulls changes since `T = 0`
+2. Client finishes the merge (this sets the checkpoint `T = 1̀`).
+3. Client closes JabRef without saving changes (in particular, the checkpoint is not persisted as well).
+3. Client opens JabRef again.
+4. Client pulls changes again from `T = 0` (since the checkpoint is still `T = 0`) and has to redo the conflict resolution.
+
+This is the best we can do, since the user decided to not save its previous work.
+
+If the user decides in step 3 to save it changes, then in step 4 JabRef would pull changes starting from `T = 1` and the user doesn't have to redo the conflict resolution.
 
 #### Sync after successful sync of client changes
-What happens after sync is completed? New changes to server are pull-back right?
-TODO
+1. Client modifies local data: `{id: 1, value: 0, _rev=1, _dirty=false} -> {id: 1, value: 1, _rev=1, _dirty=true}`.
+2. Client pulls server changes. Suppose there are none.
+3. Merge is thus not necessary. Sets checkpoint to `T = 1`.
+4. Client pushes its changes to the server. Say this corresponds to `T = 2` on the server. On the server, this updates `{id: 1, value: 0, _rev=1, updatedAt=1} -> {id: 1, value: 1, _rev=2, updatedAt=2}` and on the client `{id: 1, value: 1, _rev=1, _dirty=true} -> {id: 1, value: 1, _rev=2, _dirty=false}`.
+5. Client pulls changes starting from `T = 1` (the last local checkpoint). Server responds with `{id: 1, value: 1, _rev=2}, checkpoint={T: 2}`.
+6. Client merges the 'changes', which in this case is trivial since the data on the server and client is the same.
 
-TODO More scenarios
+This is suboptimal since the last pull response contains the full data of the entry although this data is already at the client.
+*Possible future improvement:* First pull only the `IDs` and `Revisions` of the server-side changes, and then filter out the ones we already have locally before querying the complete entry. Downside is that this solution always needs one more request (per change batch) and its not clear if this outweighs the costs of sending the full entry.
 
-### Why?
+### Reasons for some decisions
 
 #### Why do we need an ID? Is the BibTeX key not enough?
 The ID needs to be unique at the very least across the library and should stay constant in time. Both features cannot be ensured for BibTeX keys. 
