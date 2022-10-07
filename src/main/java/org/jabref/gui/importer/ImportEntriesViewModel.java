@@ -81,7 +81,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(parserResult.getDatabase().getEntries());
             if (entries.isEmpty()) {
-               task.updateMessage("No entries corresponding to given query");
+               task.updateMessage(Localization.lang("No entries corresponding to given query"));
             }
         }).onFailure(ex -> {
             LOGGER.error("Error importing", ex);
