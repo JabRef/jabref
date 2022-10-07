@@ -1,9 +1,13 @@
 package org.jabref.logic.importer.fetcher.isbntobibtex;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -15,16 +19,13 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
+import org.apache.http.client.utils.URIBuilder;
 
 /**
- * Fetcher for ISBN using <a href="https://doi-to-bibtex-converter.herokuapp.com">https://doi-to-bibtex-converter.herokuapp.com</a>.
+ * Fetcher for ISBN using <a href="https://doi-to-bibtex-converter.herokuapp.com">doi-to-bibtex-converter.herokuapp</a>.
  */
 public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
     private static final String BASE_URL = "https://doi-to-bibtex-converter.herokuapp.com";
@@ -85,23 +86,24 @@ public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
             entry.setField(StandardField.MONTH, getElementFromJSONArrayByKey(data, "month"));
             entry.setField(StandardField.DAY, getElementFromJSONArrayByKey(data, "day"));
             return entry;
-        } catch (JSONException exception) {
+        } catch (
+                JSONException exception) {
             throw new ParseException("CrossRef API JSON format has changed", exception);
         }
     }
 
     private String getElementFromJSONArrayByKey(JSONArray jsonArray, String key) {
         return IntStream.range(0, jsonArray.length())
-                .mapToObj(jsonArray::getJSONObject)
-                .map(obj -> obj.getString(key))
-                .findFirst()
-                .orElse("");
+                        .mapToObj(jsonArray::getJSONObject)
+                        .map(obj -> obj.getString(key))
+                        .findFirst()
+                        .orElse("");
     }
 
     private StandardEntryType evaluateBibEntryTypeFromString(String type) {
         return Stream.of(StandardEntryType.values())
-                .filter(entryType -> entryType.name().equalsIgnoreCase(type))
-                .findAny()
-                .orElse(StandardEntryType.Book);
+                     .filter(entryType -> entryType.name().equalsIgnoreCase(type))
+                     .findAny()
+                     .orElse(StandardEntryType.Book);
     }
 }

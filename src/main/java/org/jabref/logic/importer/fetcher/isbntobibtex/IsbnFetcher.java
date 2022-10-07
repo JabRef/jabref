@@ -1,5 +1,11 @@
 package org.jabref.logic.importer.fetcher.isbntobibtex;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
@@ -10,14 +16,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 /**
  * Fetcher to generate the Bibtex entry from an ISBN.
@@ -60,7 +61,8 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         try {
             identifier = removeNewlinesAndSpacesFromIdentifier(identifier);
             bibEntry = openLibraryIsbnFetcher.performSearchById(identifier);
-        } catch (FetcherException ex) {
+        } catch (
+                FetcherException ex) {
             LOGGER.debug("Got a fetcher exception for IBSN search", ex);
         } finally {
             while (bibEntry.isEmpty() && retryIsbnFetcher.iterator().hasNext()) {
