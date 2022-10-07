@@ -63,7 +63,12 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
             bibEntry = openLibraryIsbnFetcher.performSearchById(identifier);
         } catch (
                 FetcherException ex) {
-            LOGGER.debug("Got a fetcher exception for IBSN search", ex);
+            if (retryIsbnFetcher.isEmpty()) {
+                throw ex;
+            } else {
+                LOGGER.debug("Got a fetcher exception for IBSN search", ex);
+                LOGGER.debug("Try using the alternate ISBN fetchers to find an entry.");
+            }
         } finally {
             while (bibEntry.isEmpty() && retryIsbnFetcher.iterator().hasNext()) {
                 AbstractIsbnFetcher fetcher = retryIsbnFetcher.iterator().next();
