@@ -267,7 +267,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     sortAlphabeticallyRecursive(parent);
                 });
 
-
                 dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
 
