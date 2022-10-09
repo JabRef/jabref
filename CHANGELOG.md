@@ -64,6 +64,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where Capitalize didn't capitalize words after hyphen characters. [#9157](https://github.com/JabRef/jabref/issues/9157)
 - We fixed an issue with the message that is displayed when fetcher returns an empty list of entries for given query. [#9195](https://github.com/JabRef/jabref/issues/9195)
 - We fixed an issue where hitting enter on the search field within the preferences dialog closed the dialog. [koppor#630](https://github.com/koppor/jabref/issues/630)
+- We fixed a typo within a connection error message. [koppor#625](https://github.com/koppor/jabref/issues/625)
 
 ### Removed
 
