@@ -20,8 +20,11 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.PopOver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GenerateEntryFromIdAction extends SimpleCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEntryFromIdAction.class);
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -56,15 +59,18 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         backgroundTask.onFailure((exception) -> {
             String fetcherExceptionMessage = exception.getMessage();
 
-            boolean addEntryFlag;
+            String msg;
             if (exception instanceof FetcherClientException) {
-                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage, Localization.lang("Add entry manually"));
+                msg = Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage;
             } else if (exception instanceof FetcherServerException) {
-                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later.") + "\n" + fetcherExceptionMessage, Localization.lang("Add entry manually"));
+                msg = Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later.") + "\n" + fetcherExceptionMessage;
             } else {
-                addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage), Localization.lang("Add entry manually"));
+                msg = Localization.lang("Error message %0", fetcherExceptionMessage);
             }
-            if (addEntryFlag) {
+
+            LOGGER.info(fetcherExceptionMessage, exception);
+
+            if (dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), msg, Localization.lang("Add entry manually"))) {
                 // add entry manually
                 new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService,
                                    preferencesService, stateManager).execute();
