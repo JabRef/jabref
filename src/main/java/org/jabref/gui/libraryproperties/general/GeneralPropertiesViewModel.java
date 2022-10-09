@@ -1,6 +1,7 @@
 package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import javax.swing.undo.UndoManager;
@@ -42,7 +43,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final PreferencesService preferencesService;
 
     private final BibDatabaseContext databaseContext;
-    private final MetaData initialMetaData;
+    private final MetaData metaData;
     private final DirectoryDialogConfiguration directoryDialogConfiguration;
     private final UndoManager undoManager;
 
@@ -51,7 +52,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         this.preferencesService = preferencesService;
         this.undoManager = undoManager;
         this.databaseContext = databaseContext;
-        this.initialMetaData = databaseContext.getMetaData();
+        this.metaData = databaseContext.getMetaData();
 
         this.directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory()).build();
@@ -62,11 +63,11 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         boolean isShared = (databaseContext.getLocation() == DatabaseLocation.SHARED);
         encodingDisableProperty.setValue(isShared); // the encoding of shared database is always UTF-8
 
-        selectedEncodingProperty.setValue(initialMetaData.getEncoding().orElse(preferencesService.getGeneralPreferences().getDefaultEncoding()));
-        selectedDatabaseModeProperty.setValue(initialMetaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
-        generalFileDirectoryProperty.setValue(initialMetaData.getDefaultFileDirectory().orElse("").trim());
-        userSpecificFileDirectoryProperty.setValue(initialMetaData.getUserFileDirectory(preferencesService.getFilePreferences().getUser()).orElse("").trim());
-        laTexFileDirectoryProperty.setValue(initialMetaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUser()).map(Path::toString).orElse(""));
+        selectedEncodingProperty.setValue(metaData.getEncoding().orElse(StandardCharsets.UTF_8));
+        selectedDatabaseModeProperty.setValue(metaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
+        generalFileDirectoryProperty.setValue(metaData.getDefaultFileDirectory().orElse("").trim());
+        userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferencesService.getFilePreferences().getUser()).orElse("").trim());
+        laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUser()).map(Path::toString).orElse(""));
 
         preambleProperty.setValue(databaseContext.getDatabase().getPreamble().orElse(""));
     }

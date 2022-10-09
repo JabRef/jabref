@@ -17,8 +17,8 @@
     <updated>2021-09-28T14:37:15+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-   <macro name="editor">
-    <names variable="editor" >
+  <macro name="editor">
+    <names variable="editor">
       <name and="symbol" delimiter=", " initialize-with="."/>
       <label form="short" prefix=" (" suffix=")"/>
     </names>
@@ -90,7 +90,10 @@
     <group delimiter=", " suffix=".">
       <choose>
         <if type="report" match="none">
-          <text variable="publisher"/>
+          <group delimiter=", ">
+            <text variable="publisher-place"/>
+            <text variable="publisher"/>
+          </group>
         </if>
       </choose>
     </group>

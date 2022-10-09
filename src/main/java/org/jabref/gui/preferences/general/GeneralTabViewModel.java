@@ -68,10 +68,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public void setValues() {
         languagesListProperty.setValue(new SortedList<>(FXCollections.observableArrayList(Language.values()), Comparator.comparing(Language::getDisplayName)));
-        selectedLanguageProperty.setValue(preferencesService.getLanguage());
+        selectedLanguageProperty.setValue(preferencesService.getGeneralPreferences().getLanguage());
 
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
-        selectedEncodingProperty.setValue(generalPreferences.getDefaultEncoding());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(generalPreferences.getDefaultBibDatabaseMode());
@@ -92,8 +91,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public void storeSettings() {
         Language newLanguage = selectedLanguageProperty.getValue();
-        if (newLanguage != preferencesService.getLanguage()) {
-            preferencesService.setLanguage(newLanguage);
+        if (newLanguage != preferencesService.getGeneralPreferences().getLanguage()) {
+            preferencesService.getGeneralPreferences().setLanguage(newLanguage);
             Localization.setLanguage(newLanguage);
             restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
         }
@@ -104,7 +103,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                             + " rename or remove the jabref.xml file in the same folder as JabRef."));
         }
 
-        generalPreferences.setDefaultEncoding(selectedEncodingProperty.getValue());
         generalPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
         generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
         generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());

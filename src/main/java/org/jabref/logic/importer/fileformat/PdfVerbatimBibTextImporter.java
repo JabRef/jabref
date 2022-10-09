@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +54,9 @@ public class PdfVerbatimBibTextImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
+    public ParserResult importDatabase(Path filePath) {
         List<BibEntry> result = new ArrayList<>(1);
-        try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
             BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
             result = parser.parseEntries(firstPageContents);
@@ -99,5 +98,4 @@ public class PdfVerbatimBibTextImporter extends Importer {
     public String getDescription() {
         return "PdfVerbatimBibTextImporter imports a verbatim BibTeX entry from the first page of the PDF.";
     }
-
 }

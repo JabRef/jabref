@@ -24,7 +24,7 @@ class StringUtilTest {
         Path path = Path.of("src", "main", "java", StringUtil.class.getName().replace('.', '/') + ".java");
         int lineCount = Files.readAllLines(path, StandardCharsets.UTF_8).size();
 
-        assertTrue(lineCount <= 761, "StringUtil increased in size to " + lineCount + ". "
+        assertTrue(lineCount <= 765, "StringUtil increased in size to " + lineCount + ". "
                 + "We try to keep this class as small as possible. "
                 + "Thus think twice if you add something to StringUtil.");
     }
@@ -109,7 +109,6 @@ class StringUtilTest {
 
     @Test
     void testShaveString() {
-
         assertEquals("", StringUtil.shaveString(null));
         assertEquals("", StringUtil.shaveString(""));
         assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
@@ -148,7 +147,14 @@ class StringUtilTest {
 
     @Test
     void testGetPart() {
-        // Should be added
+        // Get word between braces
+        assertEquals("{makes}", StringUtil.getPart("Practice {makes} perfect", 8, false));
+        // When the string is empty and start Index equal zero
+        assertEquals("", StringUtil.getPart("", 0, false));
+        // When the word are in between close curly bracket
+        assertEquals("", StringUtil.getPart("A closed mouth catches no }flies}", 25, false));
+        // Get the word from the end of the sentence
+        assertEquals("bite", StringUtil.getPart("Barking dogs seldom bite", 19, true));
     }
 
     @Test
@@ -373,5 +379,33 @@ class StringUtilTest {
     @MethodSource("getQuoteStringIfSpaceIsContainedData")
     void testGuoteStringIfSpaceIsContained(String expected, String source) {
         assertEquals(expected, StringUtil.quoteStringIfSpaceIsContained(source));
+    }
+
+    @Test
+    void testStripAccents() {
+        assertEquals("aAoeee", StringUtil.stripAccents("åÄöéèë"));
+        assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
+    }
+
+    static Stream<Arguments> testContainsWhitespace() {
+        return Stream.of(
+                Arguments.of(true, "file url"),
+                Arguments.of(true, "file\nurl"),
+                Arguments.of(true, "file\r\nurl"),
+                Arguments.of(true, "file\rurl"),
+                Arguments.of(true, "file\furl"),
+                Arguments.of(true, "file_url "),
+                Arguments.of(true, "file url\n"),
+                Arguments.of(true, " "),
+
+                Arguments.of(false, "file_url"),
+                Arguments.of(false, "PascalCase"),
+                Arguments.of(false, ""));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void testContainsWhitespace(Boolean expected, String input) {
+        assertEquals(expected, StringUtil.containsWhitespace(input));
     }
 }

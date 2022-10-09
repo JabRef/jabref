@@ -10,9 +10,11 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import javax.swing.filechooser.FileSystemView;
+
+import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -38,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
+@AllowedToUseSwing("Needs access to swing for the user's os dependent file chooser path")
 public class JabRefDesktop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDesktop.class);
@@ -184,7 +187,7 @@ public class JabRefDesktop {
      * @param fileLink the location of the file
      * @throws IOException if the default file browser cannot be opened
      */
-    public static void openFolderAndSelectFile(Path fileLink, PreferencesService preferencesService) throws IOException {
+    public static void openFolderAndSelectFile(Path fileLink, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (fileLink == null) {
             return;
         }
@@ -208,7 +211,7 @@ public class JabRefDesktop {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open File Browser", exception);
-                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                    dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }
@@ -220,7 +223,7 @@ public class JabRefDesktop {
      * @param url the URL to open
      */
     public static void openBrowser(String url) throws IOException {
-        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", Globals.prefs.getFilePreferences());
         openExternalFilePlatformIndependent(fileType, url);
     }
 
@@ -233,7 +236,7 @@ public class JabRefDesktop {
      *
      * @param url the URL to open
      */
-    public static void openBrowserShowPopup(String url) {
+    public static void openBrowserShowPopup(String url, DialogService dialogService) {
         try {
             openBrowser(url);
         } catch (IOException exception) {
@@ -242,8 +245,8 @@ public class JabRefDesktop {
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
-            JabRefGUI.getMainFrame().getDialogService().notify(couldNotOpenBrowser);
-            JabRefGUI.getMainFrame().getDialogService().showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
+            dialogService.notify(couldNotOpenBrowser);
+            dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
     }
 
@@ -253,8 +256,9 @@ public class JabRefDesktop {
      * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
+     * @param dialogService
      */
-    public static void openConsole(File file, PreferencesService preferencesService) throws IOException {
+    public static void openConsole(File file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (file == null) {
             return;
         }
@@ -263,7 +267,7 @@ public class JabRefDesktop {
 
         boolean useCustomTerminal = preferencesService.getExternalApplicationsPreferences().useCustomTerminal();
         if (!useCustomTerminal) {
-            NATIVE_DESKTOP.openConsole(absolutePath);
+            NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
         } else {
             String command = preferencesService.getExternalApplicationsPreferences().getCustomTerminalCommand();
             command = command.trim();
@@ -275,17 +279,32 @@ public class JabRefDesktop {
                 String[] subcommands = command.split(" ");
 
                 LOGGER.info("Executing command \"" + command + "\"...");
-                JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Executing command \"%0\"...", command));
+                dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
                 try {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
 
-                    JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                   dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }
+    }
+
+    /**
+     * Get the user's default file chooser directory
+     *
+     * @return The path to the directory
+     */
+    public static String getDefaultFileChooserDirectory() {
+        // Property "user.home" might be "difficult" on Windows
+        // See https://stackoverflow.com/a/586917/873282 for a longer discussion
+        // The proposed solution is to use Swing's FileSystemView
+        // See https://stackoverflow.com/a/32914568/873282
+        // As of 2022, System.getProperty("user.home") returns c:\Users\USERNAME on Windows 10, whereas
+        // the FileSystemView returns C:\Users\USERNAME\Documents, which is the "better" directory
+        return FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
     }
 
     // TODO: Move to OS.java

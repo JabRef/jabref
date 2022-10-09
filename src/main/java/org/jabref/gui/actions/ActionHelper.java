@@ -13,6 +13,7 @@ import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
@@ -30,6 +31,11 @@ public class ActionHelper {
 
     public static BooleanExpression needsSharedDatabase(StateManager stateManager) {
         EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getLocation() == DatabaseLocation.SHARED).isPresent());
+        return BooleanExpression.booleanExpression(binding);
+    }
+
+    public static BooleanExpression needsStudyDatabase(StateManager stateManager) {
+        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(BibDatabaseContext::isStudy).isPresent());
         return BooleanExpression.booleanExpression(binding);
     }
 
@@ -52,14 +58,13 @@ public class ActionHelper {
                                                 .mapObservable(entry -> Bindings.createBooleanBinding(() -> {
                                                     return entry.getFields().stream().anyMatch(fields::contains);
                                                 }, entry.getFieldsObservable()))
-                                                .orElse(false);
+                                                .orElseOpt(false);
         return BooleanExpression.booleanExpression(fieldsAreSet);
     }
 
     public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {
-
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).map(entry -> {
+        Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).mapOpt(entry -> {
             List<LinkedFile> files = entry.getFiles();
 
             if ((entry.getFiles().size() > 0) && stateManager.getActiveDatabase().isPresent()) {
@@ -75,8 +80,7 @@ public class ActionHelper {
             } else {
                 return false;
             }
-
-        }).orElse(false);
+        }).orElseOpt(false);
 
         return BooleanExpression.booleanExpression(fileIsPresent);
     }
@@ -85,6 +89,7 @@ public class ActionHelper {
      * Check if at least one of the selected entries has linked files
      * <br>
      * Used in {@link org.jabref.gui.maintable.OpenExternalFileAction} when multiple entries selected
+     *
      * @param stateManager manager for the state of the GUI
      * @return a boolean binding
      */

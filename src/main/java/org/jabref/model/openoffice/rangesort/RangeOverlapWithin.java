@@ -12,23 +12,18 @@ import com.sun.star.text.XTextRangeCompare;
 
 public class RangeOverlapWithin {
 
-    private RangeOverlapWithin() { }
+    private RangeOverlapWithin() {
+    }
 
     /**
      * Report identical, overlapping or touching ranges between elements of rangeHolders.
+     * <p>
+     * For overlapping and touching, only report consecutive ranges and only with a single sample of otherwise identical ranges.
      *
-     * For overlapping and touching, only report consecutive ranges and only with a single sample of
-     * otherwise identical ranges.
-     *
-     * @param rangeHolders represent the ranges to be checked.
-     *
-     *        Note: for each rangeHolder, rangeHolder.getRange() is called multiple times.
-     *              To avoid repeated work, they should keep a copy of the range instead of
-     *              getting it each time from the document.
-     *
-     * @param reportAtMost Limit the number of records returned to atMost.
-     *        Zero {@code reportAtMost} means no limit.
-     *
+     * @param rangeHolders    represent the ranges to be checked.
+     *                        <p>
+     *                        Note: for each rangeHolder, rangeHolder.getRange() is called multiple times. To avoid repeated work, they should keep a copy of the range instead of getting it each time from the document.
+     * @param reportAtMost    Limit the number of records returned to atMost. Zero {@code reportAtMost} means no limit.
      * @param includeTouching Should the result contain ranges sharing only a boundary?
      */
     public static <V extends RangeHolder>
@@ -44,13 +39,10 @@ public class RangeOverlapWithin {
 
     /**
      * Report identical, overlapping or touching ranges.
+     * <p>
+     * For overlapping and touching, only report consecutive ranges and only with a single sample of otherwise identical ranges.
      *
-     * For overlapping and touching, only report consecutive ranges and only with a single sample of
-     * otherwise identical ranges.
-     *
-     * @param atMost Limit the number of records returned to atMost.
-     *        Zero {@code atMost} means no limit.
-     *
+     * @param atMost          Limit the number of records returned to atMost. Zero {@code atMost} means no limit.
      * @param includeTouching Should the result contain ranges sharing only a boundary?
      */
     public static <V extends RangeHolder>
@@ -66,7 +58,7 @@ public class RangeOverlapWithin {
                 continue;
             }
             XTextRangeCompare cmp = UnoCast.cast(XTextRangeCompare.class,
-                                                 partition.get(0).getRange().getText()).get();
+                    partition.get(0).getRange().getText()).get();
 
             for (int i = 0; i < (partition.size() - 1); i++) {
                 V aHolder = partition.get(i);
@@ -82,15 +74,15 @@ public class RangeOverlapWithin {
                     // aValues.add(bHolder);
                     // collect those equal
                     while (i < (partition.size() - 1) &&
-                           UnoTextRange.compareStartsThenEndsUnsafe(
-                               cmp,
-                               aRange,
-                               partition.get(i + 1).getRange()) == 0) {
+                            UnoTextRange.compareStartsThenEndsUnsafe(
+                                    cmp,
+                                    aRange,
+                                    partition.get(i + 1).getRange()) == 0) {
                         bHolder = partition.get(i + 1);
                         aValues.add(bHolder);
                         i++;
                     }
-                    result.add(new RangeOverlap<V>(RangeOverlapKind.EQUAL_RANGE, aValues));
+                    result.add(new RangeOverlap<>(RangeOverlapKind.EQUAL_RANGE, aValues));
                     if (atMost > 0 && result.size() >= atMost) {
                         return result;
                     }
@@ -105,17 +97,16 @@ public class RangeOverlapWithin {
                     List<V> valuesForOverlappingRanges = new ArrayList<>();
                     valuesForOverlappingRanges.add(aHolder);
                     valuesForOverlappingRanges.add(bHolder);
-                    result.add(new RangeOverlap<V>((cmpResult == 0)
-                                                   ? RangeOverlapKind.TOUCH
-                                                   : RangeOverlapKind.OVERLAP,
-                                                   valuesForOverlappingRanges));
+                    result.add(new RangeOverlap<>((cmpResult == 0)
+                            ? RangeOverlapKind.TOUCH
+                            : RangeOverlapKind.OVERLAP,
+                            valuesForOverlappingRanges));
                 }
                 if (atMost > 0 && result.size() >= atMost) {
-                        return result;
+                    return result;
                 }
             }
         }
         return result;
     }
-
 }

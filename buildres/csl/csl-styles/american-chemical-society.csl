@@ -148,7 +148,7 @@
   </citation>
   <bibliography second-field-align="flush" entry-spacing="0">
     <layout suffix=".">
-      <text variable="citation-number" prefix="(" suffix=") "/>
+      <text variable="citation-number" prefix="(" suffix=")"/>
       <text macro="author" suffix=" "/>
       <choose>
         <if type="article-journal review" match="any">
@@ -250,14 +250,17 @@
           </group>
         </else-if>
         <else-if type="webpage">
-          <group delimiter=" ">
-            <text variable="title"/>
-            <text variable="URL"/>
-            <date variable="accessed" prefix="(accessed " suffix=")" delimiter=" ">
-              <date-part name="year"/>
-              <date-part name="month" prefix="-" form="numeric-leading-zeros"/>
-              <date-part name="day" prefix="-" form="numeric-leading-zeros"/>
-            </date>
+          <group delimiter=". ">
+            <text variable="title" font-style="italic"/>
+            <text variable="container-title"/>
+            <group delimiter=" ">
+              <text variable="URL"/>
+              <date variable="accessed" prefix="(accessed " suffix=")">
+                <date-part name="year"/>
+                <date-part name="month" prefix="-" form="numeric-leading-zeros"/>
+                <date-part name="day" prefix="-" form="numeric-leading-zeros"/>
+              </date>
+            </group>
           </group>
         </else-if>
         <else>

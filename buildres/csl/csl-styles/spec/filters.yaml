@@ -39,6 +39,8 @@ ISSN:
 - 1520-8524
 - 1161-9473
 - 2496-7114
+- 1736-6046
+- 1736-7530
 
 # These titles are ignored when checking for duplicate titles
 TITLES: []
@@ -81,6 +83,7 @@ EXTRA_FILES:
 - STYLE_DEVELOPMENT.md
 - STYLE_REQUIREMENTS.md
 - QUALITY_CONTROL.md
+- composer.json
 
 # These directories and their contents are ignored when checking for extra files
 EXTRA_FILES_DIRECTORY:

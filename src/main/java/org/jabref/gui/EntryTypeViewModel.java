@@ -14,13 +14,13 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 
-import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.NewEntryAction;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.database.DuplicateCheck;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -52,18 +52,27 @@ public class EntryTypeViewModel {
     private final DialogService dialogService;
     private final Validator idFieldValidator;
     private final StateManager stateManager;
+    private final ImportFormatReader importFormatReader;
 
     public EntryTypeViewModel(PreferencesService preferences,
                               LibraryTab libraryTab,
                               DialogService dialogService,
-                              StateManager stateManager) {
+                              StateManager stateManager,
+                              ImportFormatReader importFormatReader) {
         this.libraryTab = libraryTab;
         this.preferencesService = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
+        this.importFormatReader = importFormatReader;
+
+        fetchers.addAll(WebFetchers.getIdBasedFetchers(
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
-        idFieldValidator = new FunctionBasedValidator<>(idText, StringUtil::isNotBlank, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
+        idFieldValidator = new FunctionBasedValidator<>(
+                idText,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
     }
 
     public BooleanProperty searchSuccesfulProperty() {
@@ -91,12 +100,15 @@ public class EntryTypeViewModel {
     }
 
     public void storeSelectedFetcher() {
-        preferencesService.storeIdBasedFetcherForEntryGenerator(selectedItemProperty.getValue().getName());
+        preferencesService.getGuiPreferences().setLastSelectedIdBasedFetcher(selectedItemProperty.getValue().getName());
     }
 
     private IdBasedFetcher getLastSelectedFetcher() {
-        return fetchers.stream().filter(fetcher -> fetcher.getName().equals(preferencesService.getIdBasedFetcherForEntryGenerator()))
-                       .findFirst().orElse(new DoiFetcher(preferencesService.getImportFormatPreferences()));
+        return fetchers.stream().filter(fetcher -> fetcher.getName()
+                                                          .equals(preferencesService.getGuiPreferences()
+                                                                                    .getLastSelectedIdBasedFetcher()))
+                       .findFirst()
+                       .orElse(new DoiFetcher(preferencesService.getImportFormatPreferences()));
     }
 
     public ListProperty<IdBasedFetcher> fetcherItemsProperty() {
@@ -134,15 +146,18 @@ public class EntryTypeViewModel {
             String fetcherExceptionMessage = exception.getMessage();
             String fetcher = selectedItemProperty().getValue().getName();
             String searchId = idText.getValue();
-            if (exception instanceof FetcherException) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Error"), Localization.lang("Error while fetching from %0", fetcher + "." + "\n" + fetcherExceptionMessage));
+
+            if (exception instanceof FetcherClientException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage);
+            } else if (exception instanceof FetcherServerException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later.") + "\n" + fetcherExceptionMessage);
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("No files found.", Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId) + "\n" + fetcherExceptionMessage));
+                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage));
             }
+
             LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchId, fetcher), exception);
 
             searchingProperty.set(false);
-
             fetcherWorker = new FetcherWorker();
         });
 
@@ -150,46 +165,38 @@ public class EntryTypeViewModel {
             Optional<BibEntry> result = fetcherWorker.getValue();
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
-                ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
-                cleanup.doPostCleanup(entry);
-                Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
-                if (duplicate.isPresent()) {
-                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, libraryTab.getBibDatabaseContext(), stateManager);
-                    switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
-                        case KEEP_LEFT:
-                            libraryTab.getDatabase().removeEntry(duplicate.get());
-                            libraryTab.getDatabase().insertEntry(entry);
-                            break;
-                        case KEEP_BOTH:
-                            libraryTab.getDatabase().insertEntry(entry);
-                            break;
-                        case KEEP_MERGE:
-                            libraryTab.getDatabase().removeEntry(duplicate.get());
-                            libraryTab.getDatabase().insertEntry(dialog.getMergedEntry());
-                            break;
-                        default:
-                            // Do nothing
-                            break;
-                    }
-                } else {
-                    // Regenerate CiteKey of imported BibEntry
-                    new CitationKeyGenerator(libraryTab.getBibDatabaseContext(), preferencesService.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
-                    libraryTab.insertEntry(entry);
-                }
+
+                ImportHandler handler = new ImportHandler(
+                        libraryTab.getBibDatabaseContext(),
+                        preferencesService,
+                        Globals.getFileUpdateMonitor(),
+                        libraryTab.getUndoManager(),
+                        stateManager,
+                        dialogService,
+                        importFormatReader);
+                handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
+
                 searchSuccesfulProperty.set(true);
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
-            } else if (result.isEmpty()) {
+            } else {
+                // result is empty
+
                 String fetcher = selectedItemProperty().getValue().getName();
                 String searchId = idText.getValue();
-                // When DOI ID is not found, allow the user to either return to the dialog or
-                // add entry manually
-                boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("DOI not found"),
+
+                // When DOI ID is not found, allow the user to either return to the dialog or add entry manually
+                boolean addEntryFlag = dialogService.showConfirmationDialogAndWait(Localization.lang("Identifier not found"),
                         Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId),
                         Localization.lang("Add entry manually"),
                         Localization.lang("Return to dialog"));
                 if (addEntryFlag) {
-                    new NewEntryAction(libraryTab.frame(), StandardEntryType.Article, dialogService, preferencesService, stateManager).execute();
+                    new NewEntryAction(
+                            libraryTab.frame(),
+                            StandardEntryType.Article,
+                            dialogService,
+                            preferencesService,
+                            stateManager).execute();
                     searchSuccesfulProperty.set(true);
                 }
             }

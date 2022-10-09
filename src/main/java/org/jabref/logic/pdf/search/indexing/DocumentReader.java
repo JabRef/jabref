@@ -22,6 +22,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
@@ -70,11 +71,7 @@ public final class DocumentReader {
     public Optional<List<Document>> readLinkedPdf(BibDatabaseContext databaseContext, LinkedFile pdf) {
         Optional<Path> pdfPath = pdf.findIn(databaseContext, filePreferences);
         if (pdfPath.isPresent()) {
-            try {
-                return Optional.of(readPdfContents(pdf, pdfPath.get()));
-            } catch (IOException e) {
-                LOGGER.error("Could not read pdf file {}!", pdf.getLink(), e);
-            }
+            return Optional.of(readPdfContents(pdf, pdfPath.get()));
         }
         return Optional.empty();
     }
@@ -93,19 +90,30 @@ public final class DocumentReader {
                     .collect(Collectors.toList());
     }
 
-    private List<Document> readPdfContents(LinkedFile pdf, Path resolvedPdfPath) throws IOException {
-        try (PDDocument pdfDocument = PDDocument.load(resolvedPdfPath.toFile())) {
-            List<Document> pages = new ArrayList<>();
-
-            for (int pageNumber = 0; pageNumber < pdfDocument.getNumberOfPages(); pageNumber++) {
-                Document newDocument = new Document();
-                addIdentifiers(newDocument, pdf.getLink());
-                addMetaData(newDocument, resolvedPdfPath, pageNumber);
-                addContentIfNotEmpty(pdfDocument, newDocument, pageNumber);
-                pages.add(newDocument);
-            }
-            return pages;
+    private List<Document> readPdfContents(LinkedFile pdf, Path resolvedPdfPath) {
+        List<Document> pages = new ArrayList<>();
+        try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
+                for (int pageNumber = 0; pageNumber < pdfDocument.getNumberOfPages(); pageNumber++) {
+                    Document newDocument = new Document();
+                    addIdentifiers(newDocument, pdf.getLink());
+                    addMetaData(newDocument, resolvedPdfPath, pageNumber);
+                    try {
+                        addContentIfNotEmpty(pdfDocument, newDocument, pageNumber);
+                    } catch (IOException e) {
+                        LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPdfPath.toAbsolutePath(), e);
+                    }
+                    pages.add(newDocument);
+                }
+        } catch (IOException e) {
+            LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
         }
+        if (pages.isEmpty()) {
+            Document newDocument = new Document();
+            addIdentifiers(newDocument, pdf.getLink());
+            addMetaData(newDocument, resolvedPdfPath, 0);
+            pages.add(newDocument);
+        }
+        return pages;
     }
 
     private void addMetaData(Document newDocument, Path resolvedPdfPath, int pageNumber) {
@@ -134,24 +142,20 @@ public final class DocumentReader {
         return LINEBREAK_WITHOUT_PERIOD_PATTERN.matcher(mergedHyphenNewlines).replaceAll("$1 ");
     }
 
-    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, int pageNumber) {
-        try {
-            PDFTextStripper pdfTextStripper = new PDFTextStripper();
-            pdfTextStripper.setLineSeparator("\n");
-            pdfTextStripper.setStartPage(pageNumber);
-            pdfTextStripper.setEndPage(pageNumber);
+    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, int pageNumber) throws IOException {
+        PDFTextStripper pdfTextStripper = new PDFTextStripper();
+        pdfTextStripper.setLineSeparator("\n");
+        pdfTextStripper.setStartPage(pageNumber);
+        pdfTextStripper.setEndPage(pageNumber);
 
-            String pdfContent = pdfTextStripper.getText(pdfDocument);
-            if (StringUtil.isNotBlank(pdfContent)) {
-                newDocument.add(new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES));
-            }
-            PDPage page = pdfDocument.getPage(pageNumber);
-            List<String> annotations = page.getAnnotations().stream().filter((annotation) -> annotation.getContents() != null).map(PDAnnotation::getContents).collect(Collectors.toList());
-            if (annotations.size() > 0) {
-                newDocument.add(new TextField(ANNOTATIONS, annotations.stream().collect(Collectors.joining("\n")), Field.Store.YES));
-            }
-        } catch (IOException e) {
-            LOGGER.info("Could not read contents of PDF document \"{}\"", pdfDocument.toString(), e);
+        String pdfContent = pdfTextStripper.getText(pdfDocument);
+        if (StringUtil.isNotBlank(pdfContent)) {
+            newDocument.add(new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES));
+        }
+        PDPage page = pdfDocument.getPage(pageNumber);
+        List<String> annotations = page.getAnnotations().stream().filter((annotation) -> annotation.getContents() != null).map(PDAnnotation::getContents).collect(Collectors.toList());
+        if (annotations.size() > 0) {
+            newDocument.add(new TextField(ANNOTATIONS, annotations.stream().collect(Collectors.joining("\n")), Field.Store.YES));
         }
     }
 

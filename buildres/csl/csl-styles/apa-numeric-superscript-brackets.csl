@@ -15,7 +15,7 @@
     <category field="psychology"/>
     <category field="generic-base"/>
     <summary>APA style, with numeric in-text citations in brackets</summary>
-    <updated>2019-12-04T13:09:49+00:00</updated>
+    <updated>2022-01-31T14:30:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -123,8 +123,8 @@
   <!-- General categories of item types:
        Periodical: article-journal article-magazine article-newspaper post-weblog review review-book
        Periodical or Booklike: paper-conference
-       Booklike: article book broadcast chapter dataset entry entry-dictionary entry-encyclopedia figure 
-                 graphic interview manuscript map motion_picture musical_score pamphlet patent 
+       Booklike: article book broadcast chapter dataset entry entry-dictionary entry-encyclopedia figure
+                 graphic interview manuscript map motion_picture musical_score pamphlet patent
                  personal_communication report song speech thesis post webpage
        Legal: bill legal_case legislation treaty
   -->
@@ -192,7 +192,7 @@
       </if>
       <else-if type="interview personal_communication" match="any">
         <choose>
-          <!-- These variables indicate that the letter is retrievable by the reader. 
+          <!-- These variables indicate that the letter is retrievable by the reader.
                 If not, then use the APA in-text-only personal communication format -->
           <if variable="archive container-title DOI publisher URL" match="none">
             <group delimiter=", ">
@@ -273,7 +273,7 @@
                   </if>
                 </choose>
               </else-if>
-              <!-- Only year: article article-journal book chapter entry entry-dictionary entry-encyclopedia dataset figure graphic 
+              <!-- Only year: article article-journal book chapter entry entry-dictionary entry-encyclopedia dataset figure graphic
                    manuscript map musical_score paper-conference[published] patent report review review-book thesis -->
             </choose>
           </if>
@@ -305,22 +305,7 @@
     </choose>
   </macro>
   <macro name="date-sort-date">
-    <choose>
-      <if type="article-magazine article-newspaper broadcast interview pamphlet personal_communication post post-weblog speech treaty webpage" match="any">
-        <date variable="issued" form="numeric"/>
-      </if>
-      <else-if type="paper-conference">
-        <!-- Capture 'speech' stored as 'paper-conference' -->
-        <choose>
-          <if variable="collection-editor editor editorial-director issue page volume" match="none">
-            <date variable="issued" form="numeric"/>
-          </if>
-        </choose>
-      </else-if>
-      <else>
-        <date variable="issued" form="numeric"/>
-      </else>
-    </choose>
+    <date variable="issued" form="numeric"/>
   </macro>
   <macro name="date-intext">
     <choose>
@@ -347,7 +332,7 @@
                 <if type="interview personal_communication" match="any">
                   <choose>
                     <if variable="archive container-title DOI publisher URL" match="none">
-                      <!-- These variables indicate that the communication is retrievable by the reader. 
+                      <!-- These variables indicate that the communication is retrievable by the reader.
                            If not, then use the in-text-only personal communication format -->
                       <date variable="issued" form="text"/>
                     </if>
@@ -1112,7 +1097,7 @@
   <macro name="reviewed-title">
     <choose>
       <if variable="reviewed-title">
-        <!-- Not possible to distinguish TV series episode from other reviewed 
+        <!-- Not possible to distinguish TV series episode from other reviewed
               works [Ex. 69] -->
         <text variable="reviewed-title" font-style="italic"/>
       </if>
@@ -1370,19 +1355,33 @@
   </macro>
   <macro name="event">
     <choose>
-      <if variable="event">
+      <if variable="event event-title" match="any">
         <!-- To prevent Zotero from printing event-place due to its double-mapping of all 'place' to
              both publisher-place and event-place. Remove this 'choose' when that is changed. -->
         <choose>
           <if variable="collection-editor editor editorial-director issue page volume" match="none">
             <!-- Don't print event info if published in a proceedings -->
             <group delimiter=", ">
-              <text variable="event"/>
+              <text macro="event-title"/>
               <text variable="event-place"/>
             </group>
           </if>
         </choose>
       </if>
+    </choose>
+  </macro>
+  <macro name="event-title">
+    <choose>
+      <!-- TODO: We expect "event-title" to be used,
+           but processors and applications may not be updated yet.
+           This macro ensures that either "event" or "event-title" can be accpeted.
+           Remove if procesor logic and application adoption can handle this. -->
+      <if variable="event-title">
+        <text variable="event-title"/>
+      </if>
+      <else>
+        <text variable="event"/>
+      </else>
     </choose>
   </macro>
   <!-- After 'source', APA also prints publication history (original publication, reprint info, retraction info) -->
@@ -1392,7 +1391,7 @@
         <group prefix="(" suffix=")">
           <choose>
             <if variable="references">
-              <!-- This provides the option for more elaborate description 
+              <!-- This provides the option for more elaborate description
                    of publication history, such as full "reprinted" references
                    (examples 11, 43, 44) or retracted references -->
               <text variable="references"/>

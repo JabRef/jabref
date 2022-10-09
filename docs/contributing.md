@@ -1,3 +1,6 @@
+---
+nav_order: 2
+---
 # Contributing
 
 After reading through this guide, check out some good first issues to contribute to by clicking here: [Good First Issues](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
@@ -16,7 +19,7 @@ We welcome contributions to JabRef and encourage you to follow the GitHub workfl
    1. Fork the JabRef into your GitHub account.
    2. Clone your forked repository on your local machine.
 2. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
-3. Do your work on the **new branch — not the master branch.** Refer to our [code how-tos](https://devdocs.jabref.org/getting-into-the-code/code-howtos) if you have questions about your implementation.
+3. Do your work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/getting-into-the-code/code-howtos) if you have questions about your implementation.
 4. Create a pull request. For an overview of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
 5. In case your pull request is not yet complete or not yet ready for review, consider creating a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
 
@@ -28,7 +31,7 @@ The main goal of the formal requirements is to provide credit to you and to be a
 
 #### Add your change to `CHANGELOG.md`
 
-You should edit the [`CHANGELOG.md`](https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#changelog) file located in the root directory of the JabRef source. Add a line with your changes in the appropriate section.
+You should edit the [`CHANGELOG.md`](https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#changelog) file located in the root directory of the JabRef source. Add a line with your changes in the appropriate section.
 
 If you did internal refactorings or improvements not visible to the user (e.g., UI, .bib file), then you don't need to put an entry there.
 
@@ -51,7 +54,7 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 
 #### Write a good commit message
 
-See [good commit message](https://github.com/joelparkerhenderson/git_commit_message) or [commit guidelines section of Pro Git](http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines). The first line of your commit message is automatically taken as the title for the pull-request. All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
+See [good commit message](https://github.com/joelparkerhenderson/git\_commit\_message) or [commit guidelines section of Pro Git](http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines). The first line of your commit message is automatically taken as the title for the pull-request. All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
 
 #### Test your code
 
@@ -79,7 +82,7 @@ You can also directly run the specific test in your IDE. The test "LocalizationC
 
 #### When adding a library
 
-Please try to use a version available at JCenter and add it to `build.gradle`. In any case, describe the library at [`external-libraries.md`](https://github.com/JabRef/jabref/blob/master/external-libraries.md#external-libraries). We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)). Also add a txt file stating the license in `libraries/`. It is used at `gradlew processResources` to generate the About.html files. You can see the result in `build\resources\main\help\en\About.html` or when clicking Help -> About.
+Please try to use a version available at JCenter and add it to `build.gradle`. In any case, describe the library at [`external-libraries.md`](https://github.com/JabRef/jabref/blob/main/external-libraries.md#external-libraries). We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)). Also add a txt file stating the license in `libraries/`. It is used at `gradlew processResources` to generate the About.html files. You can see the result in `build\resources\main\help\en\About.html` or when clicking Help -> About.
 
 #### When making an architectural decision
 
@@ -107,12 +110,13 @@ If you want to indicate that a pull request is not yet complete **before** creat
 
 ## How to improve the developer's documentation
 
-For improving developer's documentation, go on at the [docs/ subdirectory of JabRef's code](https://github.com/JabRef/jabref/tree/master/docs) and edit the file. GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
+For improving developer's documentation, go on at the [docs/ subdirectory of JabRef's code](https://github.com/JabRef/jabref/tree/main/docs) and edit the file.
+GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
 
-In case you use some gitbook special features, and you want to test them, checkout JabRef's code locally, and execute following steps:
+You can also host Jekyll locally.
 
-1. `npm install -g gitbook`
-2. `cd docs`
-3. `gitbook serve`
+    docker run --rm -it \
+      --volume="$pwd:/srv/jekyll" \
+      jekyll/builder:latest /bin/bash -c "gem install && bundle exec jekyll build && bundle exec rake search:init && jekyll serve"
 
-Then, you can see a near-to-reality rendering of the development documentation at [http://localhost:4000](http://localhost:4000).
+Then, you can see a near-to-reality rendering of the development documentation at <http://localhost:4000>.

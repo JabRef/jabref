@@ -16,30 +16,35 @@
     <issn>0082-7118</issn>
     <eissn>2752-7042</eissn>
     <summary>Tyndale Bulletin format with full notes and bibliography</summary>
-    <updated>2021-10-20T19:25:50+00:00</updated>
+    <updated>2022-03-04T14:17:21+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
-    <!-- Tyndale Bulletin style differs from SBLHS2 only rarely (§4.1). The departures are that Tyndale Bulletin uses 
-      1) hyphens, rather than en dashes, in page ranges (§§6, 6.3);
-      2) insists that DOIs be included where available (§§11.1, 11.3.7); and
-      3) uses British-style quotation mark conventions (§§8.1, 11.1, 11.6.6–11.3.8). N.B.: §11.3.8 shows punctuation coming outside the quotation mark, rather than inside. But it needs to be confirmed that this isn't a mistake in the Tyndale Bulletin style guide (as is, e.g., the italicized comma after the book title in that section's examples). 
-      
-      N.B.: Currently, the citation for an untitled book review puts the book title in quotation marks rather than italics (contra §11.3.9), as does the same code in the SBL base style. Could this be due to the difference between en-US and en-GB? -->
+    <!-- Tyndale Bulletin style differs from SBLHS2 only rarely (§4.1). The departures are that Tyndale Bulletin 
+      1) insists that DOIs be included where available (§§11.1, 11.3.7) and
+      2) uses British-style quotation mark conventions (§§8.1, 11.1, 11.6.6-11.3.8). -->
   </info>
   <locale xml:lang="en-GB">
-    <style-options punctuation-in-quote="true"/>
+    <!-- Punctuate outside quotations per the January 2022 update to the style guide. -->
+    <style-options punctuation-in-quote="false"/>
     <terms>
       <term name="collection-editor" form="verb">edited by</term>
       <term name="collection-editor" form="verb-short">ed.</term>
       <term name="editor" form="verb-short">ed.</term>
       <term name="editortranslator" form="verb-short">ed. and trans.</term>
       <term name="editortranslator" form="verb">edited and translated by</term>
-      <term name="page-range-delimiter">-</term>
+      <!-- Use en dash in page ranges per the January 2022 update to the style guide. -->
+      <term name="page-range-delimiter">&#8211;</term>
+      <term name="review-of">review of</term>
       <term name="section" form="short">
         <single>§</single>
         <multiple>§§</multiple>
       </term>
       <term name="translator" form="verb-short">trans.</term>
       <term name="translator" form="short">trans.</term>
+      <!-- Use a period after the abbreviation for volume(s) per §12.3. -->
+      <term name="volume" form="short">
+        <single>vol.</single>
+        <multiple>vols.</multiple>
+      </term>
     </terms>
   </locale>
   <macro name="editor-translator-verb-short-comma">
@@ -267,6 +272,25 @@
       <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
         <text variable="title" font-style="italic" text-case="title"/>
       </else-if>
+      <!-- Include "review of" prefix, italicize the book titles in untitled book reviews per §§11.3.8-11.3.9. -->
+      <else-if variable="reviewed-author">
+        <choose>
+          <!-- Include the review title, if avaialable, in quotation marks per §11.3.8. -->
+          <if variable="reviewed-title">
+            <group delimiter=" ">
+              <text variable="title" quotes="true" suffix=", " text-case="title"/>
+              <text term="review-of"/>
+              <text variable="reviewed-title" font-style="italic" text-case="title"/>
+            </group>
+          </if>
+          <else>
+            <group delimiter=" ">
+              <text term="review-of"/>
+              <text variable="title" font-style="italic" text-case="title"/>
+            </group>
+          </else>
+        </choose>
+      </else-if>
       <else>
         <text variable="title" quotes="true" text-case="title"/>
       </else>
@@ -283,6 +307,32 @@
       </if>
       <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
         <text variable="title" font-style="italic" text-case="title"/>
+      </else-if>
+      <!-- Include the reviewed author for book reviews per §§11.3.8-11.3.9. -->
+      <else-if variable="reviewed-author">
+        <choose>
+          <if variable="reviewed-title">
+            <group delimiter=" ">
+              <text variable="title" quotes="true" suffix="," text-case="title"/>
+              <text term="review-of"/>
+              <text variable="reviewed-title" font-style="italic" suffix="," text-case="title"/>
+              <names variable="reviewed-author">
+                <label form="verb" suffix=" "/>
+                <name and="text"/>
+              </names>
+            </group>
+          </if>
+          <else>
+            <group delimiter=" ">
+              <text term="review-of" text-case="capitalize-first"/>
+              <text variable="title" font-style="italic" suffix=", " text-case="title"/>
+              <names variable="reviewed-author">
+                <label form="verb" suffix=" "/>
+                <name and="text"/>
+              </names>
+            </group>
+          </else>
+        </choose>
       </else-if>
       <else>
         <text variable="title" quotes="true" text-case="title"/>
@@ -306,6 +356,20 @@
       </if>
       <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
         <text variable="title" form="short" font-style="italic" text-case="title"/>
+      </else-if>
+      <!-- For short citations, use the short review title if available. Otherwise, use a "review of" prefix, italicize the short book title per §11.3.8. -->
+      <else-if variable="reviewed-author">
+        <choose>
+          <if variable="reviewed-title">
+            <text variable="title" quotes="true" text-case="title"/>
+          </if>
+          <else>
+            <group delimiter=" ">
+              <text term="review-of"/>
+              <text variable="title" font-style="italic" form="short" text-case="title"/>
+            </group>
+          </else>
+        </choose>
       </else-if>
       <else>
         <text variable="title" form="short" quotes="true" text-case="title"/>
@@ -676,8 +740,8 @@
                   </if>
                   <else>
                     <group delimiter=" ">
-                        <label variable="locator" form="short"/>
-                        <text variable="locator"/>
+                      <label variable="locator" form="short"/>
+                      <text variable="locator"/>
                     </group>
                   </else>
                 </choose>
@@ -889,7 +953,7 @@
         <text variable="collection-number" prefix=" "/>
       </group>
       <group delimiter=" ">
-        <text term="sub verbo" form="short"/>
+        <text term="sub-verbo" form="short"/>
         <text variable="title" text-case="title" quotes="true"/>
       </group>
     </group>

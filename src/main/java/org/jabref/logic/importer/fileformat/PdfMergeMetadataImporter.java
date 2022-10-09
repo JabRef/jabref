@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
@@ -42,13 +40,13 @@ public class PdfMergeMetadataImporter extends Importer {
     private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public PdfMergeMetadataImporter(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences) {
+    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.metadataImporters = new ArrayList<>();
         this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importerPreferences.isGrobidEnabled()) {
-            this.metadataImporters.add(new PdfGrobidImporter(importerPreferences, importFormatPreferences));
+        if (importFormatPreferences.getGrobidPreferences().isGrobidEnabled()) {
+            this.metadataImporters.add(new PdfGrobidImporter(importFormatPreferences));
         }
         this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
         this.metadataImporters.add(new PdfContentImporter(importFormatPreferences));
@@ -74,11 +72,11 @@ public class PdfMergeMetadataImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) throws IOException {
+    public ParserResult importDatabase(Path filePath) throws IOException {
         List<BibEntry> candidates = new ArrayList<>();
 
         for (Importer metadataImporter : metadataImporters) {
-            List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, defaultEncoding).getDatabase().getEntries();
+            List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath).getDatabase().getEntries();
             if (extractedEntries.size() == 0) {
                 continue;
             }
@@ -149,13 +147,11 @@ public class PdfMergeMetadataImporter extends Importer {
         private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInjector.class);
         private final FilePreferences filePreferences;
         private final BibDatabaseContext databaseContext;
-        private final Charset defaultEncoding;
 
-        public EntryBasedFetcherWrapper(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context, Charset defaultEncoding) {
-            super(importerPreferences, importFormatPreferences);
+        public EntryBasedFetcherWrapper(ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context) {
+            super(importFormatPreferences);
             this.filePreferences = filePreferences;
             this.databaseContext = context;
-            this.defaultEncoding = defaultEncoding;
         }
 
         @Override
@@ -164,7 +160,7 @@ public class PdfMergeMetadataImporter extends Importer {
                 Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
                 if (filePath.isPresent()) {
                     try {
-                        ParserResult result = importDatabase(filePath.get(), defaultEncoding);
+                        ParserResult result = importDatabase(filePath.get());
                         if (!result.isEmpty()) {
                             return result.getDatabase().getEntries();
                         }

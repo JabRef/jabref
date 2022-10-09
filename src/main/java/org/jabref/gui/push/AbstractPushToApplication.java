@@ -2,10 +2,13 @@ package org.jabref.gui.push;
 
 import java.io.IOException;
 import java.util.List;
-
-import javafx.beans.property.ObjectProperty;
+import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.Action;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
@@ -38,8 +41,18 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
+    public JabRefIcon getApplicationIcon() {
+        return IconTheme.JabRefIcons.APPLICATION_GENERIC;
+    }
+
+    @Override
     public String getTooltip() {
         return Localization.lang("Push entries to external application (%0)", getDisplayName());
+    }
+
+    @Override
+    public Action getAction() {
+        return new PushToApplicationAction();
     }
 
     @Override
@@ -48,7 +61,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getPushToApplicationCommandPaths().get(this.getDisplayName());
+        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
@@ -85,7 +98,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
-    public void operationCompleted() {
+    public void onOperationCompleted() {
         if (notDefined) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
@@ -132,7 +145,24 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return preferencesService.getExternalApplicationsPreferences().getCiteCommand();
     }
 
-    public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
+    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
+    }
+
+    protected class PushToApplicationAction implements Action {
+        @Override
+        public String getText() {
+            return Localization.lang("Push entries to external application (%0)", getDisplayName());
+        }
+
+        @Override
+        public Optional<JabRefIcon> getIcon() {
+            return Optional.of(getApplicationIcon());
+        }
+
+        @Override
+        public Optional<KeyBinding> getKeyBinding() {
+            return Optional.of(KeyBinding.PUSH_TO_APPLICATION);
+        }
     }
 }

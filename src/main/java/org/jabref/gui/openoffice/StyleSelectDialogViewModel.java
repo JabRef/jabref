@@ -85,7 +85,6 @@ public class StyleSelectDialogViewModel {
     }
 
     public void deleteStyle() {
-
         OOBibStyle style = selectedItem.getValue().getStyle();
         if (loader.removeStyle(style)) {
             styles.remove(selectedItem.get());
@@ -94,7 +93,7 @@ public class StyleSelectDialogViewModel {
 
     public void editStyle() {
         OOBibStyle style = selectedItem.getValue().getStyle();
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", preferencesService.getFilePreferences());
         try {
             JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferencesService, style.getPath(), type);
         } catch (IOException e) {

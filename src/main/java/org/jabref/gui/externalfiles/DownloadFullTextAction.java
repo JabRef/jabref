@@ -14,7 +14,6 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -85,7 +84,9 @@ public class DownloadFullTextAction extends SimpleCommand {
                 Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
                 int count = 0;
                 for (BibEntry entry : entries) {
-                    FulltextFetchers fetchers = new FulltextFetchers(preferences.getImportFormatPreferences());
+                    FulltextFetchers fetchers = new FulltextFetchers(
+                            preferences.getImportFormatPreferences(),
+                            preferences.getImporterPreferences());
                     downloads.put(entry, fetchers.findFullTextPDF(entry));
                     updateProgress(++count, entries.size());
                 }
@@ -144,8 +145,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     databaseContext,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferences,
-                    ExternalFileTypes.getInstance());
+                    preferences);
 
             onlineFile.download();
         } else {

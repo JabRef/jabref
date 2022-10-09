@@ -37,7 +37,7 @@ class FileFieldParserTest {
         assertEquals(expected, FileFieldParser.convert(new ArrayList<>(input)));
     }
 
-    private static Stream<Arguments> stringsToParseTestData() throws Exception {
+    private static Stream<Arguments> stringsToParseTest() throws Exception {
         return Stream.of(
                 // null string
                 Arguments.of(
@@ -114,6 +114,18 @@ class FileFieldParserTest {
                         "desc:C\\:\\\\test.pdf:PDF"
                 ),
 
+                // handleNonEscapedFilePath
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("desc", Path.of("C:\\test.pdf"), "PDF")),
+                        "desc:C:\\test.pdf:PDF"
+                ),
+
+                // Source: https://github.com/JabRef/jabref/issues/8991#issuecomment-1214131042
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("Boyd2012.pdf", Path.of("C:\\Users\\Literature_database\\Boyd2012.pdf"), "PDF")),
+                        "Boyd2012.pdf:C\\:\\\\Users\\\\Literature_database\\\\Boyd2012.pdf:PDF"
+                ),
+
                 // subsetOfFieldsResultsInFileLink: description only
                 Arguments.of(
                         Collections.singletonList(new LinkedFile("", Path.of("file.pdf"), "")),
@@ -138,23 +150,40 @@ class FileFieldParserTest {
                         "desc:file.pdf:PDF:asdf"
                 ),
 
+                // www inside filename
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", Path.of("/home/www.google.de.pdf"), "")),
+                        ":/home/www.google.de.pdf"
+                ),
+
                 // url
                 Arguments.of(
                          Collections.singletonList(new LinkedFile(new URL("https://books.google.de/"), "")),
                          "https://books.google.de/"
                 ),
 
+                // url with www
+                Arguments.of(
+                             Collections.singletonList(new LinkedFile(new URL("https://www.google.de/"), "")),
+                             "https://www.google.de/"
+                ),
+
                 // url as file
                 Arguments.of(
                              Collections.singletonList(new LinkedFile("", new URL("http://ceur-ws.org/Vol-438"), "URL")),
                              ":http\\://ceur-ws.org/Vol-438:URL"
-                )
+                ),
+                // url as file with desc
+                Arguments.of(
+                             Collections.singletonList(new LinkedFile("desc", new URL("http://ceur-ws.org/Vol-438"), "URL")),
+                             "desc:http\\://ceur-ws.org/Vol-438:URL"
+               )
         );
     }
 
     @ParameterizedTest
-    @MethodSource("stringsToParseTestData")
-    public void testParse(List<LinkedFile> expected, String input) {
+    @MethodSource
+    public void stringsToParseTest(List<LinkedFile> expected, String input) {
         assertEquals(expected, FileFieldParser.parse(input));
     }
 }

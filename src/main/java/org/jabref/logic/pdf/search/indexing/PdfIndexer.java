@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.LibraryTab;
@@ -25,6 +27,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
@@ -59,9 +63,8 @@ public class PdfIndexer {
      */
     public void createIndex() {
         // Create new index by creating IndexWriter but not writing anything.
-        try {
-            IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE));
-            indexWriter.close();
+        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE))) {
+            // empty comment for checkstyle
         } catch (IOException e) {
             LOGGER.warn("Could not create new Index!", e);
         }
@@ -111,19 +114,16 @@ public class PdfIndexer {
     }
 
     /**
-     * Removes a pdf file linked to one entry in the database from the index
-     * @param entry the entry the file is linked to
-     * @param linkedFile the link to the file to be removed
+     * Removes a pdf file identified by its path from the index
+     *
+     * @param linkedFilePath the path to the file to be removed
      */
-    public void removeFromIndex(BibEntry entry, LinkedFile linkedFile) {
+    public void removeFromIndex(String linkedFilePath) {
         try (IndexWriter indexWriter = new IndexWriter(
                 directoryToIndex,
                 new IndexWriterConfig(
-                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))
-        ) {
-            if (!entry.getFiles().isEmpty()) {
-                indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFile.getLink()));
-            }
+                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+            indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
             indexWriter.commit();
         } catch (IOException e) {
             LOGGER.warn("Could not initialize the IndexWriter!", e);
@@ -132,6 +132,7 @@ public class PdfIndexer {
 
     /**
      * Removes  all files linked to a bib-entry from the index
+     *
      * @param entry the entry documents are linked to
      */
     public void removeFromIndex(BibEntry entry) {
@@ -140,11 +141,12 @@ public class PdfIndexer {
 
     /**
      * Removes a list of files linked to a bib-entry from the index
+     *
      * @param entry the entry documents are linked to
      */
     public void removeFromIndex(BibEntry entry, List<LinkedFile> linkedFiles) {
         for (LinkedFile linkedFile : linkedFiles) {
-            removeFromIndex(entry, linkedFile);
+            removeFromIndex(linkedFile.getLink());
         }
     }
 
@@ -164,6 +166,7 @@ public class PdfIndexer {
     /**
      * Writes all files linked to an entry to the index if the files are not yet in the index or the files on the fs are
      * newer than the one in the index.
+     *
      * @param entry the entry associated with the file
      */
     private void writeToIndex(BibEntry entry) {
@@ -175,6 +178,7 @@ public class PdfIndexer {
     /**
      * Writes the file to the index if the file is not yet in the index or the file on the fs is newer than the one in
      * the index.
+     *
      * @param entry the entry associated with the file
      * @param linkedFile the file to write to the index
      */
@@ -189,8 +193,7 @@ public class PdfIndexer {
         }
         try {
             // Check if a document with this path is already in the index
-            try {
-                IndexReader reader = DirectoryReader.open(directoryToIndex);
+            try (IndexReader reader = DirectoryReader.open(directoryToIndex)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
                 TermQuery query = new TermQuery(new Term(SearchFieldConstants.PATH, linkedFile.getLink()));
                 TopDocs topDocs = searcher.search(query, 1);
@@ -205,22 +208,42 @@ public class PdfIndexer {
                         return;
                     }
                 }
-                reader.close();
             } catch (IndexNotFoundException e) {
                 // if there is no index yet, don't need to check anything!
             }
             // If no document was found, add the new one
             Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
-                IndexWriter indexWriter = new IndexWriter(directoryToIndex,
-                        new IndexWriterConfig(
-                                new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
-                indexWriter.addDocuments(pages.get());
-                indexWriter.commit();
-                indexWriter.close();
+                try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
+                                                               new IndexWriterConfig(
+                                                                                     new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+                    indexWriter.addDocuments(pages.get());
+                    indexWriter.commit();
+                }
             }
         } catch (IOException e) {
             LOGGER.warn("Could not add the document {} to the index!", linkedFile.getLink(), e);
         }
+    }
+
+    /**
+     * Lists the paths of all the files that are stored in the index
+     *
+     * @return all file paths
+     */
+    public Set<String> getListOfFilePaths() {
+        Set<String> paths = new HashSet<>();
+        try (IndexReader reader = DirectoryReader.open(directoryToIndex)) {
+            IndexSearcher searcher = new IndexSearcher(reader);
+            MatchAllDocsQuery query = new MatchAllDocsQuery();
+            TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
+            for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
+                Document doc = reader.document(scoreDoc.doc);
+                paths.add(doc.getField(SearchFieldConstants.PATH).stringValue());
+            }
+        } catch (IOException e) {
+            return paths;
+        }
+        return paths;
     }
 }

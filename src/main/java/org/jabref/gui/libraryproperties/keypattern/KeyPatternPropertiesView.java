@@ -1,7 +1,5 @@
 package org.jabref.gui.libraryproperties.keypattern;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
@@ -19,6 +17,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatternPropertiesViewModel> implements PropertiesTab {
 
@@ -48,7 +47,7 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN), keyPatternHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService), keyPatternHelp);
     }
 
     @Override

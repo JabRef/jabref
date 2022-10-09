@@ -1,16 +1,14 @@
 package org.jabref.logic.importer;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 import java.util.stream.Stream;
 
-import org.jabref.logic.xmp.XmpPreferences;
+import javafx.collections.FXCollections;
+
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,11 +26,12 @@ class ImportFormatReaderIntegrationTest {
     @BeforeEach
     void setUp() {
         reader = new ImportFormatReader();
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getCustomImportList()).thenReturn(Set.of());
-        GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
-        reader.resetImportFormats(mock(ImporterPreferences.class), generalPreferences, importFormatPreferences, mock(XmpPreferences.class), new DummyFileUpdateMonitor());
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
+        reader.resetImportFormats(
+                importerPreferences,
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                new DummyFileUpdateMonitor());
     }
 
     @ParameterizedTest

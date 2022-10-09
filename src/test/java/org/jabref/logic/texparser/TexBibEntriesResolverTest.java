@@ -1,7 +1,6 @@
 package org.jabref.logic.texparser;
 
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -22,7 +21,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class TexBibEntriesResolverTest {
     private final static String DARWIN = "Darwin1888";
@@ -40,9 +38,8 @@ public class TexBibEntriesResolverTest {
     private BibEntry bibEntry;
 
     @BeforeEach
-    private void setUp() {
+    void setUp() {
         generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         database = new BibDatabase();

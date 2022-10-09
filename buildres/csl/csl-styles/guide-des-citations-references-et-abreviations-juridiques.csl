@@ -14,7 +14,7 @@
     </author>
     <category citation-format="note"/>
     <category field="law"/>
-    <updated>2020-12-04T23:56:21+00:00</updated>
+    <updated>2022-04-05T19:59:30+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -57,7 +57,8 @@
   </macro>
   <macro name="translator">
     <names variable="translator">
-      <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal" prefix=" traduit par ">
+      <label form="verb-short" suffix=" "/>
+      <name font-style="normal" and="text" delimiter-precedes-last="never" sort-separator=" ">
         <name-part name="family" font-variant="small-caps"/>
       </name>
     </names>

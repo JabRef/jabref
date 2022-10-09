@@ -9,7 +9,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -32,7 +31,7 @@ class CompositeIdFetcherTest {
 
     private CompositeIdFetcher compositeIdFetcher;
 
-    public static Stream<Arguments> provideTestData() {
+    public static Stream<Arguments> performSearchByIdReturnsCorrectEntryForIdentifier() {
         return Stream.of(
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForArXivId",
@@ -42,12 +41,14 @@ class CompositeIdFetcherTest {
                                 .withField(StandardField.DATE, "2021-10-06")
                                 .withField(StandardField.ABSTRACT, "In the era of large-scale spectroscopic surveys in the Local Group (LG), we can explore using chemical abundances of halo stars to study the star formation and chemical enrichment histories of the dwarf galaxy progenitors of the Milky Way (MW) and M31 stellar halos. In this paper, we investigate using the Chemical Abundance Ratio Distributions (CARDs) of seven stellar halos from the Latte suite of FIRE-2 simulations. We attempt to infer galaxies' assembly histories by modelling the CARDs of the stellar halos of the Latte galaxies as a linear combination of template CARDs from disrupted dwarfs, with different stellar masses $M_{\\star}$ and quenching times $t_{100}$. We present a method for constructing these templates using present-day dwarf galaxies. For four of the seven Latte halos studied in this work, we recover the mass spectrum of accreted dwarfs to a precision of $<10\\%$. For the fraction of mass accreted as a function of $t_{100}$, we find residuals of $20-30\\%$ for five of the seven simulations. We discuss the failure modes of this method, which arise from the diversity of star formation and chemical enrichment histories dwarf galaxies can take. These failure cases can be robustly identified by the high model residuals. Though the CARDs modeling method does not successfully infer the assembly histories in these cases, the CARDs of these disrupted dwarfs contain signatures of their unusual formation histories. Our results are promising for using CARDs to learn more about the histories of the progenitors of the MW and M31 stellar halos.")
                                 .withField(StandardField.EPRINT, "2110.02957")
+                                .withField(StandardField.DOI, "10.3847/1538-4357/ac78ea")
                                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2110.02957v1:PDF")
                                 .withField(StandardField.EPRINTTYPE, "arXiv")
                                 .withField(StandardField.EPRINTCLASS, "astro-ph.GA")
                                 .withField(StandardField.KEYWORDS, "astro-ph.GA"),
                         "arXiv:2110.02957"
                 ),
+                /* disabled, because Iacr does not work
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForIacrEprintId",
                         new BibEntry(StandardEntryType.Misc)
@@ -62,26 +63,23 @@ class CompositeIdFetcherTest {
                                 .withField(StandardField.YEAR, "2017")
                                 .withCitationKey("cryptoeprint:2017:1118"),
                         "2017/1118"
-                ),
+                ), */
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForIsbnId",
                         new BibEntry(StandardEntryType.Book)
                                 .withField(StandardField.TITLE, "Effective Java")
-                                .withField(StandardField.PUBLISHER, "Addison Wesley")
-                                .withField(StandardField.YEAR, "2018")
+                                .withField(StandardField.PUBLISHER, "Addison-Wesley Professional")
+                                .withField(StandardField.YEAR, "2017")
                                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
-                                .withField(StandardField.DATE, "2018-01-31")
-                                .withField(new UnknownField("ean"), "9780134685991")
-                                .withField(StandardField.ISBN, "0134685997")
-                                .withField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html")
-                                .withCitationKey("9780134685991"),
+                                .withField(StandardField.PAGES, "416")
+                                .withField(StandardField.ISBN, "9780134685991"),
                         "9780134685991"
                 ),
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForDoiId",
                         new BibEntry(StandardEntryType.Book)
                                 .withField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}")
-                                .withField(StandardField.PUBLISHER, "Wiley Publishing, Inc.")
+                                .withField(StandardField.PUBLISHER, "Wiley")
                                 .withField(StandardField.YEAR, "2011")
                                 .withField(StandardField.AUTHOR, "Barry Burd")
                                 .withField(StandardField.MONTH, "jul")
@@ -107,9 +105,8 @@ class CompositeIdFetcherTest {
     }
 
     @ParameterizedTest(name = "{index} {0}")
-    @MethodSource("provideTestData")
+    @MethodSource
     void performSearchByIdReturnsCorrectEntryForIdentifier(String name, BibEntry bibEntry, String identifier) throws FetcherException {
         assertEquals(Optional.of(bibEntry), compositeIdFetcher.performSearchById(identifier));
     }
-
 }

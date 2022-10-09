@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 
@@ -14,7 +16,7 @@ public class Windows implements NativeDesktop {
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, Globals.prefs.getFilePreferences());
 
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
@@ -79,7 +81,7 @@ public class Windows implements NativeDesktop {
     }
 
     @Override
-    public void openConsole(String absolutePath) throws IOException {
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
         ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
         process.directory(new File(absolutePath));
         process.start();

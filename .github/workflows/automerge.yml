@@ -9,19 +9,19 @@ jobs:
     steps:
       - name: 'Wait for status checks'
         id: waitforstatuschecks
-        uses: "WyriHaximus/github-action-wait-for-status@v1.4"
+        uses: "WyriHaximus/github-action-wait-for-status@v1.7.1"
         with:
           ignoreActions: Automerge Dependabot,Code coverage,Create snapcraft image,Deploy binaries on builds.jabref.org,codecov/project,markdown-link-check
           checkInterval: 13
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Auto approve
-        uses: hmarr/auto-approve-action@v2.1.0
+        uses: hmarr/auto-approve-action@v2.4.0
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Merge pull requests
-        uses: pascalgn/automerge-action@v0.14.3
+        uses: pascalgn/automerge-action@v0.15.3
         if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           MERGE_METHOD: "merge"

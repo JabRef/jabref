@@ -298,7 +298,7 @@ public class BibEntry implements Cloneable {
             }
         }
 
-        return (database == null || result.isEmpty()) ?
+        return ((database == null) || result.isEmpty()) ?
                 result :
                 Optional.of(database.resolveForStrings(result.get()));
     }
@@ -469,7 +469,7 @@ public class BibEntry implements Cloneable {
                 }
             } else {
                 // Date field not in valid format
-                LOGGER.debug("Could not parse date " + date.get());
+                LOGGER.debug("Could not parse date {}", date.get());
                 return Optional.empty();
             }
         }
@@ -597,7 +597,7 @@ public class BibEntry implements Cloneable {
      */
     public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
         Optional<String> oldValue = getField(field);
-        if (!oldValue.isPresent()) {
+        if (oldValue.isEmpty()) {
             return Optional.empty();
         }
 
@@ -777,7 +777,8 @@ public class BibEntry implements Cloneable {
         return putKeywords(keywordList, keywordDelimiter);
     }
 
-    public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Keyword newValue,
+    public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace,
+                                                 Keyword newValue,
                                                  Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         keywordList.replaceAll(keywordsToReplace, newValue);
@@ -831,6 +832,18 @@ public class BibEntry implements Cloneable {
 
     public BibEntry withField(Field field, String value) {
         setField(field, value);
+        this.setChanged(false);
+        return this;
+    }
+
+    public BibEntry withDate(Date date) {
+        setDate(date);
+        this.setChanged(false);
+        return this;
+    }
+
+    public BibEntry withMonth(Month parsedMonth) {
+        setMonth(parsedMonth);
         this.setChanged(false);
         return this;
     }
@@ -957,7 +970,7 @@ public class BibEntry implements Cloneable {
 
     public OptionalBinding<String> getFieldBinding(Field field) {
         if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
-            return EasyBind.wrapNullable(type).map(EntryType::getDisplayName);
+            return EasyBind.wrapNullable(type).mapOpt(EntryType::getDisplayName);
         }
         return EasyBind.valueAt(fields, field);
     }
@@ -989,23 +1002,34 @@ public class BibEntry implements Cloneable {
         return new Observable[] {fields, type};
     }
 
-    public void addLinkedFile(BibEntry entry, LinkedFile linkedFile, LinkedFile newLinkedFile, List<LinkedFile> linkedFiles) {
+    /**
+     * Helper method to add a downloaded file to the entry.
+     * <p>
+     * Use-case: URL is contained in the file, the file is downloaded and should then replace the url.
+     * This method. adds the given path (as file) to the entry and removes the url.
+     *
+     * @param linkToDownloadedFile the link to the file, which was downloaded
+     * @param downloadedFile the path to be added to the entry
+     */
+    public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
+        List<LinkedFile> linkedFiles = this.getFiles();
+
         int oldFileIndex = -1;
         int i = 0;
         while ((i < linkedFiles.size()) && (oldFileIndex == -1)) {
             LinkedFile file = linkedFiles.get(i);
             // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
-            if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
+            if (file.getLink().equalsIgnoreCase(linkToDownloadedFile)) {
                 oldFileIndex = i;
             }
             i++;
         }
         if (oldFileIndex == -1) {
-            linkedFiles.add(0, newLinkedFile);
+            linkedFiles.add(0, downloadedFile);
         } else {
-            linkedFiles.set(oldFileIndex, newLinkedFile);
+            linkedFiles.set(oldFileIndex, downloadedFile);
         }
-        entry.setFiles(linkedFiles);
-    }
 
+        this.setFiles(linkedFiles);
+    }
 }

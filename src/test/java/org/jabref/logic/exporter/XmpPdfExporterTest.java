@@ -3,9 +3,11 @@ package org.jabref.logic.exporter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
+
+import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -71,7 +73,7 @@ class XmpPdfExporterTest {
         olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
 
         LinkedFile linkedFile = createDefaultLinkedFile("existing.pdf", tempDir);
-        olly2018.setFiles(Arrays.asList(linkedFile));
+        olly2018.setFiles(List.of(linkedFile));
 
         toral2006.setField(StandardField.AUTHOR, "Toral, Antonio and Munoz, Rafael");
         toral2006.setField(StandardField.TITLE, "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia");
@@ -81,7 +83,7 @@ class XmpPdfExporterTest {
         toral2006.setField(StandardField.OWNER, "Ich");
         toral2006.setField(StandardField.URL, "www.url.de");
 
-        toral2006.setFiles(Arrays.asList(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
+        toral2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
 
         vapnik2000.setCitationKey("vapnik2000");
         vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
@@ -96,7 +98,7 @@ class XmpPdfExporterTest {
      */
     @BeforeEach
     void setUp() throws IOException {
-        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), ',');
+        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','));
 
         encoding = Charset.defaultCharset();
 
@@ -119,13 +121,13 @@ class XmpPdfExporterTest {
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithValidPdfFileLinks")
     void successfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, bibEntryWithValidPdfFileLink, Arrays.asList(olly2018)));
+        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018)));
     }
 
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithInvalidPdfFileLinks")
     void unsuccessfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, bibEntryWithValidPdfFileLink, Arrays.asList(olly2018)));
+        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018)));
     }
 
     public static Stream<Arguments> provideBibEntriesWithValidPdfFileLinks() {
@@ -139,13 +141,13 @@ class XmpPdfExporterTest {
     @ParameterizedTest
     @MethodSource("providePathsToValidPDFs")
     void successfulExportToFileByPath(Path path) throws Exception {
-        assertTrue(exporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, path));
+        assertTrue(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path));
     }
 
     @ParameterizedTest
     @MethodSource("providePathsToInvalidPDFs")
     void unsuccessfulExportToFileByPath(Path path) throws Exception {
-        assertFalse(exporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, path));
+        assertFalse(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path));
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {
@@ -167,8 +169,6 @@ class XmpPdfExporterTest {
             pdf.save(pdfFile.toAbsolutePath().toString());
         }
 
-        LinkedFile linkedFile = new LinkedFile("A linked pdf", pdfFile, "PDF");
-
-        return linkedFile;
+        return new LinkedFile("A linked pdf", pdfFile, "PDF");
     }
 }

@@ -2,7 +2,7 @@ package org.jabref.logic.preview;
 
 import java.util.Locale;
 
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -10,7 +10,7 @@ import org.jabref.model.entry.BibEntry;
  */
 public interface PreviewLayout {
 
-    String generatePreview(BibEntry entry, BibDatabase database);
+    String generatePreview(BibEntry entry, BibDatabaseContext databaseContext);
 
     String getDisplayName();
 

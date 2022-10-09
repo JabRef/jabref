@@ -14,6 +14,7 @@ import javafx.collections.transformation.SortedList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
+import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
@@ -28,13 +29,14 @@ import com.tobiasdiez.easybind.EasyBind;
 public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
-    private final GroupViewMode groupViewMode;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
     private final PreferencesService preferencesService;
+    private final GroupsPreferences groupsPreferences;
     private final BibDatabaseContext bibDatabaseContext;
 
     public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
         this.preferencesService = preferencesService;
+        this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.bibDatabaseContext = context;
         this.fieldValueFormatter = new SimpleObjectProperty<>(
                 new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
@@ -45,7 +47,10 @@ public class MainTableDataModel {
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty(), (groups, query) -> entry -> isMatched(groups, query, entry))
+                EasyBind.combine(stateManager.activeGroupProperty(),
+                        stateManager.activeSearchQueryProperty(),
+                        groupsPreferences.groupViewModeProperty(),
+                        (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
         );
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
@@ -53,7 +58,6 @@ public class MainTableDataModel {
         stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
-        groupViewMode = preferencesService.getGroupViewMode();
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
@@ -77,7 +81,10 @@ public class MainTableDataModel {
             return Optional.empty();
         }
 
-        final MatcherSet searchRules = MatcherSets.build(groupViewMode == GroupViewMode.INTERSECTION ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
+        final MatcherSet searchRules = MatcherSets.build(
+                groupsPreferences.getGroupViewMode() == GroupViewMode.INTERSECTION
+                        ? MatcherSets.MatcherType.AND
+                        : MatcherSets.MatcherType.OR);
 
         for (GroupTreeNode node : selectedGroups) {
             searchRules.addRule(node.getSearchMatcher());

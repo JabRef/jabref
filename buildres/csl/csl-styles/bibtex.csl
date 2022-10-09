@@ -13,7 +13,11 @@
       <email>karnesky+zotero@gmail.com</email>
       <uri>http://arc.nucapt.northwestern.edu/Richard_Karnesky</uri>
     </contributor>
-    <category citation-format="author-date"/>
+    <contributor>
+      <name>Brenton M. Wiernik</name>
+      <email>zotero@wiernik.org</email>
+    </contributor>
+    <category citation-format="label"/>
     <category field="generic-base"/>
     <updated>2012-09-14T21:22:32+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
@@ -123,6 +127,7 @@
     <text variable="page"/>
   </macro>
   <macro name="edition">
+    <!-- This should probably be ordinal? -->
     <text variable="edition"/>
   </macro>
   <citation disambiguate-add-year-suffix="true" disambiguate-add-names="false" disambiguate-add-givenname="false" collapse="year">
@@ -143,19 +148,19 @@
       <text macro="zotero2bibtexType" prefix=" @"/>
       <group prefix="{" suffix=" }" delimiter=", ">
         <text macro="citeKey"/>
-        <text variable="publisher-place" prefix=" place={" suffix="}"/>
+        <text variable="publisher-place" prefix=" address={" suffix="}"/>
         <!--Fix This-->
         <text variable="chapter-number" prefix=" chapter={" suffix="}"/>
         <!--Fix This-->
         <text macro="edition" prefix=" edition={" suffix="}"/>
-        <!--Is this in CSL? <text variable="type" prefix=" type={" suffix="}"/>-->
+        <text variable="genre" prefix=" type={" suffix="}"/>
         <text variable="collection-title" prefix=" series={" suffix="}"/>
         <text macro="title" prefix=" title={" suffix="}"/>
         <text variable="volume" prefix=" volume={" suffix="}"/>
-        <!--Not in CSL<text variable="rights" prefix=" rights={" suffix="}"/>-->
+        <text variable="license" prefix=" rights={" suffix="}"/>
         <text variable="ISBN" prefix=" ISBN={" suffix="}"/>
         <text variable="ISSN" prefix=" ISSN={" suffix="}"/>
-        <!--Not in CSL <text variable="LCCN" prefix=" callNumber={" suffix="}"/>-->
+        <text variable="call-number" prefix=" callNumber={" suffix="}"/>
         <text variable="archive_location" prefix=" archiveLocation={" suffix="}"/>
         <text variable="URL" prefix=" url={" suffix="}"/>
         <text variable="DOI" prefix=" DOI={" suffix="}"/>
@@ -170,6 +175,9 @@
         <text macro="issued-month" prefix=" month={" suffix="}"/>
         <text macro="pages" prefix=" pages={" suffix="}"/>
         <text variable="collection-title" prefix=" collection={" suffix="}"/>
+        <text variable="keyword" prefix=" keywords={" suffix="}"/>
+        <text variable="language" prefix="language={" suffix="}"/>
+        <text variable="annote" prefix="annote={" suffix="}"/>
       </group>
     </layout>
   </bibliography>

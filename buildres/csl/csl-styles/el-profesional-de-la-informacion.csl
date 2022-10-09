@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="es-ES">
   <info>
-    <title>El profesional de la información (Español)</title>
+    <title>Profesional de la información (Español)</title>
     <id>http://www.zotero.org/styles/el-profesional-de-la-informacion</id>
     <link href="http://www.zotero.org/styles/el-profesional-de-la-informacion" rel="self"/>
-    <link href="http://www.elprofesionaldelainformacion.com/autores.html#435" rel="documentation"/>
+    <link href="http://www.profesionaldelainformacion.com/autores.html" rel="documentation"/>
     <author>
       <name>Josep-Manuel Rodriguez-Gairin</name>
       <email>rodriguez.gairin@ub.edu</email>
@@ -104,10 +104,6 @@
             <group delimiter=", ">
               <text variable="volume" prefix="v. "/>
               <text variable="issue" prefix="n. "/>
-              <group delimiter=" ">
-                <label variable="page" form="short"/>
-                <text variable="page"/>
-              </group>
             </group>
           </else>
         </choose>

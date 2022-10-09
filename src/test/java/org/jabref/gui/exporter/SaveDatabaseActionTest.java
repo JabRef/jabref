@@ -1,7 +1,6 @@
 package org.jabref.gui.exporter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -112,7 +111,6 @@ class SaveDatabaseActionTest {
         libraryTab = mock(LibraryTab.class);
         MetaData metaData = mock(MetaData.class);
         when(savePreferences.withSaveType(any(SavePreferences.DatabaseSaveType.class))).thenReturn(savePreferences);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(savePreferences.getFieldWriterPreferences()).thenReturn(fieldWriterPreferences);
         GlobalCitationKeyPattern emptyGlobalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern("");
         when(metaData.getCiteKeyPattern(any(GlobalCitationKeyPattern.class))).thenReturn(emptyGlobalCitationKeyPattern);

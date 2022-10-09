@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.linkedfiles;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -31,6 +32,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private RadioButton autolinkFileExactBibtex;
     @FXML private RadioButton autolinkUseRegex;
     @FXML private TextField autolinkRegexKey;
+
+    @FXML private CheckBox fulltextIndex;
 
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirectoryPattern;
@@ -62,12 +65,13 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
         autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
         autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
+        fulltextIndex.selectedProperty().bindBidirectional(viewModel.fulltextIndexProperty());
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH), autolinkRegexHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService), autolinkRegexHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDirectory));

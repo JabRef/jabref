@@ -19,6 +19,7 @@ import org.jabref.gui.preferences.customimporter.CustomImporterTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
 import org.jabref.gui.preferences.external.ExternalTab;
+import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
 import org.jabref.gui.preferences.file.FileTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
@@ -32,8 +33,6 @@ import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
-import org.jabref.gui.push.PushToApplicationsManager;
-import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -43,7 +42,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.PreferencesFilter;
 import org.jabref.preferences.PreferencesService;
 
@@ -71,7 +69,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new TableTab(),
                 new PreviewTab(),
                 new ProtectedTermsTab(),
-                new ExternalTab(frame.getPushToApplicationsManager()),
+                new ExternalTab(),
+                new ExternalFileTypesTab(),
                 new JournalAbbreviationsTab(),
                 new GroupsTab(),
                 new EntryEditorTab(),
@@ -175,11 +174,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences,
                 xmpPreferences, preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager);
 
-        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
-        PushToApplicationsManager manager = frame.getPushToApplicationsManager();
-        manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName())
-                                               .orElse(new PushToEmacs(dialogService, preferences)));
-
         frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
 
@@ -225,7 +219,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     /**
-     * Inserts the preference values into the the Properties of the ViewModel
+     * Inserts the preference values into the Properties of the ViewModel
      */
     public void setValues() {
         for (PreferencesTab preferencesTab : preferenceTabs) {

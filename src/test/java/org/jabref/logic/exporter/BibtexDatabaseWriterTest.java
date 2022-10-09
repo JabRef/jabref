@@ -1,5 +1,6 @@
 package org.jabref.logic.exporter;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -23,6 +24,8 @@ import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.importer.fileformat.BibtexImporterTest;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
@@ -51,6 +54,7 @@ import org.jabref.preferences.GeneralPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,7 +62,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class BibtexDatabaseWriterTest {
+/**
+ * Tests for reading can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
+ */
+public class BibtexDatabaseWriterTest {
 
     private BibtexDatabaseWriter databaseWriter;
     private BibDatabase database;
@@ -75,7 +82,6 @@ class BibtexDatabaseWriterTest {
     @BeforeEach
     void setUp() {
         generalPreferences = mock(GeneralPreferences.class);
-        when(generalPreferences.getDefaultEncoding()).thenReturn(null);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
@@ -101,12 +107,21 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEncoding() throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
+    void writeEncodingUsAsciiWhenSetInPreferencesAndHeader() throws Exception {
+        metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("% Encoding: US-ASCII" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void writeEncodingWindows1252WhenSetInPreferencesAndHeader() throws Exception {
+        metaData.setEncoding(Charset.forName("windows-1252"));
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("% Encoding: windows-1252" + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -120,7 +135,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writePreambleAndEncoding() throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
         database.setPreamble("Test preamble");
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -144,10 +159,10 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEncodingAndEntry() throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         database.insertEntry(entry);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
@@ -169,13 +184,34 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEpilogueAndEncoding() throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
         database.setEpilog("Test epilog");
+        metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("% Encoding: US-ASCII" + OS.NEWLINE + OS.NEWLINE +
                 "Test epilog" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void utf8EncodingWrittenIfExplicitlyDefined() throws Exception {
+        metaData.setEncoding(StandardCharsets.UTF_8);
+        metaData.setEncodingExplicitlySupplied(true);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("% Encoding: UTF-8" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void utf8EncodingNotWrittenIfNotExplicitlyDefined() throws Exception {
+        metaData.setEncoding(StandardCharsets.UTF_8);
+        metaData.setEncodingExplicitlySupplied(false);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals("", stringWriter.toString());
     }
 
     @Test
@@ -192,10 +228,10 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeMetadataAndEncoding() throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
         DatabaseCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
@@ -222,11 +258,10 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeGroupsAndEncoding() throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
-
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
         groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ',')));
         metaData.setGroups(groupRoot);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
@@ -252,7 +287,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeStringAndEncoding() throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.US_ASCII);
+        metaData.setEncoding(StandardCharsets.US_ASCII);
         database.addString(new BibtexString("name", "content"));
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -263,7 +298,6 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void doNotWriteUtf8StringAndEncoding() throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         database.addString(new BibtexString("name", "content"));
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -337,9 +371,8 @@ class BibtexDatabaseWriterTest {
     void roundtripWithArticleMonths() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/articleWithMonths.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
 
-        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -349,7 +382,6 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripUtf8EncodingHeaderRemoved() throws Exception {
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "% Encoding: UTF8" + OS.NEWLINE +
                 OS.NEWLINE +
@@ -375,12 +407,68 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
+    void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws Exception {
+        Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+
+        Path pathToFile = bibFolder.resolve("JabRef.bib");
+        Path file = Files.createFile(pathToFile);
+        Charset charset = Charset.forName("windows-1252");
+
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
+            BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+            databaseWriter.saveDatabase(context);
+        }
+
+        assertEquals(Files.readString(testFile, charset), Files.readString(file, charset));
+    }
+
+    @Test
+    void roundtripUtf8HeaderKept(@TempDir Path bibFolder) throws Exception {
+        Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-with-header-with-databasetypecomment.bib").toURI());
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+
+        Path pathToFile = bibFolder.resolve("JabRef.bib");
+        Path file = Files.createFile(pathToFile);
+        Charset charset = StandardCharsets.UTF_8;
+
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
+            BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+            databaseWriter.saveDatabase(context);
+        }
+
+        assertEquals(Files.readString(testFile, charset), Files.readString(file, charset));
+    }
+
+    @Test
+    void roundtripNotExplicitUtf8HeaderNotInsertedDuringWrite(@TempDir Path bibFolder) throws Exception {
+        Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-without-header-with-databasetypecomment.bib").toURI());
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+
+        Path pathToFile = bibFolder.resolve("JabRef.bib");
+        Path file = Files.createFile(pathToFile);
+        Charset charset = StandardCharsets.UTF_8;
+
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
+            BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+            databaseWriter.saveDatabase(context);
+        }
+
+        assertEquals(Files.readString(testFile, charset), Files.readString(file, charset));
+    }
+
+    @Test
     void roundtripWithComplexBib() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
 
-        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -392,9 +480,8 @@ class BibtexDatabaseWriterTest {
     void roundtripWithUserComment() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
 
-        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -419,7 +506,6 @@ class BibtexDatabaseWriterTest {
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
 
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -449,7 +535,6 @@ class BibtexDatabaseWriterTest {
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
 
-        when(generalPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -464,12 +549,11 @@ class BibtexDatabaseWriterTest {
     void roundtripWithUserCommentAndEntryChange() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
 
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
 
-        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -481,14 +565,13 @@ class BibtexDatabaseWriterTest {
     void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
 
         for (BibtexString string : result.getDatabase().getStringValues()) {
             // Mark them as changed
             string.setContent(string.getContent());
         }
 
-        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -501,9 +584,8 @@ class BibtexDatabaseWriterTest {
     void roundtripWithUnknownMetaData() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/unknownMetaData.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
 
-        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -771,7 +853,6 @@ class BibtexDatabaseWriterTest {
 
         ParserResult firstParse = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(fileContent));
 
-        when(generalPreferences.getDefaultEncoding()).thenReturn(encoding);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
         BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
 

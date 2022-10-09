@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
@@ -11,8 +12,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -82,7 +86,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                   .load();
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
-                .withStringTooltip(LinkedFileViewModel::getDescription)
+                .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
                 .withGraphic(this::createFileDisplay)
                 .withContextMenu(this::createContextMenuForFile)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
@@ -92,6 +96,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .withValidation(LinkedFileViewModel::fileExistsValidationStatus);
 
         listView.setCellFactory(cellFactory);
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
@@ -123,20 +128,19 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
 
         if (dragboard.hasContent(DragAndDropDataFormats.LINKED_FILE)) {
-
             LinkedFile linkedFile = (LinkedFile) dragboard.getContent(DragAndDropDataFormats.LINKED_FILE);
-            LinkedFileViewModel transferedItem = null;
+            LinkedFileViewModel transferredItem = null;
             int draggedIdx = 0;
             for (int i = 0; i < items.size(); i++) {
                 if (items.get(i).getFile().equals(linkedFile)) {
                     draggedIdx = i;
-                    transferedItem = items.get(i);
+                    transferredItem = items.get(i);
                     break;
                 }
             }
             int thisIdx = items.indexOf(originalItem);
             items.set(draggedIdx, originalItem);
-            items.set(thisIdx, transferedItem);
+            items.set(thisIdx, transferredItem);
             success = true;
         }
 
@@ -163,10 +167,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
 
+        Label label = new Label();
+        label.graphicProperty().bind(linkedFile.typeIconProperty());
+        label.textProperty().bind(linkedFile.linkProperty());
+        label.getStyleClass().setAll("file-row-text");
+        label.textOverrunProperty().setValue(OverrunStyle.LEADING_ELLIPSIS);
+        EasyBind.subscribe(linkedFile.isAutomaticallyFoundProperty(), found -> label.pseudoClassStateChanged(opacity, found));
+
         HBox info = new HBox(8);
         HBox.setHgrow(info, Priority.ALWAYS);
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
-        info.getChildren().setAll(icon, link, desc, progressIndicator);
+        info.getChildren().setAll(label, progressIndicator);
 
         Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
@@ -175,24 +186,27 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
-        Button writeMetadataToPdf = IconTheme.JabRefIcons.IMPORT.asButton();
+        Button writeMetadataToPdf = IconTheme.JabRefIcons.PDF_METADATA_WRITE.asButton();
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
-        writeMetadataToPdf.setOnAction(event -> linkedFile.writeMetadataToPdf());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
 
-        Button parsePdfMetadata = IconTheme.JabRefIcons.FILE_SEARCH.asButton();
+        WriteMetadataToPdfCommand writeMetadataToPdfCommand = linkedFile.createWriteMetadataToPdfCommand();
+        writeMetadataToPdf.disableProperty().bind(writeMetadataToPdfCommand.executableProperty().not());
+        writeMetadataToPdf.setOnAction(event -> writeMetadataToPdfCommand.execute());
+
+        Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         parsePdfMetadata.setOnAction(event -> {
-            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getImporterPreferences());
+            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences());
             linkedFile.parsePdfMetadataAndShowMergeDialog();
         });
         parsePdfMetadata.getStyleClass().setAll("icon-button");
 
-        HBox container = new HBox(10);
+        HBox container = new HBox(2);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
-
+        container.maxWidthProperty().bind(listView.widthProperty().subtract(20d));
         container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);
 
         return container;
@@ -204,8 +218,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case DELETE_ENTRY:
-                        LinkedFileViewModel selectedItem = listView.getSelectionModel().getSelectedItem();
-                        if (selectedItem != null) {
+                        List<LinkedFileViewModel> toBeDeleted = List.copyOf(listView.getSelectionModel().getSelectedItems());
+                        for (LinkedFileViewModel selectedItem : toBeDeleted) {
                             viewModel.deleteFile(selectedItem);
                         }
                         event.consume();
@@ -248,7 +262,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
-
         if (event.getButton().equals(MouseButton.PRIMARY) && (event.getClickCount() == 2)) {
             // Double click -> open
             linkedFile.open();
@@ -257,7 +270,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @Override
     public double getWeight() {
-        return 2;
+        return 3;
     }
 
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {

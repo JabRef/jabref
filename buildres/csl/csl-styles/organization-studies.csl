@@ -15,7 +15,7 @@
     <category field="social_science"/>
     <issn>0170-8406</issn>
     <eissn>1741-3044</eissn>
-    <updated>2021-12-13T09:00:13+00:00</updated>
+    <updated>2022-02-17T09:51:30+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -1153,7 +1153,10 @@
           </choose>
         </else-if>
         <else-if type="article-journal article-magazine article-newspaper post-weblog" match="none">
-          <text variable="publisher"/>
+          <group delimiter=": ">
+            <text variable="publisher-place"/>
+            <text variable="publisher"/>
+          </group>
         </else-if>
       </choose>
       <group delimiter=", ">
@@ -1170,7 +1173,11 @@
   <macro name="access">
     <choose>
       <if variable="DOI" match="any">
-        <text variable="DOI" prefix="https://doi.org/"/>
+        <choose>
+          <if match="none" variable="volume page">
+            <text variable="DOI" prefix="https://doi.org/"/>
+          </if>
+        </choose>
       </if>
       <else-if variable="URL">
         <group delimiter=" ">

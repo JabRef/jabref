@@ -1,16 +1,15 @@
 package org.jabref.preferences;
 
-import java.nio.charset.Charset;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.logic.l10n.Language;
 import org.jabref.model.database.BibDatabaseMode;
 
 public class GeneralPreferences {
-    private final ObjectProperty<Charset> defaultEncoding;
+    private final ObjectProperty<Language> language;
     private final ObjectProperty<BibDatabaseMode> defaultBibDatabaseMode;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
@@ -18,13 +17,13 @@ public class GeneralPreferences {
     private final BooleanProperty memoryStickMode;
     private final BooleanProperty showAdvancedHints;
 
-    public GeneralPreferences(Charset defaultEncoding,
+    public GeneralPreferences(Language language,
                               BibDatabaseMode defaultBibDatabaseMode,
                               boolean warnAboutDuplicatesInInspection,
                               boolean confirmDelete,
                               boolean memoryStickMode,
                               boolean showAdvancedHints) {
-        this.defaultEncoding = new SimpleObjectProperty<>(defaultEncoding);
+        this.language = new SimpleObjectProperty<>(language);
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
@@ -33,16 +32,16 @@ public class GeneralPreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
     }
 
-    public Charset getDefaultEncoding() {
-        return defaultEncoding.get();
+    public Language getLanguage() {
+        return language.get();
     }
 
-    public ObjectProperty<Charset> defaultEncodingProperty() {
-        return defaultEncoding;
+    public ObjectProperty<Language> languageProperty() {
+        return language;
     }
 
-    public void setDefaultEncoding(Charset defaultEncoding) {
-        this.defaultEncoding.set(defaultEncoding);
+    public void setLanguage(Language language) {
+        this.language.set(language);
     }
 
     public BibDatabaseMode getDefaultBibDatabaseMode() {

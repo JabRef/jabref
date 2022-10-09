@@ -6,6 +6,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.library.GeneralCodingRules;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
@@ -16,10 +17,10 @@ class MainArchitectureTests {
     public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.gui.Globals";
     private static final String PACKAGE_JAVAX_SWING = "javax.swing..";
     private static final String PACKAGE_JAVA_AWT = "java.awt..";
-    private static final String PACKAGE_JAVA_FX = "javafx..";
     private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui..";
     private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic..";
     private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model..";
+    private static final String PACKAGE_ORG_JABREF_CLI = "org.jabref.cli..";
 
     @ArchTest
     public static void doNotUseApacheCommonsLang3(JavaClasses classes) {
@@ -30,35 +31,18 @@ class MainArchitectureTests {
 
     @ArchTest
     public static void doNotUseSwing(JavaClasses classes) {
-        // This checks for all all Swing packages, but not the UndoManager
-        noClasses().should().accessClassesThat().resideInAnyPackage("javax.swing",
-                "javax.swing.border..",
-                "javax.swing.colorchooser..",
-                "javax.swing.event..",
-                "javax.swing.filechooser..",
-                "javax.swing.plaf..",
-                "javax.swing.table..",
-                "javax.swing.text..",
-                "javax.swing.tree.."
-        ).check(classes);
-    }
-
-    @ArchTest
-    public static void doNotUseJGoodies(JavaClasses classes) {
-        noClasses().should().accessClassesThat().resideInAPackage("com.jgoodies..")
-                   .check(classes);
-    }
-
-    @ArchTest
-    public static void doNotUseGlazedLists(JavaClasses classes) {
-        noClasses().should().accessClassesThat().resideInAPackage("ca.odell.glazedlists..")
-                   .check(classes);
-    }
-
-    @ArchTest
-    public static void doNotUseGlyphsDirectly(JavaClasses classes) {
-        noClasses().that().resideOutsideOfPackage("org.jabref.gui.icon")
-                   .should().accessClassesThat().resideInAnyPackage("de.jensd.fx.glyphs", "de.jensd.fx.glyphs.materialdesignicons")
+        // This checks for all Swing packages, but not the UndoManager
+        noClasses().that().areNotAnnotatedWith(AllowedToUseSwing.class)
+                   .should().accessClassesThat()
+                   .resideInAnyPackage("javax.swing",
+                                       "javax.swing.border..",
+                                       "javax.swing.colorchooser..",
+                                       "javax.swing.event..",
+                                       "javax.swing.filechooser..",
+                                       "javax.swing.plaf..",
+                                       "javax.swing.table..",
+                                       "javax.swing.text..",
+                                       "javax.swing.tree..")
                    .check(classes);
     }
 
@@ -89,22 +73,22 @@ class MainArchitectureTests {
     // Fails currently
     public static void respectLayeredArchitecture(JavaClasses classes) {
         layeredArchitecture()
-                .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
-                .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
-                .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
-                .layer("Cli").definedBy("org.jabref.cli..")
-                .layer("Migrations").definedBy("org.jabref.migrations..") // TODO: Move to logic
-                .layer("Preferences").definedBy("org.jabref.preferences..")
-                .layer("Styletester").definedBy("org.jabref.styletester..")
+                             .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
+                             .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
+                             .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
+                             .layer("Cli").definedBy(PACKAGE_ORG_JABREF_CLI)
+                             .layer("Migrations").definedBy("org.jabref.migrations..") // TODO: Move to logic
+                             .layer("Preferences").definedBy("org.jabref.preferences..")
+                             .layer("Styletester").definedBy("org.jabref.styletester..")
 
-                .whereLayer("Gui").mayOnlyBeAccessedByLayers("Preferences", "Cli") // TODO: Remove preferences here
-                .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui", "Cli", "Model", "Migrations", "Preferences")
-                .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli", "Preferences")
-                .whereLayer("Cli").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Migrations").mayOnlyBeAccessedByLayers("Logic")
-                .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester", "Cli") // TODO: Remove logic here
+                             .whereLayer("Gui").mayOnlyBeAccessedByLayers("Preferences", "Cli") // TODO: Remove preferences here
+                             .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui", "Cli", "Model", "Migrations", "Preferences")
+                             .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli", "Preferences")
+                             .whereLayer("Cli").mayNotBeAccessedByAnyLayer()
+                             .whereLayer("Migrations").mayOnlyBeAccessedByLayers("Logic")
+                             .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester", "Cli") // TODO: Remove logic here
 
-                .check(classes);
+                             .check(classes);
     }
 
     @ArchTest
@@ -133,6 +117,16 @@ class MainArchitectureTests {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
+                   .check(classes);
+    }
+
+    @ArchTest
+    public static void restrictStandardStreams(JavaClasses classes) {
+        noClasses().that().resideOutsideOfPackages(PACKAGE_ORG_JABREF_CLI)
+                   .and().resideOutsideOfPackages("org.jabref.gui.openoffice..") // Uses LibreOffice SDK
+                   .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
+                   .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)
+                   .because("logging framework should be used instead or the class be marked explicitly as @AllowedToUseStandardStreams")
                    .check(classes);
     }
 }

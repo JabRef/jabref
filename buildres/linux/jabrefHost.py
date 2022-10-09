@@ -31,6 +31,7 @@ elif subprocess.run(["flatpak", "info", "org.jabref.jabref"], capture_output=Tru
     JABREF_PATH = "flatpak run org.jabref.jabref"
 else:
     logging.error("Could not determine JABREF_PATH")
+    send_message({"message": "error", "output": "Could not find JabRef. Please check that it is installed correctly."})
     sys.exit(-1)
 
 logging_dir = Path.home() / ".mozilla/native-messaging-hosts/"
@@ -73,14 +74,10 @@ def send_message(message):
 
 def add_jabref_entry(data):
     """Send string via cli as literal to preserve special characters"""
-    cmd = str(JABREF_PATH).split() + ["--importBibtex", r"{}".format(data)]
+    cmd = str(JABREF_PATH).split() + ["--importBibtex", r"'{}'".format(data)]
     logging.info("Try to execute command {}".format(cmd))
-    try:
-        response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as exc:
-        logging.error("Failed to call JabRef: {} {}".format(exc.returncode, exc.output))
-    else:
-        logging.info("Called JabRef and got: {}".format(response))
+    response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    logging.info("Called JabRef and got: {}".format(response))
     return response
 
 
@@ -104,5 +101,9 @@ if "status" in message and message["status"] == "validate":
         send_message({"message": "jarFound"})
 else:
     entry = message["text"]
-    output = add_jabref_entry(entry)
-    send_message({"message": "ok", "output": str(output)})
+    try:
+        output = add_jabref_entry(entry)
+        send_message({"message": "ok", "output": str(output)})
+    except subprocess.CalledProcessError as exc:
+        logging.error("Failed to call JabRef: {} {}".format(exc.returncode, exc.output))
+        send_message({"message": "error", "output": str(exc.output)})

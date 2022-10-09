@@ -1,39 +1,66 @@
 package org.jabref.logic.bibtex;
 
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.strings.StringUtil;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
 class FieldWriterTests {
 
     private FieldWriter writer;
 
+    public static Stream<Arguments> getMarkdowns() {
+        return Stream.of(Arguments.of("""
+                        # Changelog
+
+                        All notable changes to this project will be documented in this file.
+                        The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+                        We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
+                        In case, there is no issue present, the pull request implementing the feature is linked.
+
+                        Note that this project **does not** adhere to [Semantic Versioning](http://semver.org/).
+
+                        ## [Unreleased]"""),
+                // Source: https://github.com/JabRef/jabref/issues/7010#issue-720030293
+                Arguments.of(
+                        """
+                                #### Goal
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                                #### Achievement\s
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                                #### Method
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                                """
+                ),
+                // source: https://github.com/JabRef/jabref/issues/8303 --> bug2.txt
+                Arguments.of("Particularly, we equip SOVA &#x2013; a Semantic and Ontological Variability Analysis method")
+                );
+    }
+
     @BeforeEach
     void setUp() {
-        this.writer = new FieldWriter(mock(FieldWriterPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
+        writer = new FieldWriter(fieldWriterPreferences);
     }
 
     @Test
-    void normalizeNewlineInAbstractField() throws Exception {
+    void noNormalizationOfNewlinesInAbstractField() throws Exception {
         String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
-
-        String expected = "{" + "lorem" + OS.NEWLINE + " ipsum lorem ipsum" + OS.NEWLINE
-                + "lorem ipsum "
-                + OS.NEWLINE + "lorem ipsum"
-                + OS.NEWLINE + "test" + "}";
-
         String result = writer.write(StandardField.ABSTRACT, text);
-
+        // The normalization is done at org.jabref.logic.exporter.BibWriter, so no need to normalize here
+        String expected = "{" + text + "}";
         assertEquals(expected, result);
     }
 
@@ -110,15 +137,14 @@ class FieldWriterTests {
     @Test
     void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
         String text = "#jan# - #feb#";
-        assertEquals("jan #{ - } # feb", writer.write(StandardField.MONTH, text));
+        assertEquals("jan # { - } # feb", writer.write(StandardField.MONTH, text));
     }
 
-    @Test
-    void hashEnclosedWordsGetRealStringsInMonthFieldBecauseMonthIsStandardField() throws Exception {
-        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(
-                false, Collections.emptyList(), new FieldContentFormatterPreferences());
-        FieldWriter formatter = new FieldWriter(fieldWriterPreferences);
-        String text = "#jan# - #feb#";
-        assertEquals("jan #{ - } # feb", formatter.write(StandardField.MONTH, text));
+    @ParameterizedTest
+    @MethodSource("getMarkdowns")
+    void keepHashSignInComment(String text) throws Exception {
+        String writeResult = writer.write(StandardField.COMMENT, text);
+        String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(writeResult, "\n");
+        assertEquals("{" + text + "}", resultWithLfAsNewLineSeparator);
     }
 }

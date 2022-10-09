@@ -1,7 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
 import javafx.css.PseudoClass;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -31,9 +30,11 @@ public class WebSearchPaneView extends VBox {
 
     private final WebSearchPaneViewModel viewModel;
     private final PreferencesService preferences;
+    private final DialogService dialogService;
 
     public WebSearchPaneView(PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
         this.preferences = preferences;
+        this.dialogService = dialogService;
         this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
         initialize();
     }
@@ -52,7 +53,7 @@ public class WebSearchPaneView extends VBox {
         ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
         EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
             if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
-                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get()));
+                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService));
                 helpButtonContainer.getChildren().setAll(helpButton);
             } else {
                 helpButtonContainer.getChildren().clear();
@@ -88,8 +89,7 @@ public class WebSearchPaneView extends VBox {
         Button search = new Button(Localization.lang("Search"));
         search.setDefaultButton(false);
         search.setOnAction(event -> viewModel.search());
-
-        setAlignment(Pos.CENTER);
+        search.setMaxWidth(Double.MAX_VALUE);
         getChildren().addAll(fetcherContainer, query, search);
     }
 }

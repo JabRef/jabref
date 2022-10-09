@@ -86,7 +86,10 @@ public class GroupTreeView extends BorderPane {
      * Note: This panel is deliberately not created in FXML, since parsing of this took about 500 msecs. In an attempt
      * to speed up the startup time of JabRef, this has been rewritten to plain java.
      */
-    public GroupTreeView(TaskExecutor taskExecutor, StateManager stateManager, PreferencesService preferencesService, DialogService dialogService) {
+    public GroupTreeView(TaskExecutor taskExecutor,
+                         StateManager stateManager,
+                         PreferencesService preferencesService,
+                         DialogService dialogService) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
@@ -109,21 +112,27 @@ public class GroupTreeView extends BorderPane {
 
         mainColumn = new TreeTableColumn<>();
         mainColumn.setId("mainColumn");
+        mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
         numberColumn.getStyleClass().add("numberColumn");
-        numberColumn.setMinWidth(50d);
-        numberColumn.setMaxWidth(70d);
-        numberColumn.setPrefWidth(60d);
+        numberColumn.setMinWidth(40d);
+        numberColumn.setMaxWidth(40d);
+        numberColumn.setPrefWidth(40d);
+        numberColumn.setResizable(false);
         expansionNodeColumn = new TreeTableColumn<>();
         expansionNodeColumn.getStyleClass().add("expansionNodeColumn");
-        expansionNodeColumn.setMaxWidth(25d);
-        expansionNodeColumn.setMinWidth(25d);
+        expansionNodeColumn.setMaxWidth(20d);
+        expansionNodeColumn.setMinWidth(20d);
+        expansionNodeColumn.setPrefWidth(20d);
+        expansionNodeColumn.setResizable(false);
 
         groupTree = new TreeTableView<>();
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
         this.setCenter(groupTree);
+
+        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(60d).subtract(15));
 
         addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setId("addNewGroup");
@@ -162,8 +171,6 @@ public class GroupTreeView extends BorderPane {
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
-        setNewGroupButtonStyle(groupTree);
-
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
                         group -> {
@@ -199,9 +206,17 @@ public class GroupTreeView extends BorderPane {
                                 group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    if (preferencesService.getDisplayGroupCount()) {
-                        text.textProperty().bind(group.getHits().asString());
-                    }
+                    EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
+                            (newValue) -> {
+                                if (text.textProperty().isBound()) {
+                                    text.textProperty().unbind();
+                                    text.setText("");
+                                }
+
+                                if (newValue) {
+                                    text.textProperty().bind(group.getHits().asString());
+                                }
+                            });
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -234,7 +249,6 @@ public class GroupTreeView extends BorderPane {
         groupTree.setRowFactory(treeTable -> {
             TreeTableRow<GroupNodeViewModel> row = new TreeTableRow<>();
             row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
-                setNewGroupButtonStyle(treeTable);
                 boolean isRoot = newTreeItem == treeTable.getRoot();
                 row.pseudoClassStateChanged(rootPseudoClass, isRoot);
 
@@ -249,12 +263,16 @@ public class GroupTreeView extends BorderPane {
             // Add context menu (only for non-null items)
             row.contextMenuProperty().bind(
                     EasyBind.wrapNullable(row.itemProperty())
-                            .map(this::createContextMenuForGroup)
-                            .orElse((ContextMenu) null));
+                            .mapOpt(this::createContextMenuForGroup)
+                            .orElseOpt((ContextMenu) null));
             row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
                 if (event.getButton() == MouseButton.SECONDARY) {
                     // Prevent right-click to select group
                     event.consume();
+                } else if (event.getTarget() instanceof StackPane pane) {
+                    if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
+                        event.consume();
+                    }
                 }
             });
 
@@ -296,9 +314,7 @@ public class GroupTreeView extends BorderPane {
                 }
                 event.consume();
             });
-            row.setOnDragExited(event -> {
-                ControlHelper.removeDroppingPseudoClasses(row);
-            });
+            row.setOnDragExited(event -> ControlHelper.removeDroppingPseudoClasses(row));
 
             row.setOnDragDropped(event -> {
                 Dragboard dragboard = event.getDragboard();
@@ -341,7 +357,7 @@ public class GroupTreeView extends BorderPane {
         if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
-            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> model != null && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem::getValue).collect(Collectors.toList());
+            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> (model != null) && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem::getValue).collect(Collectors.toList());
             viewModel.selectedGroupsProperty().setAll(list);
         }
     }
@@ -386,7 +402,6 @@ public class GroupTreeView extends BorderPane {
     }
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
-
         ContextMenu menu = new ContextMenu();
         Menu removeGroup = new Menu(Localization.lang("Remove group"));
 
@@ -472,19 +487,6 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
-    private void setNewGroupButtonStyle(TreeTableView<GroupNodeViewModel> groupTree) {
-        PseudoClass active = PseudoClass.getPseudoClass("active");
-        PseudoClass inactive = PseudoClass.getPseudoClass("inactive");
-
-        if (groupTree.getRoot() != null) {
-            boolean isActive = groupTree.getExpandedItemCount() <= 10;
-            addNewGroup.pseudoClassStateChanged(active, isActive);
-            addNewGroup.pseudoClassStateChanged(inactive, !isActive);
-        } else {
-            addNewGroup.pseudoClassStateChanged(active, true);
-        }
-    }
-
     private static class DragExpansionHandler {
         private static final long DRAG_TIME_BEFORE_EXPANDING_MS = 1000;
         private TreeItem<GroupNodeViewModel> draggedItem;
@@ -498,7 +500,7 @@ public class GroupTreeView extends BorderPane {
                 return;
             }
 
-            if (System.currentTimeMillis() - this.dragStarted > DRAG_TIME_BEFORE_EXPANDING_MS) {
+            if ((System.currentTimeMillis() - this.dragStarted) > DRAG_TIME_BEFORE_EXPANDING_MS) {
                 // expand or collapse the tree item and reset the time
                 this.dragStarted = System.currentTimeMillis();
                 this.draggedItem.setExpanded(!this.draggedItem.isExpanded());

@@ -5,7 +5,9 @@ import java.util.function.Function;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -39,6 +41,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.journalAbbreviationRepository;
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;
+        } else if (clazz == ThemeManager.class) {
+            return Globals.getThemeManager();
         } else if (clazz == FileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
         } else if (clazz == ProtectedTermsLoader.class) {
@@ -49,6 +53,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.undoManager;
         } else if (clazz == BibEntryTypesManager.class) {
             return Globals.entryTypesManager;
+        } else if (clazz == ImportFormatReader.class) {
+            return Globals.IMPORT_FORMAT_READER;
         } else {
             try {
                 return clazz.newInstance();

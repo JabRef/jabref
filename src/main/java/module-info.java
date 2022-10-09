@@ -46,35 +46,32 @@ open module org.jabref {
     with org.jabref.gui.logging.GuiWriter,
          org.jabref.gui.logging.ApplicationInsightsWriter;
 
-    requires applicationinsights.logging.log4j2;
-
     // Preferences and XML
     requires java.prefs;
-    requires java.xml.bind;
+    requires jakarta.xml.bind;
+    // needs to be loaded here as it's otherwise not found at runtime
+    requires org.glassfish.jaxb.runtime;
     requires jdk.xml.dom;
 
     // Annotations (@PostConstruct)
-    requires java.annotation;
+    requires jakarta.annotation;
 
     // Microsoft application insights
     requires applicationinsights.core;
+    requires applicationinsights.logging.log4j2;
 
     // Libre Office
     requires org.libreoffice.uno;
 
     // Other modules
-    requires commons.logging;
     requires com.google.common;
     requires jakarta.inject;
-    requires org.apache.pdfbox;
     requires reactfx;
     requires commons.cli;
     requires com.github.tomtung.latex2unicode;
     requires fastparse;
     requires jbibtex;
     requires citeproc.java;
-    requires antlr.runtime;
-    requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;
     requires unirest.java;
@@ -89,8 +86,12 @@ open module org.jabref {
     uses org.mariadb.jdbc.credential.CredentialPlugin;
     requires org.apache.commons.lang3;
     requires org.antlr.antlr4.runtime;
-    requires flowless;
+    requires org.fxmisc.flowless;
     requires org.apache.tika.core;
+    uses org.apache.tika.detect.AutoDetectReader;
+    requires pdfbox;
+    requires xmpbox;
+    requires com.ibm.icu;
 
     requires flexmark;
     requires flexmark.ext.gfm.strikethrough;
@@ -98,8 +99,17 @@ open module org.jabref {
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;
-    requires lucene;
-    requires org.eclipse.jgit;
+
+    // fulltext search
+    requires org.apache.lucene.core;
+    // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
+    uses org.apache.lucene.codecs.lucene94.Lucene94Codec;
+
+    requires org.apache.lucene.queryparser;
+    uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+    requires org.apache.lucene.analysis.common;
+    requires org.apache.lucene.highlighter;
+
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
@@ -111,4 +121,8 @@ open module org.jabref {
     requires kotlin.stdlib;
     requires okhttp3;
     requires io.reactivex.rxjava3;
+
+    requires org.eclipse.jgit;
+    uses org.eclipse.jgit.transport.SshSessionFactory;
+    uses org.eclipse.jgit.lib.GpgSigner;
 }

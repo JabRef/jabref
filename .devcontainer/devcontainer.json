@@ -1,0 +1,40 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/java
+{
+    "name": "Java",
+    "image": "mcr.microsoft.com/vscode/devcontainers/base:bullseye",
+
+    // Configure tool-specific properties.
+    "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+            // Set *default* container specific settings.json values on container create.
+            "settings": { 
+            },
+            
+            // Add the IDs of extensions you want installed when the container is created.
+            "extensions": [
+                "vscjava.vscode-java-pack",
+                "vscjava.vscode-gradle",
+                "shengchen.vscode-checkstyle"
+            ]
+        }
+    },
+
+    "onCreateCommand": "gradle assemble",
+
+    // Need to connect as root otherwise we run into issues with gradle.
+    // default option is "vscode". More info: https://aka.ms/vscode-remote/containers/non-root.
+    "remoteUser": "root",
+    "features": {
+        // Adds a lightweight desktop that can be accessed using a VNC viewer or the web
+        "desktop-lite": "latest",
+
+        // Install java
+        "java": {
+            "version": "18",
+            "installGradle": true,
+            "jdkDistro": "sem"
+        }
+    }
+}

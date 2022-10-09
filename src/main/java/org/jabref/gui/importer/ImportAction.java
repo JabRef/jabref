@@ -77,6 +77,10 @@ public class ImportAction {
                 if (importError == null) {
                     // TODO: No control flow using exceptions
                     throw new JabRefException(Localization.lang("No entries found. Please make sure you are using the correct import filter."));
+                } else if (importError instanceof ImportException) {
+                    String content = Localization.lang("Please check your library file for wrong syntax.") + "\n\n"
+                            + importError.getLocalizedMessage();
+                    DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Import error"), content));
                 } else {
                     throw importError;
                 }
@@ -117,8 +121,11 @@ public class ImportAction {
                 if (importer.isEmpty()) {
                     // Unknown format:
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getImporterPreferences())) {
-                            Globals.IMPORT_FORMAT_READER.resetImportFormats(prefs.getImporterPreferences(), prefs.getGeneralPreferences(), prefs.getImportFormatPreferences(), prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
+                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getGrobidPreferences())) {
+                            Globals.IMPORT_FORMAT_READER.resetImportFormats(
+                                    prefs.getImporterPreferences(),
+                                    prefs.getImportFormatPreferences(),
+                                    Globals.getFileUpdateMonitor());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
                     });
@@ -126,13 +133,18 @@ public class ImportAction {
                     imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
                 } else {
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (importer.get() instanceof PdfGrobidImporter || importer.get() instanceof PdfMergeMetadataImporter && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getImporterPreferences())) {
-                                Globals.IMPORT_FORMAT_READER.resetImportFormats(prefs.getImporterPreferences(), prefs.getGeneralPreferences(), prefs.getImportFormatPreferences(), prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
+                        if ((importer.get() instanceof PdfGrobidImporter) || (
+                                (importer.get() instanceof PdfMergeMetadataImporter)
+                                && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getGrobidPreferences()))) {
+                                Globals.IMPORT_FORMAT_READER.resetImportFormats(
+                                        prefs.getImporterPreferences(),
+                                        prefs.getImportFormatPreferences(),
+                                        Globals.getFileUpdateMonitor());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
                     });
                     // Specific importer:
-                    ParserResult pr = importer.get().importDatabase(filename, prefs.getGeneralPreferences().getDefaultEncoding());
+                    ParserResult pr = importer.get().importDatabase(filename);
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));
                 }
             } catch (ImportException | IOException e) {

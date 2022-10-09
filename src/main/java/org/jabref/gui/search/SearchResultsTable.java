@@ -10,7 +10,6 @@ import javafx.scene.control.TableView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnFactory;
@@ -28,8 +27,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                               PreferencesService preferencesService,
                               UndoManager undoManager,
                               DialogService dialogService,
-                              StateManager stateManager,
-                              ExternalFileTypes externalFileTypes) {
+                              StateManager stateManager) {
         super();
 
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
@@ -38,7 +36,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                                    database,
                                    preferencesService,
                                    preferencesService.getSearchDialogColumnPreferences(),
-                                   externalFileTypes,
                                    undoManager,
                                    dialogService,
                                    stateManager).createColumns();

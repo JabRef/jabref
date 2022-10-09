@@ -2,8 +2,6 @@ package org.jabref.gui.edit;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
@@ -21,6 +19,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class ManageKeywordsDialog extends BaseDialog<Void> {
     private final List<BibEntry> entries;

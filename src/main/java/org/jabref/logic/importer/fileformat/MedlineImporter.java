@@ -15,10 +15,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -84,6 +80,10 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,7 +129,6 @@ public class MedlineImporter extends Importer implements Parser {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
-
             if (str.toLowerCase(ENGLISH).contains("<pubmedarticle>")
                     || str.toLowerCase(ENGLISH).contains("<pubmedbookarticle>")) {
                 return true;
@@ -426,7 +425,7 @@ public class MedlineImporter extends Importer implements Parser {
                 if ("pubmed".equals(id.getIdType())) {
                     fields.put(StandardField.PMID, id.getContent());
                 } else {
-                    fields.put(FieldFactory.parseField(id.getIdType()), id.getContent());
+                    fields.put(FieldFactory.parseField(StandardEntryType.Article, id.getIdType()), id.getContent());
                 }
             }
         }
@@ -500,7 +499,7 @@ public class MedlineImporter extends Importer implements Parser {
     private void addOtherId(Map<Field, String> fields, List<OtherID> otherID) {
         for (OtherID id : otherID) {
             if ((id.getSource() != null) && (id.getContent() != null)) {
-                fields.put(FieldFactory.parseField(id.getSource()), id.getContent());
+                fields.put(FieldFactory.parseField(StandardEntryType.Article, id.getSource()), id.getContent());
             }
         }
     }

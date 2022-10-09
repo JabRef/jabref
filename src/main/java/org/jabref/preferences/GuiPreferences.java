@@ -9,8 +9,13 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import org.jabref.gui.mergeentries.DiffMode;
+import org.jabref.logic.util.io.FileHistory;
 
 public class GuiPreferences {
     private final DoubleProperty positionX;
@@ -20,9 +25,14 @@ public class GuiPreferences {
 
     private final BooleanProperty windowMaximised;
 
-    private final BooleanProperty shouldOpenLastEdited;
+    // the last libraries that were open when jabref closes and should be reopened on startup
     private final ObservableList<String> lastFilesOpened;
     private final ObjectProperty<Path> lastFocusedFile;
+    // observable list last files opened in the file menu
+    private final FileHistory fileHistory;
+
+    private final StringProperty lastSelectedIdBasedFetcher;
+    private final ObjectProperty<DiffMode> mergeDiffMode;
     private final DoubleProperty sidePaneWidth;
 
     public GuiPreferences(double positionX,
@@ -30,18 +40,23 @@ public class GuiPreferences {
                           double sizeX,
                           double sizeY,
                           boolean windowMaximised,
-                          boolean shouldOpenLastEdited,
                           List<String> lastFilesOpened,
-                          Path lastFocusedFile, double sidePaneWidth) {
+                          Path lastFocusedFile,
+                          FileHistory fileHistory,
+                          String lastSelectedIdBasedFetcher,
+                          DiffMode mergeDiffMode,
+                          double sidePaneWidth) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
         this.sizeX = new SimpleDoubleProperty(sizeX);
         this.sizeY = new SimpleDoubleProperty(sizeY);
         this.windowMaximised = new SimpleBooleanProperty(windowMaximised);
-        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
+        this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
+        this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
+        this.fileHistory = fileHistory;
     }
 
     public double getPositionX() {
@@ -104,18 +119,6 @@ public class GuiPreferences {
         this.windowMaximised.set(windowMaximised);
     }
 
-    public boolean shouldOpenLastEdited() {
-        return shouldOpenLastEdited.get();
-    }
-
-    public BooleanProperty openLastEditedProperty() {
-        return shouldOpenLastEdited;
-    }
-
-    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
-        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
-    }
-
     public ObservableList<String> getLastFilesOpened() {
         return lastFilesOpened;
     }
@@ -134,6 +137,34 @@ public class GuiPreferences {
 
     public void setLastFocusedFile(Path lastFocusedFile) {
         this.lastFocusedFile.set(lastFocusedFile);
+    }
+
+    public FileHistory getFileHistory() {
+        return fileHistory;
+    }
+
+    public String getLastSelectedIdBasedFetcher() {
+        return lastSelectedIdBasedFetcher.get();
+    }
+
+    public StringProperty lastSelectedIdBasedFetcherProperty() {
+        return lastSelectedIdBasedFetcher;
+    }
+
+    public void setLastSelectedIdBasedFetcher(String lastSelectedIdBasedFetcher) {
+        this.lastSelectedIdBasedFetcher.set(lastSelectedIdBasedFetcher);
+    }
+
+    public DiffMode getMergeDiffMode() {
+        return mergeDiffMode.get();
+    }
+
+    public ObjectProperty<DiffMode> mergeDiffModeProperty() {
+        return mergeDiffMode;
+    }
+
+    public void setMergeDiffMode(DiffMode mergeDiffMode) {
+        this.mergeDiffMode.set(mergeDiffMode);
     }
 
     public double getSidePaneWidth() {

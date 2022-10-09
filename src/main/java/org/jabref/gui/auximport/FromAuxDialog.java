@@ -2,8 +2,6 @@ package org.jabref.gui.auximport;
 
 import java.nio.file.Path;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -14,6 +12,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.AuxParser;
@@ -26,6 +25,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 /**
  * A wizard dialog for generating a new sub database from existing TeX AUX file
@@ -42,6 +42,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
 
     @Inject private PreferencesService preferences;
     @Inject private DialogService dialogService;
+    @Inject private ThemeManager themeManager;
 
     public FromAuxDialog(JabRefFrame frame) {
         libraryTab = frame.getCurrentLibraryTab();
@@ -61,6 +62,8 @@ public class FromAuxDialog extends BaseDialog<Void> {
             }
             return null;
         });
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML

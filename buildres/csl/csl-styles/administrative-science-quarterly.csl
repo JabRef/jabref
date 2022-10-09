@@ -14,7 +14,7 @@
     <category field="social_science"/>
     <issn>0001-8392</issn>
     <eissn>1930-3815</eissn>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2022-03-28T16:15:40+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -179,6 +179,7 @@
           <text variable="publisher-place"/>
         </group>
       </else-if>
+      <else-if type="article-journal" match="any"/>
       <else>
         <choose>
           <if variable="event" match="none">
@@ -218,6 +219,7 @@
           <date variable="issued">
             <date-part name="year"/>
           </date>
+          <text variable="year-suffix"/>
           <choose>
             <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="none">
               <date variable="issued">
@@ -309,7 +311,7 @@
       <text macro="citation-locator" prefix=": "/>
     </layout>
   </citation>
-  <bibliography et-al-min="8" et-al-use-first="7" entry-spacing="1" line-spacing="1" subsequent-author-substitute="">
+  <bibliography et-al-min="8" et-al-use-first="7" entry-spacing="1" line-spacing="1">
     <sort>
       <key macro="author"/>
       <key variable="issued" sort="ascending"/>

@@ -253,7 +253,7 @@
                 <text variable="page"/>
               </group>
               <group delimiter=" ">
-                <text term="sub verbo" form="short" font-style="italic"/>
+                <text term="sub-verbo" form="short" font-style="italic"/>
                 <text macro="title" quotes="true"/>
               </group>
             </group>

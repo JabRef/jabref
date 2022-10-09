@@ -27,7 +27,7 @@
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <summary>The American Medical Association style as used in JAMA. Version 11 as per November-2019.</summary>
-    <updated>2021-10-28T13:38:04+00:00</updated>
+    <updated>2022-03-17T08:48:24+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -86,7 +86,7 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+      <if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
         <text variable="title" font-style="italic" text-case="title"/>
       </if>
       <else>
@@ -124,7 +124,7 @@
   </citation>
   <bibliography hanging-indent="false" et-al-min="7" et-al-use-first="3" second-field-align="flush">
     <layout>
-      <text variable="citation-number" suffix=". "/>
+      <text variable="citation-number" suffix="."/>
       <text macro="author"/>
       <text macro="title" prefix=" " suffix="."/>
       <choose>
@@ -245,6 +245,15 @@
               </date>
             </group>
             <text variable="event-place"/>
+          </group>
+        </else-if>
+        <else-if type="thesis" match="any">
+          <group delimiter=". " prefix=" " suffix=".">
+            <text variable="genre"/>
+            <group delimiter="; ">
+              <text variable="publisher"/>
+              <date date-parts="year" form="text" variable="issued"/>
+            </group>
           </group>
         </else-if>
         <else>

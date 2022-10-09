@@ -76,7 +76,6 @@ public class CopacImporter extends Importer {
         String str;
 
         while ((str = reader.readLine()) != null) {
-
             if (str.length() < 4) {
                 continue;
             }
@@ -86,8 +85,7 @@ public class CopacImporter extends Importer {
             if ("    ".equals(code)) {
                 sb.append(' ').append(str.trim());
             } else {
-
-                // begining of a new item
+                // beginning of a new item
                 if ("TI- ".equals(str.substring(0, 4))) {
                     if (sb.length() > 0) {
                         entries.add(sb.toString());
@@ -105,7 +103,6 @@ public class CopacImporter extends Importer {
         List<BibEntry> results = new LinkedList<>();
 
         for (String entry : entries) {
-
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
             BibEntry b = new BibEntry(StandardEntryType.Book);
@@ -140,7 +137,7 @@ public class CopacImporter extends Importer {
                 } else if ("DT- ".equals(code)) {
                     setOrAppend(b, new UnknownField("documenttype"), line.substring(4).trim(), ", ");
                 } else {
-                    setOrAppend(b, FieldFactory.parseField(code.substring(0, 2)), line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldFactory.parseField(StandardEntryType.Book, line.substring(0, 2)), line.substring(4).trim(), ", ");
                 }
             }
             results.add(b);

@@ -10,12 +10,20 @@
       <name>Steven Singleton</name>
       <email>stvn@gmx.ie</email>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Anglia Ruskin University Harvard style</summary>
-    <updated>2021-03-08T09:06:46+00:00</updated>
+    <updated>2022-08-25T13:44:56+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="interview">interview by</term>
+    </terms>
+  </locale>
   <macro name="cite-author">
     <choose>
       <if type="broadcast" match="any">
@@ -40,7 +48,7 @@
     </choose>
   </macro>
   <macro name="anon">
-    <text term="anonymous" form="short" text-case="capitalize-first" strip-periods="true"/>
+    <text term="anonymous" form="short" text-case="capitalize-first" strip-periods="false"/>
   </macro>
   <macro name="year-date">
     <choose>
@@ -141,7 +149,8 @@
   </macro>
   <macro name="translator">
     <names variable="translator">
-      <name and="text" initialize-with="." delimiter=". " prefix="Translated by " suffix="."/>
+      <label form="verb" text-case="capitalize-first" suffix=" "/>
+      <name and="text" delimiter-precedes-last="never" initialize-with="."/>
     </names>
   </macro>
   <macro name="bill-detail">
@@ -263,14 +272,14 @@
   </macro>
   <macro name="locator">
     <choose>
-      <if type="article-journal article-newspaper article-magazine interview" match="any">
+      <if type="article-journal article-newspaper article-magazine" match="any">
         <group delimiter=", " suffix=".">
           <group>
             <text variable="volume"/>
             <text variable="issue" prefix="(" suffix=")"/>
           </group>
           <choose>
-            <if type="article-magazine article-newspaper interview" match="any">
+            <if type="article-magazine article-newspaper" match="any">
               <date variable="issued" delimiter=" ">
                 <date-part name="day"/>
                 <date-part name="month" form="short"/>
@@ -290,7 +299,7 @@
       <else-if type="book chapter paper-conference manuscript entry-dictionary entry-encyclopedia thesis motion_picture song report" match="any">
         <group suffix=".">
           <text variable="event" suffix=". "/>
-          <group delimiter=".">
+          <group delimiter=". ">
             <text macro="publisher"/>
             <group>
               <label variable="page" form="short"/>
@@ -311,6 +320,22 @@
           </group>
         </group>
       </else-if>
+      <else-if type="interview" match="any">
+        <group delimiter=". ">
+          <group delimiter=" ">
+            <text term="interview" text-case="capitalize-first"/>
+            <names variable="interviewer"/>
+          </group>
+          <group delimiter=", ">
+            <group delimiter=" ">
+              <text variable="medium" prefix="[" suffix="]"/>
+              <text variable="publisher"/>
+            </group>
+            <date form="text" date-parts="year-month-day" variable="issued"/>
+            <text variable="dimensions"/>
+          </group>
+        </group>
+      </else-if>
     </choose>
   </macro>
   <macro name="online-access">
@@ -326,7 +351,7 @@
             <text term="accessed" text-case="capitalize-first" suffix=" "/>
             <date variable="accessed" delimiter=" ">
               <date-part name="day"/>
-              <date-part name="month" form="short"/>
+              <date-part name="month"/>
               <date-part name="year"/>
             </date>
           </group>
@@ -344,13 +369,17 @@
           <name form="short" and="text" sort-separator=", " initialize-with="." delimiter-precedes-last="never" delimiter=", "/>
           <substitute>
             <names variable="editor"/>
-            <text variable="title"/>
+            <text macro="anon" text-case="capitalize-first"/>
           </substitute>
         </names>
       </else>
     </choose>
   </macro>
-  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year-suffix">
+  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year" cite-group-delimiter="; ">
+    <sort>
+      <key macro="year-date"/>
+      <key macro="cite-author"/>
+    </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <group delimiter=", ">

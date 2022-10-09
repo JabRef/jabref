@@ -14,7 +14,6 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.PreferencesService;
 
 public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
@@ -34,16 +33,14 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty firstNameModeFullProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeBothProperty = new SimpleBooleanProperty();
 
-    private final PreferencesService preferencesService;
     private final EntryEditorPreferences entryEditorPreferences;
-    private final AutoCompletePreferences initialAutoCompletePreferences;
+    private final AutoCompletePreferences autoCompletePreferences;
 
     private final List<String> restartWarnings = new ArrayList<>();
 
-    public EntryEditorTabViewModel(PreferencesService preferencesService) {
-        this.preferencesService = preferencesService;
-        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.initialAutoCompletePreferences = preferencesService.getAutoCompletePreferences();
+    public EntryEditorTabViewModel(EntryEditorPreferences entryEditorPreferences, AutoCompletePreferences autoCompletePreferences) {
+        this.entryEditorPreferences = entryEditorPreferences;
+        this.autoCompletePreferences = autoCompletePreferences;
     }
 
     @Override
@@ -59,18 +56,18 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
 
-        enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
-        autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());
+        enableAutoCompleteProperty.setValue(autoCompletePreferences.shouldAutoComplete());
+        autoCompleteFieldsProperty.setValue(autoCompletePreferences.getCompleteNamesAsString());
 
-        if (initialAutoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.FIRST_LAST) {
+        if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.FIRST_LAST) {
             autoCompleteFirstLastProperty.setValue(true);
-        } else if (initialAutoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
+        } else if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
             autoCompleteLastFirstProperty.setValue(true);
         } else {
             autoCompleteBothProperty.setValue(true);
         }
 
-        switch (initialAutoCompletePreferences.getFirstNameMode()) {
+        switch (autoCompletePreferences.getFirstNameMode()) {
             case ONLY_ABBREVIATED -> firstNameModeAbbreviatedProperty.setValue(true);
             case ONLY_FULL -> firstNameModeFullProperty.setValue(true);
             default -> firstNameModeBothProperty.setValue(true);
@@ -89,23 +86,25 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
         // entryEditorPreferences.setDividerPosition();
 
-        // default
-        AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
-        if (autoCompleteFirstLastProperty.getValue()) {
-            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
+        autoCompletePreferences.setAutoComplete(enableAutoCompleteProperty.getValue());
+
+        if (autoCompleteBothProperty.getValue()) {
+            autoCompletePreferences.setNameFormat(AutoCompletePreferences.NameFormat.BOTH);
+        } else if (autoCompleteFirstLastProperty.getValue()) {
+            autoCompletePreferences.setNameFormat(AutoCompletePreferences.NameFormat.FIRST_LAST);
         } else if (autoCompleteLastFirstProperty.getValue()) {
-            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
+            autoCompletePreferences.setNameFormat(AutoCompletePreferences.NameFormat.LAST_FIRST);
         }
 
-        // default: AutoCompleteFirstNameMode.BOTH
-        AutoCompleteFirstNameMode firstNameMode = AutoCompleteFirstNameMode.BOTH;
-        if (firstNameModeAbbreviatedProperty.getValue()) {
-            firstNameMode = AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
+        if (firstNameModeBothProperty.getValue()) {
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
+        } else if (firstNameModeAbbreviatedProperty.getValue()) {
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
         } else if (firstNameModeFullProperty.getValue()) {
-            firstNameMode = AutoCompleteFirstNameMode.ONLY_FULL;
+            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.ONLY_FULL);
         }
 
-        if (initialAutoCompletePreferences.shouldAutoComplete() != enableAutoCompleteProperty.getValue()) {
+        if (autoCompletePreferences.shouldAutoComplete() != enableAutoCompleteProperty.getValue()) {
             if (enableAutoCompleteProperty.getValue()) {
                 restartWarnings.add(Localization.lang("Auto complete enabled."));
             } else {
@@ -113,12 +112,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             }
         }
 
-        preferencesService.storeAutoCompletePreferences(new AutoCompletePreferences(
-                enableAutoCompleteProperty.getValue(),
-                firstNameMode,
-                nameFormat,
-                FieldFactory.parseFieldList(autoCompleteFieldsProperty.getValue()),
-                preferencesService.getJournalAbbreviationPreferences()));
+        autoCompletePreferences.getCompleteFields().clear();
+        autoCompletePreferences.getCompleteFields().addAll(FieldFactory.parseFieldList(autoCompleteFieldsProperty.getValue()));
     }
 
     @Override

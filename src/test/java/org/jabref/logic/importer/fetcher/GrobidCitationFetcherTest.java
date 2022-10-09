@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
@@ -33,8 +32,11 @@ import static org.mockito.Mockito.when;
 public class GrobidCitationFetcherTest {
 
     static ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    static ImporterPreferences importerPreferences = new ImporterPreferences(false, true, false, "http://grobid.jabref.org:8070");
-    static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importerPreferences, importFormatPreferences);
+    static GrobidPreferences grobidPreferences = new GrobidPreferences(
+            true,
+            false,
+            "http://grobid.jabref.org:8070");
+    static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(grobidPreferences, importFormatPreferences);
 
     static String example1 = "Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.";
     static BibEntry example1AsBibEntry = new BibEntry(StandardEntryType.Article).withCitationKey("-1")
@@ -43,8 +45,8 @@ public class GrobidCitationFetcherTest {
                                                                                 .withField(StandardField.JOURNAL, "Journal of Multilingual and Multicultural Development")
                                                                                 .withField(StandardField.DOI, "10.1080/01434630208666468")
                                                                                 .withField(StandardField.DATE, "2002-09")
-                                                                                .withField(StandardField.YEAR, "2002")
                                                                                 .withField(StandardField.MONTH, "9")
+                                                                                .withField(StandardField.YEAR, "2002")
                                                                                 .withField(StandardField.PAGES, "245-259")
                                                                                 .withField(StandardField.VOLUME, "23")
                                                                                 .withField(StandardField.PUBLISHER, "Informa UK Limited")
@@ -60,11 +62,13 @@ public class GrobidCitationFetcherTest {
 
     static String example3 = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry : A developmental approach. Oxford, England: Oxford University Press.";
     static BibEntry example3AsBibEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withCitationKey("-1")
-                                                                            .withField(StandardField.AUTHOR, "Turk, J and Graham, P and Verhulst, F")
-                                                                            .withField(StandardField.TITLE, "Child and adolescent psychiatry : A developmental approach")
+                                                                            .withField(StandardField.AUTHOR, "Turk, Jeremy and Graham, Philip and Verhulst, Frank")
+                                                                            .withField(StandardField.TITLE, "Child and Adolescent Psychiatry")
                                                                             .withField(StandardField.PUBLISHER, "Oxford University Press")
-                                                                            .withField(StandardField.DATE, "2007")
+                                                                            .withField(StandardField.DATE, "2007-02")
                                                                             .withField(StandardField.YEAR, "2007")
+                                                                            .withField(StandardField.MONTH, "2")
+                                                                            .withField(StandardField.DOI, "10.1093/med/9780199216697.001.0001")
                                                                             .withField(StandardField.ADDRESS, "Oxford, England");
 
     static String example4 = "Carr, I., & Kidner, R. (2003). Statutes and conventions on international trade law (4th ed.). London, England: Cavendish.";

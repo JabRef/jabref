@@ -1,14 +1,11 @@
 package org.jabref.gui.exporter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,7 +23,6 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -107,7 +103,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        preferences.storeFileDirforDatabase(stateManager.getActiveDatabase()
+        preferences.storeFileDirForDatabase(stateManager.getActiveDatabase()
                                                         .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
                                                         .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory())));
 
@@ -124,14 +120,10 @@ public class ExportToClipboardAction extends SimpleCommand {
 
             // Write to file:
             exporter.export(stateManager.getActiveDatabase().get(), tmp,
-                    stateManager.getActiveDatabase().get()
-                                .getMetaData()
-                                .getEncoding()
-                                .orElse(preferences.getGeneralPreferences().getDefaultEncoding()),
                     entries);
             // Read the file and put the contents on the clipboard:
 
-            return new ExportResult(readFileToString(tmp), exporter.getFileType());
+            return new ExportResult(Files.readString(tmp), exporter.getFileType());
         } finally {
             // Clean up:
             if ((tmp != null) && Files.exists(tmp)) {
@@ -160,18 +152,6 @@ public class ExportToClipboardAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
     }
 
-    private String readFileToString(Path tmp) throws IOException {
-        Charset defaultEncoding = Objects.requireNonNull(preferences.getGeneralPreferences().getDefaultEncoding());
-        try (BufferedReader reader = Files.newBufferedReader(tmp, stateManager.getActiveDatabase()
-                                                                              .map(db -> db.getMetaData()
-                                                                                           .getEncoding()
-                                                                                           .orElse(defaultEncoding))
-                                                                              .orElse(defaultEncoding))) {
-            return reader.lines().collect(Collectors.joining(OS.NEWLINE));
-        }
-    }
-
     private record ExportResult(String content, FileType fileType) {
-
     }
 }

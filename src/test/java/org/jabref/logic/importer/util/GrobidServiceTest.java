@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.PdfGrobidImporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -30,12 +30,15 @@ import static org.mockito.Mockito.when;
 public class GrobidServiceTest {
 
     private static GrobidService grobidService;
-    private static ImporterPreferences importerPreferences = new ImporterPreferences(false, true, false, "http://grobid.jabref.org:8070");
+    private static GrobidPreferences grobidPreferences = new GrobidPreferences(
+            true,
+            false,
+            "http://grobid.jabref.org:8070");
     private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
     public static void setup() {
-        grobidService = new GrobidService(importerPreferences);
+        grobidService = new GrobidService(grobidPreferences);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
     }
@@ -70,12 +73,18 @@ public class GrobidServiceTest {
 
     @Test
     public void processInvalidCitationTest() {
-        assertThrows(IOException.class, () -> grobidService.processCitation("iiiiiiiiiiiiiiiiiiiiiiii", importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA));
+        assertThrows(IOException.class, () -> grobidService.processCitation(
+                "iiiiiiiiiiiiiiiiiiiiiiii",
+                importFormatPreferences,
+                GrobidService.ConsolidateCitations.WITH_METADATA));
     }
 
     @Test
     public void failsWhenGrobidDisabled() {
-        ImporterPreferences importSettingsWithGrobidDisabled = new ImporterPreferences(false, false, false, "http://grobid.jabref.org:8070");
+        GrobidPreferences importSettingsWithGrobidDisabled = new GrobidPreferences(
+                false,
+                false,
+                "http://grobid.jabref.org:8070");
         assertThrows(UnsupportedOperationException.class, () -> new GrobidService(importSettingsWithGrobidDisabled));
     }
 
@@ -89,5 +98,4 @@ public class GrobidServiceTest {
         assertEquals(Optional.of("Paper Title"), be0.getField(StandardField.TITLE));
         assertEquals(Optional.of("2014-10-05"), be0.getField(StandardField.DATE));
     }
-
 }

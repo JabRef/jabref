@@ -6,16 +6,20 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
@@ -25,7 +29,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     public enum DuplicateResolverType {
         DUPLICATE_SEARCH,
         IMPORT_CHECK,
-        INSPECTION,
         DUPLICATE_SEARCH_WITH_EXACT
     }
 
@@ -38,66 +41,65 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         BREAK
     }
 
-    private MergeEntries me;
+    private ThreeWayMergeView threeWayMerge;
+    private final DialogService dialogService;
+    private final ActionFactory actionFactory;
 
-    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager) {
+    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager, DialogService dialogService, PreferencesService prefs) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
         this.database = database;
         this.stateManager = stateManager;
+        this.dialogService = dialogService;
+        this.actionFactory = new ActionFactory(prefs.getKeyBindingRepository());
         init(one, two, type);
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
-
-        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES);
-        ButtonType help = new ButtonType(Localization.lang("Help"), ButtonData.HELP);
-
         ButtonType cancel = ButtonType.CANCEL;
-        ButtonType merge = new ButtonType(Localization.lang("Keep merged entry only"), ButtonData.APPLY);
+        ButtonType merge = new ButtonType(Localization.lang("Keep merged"), ButtonData.OK_DONE);
 
-        ButtonBar options = new ButtonBar();
         ButtonType both;
         ButtonType second;
         ButtonType first;
-        ButtonType removeExact = new ButtonType(Localization.lang("Automatically remove exact duplicates"), ButtonData.APPLY);
+        ButtonType removeExact = new ButtonType(Localization.lang("Automatically remove exact duplicates"), ButtonData.LEFT);
         boolean removeExactVisible = false;
 
         switch (type) {
-            case DUPLICATE_SEARCH:
-                first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
-                second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
-                both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                me = new MergeEntries(one, two);
-                break;
-            case INSPECTION:
-                first = new ButtonType(Localization.lang("Remove old entry"), ButtonData.APPLY);
-                second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
-                both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"));
-                break;
-            case DUPLICATE_SEARCH_WITH_EXACT:
-                first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
-                second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
-                both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-
+            case DUPLICATE_SEARCH -> {
+                first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
+                threeWayMerge = new ThreeWayMergeView(one, two);
+            }
+            case DUPLICATE_SEARCH_WITH_EXACT -> {
+                first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 removeExactVisible = true;
-
-                me = new MergeEntries(one, two);
-                break;
-            default:
-                first = new ButtonType(Localization.lang("Import and remove old entry"), ButtonData.APPLY);
-                second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
-                both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
-                me = new MergeEntries(one, two, Localization.lang("Old entry"),
+                threeWayMerge = new ThreeWayMergeView(one, two);
+            }
+            case IMPORT_CHECK -> {
+                first = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
+                second = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
+                both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
+                threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
                         Localization.lang("From import"));
-                break;
+            }
+            default -> throw new IllegalStateException("Switch expression should be exhaustive");
         }
+
+        this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel);
+        this.getDialogPane().setFocusTraversable(false);
+
         if (removeExactVisible) {
             this.getDialogPane().getButtonTypes().add(removeExact);
-        }
 
-        this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel, help);
+            // This will prevent all dialog buttons from having the same size
+            // Read more: https://stackoverflow.com/questions/45866249/javafx-8-alert-different-button-sizes
+            getDialogPane().getButtonTypes().stream()
+                           .map(getDialogPane()::lookupButton)
+                           .forEach(btn-> ButtonBar.setButtonUniformSize(btn, false));
+        }
 
         // Retrieves the previous window state and sets the new dialog window size and position to match it
         DialogWindowState state = stateManager.getDialogWindowState(getClass().getSimpleName());
@@ -107,8 +109,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             this.setY(state.getY());
         }
 
-        BorderPane borderPane = new BorderPane(me);
-        borderPane.setBottom(options);
+        BorderPane borderPane = new BorderPane(threeWayMerge);
 
         this.setResultConverter(button -> {
             // Updates the window state on button press
@@ -128,12 +129,22 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             return null;
         });
 
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService);
+        Button helpButton = actionFactory.createIconButton(StandardActions.HELP, helpCommand);
+        borderPane.setRight(helpButton);
+
         getDialogPane().setContent(borderPane);
-        Button helpButton = (Button) this.getDialogPane().lookupButton(help);
-        helpButton.setOnAction(evt -> helpCommand.execute());
     }
 
     public BibEntry getMergedEntry() {
-        return me.getMergeEntry();
+        return threeWayMerge.getMergedEntry();
+    }
+
+    public BibEntry getNewLeftEntry() {
+        return threeWayMerge.getLeftEntry();
+    }
+
+    public BibEntry getNewRightEntry() {
+        return threeWayMerge.getRightEntry();
     }
 }

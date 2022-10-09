@@ -11,8 +11,8 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -36,12 +36,22 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                                  DialogService dialogService,
                                  PreferencesService preferences,
                                  StateManager stateManager,
+                                 ThemeManager themeManager,
                                  IndexingTaskManager indexingTaskManager,
                                  BibEntryTypesManager entryTypesManager,
-                                 ExternalFileTypes externalFileTypes,
                                  TaskExecutor taskExecutor,
                                  JournalAbbreviationRepository journalAbbreviationRepository) {
-        super(true, databaseContext, suggestionProviders, undoManager, dialogService, preferences, stateManager, externalFileTypes, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
+        super(true,
+                databaseContext,
+                suggestionProviders,
+                undoManager,
+                dialogService,
+                preferences,
+                stateManager,
+                themeManager,
+                taskExecutor,
+                journalAbbreviationRepository,
+                indexingTaskManager);
         this.entryTypesManager = entryTypesManager;
         this.isPrimaryOptionalFields = isPrimaryOptionalFields;
         setText(title);

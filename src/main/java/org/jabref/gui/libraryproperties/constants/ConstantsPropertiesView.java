@@ -2,8 +2,6 @@ package org.jabref.gui.libraryproperties.constants;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -12,6 +10,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.util.converter.DefaultStringConverter;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
@@ -22,6 +21,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class ConstantsPropertiesView extends AbstractPropertiesTabView<ConstantsPropertiesViewModel> implements PropertiesTab {
 
@@ -33,6 +33,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
     @FXML private ButtonType saveButton;
 
     @Inject private PreferencesService preferencesService;
+    @Inject private DialogService dialogService;
 
     public ConstantsPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -44,11 +45,11 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
 
     @Override
     public String getTabName() {
-        return Localization.lang("Strings constants");
+        return Localization.lang("String constants");
     }
 
     public void initialize() {
-        this.viewModel = new ConstantsPropertiesViewModel(databaseContext);
+        this.viewModel = new ConstantsPropertiesViewModel(databaseContext, dialogService);
 
         addStringButton.setTooltip(new Tooltip(Localization.lang("New string")));
 

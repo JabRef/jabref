@@ -68,6 +68,7 @@ public class MetaData {
     private final ContentSelectors contentSelectors = new ContentSelectors();
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
+    private boolean encodingExplicitlySupplied;
 
     /**
      * Constructs an empty metadata.
@@ -291,6 +292,17 @@ public class MetaData {
         }
     }
 
+    public boolean getEncodingExplicitlySupplied() {
+        return encodingExplicitlySupplied;
+    }
+
+    /**
+     * Sets the indication whether the encoding was set using "% Encoding: ..." or whether it was detected "magically"
+     */
+    public void setEncodingExplicitlySupplied(boolean encodingExplicitlySupplied) {
+        this.encodingExplicitlySupplied = encodingExplicitlySupplied;
+    }
+
     /**
      * If disabled {@link MetaDataChangedEvent} will not be posted.
      */
@@ -349,6 +361,7 @@ public class MetaData {
         return (isProtected == metaData.isProtected)
                 && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
                 && Objects.equals(encoding, metaData.encoding)
+                && Objects.equals(encodingExplicitlySupplied, metaData.encodingExplicitlySupplied)
                 && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, metaData.userFileDirectory)
@@ -362,7 +375,12 @@ public class MetaData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupsRoot.getValue(), encoding, saveOrderConfig, citeKeyPatterns, userFileDirectory,
-                defaultCiteKeyPattern, saveActions, mode, isProtected, defaultFileDirectory);
+        return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrderConfig, citeKeyPatterns, userFileDirectory,
+                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, defaultFileDirectory, contentSelectors);
+    }
+
+    @Override
+    public String toString() {
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrderConfig + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + "]";
     }
 }

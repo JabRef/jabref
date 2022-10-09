@@ -2,6 +2,7 @@ package org.jabref.logic.pdf.search.indexing;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.jabref.gui.util.BackgroundTask;
@@ -28,6 +29,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     public IndexingTaskManager(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
         showToUser(true);
+        willBeRecoveredAutomatically(true);
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             this.updateProgress(1, 1);
             this.titleProperty().set(Localization.lang("Indexing pdf files"));
@@ -87,11 +89,16 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         enqueueTask(() -> indexer.createIndex());
     }
 
-    public void addToIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
+    public void updateIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
+        Set<String> pathsToRemove = indexer.getListOfFilePaths();
         for (BibEntry entry : databaseContext.getEntries()) {
             for (LinkedFile file : entry.getFiles()) {
                 enqueueTask(() -> indexer.addToIndex(entry, file, databaseContext));
+                pathsToRemove.remove(file.getLink());
             }
+        }
+        for (String pathToRemove : pathsToRemove) {
+            enqueueTask(() -> indexer.removeFromIndex(pathToRemove));
         }
     }
 
@@ -107,7 +114,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     public void removeFromIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles) {
         for (LinkedFile file : linkedFiles) {
-            enqueueTask(() -> indexer.removeFromIndex(entry, file));
+            enqueueTask(() -> indexer.removeFromIndex(file.getLink()));
         }
     }
 

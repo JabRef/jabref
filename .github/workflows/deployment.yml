@@ -22,6 +22,7 @@ env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
   GRADLE_OPTS: -Xmx4g -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
   JAVA_OPTS: -Xmx4g
@@ -51,21 +52,21 @@ jobs:
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.11
+        uses: gittools/actions/gitversion/setup@v0.9.13
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.11
+        uses: gittools/actions/gitversion/execute@v0.9.13
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: 16
-          distribution: 'adopt'
+          java-version: 18
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Setup OSX key chain on OSX
         if: matrix.os == 'macos-latest'
@@ -129,7 +130,7 @@ jobs:
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Upload to GitHub workflow artifacts store
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v3
         with:
           name: JabRef-${{ matrix.displayName }}
           path: build/distribution
@@ -152,16 +153,16 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.11
+        uses: gittools/actions/gitversion/setup@v0.9.13
         with:
           versionSpec: '5.x'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.11
+        uses: gittools/actions/gitversion/execute@v0.9.13
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:

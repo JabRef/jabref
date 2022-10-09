@@ -52,7 +52,7 @@ public class DocbookExporterTest {
 
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile, charset, entries);
+        exportFormat.export(databaseContext, tmpFile, entries);
 
         List<String> lines = Files.readAllLines(tmpFile);
         assertEquals(20, lines.size());
@@ -68,11 +68,10 @@ public class DocbookExporterTest {
 
         List<BibEntry> entries = Arrays.asList(entry);
 
-        exportFormat.export(databaseContext, tmpFile, charset, entries);
+        exportFormat.export(databaseContext, tmpFile, entries);
 
         List<String> lines = Files.readAllLines(tmpFile);
         assertEquals(20, lines.size());
         assertEquals("   <citetitle pubwork=\"article\">Insect neuropeptide bursicon homodimers induce innate immune and stress genes during molting by activating the NF&#45;&#954;B transcription factor Relish.</citetitle>", lines.get(9));
     }
-
 }
