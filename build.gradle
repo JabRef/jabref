@@ -27,8 +27,8 @@ plugins {
     id 'project-report'
 
     id 'idea'
-
-    id "com.apollographql.apollo3" version '3.0.0'
+    // JabRef Online GraphQL client integration
+    id 'com.apollographql.apollo3' version '3.7.0-SNAPSHOT'
 }
 
 // Enable following for debugging
@@ -83,6 +83,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
 }
 
@@ -206,8 +207,8 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    implementation("com.apollographql.apollo3:apollo-runtime:3.0.0")
-    implementation("com.apollographql.apollo3:apollo-rx3-support:3.0.0")
+    implementation group: 'com.apollographql.apollo3', name: 'apollo-runtime-java', version: '3.7.0-SNAPSHOT'
+    implementation group: 'com.apollographql.apollo3', name: 'apollo-rx3-support-java', version: '3.7.0-SNAPSHOT'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.149'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
@@ -269,9 +270,9 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateBibtexmlSource",
                                 "generateEndnoteSource",
                                 "generateModsSource",
-                                "downloadSchema",
-                                "generateApolloSources",
-                                "generateCitaviSource"]) {
+                                "generateCitaviSource",
+                                "downloadServiceApolloSchemaFromIntrospection",
+                                "generateApolloSources"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
@@ -356,21 +357,18 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
     outputDir = file("src/main/resources/journals")
 }
 
-task downloadSchema(type: com.apollographql.apollo3.gradle.internal.ApolloDownloadSchemaTask) {
-    endpoint.set("https://jabref-dev.azurewebsites.net/api")
-    schema.set("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
-}
-
 apollo {
-  schemaFile = file("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
-  srcDir(file("src/main/java/org/jabref/jabrefonline/graphql/"))
-  excludes = ["schema.json"]
+  packageName = "org.jabref.jabrefonline"
+  schemaFile = file("src-gen/main/java/org/jabref/jabrefonline/graphql/schema.json")
   customScalarsMapping = [
     "DateTime" : "java.time.LocalDateTime"
   ]
-  generateKotlinModels = false
-  useSemanticNaming = true
-  packageName = "org.jabref.jabrefonline"
+  generateModelBuilder = true
+  //generateKotlinModels = false
+  //useSemanticNaming = true
+  introspection {
+    endpointUrl = "https://mango-pebble-0224c3803-dev.westeurope.1.azurestaticapps.net/api"
+  }
 }
 
 tasks.withType(JavaCompile) {
