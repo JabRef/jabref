@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.logging.LogMessages;
 
 import org.tinylog.core.LogEntry;

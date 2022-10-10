@@ -204,5 +204,4 @@ public class Launcher {
             LOGGER.error("Could not access app-directory at {}", appData, e);
         }
     }
-
 }
