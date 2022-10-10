@@ -39,9 +39,8 @@ class SpecialFieldsToSeparateFieldsTest {
         assertEquals(expected, entry);
     }
 
-    // This test fails because we call entry removeKeywords which operates on a set of keywords
     @Test
-    public void noKewordToMigrateButDuplicateKeywords() {
+    public void noKeywordToMigrateButDuplicateKeywords() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
                                        .withField(StandardField.KEYWORDS, "asdf, asdf, asdf");
         BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")

@@ -1939,7 +1939,6 @@ class BibtexParserTest {
 
     @Test
     void parseDuplicateKeywordsWithTwoEntries() throws Exception {
-
         BibEntry expectedEntryFirst = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.KEYWORDS, "bbb")
             .withCitationKey("Test2017");
