@@ -128,7 +128,7 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.5.0'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.71.1'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.72'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
