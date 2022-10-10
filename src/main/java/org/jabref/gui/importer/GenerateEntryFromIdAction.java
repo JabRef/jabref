@@ -63,7 +63,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             if (exception instanceof FetcherClientException) {
                 msg = Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage;
             } else if (exception instanceof FetcherServerException) {
-                msg = Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later.") + "\n" + fetcherExceptionMessage;
+                msg = Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try again later.") + "\n" + fetcherExceptionMessage;
             } else {
                 msg = Localization.lang("Error message %0", fetcherExceptionMessage);
             }
