@@ -202,3 +202,5 @@ Without local revisions, it is not possible for Device A to figure out that the 
 - [CouchDB style sync and conflict resolution on Postgres with Hasura](https://hasura.io/blog/couchdb-style-conflict-resolution-rxdb-hasura/): Explains how to implement a sync algorithm in the style of CouchDB on your own
 - [A Comparison of Offline Sync Protocols and Implementations](https://offlinefirst.org/sync/)
 - [Offline data synchronization](https://developer.ibm.com/articles/offline-data-synchronization-strategies/): Discusses different strategies for offline data sync, and when to use which.
+- Transaction Processing: Concepts and Techniques
+- Transactional Information Systems: Theory, Algorithms, and the Practice of Concurrency Control and Recovery 
