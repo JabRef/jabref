@@ -298,15 +298,13 @@ public class JabRefDesktop {
      * @return The path to the directory
      */
     public static String getDefaultFileChooserDirectory() {
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {
-            // Property "user.home" might be "difficult" on Windows
-            // See https://stackoverflow.com/a/586917/873282 for a longer discussion
-            // As of 2022, System.getProperty("user.home") returns c:\Users\USERNAME on Windows 10
-            // but we want  C:\Users\USERNAME\Documents, which is the "better" directory
-            return System.getProperty("user.home") + "\\Documents";
-        } else {
-            return System.getProperty("user.home");
-        }
+        // Implementation: ADR-0026
+
+        // We do not return a subdirectory "JabRef", because
+        //   - the directory might not exist at this point of the method
+        //   - we might not have the rights to create a directory
+        //   - getters should not have any side effect
+        return FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
     }
 
     // TODO: Move to OS.java
