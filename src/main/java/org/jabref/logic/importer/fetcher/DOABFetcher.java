@@ -45,7 +45,8 @@ public class DOABFetcher implements SearchBasedParserFetcher {
         // without the quotation the results returned are not relevant to the query
         query = ("\"".concat(query)).concat("\"");
         builder.addParameter("query", query);
-        builder.addParameter("expand", "metadata");
+        // bitstreams included in URL building to acquire ISBN's.
+        builder.addParameter("expand", "metadata,bitstreams");
 
         return builder.build().toURL();
     }
@@ -64,24 +65,43 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                 // the information used for bibtex entries are in an array inside the resulting jsonarray
                 // see this query for reference https://directory.doabooks.org/rest/search?query="i open fire"&expand=metadata
                 JSONArray metadataArray = response.getJSONObject(0).getJSONArray("metadata");
-                BibEntry entry = jsonToBibEntry(metadataArray);
+                JSONArray bitstreamArray = response.getJSONObject(0).getJSONArray("bitstreams");
+                BibEntry entry = jsonToBibEntry(metadataArray, bitstreamArray);
                 return Collections.singletonList(entry);
             }
             List<BibEntry> entries = new ArrayList<>(response.length());
             for (int i = 0; i < response.length(); i++) {
                 JSONArray metadataArray = response.getJSONObject(i).getJSONArray("metadata");
-                BibEntry entry = jsonToBibEntry(metadataArray);
+                JSONArray bitstreamArray = response.getJSONObject(i).getJSONArray("bitstreams");
+                BibEntry entry = jsonToBibEntry(metadataArray, bitstreamArray);
                 entries.add(entry);
             }
             return entries;
         };
     }
 
-    private BibEntry jsonToBibEntry(JSONArray metadataArray) {
+    private BibEntry jsonToBibEntry(JSONArray metadataArray, JSONArray bitstreamArray) {
         BibEntry entry = new BibEntry();
         List<Author> authorsList = new ArrayList<>();
         List<Author> editorsList = new ArrayList<>();
         StringJoiner keywordJoiner = new StringJoiner(", ");
+
+        // Get the ISBN within the BITSTREAM. See the link below:
+        // https://directory.doabooks.org/rest/search?query=handle:%2220.500.12854/26303%22&expand=metadata,bitstreams
+        // Note that in many cases, an ISBN cannot be obtained in the metadata, even in the BITSTREAM. See the link below:
+        // https://directory.doabooks.org/rest/search?query=%22i%20open%20fire%22&expand=metadata,bitstreams
+        for (int i = 0; i < bitstreamArray.length(); i++) {
+            JSONObject bitstreamObject = bitstreamArray.getJSONObject(i);
+            // Subcategorise each instance of the BITSTREAM by "metadata" key
+            JSONArray array = bitstreamObject.getJSONArray("metadata");
+            for (int k = 0; k < array.length(); k++) {
+                JSONObject metadataInBitstreamObject = array.getJSONObject(k);
+                if (metadataInBitstreamObject.getString("key").equals("oapen.relation.isbn")) {
+                    entry.setField(StandardField.ISBN, metadataInBitstreamObject.getString("value"));
+                }
+            }
+        }
+
         for (int i = 0; i < metadataArray.length(); i++) {
             JSONObject dataObject = metadataArray.getJSONObject(i);
             switch (dataObject.getString("key")) {
@@ -123,7 +143,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                 case "dc.contributor.editor" -> editorsList.add(toAuthor(dataObject.getString("value")));
                 case "oapen.volume" -> entry.setField(StandardField.VOLUME,
                         dataObject.getString("value"));
-                case "oapen.relation.isbn" -> entry.setField(StandardField.ISBN,
+                case "oapen.relation.isbn", "dc.identifier.isbn" -> entry.setField(StandardField.ISBN,
                         dataObject.getString("value"));
                 case "dc.title.alternative" -> entry.setField(StandardField.SUBTITLE,
                         dataObject.getString("value"));
