@@ -226,14 +226,6 @@ public class LibraryTab extends Tab {
                 LOGGER.error("Cannot access lucene index", e);
             }
         }
-
-        // a temporary workaround to update groups pane
-        stateManager.activeDatabaseProperty().bind(
-                EasyBind.map(frame.getTabbedPane().getSelectionModel().selectedItemProperty(),
-                        selectedTab -> Optional.ofNullable(selectedTab)
-                                               .filter(tab -> tab instanceof LibraryTab)
-                                               .map(tab -> (LibraryTab) tab)
-                                               .map(LibraryTab::getBibDatabaseContext)));
     }
 
     public void onDatabaseLoadingFailed(Exception ex) {
