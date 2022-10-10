@@ -11,6 +11,7 @@ import com.tngtech.archunit.library.GeneralCodingRules;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
+
 @AnalyzeClasses(packages = "org.jabref")
 class MainArchitectureTests {
 
@@ -72,7 +73,7 @@ class MainArchitectureTests {
     @ArchIgnore
     // Fails currently
     public static void respectLayeredArchitecture(JavaClasses classes) {
-        layeredArchitecture()
+        layeredArchitecture().consideringOnlyDependenciesInLayers()
                              .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
                              .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
                              .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
