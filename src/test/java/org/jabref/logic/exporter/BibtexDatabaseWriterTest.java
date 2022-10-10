@@ -158,6 +158,37 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
+    void writeEntryWithDuplicateKeywords() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setType(StandardEntryType.Article);
+        entry.setField(StandardField.KEYWORDS, "asdf,asdf,asdf");
+        database.insertEntry(entry);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
+
+        assertEquals("@Article{," + OS.NEWLINE
+                     + "  keywords = {asdf,asdf,asdf}," + OS.NEWLINE
+                     + "}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void putKeyWordsRemovesDuplicateKeywordsIsVisibleDuringWrite() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setType(StandardEntryType.Article);
+        entry.putKeywords(List.of("asdf", "asdf", "asdf"), ',');
+
+        database.insertEntry(entry);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
+
+        assertEquals("@Article{," + OS.NEWLINE
+                     + "  keywords = {asdf}," + OS.NEWLINE
+                     + "}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
     void writeEncodingAndEntry() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
