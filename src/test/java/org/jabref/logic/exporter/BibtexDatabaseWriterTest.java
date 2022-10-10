@@ -173,7 +173,7 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEntryWithDuplicateKeywordsFromPutKeyword() throws Exception {
+    void putKeyWordsRemovesDuplicateKeywordsIsVisibleDuringWrite() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.putKeywords(List.of("asdf", "asdf", "asdf"), ',');
@@ -183,7 +183,7 @@ public class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
         assertEquals("@Article{," + OS.NEWLINE
-                     + "  keywords = {asdf,asdf,asdf}," + OS.NEWLINE
+                     + "  keywords = {asdf}," + OS.NEWLINE
                      + "}" + OS.NEWLINE,
                 stringWriter.toString());
     }
