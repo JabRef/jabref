@@ -86,8 +86,7 @@ public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
             entry.setField(StandardField.MONTH, getElementFromJSONArrayByKey(data, "month"));
             entry.setField(StandardField.DAY, getElementFromJSONArrayByKey(data, "day"));
             return entry;
-        } catch (
-                JSONException exception) {
+        } catch (JSONException exception) {
             throw new ParseException("CrossRef API JSON format has changed", exception);
         }
     }
