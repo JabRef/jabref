@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Map;
 
-import org.apache.commons.cli.ParseException;
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
 import org.jabref.gui.remote.JabRefMessageHandler;
@@ -30,11 +29,12 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
+
+import net.harawata.appdirs.AppDirsFactory;
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tinylog.configuration.Configuration;
-
-import net.harawata.appdirs.AppDirsFactory;
 
 /**
  * The main entry point for the JabRef application.

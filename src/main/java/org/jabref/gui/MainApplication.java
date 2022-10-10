@@ -2,14 +2,12 @@ package org.jabref.gui;
 
 import java.util.List;
 
-import org.jabref.gui.FallbackExceptionHandler;
-import org.jabref.gui.openoffice.OOBibBaseConnect;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.preferences.JabRefPreferences;
-
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * JabRef's main class to process command line options and to start the UI
@@ -40,5 +38,4 @@ public class MainApplication extends Application {
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
     }
-
 }
