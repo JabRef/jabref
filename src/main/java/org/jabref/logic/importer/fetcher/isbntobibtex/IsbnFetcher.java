@@ -61,8 +61,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         try {
             identifier = removeNewlinesAndSpacesFromIdentifier(identifier);
             bibEntry = openLibraryIsbnFetcher.performSearchById(identifier);
-        } catch (
-                FetcherException ex) {
+        } catch (FetcherException ex) {
             if (retryIsbnFetcher.isEmpty()) {
                 throw ex;
             } else {
