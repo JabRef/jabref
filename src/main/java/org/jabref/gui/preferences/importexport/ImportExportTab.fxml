@@ -21,23 +21,23 @@
     <Label styleClass="sectionHeader" text="%Custom DOI URI"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="useCustomDOI" text="%Use custom DOI base URI for article access"/>
-        <TextField fx:id="useCustomDOIName" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="useCustomDOIName"/>
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Export sort order"/>
     <SaveOrderConfigPanel fx:id="exportOrderPanel"/>
 
     <Label styleClass="sectionHeader" text="%Remote services"/>
-    <CheckBox fx:id="grobidEnabled" text="%Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."/>
+    <CheckBox fx:id="grobidEnabled" text="%Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results." wrapText="true"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label text="%Grobid URL" />
-        <TextField fx:id="grobidURL" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="grobidURL" prefWidth="200.0"/>
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Custom API key"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <ComboBox fx:id="apiKeySelector" prefWidth="200.0" GridPane.columnIndex="1"/>
-        <TextField fx:id="customApiKey" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="customApiKey" prefWidth="400.0"/>
         <CheckBox fx:id="useCustomApiKey" text="%Custom">
         </CheckBox>
     </HBox>
