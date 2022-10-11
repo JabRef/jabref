@@ -47,10 +47,12 @@ Each sync cycle is divided into three phases:
 2. `Merge phase`: The client and server merge their local changes.
 3. `Push phase`: The client sends its local changes to the server.
 
-In order to support this, additional metadata is kept for each entry:
+In order to support this, additional metadata is kept for each item:
 
 - `ID`: An unique identifier for the entry (will be a UUID).
-- `Revision`: A [MVCC](http://en.wikipedia.org/wiki/Multiversion_concurrency_control) token value that corresponds to a version of the entry saved in the server. It has the pattern: `N-hash` where the generation ID `N` is an increasing positive integer and `hash` is the hash of the entry (i.e., of all the data except for the `Revision`).
+- `Revision`: A [MVCC](http://en.wikipedia.org/wiki/Multiversion_concurrency_control) token value that corresponds to a version of the item saved in the server. It has the pattern: `N-hash` where the generation ID `N` is an increasing positive integer and `hash` is the hash of the item (i.e., of all the data except for the `Revision`).
+
+From now on, we will only discuss the sync of entries, but the sync of other data such as the groups tree will work similarily.
 
 At this point, we could already sync the server and client by asking the server for all up-to-date entries and then using the `Revision` information to merge with the local data. However, this is highly inefficient as the whole database has to be send over the wire. A small improvement is gained by first asking only for tuples of `ID` and `Revision`, and only pull the complete entry if the local data is outdated or in conflict.
 However, this still requires to send quite a bit of data. Instead we will use the following refinement.
@@ -164,7 +166,7 @@ If the user decides in step 3 to save it changes, then in step 4 JabRef would pu
 6. Client merges the 'changes', which in this case is trivial since the data on the server and client is the same.
 
 This is suboptimal since the last pull response contains the full data of the entry although this data is already at the client.
-*Possible future improvement:* First pull only the `IDs` and `Revisions` of the server-side changes, and then filter out the ones we already have locally before querying the complete entry. Downside is that this solution always needs one more request (per change batch) and its not clear if this outweighs the costs of sending the full entry.
+*Possible future improvement:* First pull only the `IDs` and `Revisions` of the server-side changes, and then filter out the ones we already have locally before querying the complete entry. Downside is that this solution always needs one more request (per change batch) and its not clear if this outweighs the costs of sending the full entry. Altenatively, the server can remember where a change came from and then not send these changes back to that client. 
 
 #### Reasons for some decisions
 
