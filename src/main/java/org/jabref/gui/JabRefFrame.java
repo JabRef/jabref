@@ -659,12 +659,14 @@ public class JabRefFrame extends BorderPane {
         Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
                 EasyBind.map(mainStage.getScene().focusOwnerProperty(), Optional::ofNullable)));
 
-        stateManager.activeDatabaseProperty().bind(
-                EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
-                        selectedTab -> Optional.ofNullable(selectedTab)
-                                               .filter(tab -> tab instanceof LibraryTab)
-                                               .map(tab -> (LibraryTab) tab)
-                                               .map(LibraryTab::getBibDatabaseContext)));
+        EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), selectedTab -> {
+            if (selectedTab instanceof LibraryTab libraryTab) {
+                stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
+            } else if (selectedTab == null) {
+                // All databases are closed
+                stateManager.setActiveDatabase(null);
+            }
+        });
 
         /*
          * The following state listener makes sure focus is registered with the
@@ -1191,7 +1193,8 @@ public class JabRefFrame extends BorderPane {
                 }
                 // The action was either canceled or unsuccessful.
                 dialogService.notify(Localization.lang("Unable to save library"));
-            } catch (Throwable ex) {
+            } catch (
+                    Throwable ex) {
                 LOGGER.error("A problem occurred when trying to save the file", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             }
@@ -1233,7 +1236,8 @@ public class JabRefFrame extends BorderPane {
                 }
                 // The action was either canceled or unsuccessful.
                 dialogService.notify(Localization.lang("Unable to save library"));
-            } catch (Throwable ex) {
+            } catch (
+                    Throwable ex) {
                 LOGGER.error("A problem occurred when trying to delete the empty entries", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Delete empty entries"), Localization.lang("Could not delete empty entries."), ex);
             }
@@ -1377,7 +1381,8 @@ public class JabRefFrame extends BorderPane {
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(path, prefs, dialogService);
-                } catch (IOException e) {
+                } catch (
+                        IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }
             });
