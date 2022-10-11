@@ -85,6 +85,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
         List<Author> authorsList = new ArrayList<>();
         List<Author> editorsList = new ArrayList<>();
         StringJoiner keywordJoiner = new StringJoiner(", ");
+        String publisherImprint = "";
 
         // Get the ISBN within the BITSTREAM. See the link below:
         // https://directory.doabooks.org/rest/search?query=handle:%2220.500.12854/26303%22&expand=metadata,bitstreams
@@ -96,7 +97,9 @@ public class DOABFetcher implements SearchBasedParserFetcher {
             JSONArray array = bitstreamObject.getJSONArray("metadata");
             for (int k = 0; k < array.length(); k++) {
                 JSONObject metadataInBitstreamObject = array.getJSONObject(k);
-                if (metadataInBitstreamObject.getString("key").equals("oapen.relation.isbn")) {
+                if (metadataInBitstreamObject.getString("key").equals("dc.identifier.isbn")) {
+                    entry.setField(StandardField.ISBN, metadataInBitstreamObject.getString("value"));
+                } else if (metadataInBitstreamObject.getString("key").equals("oapen.relation.isbn")) {
                     entry.setField(StandardField.ISBN, metadataInBitstreamObject.getString("value"));
                 }
             }
@@ -147,11 +150,20 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                         dataObject.getString("value"));
                 case "dc.title.alternative" -> entry.setField(StandardField.SUBTITLE,
                         dataObject.getString("value"));
+                case "oapen.imprint" -> publisherImprint = dataObject.getString("value");
             }
         }
+
         entry.setField(StandardField.AUTHOR, AuthorList.of(authorsList).getAsFirstLastNamesWithAnd());
         entry.setField(StandardField.EDITOR, AuthorList.of(editorsList).getAsFirstLastNamesWithAnd());
         entry.setField(StandardField.KEYWORDS, String.valueOf(keywordJoiner));
+
+        // Special condition to check if publisher field is empty. If so, retrieve imprint (if available)
+        if (entry.getField(StandardField.PUBLISHER).isEmpty()) {
+            if (!publisherImprint.equals("")) {
+                entry.setField(StandardField.PUBLISHER, publisherImprint);
+            }
+        }
         return entry;
     }
 
