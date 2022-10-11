@@ -21,7 +21,7 @@
         }
     },
 
-    "onCreateCommand": "gradle assemble",
+    "onCreateCommand": "gradle assemble || true",
 
     // Need to connect as root otherwise we run into issues with gradle.
     // default option is "vscode". More info: https://aka.ms/vscode-remote/containers/non-root.

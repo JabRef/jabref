@@ -271,7 +271,6 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateEndnoteSource",
                                 "generateModsSource",
                                 "generateCitaviSource",
-                                "downloadServiceApolloSchemaFromIntrospection",
                                 "generateApolloSources"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
@@ -370,6 +369,14 @@ apollo {
     endpointUrl = "https://mango-pebble-0224c3803-dev.westeurope.1.azurestaticapps.net/api"
   }
 }
+
+tasks.whenTaskAdded { task ->
+    // Download schema before trying to generate apollo sources
+    if (task.name.contains("generateServiceApolloSources")) {
+        task.dependsOn 'downloadServiceApolloSchemaFromIntrospection'
+    }
+}
+
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
