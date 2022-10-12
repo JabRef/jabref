@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -134,7 +135,7 @@ public class Linux implements NativeDesktop {
             if (emulatorName != null) {
                 emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
 
-                String[] cmd = {};
+                String[] cmd;
                 if (emulatorName.contains("gnome")) {
                     cmd = new String[] {"gnome-terminal", "--working-directory=", absolutePath};
                 } else if (emulatorName.contains("xfce4")) {
@@ -166,5 +167,13 @@ public class Linux implements NativeDesktop {
     @Override
     public Path getApplicationDirectory() {
         return Path.of("/usr/lib/");
+    }
+
+    @Override
+    public Path getDefaultFileChooserDirectory() {
+        return Path.of(Objects.requireNonNullElse(
+                System.getenv("XDG_DOCUMENTS_DIR"),
+                System.getProperty("users.home") + "/Documents")
+        );
     }
 }
