@@ -2,7 +2,9 @@ package org.jabref.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Authenticator;
+import java.net.InetSocketAddress;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +32,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
+//import com.sun.net.httpserver.HttpServer;
 import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -48,6 +51,25 @@ public class Launcher {
 
     public static void main(String[] args) {
         addLogToDisk();
+
+        try {
+            HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+            server.createContext("/applications/myapp", httpExchange -> {
+                    String response = "This is the response";
+                    httpExchange.getResponseHeaders().add("Content-Type", "text/plain; charset=UTF-8");
+                    httpExchange.sendResponseHeaders(200, response.length());
+                    OutputStream out = httpExchange.getResponseBody();
+                    out.write(response.getBytes());
+                    out.close();
+                }
+            );
+            server.setExecutor(null); // creates a default executor
+            server.start();
+            return;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         try {
             // Init preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
