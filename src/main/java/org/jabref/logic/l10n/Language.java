@@ -8,7 +8,7 @@ import java.util.Optional;
  * Contains all supported languages.
  */
 public enum Language {
-
+    ARABIC("العربية (Arabic)", "ar"),
     BAHASA_INDONESIA("Bahasa Indonesia", "id"),
     BRAZILIAN_PORTUGUESE("Brazilian Portuguese", "pt_BR"),
     DANISH("Dansk", "da"),
