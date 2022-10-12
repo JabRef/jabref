@@ -2187,7 +2187,9 @@ public class JabRefPreferences implements PreferencesService {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUser(),
-                get(MAIN_FILE_DIRECTORY),
+                StringUtil.isNotBlank(get(MAIN_FILE_DIRECTORY))
+                        ? get(MAIN_FILE_DIRECTORY)
+                        : JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory().toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
