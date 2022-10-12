@@ -32,7 +32,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-//import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpServer;
 import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
