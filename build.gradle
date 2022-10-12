@@ -49,7 +49,7 @@ java {
 }
 
 application {
-    mainClass.set('org.jabref.gui.JabRefLauncher')
+    mainClass.set('org.jabref.cli.Launcher')
     mainModule.set('org.jabref')
 }
 
@@ -125,7 +125,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'com.h2database:h2-mvstore:2.1.214'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.5.0'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.71.1'
@@ -211,8 +211,8 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:4.8.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.23.1'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.23.1'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.0.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.0.0'
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
