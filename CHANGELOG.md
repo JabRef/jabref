@@ -19,9 +19,17 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The properties of an existing systematic literature review can be edited. [koppor#604](https://github.com/koppor/jabref/issues/604)
 - An SLR can now be started from the SLR itself. [#9131](https://github.com/JabRef/jabref/pull/9131), [koppor#601](https://github.com/koppor/jabref/issues/601)
 - Implement a new ISBN Fetcher ([doi-to-bibtex-converter.herokuapp.com](http://doi-to-bibtex-converter.herokuapp.com) as source). [#9145](https://github.com/JabRef/jabref/pull/9145)
+- We added support for the Ukrainian and Arabic languages. [#9236](https://github.com/JabRef/jabref/pull/9236), [#9243](https://github.com/JabRef/jabref/pull/9243)
 
 ### Changed
 
+- We disabled the conversion menu for empty fields [#9200](https://github.com/JabRef/jabref/issues/9200)
+- We upgraded to Lucene 9.4 for the fulltext search.
+  Thus, the now created search index cannot be read from older versions of JabRef anylonger.
+  ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
+  Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
+  [#9213](https://github.com/JabRef/jabref/pull/9213)
+- Genres are now mapped correctly to entry types when importing MODS files. [#9185](https://github.com/JabRef/jabref/issues/9185)
 - We improved the Citavi Importer to also import so called Knowledge-items into the field `comment` of the corresponding entry [#9025](https://github.com/JabRef/jabref/issues/9025)
 - We removed wrapping of string constants when writing to a `.bib` file.
 - We call backup files `.bak` and temporary writing files now `.sav`.
@@ -38,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed the display of the "Customize Entry Types" dialogue title [#9198](https://github.com/JabRef/jabref/issues/9198)
 - We fixed an issue where author names with tilde accents (for example ñ) were marked as "Names are not in the standard BibTex format" [#8071](https://github.com/JabRef/jabref/issues/8071)
 - We fixed an issue where the possibility to generate a subdatabase from an aux file was writing empty files when called from the commandline [#9115](https://github.com/JabRef/jabref/issues/9115), [forum#3516](https://discourse.jabref.org/t/export-subdatabase-from-aux-file-on-macos-command-line/3516)
 - We fixed the display of issue, number, eid and pages fields in the entry preview. [#8607](https://github.com/JabRef/jabref/pull/8607), [#8372](https://github.com/JabRef/jabref/issues/8372), [Koppor#514](https://github.com/koppor/jabref/issues/514), [forum#2390](https://discourse.jabref.org/t/unable-to-edit-my-bibtex-file-that-i-used-before-vers-5-1/2390), [forum#3462](https://discourse.jabref.org/t/jabref-5-6-need-help-with-export-from-jabref-to-microsoft-word-entry-preview-of-apa-7-not-rendering-correctly/3462)
@@ -55,6 +64,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the CSS styles are missing in some dialogs. [#9150](https://github.com/JabRef/jabref/pull/9150)
 - We fixed an issue where pdfs were re-indexed on each startup. [#9166](https://github.com/JabRef/jabref/pull/9166)
 - We fixed an issue where Capitalize didn't capitalize words after hyphen characters. [#9157](https://github.com/JabRef/jabref/issues/9157)
+- We fixed an issue with the message that is displayed when fetcher returns an empty list of entries for given query. [#9195](https://github.com/JabRef/jabref/issues/9195)
+- We fixed an issue where an exception was not logged correctly. [koppor#627](https://github.com/JabRef/koppor/issues/627)
+- We fixed an issue where hitting enter on the search field within the preferences dialog closed the dialog. [koppor#630](https://github.com/koppor/jabref/issues/630)
+- We fixed a typo within a connection error message. [koppor#625](https://github.com/koppor/jabref/issues/625)
 
 ### Removed
 
