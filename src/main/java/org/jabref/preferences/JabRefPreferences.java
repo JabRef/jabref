@@ -1109,7 +1109,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                getFilePreferences().getFileDirectory(),
+                getFilePreferences().getMainFileDirectory(),
                 fileDirForDatabase);
     }
 

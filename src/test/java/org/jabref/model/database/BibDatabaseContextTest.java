@@ -94,7 +94,7 @@ class BibDatabaseContextTest {
     void getUserFileDirectoryIfAllAreEmpty() {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         Path userDirGlobal = Path.of("some random path").toAbsolutePath();
-        when(fileDirPrefs.getFileDirectory()).thenReturn(Optional.of(userDirGlobal));
+        when(fileDirPrefs.getMainFileDirectory()).thenReturn(Optional.of(userDirGlobal));
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(Path.of("biblio.bib"));

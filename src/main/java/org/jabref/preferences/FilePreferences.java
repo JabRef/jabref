@@ -57,7 +57,7 @@ public class FilePreferences {
         return user.getValue();
     }
 
-    public Optional<Path> getFileDirectory() {
+    public Optional<Path> getMainFileDirectory() {
         return mainFileDirectory.getValue();
     }
 
