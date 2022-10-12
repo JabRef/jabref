@@ -18,6 +18,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
@@ -160,7 +161,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
 
         // Special condition to check if publisher field is empty. If so, retrieve imprint (if available)
         if (entry.getField(StandardField.PUBLISHER).isEmpty()) {
-            if (!publisherImprint.equals("")) {
+            if (!StringUtil.isNullOrEmpty(publisherImprint)) {
                 entry.setField(StandardField.PUBLISHER, publisherImprint);
             }
         }
