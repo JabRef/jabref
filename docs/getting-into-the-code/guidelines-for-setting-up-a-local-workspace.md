@@ -20,11 +20,7 @@ This section list the prerequisites you need to get started to develop JabRef. A
 
 ### Java Development Kit 18
 
-A working Java (Development Kit) 18 installation with Java FX support is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 18 (e.g., `javac 18`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
-
-[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx\_will\_be\_removed\_from\_the\_java\_jdk\_in\_jdk\_11/), it needs to be installed separately if not using a special JDK.
-
-Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net). Afterwards, download the "jmods" JavaFX 18 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-18\jmods`.
+A working Java (Development Kit) 18 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 18 (e.g., `javac 18`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
 ### GitHub Account
 
