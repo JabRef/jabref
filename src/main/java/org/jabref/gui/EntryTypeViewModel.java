@@ -150,7 +150,7 @@ public class EntryTypeViewModel {
             if (exception instanceof FetcherClientException) {
                 dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage);
             } else if (exception instanceof FetcherServerException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later.") + "\n" + fetcherExceptionMessage);
+                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try again later.") + "\n" + fetcherExceptionMessage);
             } else {
                 dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage));
             }
