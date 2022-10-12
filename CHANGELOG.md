@@ -35,7 +35,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We call backup files `.bak` and temporary writing files now `.sav`.
 - JabRef keeps 10 older versions of a `.bib` file in the [user data dir](https://github.com/harawata/appdirs#supported-directories) (instead of a single `.sav` (now: `.bak`) file in the directory of the `.bib` file)
 - We changed the button label from "Return to JabRef" to "Return to library" to better indicate the purpose of the action.
-- We removed "last-search-date" from the SLR feature, because the last-search-date can be deducted from the git logs. [#9116](https://github.com/JabRef/jabref/pull/9116)
 - A user can now add arbitrary data into `study.yml`. JabRef just ignores this data. [#9124](https://github.com/JabRef/jabref/pull/9124)
 - We reworked the External Changes Resolver dialog. [#9021](https://github.com/JabRef/jabref/pull/9021)
 - The fallback directory of the file folder now is the general file directory. In case there was a directory configured for a library and this directory was not found, JabRef placed the PDF next to the .bib file and not into the general file directory.
@@ -43,6 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We reworked the Define study parameters dialog. [#9123](https://github.com/JabRef/jabref/pull/9123)
 - We simplified the actions to fast-resolve duplicates to 'Keep Left', 'Keep Right', 'Keep Both' and 'Keep Merged'. [#9056](https://github.com/JabRef/jabref/issues/9056)
 - We fixed an issue where a message about changed metadata would occur on saving although nothing changed. [#9159](https://github.com/JabRef/jabref/issues/9159)
+- When adding or editing a subgroup it is placed w.r.t. to alphabetical ordering rather than at the end. [koppor#577](https://github.com/koppor/jabref/issues/577)
 - We modified the Directory of Open Access Books (DOAB) fetcher so that it will now also fetch the ISBN when possible. [#8708](https://github.com/JabRef/jabref/issues/8708)
 
 ### Fixed
@@ -72,6 +72,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Removed
 
+- We removed "last-search-date" from the SLR feature, because the last-search-date can be deducted from the git logs. [#9116](https://github.com/JabRef/jabref/pull/9116)
 
 
 
