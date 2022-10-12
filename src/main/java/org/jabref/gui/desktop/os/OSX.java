@@ -52,4 +52,13 @@ public class OSX implements NativeDesktop {
     public Path getApplicationDirectory() {
         return Path.of("/Applications");
     }
+
+    @Override
+    public Path getDefaultFileChooserDirectory() {
+        // We do not return a subdirectory "JabRef", because
+        //   - the directory might not exist at this point of the method
+        //   - we might not have the rights to create a directory
+        //   - getters should not have any side effect
+        return Path.of(System.getProperty("user.home") + "/Documents");
+    }
 }
