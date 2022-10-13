@@ -1,6 +1,7 @@
 package org.jabref.logic.jabrefonline;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,8 +33,8 @@ public class GetDocumentByIdQTest {
         assertEquals(response.data, new Data(new UserDocument(
                                                               "ckondtcaf000101mh7x9g4gia",
                                                               Collections.emptyList(),
-                                                              LocalDateTime.of(2021, 1, 1, 0, 0),
-                                                              LocalDateTime.of(2000, 1, 1, 0, 0),
+                                                              ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneId.of("Z")),
+                                                              ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.of("Z")),
                                                               "Cocoa and Cardiovascular Health",
                                                               null,
                                                               null,
