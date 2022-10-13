@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.jabrefonline.RemoteSettings;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
@@ -24,6 +25,7 @@ import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +90,8 @@ public class MetaDataParser {
                 metaData.setDefaultFileDirectory(getSingleItem(value));
             } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
                 metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
+            } else if (entry.getKey().equals(MetaData.REMOTE_SETTINGS)) {
+                metaData.setRemoteSettings(new Gson().fromJson(getSingleItem(value), RemoteSettings.class));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
                 metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
             } else {

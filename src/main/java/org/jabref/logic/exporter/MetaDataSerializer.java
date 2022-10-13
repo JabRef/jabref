@@ -17,6 +17,8 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 
+import kong.unirest.json.JSONObject;
+
 public class MetaDataSerializer {
 
     private MetaDataSerializer() {
@@ -46,6 +48,9 @@ public class MetaDataSerializer {
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
         metaData.getLatexFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + "Latex-" + user, Collections.singletonList(path.toString().trim())));
+        metaData.getRemoteSettings().ifPresent(
+            settings -> stringyMetaData.put(MetaData.REMOTE_SETTINGS, Collections.singletonList(new JSONObject(settings).toString()))
+        );
 
         for (ContentSelector selector : metaData.getContentSelectorList()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());
