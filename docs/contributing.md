@@ -3,11 +3,9 @@ nav_order: 2
 ---
 # Contributing
 
-After reading through this guide, check out some good first issues to contribute to by clicking here: [Good First Issues](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-
-In case you are aiming to contribute other improvements, please head over to our general [JabRef contribution page](https://docs.jabref.org/faqcontributing).
-
-In case you are an instructor and want to use **JabRef as a software engineering example**, please head to [https://devdocs.jabref.org/teaching](https://devdocs.jabref.org/teaching).
+* After reading through this guide, check out some good first issues to contribute to by goind to our [List of Good First Issues](https://github.com/orgs/JabRef/projects/5/views/1).
+* In case you are aiming to contribute other improvements, please head over to our [general JabRef contribution page](https://docs.jabref.org/faqcontributing).
+* In case you are an instructor and want to use **JabRef as a software engineering example**, please head to [https://devdocs.jabref.org/teaching](https://devdocs.jabref.org/teaching).
 
 ## Contribute code
 
