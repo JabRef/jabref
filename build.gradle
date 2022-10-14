@@ -81,6 +81,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url 'https://repository.apache.org/content/groups/snapshots/' }
     maven { url 'https://jitpack.io' }
 }
 
@@ -111,9 +112,9 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
-    implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
-    implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.0-SNAPSHOT', changing: true
+    implementation group: 'org.apache.pdfbox', name: 'fontbox', version: '3.0.0-SNAPSHOT', changing: true
+    implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '3.0.0-SNAPSHOT', changing: true
 
     implementation 'org.apache.lucene:lucene-core:9.4.0'
     implementation 'org.apache.lucene:lucene-queryparser:9.4.0'
