@@ -112,11 +112,3 @@ If you want to indicate that a pull request is not yet complete **before** creat
 
 For improving developer's documentation, go on at the [docs/ subdirectory of JabRef's code](https://github.com/JabRef/jabref/tree/main/docs) and edit the file.
 GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
-
-You can also host Jekyll locally.
-
-    docker run --rm -it \
-      --volume="$pwd:/srv/jekyll" \
-      jekyll/builder:latest /bin/bash -c "gem install && bundle exec jekyll build && bundle exec rake search:init && jekyll serve"
-
-Then, you can see a near-to-reality rendering of the development documentation at <http://localhost:4000>.
