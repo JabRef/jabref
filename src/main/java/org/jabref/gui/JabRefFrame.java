@@ -407,6 +407,15 @@ public class JabRefFrame extends BorderPane {
                 Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext()
                                                              .getDatabasePath()
                                                              .orElse(null);
+
+                int i = 0;
+                while (focusedDatabase == null && i < tabbedPane.getTabs().size()) {
+                    focusedDatabase = getLibraryTabAt(i).getBibDatabaseContext()
+                                                        .getDatabasePath()
+                                                        .orElse(null);
+                    i++;
+                }
+
                 prefs.getGuiPreferences().setLastFilesOpened(filenames);
                 prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
             }
