@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import org.h2.mvstore.MVMap;
@@ -48,7 +49,8 @@ public class JournalAbbreviationRepository {
      * Letters) or its abbreviated form (e.g. Phys. Rev. Lett.).
      */
     public boolean isKnownName(String journalName) {
-        String journal = journalName.trim();
+        // Trims the String and also replaces any instances of "\&" with "&" for abbreviation search purposes
+        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         boolean isKnown = customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation));
         if (isKnown) {
@@ -63,7 +65,8 @@ public class JournalAbbreviationRepository {
      * i.e. journals whose abbreviation is the same as the full name are not considered
      */
     public boolean isAbbreviatedName(String journalName) {
-        String journal = journalName.trim();
+        // Trims the String and also replaces any instances of "\&" with "&" for abbreviation search purposes
+        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
                 || abbreviationToFull.containsKey(journal);
@@ -75,7 +78,8 @@ public class JournalAbbreviationRepository {
      * @param input The journal name (either abbreviated or full name).
      */
     public Optional<Abbreviation> get(String input) {
-        String journal = input.trim();
+        // Trims the String and also replaces any instances of "\&" with "&" for abbreviation search purposes
+        String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
                                                                        .filter(abbreviation -> isMatched(journal, abbreviation))
