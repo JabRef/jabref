@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
@@ -49,6 +48,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.CheckTreeView;
 
 public class UnlinkedFilesDialogView extends BaseDialog<Void> {

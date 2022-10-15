@@ -2,7 +2,6 @@ package org.jabref.gui.importer;
 
 import java.util.EnumSet;
 
-import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
@@ -44,6 +43,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
