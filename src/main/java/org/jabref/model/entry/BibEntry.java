@@ -774,8 +774,20 @@ public class BibEntry implements Cloneable {
 
     public Optional<FieldChange> removeKeywords(KeywordList keywordsToRemove, Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
+
+        // We need to fix "file has changed on disk" for duplicate keywords
+        // The input of the set may contain duplicate keywords (which are present as single keyword in the set)
+        // Even if no "keywordsToRemove" is contained, the method "putKeywords" will return a change, because the duplicate keywords will have been removed
+        int oldSize = keywordList.size();
         keywordList.removeAll(keywordsToRemove);
-        return putKeywords(keywordList, keywordDelimiter);
+        // claim 1: The size of a set is the same, if no element is removed
+        // claim 2: The size of a set is different if an element was removed
+        // With claim 1, we can assume no change if there is no change on the size
+        if (oldSize == keywordList.size()) {
+            return Optional.empty();
+        } else {
+            return putKeywords(keywordList, keywordDelimiter);
+        }
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace,

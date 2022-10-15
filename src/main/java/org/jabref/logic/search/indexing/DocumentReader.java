@@ -100,12 +100,12 @@ public final class DocumentReader {
                     try {
                         addContentIfNotEmpty(pdfDocument, newDocument, pageNumber);
                     } catch (IOException e) {
-                        LOGGER.warn("Could not read page " + pageNumber + " of " + resolvedPdfPath.toAbsolutePath(), e);
+                        LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPdfPath.toAbsolutePath(), e);
                     }
                     pages.add(newDocument);
                 }
         } catch (IOException e) {
-            LOGGER.warn("Could not read " + resolvedPdfPath.toAbsolutePath(), e);
+            LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
         }
         if (pages.isEmpty()) {
             Document newDocument = new Document();

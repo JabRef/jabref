@@ -1,7 +1,5 @@
 package org.jabref.gui.linkedfile;
 
-import javax.inject.Inject;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -18,6 +16,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 

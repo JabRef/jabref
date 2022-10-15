@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -15,6 +15,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -37,12 +38,12 @@ import org.slf4j.LoggerFactory;
  * Fetcher for OpenLibrary.
  * <a href="https://openlibrary.org/dev/docs/api/books">API documentation</a>.
  */
-public class OpenLibraryFetcher extends AbstractIsbnFetcher {
+public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenLibraryFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenLibraryIsbnFetcher.class);
     private static final String BASE_URL = "https://openlibrary.org";
 
-    public OpenLibraryFetcher(ImportFormatPreferences importFormatPreferences) {
+    public OpenLibraryIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
     }
 
@@ -54,8 +55,10 @@ public class OpenLibraryFetcher extends AbstractIsbnFetcher {
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         this.ensureThatIsbnIsValid(identifier);
-        URIBuilder uriBuilder = new URIBuilder(BASE_URL + "/isbn/" + identifier + ".json");
-        return uriBuilder.build().toURL();
+        return new URIBuilder(BASE_URL)
+                .setPathSegments("isbn", identifier + ".json")
+                .build()
+                .toURL();
     }
 
     @Override
@@ -99,10 +102,9 @@ public class OpenLibraryFetcher extends AbstractIsbnFetcher {
                             .or(() -> Optional.ofNullable(item.optString("title", null)))
                             .orElse(""));
             entry.setField(StandardField.SUBTITLE, item.optString("subtitle"));
-            Optional<String> yearOpt = Date.parse(item.optString("publish_date")).flatMap(Date::getYear).map(year -> year.toString());
-            yearOpt.ifPresent(year -> {
-                entry.setField(StandardField.YEAR, year);
-            });
+            Optional<String> yearOpt = Date.parse(item.optString("publish_date")).flatMap(Date::getYear).map(
+                    Object::toString);
+            yearOpt.ifPresent(year -> entry.setField(StandardField.YEAR, year));
             entry.setField(StandardField.PUBLISHER,
                     Optional.ofNullable(item.optJSONArray("publishers")).map(array -> array.getString(0))
                             .orElse(""));
@@ -149,7 +151,7 @@ public class OpenLibraryFetcher extends AbstractIsbnFetcher {
                                           .mapToObj(works::getJSONObject)
                                           .map(obj -> obj.getString("key"))
                                           .map(worksLink -> BASE_URL + worksLink + ".json")
-                                          .flatMap(link -> fromWorkToAuthors(link))
+                                          .flatMap(this::fromWorkToAuthors)
                                           .collect(Collectors.toList());
         return AuthorList.of(authors).getAsLastFirstNamesWithAnd(false);
     }

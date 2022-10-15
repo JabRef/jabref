@@ -193,7 +193,7 @@ public class JabRefFrame extends BorderPane {
         this.undoManager = Globals.undoManager;
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
-        this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
+        this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
         this.importFormatReader = Globals.IMPORT_FORMAT_READER;
         this.setOnKeyTyped(key -> {
@@ -403,7 +403,7 @@ public class JabRefFrame extends BorderPane {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
-                prefs.clearEditedFiles();
+                prefs.getGuiPreferences().getLastFilesOpened().clear();
             } else {
                 Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext()
                                                              .getDatabasePath()

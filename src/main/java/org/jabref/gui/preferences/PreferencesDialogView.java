@@ -2,12 +2,11 @@ package org.jabref.gui.preferences;
 
 import java.util.Locale;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyCode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -21,6 +20,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
 /**
@@ -51,6 +51,13 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                   .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
+
+        // Stop the default button from firing when the user hits enter within the search box
+        searchBox.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                event.consume();
+            }
+        });
 
         themeManager.updateFontStyle(getDialogPane().getScene());
     }

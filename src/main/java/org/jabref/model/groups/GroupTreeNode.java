@@ -72,17 +72,17 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         group = Objects.requireNonNull(newGroup);
 
         List<FieldChange> changes = new ArrayList<>();
-        boolean shouldRemove = shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);
-        boolean shouldAdd = shouldKeepPreviousAssignments && (newGroup instanceof GroupEntryChanger);
-        if (shouldAdd || shouldRemove) {
+        boolean shouldRemoveFromOldGroup = shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);
+        boolean shouldAddToNewGroup = shouldKeepPreviousAssignments && (newGroup instanceof GroupEntryChanger);
+        if (shouldAddToNewGroup || shouldRemoveFromOldGroup) {
             List<BibEntry> entriesMatchedByOldGroup = entriesInDatabase.stream().filter(oldGroup::isMatch)
                                                                        .collect(Collectors.toList());
-            if (shouldRemove) {
+            if (shouldRemoveFromOldGroup) {
                 GroupEntryChanger entryChanger = (GroupEntryChanger) oldGroup;
                 changes.addAll(entryChanger.remove(entriesMatchedByOldGroup));
             }
 
-            if (shouldAdd) {
+            if (shouldAddToNewGroup) {
                 GroupEntryChanger entryChanger = (GroupEntryChanger) newGroup;
                 changes.addAll(entryChanger.add(entriesMatchedByOldGroup));
             }
