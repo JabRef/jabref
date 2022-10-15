@@ -99,7 +99,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "19"
+    version = "18"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
