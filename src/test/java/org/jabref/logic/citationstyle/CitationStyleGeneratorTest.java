@@ -46,10 +46,10 @@ class CitationStyleGeneratorTest {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
         context.setMode(BibDatabaseMode.BIBLATEX);
         List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
-        CitationStyle style = styleList.stream().filter(e -> "American Psychological Association 6th edition".equals(e.getTitle())).findAny().orElse(null);
+        CitationStyle style = styleList.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().orElse(null);
         String citation = CitationStyleGenerator.generateCitation(TestEntry.getTestEntry(), style.getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager());
 
-        // if the apa-6th-citation.csl citation style changes this has to be modified
+        // if the apa-7th-citation.csl citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">"
                 + "Smith, B., Jones, B., &amp; Williams, J. (2016-07). Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span>, <span style=\"font-style: italic\">34</span>(3), 45&ndash;67. https://doi.org/10.1001/bla.blubb"
                 + "</div>\n"
@@ -229,7 +229,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.VOLUME, "1")
                                 .withField(StandardField.COMMENT, "The issue field does not exist in Bibtex standard, therefore there is no need to render it (The issue field exists in biblatex standard though)")
                                 .withField(StandardField.ISSUE, "9issue"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 Arguments.of(
                         "Foo, B. (n.d.). volume + issue + pages. Bib(La)TeX Journal, 1(9), 45–67.\n",
@@ -242,7 +242,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.VOLUME, "1")
                                 .withField(StandardField.COMMENT, "The issue field does not exist in Bibtex standard, therefore there is no need to render it (The issue field exists in biblatex standard though.). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.")
                                 .withField(StandardField.ISSUE, "9"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 Arguments.of(
                         "Foo, B. (n.d.). volume + pages. Bib(La)TeX Journal, 1, 45–67.\n",
@@ -253,7 +253,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.TITLE, "volume + pages")
                                 .withField(StandardField.VOLUME, "1"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 Arguments.of(
                         "Foo, B. (n.d.). number. Bib(La)TeX Journal, (3number).\n",
@@ -263,7 +263,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.TITLE, "number"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing.
                 Arguments.of(
@@ -275,7 +275,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.TITLE, "issue + pages")
                                 .withField(StandardField.ISSUE, "9"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though)
                 Arguments.of(
@@ -287,7 +287,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.TITLE, "issue + number")
                                 .withField(StandardField.ISSUE, "9issue"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though)
                 Arguments.of(
@@ -300,7 +300,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.TITLE, "issue + number + pages")
                                 .withField(StandardField.ISSUE, "9issue"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // "Article number" is not a field that exists in Bibtex standard. Printing the article number in the pages field is a workaround. Some Journals have opted to put the article number into the pages field. APA 7th Style recommends following procedure: If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range. Question: Should it be rendered WITH Article or WITHOUT the Word Article in Front? I guess without?
                 Arguments.of(
@@ -313,7 +313,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.PAGES, "Article 777")
                                 .withField(StandardField.TITLE, "number + pages")
                                 .withField(StandardField.COMMENT, "number + article-number WITH the word article instead of pagerange"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // "The issue field does not exist in bibtex standard, therefore there is no need to render it (it exists in biblatex standard though). Since, for this entry, there is no number field present and therefore no data will be overwriten, enabling the user to be able to move the data within the issue field to the number field via cleanup action is something worth pursuing."
                 Arguments.of(
@@ -324,7 +324,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.JOURNAL, "Bib(La)TeX Journal")
                                 .withField(StandardField.TITLE, "issue")
                                 .withField(StandardField.ISSUE, "9issue"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 Arguments.of(
                         "Foo, B. (n.d.). number + pages. Bib(La)TeX Journal, (3number), 45–67.\n",
@@ -335,7 +335,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.TITLE, "number + pages"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // "Article number" is not a field that exists in Bibtex standard. Printing the article number in the pages field is a workaround. Some Journals have opted to put the article number into the pages field. APA 7th Style recommends following procedure: If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range. Question: Should it be rendered WITH Article or WITHOUT the Word Article in Front? I guess without?
                 Arguments.of(
@@ -348,7 +348,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.PAGES, "777e23")
                                 .withField(StandardField.TITLE, "number + pages")
                                 .withField(StandardField.COMMENT, "number + article-number WITHOUT the word article instead of pagerange"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "eid" field here, is correct. The "eid" field(short for: electronic identifier) does not exist in Bibtex standard. It exists in Biblatex standard though and is the field, in which the "article number" should be entered into. "Article number" is a field that does not exist in Bibtex and also not in Biblatex standard. As a workaround, some Journals have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue (= the "number" field" in Biblatex)  whenever it is in the data and the number (= the "eid" field in Biblatex) when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280). I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition. Not rendering the "issue" field here is sufficient for APA 7th edition. Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 Arguments.of(
@@ -362,7 +362,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "eid + issue + number + pages")
                                 .withField(StandardField.EID, "6eid")
                                 .withField(StandardField.ISSUE, "9issue"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 /*
                 Not rendering the "eid" field here, is correct. The "eid" field(= electronic identifier) does not exist in Bibtex standard.
@@ -381,7 +381,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.COMMENT, "")
                                 .withField(StandardField.EID, "Article 6eid")
                                 .withField(StandardField.ISSUE, "9issue"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
         /*
         Not rendering the "eid" field here, is sufficient, but contested practice. This statement is based on the following reasoning: "eid" (in long: electronic identifier) is the field, which should be used to enter the "article number", when using the Biblatex standard. Both "eid" and "article number" do not exist in the older Bibtex standard. As a workaround, some Journals and publishers have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue [= the "number" field" in both Biblatex and Bibtex]  whenever it is in the data and the number [= the "eid" field in Biblatex] when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280. I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition.
@@ -400,7 +400,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.VOLUME, "1"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "eid" field here, is sufficient, but contested practice. This statement is based on the following reasoning: "eid" (in long: electronic identifier) is the field, which should be used to enter the "article number", when using the Biblatex standard. Both "eid" and "article number" do not exist in the older Bibtex standard. As a workaround, some Journals and publishers have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue [= the "number" field" in both Biblatex and Bibtex]  whenever it is in the data and the number [= the "eid" field in Biblatex] when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280. I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition.
                 Arguments.of(
@@ -414,7 +414,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue")
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.VOLUME, "1"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "eid" field here, is sufficient, but contested practice. This statement is based on the following reasoning: "eid" (in long: electronic identifier) is the field, which should be used to enter the "article number", when using the Biblatex standard. Both "eid" and "article number" do not exist in the older Bibtex standard. As a workaround, some Journals and publishers have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue [= the "number" field" in both Biblatex and Bibtex]  whenever it is in the data and the number [= the "eid" field in Biblatex] when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280. I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition.
                 Arguments.of(
@@ -428,11 +428,11 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.VOLUME, "1"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 Arguments.of(
                         /*
-                         * Change test once apa-6th-edition.csl supports the CSL "number" field.
+                         * Change test once apa.csl supports the CSL "number" field.
                          * Tracked in https://github.com/citation-style-language/styles/issues/5827
                          * Ideal test: "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, (9issue), Article 6eid.\n",
                          * Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
@@ -445,7 +445,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "eid + issue")
                                 .withField(StandardField.EID, "Article 6eid")
                                 .withField(StandardField.ISSUE, "9issue"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "eid" field here, is sufficient, but contested practice. This statement is based on the following reasoning: "eid" (in long: electronic identifier) is the field, which should be used to enter the "article number", when using the Biblatex standard. Both "eid" and "article number" do not exist in the older Bibtex standard. As a workaround, some Journals and publishers have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue [= the "number" field" in both Biblatex and Bibtex]  whenever it is in the data and the number [= the "eid" field in Biblatex] when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280. I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition.
                 Arguments.of(
@@ -458,11 +458,11 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.EID, "6eid")
                                 .withField(StandardField.ISSUE, "9issue")
                                 .withField(StandardField.PAGES, "45--67"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "issue" field here is sufficient for APA 7th edition. Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 /*
-                  Change test once apa-6th-edition.csl supports the CSL "number" field.
+                  Change test once apa.csl supports the CSL "number" field.
                   Tracked in https://github.com/citation-style-language/styles/issues/5827
                   Ideal test: "Foo, B. (n.d.). eid + issue + number. Bib(La)TeX Journal, (3number), Article 6eid.\n",
                   Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
@@ -477,7 +477,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.EID, "Article 6eid")
                                 .withField(StandardField.ISSUE, "9issue")
                                 .withField(StandardField.NUMBER, "3number"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 /*
                     Not rendering the "eid" field here, is sufficient, but contested practice. This statement is based on the following reasoning: "eid" (in long: electronic identifier) is the field, which should be used to enter the "article number", when using the Biblatex standard. Both "eid" and "article number" do not exist in the older Bibtex standard. As a workaround, some Journals and publishers have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue [= the "number" field" in both Biblatex and Bibtex]  whenever it is in the data and the number [= the "eid" field in Biblatex] when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280. I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition.
@@ -495,7 +495,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue")
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "45--67"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "eid" field here, is sufficient, but contested practice. My personal opinion is that the "eid" (article number) will probably be more helpful to users for finding this article than the page range, if the "number" and "issue" and "volume" are unknown.
                 Arguments.of(
@@ -507,11 +507,11 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "eid + pages")
                                 .withField(StandardField.EID, "6eid")
                                 .withField(StandardField.PAGES, "45--67"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 Arguments.of(
                        /*
-                         Change test once apa-6th-edition.csl supports the CSL "number" field.
+                         Change test once apa.csl supports the CSL "number" field.
                          Tracked in https://github.com/citation-style-language/styles/issues/5827
                          Ideal test: "Foo, B. (n.d.). eid. Bib(La)TeX Journal, Article 6eid.\n",
                          Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
@@ -523,11 +523,11 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.JOURNALTITLE, "Bib(La)TeX Journal")
                                 .withField(StandardField.TITLE, "eid")
                                 .withField(StandardField.EID, "Article 6eid"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // All correct and not controversial, because APA Style (7th edition) recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." (Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2)
                 /*
-                 Change test once apa-6th-edition.csl supports the CSL "number" field.
+                 Change test once apa.csl supports the CSL "number" field.
                  Tracked in https://github.com/citation-style-language/styles/issues/5827
                  Ideal test: "Foo, B. (n.d.). volume + number + eid. Bib(La)TeX Journal, 1(3number), Article 6eid.\n",
                  Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
@@ -542,7 +542,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.EID, "Article 6eid")
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.VOLUME, "1"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "eid" field here, is sufficient, but contested practice. This statement is based on the following reasoning: "eid" (in long: electronic identifier) is the field, which should be used to enter the "article number", when using the Biblatex standard. Both "eid" and "article number" do not exist in the older Bibtex standard. As a workaround, some Journals and publishers have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue [= the "number" field" in both Biblatex and Bibtex]  whenever it is in the data and the number [= the "eid" field in Biblatex] when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280. I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition.
                 Arguments.of(
@@ -555,11 +555,11 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.EID, "6eid")
                                 .withField(StandardField.PAGES, "45--67")
                                 .withField(StandardField.VOLUME, "1"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." (Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2)
                 /*
-                 Change test once apa-6th-edition.csl supports the CSL "number" field.
+                 Change test once apa.csl supports the CSL "number" field.
                  Tracked in https://github.com/citation-style-language/styles/issues/5827
                  Ideal test: "Foo, B. (n.d.). eid + number. Bib(La)TeX Journal, (3number), Article 6eid.\n",
                  Because of https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
@@ -573,7 +573,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "eid + number")
                                 .withField(StandardField.EID, "Article 6eid")
                                 .withField(StandardField.NUMBER, "3number"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "eid" field here, is sufficient, but contested practice. This statement is based on the following reasoning: "eid" (in long: electronic identifier) is the field, which should be used to enter the "article number", when using the Biblatex standard. Both "eid" and "article number" do not exist in the older Bibtex standard. As a workaround, some Journals and publishers have opted to put the article number into the pages field. APA 7th Style recommends following procedure: "If the journal article has an article number instead of a page range, include the word "Article" and then the article number instead of the page range." - Source: https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2. Additionally the APA style (7th edition) created by the CSL community "prints the issue [= the "number" field" in both Biblatex and Bibtex]  whenever it is in the data and the number [= the "eid" field in Biblatex] when no page range is present, entirely independent of the issue number" - Source: https://github.com/citation-style-language/styles/issues/5827#issuecomment-1006011280. I personally think the "eid" field SHOULD be rendered here SOMEWHERE, maybe even IN ADDITION to the page range, because we have the data, right? Why not show it? - But this is just my humble opinion and may not be coherent with the current APA Style 7th edition.
                 Arguments.of(
@@ -586,7 +586,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.EID, "6eid")
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "45--67"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "issue" field here is sufficient for APA Style (7th edition). Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 Arguments.of(
@@ -598,7 +598,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.TITLE, "issue + number")
                                 .withField(StandardField.ISSUE, "9issue")
                                 .withField(StandardField.NUMBER, "3number"),
-                        "apa-6th-edition.csl"),
+                        "apa.csl"),
 
                 // Not rendering the "issue" field here is sufficient for APA 7th edition. Under current circumstances the "number" field takes priority over the "issue" field (see https://github.com/JabRef/jabref/issues/8372#issuecomment-1023768144). [Keyword: IS RENDERING BOTH VIABLE?]. Ideally, they would coexist: "Roughly speaking number subdivides volume and issue is much closer to subdividing year. I don't think I would want to say that issue is subordinate to number or vice versa. They sort of operate on a similar level." (Source: https://github.com/plk/biblatex/issues/726#issuecomment-1010264258)
                 Arguments.of(
@@ -611,7 +611,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "9issue")
                                 .withField(StandardField.NUMBER, "3number")
                                 .withField(StandardField.PAGES, "45--67"),
-                        "apa-6th-edition.csl")
+                        "apa.csl")
         );
     }
 
