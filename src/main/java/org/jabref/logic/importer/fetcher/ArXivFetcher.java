@@ -155,25 +155,22 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /**
-     * Get ArXiv-issued DOI from the entry itself. Might require an API call
+     * Get ArXiv-issued DOI from the arXiv entry itself.
      * <br/><br/>
      * ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed {@link #DOI_PREFIX} + the entry's ArXiv ID
      *
-     * @param arXivBibEntry A Bibtex Entry, formatted as a ArXiv entry
+     * @param arXivBibEntry A Bibtex Entry, formatted as a ArXiv entry. Must contain an EPRINT field
      * @return ArXiv-issued DOI, or Empty, if method could not retrieve it
      */
     private Optional<String> getAutomaticDoi(BibEntry arXivBibEntry) {
-        try {
-            // Avoid additional call to ArXiv API, if possible
-            Optional<String> entryEPrint = arXivBibEntry.getField(StandardField.EPRINT);
-            Optional<String> arXivId = entryEPrint.isPresent() ? entryEPrint : findIdentifier(arXivBibEntry).map(ArXivIdentifier::getNormalizedWithoutVersion);
-            if (arXivId.isEmpty()) {
-                LOGGER.error("ArXiv ID could not be found from BibEntry");
-            }
-            return arXivId.map(ArXivFetcher::getAutomaticDoi);
-        } catch (FetcherException e) {
-            LOGGER.error("Could not fetch ArXiv-assigned DOI from BibEntry");
+        // As the input should always contain a EPRINT if created from inner 'ArXiv' class, don't bother doing a check that might call
+        // ArXiv's API again (method 'findIdentifier')
+        Optional<String> entryEprint = arXivBibEntry.getField(StandardField.EPRINT);
+        if (entryEprint.isEmpty()) {
+            LOGGER.error("Failed to retrieve ArXiv-issued DOI: Bibtext entry '%s' does not contain a EPRINT field");
             return Optional.empty();
+        } else {
+            return Optional.of(ArXivFetcher.getAutomaticDoi(entryEprint.get()));
         }
     }
 
@@ -209,7 +206,6 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * @return the fetch result
      */
     private static Optional<BibEntry> waitForBibEntryRetrieval(CompletableFuture<Optional<BibEntry>> bibEntryFuture) throws FetcherException {
-        // TODO: A retry process might be need (because of API throttling)
         try {
             return bibEntryFuture.join();
         } catch (CompletionException e) {
@@ -249,11 +245,6 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         this.inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise);
         return arXivBibEntryPromise;
     }
-
-//    private Optional<BibEntry> asyncInfuseArXivWithDoi(CompletableFuture<Optional<BibEntry>> arXivBibEntryFuture, Optional<ArXivIdentifier> arXivId) throws FetcherException {
-//        this.inplaceAsyncInfuseArXivWithDoi(arXivBibEntryFuture, arXivId);
-//        return arXivBibEntryFuture.join();
-//    }
 
     /**
      * Infuse arXivBibEntryPromise with additional fields in an asynchronous way

@@ -1,7 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +31,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
+import com.google.common.util.concurrent.RateLimiter;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
@@ -44,6 +47,18 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     private static final Pattern APS_SUFFIX_PATTERN = Pattern.compile(APS_SUFFIX);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiFetcher.class);
+
+    // 1000 request per 5 minutes. See https://support.datacite.org/docs/is-there-a-rate-limit-for-making-requests-against-the-datacite-apis
+    private static final RateLimiter DATA_CITE_DCN_RATE_LIMITER = RateLimiter.create(3.33);
+
+    /*
+    *  By default, it seems that CrossRef DOI Content Negotiation responses are returned by their API pools, more specifically the public one
+    *  (by default). See https://www.crossref.org/documentation/retrieve-metadata/content-negotiation/
+    *  Experimentally, the rating applied to this pool is defined by response headers "X-Rate-Limit-Interval" and "X-Rate-Limit-Limit", which seems
+    *  to default to 50 request / second. However, because of its dynamic nature, this rate could change between API calls, so we need to update it
+    *  atomically when that happens (as multiple threads might access it at the same time)
+    * */
+    private static final RateLimiter CROSSREF_DCN_RATE_LIMITER = RateLimiter.create(50.0);
 
     private final ImportFormatPreferences preferences;
 
@@ -61,7 +76,28 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         return Optional.of(HelpFile.FETCHER_DOI);
     }
 
-    public CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(String identifier) throws CompletionException {
+    public CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(String identifier) {
+        // Without a generic API Rate Limiter implemented on the project, use Guava's RateLimiter for avoiding
+        // API throttling when multiple threads are working, specially during DOI Content Negotiations
+        Optional<DOI> doi = DOI.parse(identifier);
+
+        try {
+            Optional<String> agency;
+            if (doi.isPresent() && (agency = getAgency(doi.get())).isPresent()) {
+                double waitingTime = 0.0;
+                if (agency.get().equalsIgnoreCase("datacite")) {
+                    waitingTime = DATA_CITE_DCN_RATE_LIMITER.acquire();
+                } else if (agency.get().equalsIgnoreCase("crossref")) {
+                    waitingTime = CROSSREF_DCN_RATE_LIMITER.acquire();
+                } // mEDRA does not explicit an API rating
+
+                LOGGER.trace(String.format("Thread %s, searching for DOI '%s', waited %.2fs because of API rate limiter",
+                        Thread.currentThread().getId(), identifier, waitingTime));
+            }
+        } catch (IOException ignored) { // This will be caught during the CompletableFuture's processing
+            LOGGER.warn("Could not limit DOI API access rate");
+        }
+
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return performSearchById(identifier);
@@ -80,16 +116,21 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 Optional<BibEntry> fetchedEntry;
 
                 // mEDRA does not return a parsable bibtex string
-                if (getAgency(doi.get()).isPresent() && "medra".equalsIgnoreCase(getAgency(doi.get()).get())) {
+                Optional<String> agency;
+                if ((agency = getAgency(doi.get())).isPresent() && "medra".equalsIgnoreCase(agency.get())) {
                     return new Medra().performSearchById(identifier);
                 }
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
+
                 // BibTeX data
                 URLDownload download = getUrlDownload(doiURL);
                 download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
+
                 String bibtexString;
+                URLConnection openConnection;
                 try {
-                    bibtexString = download.asString();
+                    openConnection = download.openConnection();
+                    bibtexString = URLDownload.asString(openConnection);
                 } catch (IOException e) {
                     // an IOException with a nested FetcherException will be thrown when you encounter a 400x or 500x http status code
                     if (e.getCause() instanceof FetcherException fe) {
@@ -102,6 +143,11 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
+                // Crossref has a dynamic API rate limit
+                if (agency.isPresent() && agency.get().equalsIgnoreCase("crossref")) {
+                    updateCrossrefAPIRate(openConnection);
+                }
+
                 // Check if the entry is an APS journal and add the article id as the page count if page field is missing
                 if (fetchedEntry.isPresent() && fetchedEntry.get().hasField(StandardField.DOI)) {
                     BibEntry entry = fetchedEntry.get();
@@ -110,6 +156,9 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     }
                 }
 
+                if (openConnection instanceof HttpURLConnection) {
+                    ((HttpURLConnection) openConnection).disconnect();
+                }
                 return fetchedEntry;
             } else {
                 throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
@@ -126,6 +175,25 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     private void doPostCleanup(BibEntry entry) {
         new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
+    }
+
+    private void updateCrossrefAPIRate(URLConnection existingConnection) {
+        // Assuming this field is given in seconds
+        String xRateLimitInterval = existingConnection.getHeaderField("X-Rate-Limit-Interval").replaceAll("[^\\.0123456789]", "");
+        String xRateLimit = existingConnection.getHeaderField("X-Rate-Limit-Limit");
+
+        try {
+            double newRate = Double.parseDouble(xRateLimit) / Double.parseDouble(xRateLimitInterval);
+            double oldRate = CROSSREF_DCN_RATE_LIMITER.getRate();
+
+            // In theory, the actual update might rarely happen...
+            if (Math.abs(newRate - oldRate) >= 1.0) {
+                LOGGER.info(String.format("Updated Crossref API rate limit from %.2f to %.2f", oldRate, newRate));
+                CROSSREF_DCN_RATE_LIMITER.setRate(newRate);
+            }
+        } catch (NullPointerException | IllegalArgumentException e) {
+            LOGGER.warn("Could not deduce Crossref API's rate limit from response header. API might have changed");
+        }
     }
 
     @Override
@@ -152,7 +220,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 agency = Optional.ofNullable(response.optString("RA"));
             }
         } catch (JSONException e) {
-            LOGGER.error("Cannot parse agency fetcher repsonse to JSON");
+            LOGGER.error("Cannot parse agency fetcher response to JSON");
             return Optional.empty();
         }
 
