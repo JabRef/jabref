@@ -1,176 +1,73 @@
 package org.jabref.logic.search;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.SearchMatcher;
-import org.jabref.model.search.rules.ContainsBasedSearchRule;
-import org.jabref.model.search.rules.GrammarBasedSearchRule;
-import org.jabref.model.search.rules.SearchRule;
+import org.jabref.model.pdf.search.EnglishStemAnalyzer;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SentenceAnalyzer;
 
-public class SearchQuery implements SearchMatcher {
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.Query;
 
-    /**
-     * The mode of escaping special characters in regular expressions
-     */
-    private enum EscapeMode {
-        /**
-         * using \Q and \E marks
-         */
-        JAVA {
-            @Override
-            String format(String regex) {
-                return Pattern.quote(regex);
-            }
-        },
-        /**
-         * escaping all javascript regex special characters separately
-         */
-        JAVASCRIPT {
-            @Override
-            String format(String regex) {
-                return JAVASCRIPT_ESCAPED_CHARS_PATTERN.matcher(regex).replaceAll("\\\\$0");
-            }
-        };
-
-        /**
-         * Regex pattern for escaping special characters in javascript regular expressions
-         */
-        private static final Pattern JAVASCRIPT_ESCAPED_CHARS_PATTERN = Pattern.compile("[.*+?^${}()|\\[\\]\\\\/]");
-
-        /**
-         * Attempt to escape all regex special characters.
-         *
-         * @param regex a string containing a regex expression
-         * @return a regex with all special characters escaped
-         */
-        abstract String format(String regex);
-    }
+public class SearchQuery {
 
     protected final String query;
+    protected Query parsedQuery;
+    protected String parseError;
     protected EnumSet<SearchRules.SearchFlags> searchFlags;
-    protected final SearchRule rule;
 
     public SearchQuery(String query, EnumSet<SearchRules.SearchFlags> searchFlags) {
         this.query = Objects.requireNonNull(query);
         this.searchFlags = searchFlags;
-        this.rule = SearchRules.getSearchRuleByQuery(query, searchFlags);
+
+        HashMap<String, Float> boosts = new HashMap<>();
+        SearchFieldConstants.searchableBibFields.forEach(field -> boosts.put(field, Float.valueOf(4)));
+
+        if (searchFlags.contains(SearchRules.SearchFlags.FULLTEXT)) {
+            Arrays.stream(SearchFieldConstants.PDF_FIELDS).forEach(field -> boosts.put(field, Float.valueOf(1)));
+        }
+        String[] fieldsToSearchArray = new String[boosts.size()];
+        boosts.keySet().toArray(fieldsToSearchArray);
+
+        if (searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
+            if (query.length() > 0 && !(query.startsWith("/") && query.endsWith("/"))) {
+                query = "/" + query + "/";
+            }
+        }
+
+        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer(), boosts);
+        queryParser.setAllowLeadingWildcard(true);
+        if (!query.contains("\"") && !query.contains(":") && !query.contains("*") && !query.contains("~")) {
+            query = Arrays.stream(query.split(" ")).map(s -> "*" + s + "*").collect(Collectors.joining(" "));
+        }
+        try {
+            parsedQuery = queryParser.parse(query);
+            parseError = null;
+        } catch (ParseException e) {
+            parsedQuery = null;
+            parseError = e.getMessage();
+        }
     }
 
     @Override
     public String toString() {
-        return String.format("\"%s\" (%s)", getQuery(), getRegularExpressionDescription());
-    }
-
-    @Override
-    public boolean isMatch(BibEntry entry) {
-        return rule.applyRule(getQuery(), entry);
+        return query;
     }
 
     public boolean isValid() {
-        return rule.validateSearchStrings(getQuery());
+        return parseError == null;
     }
 
-    public boolean isContainsBasedSearch() {
-        return rule instanceof ContainsBasedSearchRule;
-    }
-
-    private String getRegularExpressionDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
-            return "regular expression";
-        } else {
-            return "plain text";
-        }
-    }
-
-    public String localize() {
-        return String.format("\"%s\" (%s)",
-                getQuery(),
-                getLocalizedRegularExpressionDescription());
-    }
-
-    private String getLocalizedRegularExpressionDescription() {
-        if (searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
-            return Localization.lang("regular expression");
-        } else {
-            return Localization.lang("plain text");
-        }
-    }
-
-    /**
-     * Tests if the query is an advanced search query described as described in the help
-     *
-     * @return true if the query is an advanced search query
-     */
-    public boolean isGrammarBasedSearch() {
-        return rule instanceof GrammarBasedSearchRule;
-    }
-
-    public String getQuery() {
-        return query;
+    public Query getQuery() {
+        return parsedQuery;
     }
 
     public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
         return searchFlags;
-    }
-
-    /**
-     * Returns a list of words this query searches for. The returned strings can be a regular expression.
-     */
-    public List<String> getSearchWords() {
-        if (searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
-            return Collections.singletonList(getQuery());
-        } else {
-            // Parses the search query for valid words and returns a list these words.
-            // For example, "The great Vikinger" will give ["The","great","Vikinger"]
-            return (new SentenceAnalyzer(getQuery())).getWords();
-        }
-    }
-
-    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
-    public Optional<Pattern> getPatternForWords() {
-        return joinWordsToPattern(EscapeMode.JAVA);
-    }
-
-    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped for javascript if no regular expression search is enabled
-    public Optional<Pattern> getJavaScriptPatternForWords() {
-        return joinWordsToPattern(EscapeMode.JAVASCRIPT);
-    }
-
-    /**
-     * Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
-     *
-     * @param escapeMode the mode of escaping special characters in wi
-     */
-    private Optional<Pattern> joinWordsToPattern(EscapeMode escapeMode) {
-        List<String> words = getSearchWords();
-
-        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
-            return Optional.empty();
-        }
-
-        // compile the words to a regular expression in the form (w1)|(w2)|(w3)
-        Stream<String> joiner = words.stream();
-        if (!searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)) {
-            // Reformat string when we are looking for a literal match
-            joiner = joiner.map(escapeMode::format);
-        }
-        String searchPattern = joiner.collect(Collectors.joining(")|(", "(", ")"));
-
-        return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));
-    }
-
-    public SearchRule getRule() {
-        return rule;
     }
 }

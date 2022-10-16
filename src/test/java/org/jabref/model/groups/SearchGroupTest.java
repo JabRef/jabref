@@ -4,7 +4,6 @@ import java.util.EnumSet;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.rules.SearchRules;
 
 import org.junit.jupiter.api.Test;
 

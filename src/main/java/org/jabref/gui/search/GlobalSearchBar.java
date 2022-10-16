@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,7 +53,6 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -72,6 +72,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import impl.org.controlsfx.skin.AutoCompletePopup;
+import org.apache.lucene.search.Query;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.reactfx.util.FxTimer;
@@ -199,15 +200,14 @@ public class GlobalSearchBar extends HBox {
                     // Async update
                     searchTask.restart();
                 },
-                query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
+                query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)).getQuery())));
 
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldValue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.getSearchResults().addListener((MapChangeListener<? super BibEntry, ? super LuceneSearchResults>) map -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
-        updateResults(this.stateManager.getSearchResults().size(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
-                query.isGrammarBasedSearch());
+        updateResults(this.stateManager.getSearchResults().size());
     }
 
     private void initSearchModifierButtons() {
@@ -356,7 +356,7 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    private void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
+    private void updateResults(int matched) {
         if (matched == 0) {
             currentResults.setText(Localization.lang("No results found."));
             searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
@@ -364,15 +364,8 @@ public class GlobalSearchBar extends HBox {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
-        if (grammarBasedSearch) {
-            // TODO: switch Icon color
-            // searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
-        } else {
-            // TODO: switch Icon color
-            // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
-        }
 
-        setSearchFieldHintTooltip(description);
+        // setSearchFieldHintTooltip(description); TODO btut: Search-tooltip for lucene
     }
 
     private void setSearchFieldHintTooltip(TextFlow description) {
@@ -396,12 +389,12 @@ public class GlobalSearchBar extends HBox {
         setSearchFieldHintTooltip(null);
     }
 
-    public void setSearchTerm(String searchTerm) {
-        if (searchTerm.equals(searchField.getText())) {
+    public void setSearchTerm(Query searchQuery) {
+        if (searchQuery.toString().equals(searchField.getText())) {
             return;
         }
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
+        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchQuery.toString()));
     }
 
     private static class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {

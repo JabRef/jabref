@@ -7,53 +7,53 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.rules.SearchRules;
 
 public class SearchPreferences {
 
-    private final ObservableSet<SearchFlags> searchFlags;
+    private final ObservableSet<SearchRules.SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
 
     public SearchPreferences(boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFilteringMode, boolean isSortByScore, boolean keepWindowOnTop) {
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
-        searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
+        searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchRules.SearchFlags.class));
         if (isRegularExpression) {
-            searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
+            searchFlags.add(SearchRules.SearchFlags.REGULAR_EXPRESSION);
         }
         if (isFulltext) {
-            searchFlags.add(SearchFlags.FULLTEXT);
+            searchFlags.add(SearchRules.SearchFlags.FULLTEXT);
         }
         if (isKeepSearchString) {
-            searchFlags.add(SearchFlags.KEEP_SEARCH_STRING);
+            searchFlags.add(SearchRules.SearchFlags.KEEP_SEARCH_STRING);
         }
         if (isFilteringMode) {
-            searchFlags.add(SearchFlags.FILTERING_SEARCH);
+            searchFlags.add(SearchRules.SearchFlags.FILTERING_SEARCH);
         }
         if (isSortByScore) {
-            searchFlags.add(SearchFlags.SORT_BY_SCORE);
+            searchFlags.add(SearchRules.SearchFlags.SORT_BY_SCORE);
         }
     }
 
-    public SearchPreferences(EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
+    public SearchPreferences(EnumSet<SearchRules.SearchFlags> searchFlags, boolean keepWindowOnTop) {
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
         this.searchFlags = FXCollections.observableSet(searchFlags);
     }
 
-    public EnumSet<SearchFlags> getSearchFlags() {
+    public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
         // copy of returns an exception when the EnumSet is empty
         if (searchFlags.isEmpty()) {
-            return EnumSet.noneOf(SearchFlags.class);
+            return EnumSet.noneOf(SearchRules.SearchFlags.class);
         }
         return EnumSet.copyOf(searchFlags);
     }
 
-    public ObservableSet<SearchFlags> getObservableSearchFlags() {
+    public ObservableSet<SearchRules.SearchFlags> getObservableSearchFlags() {
         return searchFlags;
     }
 
-    public void setSearchFlag(SearchFlags flag, boolean value) {
+    public void setSearchFlag(SearchRules.SearchFlags flag, boolean value) {
         if (searchFlags.contains(flag) && !value) {
             searchFlags.remove(flag);
         } else if (!searchFlags.contains(flag) && value) {
@@ -62,23 +62,23 @@ public class SearchPreferences {
     }
 
     public boolean isRegularExpression() {
-        return searchFlags.contains(SearchFlags.REGULAR_EXPRESSION);
+        return searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION);
     }
 
     public boolean isFulltext() {
-        return searchFlags.contains(SearchFlags.FULLTEXT);
+        return searchFlags.contains(SearchRules.SearchFlags.FULLTEXT);
     }
 
     public boolean shouldKeepSearchString() {
-        return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
+        return searchFlags.contains(SearchRules.SearchFlags.KEEP_SEARCH_STRING);
     }
 
     public boolean isFilteringMode() {
-        return searchFlags.contains(SearchFlags.FILTERING_SEARCH);
+        return searchFlags.contains(SearchRules.SearchFlags.FILTERING_SEARCH);
     }
 
     public boolean isSortByScore() {
-        return searchFlags.contains(SearchFlags.SORT_BY_SCORE);
+        return searchFlags.contains(SearchRules.SearchFlags.SORT_BY_SCORE);
     }
 
     public boolean shouldKeepWindowOnTop() {

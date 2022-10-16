@@ -18,7 +18,7 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 
 public class GroupSerializer {
@@ -72,7 +72,7 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.booleanToBinaryString(false));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(StringUtil.booleanToBinaryString(group.getSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION)));
+        sb.append(StringUtil.booleanToBinaryString(group.getSearchFlags().contains(SearchFlags.REGULAR_EXPRESSION)));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
 
         appendGroupDetails(sb, group);

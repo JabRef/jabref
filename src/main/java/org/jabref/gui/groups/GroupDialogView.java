@@ -36,7 +36,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
-import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.preferences.PreferencesService;
 
@@ -156,9 +155,9 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> {
             EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
             if (newValue) {
-                searchFlags.add(SearchRules.SearchFlags.REGULAR_EXPRESSION);
+                searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
             } else {
-                searchFlags.remove(SearchRules.SearchFlags.REGULAR_EXPRESSION);
+                searchFlags.remove(SearchFlags.REGULAR_EXPRESSION);
             }
             viewModel.searchFlagsProperty().set(searchFlags);
         });

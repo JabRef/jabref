@@ -134,7 +134,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private boolean registered;
 
     private final ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
-        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
+        // searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords); TODO btut: Pattern-Highlighting with lucene
         highlightSearchPattern();
     };
 

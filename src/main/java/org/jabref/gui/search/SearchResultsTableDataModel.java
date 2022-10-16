@@ -1,7 +1,6 @@
 package org.jabref.gui.search;
 
 import java.util.List;
-import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,7 +12,6 @@ import javafx.collections.transformation.SortedList;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableFieldValueFormatter;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -45,11 +43,6 @@ public class SearchResultsTableDataModel {
 
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
-    }
-
-    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
-                    .orElse(true);
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {

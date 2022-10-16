@@ -10,6 +10,7 @@ import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class SearchGroup extends AbstractGroup {
         return matches.contains(entry);
     }
 
-    public EnumSet<SearchFlags> getSearchFlags() {
+    public EnumSet<SearchRules.SearchFlags> getSearchFlags() {
         return query.getSearchFlags();
     }
 

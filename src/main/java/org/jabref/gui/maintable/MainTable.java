@@ -53,7 +53,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -187,9 +187,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         };
 
-        preferencesService.getSearchPreferences().getObservableSearchFlags().addListener(new SetChangeListener<SearchRules.SearchFlags>() {
+        preferencesService.getSearchPreferences().getObservableSearchFlags().addListener(new SetChangeListener<SearchFlags>() {
             @Override
-            public void onChanged(Change<? extends SearchRules.SearchFlags> change) {
+            public void onChanged(Change<? extends SearchFlags> change) {
                 getSortOrder().removeListener(scoreSortOderPrioritizer);
                 updateSortOrder();
                 getSortOrder().addListener(scoreSortOderPrioritizer);
