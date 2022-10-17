@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -45,6 +46,7 @@ import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
@@ -89,6 +91,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * */
     private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER);
 
+    private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = ImmutableMap.of(
+            "Computational Engineering, Finance, and Science", "Computational Engineering / Finance / Science",
+            "Distributed, Parallel, and Cluster Computing", "Distributed / Parallel / Cluster Computing");
+
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
 
@@ -117,10 +123,6 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         return arXiv.getHelpPage();
     }
 
-    // When using ArXiv-issued DOIs, it seems as though there is always a problem with the "KEYWORDS" field: it include the "FOS" ("Field of Specialization", I assume) entry TWICE,
-    // which, when placed on the final BibEntry, seems the prompt "The library has been modified by another program.", even though no such thing has happened. I don't know the exact reason why,
-    // but removing the duplication seems to fix it.
-    // You can see this is imported from DOI fetcher by making a GET to "https://doi.org/10.48550/arXiv.2201.00023" with header "Accept=application/x-bibtex"
     /**
      * Remove duplicate values on "KEYWORD" field, if any.
      *
@@ -128,9 +130,14 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      */
     // TODO: FInd out what to do in the case of keywords like "Distributed, Parallel, and Cluster Computing (cs.DC)", with commas in their names
     private static void adaptKeywordsFrom(BibEntry bibEntry) {
-        Optional<String> originalKeywords = bibEntry.getField(StandardField.KEYWORDS);
-        if (originalKeywords.isPresent()) {
-            String filteredKeywords = Arrays.stream(originalKeywords.get().split(","))
+        Optional<String> allKeywords = bibEntry.getField(StandardField.KEYWORDS);
+        if (allKeywords.isPresent()) {
+            // See https://github.com/JabRef/jabref/pull/9170/#issuecomment-1266042981
+            for (Map.Entry<String, String> entry : ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS.entrySet()) {
+                allKeywords = Optional.of(allKeywords.get().replaceAll(entry.getKey(), entry.getValue()));
+            }
+
+            String filteredKeywords = Arrays.stream(allKeywords.get().split(","))
                                             .map(String::trim).distinct()
                                             .collect(Collectors.joining(", "));
             bibEntry.setField(StandardField.KEYWORDS, filteredKeywords);
