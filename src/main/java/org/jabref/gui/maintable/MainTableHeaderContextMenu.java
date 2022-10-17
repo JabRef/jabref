@@ -48,7 +48,9 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
     /**
      * Creates an item for the menu constructed with the name/visibility of the table column.
+     *
      */
+    @SuppressWarnings("rawtypes")
     private RadioMenuItem createMenuItem(TableColumn<BibEntryTableViewModel, ?> column) {
         // Construct initial menuItem and flag if item is visible in main table
         String itemName = ((MainTableColumn<?>) column).getDisplayName();
