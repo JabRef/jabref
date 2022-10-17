@@ -31,6 +31,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
     private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeDarkProperty = new SimpleBooleanProperty();
+    private final BooleanProperty themeAutomaticProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeCustomProperty = new SimpleBooleanProperty();
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
 
@@ -154,6 +155,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty customThemeProperty() {
         return themeCustomProperty;
+    }
+
+    public BooleanProperty themeAutomaticProperty() {
+        return themeAutomaticProperty;
     }
 
     public StringProperty customPathToThemeProperty() {
