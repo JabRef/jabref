@@ -16,7 +16,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.model.strings.StringUtil;
 
 public class FilePreferences {
@@ -24,7 +23,7 @@ public class FilePreferences {
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
 
     private final StringProperty user = new SimpleStringProperty();
-    private final OptionalObjectProperty<Path> mainFileDirectory = OptionalObjectProperty.empty();
+    private final SimpleStringProperty mainFileDirectory = new SimpleStringProperty();
     private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
@@ -43,7 +42,7 @@ public class FilePreferences {
                            Path workingDirectory,
                            Set<ExternalFileType> externalFileTypes) {
         this.user.setValue(user);
-        this.setMainFileDirectory(mainFileDirectory);
+        this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
@@ -57,20 +56,20 @@ public class FilePreferences {
         return user.getValue();
     }
 
-    public Optional<Path> getMainFileDirectory() {
-        return mainFileDirectory.getValue();
+    public Optional<Path> getFileDirectory() {
+        if (StringUtil.isBlank(mainFileDirectory.getValue())) {
+            return Optional.empty();
+        } else {
+            return Optional.of(Path.of(mainFileDirectory.getValue()));
+        }
     }
 
-    public OptionalObjectProperty<Path> mainFileDirectoryProperty() {
+    public StringProperty mainFileDirectoryProperty() {
         return mainFileDirectory;
     }
 
     public void setMainFileDirectory(String mainFileDirectory) {
-        if (StringUtil.isBlank(mainFileDirectory)) {
-            this.mainFileDirectory.setValue(Optional.empty());
-        } else {
-            this.mainFileDirectory.setValue(Optional.of(Path.of(mainFileDirectory)));
-        }
+        this.mainFileDirectory.set(mainFileDirectory);
     }
 
     public boolean shouldStoreFilesRelativeToBibFile() {

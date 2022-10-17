@@ -2,19 +2,18 @@ package org.jabref.logic.layout.format;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
 public class FileLinkPreferences {
 
-    private final Optional<Path> mainFileDirectory;
+    private final String mainFileDirectory;
     private final List<Path> fileDirForDatabase;
 
-    public FileLinkPreferences(Optional<Path> mainFileDirectory, List<Path> fileDirForDatabase) {
+    public FileLinkPreferences(String mainFileDirectory, List<Path> fileDirForDatabase) {
         this.mainFileDirectory = mainFileDirectory;
         this.fileDirForDatabase = fileDirForDatabase;
     }
 
-    public Optional<Path> getMainFileDirectory() {
+    public String getMainFileDirectory() {
         return mainFileDirectory;
     }
 

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ class WrapFileLinksTest {
 
     @BeforeEach
     void setUp() {
-        FileLinkPreferences preferences = new FileLinkPreferences(Optional.empty(), Collections.emptyList());
+        FileLinkPreferences preferences = new FileLinkPreferences("", Collections.emptyList());
         formatter = new WrapFileLinks(preferences);
     }
 
@@ -98,7 +97,7 @@ class WrapFileLinksTest {
 
     @Test
     void testPath() throws IOException {
-        FileLinkPreferences preferences = new FileLinkPreferences(Optional.empty(),
+        FileLinkPreferences preferences = new FileLinkPreferences("",
                 Collections.singletonList(Path.of("src/test/resources/pdfs/")));
         formatter = new WrapFileLinks(preferences);
         formatter.setArgument("\\p");
@@ -108,7 +107,7 @@ class WrapFileLinksTest {
 
     @Test
     void testPathFallBackToGeneratedDir() throws IOException {
-        FileLinkPreferences preferences = new FileLinkPreferences(Optional.of(Path.of("src/test/resources/pdfs/")),
+        FileLinkPreferences preferences = new FileLinkPreferences("src/test/resources/pdfs/",
                 Collections.emptyList());
         formatter = new WrapFileLinks(preferences);
         formatter.setArgument("\\p");
@@ -118,7 +117,7 @@ class WrapFileLinksTest {
 
     @Test
     void testPathReturnsRelativePathIfNotFound() {
-        FileLinkPreferences preferences = new FileLinkPreferences(Optional.empty(),
+        FileLinkPreferences preferences = new FileLinkPreferences("",
                 Collections.singletonList(Path.of("src/test/resources/pdfs/")));
         formatter = new WrapFileLinks(preferences);
         formatter.setArgument("\\p");

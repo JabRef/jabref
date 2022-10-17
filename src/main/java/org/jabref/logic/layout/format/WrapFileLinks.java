@@ -199,7 +199,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             // ugly hack, the export routine has set a global variable before
                             // starting the export, which contains the database's file directory:
                             if ((prefs.getFileDirForDatabase() == null) || prefs.getFileDirForDatabase().isEmpty()) {
-                                dirs = prefs.getMainFileDirectory().map(List::of).orElse(Collections.emptyList());
+                                dirs = Collections.singletonList(Path.of(prefs.getMainFileDirectory()));
                             } else {
                                 dirs = prefs.getFileDirForDatabase();
                             }
