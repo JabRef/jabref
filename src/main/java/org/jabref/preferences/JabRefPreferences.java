@@ -2179,19 +2179,6 @@ public class JabRefPreferences implements PreferencesService {
                 getFieldContentParserPreferences());
     }
 
-    /**
-     * Ensures that the main file directory is a non-empty String.
-     * The directory is <emph>NOT</emph> created, because creation of the directory is the task of the respective methods.
-     *
-     * @param originalDirectory the directory as configured
-     */
-    private String determineMainFileDirectory(String originalDirectory) {
-        if ((originalDirectory != null) && !originalDirectory.isEmpty()) {
-            // A non-empty directory is kept
-            return originalDirectory;
-        }
-        return JabRefDesktop.getDefaultFileChooserDirectory();
-    }
 
     @Override
     public FilePreferences getFilePreferences() {
@@ -2201,7 +2188,9 @@ public class JabRefPreferences implements PreferencesService {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUser(),
-                determineMainFileDirectory(get(MAIN_FILE_DIRECTORY)),
+                StringUtil.isNotBlank(get(MAIN_FILE_DIRECTORY))
+                                        ? get(MAIN_FILE_DIRECTORY)
+                                        : JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory().toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
