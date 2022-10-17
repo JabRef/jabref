@@ -173,7 +173,7 @@ public class Linux implements NativeDesktop {
     public Path getDefaultFileChooserDirectory() {
         return Path.of(Objects.requireNonNullElse(
                 System.getenv("XDG_DOCUMENTS_DIR"),
-                System.getProperty("users.home") + "/Documents")
+                System.getProperty("user.home") + "/Documents")
         );
     }
 }
