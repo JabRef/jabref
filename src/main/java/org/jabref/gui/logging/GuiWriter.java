@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.logging.LogMessages;
 
 import org.tinylog.core.LogEntry;
@@ -28,7 +29,7 @@ public class GuiWriter extends AbstractFormatPatternWriter {
 
     @Override
     public void write(LogEntry logEntry) throws Exception {
-        LogMessages.getInstance().add(logEntry);
+        DefaultTaskExecutor.runInJavaFXThread(() -> LogMessages.getInstance().add(logEntry));
     }
 
     @Override

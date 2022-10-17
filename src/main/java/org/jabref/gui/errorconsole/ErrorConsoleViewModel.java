@@ -14,7 +14,6 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.util.BuildInfo;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ErrorConsoleViewModel extends AbstractViewModel {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);
 
     private final DialogService dialogService;
@@ -38,7 +36,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         this.buildInfo = Objects.requireNonNull(buildInfo);
-        ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(BindingsHelper.forUI(LogMessages.getInstance().getMessages()), LogEventViewModel::new);
+        ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(LogMessages.getInstance().getMessages(), LogEventViewModel::new);
         allMessagesData = new ReadOnlyListWrapper<>(eventViewModels);
     }
 

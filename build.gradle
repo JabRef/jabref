@@ -49,7 +49,7 @@ java {
 }
 
 application {
-    mainClass.set('org.jabref.cli.Launcher')
+    mainClass.set('org.jabref.gui.JabRefLauncher')
     mainModule.set('org.jabref')
 }
 
