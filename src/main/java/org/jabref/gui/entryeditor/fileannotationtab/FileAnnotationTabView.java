@@ -2,8 +2,6 @@ package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.nio.file.Path;
 
-import javax.inject.Inject;
-
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
@@ -28,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class FileAnnotationTabView {
 

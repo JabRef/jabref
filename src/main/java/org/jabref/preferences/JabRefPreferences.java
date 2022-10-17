@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
@@ -414,7 +415,6 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Cache variables
      */
-    private Language language;
     private GeneralPreferences generalPreferences;
     private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
@@ -1255,45 +1255,26 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public Language getLanguage() {
-        if (language == null) {
-            updateLanguage();
-        }
-        return language;
-    }
-
-    private void updateLanguage() {
-        String languageId = get(LANGUAGE);
-        language = Stream.of(Language.values())
-                         .filter(language -> language.getId().equalsIgnoreCase(languageId))
-                         .findFirst()
-                         .orElse(Language.ENGLISH);
-    }
-
-    @Override
-    public void setLanguage(Language language) {
-        Language oldLanguage = getLanguage();
-        put(LANGUAGE, language.getId());
-        if (language != oldLanguage) {
-            // Update any defaults that might be language dependent:
-            setLanguageDependentDefaultValues();
-        }
-        updateLanguage();
-    }
-
-    @Override
     public GeneralPreferences getGeneralPreferences() {
         if (Objects.nonNull(generalPreferences)) {
             return generalPreferences;
         }
 
         generalPreferences = new GeneralPreferences(
+                getLanguage(),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
                 getBoolean(MEMORY_STICK_MODE),
                 getBoolean(SHOW_ADVANCED_HINTS));
 
+        EasyBind.listen(generalPreferences.languageProperty(), (obs, oldValue, newValue) -> {
+            put(LANGUAGE, newValue.getId());
+            if (oldValue != newValue) {
+                setLanguageDependentDefaultValues();
+                Localization.setLanguage(newValue);
+            }
+        });
         EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
         EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
@@ -1301,6 +1282,13 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(generalPreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
 
         return generalPreferences;
+    }
+
+    private Language getLanguage() {
+        return Stream.of(Language.values())
+                     .filter(language -> language.getId().equalsIgnoreCase(get(LANGUAGE)))
+                     .findFirst()
+                     .orElse(Language.ENGLISH);
     }
 
     @Override
@@ -1312,7 +1300,7 @@ public class JabRefPreferences implements PreferencesService {
         telemetryPreferences = new TelemetryPreferences(
                 getBoolean(COLLECT_TELEMETRY),
                 !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY), // mind the !
-                getOrCreateUserId()
+                getTelemetryUserId()
         );
 
         EasyBind.listen(telemetryPreferences.collectTelemetryProperty(), (obs, oldValue, newValue) -> putBoolean(COLLECT_TELEMETRY, newValue));
@@ -1321,7 +1309,7 @@ public class JabRefPreferences implements PreferencesService {
         return telemetryPreferences;
     }
 
-    private String getOrCreateUserId() {
+    private String getTelemetryUserId() {
         Optional<String> userId = getAsOptional(USER_ID);
         if (userId.isPresent()) {
             return userId.get();
@@ -2202,7 +2190,7 @@ public class JabRefPreferences implements PreferencesService {
             // A non-empty directory is kept
             return originalDirectory;
         }
-        return JabRefDesktop.getDefaultFileChooserDirectory().toString();
+        return JabRefDesktop.getDefaultFileChooserDirectory();
     }
 
     @Override
@@ -2574,8 +2562,13 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
-        guiPreferences.getLastFilesOpened().addListener((InvalidationListener) change ->
-                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened()));
+        guiPreferences.getLastFilesOpened().addListener((ListChangeListener<String>) change -> {
+            if (change.getList().isEmpty()) {
+                prefs.remove(LAST_EDITED);
+            } else {
+                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened());
+            }
+        });
         EasyBind.listen(guiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
             if (newValue != null) {
                 put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
@@ -2583,7 +2576,7 @@ public class JabRefPreferences implements PreferencesService {
                 remove(LAST_EDITED);
             }
         });
-        guiPreferences.getFileHistory().getHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
+        guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
@@ -2592,24 +2585,16 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_DATABASES).stream()
-                                                              .map(Path::of)
-                                                              .collect(Collectors.toList()));
+        return FileHistory.of(getStringList(RECENT_DATABASES).stream()
+                                                             .map(Path::of)
+                                                             .toList());
     }
 
     private void storeFileHistory(FileHistory history) {
-        if (!history.isEmpty()) {
-            putStringList(RECENT_DATABASES, history.getHistory()
-                                                   .stream()
-                                                   .map(Path::toAbsolutePath)
-                                                   .map(Path::toString)
-                                                   .collect(Collectors.toList()));
-        }
-    }
-
-    @Override
-    public void clearEditedFiles() {
-        prefs.remove(LAST_EDITED);
+        putStringList(RECENT_DATABASES, history.stream()
+                                               .map(Path::toAbsolutePath)
+                                               .map(Path::toString)
+                                               .toList());
     }
 
     //*************************************************************************************************************

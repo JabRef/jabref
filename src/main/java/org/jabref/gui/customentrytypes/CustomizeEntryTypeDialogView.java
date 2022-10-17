@@ -2,8 +2,6 @@ package org.jabref.gui.customentrytypes;
 
 import java.util.EnumSet;
 
-import javax.inject.Inject;
-
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
@@ -43,6 +41,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 
 public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
@@ -73,6 +72,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     private CustomLocalDragboard localDragboard;
 
     public CustomizeEntryTypeDialogView(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+        this.setTitle(Localization.lang("Customize entry types"));
         this.mode = bibDatabaseContext.getMode();
         this.entryTypesManager = entryTypesManager;
 

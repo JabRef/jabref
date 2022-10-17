@@ -45,6 +45,7 @@ public class DOABFetcherTest {
                 ),
                 Arguments.of(
                         new BibEntry(StandardEntryType.Book)
+                                .withField(StandardField.ISBN, "9789085551201")
                                 .withField(StandardField.AUTHOR, "Ronald Snijder")
                                 .withField(StandardField.TITLE, "The deliverance of open access books")
                                 .withField(StandardField.SUBTITLE, "Examining usage and dissemination")

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modsCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.loc.gov/mods/v3"
+                xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-3.xsd">
+<mods version="3.3">
+<genre authority="gmgpc">Conference Publication</genre>
+<identifier type="citekey">TestPublication</identifier>
+</mods>
+</modsCollection>

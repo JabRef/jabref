@@ -1,6 +1,5 @@
 ---
 parent: Code Howtos
-nav_order: 7
 ---
 # JPackage: Creating a binary and debug it
 
