@@ -10,9 +10,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.swing.filechooser.FileSystemView;
-
-import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.os.DefaultDesktop;
@@ -40,7 +37,6 @@ import org.slf4j.LoggerFactory;
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
-@AllowedToUseSwing("Needs access to swing for the user's os dependent file chooser path")
 public class JabRefDesktop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDesktop.class);
@@ -290,21 +286,6 @@ public class JabRefDesktop {
                 }
             }
         }
-    }
-
-    /**
-     * Get the user's default file chooser directory
-     *
-     * @return The path to the directory
-     */
-    public static String getDefaultFileChooserDirectory() {
-        // Implementation: ADR-0026
-
-        // We do not return a subdirectory "JabRef", because
-        //   - the directory might not exist at this point of the method
-        //   - we might not have the rights to create a directory
-        //   - getters should not have any side effect
-        return FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
     }
 
     // TODO: Move to OS.java
