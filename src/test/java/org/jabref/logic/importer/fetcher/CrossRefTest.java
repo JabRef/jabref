@@ -149,4 +149,9 @@ public class CrossRefTest {
     public void testPerformSearchValidReturnNothingDOI() throws FetcherException {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1392/BC1.0"));
     }
+
+    @Test
+    public void extractReferencedByCountForWellFormattedEntry() throws Exception {
+        assertEquals(Optional.of("153"), fetcher.extractReferencedByCount(barrosEntry));
+    }
 }
