@@ -89,7 +89,7 @@ public class Windows implements NativeDesktop {
                 return Path.of(Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS));
             }
         } catch (Win32Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Error accessing folder", e);
             return Path.of(System.getProperty("user.home"));
         }
     }
