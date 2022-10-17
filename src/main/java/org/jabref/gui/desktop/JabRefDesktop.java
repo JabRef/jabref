@@ -288,8 +288,6 @@ public class JabRefDesktop {
         }
     }
 
-
-
     // TODO: Move to OS.java
     public static NativeDesktop getNativeDesktop() {
         if (OS.WINDOWS) {
