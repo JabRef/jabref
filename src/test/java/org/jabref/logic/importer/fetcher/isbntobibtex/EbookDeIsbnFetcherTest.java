@@ -1,10 +1,11 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.AbstractIsbnFetcherTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
-public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
+public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     @BeforeEach
     public void setUp() {
@@ -35,7 +36,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
                 .withField(StandardField.ISBN, "0134685997")
                 .withField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
 
-        fetcher = new IsbnViaEbookDeFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        fetcher = new EbookDeIsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test

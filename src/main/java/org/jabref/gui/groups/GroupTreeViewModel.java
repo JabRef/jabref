@@ -154,7 +154,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /**
-     * Opens "New Group Dialog" and add the resulting group to the specified group
+     * Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group while maintaining the
+     * alphabetical order
      */
     public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
         currentDatabase.ifPresent(database -> {
@@ -174,6 +175,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 // TODO: Expand parent to make new group visible
                 // parent.expand();
+
+                sortAlphabeticallyRecursive(parent.getGroupNode());
 
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
@@ -364,6 +367,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 // if (!addChange.isEmpty()) {
                 //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
                 // }
+
+                oldGroup.getParent().ifPresent(parent -> {
+                    sortAlphabeticallyRecursive(parent);
+                });
+
                 dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
                 // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
@@ -523,7 +531,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
     }
 
-    public void sortAlphabeticallyRecursive(GroupNodeViewModel group) {
-        group.getGroupNode().sortChildren(compAlphabetIgnoreCase, true);
+    public void sortAlphabeticallyRecursive(GroupTreeNode group) {
+        group.sortChildren(compAlphabetIgnoreCase, true);
     }
 }
