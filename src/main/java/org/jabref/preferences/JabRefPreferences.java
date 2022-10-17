@@ -945,6 +945,14 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
+     * Returns a Path
+     */
+    private Path getPath(String key, Path defaultValue) {
+        String rawPath = get(key);
+        return StringUtil.isNotBlank(rawPath) ? Path.of(rawPath) : defaultValue;
+    }
+
+    /**
      * Clear all preferences.
      *
      * @throws BackingStoreException if JabRef is unable to write to the registry/the preferences storage
@@ -2187,7 +2195,7 @@ public class JabRefPreferences implements PreferencesService {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUser(),
-                determineMainFileDirectory(get(MAIN_FILE_DIRECTORY)),
+                getPath(MAIN_FILE_DIRECTORY, JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
@@ -2208,13 +2216,6 @@ public class JabRefPreferences implements PreferencesService {
                 put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(filePreferences.getExternalFileTypes())));
 
         return filePreferences;
-    }
-
-    private String determineMainFileDirectory(String mainFileDirecotry) {
-        if (StringUtil.isNotBlank(mainFileDirecotry)) {
-            return mainFileDirecotry;
-        }
-        return JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory().toString();
     }
 
     @Override
