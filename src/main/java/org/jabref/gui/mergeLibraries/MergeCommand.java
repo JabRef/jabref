@@ -1,5 +1,6 @@
 package org.jabref.gui.mergeLibraries;
 
+import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -22,7 +23,9 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +34,7 @@ import org.jabref.logic.database.DuplicateCheck.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -69,7 +73,11 @@ public class MergeCommand extends SimpleCommand {
     public BibDatabase doMerge(Path path, BibDatabase database){
         SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
         //find all the .lib files by crawling in doMerge and merge them
-        for(File f : getAllFiles(path)){
+        System.out.println(getAllFiles(path).size());
+
+//        List<BibEntry> toAdd = new ArrayList<>();
+        Set<BibEntry> toAdd = new HashSet<>();
+        for(File f : getAllFiles(path)) {
             System.out.println(f.toString());
             ParserResult result;
 
@@ -86,18 +94,39 @@ public class MergeCommand extends SimpleCommand {
               2. if the entry has the same key as any in the main database then ignore the new entry
               3. if the entry is a duplicate of any in the main database then ignore the new entry
             */
-            for(BibEntry entry : result.getDatabase().getEntries()){
-                for(BibEntry dbEntry : database.getEntries()){
-//                    if(!entry.equals(dbEntry) && !(entry.getCiteKeyBinding().equals(dbEntry.getCiteKeyBinding()))
-//                            && !(DuplicateCheck()))
+            BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+
+            for (BibEntry entry : result.getDatabase().getEntries()) {
+                System.out.println(entry.getCitationKey());
+                for (BibEntry dbEntry : database.getEntries()) {
+                    System.out.println("------" + dbEntry.getCitationKey());
+                    if (entry.equals(dbEntry)) {
+                        System.out.println("equals");
+                    }
+
+                    if (entry.getCitationKey().equals(dbEntry.getCitationKey())) {
+                        System.out.println("same key");
+                    }
+
+                    if (new DuplicateCheck(entryTypesManager).isDuplicate(entry, dbEntry, BibDatabaseMode.BIBTEX)){
+                        System.out.println("duplicate");
+                    }
+
+
+                    if (!entry.equals(dbEntry) &&
+                        !(entry.getCiteKeyBinding().equals(dbEntry.getCiteKeyBinding())) &&
+                        !(new DuplicateCheck(entryTypesManager).isDuplicate(entry, dbEntry, BibDatabaseMode.BIBTEX))) {
+
+                        System.out.println(entry.getCitationKey() + " added");
+                        toAdd.add(entry);
+                    }
                 }
             }
         }
-
-
+        database.insertEntries(toAdd.stream().toList());
+//
         //then add the database to the StateManager's activeDatabase
-
-        return null;
+        return database;
     }
 
     /**
