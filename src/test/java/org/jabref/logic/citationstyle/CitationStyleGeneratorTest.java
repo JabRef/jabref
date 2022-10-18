@@ -430,7 +430,6 @@ class CitationStyleGeneratorTest {
                         "apa.csl"),
 
                 Arguments.of(
-
                         "Foo, B. (n.d.). eid + issue. Bib(La)TeX Journal, 9issue, Article Article 6eid.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
