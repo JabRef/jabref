@@ -263,4 +263,6 @@ public interface PreferencesService {
     MrDlibPreferences getMrDlibPreferences();
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
+
+    JabRefOnlinePreferences getJabRefOnlinePreferences();
 }

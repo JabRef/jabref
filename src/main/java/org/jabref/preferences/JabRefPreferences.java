@@ -2891,4 +2891,9 @@ public class JabRefPreferences implements PreferencesService {
 
         return grobidPreferences;
     }
+
+    @Override
+    public JabRefOnlinePreferences getJabRefOnlinePreferences() {
+        return new JabRefOnlinePreferences();
+    }
 }

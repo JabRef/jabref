@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.jabrefonline.RemoteService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -30,6 +31,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
 
     @Inject private PreferencesService preferencesService;
     @Inject private UndoManager undoManager;
+    @Inject private RemoteService remoteService;
 
     public GeneralPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -45,7 +47,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     }
 
     public void initialize() {
-        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferencesService, undoManager);
+        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferencesService, remoteService, undoManager);
 
         new ViewModelListCellFactory<Charset>()
                 .withText(Charset::displayName)
@@ -80,5 +82,10 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML
     void browseLatexFileDirectory() {
         viewModel.browseLatexDir();
+    }
+
+    @FXML
+    void connectJabRefAccount() {
+        viewModel.connectJabRefAccount();
     }
 }

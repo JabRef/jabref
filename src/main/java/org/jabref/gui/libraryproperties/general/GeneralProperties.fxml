@@ -28,6 +28,8 @@
             <RowConstraints/>
             <RowConstraints/>
             <RowConstraints/>
+            <RowConstraints/>
+            <RowConstraints/>
         </rowConstraints>
 
         <Label styleClass="sectionHeader" text="%General"
@@ -41,15 +43,19 @@
         <ComboBox fx:id="databaseMode" prefWidth="150.0"
                   GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2"/>
 
-        <Label styleClass="sectionHeader" text="%Override default file directories"
+        <Label styleClass="sectionHeader" text="%JabRef Account"
                GridPane.columnSpan="3" GridPane.rowIndex="3"/>
+        <Button onAction="#connectJabRefAccount" text="%Connect" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+        <Label styleClass="sectionHeader" text="%Override default file directories"
+               GridPane.columnSpan="3" GridPane.rowIndex="5"/>
         <Label text="%General file directory"
-               GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+               GridPane.columnIndex="0" GridPane.rowIndex="6"/>
         <TextField fx:id="generalFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="6"/>
         <Button onAction="#browseGeneralFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
-                GridPane.columnIndex="2" GridPane.rowIndex="4">
+                GridPane.columnIndex="2" GridPane.rowIndex="6">
             <graphic>
                 <JabRefIconView glyph="OPEN"/>
             </graphic>
@@ -59,12 +65,12 @@
         </Button>
 
         <Label text="%User-specific file directory"
-               GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+               GridPane.columnIndex="0" GridPane.rowIndex="7"/>
         <TextField fx:id="userSpecificFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="7"/>
         <Button onAction="#browseUserSpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
-                GridPane.columnIndex="2" GridPane.rowIndex="5">
+                GridPane.columnIndex="2" GridPane.rowIndex="7">
             <graphic>
                 <JabRefIconView glyph="OPEN"/>
             </graphic>
@@ -74,12 +80,12 @@
         </Button>
 
         <Label text="%LaTeX file directory"
-               GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+               GridPane.columnIndex="0" GridPane.rowIndex="8"/>
         <TextField fx:id="laTexFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="8"/>
         <Button onAction="#browseLatexFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
-                GridPane.columnIndex="2" GridPane.rowIndex="6">
+                GridPane.columnIndex="2" GridPane.rowIndex="8">
             <graphic>
                 <JabRefIconView glyph="OPEN"/>
             </graphic>

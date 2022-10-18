@@ -20,6 +20,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.undo.UndoablePreambleChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.logic.jabrefonline.RemoteService;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
@@ -41,15 +42,17 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final RemoteService remoteService;
 
     private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
     private final DirectoryDialogConfiguration directoryDialogConfiguration;
     private final UndoManager undoManager;
 
-    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, PreferencesService preferencesService, UndoManager undoManager) {
+    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, PreferencesService preferencesService, RemoteService remoteService, UndoManager undoManager) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.remoteService = remoteService;
         this.undoManager = undoManager;
         this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
@@ -158,5 +161,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public StringProperty preambleProperty() {
         return this.preambleProperty;
+    }
+
+    public void connectJabRefAccount() {
+        remoteService.initialSync(databaseContext);
     }
 }

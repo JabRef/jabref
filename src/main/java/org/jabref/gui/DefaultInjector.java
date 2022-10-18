@@ -8,6 +8,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportFormatReader;
+import org.jabref.logic.jabrefonline.RemoteService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -35,6 +36,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.TASK_EXECUTOR;
         } else if (clazz == PreferencesService.class) {
             return Globals.prefs;
+        } else if (clazz == RemoteService.class) {
+            return new RemoteService(Globals.prefs);
         } else if (clazz == KeyBindingRepository.class) {
             return Globals.getKeyPrefs();
         } else if (clazz == JournalAbbreviationRepository.class) {
