@@ -96,30 +96,29 @@ public class MergeCommand extends SimpleCommand {
             */
             BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
 
+
             for (BibEntry entry : result.getDatabase().getEntries()) {
-                System.out.println(entry.getCitationKey());
+                boolean addFlag = true;
                 for (BibEntry dbEntry : database.getEntries()) {
+
                     System.out.println("------" + dbEntry.getCitationKey());
                     if (entry.equals(dbEntry)) {
-                        System.out.println("equals");
+                        addFlag = false;
+                        break;
                     }
 
                     if (entry.getCitationKey().equals(dbEntry.getCitationKey())) {
-                        System.out.println("same key");
+                        addFlag = false;
+                        break;
                     }
 
                     if (new DuplicateCheck(entryTypesManager).isDuplicate(entry, dbEntry, BibDatabaseMode.BIBTEX)){
-                        System.out.println("duplicate");
+                        addFlag = false;
+                        break;
                     }
-
-
-                    if (!entry.equals(dbEntry) &&
-                        !(entry.getCiteKeyBinding().equals(dbEntry.getCiteKeyBinding())) &&
-                        !(new DuplicateCheck(entryTypesManager).isDuplicate(entry, dbEntry, BibDatabaseMode.BIBTEX))) {
-
-                        System.out.println(entry.getCitationKey() + " added");
-                        toAdd.add(entry);
-                    }
+                }
+                if (addFlag) {
+                    toAdd.add(entry);
                 }
             }
         }
