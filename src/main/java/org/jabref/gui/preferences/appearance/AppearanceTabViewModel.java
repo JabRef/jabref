@@ -16,6 +16,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.jthemedetecor.OsThemeDetector;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -41,6 +42,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
+    private final BooleanProperty automaticDetectionChecked = new SimpleBooleanProperty();
 
     public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -79,17 +81,34 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
         Theme currentTheme = appearancePreferences.getTheme();
         if (currentTheme.getType() == Theme.Type.DEFAULT) {
-            themeLightProperty.setValue(true);
-            themeDarkProperty.setValue(false);
-            themeCustomProperty.setValue(false);
+            if (automaticDetectionChecked.getValue()) {
+                themeAutomaticProperty.setValue(true);
+                themeLightProperty.setValue(false);
+                themeDarkProperty.setValue(false);
+                themeCustomProperty.setValue(false);
+            } else {
+                themeLightProperty.setValue(true);
+                themeDarkProperty.setValue(false);
+                themeCustomProperty.setValue(false);
+                themeAutomaticProperty.setValue(false);
+            }
         } else if (currentTheme.getType() == Theme.Type.EMBEDDED) {
-            themeLightProperty.setValue(false);
-            themeDarkProperty.setValue(true);
-            themeCustomProperty.setValue(false);
+            if (automaticDetectionChecked.getValue()) {
+                themeAutomaticProperty.setValue(true);
+                themeLightProperty.set(false);
+                themeDarkProperty.setValue(false);
+                themeCustomProperty.setValue(false);
+            } else {
+                themeLightProperty.setValue(false);
+                themeDarkProperty.setValue(true);
+                themeCustomProperty.setValue(false);
+                themeAutomaticProperty.setValue(false);
+            }
         } else {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(true);
+            themeAutomaticProperty.set(false);
             customPathToThemeProperty.setValue(currentTheme.getName());
         }
     }
@@ -105,6 +124,18 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             appearancePreferences.setTheme(Theme.dark());
         } else if (themeCustomProperty.getValue()) {
             appearancePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
+        } else if (themeAutomaticProperty.getValue()) {
+            appearancePreferences.setTheme(detectSystemThemePreferences());
+        }
+    }
+
+    public Theme detectSystemThemePreferences() {
+        final OsThemeDetector detector = OsThemeDetector.getDetector();
+        final boolean isDarkThemeUsed = detector.isDark();
+        if (isDarkThemeUsed) {
+            return Theme.dark();
+        } else {
+            return Theme.light();
         }
     }
 
@@ -158,7 +189,15 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     }
 
     public BooleanProperty themeAutomaticProperty() {
+        appearancePreferences.automaticDetectionFlag().setValue(true);
         return themeAutomaticProperty;
+//        final OsThemeDetector detector = OsThemeDetector.getDetector();
+//        final boolean isDarkThemeUsed = detector.isDark();
+//        if (isDarkThemeUsed) {
+//            return themeDarkProperty;
+//        } else {
+//            return themeLightProperty;
+//        }
     }
 
     public StringProperty customPathToThemeProperty() {

@@ -13,11 +13,13 @@ public class AppearancePreferences {
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
     private final ObjectProperty<Theme> theme;
+    private final BooleanProperty automaticDetectionFlag;
 
-    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, Theme theme) {
+    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, Theme theme, boolean automaticDetectionFlag) {
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
+        this.automaticDetectionFlag = new SimpleBooleanProperty(automaticDetectionFlag);
     }
 
     public boolean shouldOverrideDefaultFontSize() {
@@ -54,5 +56,9 @@ public class AppearancePreferences {
 
     public ObjectProperty<Theme> themeProperty() {
         return theme;
+    }
+
+    public BooleanProperty automaticDetectionFlag() {
+        return automaticDetectionFlag;
     }
 }

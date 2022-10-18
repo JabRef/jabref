@@ -73,17 +73,6 @@ public class ThemeManager {
     }
 
     private void updateThemeSettings() {
-        final OsThemeDetector detector = OsThemeDetector.getDetector();
-        detector.registerListener(isDark -> {
-            Platform.runLater(() -> {
-                if (isDark) {
-                    if (theme.getType() == Theme.Type.EMBEDDED) {
-                        // TODO
-                    }
-                }
-            });
-        });
-
         Theme newTheme = Objects.requireNonNull(appearancePreferences.getTheme());
 
         if (newTheme.equals(theme)) {

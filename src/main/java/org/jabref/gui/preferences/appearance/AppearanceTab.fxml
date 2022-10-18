@@ -33,7 +33,7 @@
     <Label styleClass="sectionHeader" text="%Visual theme"/>
     <RadioButton fx:id="themeLight" text="%Light theme" toggleGroup="$theme"/>
     <RadioButton fx:id="themeDark" text="%Dark theme" toggleGroup="$theme"/>
-    <RadioButton fx:id="automaticThemeDetection" text="Automatic detection" toggleGroup="$theme"/>
+    <RadioButton fx:id="themeAutomatic" text="Automatic detection" toggleGroup="$theme"/>
     <HBox alignment="CENTER_LEFT" spacing="4.0">
         <RadioButton fx:id="customTheme" text="%Custom theme" toggleGroup="$theme"/>
         <TextField fx:id="customThemePath" HBox.hgrow="ALWAYS" disable="${!customTheme.selected}"/>
