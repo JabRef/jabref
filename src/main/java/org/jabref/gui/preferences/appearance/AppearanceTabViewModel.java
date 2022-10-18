@@ -80,35 +80,36 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
         Theme currentTheme = appearancePreferences.getTheme();
+        // If the theme of JabRef is Light
         if (currentTheme.getType() == Theme.Type.DEFAULT) {
+            // If the user has set automatic theme detection: ON.
             if (automaticDetectionChecked.getValue()) {
                 themeAutomaticProperty.setValue(true);
                 themeLightProperty.setValue(false);
-                themeDarkProperty.setValue(false);
-                themeCustomProperty.setValue(false);
+            // If the user has set automatic theme detection: OFF.
             } else {
+                themeAutomaticProperty.setValue(false);
                 themeLightProperty.setValue(true);
-                themeDarkProperty.setValue(false);
-                themeCustomProperty.setValue(false);
-                themeAutomaticProperty.setValue(false);
             }
+            themeCustomProperty.setValue(false);
+            themeDarkProperty.setValue(false);
+            // If the theme of JabRef is Dark
         } else if (currentTheme.getType() == Theme.Type.EMBEDDED) {
+            // If the user has set automatic theme detection: ON.
             if (automaticDetectionChecked.getValue()) {
-                themeAutomaticProperty.setValue(true);
-                themeLightProperty.set(false);
                 themeDarkProperty.setValue(false);
-                themeCustomProperty.setValue(false);
+                themeAutomaticProperty.setValue(true);
+            // If the user has set automatic theme detection: OFF.
             } else {
-                themeLightProperty.setValue(false);
                 themeDarkProperty.setValue(true);
-                themeCustomProperty.setValue(false);
                 themeAutomaticProperty.setValue(false);
             }
+            themeLightProperty.setValue(false);
+            themeCustomProperty.setValue(false);
         } else {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(true);
-            themeAutomaticProperty.set(false);
             customPathToThemeProperty.setValue(currentTheme.getName());
         }
     }
@@ -130,6 +131,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     }
 
     public Theme detectSystemThemePreferences() {
+        appearancePreferences.automaticDetectionFlag().setValue(true);
         final OsThemeDetector detector = OsThemeDetector.getDetector();
         final boolean isDarkThemeUsed = detector.isDark();
         if (isDarkThemeUsed) {

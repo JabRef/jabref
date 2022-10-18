@@ -13,6 +13,8 @@ public class AppearancePreferences {
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
     private final ObjectProperty<Theme> theme;
+
+    // Flag to check if user has selected 'Automatic Detection' in Appearance preferences.
     private final BooleanProperty automaticDetectionFlag;
 
     public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, Theme theme, boolean automaticDetectionFlag) {
