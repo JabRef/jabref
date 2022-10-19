@@ -76,7 +76,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         return Optional.of(HelpFile.FETCHER_DOI);
     }
 
-    public CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(String identifier) {
+    private void doAPILimiting(String identifier) {
         // Without a generic API Rate Limiter implemented on the project, use Guava's RateLimiter for avoiding
         // API throttling when multiple threads are working, specially during DOI Content Negotiations
         Optional<DOI> doi = DOI.parse(identifier);
@@ -94,10 +94,13 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 LOGGER.trace(String.format("Thread %s, searching for DOI '%s', waited %.2fs because of API rate limiter",
                         Thread.currentThread().getId(), identifier, waitingTime));
             }
-        } catch (IOException ignored) { // This will be caught during the CompletableFuture's processing
-            LOGGER.warn("Could not limit DOI API access rate");
+        } catch (IOException e) {
+            LOGGER.warn("Could not limit DOI API access rate", e);
         }
+    }
 
+    protected CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(String identifier) {
+        doAPILimiting(identifier);
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return performSearchById(identifier);
@@ -144,6 +147,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
                 // Crossref has a dynamic API rate limit
+                // TODO: Test this
                 if (agency.isPresent() && agency.get().equalsIgnoreCase("crossref")) {
                     updateCrossrefAPIRate(openConnection);
                 }

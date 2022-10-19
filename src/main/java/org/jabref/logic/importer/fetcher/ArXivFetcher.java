@@ -128,7 +128,6 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      *
      * @param bibEntry A BibEntry to modify
      */
-    // TODO: FInd out what to do in the case of keywords like "Distributed, Parallel, and Cluster Computing (cs.DC)", with commas in their names
     private static void adaptKeywordsFrom(BibEntry bibEntry) {
         Optional<String> allKeywords = bibEntry.getField(StandardField.KEYWORDS);
         if (allKeywords.isPresent()) {
@@ -157,10 +156,6 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         return DOI_PREFIX + arXivId;
     }
 
-    private static boolean isManualDoi(String doi) {
-        return !doi.toLowerCase().contains(DOI_PREFIX.toLowerCase());
-    }
-
     /**
      * Get ArXiv-issued DOI from the arXiv entry itself.
      * <br/><br/>
@@ -169,12 +164,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * @param arXivBibEntry A Bibtex Entry, formatted as a ArXiv entry. Must contain an EPRINT field
      * @return ArXiv-issued DOI, or Empty, if method could not retrieve it
      */
-    private Optional<String> getAutomaticDoi(BibEntry arXivBibEntry) {
+    private static Optional<String> getAutomaticDoi(BibEntry arXivBibEntry) {
         // As the input should always contain a EPRINT if created from inner 'ArXiv' class, don't bother doing a check that might call
         // ArXiv's API again (method 'findIdentifier')
         Optional<String> entryEprint = arXivBibEntry.getField(StandardField.EPRINT);
         if (entryEprint.isEmpty()) {
-            LOGGER.error("Failed to retrieve ArXiv-issued DOI: Bibtext entry '%s' does not contain a EPRINT field");
+            LOGGER.error("Cannot infer ArXiv-issued DOI from BibEntry: no 'EPRINT' field found");
             return Optional.empty();
         } else {
             return Optional.of(ArXivFetcher.getAutomaticDoi(entryEprint.get()));
@@ -194,6 +189,13 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /**
+     * Check if a specific DOI is user-assigned.
+     */
+    private static boolean isManualDoi(String doi) {
+        return !doi.toLowerCase().contains(DOI_PREFIX.toLowerCase());
+    }
+
+    /**
      * Get user-issued DOI from ArXiv Bibtex entry, if any
      * <br/><br/>
      * User-issued DOIs are identifiers associated with some ArXiv entries that can associate an entry with an external service, like
@@ -207,7 +209,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /**
-     * Get the Bibtex Entry from a Future API request and treat exceptions.
+     * Get the Bibtex Entry from a Future API request (uses blocking) and treat exceptions.
      *
      * @param bibEntryFuture A CompletableFuture that parallelize the API fetching process
      * @return the fetch result
@@ -217,6 +219,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             return bibEntryFuture.join();
         } catch (CompletionException e) {
             if (!(e.getCause() instanceof FetcherException)) {
+                LOGGER.error("The supplied future should only throw a FetcherException.", e);
                 throw e;
             }
             throw (FetcherException) e.getCause();
@@ -229,49 +232,48 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * @param arXivEntry The entry to merge into
      * @param bibEntryFuture A future result of the fetching process
      * @param priorityFields Which fields from "bibEntryFuture" to prioritize, replacing them on "arXivEntry"
-     * @param doi Identifier used in initiating the "bibEntryFuture" future (for logging)
+     * @param id Identifier used in initiating the "bibEntryFuture" future (for logging). This is usually a DOI, but can be anything.
      */
-    private static void mergeArXivEntryWithFutureDoiEntry(BibEntry arXivEntry, CompletableFuture<Optional<BibEntry>> bibEntryFuture, Set<Field> priorityFields, String doi) {
-        Optional<BibEntry> doiBibEntry;
+    private static void mergeArXivEntryWithFutureDoiEntry(BibEntry arXivEntry, CompletableFuture<Optional<BibEntry>> bibEntryFuture, Set<Field> priorityFields, String id) {
+        Optional<BibEntry> bibEntry;
         try {
-            doiBibEntry = waitForBibEntryRetrieval(bibEntryFuture);
-        } catch (FetcherException e) {
-            LOGGER.error(e.getMessage());
+            bibEntry = waitForBibEntryRetrieval(bibEntryFuture);
+        } catch (FetcherException | CompletionException e) {
+            LOGGER.error("Failed to fetch future BibEntry with id '{}' (skipping merge).", id, e);
             return;
         }
 
-        if (doiBibEntry.isPresent()) {
-            adaptKeywordsFrom(doiBibEntry.get());
-            arXivEntry.mergeWith(doiBibEntry.get(), priorityFields);
+        if (bibEntry.isPresent()) {
+            adaptKeywordsFrom(bibEntry.get());
+            arXivEntry.mergeWith(bibEntry.get(), priorityFields);
         } else {
-            LOGGER.error(String.format("Could not retrieve entry data from DOI '%s'", doi));
+            LOGGER.error("Future BibEntry for id '{}' was completed, but no entry was found (skipping merge).", id);
         }
-    }
-
-    private BibEntry asyncInfuseArXivWithDoi(BibEntry arXivBibEntryPromise) {
-        this.inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise);
-        return arXivBibEntryPromise;
     }
 
     /**
      * Infuse arXivBibEntryPromise with additional fields in an asynchronous way
      *
-     * @param arXivBibEntry Entry to be updated with new/modified fields
+     * @param arXivBibEntry An existing entry to be updated with new/modified fields
      */
     private void inplaceAsyncInfuseArXivWithDoi(BibEntry arXivBibEntry) {
         CompletableFuture<Optional<BibEntry>> arXivBibEntryCompletedFuture = CompletableFuture.completedFuture(Optional.of(arXivBibEntry));
+        Optional<ArXivIdentifier> arXivBibEntryId = arXivBibEntry.getField(StandardField.EPRINT).flatMap(ArXivIdentifier::parse);
+
         try {
-            this.inplaceAsyncInfuseArXivWithDoi(arXivBibEntryCompletedFuture, Optional.empty());
+            this.inplaceAsyncInfuseArXivWithDoi(arXivBibEntryCompletedFuture, arXivBibEntryId);
         } catch (FetcherException e) {
-            LOGGER.error("Unexpected merging of additional information. Skipping...");
+            LOGGER.error("FetcherException should not be found here, as main Bibtex Entry already exists " +
+                    "(and failing additional fetches should be skipped)", e);
         }
     }
 
     /**
-     * Infuse arXivBibEntryPromise with additional fields in an asynchronous way, accelerating the process by providing a valid ArXiv ID
+     * Infuse arXivBibEntryFuture with additional fields in an asynchronous way, accelerating the process by providing a valid ArXiv ID
      *
-     * @param arXivBibEntryFuture Entry to be updated with new/modified fields
-     * @param arXivId An ArXiv ID for providing faster processing time, or Empty if none is available
+     * @param arXivBibEntryFuture A future entry that (if it exists) will be updated with new/modified fields
+     * @param arXivId An ArXiv ID for the main reference (from ArXiv), so that the retrieval of ArXiv-issued DOI metadata can be faster
+     * @throws FetcherException when failed to fetch the main ArtXiv Bibtex entry ('arXivBibEntryFuture').
      */
     private void inplaceAsyncInfuseArXivWithDoi(CompletableFuture<Optional<BibEntry>> arXivBibEntryFuture, Optional<ArXivIdentifier> arXivId) throws FetcherException {
 
@@ -282,8 +284,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         Optional<String> manualDoi;
 
         // We can accelerate the processing time by initiating a parallel request for DOIFetcher with an ArXiv-issued DOI alongside the ArXiv fetching itself,
-        // BUT ONLY IF we have a valid arXivId. If not, the ArXiv entry must be retrieved before, which invalidates this optimization. In any way, if ArXiv entry
-        // possess a user-assigned DOI, there's still an optimization there (although this occurrence seems somewhat low)
+        // BUT ONLY IF we have a valid arXivId. If not, the ArXiv entry must be retrieved before, which invalidates this optimization (although we can still speed
+        // up the process by running both the ArXiv-assigned and user-assigned DOI fetching at the same time, if an entry has this last information)
         if (arXivId.isPresent()) {
             automaticDoi = Optional.of(ArXivFetcher.getAutomaticDoi(arXivId.get()));
             automaticDoiBibEntryFuture = Optional.of(doiFetcher.asyncPerformSearchById(automaticDoi.get()));
@@ -293,22 +295,16 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 return;
             }
         } else {
-            // If ArXiv fetch fails (FetcherException), exception must be passed onwards (as inner ArXiv class was supposed to be)
+            // If ArXiv fetch fails (FetcherException), exception must be passed onwards for the transparency of this class (original ArXiv fetcher does the same)
             arXivBibEntry = ArXivFetcher.waitForBibEntryRetrieval(arXivBibEntryFuture);
             if (arXivBibEntry.isEmpty()) {
                 return;
             }
 
-            automaticDoi = this.getAutomaticDoi(arXivBibEntry.get());
-            if (automaticDoi.isPresent()) {
-                automaticDoiBibEntryFuture = Optional.of(doiFetcher.asyncPerformSearchById(automaticDoi.get()));
-            } else {
-                LOGGER.error("Could not retrieve ArXiv-assigned DOI");
-                automaticDoiBibEntryFuture = Optional.empty();
-            }
+            automaticDoi = ArXivFetcher.getAutomaticDoi(arXivBibEntry.get());
+            automaticDoiBibEntryFuture = automaticDoi.map(arXiv::asyncPerformSearchById);
         }
 
-        // From here onwards, arXivBibEntry is not empty
         manualDoi = ArXivFetcher.getManualDoi(arXivBibEntry.get());
         Optional<CompletableFuture<Optional<BibEntry>>> manualDoiBibEntryFuture = manualDoi.map(doiFetcher::asyncPerformSearchById);
 
@@ -335,9 +331,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
                                                                        .stream()
                                                                        .map(bibEntry ->
-                                                                               CompletableFuture.supplyAsync(() ->
-                                                                                       this.asyncInfuseArXivWithDoi(bibEntry),
-                                                                                       executor))
+                                                                               CompletableFuture.supplyAsync(() -> {
+                                                                                   this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
+                                                                                   return bibEntry;
+                                                                               }, executor))
                                                                        .toList();
 
         Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
@@ -600,7 +597,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                                .collect(Collectors.toList());
         }
 
-        public CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(String identifier) throws CompletionException {
+        protected CompletableFuture<Optional<BibEntry>> asyncPerformSearchById(String identifier) throws CompletionException {
             return CompletableFuture.supplyAsync(() -> {
                 try {
                     return performSearchById(identifier);
