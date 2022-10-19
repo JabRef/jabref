@@ -106,6 +106,32 @@ public class JabRefGUI {
 //            }
 //        }
 
+        // Call the OsThemeDetector from jSystemThemeDetector library (https://github.com/Dansoftowner/jSystemThemeDetector)
+        final OsThemeDetector detector = OsThemeDetector.getDetector();
+
+        // If OS theme is light or dark, JabRef UI Theme will correspond to it. If JabRef is then closed and user modifies their
+        // OS theme settings, the code below will make the necessary theme switch IF automatic detection is enabled by user in
+        // JabRef Appearance Preferences.
+        if (preferencesService.getAppearancePreferences().automaticThemeDetectionFlag().getValue()) {
+            final boolean isDarkThemeUsed = detector.isDark();
+            if (isDarkThemeUsed) {
+                preferencesService.getAppearancePreferences().setTheme(Theme.dark());
+            } else {
+                preferencesService.getAppearancePreferences().setTheme(Theme.light());
+            }
+
+            // Listener implemented so that JabRef UI Theme will update LIVE
+            detector.registerListener(isDark -> {
+                Platform.runLater(() -> {
+                    if (isDark) {
+                        preferencesService.getAppearancePreferences().setTheme(Theme.dark());
+                    } else {
+                        preferencesService.getAppearancePreferences().setTheme(Theme.light());
+                    }
+                });
+            });
+        }
+
         Globals.getThemeManager().installCss(scene);
 
         // Handle TextEditor key bindings

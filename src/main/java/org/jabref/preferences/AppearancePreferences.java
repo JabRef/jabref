@@ -23,10 +23,6 @@ public class AppearancePreferences {
         this.automaticThemeDetectionFlag = new SimpleBooleanProperty(automaticThemeDetectionFlag);
     }
 
-    public boolean getAutomaticThemeDetectionFlag() {
-        return this.automaticThemeDetectionFlag.getValue();
-    }
-
     public BooleanProperty automaticThemeDetectionFlag() {
         return automaticThemeDetectionFlag;
     }

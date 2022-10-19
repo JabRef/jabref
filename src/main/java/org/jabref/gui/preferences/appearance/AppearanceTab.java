@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
@@ -22,6 +23,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
 
+    @FXML public Label restartJabRefHint;
     @FXML private CheckBox fontOverride;
     @FXML private Spinner<Integer> fontSize;
     @FXML private RadioButton themeLight;
@@ -29,7 +31,6 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     @FXML private RadioButton themeAutomaticDetectionButton;
     @FXML private RadioButton customTheme;
     @FXML private TextField customThemePath;
-    @FXML private RadioButton themeAutomatic;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 

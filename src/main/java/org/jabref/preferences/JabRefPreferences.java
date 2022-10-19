@@ -384,6 +384,7 @@ public class JabRefPreferences implements PreferencesService {
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
 
+    // System default theme / Auto detect theme constant
     private static final String AUTOMATIC_THEME_DETECTION = "automaticThemeDetection";
 
     // Indexes for Strings within stored custom export entries
@@ -747,6 +748,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // set default theme
         defaults.put(FX_THEME, Theme.BASE_CSS);
+        // Set automatic theme detection OFF.
         defaults.put(AUTOMATIC_THEME_DETECTION, Boolean.FALSE);
 
         setLanguageDependentDefaultValues();
