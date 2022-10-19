@@ -26,7 +26,7 @@ public class CLIMessageHandler implements TeleMessageHandler {
     @Override
     public void handleCommandLineArguments(String[] message) {
         try {
-            ArgumentProcessor argumentProcessor = new ArgumentProcessor(message, ArgumentProcessor.Mode.REMOTE_START, preferencesService);
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(message, ArgumentProcessor.Mode.TELE_START, preferencesService);
 
             List<ParserResult> loaded = argumentProcessor.getParserResults();
             for (int i = 0; i < loaded.size(); i++) {

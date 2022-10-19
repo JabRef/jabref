@@ -461,7 +461,7 @@ public class ArgumentProcessor {
                 if (!bibExtension || (pr.isEmpty())) {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
-                    // been initiated by another instance through the remote
+                    // been initiated by another instance through the tele
                     // listener, we will instead import it into the current library.
                     // This will enable easy integration with web browsers that can
                     // open a reference file in JabRef.
@@ -719,6 +719,6 @@ public class ArgumentProcessor {
     }
 
     public enum Mode {
-        INITIAL_START, REMOTE_START
+        INITIAL_START, TELE_START
     }
 }

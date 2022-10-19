@@ -50,7 +50,7 @@ public class TelePreferences {
     }
 
     /**
-     * Gets the IP address where the remote server is listening.
+     * Gets the IP address where the tele server is listening.
      */
     public static InetAddress getIpAddress() throws UnknownHostException {
         return InetAddress.getByName("localhost");

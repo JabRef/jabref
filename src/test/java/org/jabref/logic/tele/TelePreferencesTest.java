@@ -30,12 +30,12 @@ public class TelePreferencesTest {
     }
 
     @Test
-    public void testUseRemoteServer() {
+    public void testUseTeleServer() {
         assertTrue(preferences.shouldUseTeleServer());
     }
 
     @Test
-    public void testSetUseRemoteServer() {
+    public void testSetUseTeleServer() {
         preferences.setShouldUseTeleServer(false);
         assertFalse(preferences.shouldUseTeleServer());
     }

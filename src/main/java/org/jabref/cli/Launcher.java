@@ -120,11 +120,11 @@ public class Launcher {
         TelePreferences telePreferences = preferences.getTelePreferences();
         if (telePreferences.shouldUseTeleServer()) {
             // Try to contact already running JabRef
-            TeleClient remoteClient = new TeleClient(telePreferences.getPort());
-            if (remoteClient.ping()) {
+            TeleClient teleClient = new TeleClient(telePreferences.getPort());
+            if (teleClient.ping()) {
                 // We are not alone, there is already a server out there, send command line
                 // arguments to other instance
-                if (remoteClient.sendCommandLineArguments(args)) {
+                if (teleClient.sendCommandLineArguments(args)) {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     return false;

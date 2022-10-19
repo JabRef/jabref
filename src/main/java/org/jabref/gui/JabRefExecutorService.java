@@ -119,7 +119,7 @@ public class JabRefExecutorService {
 
     public void startTeleThread(Thread thread) {
         if (this.teleThread != null) {
-            throw new IllegalStateException("Remote thread is already attached");
+            throw new IllegalStateException("Tele thread is already attached");
         } else {
             this.teleThread = thread;
             teleThread.start();

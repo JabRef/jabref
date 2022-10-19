@@ -389,7 +389,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final int EXPORTER_FILENAME_INDEX = 1;
     private static final int EXPORTER_EXTENSION_INDEX = 2;
 
-    // Remote
+    // Tele Server
     private static final String USE_TELE_SERVER = "useRemoteServer";
     private static final String TELE_SERVER_PORT = "remoteServerPort";
 
