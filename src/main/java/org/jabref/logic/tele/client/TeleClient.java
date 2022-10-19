@@ -1,4 +1,4 @@
-package org.jabref.logic.remote.client;
+package org.jabref.logic.tele.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -7,30 +7,30 @@ import java.net.Socket;
 import javafx.util.Pair;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.shared.Protocol;
-import org.jabref.logic.remote.shared.RemoteMessage;
+import org.jabref.logic.tele.TeleMessage;
+import org.jabref.logic.tele.TelePreferences;
+import org.jabref.logic.tele.TeleProtocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RemoteClient {
+public class TeleClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TeleClient.class);
 
     private static final int TIMEOUT = 1000;
     private final int port;
 
-    public RemoteClient(int port) {
+    public TeleClient(int port) {
         this.port = port;
     }
 
     public boolean ping() {
-        try (Protocol protocol = openNewConnection()) {
-            protocol.sendMessage(RemoteMessage.PING);
-            Pair<RemoteMessage, Object> response = protocol.receiveMessage();
+        try (TeleProtocol protocol = openNewConnection()) {
+            protocol.sendMessage(TeleMessage.PING);
+            Pair<TeleMessage, Object> response = protocol.receiveMessage();
 
-            if (response.getKey() == RemoteMessage.PONG && Protocol.IDENTIFIER.equals(response.getValue())) {
+            if (response.getKey() == TeleMessage.PONG && TeleProtocol.IDENTIFIER.equals(response.getValue())) {
                 return true;
             } else {
                 String port = String.valueOf(this.port);
@@ -51,20 +51,20 @@ public class RemoteClient {
      * @return true if successful, false otherwise.
      */
     public boolean sendCommandLineArguments(String[] args) {
-        try (Protocol protocol = openNewConnection()) {
-            protocol.sendMessage(RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS, args);
-            Pair<RemoteMessage, Object> response = protocol.receiveMessage();
-            return response.getKey() == RemoteMessage.OK;
+        try (TeleProtocol protocol = openNewConnection()) {
+            protocol.sendMessage(TeleMessage.SEND_COMMAND_LINE_ARGUMENTS, args);
+            Pair<TeleMessage, Object> response = protocol.receiveMessage();
+            return response.getKey() == TeleMessage.OK;
         } catch (IOException e) {
             LOGGER.debug("Could not send args " + String.join(", ", args) + " to the server at port " + port, e);
             return false;
         }
     }
 
-    private Protocol openNewConnection() throws IOException {
+    private TeleProtocol openNewConnection() throws IOException {
         Socket socket = new Socket();
         socket.setSoTimeout(TIMEOUT);
-        socket.connect(new InetSocketAddress(RemotePreferences.getIpAddress(), port), TIMEOUT);
-        return new Protocol(socket);
+        socket.connect(new InetSocketAddress(TelePreferences.getIpAddress(), port), TIMEOUT);
+        return new TeleProtocol(socket);
     }
 }

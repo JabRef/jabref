@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
-import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
@@ -21,8 +20,8 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.tele.TelePreferences;
+import org.jabref.logic.tele.client.TeleClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
@@ -118,10 +117,10 @@ public class Launcher {
     }
 
     private static boolean handleMultipleAppInstances(String[] args, PreferencesService preferences) {
-        RemotePreferences remotePreferences = preferences.getRemotePreferences();
-        if (remotePreferences.useRemoteServer()) {
+        TelePreferences telePreferences = preferences.getTelePreferences();
+        if (telePreferences.shouldUseTeleServer()) {
             // Try to contact already running JabRef
-            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+            TeleClient remoteClient = new TeleClient(telePreferences.getPort());
             if (remoteClient.ping()) {
                 // We are not alone, there is already a server out there, send command line
                 // arguments to other instance
@@ -132,10 +131,6 @@ public class Launcher {
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");
                 }
-            } else {
-                // We are alone, so we start the server
-                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(),
-                        preferences);
             }
         }
         return true;

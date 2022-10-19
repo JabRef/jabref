@@ -1,6 +1,6 @@
-package org.jabref.logic.remote.shared;
+package org.jabref.logic.tele;
 
-public enum RemoteMessage {
+public enum TeleMessage {
     /**
      * Send command line arguments. The message content is of type {@code String[]}.
      */

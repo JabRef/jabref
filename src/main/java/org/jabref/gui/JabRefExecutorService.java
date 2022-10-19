@@ -41,7 +41,7 @@ public class JabRefExecutorService {
 
     private final Timer timer = new Timer("timer", true);
 
-    private Thread remoteThread;
+    private Thread teleThread;
 
     private JabRefExecutorService() {
    }
@@ -117,19 +117,19 @@ public class JabRefExecutorService {
         }
     }
 
-    public void manageRemoteThread(Thread thread) {
-        if (this.remoteThread != null) {
+    public void startTeleThread(Thread thread) {
+        if (this.teleThread != null) {
             throw new IllegalStateException("Remote thread is already attached");
         } else {
-            this.remoteThread = thread;
-            remoteThread.start();
+            this.teleThread = thread;
+            teleThread.start();
         }
     }
 
-    public void stopRemoteThread() {
-        if (remoteThread != null) {
-            remoteThread.interrupt();
-            remoteThread = null;
+    public void stopTeleThread() {
+        if (teleThread != null) {
+            teleThread.interrupt();
+            teleThread = null;
         }
     }
 
@@ -141,8 +141,7 @@ public class JabRefExecutorService {
      * Shuts everything down. After termination, this method returns.
      */
     public void shutdownEverything() {
-        // kill the remote thread
-        stopRemoteThread();
+        stopTeleThread();
 
         gracefullyShutdown(this.executorService);
         gracefullyShutdown(this.lowPriorityExecutorService);

@@ -21,7 +21,7 @@ import javafx.stage.FileChooser;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.gui.remote.JabRefMessageHandler;
+import org.jabref.gui.tele.CLIMessageHandler;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
@@ -30,8 +30,8 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.net.ssl.SSLCertificate;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
-import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.RemoteUtil;
+import org.jabref.logic.tele.TelePreferences;
+import org.jabref.logic.tele.TeleUtil;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
@@ -66,7 +66,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final RemotePreferences remotePreferences;
+    private final TelePreferences remotePreferences;
     private final ProxyPreferences proxyPreferences;
     private final ProxyPreferences backupProxyPreferences;
     private final SSLPreferences sslPreferences;
@@ -78,7 +78,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.remotePreferences = preferences.getRemotePreferences();
+        this.remotePreferences = preferences.getTelePreferences();
         this.proxyPreferences = preferences.getProxyPreferences();
         this.sslPreferences = preferences.getSSLPreferences();
 
@@ -95,7 +95,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 input -> {
                     try {
                         int portNumber = Integer.parseInt(remotePortProperty().getValue());
-                        return RemoteUtil.isUserPort(portNumber);
+                        return TeleUtil.isUserPort(portNumber);
                     } catch (NumberFormatException ex) {
                         return false;
                     }
@@ -140,7 +140,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        remoteServerProperty.setValue(remotePreferences.useRemoteServer());
+        remoteServerProperty.setValue(remotePreferences.shouldUseTeleServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
 
         setProxyValues();
@@ -188,7 +188,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     private void storeRemoteSettings() {
-        RemotePreferences newRemotePreferences = new RemotePreferences(
+        TelePreferences newRemotePreferences = new TelePreferences(
                 remotePreferences.getPort(),
                 remoteServerProperty.getValue()
         );
@@ -200,11 +200,11 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         });
 
         if (remoteServerProperty.getValue()) {
-            remotePreferences.setUseRemoteServer(true);
-            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(), preferences);
+            remotePreferences.setShouldUseTeleServer(true);
+            Globals.TELE_SERVER.openAndStart(new CLIMessageHandler(preferences), remotePreferences.getPort());
         } else {
-            remotePreferences.setUseRemoteServer(false);
-            Globals.REMOTE_LISTENER.stop();
+            remotePreferences.setShouldUseTeleServer(false);
+            Globals.TELE_SERVER.stop();
         }
     }
 

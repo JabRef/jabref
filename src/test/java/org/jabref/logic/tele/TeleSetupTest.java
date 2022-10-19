@@ -1,4 +1,4 @@
-package org.jabref.logic.remote;
+package org.jabref.logic.tele;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -6,11 +6,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.remote.server.MessageHandler;
-import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
+import org.jabref.logic.tele.client.TeleClient;
+import org.jabref.logic.tele.server.TeleMessageHandler;
+import org.jabref.logic.tele.server.TeleServerManager;
 import org.jabref.logic.util.OS;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,24 +19,18 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-/**
- * Tests where the remote client and server setup is wrong.
- */
 @DisabledOnCIServer("Tests fails sporadically on CI server")
-class RemoteSetupTest {
+class TeleSetupTest {
 
-    private MessageHandler messageHandler;
-    private PreferencesService preferencesService;
+    private TeleMessageHandler messageHandler;
 
     @BeforeEach
     void setUp() {
-        messageHandler = mock(MessageHandler.class);
-        preferencesService = mock(PreferencesService.class);
+        messageHandler = mock(TeleMessageHandler.class);
     }
 
     @Test
@@ -45,12 +38,12 @@ class RemoteSetupTest {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
-        try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+        try (TeleServerManager server = new TeleServerManager()) {
             assertFalse(server.isOpen());
-            server.openAndStart(messageHandler, port, preferencesService);
+            server.openAndStart(messageHandler, port);
             assertTrue(server.isOpen());
-            assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
-            verify(messageHandler).handleCommandLineArguments(message, preferencesService);
+            assertTrue(new TeleClient(port).sendCommandLineArguments(message));
+            verify(messageHandler).handleCommandLineArguments(message);
             server.stop();
             assertFalse(server.isOpen());
         }
@@ -61,21 +54,21 @@ class RemoteSetupTest {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
-        try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+        try (TeleServerManager server = new TeleServerManager()) {
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
             server.stop();
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
-            server.open(messageHandler, port, preferencesService);
+            server.open(messageHandler, port);
             assertTrue(server.isOpen());
             assertTrue(server.isNotStartedBefore());
             server.start();
             assertTrue(server.isOpen());
             assertFalse(server.isNotStartedBefore());
 
-            assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
-            verify(messageHandler).handleCommandLineArguments(message, preferencesService);
+            assertTrue(new TeleClient(port).sendCommandLineArguments(message));
+            verify(messageHandler).handleCommandLineArguments(message);
             server.stop();
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
@@ -91,11 +84,11 @@ class RemoteSetupTest {
         try (ServerSocket socket = new ServerSocket(port)) {
             assertTrue(socket.isBound());
 
-            try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+            try (TeleServerManager server = new TeleServerManager()) {
                 assertFalse(server.isOpen());
-                server.openAndStart(messageHandler, port, preferencesService);
+                server.openAndStart(messageHandler, port);
                 assertFalse(server.isOpen());
-                verify(messageHandler, never()).handleCommandLineArguments(any(), eq(preferencesService));
+                verify(messageHandler, never()).handleCommandLineArguments(any());
             }
         }
     }
@@ -105,7 +98,7 @@ class RemoteSetupTest {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        assertFalse(new RemoteClient(port).sendCommandLineArguments(new String[]{message}));
+        assertFalse(new TeleClient(port).sendCommandLineArguments(new String[]{message}));
     }
 
     @Test
@@ -123,7 +116,7 @@ class RemoteSetupTest {
             }).start();
             Thread.sleep(100);
 
-            assertFalse(new RemoteClient(port).ping());
+            assertFalse(new TeleClient(port).ping());
         }
     }
 
@@ -131,17 +124,17 @@ class RemoteSetupTest {
     void pingReturnsFalseForNoServerListening() throws IOException, InterruptedException {
         final int port = 34567;
 
-        assertFalse(new RemoteClient(port).ping());
+        assertFalse(new TeleClient(port).ping());
     }
 
     @Test
     void pingReturnsTrueWhenServerIsRunning() {
         final int port = 34567;
 
-        try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
-            server.openAndStart(messageHandler, port, preferencesService);
+        try (TeleServerManager server = new TeleServerManager()) {
+            server.openAndStart(messageHandler, port);
 
-            assertTrue(new RemoteClient(port).ping());
+            assertTrue(new TeleClient(port).ping());
         }
     }
 }

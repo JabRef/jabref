@@ -1,4 +1,4 @@
-package org.jabref.logic.remote.server;
+package org.jabref.logic.tele.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -7,29 +7,26 @@ import java.net.SocketException;
 
 import javafx.util.Pair;
 
-import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.shared.Protocol;
-import org.jabref.logic.remote.shared.RemoteMessage;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.logic.tele.TeleMessage;
+import org.jabref.logic.tele.TelePreferences;
+import org.jabref.logic.tele.TeleProtocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RemoteListenerServer implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServer.class);
+public class TeleServer implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TeleServer.class);
 
     private static final int BACKLOG = 1;
 
     private static final int TIMEOUT = 1000;
 
-    private final MessageHandler messageHandler;
+    private final TeleMessageHandler messageHandler;
     private final ServerSocket serverSocket;
-    private final PreferencesService preferencesService;
 
-    public RemoteListenerServer(MessageHandler messageHandler, int port, PreferencesService preferencesService) throws IOException {
-        this.serverSocket = new ServerSocket(port, BACKLOG, RemotePreferences.getIpAddress());
+    public TeleServer(TeleMessageHandler messageHandler, int port) throws IOException {
+        this.serverSocket = new ServerSocket(port, BACKLOG, TelePreferences.getIpAddress());
         this.messageHandler = messageHandler;
-        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -39,14 +36,14 @@ public class RemoteListenerServer implements Runnable {
                 try (Socket socket = serverSocket.accept()) {
                     socket.setSoTimeout(TIMEOUT);
 
-                    try (Protocol protocol = new Protocol(socket)) {
-                        Pair<RemoteMessage, Object> input = protocol.receiveMessage();
+                    try (TeleProtocol protocol = new TeleProtocol(socket)) {
+                        Pair<TeleMessage, Object> input = protocol.receiveMessage();
                         handleMessage(protocol, input.getKey(), input.getValue());
                     }
                 } catch (SocketException ex) {
                     return;
                 } catch (IOException e) {
-                    LOGGER.warn("RemoteListenerServer crashed", e);
+                    LOGGER.warn("TeleServer crashed", e);
                 }
             }
         } finally {
@@ -54,15 +51,15 @@ public class RemoteListenerServer implements Runnable {
         }
     }
 
-    private void handleMessage(Protocol protocol, RemoteMessage type, Object argument) throws IOException {
+    private void handleMessage(TeleProtocol protocol, TeleMessage type, Object argument) throws IOException {
         switch (type) {
             case PING:
-                protocol.sendMessage(RemoteMessage.PONG, Protocol.IDENTIFIER);
+                protocol.sendMessage(TeleMessage.PONG, TeleProtocol.IDENTIFIER);
                 break;
             case SEND_COMMAND_LINE_ARGUMENTS:
                 if (argument instanceof String[]) {
-                    messageHandler.handleCommandLineArguments((String[]) argument, preferencesService);
-                    protocol.sendMessage(RemoteMessage.OK);
+                    messageHandler.handleCommandLineArguments((String[]) argument);
+                    protocol.sendMessage(TeleMessage.OK);
                 } else {
                     throw new IOException("Argument for 'SEND_COMMAND_LINE_ARGUMENTS' is not of type String[]. Got " + argument);
                 }
@@ -75,8 +72,8 @@ public class RemoteListenerServer implements Runnable {
     public void closeServerSocket() {
         try {
             serverSocket.close();
-        } catch (IOException ignored) {
-            // Ignored
+        } catch (IOException exception) {
+            LOGGER.error("Could not close server socket", exception);
         }
     }
 }
