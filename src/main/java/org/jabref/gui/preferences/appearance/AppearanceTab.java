@@ -70,7 +70,6 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
         themeAutomaticDetectionButton.selectedProperty().bindBidirectional(viewModel.automaticDetectionProperty());
         customTheme.selectedProperty().bindBidirectional(viewModel.customThemeProperty());
-        themeAutomatic.selectedProperty().bindBidirectional(viewModel.themeAutomaticProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
