@@ -26,6 +26,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     @FXML private Spinner<Integer> fontSize;
     @FXML private RadioButton themeLight;
     @FXML private RadioButton themeDark;
+    @FXML private RadioButton themeAutomaticDetectionButton;
     @FXML private RadioButton customTheme;
     @FXML private TextField customThemePath;
     @FXML private RadioButton themeAutomatic;
@@ -67,6 +68,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
 
         themeLight.selectedProperty().bindBidirectional(viewModel.themeLightProperty());
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
+        themeAutomaticDetectionButton.selectedProperty().bindBidirectional(viewModel.automaticDetectionProperty());
         customTheme.selectedProperty().bindBidirectional(viewModel.customThemeProperty());
         themeAutomatic.selectedProperty().bindBidirectional(viewModel.themeAutomaticProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());

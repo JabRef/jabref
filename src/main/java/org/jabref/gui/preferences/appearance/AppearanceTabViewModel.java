@@ -32,9 +32,11 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
     private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeDarkProperty = new SimpleBooleanProperty();
-    private final BooleanProperty themeAutomaticProperty = new SimpleBooleanProperty();
+
+    private final BooleanProperty automaticThemeDetectionProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeCustomProperty = new SimpleBooleanProperty();
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
+    private final BooleanProperty flagWhenAutomaticButtonSelected = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
@@ -42,7 +44,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
-    private final BooleanProperty automaticDetectionChecked = new SimpleBooleanProperty();
 
     public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -80,36 +81,35 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
         Theme currentTheme = appearancePreferences.getTheme();
-        // If the theme of JabRef is Light
         if (currentTheme.getType() == Theme.Type.DEFAULT) {
-            // If the user has set automatic theme detection: ON.
-            if (automaticDetectionChecked.getValue()) {
-                themeAutomaticProperty.setValue(true);
+            if (appearancePreferences.automaticThemeDetectionFlag().getValue()) {
+                automaticThemeDetectionProperty.setValue(true);
                 themeLightProperty.setValue(false);
-            // If the user has set automatic theme detection: OFF.
-            } else {
-                themeAutomaticProperty.setValue(false);
-                themeLightProperty.setValue(true);
-            }
-            themeCustomProperty.setValue(false);
-            themeDarkProperty.setValue(false);
-            // If the theme of JabRef is Dark
-        } else if (currentTheme.getType() == Theme.Type.EMBEDDED) {
-            // If the user has set automatic theme detection: ON.
-            if (automaticDetectionChecked.getValue()) {
+                themeCustomProperty.setValue(false);
                 themeDarkProperty.setValue(false);
-                themeAutomaticProperty.setValue(true);
-            // If the user has set automatic theme detection: OFF.
             } else {
-                themeDarkProperty.setValue(true);
-                themeAutomaticProperty.setValue(false);
+                themeLightProperty.setValue(true);
+                themeDarkProperty.setValue(false);
+                themeCustomProperty.setValue(false);
+                automaticThemeDetectionProperty.setValue(false);
             }
-            themeLightProperty.setValue(false);
-            themeCustomProperty.setValue(false);
+        } else if (currentTheme.getType() == Theme.Type.EMBEDDED) {
+            if (appearancePreferences.automaticThemeDetectionFlag().getValue()) {
+                automaticThemeDetectionProperty.setValue(true);
+                themeLightProperty.setValue(false);
+                themeCustomProperty.setValue(false);
+                themeDarkProperty.setValue(false);
+            } else {
+                themeLightProperty.setValue(false);
+                themeDarkProperty.setValue(true);
+                themeCustomProperty.setValue(false);
+                automaticThemeDetectionProperty.setValue(false);
+            }
         } else {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(true);
+            automaticThemeDetectionProperty.setValue(false);
             customPathToThemeProperty.setValue(currentTheme.getName());
         }
     }
@@ -121,17 +121,25 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
         if (themeLightProperty.getValue()) {
             appearancePreferences.setTheme(Theme.light());
+            // If the Light Theme Property is true, check if user has enabled automatic detection.
+            // If so, change the flag in appearancePreferences so that it knows to set the auto detection radio button
+            // to checked.
+            appearancePreferences.setAutomaticThemeDetectionFlag(flagWhenAutomaticButtonSelected.getValue());
         } else if (themeDarkProperty.getValue()) {
             appearancePreferences.setTheme(Theme.dark());
+            // If the Dark Theme Property is true, check if user has enabled automatic detection.
+            // If so, change the flag in appearancePreferences to true so that it knows to set the auto detection
+            // radio button to checked.
+            appearancePreferences.setAutomaticThemeDetectionFlag(flagWhenAutomaticButtonSelected.getValue());
         } else if (themeCustomProperty.getValue()) {
             appearancePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
-        } else if (themeAutomaticProperty.getValue()) {
-            appearancePreferences.setTheme(detectSystemThemePreferences());
+        } else if (automaticThemeDetectionProperty.getValue()) {
+            appearancePreferences.setTheme(detectOSThemePreference());
+            appearancePreferences.setAutomaticThemeDetectionFlag(true);
         }
     }
 
-    public Theme detectSystemThemePreferences() {
-        appearancePreferences.automaticDetectionFlag().setValue(true);
+    public Theme detectOSThemePreference() {
         final OsThemeDetector detector = OsThemeDetector.getDetector();
         final boolean isDarkThemeUsed = detector.isDark();
         if (isDarkThemeUsed) {
@@ -179,27 +187,23 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     }
 
     public BooleanProperty themeLightProperty() {
+        flagWhenAutomaticButtonSelected.setValue(false);
         return themeLightProperty;
     }
 
     public BooleanProperty themeDarkProperty() {
+        flagWhenAutomaticButtonSelected.setValue(false);
         return themeDarkProperty;
     }
 
     public BooleanProperty customThemeProperty() {
+        flagWhenAutomaticButtonSelected.setValue(false);
         return themeCustomProperty;
     }
 
-    public BooleanProperty themeAutomaticProperty() {
-        appearancePreferences.automaticDetectionFlag().setValue(true);
-        return themeAutomaticProperty;
-//        final OsThemeDetector detector = OsThemeDetector.getDetector();
-//        final boolean isDarkThemeUsed = detector.isDark();
-//        if (isDarkThemeUsed) {
-//            return themeDarkProperty;
-//        } else {
-//            return themeLightProperty;
-//        }
+    public BooleanProperty automaticDetectionProperty() {
+        flagWhenAutomaticButtonSelected.setValue(true);
+        return automaticThemeDetectionProperty;
     }
 
     public StringProperty customPathToThemeProperty() {

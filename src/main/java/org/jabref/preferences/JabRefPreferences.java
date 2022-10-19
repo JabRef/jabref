@@ -384,6 +384,8 @@ public class JabRefPreferences implements PreferencesService {
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
 
+    private static final String AUTOMATIC_THEME_DETECTION = "automaticThemeDetection";
+
     // Indexes for Strings within stored custom export entries
     private static final int EXPORTER_NAME_INDEX = 0;
     private static final int EXPORTER_FILENAME_INDEX = 1;
@@ -745,6 +747,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // set default theme
         defaults.put(FX_THEME, Theme.BASE_CSS);
+        defaults.put(AUTOMATIC_THEME_DETECTION, Boolean.FALSE);
 
         setLanguageDependentDefaultValues();
     }
@@ -2068,12 +2071,13 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
                 new Theme(get(FX_THEME)),
-                false
+                getBoolean(AUTOMATIC_THEME_DETECTION)
         );
 
         EasyBind.listen(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
         EasyBind.listen(appearancePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
         EasyBind.listen(appearancePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
+        EasyBind.listen(appearancePreferences.automaticThemeDetectionFlag(), (obs, oldValue, newValue) -> putBoolean(AUTOMATIC_THEME_DETECTION, newValue));
 
         return appearancePreferences;
     }
