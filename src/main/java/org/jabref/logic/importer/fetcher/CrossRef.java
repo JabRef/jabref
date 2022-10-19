@@ -1,15 +1,11 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -144,6 +140,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
             entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
+            entry.setField(StandardField.TIMESEXTERNALLYCITED, item.optString("is-referenced-by-count"));
             return entry;
         } catch (JSONException exception) {
             throw new ParseException("CrossRef API JSON format has changed", exception);
@@ -199,69 +196,5 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public String getIdentifierName() {
         return "DOI";
-    }
-
-    /**
-     * Queries the CrossRef API for the is-referenced-by-count. This is used to display how many times this
-     * entry has been referenced according to CrossRef.
-     *
-     * @return the is-referenced-by-count for the entry.
-     */
-    public Optional<String> extractReferencedByCount(BibEntry entry) throws FetcherException {
-        Objects.requireNonNull(entry);
-
-        try (InputStream stream = new BufferedInputStream(getURLForEntry(entry).openStream())) {
-            JSONObject response = JsonReader.toJsonObject(stream);
-
-            // The whole response is empty
-            if (response.isEmpty()) {
-                return Optional.empty();
-            }
-
-            // There is no message
-            response = response.getJSONObject("message");
-            if (response.isEmpty()) {
-                return Optional.empty();
-            }
-
-            // For singleton responses
-            if (!response.has("items")) {
-                return getJSONValueFromKey(response, "is-referenced-by-count");
-            }
-
-            // For multiple item responses
-            JSONArray items = response.getJSONArray("items");
-            return getJSONValueFromKey(items.getJSONObject(0), "is-referenced-by-count");
-        } catch (
-                URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
-        } catch (
-                IOException e) {
-            // check for the case where we already have a FetcherException from UrlDownload
-            if (e.getCause() instanceof FetcherException fe) {
-                throw fe;
-            }
-        } catch (
-                ParseException e) {
-            throw new FetcherException("An internal parser error occurred", e);
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Returns the String associated with the given key in the JSONObject.
-     *
-     * @param item the JSON Object to parse for the key
-     * @param key the key of the key:value pair to return the value of
-     * @return the value associated with the given key
-     * @throws ParseException if the key cannot be found
-     */
-    public Optional<String> getJSONValueFromKey(JSONObject item, String key) throws ParseException {
-        try {
-            return Optional.of(item.getString(key));
-        } catch (
-                JSONException exception) {
-            throw new ParseException("Key cannot be found within the object", exception);
-        }
     }
 }

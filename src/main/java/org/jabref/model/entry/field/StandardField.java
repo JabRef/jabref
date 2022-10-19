@@ -10,7 +10,6 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
 
 /**
  * Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
- *
  * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
  */
 public enum StandardField implements Field {
@@ -136,7 +135,9 @@ public enum StandardField implements Field {
     OWNER("owner"),
     TIMESTAMP("timestamp", FieldProperty.DATE),
     CREATIONDATE("creationdate", FieldProperty.DATE),
-    MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
+    MODIFICATIONDATE("modificationdate", FieldProperty.DATE),
+    // The number of times the article has been referenced by other articles
+    TIMESEXTERNALLYCITED("timesexternallycited", FieldProperty.NUMERIC);
 
     private final String name;
     private final String displayName;

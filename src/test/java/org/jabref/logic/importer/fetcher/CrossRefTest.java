@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
 public class CrossRefTest {
@@ -150,8 +151,18 @@ public class CrossRefTest {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1392/BC1.0"));
     }
 
+    /**
+     * Checks that TIMESEXTERNALLYREFERENCED is added successfully by the crossref call.
+     */
     @Test
-    public void extractReferencedByCountForWellFormattedEntry() throws Exception {
-        assertEquals(Optional.of("153"), fetcher.extractReferencedByCount(barrosEntry));
+    public void findTimesExternallyCited() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "Service Interaction Patterns");
+        entry.setField(StandardField.AUTHOR, "Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede");
+        entry.setField(StandardField.YEAR, "2005");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearch(entry).stream().findFirst();
+        int timesCited = Integer.parseInt(fetchedEntry.get().getField(StandardField.TIMESEXTERNALLYCITED).get());
+        // As the number of timesExternallyCited can change over time, this only tests that it is >= 0.
+        assertTrue(timesCited >= 0);
     }
 }
