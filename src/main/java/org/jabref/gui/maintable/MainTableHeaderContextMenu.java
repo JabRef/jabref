@@ -1,7 +1,9 @@
 package org.jabref.gui.maintable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.RadioMenuItem;
@@ -12,18 +14,27 @@ import org.jabref.gui.maintable.columns.MainTableColumn;
 
 public class MainTableHeaderContextMenu extends ContextMenu {
 
-    public MainTableHeaderContextMenu() {
+    MainTable mainTable;
+    Set<TableColumn<BibEntryTableViewModel, ?>> columnSet;
+    /**
+     * Constructor for the right click menu
+     *
+     */
+    public MainTableHeaderContextMenu(MainTable mainTable) {
         super();
+        columnSet = new HashSet<>();
+        constructItems(mainTable);
+        this.mainTable = mainTable;
     }
 
     /**
      * Handles showing the menu in the cursors position when right-clicked.
      */
-    public void show(MainTable mainTable) {
+    public void show(boolean show) {
+        // TODO: 20/10/2022 unknown bug where issue does not show unless parameter is passed through this method.
         mainTable.setOnContextMenuRequested(event -> {
-            if (!(event.getTarget() instanceof StackPane)) {
+            if (!(event.getTarget() instanceof StackPane) && show) {
                 // Main table columns
-                constructItems(mainTable);
                 this.show(mainTable, event.getScreenX(), event.getScreenY());
             }
             event.consume();
@@ -43,6 +54,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         ) {
             RadioMenuItem itemToAdd = createMenuItem(column);
             this.getItems().add(itemToAdd);
+            this.columnSet.add(column);
         }
     }
 
@@ -61,9 +73,37 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         returnItem.setSelected(tableColumn.isVisible());
 
         // Set action to toggle visibility from main table when item is clicked
-        returnItem.setOnAction(event -> tableColumn.setVisible(!tableColumn.isVisible()));
+        returnItem.setOnAction(event -> {
+            if (tableColumn.isVisible()) {
+                removeColumn(tableColumn);
+            } else {
+                addColumn(tableColumn);
+            }
+        });
 
         return returnItem;
+    }
+
+    /**
+     * Adds the column into the MainTable for display.
+     */
+    @SuppressWarnings("rawtypes")
+    private void addColumn(MainTableColumn tableColumn) {
+        // Do not add duplicate if table column is already within the table.
+        if (!mainTable.getColumns().contains(tableColumn)) {
+            // noinspection unchecked
+            mainTable.getColumns().add(tableColumn);
+            tableColumn.setVisible(true);
+        }
+    }
+
+    /**
+     * Removes the column from the MainTable to remove visibility.
+     */
+    @SuppressWarnings("rawtypes")
+    private void removeColumn(MainTableColumn tableColumn) {
+        tableColumn.setVisible(!tableColumn.isVisible());
+        mainTable.getColumns().removeIf(tableCol -> tableCol == tableColumn);
     }
 
     private List<RadioMenuItem> commonColumns() {
