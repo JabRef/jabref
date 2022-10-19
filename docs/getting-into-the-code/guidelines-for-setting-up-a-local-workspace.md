@@ -215,8 +215,8 @@ Make sure your Eclipse installation us up to date.
 3. Open or import the existing project in Eclipse as Java project.
    * Remark: Importing it as gradle project will not work correctly.
    * Refresh the project in Eclipse
-4. Create a run/debug configuration for the main class `org.jabref.gui.JabRefLauncher` and/or for `org.jabref.gui.JabRefMain` (both can be used equivalently)
-   *   Remark: The run/debug configuration needs to be added by right clicking the class (e.g. JabRefLauncher or JabRefMain) otherwise it will not work.
+4. Create a run/debug configuration for the main class `org.jabref.cli.Launcher` and/or for `org.jabref.gui.JabRefMain` (both can be used equivalently)
+   *   Remark: The run/debug configuration needs to be added by right clicking the class (e.g. `Launcher` or JabRefMain) otherwise it will not work.
 
        ![Creating the run/debug configuration by right clicking on the class](<../images/eclipse-create-run-config.png>)
    *   In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
@@ -242,7 +242,7 @@ Make sure your Eclipse installation us up to date.
        ```
    * In the tab "Dependencies" of the run/debug configuration tick the checkbox "Exclude test code"
 5. Optional: Install the [e(fx)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -> Eclipse Marketplace... -> Search tab 2. Enter "e(fx)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
-6. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
+6. Now you can build and run/debug the application by either using `Launcher` or `JabRefMain`. This is the recommended way, since the application starts quite fast.
 
 ### Localization Test Configuration (IDEA)
 
