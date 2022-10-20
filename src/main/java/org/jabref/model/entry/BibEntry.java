@@ -1048,10 +1048,23 @@ public class BibEntry implements Cloneable {
         this.setFiles(linkedFiles);
     }
 
+    /**
+     * Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
+     * intersection, priority is given to THIS entry's field value.
+     *
+     * @param other another BibEntry from which fields are sourced from
+     */
     public void mergeWith(BibEntry other) {
         mergeWith(other, Set.of());
     }
 
+    /**
+     * Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
+     * intersection, priority is given to THIS entry's field value, UNLESS specified otherwise in the arguments.
+     *
+     * @param other another BibEntry from which fields are sourced from
+     * @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
+     */
     public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {
         Set<Field> thisFields = new TreeSet<>(Comparator.comparing(Field::getName));
         Set<Field> otherFields = new TreeSet<>(Comparator.comparing(Field::getName));

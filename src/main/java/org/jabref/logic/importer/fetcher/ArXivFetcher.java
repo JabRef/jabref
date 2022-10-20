@@ -38,6 +38,7 @@ import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
@@ -56,26 +57,26 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
- * Fetcher for the arXiv - with post-processing:
- * <ul>
- *     <li>Merges fields from arXiv-issued DOIs to get more information overall.</li>
- * </ul>
- *<p>
+ * Fetcher for ArXiv that merges fields from arXiv-issued DOIs (and user-issued ones when applicable) to get more information overall.
+ * <p>
+ * These are the post-processing steps applied to the original fetch from ArXiv's API:
+ * <ol>
+ *     <li>Use ArXiv-issued DOI to get more merge more data with original entry, overwriting some of those fields;</li>
+ *     <li>Use user-issued DOI (if it was provided) to merge even more data with the result of the previous step, overwriting some of those fields;</li>
+ *     <li>Modify keywords: remove repetitions and adapt some edge cases (commas in keyword transformed into forward slashes).</li>
+ * </ol>
  *
  * @see <a href="https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/">arXiv.org blog </a> for more info about arXiv-issued DOIs
  * @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
- * @see <a href="https://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
- * description on how to use the API
- * <p>
- * Similar implementions:
- * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
- * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
+ * @see <a href="https://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed description on how to use the API
  */
 public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivFetcher.class);
+
     // See https://github.com/JabRef/jabref/issues/9092#issuecomment-1251093262
     private static final String DOI_PREFIX = "10.48550/arXiv.";
+
     // See https://github.com/JabRef/jabref/pull/9170 discussion
     /*
     * Reason behind choice of these fields:
@@ -89,7 +90,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      *   - PUBLISHER: ArXiv-issued DOIs give 'ArXiv' as entry publisher. While this can be true, prefer using one from external sources,
      *      if applicable
      * */
-    private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER);
+    private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER, InternalField.KEY_FIELD);
 
     private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = ImmutableMap.of(
             "Computational Engineering, Finance, and Science", "Computational Engineering / Finance / Science",
@@ -101,6 +102,15 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     public ArXivFetcher(ImportFormatPreferences importFormatPreferences) {
         this.arXiv = new ArXiv(importFormatPreferences);
         this.doiFetcher = new DoiFetcher(importFormatPreferences);
+    }
+
+    /**
+     * NOTE: with this constructor, one can disable the additional search for more metadata (with related DOI) by passing
+     * a NULL DoiFetcher.
+     */
+    public ArXivFetcher(ImportFormatPreferences importFormatPreferences, DoiFetcher doiFetcher) {
+        this.arXiv = new ArXiv(importFormatPreferences);
+        this.doiFetcher = doiFetcher;
     }
 
     @Override
@@ -325,6 +335,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
 
         Page<BibEntry> result = arXiv.performSearchPaged(luceneQuery, pageNumber);
+        if (this.doiFetcher == null) {
+            return result;
+        }
 
         ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2);
 
@@ -346,9 +359,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-
         CompletableFuture<Optional<BibEntry>> arXivBibEntryPromise = arXiv.asyncPerformSearchById(identifier);
-        inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, ArXivIdentifier.parse(identifier));
+        if (this.doiFetcher != null) {
+            inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, ArXivIdentifier.parse(identifier));
+        }
         return arXivBibEntryPromise.join();
     }
 

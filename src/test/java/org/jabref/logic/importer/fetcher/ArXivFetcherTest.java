@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -121,7 +122,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(StandardField.KEYWORDS, "Tissues and Organs (q-bio.TO), FOS: Biological sciences")
-                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2003.04601")
+                .withField(InternalField.KEY_FIELD, "B_scher_2020")
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
         sliceTheoremPaper = new BibEntry(StandardEntryType.Article)
@@ -342,7 +343,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.KEYWORDS, "High Energy Physics - Experiment (hep-ex), FOS: Physical sciences")
                 .withField(StandardField.DOI, "10.1140/epjc/s2003-01326-x")
                 .withField(StandardField.JOURNAL, "Eur.Phys.J.C31:17-29,2003")
-                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.hep-ex/0307015")
+                .withField(InternalField.KEY_FIELD, "2003")
                 .withField(new UnknownField("copyright"), "Assumed arXiv.org perpetual, non-exclusive license to distribute this article for submissions made before January 2004");
 
         assertEquals(Optional.of(expected), fetcher.performSearchById("hep-ex/0307015"));
@@ -449,7 +450,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2009.10618v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "cs.DC")
-                .withField(StandardField.KEYWORDS, "Distributed, Parallel, and Cluster Computing (cs.DC), Machine Learning (cs.LG), FOS: Computer and information sciences")
+                .withField(StandardField.KEYWORDS, "Distributed / Parallel / Cluster Computing (cs.DC), Machine Learning (cs.LG), FOS: Computer and information sciences")
                 .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2009.10618")
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
@@ -479,12 +480,109 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(StandardField.KEYWORDS, "Tissues and Organs (q-bio.TO), FOS: Biological sciences")
-                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2003.04601")
+                .withField(InternalField.KEY_FIELD, "B_scher_2020")
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
         List<BibEntry> result = fetcher.performSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
         assertEquals(Collections.singletonList(expected), result);
+    }
+
+    @Test
+    public void retrievePureArxivEntryWhenAllDOIFetchingFails() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Hai Zheng and Po-Yi Ho and Meiling Jiang and Bin Tang and Weirong Liu and Dengjin Li and Xuefeng Yu and Nancy E. Kleckner and Ariel Amir and Chenli Liu")
+                .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
+                .withField(StandardField.DATE, "2017-01-03")
+                .withField(StandardField.JOURNAL, "PNAS December 27, 2016 vol. 113 no. 52 15000-15005")
+                .withField(StandardField.ABSTRACT, "Bacteria tightly regulate and coordinate the various events in their cell cycles to duplicate themselves accurately and to control their cell sizes. Growth of Escherichia coli, in particular, follows a relation known as Schaechter 's growth law. This law says that the average cell volume scales exponentially with growth rate, with a scaling exponent equal to the time from initiation of a round of DNA replication to the cell division at which the corresponding sister chromosomes segregate. Here, we sought to test the robustness of the growth law to systematic perturbations in cell dimensions achieved by varying the expression levels of mreB and ftsZ. We found that decreasing the mreB level resulted in increased cell width, with little change in cell length, whereas decreasing the ftsZ level resulted in increased cell length. Furthermore, the time from replication termination to cell division increased with the perturbed dimension in both cases. Moreover, the growth law remained valid over a range of growth conditions and dimension perturbations. The growth law can be quantitatively interpreted as a consequence of a tight coupling of cell division to replication initiation. Thus, its robustness to perturbations in cell dimensions strongly supports models in which the timing of replication initiation governs that of cell division, and cell volume is the key phenomenological variable governing the timing of replication initiation. These conclusions are discussed in the context of our recently proposed adder-per-origin model, in which cells add a constant volume per origin between initiations and divide a constant time after initiation.")
+                .withField(StandardField.DOI, "10.1073/pnas.1617932114")
+                .withField(StandardField.EPRINT, "1701.00587")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1701.00587v1:PDF")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINTCLASS, "q-bio.CB")
+                .withField(StandardField.KEYWORDS, "q-bio.CB");
+
+        DoiFetcher modifiedDoiFetcher = Mockito.spy(new DoiFetcher(importFormatPreferences));
+        when(modifiedDoiFetcher.performSearchById("10.1073/pnas.1617932114")).thenThrow(new FetcherException("Could not fetch user-assigned DOI"));
+        when(modifiedDoiFetcher.performSearchById("10.48550/arXiv.1701.00587")).thenThrow(new FetcherException("Could not fetch ArXiv-assigned DOI"));
+
+        ArXivFetcher modifiedArXivFetcher = Mockito.spy(new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher));
+        assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
+    }
+
+    @Test
+    public void canReplicateArXivOnlySearchByPassingNullParameter() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Hai Zheng and Po-Yi Ho and Meiling Jiang and Bin Tang and Weirong Liu and Dengjin Li and Xuefeng Yu and Nancy E. Kleckner and Ariel Amir and Chenli Liu")
+                .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
+                .withField(StandardField.DATE, "2017-01-03")
+                .withField(StandardField.JOURNAL, "PNAS December 27, 2016 vol. 113 no. 52 15000-15005")
+                .withField(StandardField.ABSTRACT, "Bacteria tightly regulate and coordinate the various events in their cell cycles to duplicate themselves accurately and to control their cell sizes. Growth of Escherichia coli, in particular, follows a relation known as Schaechter 's growth law. This law says that the average cell volume scales exponentially with growth rate, with a scaling exponent equal to the time from initiation of a round of DNA replication to the cell division at which the corresponding sister chromosomes segregate. Here, we sought to test the robustness of the growth law to systematic perturbations in cell dimensions achieved by varying the expression levels of mreB and ftsZ. We found that decreasing the mreB level resulted in increased cell width, with little change in cell length, whereas decreasing the ftsZ level resulted in increased cell length. Furthermore, the time from replication termination to cell division increased with the perturbed dimension in both cases. Moreover, the growth law remained valid over a range of growth conditions and dimension perturbations. The growth law can be quantitatively interpreted as a consequence of a tight coupling of cell division to replication initiation. Thus, its robustness to perturbations in cell dimensions strongly supports models in which the timing of replication initiation governs that of cell division, and cell volume is the key phenomenological variable governing the timing of replication initiation. These conclusions are discussed in the context of our recently proposed adder-per-origin model, in which cells add a constant volume per origin between initiations and divide a constant time after initiation.")
+                .withField(StandardField.DOI, "10.1073/pnas.1617932114")
+                .withField(StandardField.EPRINT, "1701.00587")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1701.00587v1:PDF")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINTCLASS, "q-bio.CB")
+                .withField(StandardField.KEYWORDS, "q-bio.CB");
+
+        ArXivFetcher modifiedArXivFetcher = new ArXivFetcher(importFormatPreferences, null);
+        assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
+    }
+
+    @Test
+    public void retrievePartialResultWhenCannotGetInformationFromUserAssignedDOI() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Zheng, Hai and Ho, Po-Yi and Jiang, Meiling and Tang, Bin and Liu, Weirong and Li, Dengjin and Yu, Xuefeng and Kleckner, Nancy E. and Amir, Ariel and Liu, Chenli")
+                .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
+                .withField(StandardField.DATE, "2017-01-03")
+                .withField(StandardField.JOURNAL, "PNAS December 27, 2016 vol. 113 no. 52 15000-15005")
+                .withField(StandardField.ABSTRACT, "Bacteria tightly regulate and coordinate the various events in their cell cycles to duplicate themselves accurately and to control their cell sizes. Growth of Escherichia coli, in particular, follows a relation known as Schaechter 's growth law. This law says that the average cell volume scales exponentially with growth rate, with a scaling exponent equal to the time from initiation of a round of DNA replication to the cell division at which the corresponding sister chromosomes segregate. Here, we sought to test the robustness of the growth law to systematic perturbations in cell dimensions achieved by varying the expression levels of mreB and ftsZ. We found that decreasing the mreB level resulted in increased cell width, with little change in cell length, whereas decreasing the ftsZ level resulted in increased cell length. Furthermore, the time from replication termination to cell division increased with the perturbed dimension in both cases. Moreover, the growth law remained valid over a range of growth conditions and dimension perturbations. The growth law can be quantitatively interpreted as a consequence of a tight coupling of cell division to replication initiation. Thus, its robustness to perturbations in cell dimensions strongly supports models in which the timing of replication initiation governs that of cell division, and cell volume is the key phenomenological variable governing the timing of replication initiation. These conclusions are discussed in the context of our recently proposed adder-per-origin model, in which cells add a constant volume per origin between initiations and divide a constant time after initiation.")
+                .withField(StandardField.DOI, "10.1073/pnas.1617932114")
+                .withField(StandardField.EPRINT, "1701.00587")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1701.00587v1:PDF")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINTCLASS, "q-bio.CB")
+                .withField(StandardField.KEYWORDS, "Cell Behavior (q-bio.CB), FOS: Biological sciences")
+                .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license")
+                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.1701.00587")
+                .withField(StandardField.YEAR, "2017")
+                .withField(StandardField.PUBLISHER, "arXiv");
+
+        DoiFetcher modifiedDoiFetcher = Mockito.spy(new DoiFetcher(importFormatPreferences));
+        when(modifiedDoiFetcher.performSearchById("10.1073/pnas.1617932114")).thenThrow(new FetcherException("Could not fetch user-assigned DOI"));
+
+        ArXivFetcher modifiedArXivFetcher = Mockito.spy(new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher));
+        assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
+    }
+
+    @Test
+    public void retrievePartialResultWhenCannotGetInformationFromArXivAssignedDOI() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Hai Zheng and Po-Yi Ho and Meiling Jiang and Bin Tang and Weirong Liu and Dengjin Li and Xuefeng Yu and Nancy E. Kleckner and Ariel Amir and Chenli Liu")
+                .withField(StandardField.TITLE, "Interrogating the Escherichia coli cell cycle by cell dimension perturbations")
+                .withField(StandardField.DATE, "2017-01-03")
+                .withField(StandardField.JOURNAL, "PNAS December 27, 2016 vol. 113 no. 52 15000-15005")
+                .withField(StandardField.ABSTRACT, "Bacteria tightly regulate and coordinate the various events in their cell cycles to duplicate themselves accurately and to control their cell sizes. Growth of Escherichia coli, in particular, follows a relation known as Schaechter 's growth law. This law says that the average cell volume scales exponentially with growth rate, with a scaling exponent equal to the time from initiation of a round of DNA replication to the cell division at which the corresponding sister chromosomes segregate. Here, we sought to test the robustness of the growth law to systematic perturbations in cell dimensions achieved by varying the expression levels of mreB and ftsZ. We found that decreasing the mreB level resulted in increased cell width, with little change in cell length, whereas decreasing the ftsZ level resulted in increased cell length. Furthermore, the time from replication termination to cell division increased with the perturbed dimension in both cases. Moreover, the growth law remained valid over a range of growth conditions and dimension perturbations. The growth law can be quantitatively interpreted as a consequence of a tight coupling of cell division to replication initiation. Thus, its robustness to perturbations in cell dimensions strongly supports models in which the timing of replication initiation governs that of cell division, and cell volume is the key phenomenological variable governing the timing of replication initiation. These conclusions are discussed in the context of our recently proposed adder-per-origin model, in which cells add a constant volume per origin between initiations and divide a constant time after initiation.")
+                .withField(StandardField.DOI, "10.1073/pnas.1617932114")
+                .withField(StandardField.EPRINT, "1701.00587")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1701.00587v1:PDF")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINTCLASS, "q-bio.CB")
+                .withField(StandardField.KEYWORDS, "q-bio.CB")
+                .withField(StandardField.MONTH, "dec")
+                .withField(StandardField.YEAR, "2016")
+                .withField(StandardField.VOLUME, "113")
+                .withField(InternalField.KEY_FIELD, "Zheng_2016")
+                .withField(StandardField.PUBLISHER, "Proceedings of the National Academy of Sciences")
+                .withField(StandardField.PAGES, "15000--15005")
+                .withField(StandardField.NUMBER, "52");
+
+        DoiFetcher modifiedDoiFetcher = Mockito.spy(new DoiFetcher(importFormatPreferences));
+        when(modifiedDoiFetcher.performSearchById("10.48550/arXiv.1701.00587")).thenThrow(new FetcherException("Could not fetch ArXiv-assigned DOI"));
+
+        ArXivFetcher modifiedArXivFetcher = Mockito.spy(new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher));
+        assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
     }
 }
