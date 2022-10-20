@@ -52,6 +52,7 @@ public class SystemThemeDetector {
         }
     }
 
+    @AllowedToUseStandardStreams("")
     public static boolean isWindowsDarkMode() {
         try {
             Process process = Runtime.getRuntime().exec(DARK_THEME_CMD);
@@ -92,6 +93,7 @@ public class SystemThemeDetector {
     }
 
     // ******************** Internal Classes **********************************
+    @AllowedToUseStandardStreams("")
     static class StreamReader extends Thread {
         private final InputStream is;
         private final StringWriter sw;
