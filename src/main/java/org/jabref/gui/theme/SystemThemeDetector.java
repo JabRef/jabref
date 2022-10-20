@@ -6,6 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
+import org.jabref.architecture.AllowedToUseStandardStreams;
+
+// This class is extracted from https://gist.github.com/HanSolo/7cf10b86efff8ca2845bf5ec2dd0fe1d.
+// Permission has been explicitly granted by the author.
+
+@AllowedToUseStandardStreams("Required to detect dark theme in Windows OS")
 public class SystemThemeDetector {
     public enum OperatingSystem {
         WINDOWS, MACOS, LINUX, SOLARIS, NONE
