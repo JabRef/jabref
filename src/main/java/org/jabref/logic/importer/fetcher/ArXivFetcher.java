@@ -89,6 +89,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      *   - DOI: give preference to DOIs manually inputted by users, instead of automatic ones
      *   - PUBLISHER: ArXiv-issued DOIs give 'ArXiv' as entry publisher. While this can be true, prefer using one from external sources,
      *      if applicable
+     *   - KEY_FIELD: Usually, the KEY_FIELD retrieved from user-assigned DOIs are 'nicer' (instead of a DOI link, it's usually contains one author and the year)
      * */
     private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER, InternalField.KEY_FIELD);
 
