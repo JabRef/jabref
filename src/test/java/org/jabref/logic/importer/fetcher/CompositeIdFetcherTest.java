@@ -56,7 +56,7 @@ class CompositeIdFetcherTest {
                                 .withField(StandardField.EPRINTTYPE, "arXiv")
                                 .withField(StandardField.EPRINTCLASS, "astro-ph.GA")
                                 .withField(StandardField.KEYWORDS, "Astrophysics of Galaxies (astro-ph.GA), FOS: Physical sciences")
-                                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2110.02957")
+                                .withField(InternalField.KEY_FIELD, "Cunningham_2022")
                                 .withField(new UnknownField("copyright"), "Creative Commons Attribution 4.0 International"),
                         "arXiv:2110.02957"
                 ),
