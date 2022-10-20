@@ -1,0 +1,15 @@
+mutation Login($input: LoginInput!) {
+    login(input: $input) {
+        ... on UserReturned {
+            user {
+            id
+            }
+        }
+        ... on InputValidationProblem {
+            problems {
+            path
+            message
+            }
+        }
+    }
+}

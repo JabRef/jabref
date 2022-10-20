@@ -1,0 +1,20 @@
+query UserChanges($id: ID!) {
+    user(id: $id) {
+        id
+        changes {
+            edges {
+                node {
+                    id
+                    lastModified
+                }
+            }
+            pageInfo {
+                hasNextPage
+                endCursor {
+                    id
+                    lastModified
+                }
+            }
+        }
+    }
+}
