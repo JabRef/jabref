@@ -74,50 +74,55 @@ public class MainTableColumnFactory {
         this.stateManager = stateManager;
     }
 
+    public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
+        TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
+        switch (column.getType()) {
+            case INDEX:
+                returnColumn = createIndexColumn(column);
+                break;
+            case GROUPS:
+                returnColumn = createGroupColumn(column);
+                break;
+            case FILES:
+                returnColumn = createFilesColumn(column);
+                break;
+            case LINKED_IDENTIFIER:
+                returnColumn = createIdentifierColumn(column);
+                break;
+            case LIBRARY_NAME:
+                returnColumn = createLibraryColumn(column);
+                break;
+            case EXTRAFILE:
+                if (!column.getQualifier().isBlank()) {
+                    returnColumn = createExtraFileColumn(column);
+                }
+                break;
+            case SPECIALFIELD:
+                if (!column.getQualifier().isBlank()) {
+                    Field field = FieldFactory.parseField(column.getQualifier());
+                    if (field instanceof SpecialField) {
+                        returnColumn = createSpecialFieldColumn(column);
+                    } else {
+                        LOGGER.warn("Special field type '{}' is unknown. Using normal column type.", column.getQualifier());
+                        returnColumn = createFieldColumn(column);
+                    }
+                }
+                break;
+            default:
+            case NORMALFIELD:
+                if (!column.getQualifier().isBlank()) {
+                    returnColumn = createFieldColumn(column);
+                }
+                break;
+        }
+        return returnColumn;
+    }
+
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columnPreferences.getColumns().forEach(column -> {
-
-            switch (column.getType()) {
-                case INDEX:
-                    columns.add(createIndexColumn(column));
-                    break;
-                case GROUPS:
-                    columns.add(createGroupColumn(column));
-                    break;
-                case FILES:
-                    columns.add(createFilesColumn(column));
-                    break;
-                case LINKED_IDENTIFIER:
-                    columns.add(createIdentifierColumn(column));
-                    break;
-                case LIBRARY_NAME:
-                    columns.add(createLibraryColumn(column));
-                    break;
-                case EXTRAFILE:
-                    if (!column.getQualifier().isBlank()) {
-                        columns.add(createExtraFileColumn(column));
-                    }
-                    break;
-                case SPECIALFIELD:
-                    if (!column.getQualifier().isBlank()) {
-                        Field field = FieldFactory.parseField(column.getQualifier());
-                        if (field instanceof SpecialField) {
-                            columns.add(createSpecialFieldColumn(column));
-                        } else {
-                            LOGGER.warn("Special field type '{}' is unknown. Using normal column type.", column.getQualifier());
-                            columns.add(createFieldColumn(column));
-                        }
-                    }
-                    break;
-                default:
-                case NORMALFIELD:
-                    if (!column.getQualifier().isBlank()) {
-                        columns.add(createFieldColumn(column));
-                    }
-                    break;
-            }
+            columns.add(createColumn(column));
         });
 
         return columns;

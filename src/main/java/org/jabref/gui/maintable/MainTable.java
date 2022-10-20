@@ -189,8 +189,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         database.getDatabase().registerListener(this);
 
+        MainTableColumnFactory rightClickMenuFactory = new MainTableColumnFactory(
+                database,
+                preferencesService,
+                preferencesService.getColumnPreferences(),
+                libraryTab.getUndoManager(),
+                dialogService,
+                stateManager);
         // Enable the header right-click menu.
-        new MainTableHeaderContextMenu(this).show(true);
+        new MainTableHeaderContextMenu(this, rightClickMenuFactory).show(true);
     }
 
     /**
