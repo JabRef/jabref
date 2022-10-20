@@ -147,7 +147,6 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
                 // Crossref has a dynamic API rate limit
-                // TODO: Test this
                 if (agency.isPresent() && agency.get().equalsIgnoreCase("crossref")) {
                     updateCrossrefAPIRate(openConnection);
                 }
@@ -182,11 +181,11 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     private void updateCrossrefAPIRate(URLConnection existingConnection) {
-        // Assuming this field is given in seconds
-        String xRateLimitInterval = existingConnection.getHeaderField("X-Rate-Limit-Interval").replaceAll("[^\\.0123456789]", "");
-        String xRateLimit = existingConnection.getHeaderField("X-Rate-Limit-Limit");
-
         try {
+            // Assuming this field is given in seconds
+            String xRateLimitInterval = existingConnection.getHeaderField("X-Rate-Limit-Interval").replaceAll("[^\\.0123456789]", "");
+            String xRateLimit = existingConnection.getHeaderField("X-Rate-Limit-Limit");
+
             double newRate = Double.parseDouble(xRateLimit) / Double.parseDouble(xRateLimitInterval);
             double oldRate = CROSSREF_DCN_RATE_LIMITER.getRate();
 
