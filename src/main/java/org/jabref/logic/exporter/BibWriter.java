@@ -1,9 +1,9 @@
 package org.jabref.logic.exporter;
 
-import org.jabref.model.strings.StringUtil;
-
 import java.io.IOException;
 import java.io.Writer;
+
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Class to write to a .bib file. Used by {@link BibtexDatabaseWriter}
@@ -29,18 +29,6 @@ public class BibWriter {
      * Writes the given string. The newlines of the given string are converted to the newline set for this clas
      */
     public void write(String string) throws IOException {
-        StringBuilder temp = new StringBuilder();
-
-        for (int i = 0; i < string.length(); i++) {
-            if (string.charAt(i) == '&') {
-                temp.append("\\&");
-            } else {
-                temp.append(string.charAt(i));
-            }
-        }
-
-        string = temp.toString();
-
 
         if (precedingNewLineRequired) {
             writer.write(newLineSeparator);

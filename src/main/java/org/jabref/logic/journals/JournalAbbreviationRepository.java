@@ -65,8 +65,7 @@ public class JournalAbbreviationRepository {
      * i.e. journals whose abbreviation is the same as the full name are not considered
      */
     public boolean isAbbreviatedName(String journalName) {
-        // Trims the String and also replaces any instances of "\&" with "&" for abbreviation search purposes
-        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        String journal = journalName.trim();
 
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
                 || abbreviationToFull.containsKey(journal);
