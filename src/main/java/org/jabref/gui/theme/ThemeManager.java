@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
@@ -20,7 +19,6 @@ import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
 
-import com.jthemedetecor.OsThemeDetector;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,17 +71,6 @@ public class ThemeManager {
     }
 
     private void updateThemeSettings() {
-        final OsThemeDetector detector = OsThemeDetector.getDetector();
-        detector.registerListener(isDark -> {
-            Platform.runLater(() -> {
-                if (isDark) {
-                    if (theme.getType() == Theme.Type.EMBEDDED) {
-                        // TODO
-                    }
-                }
-            });
-        });
-
         Theme newTheme = Objects.requireNonNull(appearancePreferences.getTheme());
 
         if (newTheme.equals(theme)) {
