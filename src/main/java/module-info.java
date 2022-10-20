@@ -117,7 +117,6 @@ open module org.jabref {
     requires com.sun.jna.platform;
 
     requires org.eclipse.jgit;
-    requires com.jthemedetector;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.GpgSigner;
 }

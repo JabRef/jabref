@@ -8,6 +8,7 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.theme.SystemThemeDetector;
 import org.jabref.gui.theme.Theme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -16,12 +17,13 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
 
-import com.jthemedetecor.OsThemeDetector;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+
+// import com.jthemedetecor.OsThemeDetector;
 
 public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
@@ -148,8 +150,8 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
      * automatic detection in JabRef Appearance Preferences.
      */
     public Theme detectOSThemePreference() {
-        final OsThemeDetector detector = OsThemeDetector.getDetector();
-        final boolean isDarkThemeUsed = detector.isDark();
+        SystemThemeDetector systemThemeDetector = new SystemThemeDetector();
+        final boolean isDarkThemeUsed = systemThemeDetector.isDarkMode();
         if (isDarkThemeUsed) {
             return Theme.dark();
         } else {
