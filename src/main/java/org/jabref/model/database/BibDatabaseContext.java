@@ -171,7 +171,7 @@ public class BibDatabaseContext {
             });
         } else {
             // Main file directory
-            preferences.getFileDirectory().ifPresent(fileDirs::add);
+            preferences.getMainFileDirectory().ifPresent(fileDirs::add);
         }
 
         return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
