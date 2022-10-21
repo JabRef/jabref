@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.tobiasdiez.easybind.EasyBind;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -21,6 +20,8 @@ import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 /**
  * Provides context menus for the text fields of the entry editor. Note that we use {@link Supplier} to prevent an early
