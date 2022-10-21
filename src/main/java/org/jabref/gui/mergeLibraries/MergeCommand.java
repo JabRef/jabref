@@ -33,7 +33,8 @@ import org.jabref.logic.database.DuplicateCheck.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.lang.module.Configuration;
+import java.nio.file.*;
 import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
@@ -66,27 +67,30 @@ public class MergeCommand extends SimpleCommand {
 
 
         Optional<BibDatabaseContext> database = stateManager.getActiveDatabase();
-        if(path.isPresent() && database.isPresent())
-            doMerge(path.get(), database.get().getDatabase());
+        if(path.isPresent() && database.isPresent()) {
+            try {
+                doMerge(path.get(), database.get().getDatabase());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
-    public BibDatabase doMerge(Path path, BibDatabase database){
+    public BibDatabase doMerge(Path path, BibDatabase database) throws IOException {
         SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
         //find all the .lib files by crawling in doMerge and merge them
-        System.out.println(getAllFiles(path).size());
-
-//        List<BibEntry> toAdd = new ArrayList<>();
         Set<BibEntry> toAdd = new HashSet<>();
-        for(File f : getAllFiles(path)) {
-            System.out.println(f.toString());
+        for(Path f : getAllFiles(path)) {
             ParserResult result;
 
             //try to convert the .bib file to a database
+
             try {
-                result = loadDatabase(f.toPath());
+                result = loadDatabase(f);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+
 
             /*then go through each entry in the current database and check
               against the following rules for merging:
@@ -135,25 +139,21 @@ public class MergeCommand extends SimpleCommand {
      *             to merge
      * @return all the .bib files in a given directory and subdirectories
      */
-    private List<File> getAllFiles(Path path){
-        List<File> files = new ArrayList<>();
+    private List<Path> getAllFiles(Path path) throws IOException {
+        List<Path> paths = new ArrayList<>();
 
-        // Get all the .bib files in this directory
-        List currentFile = List.of(path.toFile().listFiles((dir, name) -> name.endsWith(".bib")));
-        if(currentFile != null)
-            files.addAll(currentFile);
-
-        // Get all the directories in the directory
-        File[] directories = path.toFile().listFiles(File::isDirectory);
-        if(directories == null) return files;
-
-        //crawl through all the files in the directory and add them to the files
-        for(File f : directories){
-            Path p = f.toPath();
-            files.addAll(getAllFiles(p));
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            for (Path entry : stream) {
+                if (Files.isDirectory(entry)) {
+                    paths.addAll(getAllFiles(entry));
+                } else {
+                    if (entry.toString().endsWith(".bib")) {
+                        paths.add(entry);
+                    }
+                }
+            }
         }
-
-        return files;
+        return paths;
     }
 
     /**
@@ -161,15 +161,14 @@ public class MergeCommand extends SimpleCommand {
      */
     private ParserResult loadDatabase(Path file) throws Exception {
         Path fileToLoad = file.toAbsolutePath();
-
         preferences.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
 
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
         }
-
         ParserResult result;
         try {
+
             result = OpenDatabase.loadDatabase(fileToLoad,
                     preferences.getImportFormatPreferences(),
                     Globals.getFileUpdateMonitor());
