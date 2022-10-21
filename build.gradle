@@ -49,7 +49,7 @@ java {
 }
 
 application {
-    mainClass.set('org.jabref.gui.JabRefLauncher')
+    mainClass.set('org.jabref.cli.Launcher')
     mainModule.set('org.jabref')
 }
 
@@ -173,7 +173,7 @@ dependencies {
     implementation 'org.fxmisc.flowless:flowless:0.6.10'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.9'
     implementation 'com.jfoenix:jfoenix:9.0.10'
-    implementation 'org.controlsfx:controlsfx:11.1.1'
+    implementation 'org.controlsfx:controlsfx:11.1.2'
 
     implementation 'org.jsoup:jsoup:1.15.3'
     implementation 'com.konghq:unirest-java:3.13.11'
