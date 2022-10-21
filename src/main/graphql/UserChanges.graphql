@@ -1,3 +1,14 @@
+fragment allDetails on Entity {
+    ... on Person {
+        id
+        name
+    }
+    ... on Organization {
+        id
+        name
+    }
+}
+
 query UserChanges($id: ID!) {
     user(id: $id) {
         id
@@ -5,16 +16,69 @@ query UserChanges($id: ID!) {
             edges {
                 node {
                     id
-                    # TODO: Implement revision on remote
+                    citationKeys
+                    lastModified
+                    added
+                    title
+                    subtitle
+                    titleAddon
+                    abstract
+                    authors {
+                        ...allDetails
+                    }
+                    note
+                    languages
+                    publicationState
+                    doi
+                    keywords
+                    ... on JournalArticle {
+                        in {
+                            id
+                            journal {
+                                id
+                                name
+                                subtitle
+                                titleAddon
+                                issn
+                            }
+                            title
+                            subtitle
+                            titleAddon
+                            number
+                            name
+                            series
+                            volume
+                        }
+                        pageStart
+                        pageEnd
+                        electronicId
+                        translated {
+                            translators {
+                                ...allDetails
+                            }
+                            originalLanguages
+                        }
+                        published
+                        annotators {
+                            ...allDetails
+                        }
+                        commentators {
+                            ...allDetails
+                        }
+                    }
+                }
+                revision {
+                    generation
+                    hash
                 }
             }
-            pageInfo {
+             pageInfo {
                 hasNextPage
                 endCursor {
                     id
                     lastModified
                 }
-            }
+             }
         }
     }
 }

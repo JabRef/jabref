@@ -95,7 +95,7 @@ public class RemoteService {
             var localEntry = database.getDatabase().getEntryByCitationKey(remoteEntry.id);
 
             if (localEntry.isPresent()) {
-                var remoteRevision = new RemoteRevision(remoteEntry.id, remoteEntry.revision);
+                var remoteRevision = new RemoteRevision(remoteEntry.id, change.revision.generation, change.revision.hash);
                 var localRevision = localEntry.get().getRevision().get();
                 if (remoteRevision.isNewerThan(localRevision)) {
                     // The server's `Revision` is higher than the client's `Revision`
@@ -121,6 +121,7 @@ public class RemoteService {
             }
         }
         // TODO: Handle tombstones
+        return conflicts;
     }
 
     private void assertBoundToAccount(BibDatabaseContext database) {
