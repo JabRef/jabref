@@ -430,7 +430,7 @@ public class GroupTreeView extends BorderPane {
         });
 
         MenuItem sortSubgroups = new MenuItem(Localization.lang("Sort subgroups"));
-        sortSubgroups.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
+        sortSubgroups.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group.getGroupNode()));
 
         MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
         addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));

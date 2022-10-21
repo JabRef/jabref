@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB" page-range-format="chicago">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="chicago" default-locale="en-GB">
   <info>
     <title>Modern Humanities Research Association 3rd edition (note with bibliography)</title>
     <title-short>MHRA</title-short>
@@ -140,7 +140,7 @@
           </if>
         </choose>
       </group>
-      <names variable="editor translator" delimiter=", ">
+      <names variable="editor translator director" delimiter=", ">
         <label form="verb-short" text-case="lowercase" suffix=" "/>
         <name and="text" delimiter=", "/>
       </names>

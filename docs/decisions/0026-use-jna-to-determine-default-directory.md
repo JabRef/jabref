@@ -2,7 +2,7 @@
 nav_order: 26
 parent: Decision Records
 ---
-# Use Swing's FileChooser to Determine Default Directory
+# Use Java Native Access to Determine Default Directory
 
 ## Context and Problem Statement
 
@@ -20,11 +20,11 @@ How to determine the "best" directory native for the OS the user runs.
 * Use Swing's FileChooser to Determine Default Directory
 * Use `user.home`
 * [AppDirs](https://github.com/harawata/appdirs)
+* [Java Native Access](https://github.com/java-native-access/jna)
 
 ## Decision Outcome
 
-Chosen option: "Use Swing's FileChooser to Determine Default Directory", because
-comes out best (see below).
+Chosen option: "Java Native Access", because comes out best (see below).
 
 ## Pros and Cons of the Options
 
@@ -51,7 +51,13 @@ There is `System.getProperty("user.home");`.
 > AppDirs is a small java library which provides a path to the platform dependent special folder/directory.
 
 * Good, because already used in JabRef
-* Bad, because does not use "MyDocuments" on Windows, but rather `C:\Users\<Account>\AppData\<AppAuthor>\<AppName>` as basis
+* Bad, because does not use `Documents` on Windows, but rather `C:\Users\<Account>\AppData\<AppAuthor>\<AppName>` as basis
+
+### Java Native Access
+
+* Good, because no additional dependency required, as it is already loaded by AppDirs
+* Good, because it is well maintained and widely used
+* Good, because it provides direct access to `Documents` and other system variables
 
 ## More Information
 
