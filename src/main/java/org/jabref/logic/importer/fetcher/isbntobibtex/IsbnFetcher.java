@@ -32,11 +32,15 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     private static final Pattern NEWLINE_SPACE_PATTERN = Pattern.compile("\\n|\\r\\n|\\s");
     protected final ImportFormatPreferences importFormatPreferences;
     private final OpenLibraryIsbnFetcher openLibraryIsbnFetcher;
+    private final EbookDeIsbnFetcher ebookDeIsbnFetcher;
+    private final BookInfoFetcher bookInfoFetcher;
     private final List<AbstractIsbnFetcher> retryIsbnFetcher;
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
+        this.ebookDeIsbnFetcher = new EbookDeIsbnFetcher(importFormatPreferences);
+        this.bookInfoFetcher = new BookInfoFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
     }
 
@@ -59,6 +63,8 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         Optional<BibEntry> bibEntry = Optional.empty();
 
         try {
+            retryIsbnFetcher.add(ebookDeIsbnFetcher);
+            retryIsbnFetcher.add(bookInfoFetcher);
             identifier = removeNewlinesAndSpacesFromIdentifier(identifier);
             bibEntry = openLibraryIsbnFetcher.performSearchById(identifier);
         } catch (FetcherException ex) {
