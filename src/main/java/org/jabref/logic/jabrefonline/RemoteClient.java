@@ -1,6 +1,7 @@
 package org.jabref.logic.jabrefonline;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.jabref.preferences.JabRefOnlinePreferences;
@@ -20,5 +21,9 @@ public class RemoteClient {
 
     public <U> U assertLoggedIn(Function<String, ? extends U> after) {
         return loggedInUser.map(after).orElseThrow(() -> new UnsupportedOperationException("Not logged in"));
+    }
+
+    public void assertLoggedIn(Consumer<String> after) {
+        loggedInUser.ifPresentOrElse(after, () -> new UnsupportedOperationException("Not logged in"));
     }
 }

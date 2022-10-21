@@ -41,7 +41,6 @@ public class RemoteService {
         remoteClient.assertLoggedIn((client) -> {
             RemoteSettings remoteSettings = new RemoteSettings(client);
             database.getMetaData().setRemoteSettings(remoteSettings);
-            return null;
         });
     }
 
