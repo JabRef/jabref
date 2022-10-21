@@ -5,7 +5,7 @@ query UserChanges($id: ID!) {
             edges {
                 node {
                     id
-                    lastModified
+                    # TODO: Implement revision on remote
                 }
             }
             pageInfo {

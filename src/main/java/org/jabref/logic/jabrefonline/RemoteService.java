@@ -1,5 +1,6 @@
 package org.jabref.logic.jabrefonline;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,10 +12,12 @@ public class RemoteService {
 
     private RemoteClient remoteClient;
     private RemoteCommunicationService communicationService;
+    private JabRefOnlineTransformer transformer;
 
     public RemoteService(PreferencesService preferences) {
         this.remoteClient = new RemoteClient(preferences.getJabRefOnlinePreferences());
         this.communicationService = new JabRefOnlineService();
+        this.transformer = new JabRefOnlineTransformer();
     }
 
     /**
@@ -86,7 +89,38 @@ public class RemoteService {
      * Merges the remote changes into the given database and return the conflicts.
      */
     private List<Conflict> mergeChanges(BibDatabaseContext database, UserChangesQuery.Changes changes) {
-        // TODO: Implement merge
+        List<Conflict> conflicts = new ArrayList<>();
+        for (var change : changes.edges) {
+            var remoteEntry = change.node;
+            var localEntry = database.getDatabase().getEntryByCitationKey(remoteEntry.id);
+
+            if (localEntry.isPresent()) {
+                var remoteRevision = new RemoteRevision(remoteEntry.id, remoteEntry.revision);
+                var localRevision = localEntry.get().getRevision().get();
+                if (remoteRevision.isNewerThan(localRevision)) {
+                    // The server's `Revision` is higher than the client's `Revision`
+                    // If the client's entry is dirty, then the user is shown a message to resolve the conflict
+                    // otherwise the client's entry is replaced by the server's one (including the revision)
+                    if (localRevision.isDirty()) {
+                        conflicts.add(new Conflict(localEntry.get(), remoteEntry));
+                    } else {
+                        database.getDatabase().removeEntry(localEntry.get());
+                        database.getDatabase().insertEntry(transformer.toBibEntry(remoteEntry));
+                    }
+                } else if (localRevision.isNewerThan(remoteRevision)) {
+                    // The server's `Revision` is lower than the client's `Revision`
+                    // This should never be the case, as revisions are only increased on the server.
+                    throw new IllegalStateException("Revision of local entry is higher than the remote revision");
+                } else {
+                    // The server's `Revision` is equal to the client's `Revision`
+                    // Both entries are up-to-date and nothing has to be done.
+                    // This case may happen if the library is synchronized by other means.
+                }
+            } else {
+                database.getDatabase().insertEntry(transformer.toBibEntry(remoteEntry));
+            }
+        }
+        // TODO: Handle tombstones
     }
 
     private void assertBoundToAccount(BibDatabaseContext database) {

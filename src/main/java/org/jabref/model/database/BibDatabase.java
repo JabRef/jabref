@@ -158,6 +158,18 @@ public class BibDatabase {
     }
 
     /**
+     * Returns the entry with the given remote ID.
+     */
+    public synchronized Optional<BibEntry> getEntryByRemoteId(String id) {
+        for (BibEntry entry : entries) {
+            if (entry.getRevision().isPresent() && id.equals(entry.getRevision().get().getNodeId())) {
+                return Optional.of(entry);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Collects entries having the specified citation key and returns these entries as list.
      * The order of the entries is the order they appear in the database.
      *
