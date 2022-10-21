@@ -139,6 +139,8 @@ dependencies {
     implementation 'info.debatty:java-string-similarity:2.0.0'
     implementation 'com.google.jimfs:jimfs:1.2'
     implementation 'com.google.jimfs:jimfs-parent:1.2'
+    implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 
     antlr4 'org.antlr:antlr4:4.9.3'
     implementation 'org.antlr:antlr4-runtime:4.9.3'

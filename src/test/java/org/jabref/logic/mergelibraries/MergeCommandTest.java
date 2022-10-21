@@ -20,6 +20,8 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.jabref.gui.Globals.entryTypesManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -60,14 +62,13 @@ public class MergeCommandTest {
         BibDatabase db = new BibDatabase();
 
         // For a simple file system with Unix-style paths and behavior:
-        FileSystem fs = Jimfs.newFileSystem(Configuration.forCurrentPlatform());
+        FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
         Path foo = fs.getPath("/foo");
-
         Files.createDirectory(foo);
 
         Path a = foo.resolve("a.bib"); // /foo/hello.txt
         Files.write(a, ImmutableList.of(
-                        "@Book{Leon2009,\n" +
+                        "@misc{Leon2009,\n" +
                         "  author    = {Leon},\n" +
                         "  editor    = {Qingxuan},\n" +
                         "  publisher = {Liu inc.},\n" +
@@ -79,7 +80,7 @@ public class MergeCommandTest {
 
         Path b = foo.resolve("b.bib"); // /foo/hello.txt
         Files.write(b, ImmutableList.of(
-                        "@Book{Brown2001,\n" +
+                        "@misc{Brown2001,\n" +
                         "  author    = {Jimmy Brown},\n" +
                         "  editor    = {Brian Smith},\n" +
                         "  publisher = {Liu inc.},\n" +
@@ -114,14 +115,12 @@ public class MergeCommandTest {
         entry2.setField(StandardField.KEY,"Leon2009");
         testDB.insertEntry(entry2);
 
-//        assertEquals(db, testDB);
-
         for (BibEntry dbEntry : db.getEntries()) {
             boolean equalFlag = false;
             System.out.println("dbEntry: " + dbEntry);
             for (BibEntry testDbEntry : testDB.getEntries()) {
                 System.out.println("---- testDbEntry: " + testDbEntry);
-                if (dbEntry.equals(testDbEntry)) {
+                if (new DuplicateCheck(entryTypesManager).isDuplicate(testDbEntry, dbEntry, BibDatabaseMode.BIBTEX)) {
                     equalFlag = true;
                     break;
                 }
