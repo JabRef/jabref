@@ -1193,8 +1193,7 @@ public class JabRefFrame extends BorderPane {
                 }
                 // The action was either canceled or unsuccessful.
                 dialogService.notify(Localization.lang("Unable to save library"));
-            } catch (
-                    Throwable ex) {
+            } catch (Throwable ex) {
                 LOGGER.error("A problem occurred when trying to save the file", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             }
@@ -1236,8 +1235,7 @@ public class JabRefFrame extends BorderPane {
                 }
                 // The action was either canceled or unsuccessful.
                 dialogService.notify(Localization.lang("Unable to save library"));
-            } catch (
-                    Throwable ex) {
+            } catch (Throwable ex) {
                 LOGGER.error("A problem occurred when trying to delete the empty entries", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Delete empty entries"), Localization.lang("Could not delete empty entries."), ex);
             }
@@ -1381,8 +1379,7 @@ public class JabRefFrame extends BorderPane {
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(path, prefs, dialogService);
-                } catch (
-                        IOException e) {
+                } catch (IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }
             });
