@@ -7,7 +7,7 @@ nav_order: 2
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
 > **The most important step is to configure your IDE.**\
-> **In case you know how to install JDK 18 with JavaFX support and [to fork JabRef's code](#get-the-code),**\
+> **In case you know how to install JDK 18 and [to fork JabRef's code](#get-the-code),**\
 > **please scroll down to the [IDE setup](#configure-your-ide).**
 
 For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have a look at the following video instructions:
@@ -21,6 +21,9 @@ This section list the prerequisites you need to get started to develop JabRef. A
 ### Java Development Kit 18
 
 A working Java (Development Kit) 18 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 18 (e.g., `javac 18`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+
+Please head to <https://adoptium.net/de/temurin/releases> to download JDK 18.
+Note that JDK 19 does not work.
 
 ### GitHub Account
 
