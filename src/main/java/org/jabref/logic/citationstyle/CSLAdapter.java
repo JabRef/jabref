@@ -104,6 +104,50 @@ public class CSLAdapter {
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
+         *
+         *<br>
+         *<table>
+         * <thead>
+         *<tr>
+         *<th style="text-align:left">BibTeX</th>
+         *<th style="text-align:left">BibLaTeX</th>
+         *<th style="text-align:left">EntryPreview/CSL</th>
+         *<th style="text-align:left">proposed logic, conditions and info</th>
+         *</tr>
+         *</thead>
+         *<tbody>
+         *<tr>
+         *<td style="text-align:left">volume</td>
+         *<td style="text-align:left">volume</td>
+         *<td style="text-align:left">volume</td>
+         *<td style="text-align:left"></td>
+         *</tr>
+         *<tr>
+         *<td style="text-align:left">number</td>
+         *<td style="text-align:left">issue</td>
+         *<td style="text-align:left">issue</td>
+         *<td style="text-align:left">For conversion to CSL or BibTeX: BibLaTeX <code>number</code> takes priority and supersedes BibLaTeX <code>issue</code></td>
+         *</tr>
+         *<tr>
+         *<td style="text-align:left">number</td>
+         *<td style="text-align:left">number</td>
+         *<td style="text-align:left">issue</td>
+         *<td style="text-align:left">same as above</td>
+         *</tr>
+         *<tr>
+         *<td style="text-align:left">pages</td>
+         *<td style="text-align:left">eid</td>
+         *<td style="text-align:left">number</td>
+         *<td style="text-align:left">Some journals put the article-number (= eid) into the pages field. If BibLaTeX <code>eid</code> exists, provide csl <code>number</code> to the style. If <code>pages</code> exists, provide csl <code>page</code>.  If <code>eid</code> WITHIN the <code>pages</code> field exists, detect the eid and provide csl <code>number</code>. If both <code>eid</code> and <code>pages</code> exists, ideally provide both csl <code>number</code> and csl <code>page</code>. Ideally the citationstyle should be able to flexibly choose the rendering.</td>
+         *</tr>
+         *<tr>
+         *<td style="text-align:left">pages</td>
+         *<td style="text-align:left">pages</td>
+         *<td style="text-align:left">page</td>
+         *<td style="text-align:left">same as above</td>
+         *</tr>
+         *</tbody>
+         *</table>
          */
         private CSLItemData bibEntryToCSLItemData(BibEntry originalBibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
             // We need to make a deep copy, because we modify the entry according to the logic presented at
@@ -129,14 +173,7 @@ public class CSLAdapter {
                             bibEntry.clearField(StandardField.NUMBER);
                         }
                     );
-                /* TODO: fix tests in CitationStyleGeneratorTest.java using APA style, once APA recognizes a "number" field (and thereby will be able to render the "eid" field)
-                 * tracked at https://github.com/citation-style-language/styles/issues/5827
-                 *
-                 * Further info:
-                 * www.zotero.org/styles/apa-6th-edition
-                 * https://docs.citationstyles.org/en/stable/specification.html#number-variables
-                 * https://apastyle.apa.org/style-grammar-guidelines/references/examples/journal-article-references#2
-                 */
+
                   bibEntry.getField(StandardField.EID).ifPresent(eid -> {
                    if (!bibEntry.hasField(StandardField.NUMBER)) {
                        bibEntry.setField(StandardField.NUMBER, eid);

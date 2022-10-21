@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -9,18 +9,19 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.http.client.utils.URIBuilder;
 
 /**
- * Fetcher for ISBN using http://www.ebook.de.
+ * Fetcher for ISBN using <a href="https://www.ebook.de">https://www.ebook.de</a>.
  */
-public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
-    private static final String BASE_URL = "http://www.ebook.de/de/tools/isbn2bibtex";
+public class EbookDeIsbnFetcher extends AbstractIsbnFetcher {
+    private static final String BASE_URL = "https://www.ebook.de/de/tools/isbn2bibtex";
 
-    public IsbnViaEbookDeFetcher(ImportFormatPreferences importFormatPreferences) {
+    public EbookDeIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
     }
 
@@ -32,9 +33,10 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         this.ensureThatIsbnIsValid(identifier);
-        URIBuilder uriBuilder = new URIBuilder(BASE_URL);
-        uriBuilder.addParameter("isbn", identifier);
-        return uriBuilder.build().toURL();
+        return new URIBuilder(BASE_URL)
+                .addParameter("isbn", identifier)
+                .build()
+                .toURL();
     }
 
     @Override
