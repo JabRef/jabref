@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
@@ -38,9 +39,9 @@ public class MainTableHeaderContextMenu extends ContextMenu {
             }
             event.consume();
         });
-        // Cancels right-click menu when double-clicked
+        // Cancels right-click menu when middle mouse button clicked
         mainTable.setOnMouseClicked(event -> {
-            if (event.getButton() != MouseButton.SECONDARY && !event.isControlDown()) {
+            if (event.getButton() != MouseButton.MIDDLE && !event.isControlDown()) {
                 this.hide();
             }
         });
@@ -58,6 +59,9 @@ public class MainTableHeaderContextMenu extends ContextMenu {
             RadioMenuItem itemToAdd = createMenuItem(tableColumn);
             this.getItems().add(itemToAdd);
         }
+
+        SeparatorMenuItem separator = new SeparatorMenuItem();
+        this.getItems().add(separator);
 
         // Append to the menu the current remaining columns in the table.
         for (TableColumn<BibEntryTableViewModel, ?> column :mainTable.getColumns()
