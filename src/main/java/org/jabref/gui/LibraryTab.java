@@ -239,6 +239,10 @@ public class LibraryTab extends Tab {
         cleanUp();
 
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+        // When you open an existing library, a library tab with a loading animation is added immediately.
+        // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
+        // This line is necessary because, while there is already a binding that updates the active database when a new tab is added,
+        // it doesn't handle the case when a library is loaded asynchronously.
         stateManager.setActiveDatabase(bibDatabaseContext);
 
         bibDatabaseContext.getDatabase().registerListener(this);
