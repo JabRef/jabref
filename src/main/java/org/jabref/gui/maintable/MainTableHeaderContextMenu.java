@@ -1,13 +1,12 @@
 package org.jabref.gui.maintable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.maintable.columns.MainTableColumn;
@@ -15,8 +14,8 @@ import org.jabref.gui.maintable.columns.MainTableColumn;
 public class MainTableHeaderContextMenu extends ContextMenu {
 
     MainTable mainTable;
-    Set<TableColumn<BibEntryTableViewModel, ?>> mainTableColumnSet;
     MainTableColumnFactory factory;
+
     /**
      * Constructor for the right click menu
      *
@@ -25,7 +24,6 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         super();
         this.mainTable = mainTable;
         this.factory = factory;
-        mainTableColumnSet = new HashSet<>();
         constructItems(mainTable);
     }
 
@@ -36,10 +34,15 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         // TODO: 20/10/2022 unknown bug where issue does not show unless parameter is passed through this method.
         mainTable.setOnContextMenuRequested(event -> {
             if (!(event.getTarget() instanceof StackPane) && show) {
-                // Main table columns
                 this.show(mainTable, event.getScreenX(), event.getScreenY());
             }
             event.consume();
+        });
+        // Cancels right-click menu when double-clicked
+        mainTable.setOnMouseClicked(event -> {
+            if (event.getButton() != MouseButton.SECONDARY && !event.isControlDown()) {
+                this.hide();
+            }
         });
     }
 
@@ -47,17 +50,20 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      * Constructs the items for the list and places them in the menu.
      */
     private void constructItems(MainTable mainTable) {
-        // Reset the right-click menu and
+        // Reset the right-click menu
         this.getItems().clear();
-        // Obtain the most commonly used fields and the current fields in header.
-        // TODO: 17/10/2022 implement most commonly used fields
-        mainTableColumnSet.addAll(commonColumns());
 
-        // Populate the menu with the current columns in the table.
+        // Populate the menu with the commonly used fields
+        for (TableColumn<BibEntryTableViewModel, ?> tableColumn:commonColumns()) {
+            RadioMenuItem itemToAdd = createMenuItem(tableColumn);
+            this.getItems().add(itemToAdd);
+        }
+
+        // Append to the menu the current remaining columns in the table.
         for (TableColumn<BibEntryTableViewModel, ?> column :mainTable.getColumns()
         ) {
-            if (!isInTable((MainTableColumn) column, mainTableColumnSet.stream().toList())) {
-                this.mainTableColumnSet.add(column);
+            // Append only if the column has not already been added (a common column)
+            if (!isACommonColumn((MainTableColumn) column)) {
                 RadioMenuItem itemToAdd = createMenuItem(column);
                 this.getItems().add(itemToAdd);
             }
@@ -77,14 +83,12 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         RadioMenuItem returnItem = new RadioMenuItem(itemName);
 
         // Flag item as selected if the item is already in the main table.
-        returnItem.setSelected(isInTable(tableColumn, mainTable.getColumns()));
+        returnItem.setSelected(isInMainTable(tableColumn));
 
         // Set action to toggle visibility from main table when item is clicked
         returnItem.setOnAction(event -> {
-            if (isInTable(tableColumn, mainTable.getColumns())) {
+            if (isInMainTable(tableColumn)) {
                 removeColumn(tableColumn);
-                System.out.println(tableColumn.getModel().getType());
-                System.out.println(tableColumn.getModel().getQualifier());
             } else {
                 addColumn(tableColumn);
             }
@@ -99,9 +103,8 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     @SuppressWarnings("rawtypes")
     private void addColumn(MainTableColumn tableColumn) {
         // Do not add duplicate if table column is already within the table.
-        if (!isInTable(tableColumn, mainTable.getColumns())) {
+        if (!isInMainTable(tableColumn)) {
             mainTable.getColumns().add(tableColumn);
-            tableColumn.setVisible(true);
         }
     }
 
@@ -110,31 +113,42 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      */
     @SuppressWarnings("rawtypes")
     private void removeColumn(MainTableColumn tableColumn) {
-        tableColumn.setVisible(!tableColumn.isVisible());
-        mainTable.getColumns().removeIf(tableCol -> tableCol == tableColumn);
+        mainTable.getColumns().removeIf(tableCol -> ((MainTableColumn) tableCol).getModel().equals(tableColumn.getModel()));
     }
 
-    private boolean isInTable(MainTableColumn tableColumn, List<TableColumn<BibEntryTableViewModel, ?>> tableColumns) {
+    /**
+     * Determines if column already exists in the MainTable.
+     */
+    private boolean isInMainTable(MainTableColumn tableColumn) {
+        return isColumnInList(tableColumn, mainTable.getColumns());
+    }
+
+    /**
+     * Checks if a column is one of the commonly used columns.
+     */
+    private boolean isACommonColumn(MainTableColumn tableColumn) {
+        return isColumnInList(tableColumn, commonColumns());
+    }
+
+    /**
+     * Determines if a list of TableColumns contains the searched column.
+     */
+    private boolean isColumnInList(MainTableColumn searchColumn, List<TableColumn<BibEntryTableViewModel, ?>> tableColumns) {
         for (TableColumn<BibEntryTableViewModel, ?> column:
         tableColumns) {
             MainTableColumnModel model = ((MainTableColumn) column).getModel();
-            if (tableColumn.getModel().getQualifier().equals(model.getQualifier()) || tableColumn.getModel().getType().equals(model.getType())) {
+            if (model.equals(searchColumn.getModel())) {
                 return true;
             }
         }
         return false;
     }
 
-    private void refreshMenu() {
-        for (TableColumn<BibEntryTableViewModel, ?> column :mainTableColumnSet) {
-            RadioMenuItem itemToAdd = createMenuItem(column);
-            this.getItems().add(itemToAdd);
-        }
-    }
-
-    private Set<TableColumn<BibEntryTableViewModel, ?>> commonColumns() {
-        // TODO: 17/10/2022 obtain list of common columns
-
+    /**
+     * Creates the list of the "commonly used" columns (currently based on the default preferences).
+     */
+    private List<TableColumn<BibEntryTableViewModel, ?>> commonColumns() {
+        // Qualifier strings
         String entryTypeQualifier = "entrytype";
         String authorEditQualifier = "author/editor";
         String titleQualifier = "title";
@@ -158,15 +172,13 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, readStatusQualifier));
         commonColumns.add(new MainTableColumnModel(MainTableColumnModel.Type.SPECIALFIELD, priorityQualifier));
 
-        // Create the Table Columns from the models.
-        Set<TableColumn<BibEntryTableViewModel, ?>> commonTableColumns = new HashSet<>();
+        // Create the Table Columns from the models using factory methods.
+        List<TableColumn<BibEntryTableViewModel, ?>> commonTableColumns = new ArrayList<>();
         for (MainTableColumnModel columnModel: commonColumns
              ) {
             TableColumn<BibEntryTableViewModel, ?> tableColumn = factory.createColumn(columnModel);
             commonTableColumns.add(tableColumn);
-            this.getItems().add(createMenuItem(tableColumn));
         }
-
         return commonTableColumns;
     }
 }
