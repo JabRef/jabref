@@ -1,10 +1,12 @@
 package org.jabref.gui.duplicationFinder;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Screen;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -55,6 +57,12 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     }
 
     private void init(BibEntry one, BibEntry two, DuplicateResolverType type) {
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+        this.setX(primaryScreenBounds.getMinX());
+        this.setY(primaryScreenBounds.getMinY());
+        this.setWidth(primaryScreenBounds.getWidth());
+        this.setHeight(primaryScreenBounds.getHeight());
+
         ButtonType cancel = ButtonType.CANCEL;
         ButtonType merge = new ButtonType(Localization.lang("Keep merged"), ButtonData.OK_DONE);
 
