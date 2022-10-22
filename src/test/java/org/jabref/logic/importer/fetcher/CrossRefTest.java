@@ -35,6 +35,7 @@ public class CrossRefTest {
         barrosEntry.setField(StandardField.DOI, "10.1007/11538394_20");
         barrosEntry.setField(StandardField.ISSN, "0302-9743");
         barrosEntry.setField(StandardField.PAGES, "302-318");
+        barrosEntry.setField(StandardField.REFERENCEDBYCOUNT, "153");
     }
 
     @Test
@@ -117,6 +118,7 @@ public class CrossRefTest {
         entry.setField(StandardField.TITLE, "Service Interaction Patterns");
         entry.setField(StandardField.AUTHOR, "Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede");
         entry.setField(StandardField.YEAR, "2005");
+        entry.setField(StandardField.REFERENCEDBYCOUNT, "0");
         assertEquals(Optional.of(barrosEntry), fetcher.performSearch(entry).stream().findFirst());
     }
 
@@ -129,6 +131,7 @@ public class CrossRefTest {
         entry.setField(StandardField.PAGES, "172-176");
         entry.setField(StandardField.VOLUME, "42");
         entry.setField(StandardField.YEAR, "1999");
+        entry.setField(StandardField.REFERENCEDBYCOUNT, "0");
 
         assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
     }
