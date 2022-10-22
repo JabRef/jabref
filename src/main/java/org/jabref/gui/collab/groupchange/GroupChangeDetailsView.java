@@ -2,10 +2,10 @@ package org.jabref.gui.collab.groupchange;
 
 import javafx.scene.control.Label;
 
-import org.jabref.gui.collab.ExternalChangeDetailsView;
+import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.l10n.Localization;
 
-public final class GroupChangeDetailsView extends ExternalChangeDetailsView {
+public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
 
     public GroupChangeDetailsView(GroupChange groupChange) {
         String labelValue = "";

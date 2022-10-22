@@ -26,7 +26,7 @@ public class ChangeScanner {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
 
-    private final ExternalChangeResolverFactory externalChangeResolverFactory;
+    private final DatabaseChangeResolverFactory databaseChangeResolverFactory;
 
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
@@ -38,10 +38,10 @@ public class ChangeScanner {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
-        this.externalChangeResolverFactory = new ExternalChangeResolverFactory(dialogService, database);
+        this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database);
     }
 
-    public List<ExternalChange> scanForChanges() {
+    public List<DatabaseChange> scanForChanges() {
         if (database.getDatabasePath().isEmpty()) {
             return Collections.emptyList();
         }
@@ -53,7 +53,7 @@ public class ChangeScanner {
             ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
-            return ExternalChangeList.compareAndGetChanges(database, databaseOnDisk, externalChangeResolverFactory);
+            return DatabaseChangeList.compareAndGetChanges(database, databaseOnDisk, databaseChangeResolverFactory);
         } catch (IOException e) {
             LOGGER.warn("Error while parsing changed file.", e);
             return Collections.emptyList();

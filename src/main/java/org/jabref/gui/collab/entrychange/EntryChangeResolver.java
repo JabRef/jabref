@@ -3,8 +3,8 @@ package org.jabref.gui.collab.entrychange;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.collab.ExternalChange;
-import org.jabref.gui.collab.ExternalChangeResolver;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeResolver;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
@@ -13,7 +13,7 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
-public final class EntryChangeResolver extends ExternalChangeResolver {
+public final class EntryChangeResolver extends DatabaseChangeResolver {
     private final EntryChange entryChange;
     private final BibDatabaseContext databaseContext;
 
@@ -24,7 +24,7 @@ public final class EntryChangeResolver extends ExternalChangeResolver {
     }
 
     @Override
-    public Optional<ExternalChange> askUserToResolveChange() {
+    public Optional<DatabaseChange> askUserToResolveChange() {
         MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry());
         mergeEntriesDialog.setLeftHeaderText(Localization.lang("On JabRef"));
         mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));

@@ -3,10 +3,10 @@ package org.jabref.gui.collab.stringdelete;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.collab.ExternalChangeDetailsView;
+import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.l10n.Localization;
 
-public final class BibTexStringDeleteDetailsView extends ExternalChangeDetailsView {
+public final class BibTexStringDeleteDetailsView extends DatabaseChangeDetailsView {
 
     public BibTexStringDeleteDetailsView(BibTexStringDelete stringDelete) {
         VBox container = new VBox();

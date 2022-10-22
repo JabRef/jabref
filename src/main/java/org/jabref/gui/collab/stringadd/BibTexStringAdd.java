@@ -1,7 +1,7 @@
 package org.jabref.gui.collab.stringadd;
 
-import org.jabref.gui.collab.ExternalChange;
-import org.jabref.gui.collab.ExternalChangeResolverFactory;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.logic.l10n.Localization;
@@ -12,13 +12,13 @@ import org.jabref.model.entry.BibtexString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class BibTexStringAdd extends ExternalChange {
+public final class BibTexStringAdd extends DatabaseChange {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringAdd.class);
 
     private final BibtexString addedString;
 
-    public BibTexStringAdd(BibtexString addedString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
-        super(databaseContext, externalChangeResolverFactory);
+    public BibTexStringAdd(BibtexString addedString, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+        super(databaseContext, databaseChangeResolverFactory);
         this.addedString = addedString;
         setChangeName(Localization.lang("Added string: '%0'", addedString.getName()));
     }

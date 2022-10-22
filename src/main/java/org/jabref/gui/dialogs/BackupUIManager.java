@@ -9,7 +9,7 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.backup.BackupResolverDialog;
-import org.jabref.gui.collab.ExternalChangesResolverDialog;
+import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.collab.stringadd.BibTexStringAdd;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -43,7 +43,7 @@ public class BackupUIManager {
     }
 
     private static Optional<Boolean> showReviewBackupDialog(DialogService dialogService) {
-        return DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCustomDialogAndWait(new ExternalChangesResolverDialog(List.of(new BibTexStringAdd(
+        return DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCustomDialogAndWait(new DatabaseChangesResolverDialog(List.of(new BibTexStringAdd(
                 new BibtexString("op", "Nasri"), new BibDatabaseContext(), null)),
                 new BibDatabaseContext(), dialogService, Globals.stateManager, Globals.getThemeManager(),
                 Globals.prefs, "Review Backup")));

@@ -28,35 +28,35 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverDialog.class);
+public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
+    private final static Logger LOGGER = LoggerFactory.getLogger(DatabaseChangesResolverDialog.class);
     /**
-     * Reconstructing the details view to preview an {@link ExternalChange} every time it's selected is a heavy operation.
+     * Reconstructing the details view to preview an {@link DatabaseChange} every time it's selected is a heavy operation.
      * It is also useless because changes are static and if the change data is static then the view doesn't have to change
-     * either. This cache is used to ensure that we only create the detail view instance once for each {@link ExternalChange}.
+     * either. This cache is used to ensure that we only create the detail view instance once for each {@link DatabaseChange}.
      */
-    private final Map<ExternalChange, ExternalChangeDetailsView> DETAILS_VIEW_CACHE = new HashMap<>();
+    private final Map<DatabaseChange, DatabaseChangeDetailsView> DETAILS_VIEW_CACHE = new HashMap<>();
 
     @FXML
-    private TableView<ExternalChange> changesTableView;
+    private TableView<DatabaseChange> changesTableView;
     @FXML
-    private TableColumn<ExternalChange, String> changeName;
+    private TableColumn<DatabaseChange, String> changeName;
     @FXML
     private Button askUserToResolveChangeButton;
     @FXML
     private BorderPane changeInfoPane;
 
-    private final List<ExternalChange> changes;
+    private final List<DatabaseChange> changes;
 
     private ExternalChangesResolverViewModel viewModel;
 
-    private final ExternalChangeDetailsViewFactory externalChangeDetailsViewFactory;
+    private final DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory;
 
     @Inject private UndoManager undoManager;
 
-    public ExternalChangesResolverDialog(List<ExternalChange> changes, BibDatabaseContext database, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, String dialogTitle) {
+    public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, String dialogTitle) {
         this.changes = changes;
-        this.externalChangeDetailsViewFactory = new ExternalChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService);
+        this.databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService);
 
         this.setTitle(dialogTitle);
         ViewLoader.view(this)
@@ -89,7 +89,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
         viewModel.selectedChangeProperty().bind(changesTableView.getSelectionModel().selectedItemProperty());
         EasyBind.subscribe(viewModel.selectedChangeProperty(), selectedChange -> {
             if (selectedChange != null) {
-                ExternalChangeDetailsView detailsView = DETAILS_VIEW_CACHE.computeIfAbsent(selectedChange, externalChangeDetailsViewFactory::create);
+                DatabaseChangeDetailsView detailsView = DETAILS_VIEW_CACHE.computeIfAbsent(selectedChange, databaseChangeDetailsViewFactory::create);
                 changeInfoPane.setCenter(detailsView);
             }
         });
@@ -115,7 +115,7 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     public void askUserToResolveChange() {
-        viewModel.getSelectedChange().flatMap(ExternalChange::getExternalChangeResolver)
-                 .flatMap(ExternalChangeResolver::askUserToResolveChange).ifPresent(viewModel::acceptMergedChange);
+        viewModel.getSelectedChange().flatMap(DatabaseChange::getExternalChangeResolver)
+                 .flatMap(DatabaseChangeResolver::askUserToResolveChange).ifPresent(viewModel::acceptMergedChange);
     }
 }

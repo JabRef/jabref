@@ -1,7 +1,7 @@
 package org.jabref.gui.collab.groupchange;
 
-import org.jabref.gui.collab.ExternalChange;
-import org.jabref.gui.collab.ExternalChangeResolverFactory;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.groups.UndoableModifySubtree;
 import org.jabref.gui.undo.NamedCompound;
@@ -11,11 +11,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
 
-public final class GroupChange extends ExternalChange {
+public final class GroupChange extends DatabaseChange {
     private final GroupDiff groupDiff;
 
-    public GroupChange(GroupDiff groupDiff, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
-        super(databaseContext, externalChangeResolverFactory);
+    public GroupChange(GroupDiff groupDiff, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+        super(databaseContext, databaseChangeResolverFactory);
         this.groupDiff = groupDiff;
         setChangeName(groupDiff.getOriginalGroupRoot() == null ? Localization.lang("Removed all groups") : Localization
                 .lang("Modified groups tree"));

@@ -2,8 +2,8 @@ package org.jabref.gui.collab.entrychange;
 
 import javax.swing.undo.CompoundEdit;
 
-import org.jabref.gui.collab.ExternalChange;
-import org.jabref.gui.collab.ExternalChangeResolverFactory;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -11,12 +11,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public final class EntryChange extends ExternalChange {
+public final class EntryChange extends DatabaseChange {
     private final BibEntry oldEntry;
     private final BibEntry newEntry;
 
-    public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
-        super(databaseContext, externalChangeResolverFactory);
+    public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+        super(databaseContext, databaseChangeResolverFactory);
         this.oldEntry = oldEntry;
         this.newEntry = newEntry;
         setChangeName(oldEntry.getCitationKey().map(key -> Localization.lang("Modified entry '%0'", key))

@@ -25,15 +25,15 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverViewModel.class);
 
     private final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
-    private final ObservableList<ExternalChange> visibleChanges = FXCollections.observableArrayList();
+    private final ObservableList<DatabaseChange> visibleChanges = FXCollections.observableArrayList();
 
     /**
      * Because visible changes list will be bound to the UI, certain changes can be removed. This list is used to keep
      * track of changes even when they're removed from the UI.
      */
-    private final ObservableList<ExternalChange> changes = FXCollections.observableArrayList();
+    private final ObservableList<DatabaseChange> changes = FXCollections.observableArrayList();
 
-    private final ObjectProperty<ExternalChange> selectedChange = new SimpleObjectProperty<>();
+    private final ObjectProperty<DatabaseChange> selectedChange = new SimpleObjectProperty<>();
 
     private final BooleanBinding areAllChangesResolved;
 
@@ -41,7 +41,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     private final UndoManager undoManager;
 
-    public ExternalChangesResolverViewModel(List<ExternalChange> externalChanges, UndoManager undoManager) {
+    public ExternalChangesResolverViewModel(List<DatabaseChange> externalChanges, UndoManager undoManager) {
         Objects.requireNonNull(externalChanges);
         assert !externalChanges.isEmpty();
 
@@ -53,15 +53,15 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         canAskUserToResolveChange = Bindings.createBooleanBinding(() -> selectedChange.isNotNull().get() && selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);
     }
 
-    public ObservableList<ExternalChange> getVisibleChanges() {
+    public ObservableList<DatabaseChange> getVisibleChanges() {
         return visibleChanges;
     }
 
-    public ObjectProperty<ExternalChange> selectedChangeProperty() {
+    public ObjectProperty<DatabaseChange> selectedChangeProperty() {
         return selectedChange;
     }
 
-    public Optional<ExternalChange> getSelectedChange() {
+    public Optional<DatabaseChange> getSelectedChange() {
         return Optional.ofNullable(selectedChangeProperty().get());
     }
 
@@ -88,19 +88,19 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         getSelectedChange().ifPresent(getVisibleChanges()::remove);
     }
 
-    public void acceptMergedChange(ExternalChange externalChange) {
-        Objects.requireNonNull(externalChange);
+    public void acceptMergedChange(DatabaseChange databaseChange) {
+        Objects.requireNonNull(databaseChange);
 
         getSelectedChange().ifPresent(oldChange -> {
             changes.remove(oldChange);
-            changes.add(externalChange);
+            changes.add(databaseChange);
             getVisibleChanges().remove(oldChange);
-            externalChange.accept();
+            databaseChange.accept();
         });
     }
 
     public void applyChanges() {
-        changes.stream().filter(ExternalChange::isAccepted).forEach(change -> change.applyChange(ce));
+        changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
         ce.end();
         undoManager.addEdit(ce);
     }

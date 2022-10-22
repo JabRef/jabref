@@ -26,14 +26,14 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
-public class ExternalChangeDetailsViewFactory {
+public class DatabaseChangeDetailsViewFactory {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final ThemeManager themeManager;
     private final PreferencesService preferencesService;
 
-    public ExternalChangeDetailsViewFactory(BibDatabaseContext databaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService) {
+    public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -41,29 +41,29 @@ public class ExternalChangeDetailsViewFactory {
         this.preferencesService = preferencesService;
     }
 
-    public ExternalChangeDetailsView create(ExternalChange externalChange) {
+    public DatabaseChangeDetailsView create(DatabaseChange databaseChange) {
         // TODO: Use Pattern Matching for switch once it's out of preview
-        if (externalChange instanceof EntryChange entryChange) {
+        if (databaseChange instanceof EntryChange entryChange) {
             return new EntryChangeDetailsView(entryChange, databaseContext, dialogService, stateManager, themeManager, preferencesService);
-        } else if (externalChange instanceof EntryAdd entryAdd) {
+        } else if (databaseChange instanceof EntryAdd entryAdd) {
             return new EntryAddDetailsView(entryAdd, databaseContext, dialogService, stateManager, themeManager, preferencesService);
-        } else if (externalChange instanceof EntryDelete entryDelete) {
+        } else if (databaseChange instanceof EntryDelete entryDelete) {
             return new EntryDeleteDetailsView(entryDelete, databaseContext, dialogService, stateManager, themeManager, preferencesService);
-        } else if (externalChange instanceof BibTexStringAdd stringAdd) {
+        } else if (databaseChange instanceof BibTexStringAdd stringAdd) {
             return new BibTexStringAddDetailsView(stringAdd);
-        } else if (externalChange instanceof BibTexStringDelete stringDelete) {
+        } else if (databaseChange instanceof BibTexStringDelete stringDelete) {
             return new BibTexStringDeleteDetailsView(stringDelete);
-        } else if (externalChange instanceof BibTexStringChange stringChange) {
+        } else if (databaseChange instanceof BibTexStringChange stringChange) {
             return new BibTexStringChangeDetailsView(stringChange);
-        } else if (externalChange instanceof BibTexStringRename stringRename) {
+        } else if (databaseChange instanceof BibTexStringRename stringRename) {
             return new BibTexStringRenameDetailsView(stringRename);
-        } else if (externalChange instanceof MetadataChange metadataChange) {
+        } else if (databaseChange instanceof MetadataChange metadataChange) {
             return new MetadataChangeDetailsView(metadataChange, preferencesService);
-        } else if (externalChange instanceof GroupChange groupChange) {
+        } else if (databaseChange instanceof GroupChange groupChange) {
             return new GroupChangeDetailsView(groupChange);
-        } else if (externalChange instanceof PreambleChange preambleChange) {
+        } else if (databaseChange instanceof PreambleChange preambleChange) {
             return new PreambleChangeDetailsView(preambleChange);
         }
-        throw new UnsupportedOperationException("Cannot preview the given change: " + externalChange.getName());
+        throw new UnsupportedOperationException("Cannot preview the given change: " + databaseChange.getName());
     }
 }

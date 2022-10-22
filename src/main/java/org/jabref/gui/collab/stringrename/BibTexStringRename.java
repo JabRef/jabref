@@ -1,7 +1,7 @@
 package org.jabref.gui.collab.stringrename;
 
-import org.jabref.gui.collab.ExternalChange;
-import org.jabref.gui.collab.ExternalChangeResolverFactory;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableStringChange;
 import org.jabref.logic.l10n.Localization;
@@ -11,14 +11,14 @@ import org.jabref.model.entry.BibtexString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class BibTexStringRename extends ExternalChange {
+public final class BibTexStringRename extends DatabaseChange {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringRename.class);
 
     private final BibtexString oldString;
     private final BibtexString newString;
 
-    public BibTexStringRename(BibtexString oldString, BibtexString newString, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
-        super(databaseContext, externalChangeResolverFactory);
+    public BibTexStringRename(BibtexString oldString, BibtexString newString, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+        super(databaseContext, databaseChangeResolverFactory);
         this.oldString = oldString;
         this.newString = newString;
 

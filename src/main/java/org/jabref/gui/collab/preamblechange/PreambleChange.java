@@ -1,7 +1,7 @@
 package org.jabref.gui.collab.preamblechange;
 
-import org.jabref.gui.collab.ExternalChange;
-import org.jabref.gui.collab.ExternalChangeResolverFactory;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoablePreambleChange;
 import org.jabref.logic.bibtex.comparator.PreambleDiff;
@@ -11,13 +11,13 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class PreambleChange extends ExternalChange {
+public final class PreambleChange extends DatabaseChange {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreambleChange.class);
 
     private final PreambleDiff preambleDiff;
 
-    public PreambleChange(PreambleDiff preambleDiff, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
-        super(databaseContext, externalChangeResolverFactory);
+    public PreambleChange(PreambleDiff preambleDiff, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+        super(databaseContext, databaseChangeResolverFactory);
         this.preambleDiff = preambleDiff;
 
         setChangeName(Localization.lang("Changed preamble"));
