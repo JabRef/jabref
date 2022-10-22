@@ -161,7 +161,7 @@ public class CrossRefTest {
         entry.setField(StandardField.AUTHOR, "Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede");
         entry.setField(StandardField.YEAR, "2005");
         Optional<BibEntry> fetchedEntry = fetcher.performSearch(entry).stream().findFirst();
-        int timesCited = Integer.parseInt(fetchedEntry.get().getField(StandardField.TIMESEXTERNALLYCITED).get());
+        int timesCited = Integer.parseInt(fetchedEntry.get().getField(StandardField.REFERENCEDBYCOUNT).get());
         // As the number of timesExternallyCited can change over time, this only tests that it is >= 0.
         assertTrue(timesCited >= 0);
     }

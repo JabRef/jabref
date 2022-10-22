@@ -137,7 +137,7 @@ public enum StandardField implements Field {
     CREATIONDATE("creationdate", FieldProperty.DATE),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE),
     // The number of times the article has been referenced by other articles
-    TIMESEXTERNALLYCITED("timesexternallycited", FieldProperty.NUMERIC);
+    REFERENCEDBYCOUNT("Referencedbycount", FieldProperty.NUMERIC);
 
     private final String name;
     private final String displayName;

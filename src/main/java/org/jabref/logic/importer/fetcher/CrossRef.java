@@ -56,6 +56,10 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
+        if (entry.getLatexFreeField(StandardField.DOI).isPresent()) {
+            String doi = entry.getLatexFreeField(StandardField.DOI).get();
+            return uriBuilder.setPath("/works/" + doi).build().toURL();
+        }
         entry.getLatexFreeField(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("query.bibliographic", title));
         entry.getLatexFreeField(StandardField.AUTHOR).ifPresent(author -> uriBuilder.addParameter("query.author", author));
         entry.getLatexFreeField(StandardField.YEAR).ifPresent(year ->
@@ -140,9 +144,10 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
             entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
-            entry.setField(StandardField.TIMESEXTERNALLYCITED, item.optString("is-referenced-by-count"));
+            entry.setField(StandardField.REFERENCEDBYCOUNT, item.optString("is-referenced-by-count"));
             return entry;
-        } catch (JSONException exception) {
+        } catch (
+                JSONException exception) {
             throw new ParseException("CrossRef API JSON format has changed", exception);
         }
     }
