@@ -403,7 +403,11 @@ public class GroupTreeView extends BorderPane {
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
         ContextMenu menu = new ContextMenu();
-        Menu removeGroup = new Menu(Localization.lang("Remove group"));
+
+        Menu removeGroupWithSubgroups = new Menu(Localization.lang("Remove group"));
+
+        MenuItem removeGroupNoSubgroups = new MenuItem(Localization.lang("Remove group"));
+        removeGroupNoSubgroups.setOnAction(event -> viewModel.removeGroupNoSubgroups(group));
 
         MenuItem editGroup = new MenuItem(Localization.lang("Edit group"));
         editGroup.setOnAction(event -> {
@@ -439,9 +443,13 @@ public class GroupTreeView extends BorderPane {
         removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
 
         menu.getItems().add(editGroup);
-        removeGroup.getItems().add(removeGroupKeepSubgroups);
-        removeGroup.getItems().add(removeGroupAndSubgroups);
-        menu.getItems().add(removeGroup);
+        if (group.getChildren().size() > 0) {
+            removeGroupWithSubgroups.getItems().add(removeGroupKeepSubgroups);
+            removeGroupWithSubgroups.getItems().add(removeGroupAndSubgroups);
+            menu.getItems().add(removeGroupWithSubgroups);
+        } else {
+            menu.getItems().add(removeGroupNoSubgroups);
+        }
         menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().add(addSubgroup);
         menu.getItems().add(removeSubgroups);
