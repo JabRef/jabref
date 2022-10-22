@@ -7,12 +7,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Region;
 
 import org.jabref.gui.FXDialog;
-import org.jabref.gui.Globals;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -38,46 +32,5 @@ public class BackupResolverDialog extends FXDialog {
                 backupPath.getFileName().toString()));
 
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
-        ControlHelper.setAction(REVIEW_BACKUP, getDialogPane(), (e) -> reviewBackup());
-
-        setResultConverter(action -> {
-            if (RESTORE_FROM_BACKUP == action) {
-                System.out.println("Restore from backup");
-               /* BackgroundTask.wrap(() -> {
-                                  try {
-                                      Thread.sleep(6000);
-                                  } catch (
-                                          InterruptedException e) {
-                                      throw new RuntimeException(e);
-                                  }
-                              })
-                              .executeWith(Globals.TASK_EXECUTOR);*/
-                DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                    try {
-                        Thread.sleep(8000);
-                    } catch (
-                            InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-
-            } else if (IGNORE_BACKUP == action) {
-                ignoreBackup();
-            } else if (REVIEW_BACKUP == action) {
-                reviewBackup();
-            }
-            return action;
-        });
-    }
-
-    private void restoreBackup() {
-    }
-
-    private void ignoreBackup() {
-        System.out.println("Ignore backup");
-    }
-
-    private void reviewBackup() {
-        System.out.println("Review backup");
     }
 }
