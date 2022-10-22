@@ -223,7 +223,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         } else {
             urlText = dialogService.showInputDialogAndWait(
                     Localization.lang("Download file"), Localization.lang("Enter URL to download"));
-
         }
         if (urlText.isPresent()) {
             try {
