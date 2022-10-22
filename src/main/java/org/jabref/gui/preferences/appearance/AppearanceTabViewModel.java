@@ -14,7 +14,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AppearancePreferences;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
@@ -97,12 +96,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         appearancePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
-
-        if (!fontOverrideProperty.getValue()) {
-            appearancePreferences.setMainFontSize((Integer) this.preferences.getDefaults().get(JabRefPreferences.MAIN_FONT_SIZE));
-        } else {
-            appearancePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
-        }
+        appearancePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
 
         if (themeLightProperty.getValue()) {
             appearancePreferences.setTheme(Theme.light());
