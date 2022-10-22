@@ -19,7 +19,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
@@ -55,12 +54,9 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     @Inject private UndoManager undoManager;
 
-    private final String dialogTitle;
-
     public ExternalChangesResolverDialog(List<ExternalChange> changes, BibDatabaseContext database, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, String dialogTitle) {
         this.changes = changes;
         this.externalChangeDetailsViewFactory = new ExternalChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService);
-        this.dialogTitle = dialogTitle;
 
         this.setTitle(dialogTitle);
         ViewLoader.view(this)
