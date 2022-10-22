@@ -7,6 +7,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import org.jabref.gui.Globals;
@@ -17,6 +18,13 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T> {
 
     protected BaseDialog() {
+        getDialogPane().getScene().addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+            KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                close();
+            }
+        });
+
         getDialogPane().getScene().setOnKeyPressed(event -> {
             KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {

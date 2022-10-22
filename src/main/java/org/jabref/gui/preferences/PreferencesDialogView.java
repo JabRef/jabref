@@ -11,7 +11,6 @@ import javafx.scene.input.KeyCode;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -72,13 +71,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         viewModel = new PreferencesDialogViewModel(dialogService, preferencesService, frame);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
-
-        // The list view does not respect the listener for the dialog and needs its own
-        preferenceTabList.setOnKeyReleased(key -> {
-            if (preferencesService.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {
-                this.closeDialog();
-            }
-        });
 
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
         preferenceTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
