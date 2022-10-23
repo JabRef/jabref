@@ -31,7 +31,7 @@ Sometimes issues with modularity only arise in the installed version and do not 
 3.  Modify the `build\image\JabRef\runtime\bin\Jabref.bat` file, replace the last line with
 
     ```
-    pushd %DIR% & %JAVA_EXEC% -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -p "%~dp0/../app" -m org.jabref/org.jabref.gui.JabRefLauncher  %* & popd
+    pushd %DIR% & %JAVA_EXEC% -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n -p "%~dp0/../app" -m org.jabref/org.jabref.cli.Launcher  %* & popd
     ```
 4. Open your IDE and add a "Remote Debugging Configuration" for `localhost:8000`
 5. Start JabRef by running the above bat file
