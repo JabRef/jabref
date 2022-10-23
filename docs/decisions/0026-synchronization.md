@@ -88,7 +88,7 @@ After the merging is done, the client sets its local checkpoint to the value of 
 
 ##### Pushing
 
-The client sends the following information back to the client:
+The client sends the following information back to the server:
 
 - the list of entries that are marked dirty (along with their `Revision` data).
 - the list of entries that are new, i.e., that don't have an `ID`.
