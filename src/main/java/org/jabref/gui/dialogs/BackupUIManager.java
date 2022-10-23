@@ -15,6 +15,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -28,17 +29,16 @@ public class BackupUIManager {
     private BackupUIManager() {
     }
 
-    public static void showRestoreBackupDialog(DialogService dialogService, Path originalPath) {
+    public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService, Path originalPath) {
         var actionOpt = showBackupResolverDialog(dialogService, originalPath);
-        actionOpt.ifPresent(action -> {
+        return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 BackupManager.restoreBackup(originalPath);
+                return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                var allChangesResolved = showReviewBackupDialog(dialogService, originalPath);
-                if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
-                    showRestoreBackupDialog(dialogService, originalPath);
-                }
+                return showReviewBackupDialog(dialogService, originalPath);
             }
+            return Optional.empty();
         });
     }
 
@@ -46,11 +46,12 @@ public class BackupUIManager {
         return DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath)));
     }
 
-    private static Optional<Boolean> showReviewBackupDialog(DialogService dialogService, Path originalPath) {
+    private static Optional<ParserResult> showReviewBackupDialog(DialogService dialogService, Path originalPath) {
         try {
             Path backupPath = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP).orElseThrow();
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-            BibDatabaseContext originalDatabase = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
+            ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, new DummyFileUpdateMonitor());
+            BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             return DefaultTaskExecutor.runInJavaFXThread(() -> {
@@ -58,7 +59,11 @@ public class BackupUIManager {
                         DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, null),
                         originalDatabase, dialogService, Globals.stateManager, Globals.getThemeManager(), Globals.prefs, "Review Backup"
                 );
-                return dialogService.showCustomDialogAndWait(reviewBackupDialog);
+                var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
+                if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
+                    showRestoreBackupDialog(dialogService, originalPath);
+                }
+                return Optional.of(originalParserResult);
             });
         } catch (IOException e) {
             e.printStackTrace();

@@ -195,16 +195,26 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
 
+        ParserResult result = null;
         if (BackupManager.backupFileDiffers(fileToLoad)) {
-            BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
+            var resultOpt = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
+            if (resultOpt.isPresent()) {
+                result = resultOpt.get();
+            }
+        }
+        if (result != null) {
+            System.out.println("Result: " + result);
+            System.out.println(result.getDatabaseContext().getEntries().size());
         }
         System.out.println("Handled Backup");
 
-        ParserResult result;
         try {
-            result = OpenDatabase.loadDatabase(fileToLoad,
-                    preferencesService.getImportFormatPreferences(),
-                    Globals.getFileUpdateMonitor());
+            if (result == null) {
+                result = OpenDatabase.loadDatabase(fileToLoad,
+                        preferencesService.getImportFormatPreferences(),
+                        Globals.getFileUpdateMonitor());
+            }
+
             if (result.hasWarnings()) {
                 String content = Localization.lang("Please check your library file for wrong syntax.")
                         + "\n\n" + result.getErrorMessage();
