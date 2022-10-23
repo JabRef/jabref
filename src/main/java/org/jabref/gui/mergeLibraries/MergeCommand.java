@@ -77,9 +77,8 @@ public class MergeCommand extends SimpleCommand {
     }
 
     public BibDatabase doMerge(Path path, BibDatabase database) throws IOException {
-        SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
         //find all the .lib files by crawling in doMerge and merge them
-        Set<BibEntry> toAdd = new HashSet<>();
+        List<BibEntry> toAdd = new ArrayList<>();
         for(Path f : getAllFiles(path)) {
             ParserResult result;
 
@@ -105,7 +104,6 @@ public class MergeCommand extends SimpleCommand {
                 boolean addFlag = true;
                 for (BibEntry dbEntry : database.getEntries()) {
 
-                    System.out.println("------" + dbEntry.getCitationKey());
                     if (entry.equals(dbEntry)) {
                         addFlag = false;
                         break;
