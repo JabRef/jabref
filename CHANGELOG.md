@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - An SLR can now be started from the SLR itself. [#9131](https://github.com/JabRef/jabref/pull/9131), [koppor#601](https://github.com/koppor/jabref/issues/601)
 - Implement a new ISBN Fetcher ([doi-to-bibtex-converter.herokuapp.com](http://doi-to-bibtex-converter.herokuapp.com) as source). [#9145](https://github.com/JabRef/jabref/pull/9145)
 - We added support for the Ukrainian and Arabic languages. [#9236](https://github.com/JabRef/jabref/pull/9236), [#9243](https://github.com/JabRef/jabref/pull/9243)
+- We added a new field, Referencedbycount that shows the number of times an entry has been referenced by others. [#8954](https://github.com/JabRef/jabref/issues/8954)
 
 ### Changed
 
@@ -44,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where a message about changed metadata would occur on saving although nothing changed. [#9159](https://github.com/JabRef/jabref/issues/9159)
 - When adding or editing a subgroup it is placed w.r.t. to alphabetical ordering rather than at the end. [koppor#577](https://github.com/koppor/jabref/issues/577)
 - We modified the Directory of Open Access Books (DOAB) fetcher so that it will now also fetch the ISBN when possible. [#8708](https://github.com/JabRef/jabref/issues/8708)
+- We changed the CrossRef fetcher to use DOI when available, and add Referencedbycount. [#8954](https://github.com/JabRef/jabref/issues/8954)
 
 ### Fixed
 
