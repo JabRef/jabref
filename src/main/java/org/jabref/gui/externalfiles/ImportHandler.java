@@ -119,10 +119,10 @@ public class ImportHandler {
 
                             if (!pdfEntriesInFile.isEmpty()) {
                                 entriesToAdd.addAll(pdfEntriesInFile);
-                                addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
+                                addResultToList(file, true, Localization.lang("File successfully imported as a new entry"));
                             } else {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
-                                addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
+                                addResultToList(file, false, Localization.lang("No metadata found. Created an empty entry with file link"));
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
@@ -131,10 +131,10 @@ public class ImportHandler {
                             }
 
                             entriesToAdd.addAll(bibtexParserResult.getDatabaseContext().getEntries());
-                            addResultToList(file, false, Localization.lang("Importing bib entry"));
+                            addResultToList(file, false, Localization.lang("Successfully imported bib entry"));
                         } else {
                             entriesToAdd.add(createEmptyEntryWithLink(file));
-                            addResultToList(file, false, Localization.lang("No BibTeX data found. Creating empty entry with file link"));
+                            addResultToList(file, false, Localization.lang("No BibTeX data found. Created an empty entry with file link"));
                         }
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
