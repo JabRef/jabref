@@ -19,8 +19,8 @@ public class GrobidOptInDialogHelper {
      * @return if the user enabled Grobid, either in the past or after being asked by the dialog.
      */
     public static boolean showAndWaitIfUserIsUndecided(DialogService dialogService, GrobidPreferences preferences) {
-        if (preferences.isGrobidEnabled()) {
-            return true;
+        if (!preferences.isGrobidEnabled()) {
+            return false;
         }
         if (preferences.isGrobidOptOut()) {
             return false;
