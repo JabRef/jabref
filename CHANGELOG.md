@@ -45,7 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where a message about changed metadata would occur on saving although nothing changed. [#9159](https://github.com/JabRef/jabref/issues/9159)
 - When adding or editing a subgroup it is placed w.r.t. to alphabetical ordering rather than at the end. [koppor#577](https://github.com/koppor/jabref/issues/577)
 - We modified the Directory of Open Access Books (DOAB) fetcher so that it will now also fetch the ISBN when possible. [#8708](https://github.com/JabRef/jabref/issues/8708)
-- We changed the messages after importing unlinked local files to passive. [koppor#548](https://github.com/koppor/jabref/issues/548)
+- We changed the messages after importing unlinked local files to past passive tense. [koppor#548](https://github.com/koppor/jabref/issues/548)
 
 ### Fixed
 
