@@ -104,6 +104,7 @@ public class Globals {
         if (themeManager == null) {
             themeManager = new ThemeManager(
                     prefs.getAppearancePreferences(),
+                    prefs,
                     getFileUpdateMonitor(),
                     Runnable::run);
         }
