@@ -444,8 +444,6 @@ public class GroupTreeView extends BorderPane {
             menu.getItems().clear();
             menu.getItems().add(editGroup);
             if (group.getChildren().size() > 0) {
-                removeGroupWithSubgroups.getItems().add(removeGroupKeepSubgroups);
-                removeGroupWithSubgroups.getItems().add(removeGroupAndSubgroups);
                 menu.getItems().add(removeGroupWithSubgroups);
                 menu.getItems().add(new SeparatorMenuItem());
                 menu.getItems().add(addSubgroup);
@@ -462,6 +460,8 @@ public class GroupTreeView extends BorderPane {
         });
 
         menu.getItems().add(new Menu());
+        removeGroupWithSubgroups.getItems().add(removeGroupKeepSubgroups);
+        removeGroupWithSubgroups.getItems().add(removeGroupAndSubgroups);
 
         // TODO: Disable some actions under certain conditions
         // if (group.canBeEdited()) {
