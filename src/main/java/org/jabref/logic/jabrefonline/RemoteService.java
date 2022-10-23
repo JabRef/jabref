@@ -3,10 +3,15 @@ package org.jabref.logic.jabrefonline;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.jabrefonline.UserChangesQuery;
+import org.jabref.jabrefonline.UserChangesQuery.Node;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
+
+import com.google.common.collect.Streams;
 
 public class RemoteService {
 
@@ -29,7 +34,7 @@ public class RemoteService {
         if (database.getMetaData().getRemoteSettings().isPresent()) {
             throw new UnsupportedOperationException("Database is already bound to a remote server");
         }
-        
+
         bindToAccount(database);
         sync(database);
     }
@@ -71,7 +76,7 @@ public class RemoteService {
      */
     public void pull(BibDatabaseContext database, Optional<SyncCheckpoint> since) {
         assertBoundToAccount(database);
-        
+
         var changes = remoteClient.assertLoggedIn((client) -> {
             return communicationService.getChanges(client, since);
         });
@@ -82,6 +87,59 @@ public class RemoteService {
         if (changes.pageInfo.hasNextPage) {
             pull(database, Optional.of(new SyncCheckpoint(changes.pageInfo.endCursor)));
         }
+    }
+
+    /**
+     * Pushes the local changes (since the last sync) to the remote server.
+     * In particular, the following information is pushed:
+     * - the list of entries that are marked dirty.
+     * - the list of entries that are new.
+     * - the list of entries that have been deleted.
+     * 
+     * TODO: Trigger this by saving the database
+     */
+    public void push(BibDatabaseContext database) {
+        assertBoundToAccount(database);
+
+        boolean needsAnotherSync = false;
+        remoteClient.assertLoggedIn((client) -> {
+            List<BibEntry> dirtyEntries = database.getDatabase().getEntries().stream()
+                                                  .filter(entry -> entry.getRevision().map(LocalRevision::isDirty).orElse(false))
+                                                  .collect(Collectors.toList());
+            if (!dirtyEntries.isEmpty()) {
+                var result = communicationService.updateEntries(client, dirtyEntries.stream()
+                                                                                             .map(entry -> transformer.toDocument(entry))
+                                                                                             .collect(Collectors.toList()));
+                Streams.forEachPair(dirtyEntries.stream(), result.stream(), (entry, update) -> {
+                    var revision = entry.getRevision().get();
+                    if (update.wasAccepted) {
+                        revision.setDirty(false);
+                        revision.setGeneration(update.newGeneration);
+                        revision.setHash(update.newHash);
+                    } else {
+                        needsAnotherSync = true;
+                    }
+                });
+            }
+
+            List<BibEntry> newEntries = database.getDatabase().getEntries().stream()
+                                            .filter(entry -> entry.getRevision().isEmpty())
+                                            .collect(Collectors.toList());
+            if (!newEntries.isEmpty()) {
+                var acceptedAdditions = communicationService.createEntries(client, newEntries.stream()
+                                                                                             .map(entry -> transformer.toDocument(entry))
+                                                                                             .collect(Collectors.toList()));
+                Streams.forEachPair(newEntries.stream(), acceptedAdditions.stream(), (entry, addition) -> {
+                    if (addition.wasAccepted) {
+                        entry.setRevision(new LocalRevision(addition.id, addition.generation, addition.hash));
+                    } else {
+                        needsAnotherSync = true;
+                    }
+                });
+            }
+
+            // TODO: Delete entries
+        });
     }
 
     /**

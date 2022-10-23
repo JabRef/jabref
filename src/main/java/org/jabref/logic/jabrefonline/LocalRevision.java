@@ -14,4 +14,8 @@ public class LocalRevision extends RemoteRevision {
         // TODO: Keep this state in sync with the entry's state
         return isDirty;
     }
+
+    public void setDirty(boolean newValue) {
+        isDirty = newValue;
+    }
 }

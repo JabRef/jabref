@@ -1042,4 +1042,8 @@ public class BibEntry implements Cloneable {
     public Optional<LocalRevision> getRevision() {
         return revision;
     }
+
+    public void setRevision(LocalRevision localRevision) {
+        this.revision = Optional.ofNullable(localRevision);
+    }
 }

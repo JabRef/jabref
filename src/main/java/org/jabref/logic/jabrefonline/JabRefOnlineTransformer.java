@@ -47,4 +47,9 @@ public class JabRefOnlineTransformer {
         .collect(Collectors.joining(" and "));
         // TODO: Handle onOrganization
     }
+
+    public Node toDocument(BibEntry entry) {
+        // TODO: Implement
+        return null;
+    }
 }

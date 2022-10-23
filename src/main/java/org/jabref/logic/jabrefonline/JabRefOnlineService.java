@@ -1,8 +1,10 @@
 package org.jabref.logic.jabrefonline;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.jabrefonline.UserChangesQuery;
+import org.jabref.jabrefonline.UserChangesQuery.Node;
 
 import com.apollographql.apollo3.runtime.java.ApolloClient;
 import com.apollographql.apollo3.rx3.java.Rx3Apollo;
@@ -23,5 +25,17 @@ public class JabRefOnlineService implements RemoteCommunicationService {
         var queryCall = apolloClient.query(new UserChangesQuery("ckondtcaf000101mh7x9g4gia"));
         var response = Rx3Apollo.single(queryCall, BackpressureStrategy.BUFFER).blockingGet();
         return response.data.user.changes;
+    }
+
+    @Override
+    public List<Node> updateEntries(String clientId, List<Node> entries) {
+        // TODO Auto-generated method stub
+        return entries;
+    }
+
+    @Override
+    public List<Node> createEntries(String clientId, List<Node> entries) {
+        // TODO Auto-generated method stub
+        return entries;
     }
 }
