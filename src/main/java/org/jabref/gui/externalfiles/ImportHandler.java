@@ -131,7 +131,7 @@ public class ImportHandler {
                             }
 
                             entriesToAdd.addAll(bibtexParserResult.getDatabaseContext().getEntries());
-                            addResultToList(file, false, Localization.lang("Successfully imported bib entry"));
+                            addResultToList(file, true, Localization.lang("Successfully imported bib entry"));
                         } else {
                             entriesToAdd.add(createEmptyEntryWithLink(file));
                             addResultToList(file, false, Localization.lang("No BibTeX data found. Created an empty entry with file link"));
