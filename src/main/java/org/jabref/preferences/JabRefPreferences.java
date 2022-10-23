@@ -2075,6 +2075,7 @@ public class JabRefPreferences implements PreferencesService {
         appearancePreferences = new AppearancePreferences(
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
+                (Integer) defaults.get(MAIN_FONT_SIZE),
                 new Theme(get(FX_THEME))
         );
 

@@ -18,8 +18,6 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
-import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -215,7 +213,7 @@ public class ThemeManager {
         if (appearancePreferences.shouldOverrideDefaultFontSize()) {
             scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getMainFontSize() + "pt;");
         } else {
-            scene.getRoot().setStyle("-fx-font-size: " + JabRefPreferences.getInstance().getDefaults().get(JabRefPreferences.MAIN_FONT_SIZE) + "pt;");
+            scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getDefaultFontSize() + "pt;");
         }
     }
 
