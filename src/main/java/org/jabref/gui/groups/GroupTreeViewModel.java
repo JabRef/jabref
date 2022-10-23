@@ -472,7 +472,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /**
-     * Removes the specified group and its subgroups (after asking for confirmation).
+     * Removes the specified group (after asking for confirmation).
      */
     public void removeGroupNoSubgroups(GroupNodeViewModel group) {
         boolean confirmed;
