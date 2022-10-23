@@ -2573,7 +2573,9 @@ public class JabRefPreferences implements PreferencesService {
             if (newValue != null) {
                 put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
             } else {
-                remove(LAST_EDITED);
+                if (guiPreferences.getLastFilesOpened().isEmpty()) {
+                    remove(LAST_EDITED);
+                }
             }
         });
         guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
