@@ -122,7 +122,10 @@
 }
 
 #bibtexSourceCodeArea .search {
-    -fx-fill: red;
+    -fx-fill: green;
+    -fx-font-size: 1.2em;
+    -fx-font-weight: bolder;
+
 }
 
 #citationsPane {
