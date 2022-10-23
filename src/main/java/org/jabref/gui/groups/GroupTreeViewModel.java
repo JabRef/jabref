@@ -500,9 +500,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
             });
 
             if (selectedGroupNodes.size() > 1) {
-                dialogService.notify(Localization.lang("Removed all selected groups and their subgroups."));
+                dialogService.notify(Localization.lang("Removed all selected groups."));
             } else {
-                dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+                dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
             }
             writeGroupChangesToMetaData();
         }
