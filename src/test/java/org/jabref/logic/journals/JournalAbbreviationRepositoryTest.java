@@ -134,4 +134,16 @@ class JournalAbbreviationRepositoryTest {
     void getFromAbbreviatedName() {
         assertEquals(new Abbreviation("American Journal of Public Health", "Am. J. Public Health"), repository.get("Am. J. Public Health").get());
     }
+
+    @Test
+    void testAbbreviationsWithEscapedAmpersand() {
+        assertEquals(new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"), repository.get("ACS Applied Materials & Interfaces").get());
+        assertEquals(new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"), repository.get("ACS Applied Materials \\& Interfaces").get());
+        assertEquals(new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Signaling"), repository.get("Antioxidants & Redox Signaling").get());
+        assertEquals(new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Signaling"), repository.get("Antioxidants \\& Redox Signaling").get());
+
+        repository.addCustomAbbreviation(new Abbreviation("Long & Name", "L. N.", "LN"));
+        assertEquals(new Abbreviation("Long & Name", "L. N.", "LN"), repository.get("Long & Name").get());
+        assertEquals(new Abbreviation("Long & Name", "L. N.", "LN"), repository.get("Long \\& Name").get());
+    }
 }
