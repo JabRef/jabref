@@ -45,8 +45,10 @@ import org.tinylog.configuration.Configuration;
  */
 public class Launcher {
     private static Logger LOGGER;
+    private static String[] ARGUMENTS;
 
     public static void main(String[] args) {
+        ARGUMENTS = args;
         addLogToDisk();
         try {
             // Init preferences
@@ -74,7 +76,7 @@ public class Launcher {
                     return;
                 }
 
-                MainApplication.create(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences);
+                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage();
