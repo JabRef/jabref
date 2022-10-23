@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -96,9 +95,8 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
         EasyBind.subscribe(viewModel.areAllChangesResolvedProperty(), isResolved -> {
             if (isResolved) {
-                Platform.runLater(viewModel::applyChanges);
+                viewModel.applyChanges();
                 close();
-                LOGGER.debug("Closing ExternalChangesResolverDialog");
             }
         });
     }
