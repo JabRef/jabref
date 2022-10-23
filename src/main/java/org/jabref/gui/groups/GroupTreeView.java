@@ -447,13 +447,15 @@ public class GroupTreeView extends BorderPane {
                 removeGroupWithSubgroups.getItems().add(removeGroupKeepSubgroups);
                 removeGroupWithSubgroups.getItems().add(removeGroupAndSubgroups);
                 menu.getItems().add(removeGroupWithSubgroups);
+                menu.getItems().add(new SeparatorMenuItem());
+                menu.getItems().add(addSubgroup);
+                menu.getItems().add(removeSubgroups);
+                menu.getItems().add(sortSubgroups);
             } else {
                 menu.getItems().add(removeGroupNoSubgroups);
+                menu.getItems().add(new SeparatorMenuItem());
+                menu.getItems().add(addSubgroup);
             }
-            menu.getItems().add(new SeparatorMenuItem());
-            menu.getItems().add(addSubgroup);
-            menu.getItems().add(removeSubgroups);
-            menu.getItems().add(sortSubgroups);
             menu.getItems().add(new SeparatorMenuItem());
             menu.getItems().add(addEntries);
             menu.getItems().add(removeEntries);
