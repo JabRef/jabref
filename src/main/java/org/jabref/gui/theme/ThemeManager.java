@@ -19,6 +19,7 @@ import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -42,7 +43,6 @@ public class ThemeManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
     private final AppearancePreferences appearancePreferences;
-    private final JabRefPreferences jabRefPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Consumer<Runnable> updateRunner;
 
@@ -53,11 +53,9 @@ public class ThemeManager {
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
     public ThemeManager(AppearancePreferences appearancePreferences,
-                        JabRefPreferences jabRefPreferences,
                         FileUpdateMonitor fileUpdateMonitor,
                         Consumer<Runnable> updateRunner) {
         this.appearancePreferences = Objects.requireNonNull(appearancePreferences);
-        this.jabRefPreferences = Objects.requireNonNull(jabRefPreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
 
@@ -217,7 +215,7 @@ public class ThemeManager {
         if (appearancePreferences.shouldOverrideDefaultFontSize()) {
             scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getMainFontSize() + "pt;");
         } else {
-            scene.getRoot().setStyle("-fx-font-size: " + jabRefPreferences.getDefaults().get(JabRefPreferences.MAIN_FONT_SIZE) + "pt;");
+            scene.getRoot().setStyle("-fx-font-size: " + JabRefPreferences.getInstance().getDefaults().get(JabRefPreferences.MAIN_FONT_SIZE) + "pt;");
         }
     }
 
