@@ -14,6 +14,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.jabref.logic.importer.IdBasedParserFetcher.LOGGER;
+
 public class Date {
 
     private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
@@ -99,7 +101,8 @@ public class Date {
                 TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0]);
                 TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1]);
                 return Optional.of(new Date(parsedDate, parsedEndDate));
-            } catch (DateTimeParseException ignored) {
+            } catch (DateTimeParseException error) {
+                LOGGER.warn("Parsing error", error);
                 return Optional.empty();
             }
         }
@@ -107,7 +110,8 @@ public class Date {
         try {
             TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
             return Optional.of(new Date(parsedDate));
-        } catch (DateTimeParseException ignored) {
+        } catch (DateTimeParseException error) {
+            LOGGER.warn("Parsing error", error);
             return Optional.empty();
         }
     }

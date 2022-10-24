@@ -42,7 +42,7 @@ public final class BuildInfo {
                     properties.load(reader);
                 }
             }
-        } catch (IOException ignored) {
+        } catch (IOException error) {
             // nothing to do -> default already set
         }
 

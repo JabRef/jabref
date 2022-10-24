@@ -777,8 +777,8 @@ public class JabRefPreferences implements PreferencesService {
             while ((rs = getNextUnit(reader)).isPresent()) {
                 result.add(rs.get());
             }
-        } catch (IOException ignored) {
-            // Ignored
+        } catch (IOException error) {
+            LOGGER.warn("Unable to convert String to List", error);
         }
         return result;
     }
