@@ -106,7 +106,6 @@ public class Date {
                 return Optional.empty();
             }
         }
-
         try {
             TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
             return Optional.of(new Date(parsedDate));
