@@ -75,8 +75,8 @@ public class RemoteListenerServer implements Runnable {
     public void closeServerSocket() {
         try {
             serverSocket.close();
-        } catch (IOException error) {
-            LOGGER.warn("Unable to close server socket!", error);
+        } catch (IOException e) {
+            LOGGER.warn("Unable to close server socket!", e);
         }
     }
 }

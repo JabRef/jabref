@@ -86,20 +86,20 @@ public class Protocol implements AutoCloseable {
     public void close() {
         try {
             in.close();
-        } catch (IOException error) {
-            LOGGER.warn("Input stream not closed", error);
+        } catch (IOException e) {
+            LOGGER.warn("Input stream not closed", e);
         }
 
         try {
             out.close();
-        } catch (IOException error) {
-            LOGGER.warn("Output stream not closed", error);
+        } catch (IOException e) {
+            LOGGER.warn("Output stream not closed", e);
         }
 
         try {
             socket.close();
-        } catch (IOException error) {
-            LOGGER.warn("Socket not closed", error);
+        } catch (IOException e) {
+            LOGGER.warn("Socket not closed", e);
         }
     }
 }

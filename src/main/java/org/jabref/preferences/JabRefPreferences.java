@@ -745,7 +745,6 @@ public class JabRefPreferences implements PreferencesService {
 
         // set default theme
         defaults.put(FX_THEME, Theme.BASE_CSS);
-
         setLanguageDependentDefaultValues();
     }
 
@@ -777,8 +776,8 @@ public class JabRefPreferences implements PreferencesService {
             while ((rs = getNextUnit(reader)).isPresent()) {
                 result.add(rs.get());
             }
-        } catch (IOException error) {
-            LOGGER.warn("Unable to convert String to List", error);
+        } catch (IOException e) {
+            LOGGER.warn("Unable to convert String to List", e);
         }
         return result;
     }

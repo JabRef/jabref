@@ -101,8 +101,8 @@ public class Date {
                 TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0]);
                 TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1]);
                 return Optional.of(new Date(parsedDate, parsedEndDate));
-            } catch (DateTimeParseException error) {
-                LOGGER.warn("Parsing error", error);
+            } catch (DateTimeParseException e) {
+                LOGGER.warn("Parsing error", e);
                 return Optional.empty();
             }
         }
@@ -110,8 +110,8 @@ public class Date {
         try {
             TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
             return Optional.of(new Date(parsedDate));
-        } catch (DateTimeParseException error) {
-            LOGGER.warn("Parsing error", error);
+        } catch (DateTimeParseException e) {
+            LOGGER.warn("Parsing error", e);
             return Optional.empty();
         }
     }

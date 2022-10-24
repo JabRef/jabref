@@ -355,7 +355,6 @@ public class IsiImporter extends Importer {
         return null;
     }
 
-
     /**
      * Will expand ISI first names.
      * <p>
