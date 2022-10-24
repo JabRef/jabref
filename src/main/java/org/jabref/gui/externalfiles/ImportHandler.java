@@ -288,7 +288,9 @@ public class ImportHandler {
         try {
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
             return unknownFormatImport.parserResult.getDatabase().getEntries();
-        } catch (ImportException ignored) {
+        } catch (ImportException ex) {
+            dialogService.notify(Localization.lang("ImportError: UnknownFormat"));
+            LOGGER.info("Detail: Found UnknownFormat in clipboard but it is not a suitable importer", ex);
             return Collections.emptyList();
         }
     }

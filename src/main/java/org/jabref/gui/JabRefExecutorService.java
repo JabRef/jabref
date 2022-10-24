@@ -56,8 +56,8 @@ public class JabRefExecutorService {
         Future<?> future = executorService.submit(command);
         try {
             future.get();
-        } catch (InterruptedException ignored) {
-            // Ignored
+        } catch (InterruptedException e) {
+            LOGGER.error("The thread is waiting, occupied or interrupted", e);
         } catch (ExecutionException e) {
             LOGGER.error("Problem executing command", e);
         }
@@ -110,8 +110,8 @@ public class JabRefExecutorService {
         Future<?> future = lowPriorityExecutorService.submit(runnable);
         try {
             future.get();
-        } catch (InterruptedException ignored) {
-            // Ignored
+        } catch (InterruptedException e) {
+            LOGGER.error("The thread is waiting, occupied or interrupted", e);
         } catch (ExecutionException e) {
             LOGGER.error("Problem executing command", e);
         }

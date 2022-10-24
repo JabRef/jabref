@@ -174,6 +174,7 @@ public class GroupDialogViewModel {
                         Pattern.compile(input);
                         return true;
                     } catch (PatternSyntaxException e) {
+                        // Ignored
                         return false;
                     }
                 },
@@ -211,6 +212,7 @@ public class GroupDialogViewModel {
                         Pattern.compile(input);
                         return true;
                     } catch (PatternSyntaxException e) {
+                        // Ignored
                         return false;
                     }
                 },
