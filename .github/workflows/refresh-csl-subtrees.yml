@@ -32,6 +32,7 @@ jobs:
         run: |
           git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash || true
           cp buildres/csl/csl-styles/acm-siggraph.csl src/main/resources/csl-styles/
+          cp buildres/csl/csl-styles/apa.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/turabian-author-date.csl src/main/resources/csl-styles/
           git add .

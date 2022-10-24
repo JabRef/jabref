@@ -6,10 +6,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyCode;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -51,6 +53,13 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
+        // Stop the default button from firing when the user hits enter within the search box
+        searchBox.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                event.consume();
+            }
+        });
+
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
@@ -63,6 +72,13 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         viewModel = new PreferencesDialogViewModel(dialogService, preferencesService, frame);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
+
+        // The list view does not respect the listener for the dialog and needs its own
+        preferenceTabList.setOnKeyReleased(key -> {
+            if (preferencesService.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {
+                this.closeDialog();
+            }
+        });
 
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
         preferenceTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
