@@ -40,7 +40,7 @@ public abstract sealed class DiffHighlighter permits SplitDiffHighlighter, Unifi
     }
 
     public enum DiffMethod {
-        WORDS(" "), CHARS("");
+        WORDS(" "), CHARS(""), COMMA(",");
 
         private final String separator;
 
