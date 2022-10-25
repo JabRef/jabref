@@ -72,7 +72,7 @@ class MainArchitectureTests {
     @ArchIgnore
     // Fails currently
     public static void respectLayeredArchitecture(JavaClasses classes) {
-        layeredArchitecture()
+        layeredArchitecture().consideringOnlyDependenciesInLayers()
                              .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
                              .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
                              .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)

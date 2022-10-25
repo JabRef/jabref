@@ -72,6 +72,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     private CustomLocalDragboard localDragboard;
 
     public CustomizeEntryTypeDialogView(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+        this.setTitle(Localization.lang("Customize entry types"));
         this.mode = bibDatabaseContext.getMode();
         this.entryTypesManager = entryTypesManager;
 

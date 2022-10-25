@@ -7,7 +7,7 @@ nav_order: 2
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
 > **The most important step is to configure your IDE.**\
-> **In case you know how to install JDK 18 with JavaFX support and [to fork JabRef's code](#get-the-code),**\
+> **In case you know how to install JDK 18 and [to fork JabRef's code](#get-the-code),**\
 > **please scroll down to the [IDE setup](#configure-your-ide).**
 
 For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have a look at the following video instructions:
@@ -20,11 +20,10 @@ This section list the prerequisites you need to get started to develop JabRef. A
 
 ### Java Development Kit 18
 
-A working Java (Development Kit) 18 installation with Java FX support is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 18 (e.g., `javac 18`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+A working Java (Development Kit) 18 installation is required. In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 18 (e.g., `javac 18`). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
-[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx\_will\_be\_removed\_from\_the\_java\_jdk\_in\_jdk\_11/), it needs to be installed separately if not using a special JDK.
-
-Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net). Afterwards, download the "jmods" JavaFX 18 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-18\jmods`.
+Please head to <https://adoptium.net/de/temurin/releases> to download JDK 18.
+Note that JDK 19 does not work.
 
 ### GitHub Account
 
@@ -219,8 +218,8 @@ Make sure your Eclipse installation us up to date.
 3. Open or import the existing project in Eclipse as Java project.
    * Remark: Importing it as gradle project will not work correctly.
    * Refresh the project in Eclipse
-4. Create a run/debug configuration for the main class `org.jabref.gui.JabRefLauncher` and/or for `org.jabref.gui.JabRefMain` (both can be used equivalently)
-   *   Remark: The run/debug configuration needs to be added by right clicking the class (e.g. JabRefLauncher or JabRefMain) otherwise it will not work.
+4. Create a run/debug configuration for the main class `org.jabref.cli.Launcher` and/or for `org.jabref.gui.JabRefMain` (both can be used equivalently)
+   *   Remark: The run/debug configuration needs to be added by right clicking the class (e.g. `Launcher` or JabRefMain) otherwise it will not work.
 
        ![Creating the run/debug configuration by right clicking on the class](<../images/eclipse-create-run-config.png>)
    *   In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
@@ -246,7 +245,7 @@ Make sure your Eclipse installation us up to date.
        ```
    * In the tab "Dependencies" of the run/debug configuration tick the checkbox "Exclude test code"
 5. Optional: Install the [e(fx)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -> Eclipse Marketplace... -> Search tab 2. Enter "e(fx)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
-6. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
+6. Now you can build and run/debug the application by either using `Launcher` or `JabRefMain`. This is the recommended way, since the application starts quite fast.
 
 ### Localization Test Configuration (IDEA)
 

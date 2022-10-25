@@ -103,7 +103,7 @@ open module org.jabref {
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
-    uses org.apache.lucene.codecs.lucene92.Lucene92Codec;
+    uses org.apache.lucene.codecs.lucene94.Lucene94Codec;
 
     requires org.apache.lucene.queryparser;
     uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -114,6 +114,7 @@ open module org.jabref {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+    requires com.sun.jna.platform;
 
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;

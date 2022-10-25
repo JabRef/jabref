@@ -1923,4 +1923,39 @@ class BibtexParserTest {
 
         assertEquals(Optional.of("#apr#"), result.get().getField(StandardField.MONTH));
     }
+
+    @Test
+    void parseDuplicateKeywordsWithOnlyOneEntry() throws ParseException {
+        Optional<BibEntry> result = parser.parseSingleEntry("@Article{,\n"
+            + "Keywords={asdf,asdf,asdf},\n"
+            + "}\n"
+            + "");
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
+
+        assertEquals(Optional.of(expectedEntry), result);
+    }
+
+    @Test
+    void parseDuplicateKeywordsWithTwoEntries() throws Exception {
+        BibEntry expectedEntryFirst = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.KEYWORDS, "bbb")
+            .withCitationKey("Test2017");
+
+        BibEntry expectedEntrySecond = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
+
+        String entries = """
+            @Article{Test2017,
+              keywords = {bbb},
+            }
+
+            @Article{,
+              keywords = {asdf,asdf,asdf},
+            },
+            """;
+        ParserResult result = parser.parse(new StringReader(entries));
+        assertEquals(List.of(expectedEntryFirst, expectedEntrySecond), result.getDatabase().getEntries());
+    }
 }

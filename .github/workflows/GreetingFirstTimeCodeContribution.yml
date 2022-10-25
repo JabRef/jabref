@@ -1,0 +1,23 @@
+name: GreetingFirstTimeCodeContribution
+
+on: 
+  issues:
+     types:
+       - labeled
+    
+jobs:
+  GreetingFirstTimeCodeContribution:
+    if: ${{ github.event.label.name == 'FirstTimeCodeContribution' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+    - name: GreetingFirstTimeCodeContribution
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.issue.number }}
+        body: |
+            As a general advice for newcomers: check out [Contributing](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) for a start. Also, [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) is worth having a look at.
+            
+            Feel free to ask here at GitHub, if you have any issue related questions. If you have questions about how to setup your workspace use JabRef's [Gitter](https://gitter.im/JabRef/jabref) chat. Try to open a (draft) pull-request early on, so that people can see you are working on the issue and so that they can see the direction the pull request is heading towards. This way, you will likely receive valuable feedback.

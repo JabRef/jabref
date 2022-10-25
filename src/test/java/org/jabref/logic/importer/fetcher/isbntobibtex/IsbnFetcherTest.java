@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.util.Collections;
 import java.util.List;
