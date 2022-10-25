@@ -2187,7 +2187,6 @@ public class JabRefPreferences implements PreferencesService {
                 getFieldContentParserPreferences());
     }
 
-
     @Override
     public FilePreferences getFilePreferences() {
         if (Objects.nonNull(filePreferences)) {
