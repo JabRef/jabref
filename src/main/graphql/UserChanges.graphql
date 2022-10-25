@@ -1,7 +1,11 @@
 fragment allDetails on Entity {
     ... on Person {
         id
-        name
+        family
+        given
+        suffix
+        nonDroppingParticle
+        droppingParticle
     }
     ... on Organization {
         id

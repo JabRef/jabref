@@ -43,7 +43,7 @@ public class JabRefOnlineTransformer {
     private String toBibAuthor(List<Author> authors) {
         return authors.stream()
         .map(author -> author.allDetails.onPerson)
-        .map(author -> author.name)
+        .map(author -> author.family)
         .collect(Collectors.joining(" and "));
         // TODO: Handle onOrganization
     }

@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.jabrefonline.UserChangesQuery;
-import org.jabref.jabrefonline.UserChangesQuery.Node;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -77,8 +76,8 @@ public class RemoteService {
     public void pull(BibDatabaseContext database, Optional<SyncCheckpoint> since) {
         assertBoundToAccount(database);
 
-        var changes = remoteClient.assertLoggedIn((client) -> {
-            return communicationService.getChanges(client, since);
+        var changes = remoteClient.assertLoggedIn((user) -> {
+            return communicationService.getChanges(user, since);
         });
         var conflicts = mergeChanges(database, changes);
         if (!conflicts.isEmpty()) {
@@ -112,6 +111,8 @@ public class RemoteService {
                                                                                              .collect(Collectors.toList()));
                 Streams.forEachPair(dirtyEntries.stream(), result.stream(), (entry, update) -> {
                     var revision = entry.getRevision().get();
+                    // TODO: Implement
+                    /*
                     if (update.wasAccepted) {
                         revision.setDirty(false);
                         revision.setGeneration(update.newGeneration);
@@ -119,6 +120,7 @@ public class RemoteService {
                     } else {
                         needsAnotherSync = true;
                     }
+                    */
                 });
             }
 
@@ -130,11 +132,14 @@ public class RemoteService {
                                                                                              .map(entry -> transformer.toDocument(entry))
                                                                                              .collect(Collectors.toList()));
                 Streams.forEachPair(newEntries.stream(), acceptedAdditions.stream(), (entry, addition) -> {
+                    // TODO: Implement
+                    /*
                     if (addition.wasAccepted) {
                         entry.setRevision(new LocalRevision(addition.id, addition.generation, addition.hash));
                     } else {
                         needsAnotherSync = true;
                     }
+                    */
                 });
             }
 

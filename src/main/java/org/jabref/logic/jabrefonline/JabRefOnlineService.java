@@ -21,9 +21,15 @@ public class JabRefOnlineService implements RemoteCommunicationService {
     }
 
     @Override
-    public UserChangesQuery.Changes getChanges(String clientId, Optional<SyncCheckpoint> since) {
-        var queryCall = apolloClient.query(new UserChangesQuery("ckondtcaf000101mh7x9g4gia"));
+    public UserChangesQuery.Changes getChanges(String userId, Optional<SyncCheckpoint> since) {
+        var queryCall = apolloClient.query(new UserChangesQuery(userId));
         var response = Rx3Apollo.single(queryCall, BackpressureStrategy.BUFFER).blockingGet();
+        if (response.hasErrors()) {
+            throw new RuntimeException("Error while fetching changes from server: " + response.errors);
+        }
+        if (response.data.user == null) {
+            throw new RuntimeException("Error while fetching changes from server: User with id " + userId + " not found");
+        }
         return response.data.user.changes;
     }
 

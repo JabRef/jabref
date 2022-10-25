@@ -10,7 +10,7 @@ query getDocumentById($userDocumentId: ID!) {
   abstract
   authors {
     ... on Person {
-      name
+      family
       id
     }
     ... on Organization {

@@ -12,7 +12,7 @@ public class RemoteClient {
 
     public RemoteClient(JabRefOnlinePreferences jabRefOnlinePreferences) {
         // TODO: Init from prefs
-        loggedInUser = Optional.of("ckondtcaf000101mh7x9g4gia");
+        loggedInUser = Optional.of("ckn4oul7100004cv7y3t94n8j");
     }
 
     public Optional<String> getUserId() {
