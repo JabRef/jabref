@@ -206,7 +206,6 @@ public class OpenDatabaseAction extends SimpleCommand {
             System.out.println("Result: " + result);
             System.out.println(result.getDatabaseContext().getEntries().size());
         }
-        System.out.println("Handled Backup");
 
         try {
             if (result == null) {
