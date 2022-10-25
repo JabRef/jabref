@@ -198,6 +198,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
         }
+        System.out.println("Handled Backup");
 
         ParserResult result;
         try {

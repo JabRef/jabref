@@ -2,11 +2,11 @@ package org.jabref.gui.dialogs;
 
 import java.nio.file.Path;
 
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.backup.ResolveBackupAction;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.l10n.Localization;
@@ -37,8 +37,12 @@ public class BackupUIManager {
         // Problem: reviewing backup should not close the dialog
         ButtonType reviewBackup = new ButtonType(Localization.lang("Review backup"), ButtonBar.ButtonData.LEFT);
         ButtonType ignoreBackup = new ButtonType(Localization.lang("Ignore backup"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        int x = DefaultTaskExecutor.runInJavaFXThread(() -> {
+            new ResolveBackupAction(originalPath, dialogService).execute();
+            return 1;
+        });
 
-        boolean shouldRestoreBackup = DefaultTaskExecutor.runInJavaFXThread(() ->
+/*        boolean shouldRestoreBackup = DefaultTaskExecutor.runInJavaFXThread(() ->
                 dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
                         Localization.lang("Backup found"),
                         content,
@@ -50,6 +54,6 @@ public class BackupUIManager {
 
         if (shouldRestoreBackup) {
             BackupManager.restoreBackup(originalPath);
-        }
+        }*/
     }
 }
