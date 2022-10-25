@@ -2,6 +2,10 @@ package org.jabref.gui.dialogs;
 
 import java.nio.file.Path;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -17,24 +21,34 @@ public class BackupUIManager {
     private BackupUIManager() {
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static void showRestoreBackupDialog(DialogService dialogService, Path originalPath) {
-        String content = new StringBuilder()
-                .append(Localization.lang("A backup file for '%0' was found at '%1'.",
-                        originalPath.getFileName().toString(),
-                        // We need to determine the path "manually" as the path does not get passed through when a diff is detected.
-                        BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP).map(Path::toString).orElse(Localization.lang("File not found"))))
-                .append("\n")
-                .append(Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used."))
-                .append("\n\n")
-                .append(Localization.lang("Do you want to recover the library from the backup file?"))
-                .toString();
+        Path backupPath = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP).orElseThrow();
 
-        boolean restoreClicked = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Backup found"), content,
-                Localization.lang("Restore from backup"),
-                Localization.lang("Ignore backup")));
+        String content = Localization.lang("""
+                        A backup file for '%0' was found at '%1'.
+                        This could indicate that JabRef did not shut down cleanly last time the file was used.
 
-        if (restoreClicked) {
+                        Do you want to recover the library from the backup file?
+                        """, originalPath.getFileName().toString(),
+                backupPath.getFileName().toString());
+
+        ButtonType restoreFromBackup = new ButtonType(Localization.lang("Restore from backup"), ButtonBar.ButtonData.OK_DONE);
+        // Problem: reviewing backup should not close the dialog
+        ButtonType reviewBackup = new ButtonType(Localization.lang("Review backup"), ButtonBar.ButtonData.LEFT);
+        ButtonType ignoreBackup = new ButtonType(Localization.lang("Ignore backup"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        boolean shouldRestoreBackup = DefaultTaskExecutor.runInJavaFXThread(() ->
+                dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
+                        Localization.lang("Backup found"),
+                        content,
+                        restoreFromBackup,
+                        reviewBackup,
+                        ignoreBackup
+                ).map(buttonType -> buttonType == ButtonType.APPLY).orElse(false)
+        );
+
+        if (shouldRestoreBackup) {
             BackupManager.restoreBackup(originalPath);
         }
     }
