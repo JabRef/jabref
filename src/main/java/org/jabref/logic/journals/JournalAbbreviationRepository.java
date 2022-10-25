@@ -49,7 +49,6 @@ public class JournalAbbreviationRepository {
      * Letters) or its abbreviated form (e.g. Phys. Rev. Lett.).
      */
     public boolean isKnownName(String journalName) {
-        // Trims the String and also replaces any instances of "\&" with "&" for abbreviation search purposes
         String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         boolean isKnown = customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation));
@@ -77,7 +76,6 @@ public class JournalAbbreviationRepository {
      * @param input The journal name (either abbreviated or full name).
      */
     public Optional<Abbreviation> get(String input) {
-        // Trims the String and also replaces any instances of "\&" with "&" for abbreviation search purposes
         String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
