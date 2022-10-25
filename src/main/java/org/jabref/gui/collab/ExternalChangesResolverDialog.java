@@ -55,11 +55,14 @@ public class ExternalChangesResolverDialog extends BaseDialog<Boolean> {
 
     @Inject private UndoManager undoManager;
 
-    public ExternalChangesResolverDialog(List<ExternalChange> changes, BibDatabaseContext database, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService) {
+    private final String dialogTitle;
+
+    public ExternalChangesResolverDialog(List<ExternalChange> changes, BibDatabaseContext database, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, String dialogTitle) {
         this.changes = changes;
         this.externalChangeDetailsViewFactory = new ExternalChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService);
+        this.dialogTitle = dialogTitle;
 
-        this.setTitle(Localization.lang("External Changes Resolver"));
+        this.setTitle(dialogTitle);
         ViewLoader.view(this)
                 .load()
                 .setAsDialogPane(this);
