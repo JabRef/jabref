@@ -38,7 +38,10 @@ public class Date {
                 "d.M.uuuu",                             // covers 15.1.2015
                 "uuuu.M.d",                             // covers 2015.1.15
                 "uuuu",                                 // covers 2015
-                "MMM, uuuu");                           // covers Jan, 2020
+                "MMM, uuuu",                            // covers Jan, 2020
+                "uuuu/M",                               // covers 2020/10
+                "uuuu.MM.d"                             // covers 2015.10.15
+                );
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
                                            .map(DateTimeFormatter::ofPattern)
@@ -58,6 +61,7 @@ public class Date {
     public Date(int year, int month) {
         this(YearMonth.of(year, month));
     }
+
 
     public Date(int year) {
         this(Year.of(year));

@@ -1,25 +1,17 @@
 package org.jabref.model.entry;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.temporal.Temporal;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.time.Month;
+import java.time.*;
+import java.time.temporal.Temporal;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class DateTest {
     private static Stream<Arguments> validDates() {
@@ -42,7 +34,9 @@ class DateTest {
                 Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "15.1.2015"),
                 Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "2015.1.15"),
                 Arguments.of(Year.of(2015), "2015"),
-                Arguments.of(YearMonth.of(2020, Month.JANUARY), "Jan, 2020"));
+                Arguments.of(YearMonth.of(2020, Month.JANUARY), "Jan, 2020"),
+                Arguments.of(LocalDate.of(2015, Month.OCTOBER, 15), "2015.10.15")
+                );
     }
 
     @ParameterizedTest
