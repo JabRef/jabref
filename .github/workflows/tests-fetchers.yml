@@ -11,10 +11,8 @@ on:
       - 'build.gradle'
   pull_request:
     paths:
-      - 'src/main/java/org/jabref/logic/**'
-      - 'src/test/java/org/jabref/logic/**'
-      - 'src/main/java/org/jabref/model/**'
-      - 'src/test/java/org/jabref/model/**'
+      - 'src/main/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/test/java/org/jabref/logic/importer/fetcher/**'
       - '.github/workflows/tests-fetchers.yml'
       - 'build.gradle'
   schedule:
