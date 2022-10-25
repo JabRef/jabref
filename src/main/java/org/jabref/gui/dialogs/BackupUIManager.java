@@ -61,7 +61,7 @@ public class BackupUIManager {
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
-                    showRestoreBackupDialog(dialogService, originalPath);
+                    return showRestoreBackupDialog(dialogService, originalPath);
                 }
                 return Optional.of(originalParserResult);
             });
