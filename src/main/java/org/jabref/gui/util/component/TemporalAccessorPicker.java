@@ -76,7 +76,6 @@ public class TemporalAccessorPicker extends DatePicker {
 
     private static LocalDate getLocalDate(TemporalAccessor dateTime) {
         // Try to get as much information from the temporal accessor
-        if (dateTime == null) return null;
         LocalDate date = dateTime.query(TemporalQueries.localDate());
         if (date != null) {
             return date;
@@ -140,7 +139,7 @@ public class TemporalAccessorPicker extends DatePicker {
 
             TemporalAccessor dateTime = getStringConverter().fromString(value);
             temporalAccessorValue.set(dateTime);
-            return dateTime == null ? null : getLocalDate(dateTime);
+            return getLocalDate(dateTime);
         }
     }
 }
