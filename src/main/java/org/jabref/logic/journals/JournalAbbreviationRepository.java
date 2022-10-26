@@ -61,6 +61,13 @@ public class JournalAbbreviationRepository {
         return fullToAbbreviation.containsKey(journal) || abbreviationToFull.containsKey(journal);
     }
 
+    /**
+     * Returns the LaTeX free version of a journal (e.g., IEEE Design \& Test would be returned as IEEE Design & Test)
+     * i.e., the journal name should not contain any unnecessary LaTeX syntax such as escaped ampersands
+     *
+     * @param journal The journal name
+     * @return The LaTeX free version of the journal name
+     */
     private String getLatexFreeJournal(String journal) {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.JOURNAL, journal);
