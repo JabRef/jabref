@@ -87,7 +87,6 @@ public class UnlinkedFilesDialogViewModel {
         this.fileFilterList = FXCollections.observableArrayList(
                 new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getFilePreferences()),
                 new FileExtensionViewModel(StandardFileType.HTML, preferences.getFilePreferences()),
-                new FileExtensionViewModel(StandardFileType.TXT, preferences.getFilePreferences()),
                 new FileExtensionViewModel(StandardFileType.PDF, preferences.getFilePreferences()));
 
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
