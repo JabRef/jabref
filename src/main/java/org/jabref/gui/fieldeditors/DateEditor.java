@@ -13,13 +13,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jabref.preferences.PreferencesService;
 
 public class DateEditor extends HBox implements FieldEditorFX {
 
     @FXML private DateEditorViewModel viewModel;
     @FXML private TemporalAccessorPicker datePicker;
 
-    public DateEditor(Field field, DateTimeFormatter dateFormatter, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public DateEditor(Field field, DateTimeFormatter dateFormatter, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, PreferencesService preferences) {
         this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers);
 
         ViewLoader.view(this)
@@ -28,6 +29,8 @@ public class DateEditor extends HBox implements FieldEditorFX {
 
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
         datePicker.getEditor().textProperty().bindBidirectional(viewModel.textProperty());
+
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), datePicker.getEditor());
     }
 
     public DateEditorViewModel getViewModel() {
