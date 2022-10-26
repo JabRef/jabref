@@ -1,36 +1,21 @@
 package org.jabref.logic.util.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.CopyOption;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.*;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The idea of this class is to add general functionality that could possibly even in the
@@ -380,14 +365,25 @@ public class FileUtil {
     }
 
     /**
-     * Test if the file is a bib file by simply checking the extension to be ".bib"
+     * Test if the file is a pdf file by simply checking the extension to be ".pdf"
      *
      * @param file The file to check
-     * @return True if file extension is ".bib", false otherwise
+     * @return True if file extension is ".pdf", false otherwise
      */
     public static boolean isPDFFile(Path file) {
         return getFileExtension(file).filter("pdf"::equals).isPresent();
     }
+
+    /**
+     * Test if the file is a html file by simply checking the extension to be ".html"
+     *
+     * @param file The file to check
+     * @return True if file extension is ".html", false otherwise
+     */
+    public static boolean isHTMLFile(Path file) {
+        return getFileExtension(file).filter("html"::equals).isPresent();
+    }
+
 
     /**
      * @return Path of current panel database directory or the standard working directory in case the database was not saved yet
