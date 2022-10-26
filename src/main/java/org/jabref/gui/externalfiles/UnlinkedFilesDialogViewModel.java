@@ -19,7 +19,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.swing.undo.UndoManager;
 import java.io.BufferedWriter;
 import java.io.IOException;
