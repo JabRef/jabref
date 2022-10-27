@@ -65,7 +65,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
         return result.stream().sorted().collect(Collectors.toList());
     }
 
-    private static String getSafeCiteKey(String citeKey) {
+    public static String getSafeCiteKey(String citeKey) {
         // replace the unsafe character with the underscore.
         return citeKey.replaceAll("[:/*?<>|]", "_");
     }

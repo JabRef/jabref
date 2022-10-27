@@ -99,4 +99,17 @@ class CitationKeyBasedFileFinderTest {
 
         assertEquals(Collections.emptyList(), results);
     }
+
+    @Test
+    void findAssociatedFilesWithUnsafeCharacters() throws Exception {
+        BibEntry entryWithUnsafeCitationKey = new BibEntry(StandardEntryType.Article);
+        entryWithUnsafeCitationKey.setCitationKey("test:test/*test?");
+
+        Path testFile = Files.createFile(pdfsDir.resolve("test_test__test_.pdf"));
+        FileFinder fileFinder = new CitationKeyBasedFileFinder(false);
+
+        List<Path> results = fileFinder.findAssociatedFiles(entryWithUnsafeCitationKey, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
+
+        assertEquals(Collections.singletonList(testFile), results);
+    }
 }
