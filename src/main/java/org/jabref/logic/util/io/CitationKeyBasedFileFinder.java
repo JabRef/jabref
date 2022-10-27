@@ -65,8 +65,13 @@ class CitationKeyBasedFileFinder implements FileFinder {
         return result.stream().sorted().collect(Collectors.toList());
     }
 
+    private static String getSafeCiteKey(String citeKey) {
+        // replace the unsafe character with the underscore.
+        return citeKey.replaceAll("[:/*?<>|]", "_");
+    }
+
     private boolean matches(String filename, String citeKey) {
-        boolean startsWithKey = filename.startsWith(citeKey);
+        boolean startsWithKey = filename.startsWith(getSafeCiteKey(citeKey));
         if (startsWithKey) {
             // The file name starts with the key, that's already a good start
             // However, we do not want to match "JabRefa" for "JabRef" since this is probably a file belonging to another entry published in the same time / same name
