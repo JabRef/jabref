@@ -132,6 +132,8 @@ public class TemporalAccessorPicker extends DatePicker {
         @Override
         public String toString(LocalDate object) {
             TemporalAccessor value = getTemporalAccessorValue();
+
+            // Keeps the original text when it is an invalid date
             return (value != null) ? getStringConverter().toString(value) : getEditor().getText();
         }
 
@@ -144,7 +146,8 @@ public class TemporalAccessorPicker extends DatePicker {
 
             TemporalAccessor dateTime = getStringConverter().fromString(value);
             temporalAccessorValue.set(dateTime);
-            return (dateTime != null) ? getLocalDate(dateTime) : null;
+
+            return getLocalDate(dateTime);
         }
     }
 }
