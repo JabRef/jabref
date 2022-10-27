@@ -46,7 +46,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - When adding or editing a subgroup it is placed w.r.t. to alphabetical ordering rather than at the end. [koppor#577](https://github.com/koppor/jabref/issues/577)
 - We modified the Directory of Open Access Books (DOAB) fetcher so that it will now also fetch the ISBN when possible. [#8708](https://github.com/JabRef/jabref/issues/8708)
 - We changed the color of found text from red to green. [koppor#552](https://github.com/koppor/jabref/issues/552)
-
+- We modified the "Delete file" dialog and add the full file path to the dialog text. The file path in the title was changed to file name only. [koppor#534](https://github.com/koppor/jabref/issues/534)
+- Download from URL now automatically fills with URL from clipboard. [koppor#535](https://github.com/koppor/jabref/issues/535)
 
 ### Fixed
 
