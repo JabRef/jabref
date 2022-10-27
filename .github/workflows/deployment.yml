@@ -80,14 +80,14 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
       - name: Setup OSX key chain on OSX
-        if: matrix.os == 'macos-latest' && ${{ steps.checksecrets.outputs.secretspresent }}
+        if: (matrix.os == 'macos-latest') && steps.checksecrets.outputs.secretspresent
         uses: apple-actions/import-codesign-certs@v1
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup OSX key chain on OSX for app id cert
-        if: matrix.os == 'macos-latest' && ${{ steps.checksecrets.outputs.secretspresent }}
+        if: (matrix.os == 'macos-latest') && steps.checksecrets.outputs.secretspresent
         uses: apple-actions/import-codesign-certs@v1
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
