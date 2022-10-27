@@ -74,6 +74,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where hitting enter on the search field within the preferences dialog closed the dialog. [koppor#630](https://github.com/koppor/jabref/issues/630)
 - We fixed a typo within a connection error message. [koppor#625](https://github.com/koppor/jabref/issues/625)
 - We fixed an issue where the 'close dialog' key binding was not closing the Preferences dialog. [#8888](https://github.com/jabref/jabref/issues/8888)
+- We fixed an issue where editing entry's "date" field in library mode "biblatex" causes an uncaught exception. [#8747][https://github.com/JabRef/jabref/issues/8747]
 
 ### Removed
 
