@@ -28,8 +28,8 @@ public enum StandardExternalFileType implements ExternalFileType {
     TIFF(Localization.lang("%0 image", "TIFF"), "tiff", "image/tiff", "gimp", "picture", IconTheme.JabRefIcons.PICTURE),
     URL("URL", "html", "text/html", "firefox", "www", IconTheme.JabRefIcons.WWW),
     MHT("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.JabRefIcons.WWW),
-    ePUB("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.JabRefIcons.WWW);
-
+    ePUB("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.JabRefIcons.WWW),
+    MARKDOWN("Markdown", "md", "application/x-latex", "emacs", "emacs", IconTheme.JabRefIcons.FILE_TEXT);
     private final String name;
     private final String extension;
     private final String mimeType;
