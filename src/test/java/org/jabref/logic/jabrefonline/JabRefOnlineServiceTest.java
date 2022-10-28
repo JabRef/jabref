@@ -1,5 +1,6 @@
 package org.jabref.logic.jabrefonline;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -22,8 +23,8 @@ public class JabRefOnlineServiceTest {
     void getChangesSinceCheckpoint() {
         var changes = new JabRefOnlineService().getChanges(
                                                            "ckn4oul7100004cv7y3t94n8j",
-                                                           Optional.of(new SyncCheckpoint(ZonedDateTime.of(0, 0, 0, 0, 0, 0, 0, null), "1")));
-        expect.serializer("json").toMatchSnapshot(changes);
+                                                           Optional.of(new SyncCheckpoint(ZonedDateTime.of(2022, 10, 1, 0, 0, 0, 0, ZoneId.of("Z")), "1")));
+        expect.toMatchSnapshot(changes);
     }
 
     @Test
@@ -31,7 +32,7 @@ public class JabRefOnlineServiceTest {
         var changes = new JabRefOnlineService().getChanges(
                                                            "ckn4oul7100004cv7y3t94n8j",
                                                            Optional.empty());
-        expect.serializer("json").toMatchSnapshot(changes);
+        expect.toMatchSnapshot(changes);
     }
 
     @Test
