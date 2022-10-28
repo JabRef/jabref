@@ -48,8 +48,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the color of found text from red to high-contrast colors (background: yellow; font color: purple). [koppor#552](https://github.com/koppor/jabref/issues/552)
 - We modified the "Delete file" dialog and add the full file path to the dialog text. The file path in the title was changed to file name only. [koppor#534](https://github.com/koppor/jabref/issues/534)
 - Download from URL now automatically fills with URL from clipboard. [koppor#535](https://github.com/koppor/jabref/issues/535)
-- We changed the messages after importing unlinked local files to past passive tense. [koppor#548](https://github.com/koppor/jabref/issues/548)
-- We fixed an issue where the wrong icon for a successful import of a bib entry was shown [koppor#548](https://github.com/koppor/jabref/issues/548)
+- We changed the messages after importing unlinked local files to past tense. [koppor#548](https://github.com/koppor/jabref/issues/548)
+- We fixed an issue where the wrong icon for a successful import of a bib entry was shown [#9308](https://github.com/JabRef/jabref/pull/9308)
 
 ### Fixed
 
