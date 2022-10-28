@@ -24,11 +24,14 @@ public class NewEntryAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);
 
     private final JabRefFrame jabRefFrame;
+
     /**
      * The type of the entry to create.
      */
     private Optional<EntryType> type;
+
     private final DialogService dialogService;
+
     private final PreferencesService preferences;
 
     public NewEntryAction(JabRefFrame jabRefFrame, DialogService dialogService, PreferencesService preferences, StateManager stateManager) {
