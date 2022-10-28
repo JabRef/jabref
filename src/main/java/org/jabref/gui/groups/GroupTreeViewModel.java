@@ -399,39 +399,43 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
     public void removeGroupKeepSubgroups(GroupNodeViewModel group) {
         boolean confirmed;
-        if (selectedGroups.size() <= 1) {
-            confirmed = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Remove group"),
-                    Localization.lang("Remove group \"%0\" and keep its subgroups?", group.getDisplayName()),
-                    Localization.lang("Remove"));
-        } else {
-            confirmed = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Remove groups"),
-                    Localization.lang("Remove all selected groups and keep their subgroups?"),
-                    Localization.lang("Remove all"));
-        }
+        if (selectedGroups.contains(group)) {
+            if (selectedGroups.size() <= 1) {
 
-        if (confirmed) {
-            // TODO: Add undo
-            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
-            // panel.getUndoManager().addEdit(undo);
-
-            List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
-            selectedGroupNodes.forEach(eachNode -> {
-                GroupTreeNode groupNode = eachNode.getGroupNode();
-
-                groupNode.getParent()
-                         .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
-                groupNode.removeFromParent();
-            });
-
-            if (selectedGroupNodes.size() > 1) {
-                dialogService.notify(Localization.lang("Removed all selected groups."));
+                confirmed = dialogService.showConfirmationDialogAndWait(
+                        Localization.lang("Remove group"),
+                        Localization.lang("Remove group \"%0\" and keep its subgroups?", group.getDisplayName()),
+                        Localization.lang("Remove"));
             } else {
-                dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+                confirmed = dialogService.showConfirmationDialogAndWait(
+                        Localization.lang("Remove groups"),
+                        Localization.lang("Remove all selected groups and keep their subgroups?"),
+                        Localization.lang("Remove all"));
             }
-            writeGroupChangesToMetaData();
+
+            if (confirmed) {
+                // TODO: Add undo
+                // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
+                // panel.getUndoManager().addEdit(undo);
+
+                List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+                selectedGroupNodes.forEach(eachNode -> {
+                    GroupTreeNode groupNode = eachNode.getGroupNode();
+
+                    groupNode.getParent()
+                             .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+                    groupNode.removeFromParent();
+                });
+
+                if (selectedGroupNodes.size() > 1) {
+                    dialogService.notify(Localization.lang("Removed all selected groups."));
+                } else {
+                    dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+                }
+                writeGroupChangesToMetaData();
+            }
         }
+
     }
 
     /**
