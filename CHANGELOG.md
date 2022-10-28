@@ -47,7 +47,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We modified the Directory of Open Access Books (DOAB) fetcher so that it will now also fetch the ISBN when possible. [#8708](https://github.com/JabRef/jabref/issues/8708)
 - We modified the "Delete file" dialog and add the full file path to the dialog text. The file path in the title was changed to file name only. [koppor#534](https://github.com/koppor/jabref/issues/534)
 - Download from URL now automatically fills with URL from clipboard. [koppor#535](https://github.com/koppor/jabref/issues/535)
-- We added HTML and Markdown files to Find Unlinked Files and removed BibTex. Markdown was added as a StandardFileType and StandardExternalFileType [koppor#547](https://github.com/koppor/jabref/issues/547)
+- We added HTML and Markdown files to Find Unlinked Files and removed BibTex. [koppor#547](https://github.com/koppor/jabref/issues/547)
 
 ### Fixed
 
