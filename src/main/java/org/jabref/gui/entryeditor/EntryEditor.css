@@ -122,7 +122,8 @@
 }
 
 #bibtexSourceCodeArea .search {
-    -fx-fill: green;
+    -rtfx-background-color: #ffff00;
+    -fx-fill: #7800A9 ;
     -fx-font-size: 1.2em;
     -fx-font-weight: bolder;
 
