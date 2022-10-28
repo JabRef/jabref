@@ -9,19 +9,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import javax.swing.undo.CompoundEdit;
-
-import org.jabref.gui.journals.AbbreviationType;
-import org.jabref.gui.journals.UndoableAbbreviator;
-import org.jabref.gui.journals.UndoableUnabbreviator;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.OS;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -858,72 +850,6 @@ class BibEntryWriterTest {
                 Arguments.of("abc = ", "abc", 2),
                 Arguments.of("abcdef = ", "abcdef", 6)
         );
-    }
-
-    @Test
-    void testJournalAbbreviationWithEscapedAmpersand() throws IOException {
-        BibDatabase bibDatabase = new BibDatabase();
-        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
-        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT);
-
-        BibEntry entryWithEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article);
-        entryWithEscapedAmpersandInJournal.setField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
-
-        // @formatter:off
-        String expectedAbbreviatedJournalEntry = """
-                @Article{,
-                  journal = {ACS Appl. Mater. Interfaces},
-                }
-                """.replaceAll("\n", OS.NEWLINE);
-        // @formatter:on
-
-        undoableAbbreviator.abbreviate(bibDatabase, entryWithEscapedAmpersandInJournal, StandardField.JOURNAL, new CompoundEdit());
-        bibEntryWriter.write(entryWithEscapedAmpersandInJournal, bibWriter, BibDatabaseMode.BIBLATEX);
-        assertEquals(expectedAbbreviatedJournalEntry, stringWriter.toString());
-    }
-
-    @Test
-    void testJournalUnabbreviate() throws IOException {
-        BibDatabase bibDatabase = new BibDatabase();
-        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
-        UndoableUnabbreviator undoableUnabbreviator = new UndoableUnabbreviator(journalAbbreviationRepository);
-
-        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article);
-        abbreviatedJournalEntry.setField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
-
-        // @formatter:off
-        String expectedUnabbreviatedJournalEntry = """
-                @Article{,
-                  journal = {ACS Applied Materials & Interfaces},
-                }
-                """.replaceAll("\n", OS.NEWLINE);
-        // @formatter:on
-
-        undoableUnabbreviator.unabbreviate(bibDatabase, abbreviatedJournalEntry, StandardField.JOURNAL, new CompoundEdit());
-        bibEntryWriter.write(abbreviatedJournalEntry, bibWriter, BibDatabaseMode.BIBLATEX);
-        assertEquals(expectedUnabbreviatedJournalEntry, stringWriter.toString());
-    }
-
-    @Test
-    void testJournalAbbreviateWithoutEscapedAmpersand() throws IOException {
-        BibDatabase bibDatabase = new BibDatabase();
-        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
-        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT);
-
-        BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article);
-        entryWithoutEscapedAmpersandInJournal.setField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
-
-        // @formatter:off
-        String expectedAbbreviatedJournalEntry = """
-                @Article{,
-                  journal = {ACS Appl. Mater. Interfaces},
-                }
-                """.replaceAll("\n", OS.NEWLINE);
-        // @formatter:on
-
-        undoableAbbreviator.abbreviate(bibDatabase, entryWithoutEscapedAmpersandInJournal, StandardField.JOURNAL, new CompoundEdit());
-        bibEntryWriter.write(entryWithoutEscapedAmpersandInJournal, bibWriter, BibDatabaseMode.BIBLATEX);
-        assertEquals(expectedAbbreviatedJournalEntry, stringWriter.toString());
     }
 
     @ParameterizedTest
