@@ -45,7 +45,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where a message about changed metadata would occur on saving although nothing changed. [#9159](https://github.com/JabRef/jabref/issues/9159)
 - When adding or editing a subgroup it is placed w.r.t. to alphabetical ordering rather than at the end. [koppor#577](https://github.com/koppor/jabref/issues/577)
 - We modified the Directory of Open Access Books (DOAB) fetcher so that it will now also fetch the ISBN when possible. [#8708](https://github.com/JabRef/jabref/issues/8708)
-- We added HTML, TXT and Markdown files to Find Unlinked Files and removed BibTex. Markdown was added as a StandardFileType [koppor#547](https://github.com/koppor/jabref/issues/547)
+- We modified the "Delete file" dialog and add the full file path to the dialog text. The file path in the title was changed to file name only. [koppor#534](https://github.com/koppor/jabref/issues/534)
+- Download from URL now automatically fills with URL from clipboard. [koppor#535](https://github.com/koppor/jabref/issues/535)
+- We added HTML and Markdown files to Find Unlinked Files and removed BibTex. Markdown was added as a StandardFileType [koppor#547](https://github.com/koppor/jabref/issues/547)
 
 ### Fixed
 
@@ -769,10 +771,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where some importers used the field `pubstatus` instead of the standard BibTeX field `pubstate`.
 - We changed the latex command removal for docbook exporter. [#3838](https://github.com/JabRef/jabref/issues/3838)
 - We changed the location of some fields in the entry editor (you might need to reset your preferences for these changes to come into effect)
-  - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
-  - DOI/URL: General -> Optional
-  - Internal fields like ranking, read status and priority: Other -> General
-  - Moreover, empty deprecated fields are no longer shown
+    - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
+    - DOI/URL: General -> Optional
+    - Internal fields like ranking, read status and priority: Other -> General
+    - Moreover, empty deprecated fields are no longer shown
 - Added server timezone parameter when connecting to a shared database.
 - We updated the dialog for setting up general fields.
 - URL field formatting is updated. All whitespace chars, located at the beginning/ending of the URL, are trimmed automatically
@@ -904,12 +906,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We removed the coloring of cells in the main table according to whether the field is optional/required.
 - We removed the feature to find and resolve duplicate BibTeX keys (as this use case is already covered by the integrity check).
 - We removed a few commands from the right-click menu that are not needed often and thus don't need to be placed that prominently:
-  - Print entry preview: available through entry preview
-  - All commands related to marking: marking is not yet reimplemented
-  - Set/clear/append/rename fields: available through Edit menu
-  - Manage keywords: available through the Edit menu
-  - Copy linked files to folder: available through File menu
-  - Add/move/remove from group: removed completely (functionality still available through group interface)
+    - Print entry preview: available through entry preview
+    - All commands related to marking: marking is not yet reimplemented
+    - Set/clear/append/rename fields: available through Edit menu
+    - Manage keywords: available through the Edit menu
+    - Copy linked files to folder: available through File menu
+    - Add/move/remove from group: removed completely (functionality still available through group interface)
 - We removed the option to change the column widths in the preferences dialog. [#4546](https://github.com/JabRef/jabref/issues/4546)
 
 ## Older versions
