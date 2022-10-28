@@ -161,7 +161,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 
-            if (!folder.getValue().isEmpty()) {
+            if (!folder.getValue().isEmpty() && autosave.get()) {
                 try {
                     new SaveDatabaseAction(libraryTab, preferencesService, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {

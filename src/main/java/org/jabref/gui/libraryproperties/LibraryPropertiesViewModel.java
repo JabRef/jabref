@@ -1,8 +1,6 @@
 package org.jabref.gui.libraryproperties;
 
-import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.List;
 
 import org.jabref.gui.libraryproperties.constants.ConstantsPropertiesView;
 import org.jabref.gui.libraryproperties.general.GeneralPropertiesView;
@@ -12,10 +10,10 @@ import org.jabref.model.database.BibDatabaseContext;
 
 public class LibraryPropertiesViewModel {
 
-    private final ObservableList<PropertiesTab> propertiesTabs;
+    private final List<PropertiesTab> propertiesTabs;
 
     public LibraryPropertiesViewModel(BibDatabaseContext databaseContext) {
-        propertiesTabs = FXCollections.observableArrayList(
+        propertiesTabs = List.of(
                 new GeneralPropertiesView(databaseContext),
                 new SavingPropertiesView(databaseContext),
                 new ConstantsPropertiesView(databaseContext),
@@ -35,7 +33,7 @@ public class LibraryPropertiesViewModel {
         }
     }
 
-    public ObservableList<PropertiesTab> getPropertiesTabs() {
-        return new ReadOnlyListWrapper<>(propertiesTabs);
+    public List<PropertiesTab> getPropertiesTabs() {
+        return propertiesTabs;
     }
 }
