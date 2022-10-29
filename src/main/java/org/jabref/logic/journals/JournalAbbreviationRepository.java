@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
@@ -51,7 +49,7 @@ public class JournalAbbreviationRepository {
      * Letters) or its abbreviated form (e.g. Phys. Rev. Lett.).
      */
     public boolean isKnownName(String journalName) {
-        String journal = getLatexFreeJournal(journalName.trim());
+        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         boolean isKnown = customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation));
         if (isKnown) {
@@ -59,22 +57,6 @@ public class JournalAbbreviationRepository {
         }
 
         return fullToAbbreviation.containsKey(journal) || abbreviationToFull.containsKey(journal);
-    }
-
-    /**
-     * Returns the LaTeX free version of a journal (e.g., IEEE Design \& Test would be returned as IEEE Design & Test)
-     * i.e., the journal name should not contain any unnecessary LaTeX syntax such as escaped ampersands
-     *
-     * @param journal The journal name
-     * @return The LaTeX free version of the journal name
-     */
-    private String getLatexFreeJournal(String journal) {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.JOURNAL, journal);
-        if (entry.getResolvedFieldOrAliasLatexFree(StandardField.JOURNAL, null).isPresent()) {
-            journal = entry.getResolvedFieldOrAliasLatexFree(StandardField.JOURNAL, null).get();
-        }
-        return journal;
     }
 
     /**
@@ -94,7 +76,7 @@ public class JournalAbbreviationRepository {
      * @param input The journal name (either abbreviated or full name).
      */
     public Optional<Abbreviation> get(String input) {
-        String journal = getLatexFreeJournal(input.trim());
+        String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
                                                                        .filter(abbreviation -> isMatched(journal, abbreviation))

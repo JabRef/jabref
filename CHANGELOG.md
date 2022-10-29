@@ -74,7 +74,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where hitting enter on the search field within the preferences dialog closed the dialog. [koppor#630](https://github.com/koppor/jabref/issues/630)
 - We fixed a typo within a connection error message. [koppor#625](https://github.com/koppor/jabref/issues/625)
 - We fixed an issue where the 'close dialog' key binding was not closing the Preferences dialog. [#8888](https://github.com/jabref/jabref/issues/8888)
-- We fixed an issue where journal abbreviations would not abbreviate journal titles with escaped ampersands (\\&) which are written in accordance with Latex format. [#8948](https://github.com/JabRef/jabref/issues/8948)
+- We fixed an issue where journal abbreviations would not abbreviate journal titles with escaped ampersands (\\&). [#8948](https://github.com/JabRef/jabref/issues/8948)
 
 ### Removed
 
