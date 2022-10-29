@@ -92,26 +92,42 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
     private Rating createSpecialRating(BibEntryTableViewModel entry, Optional<SpecialFieldValueViewModel> value) {
         Rating ranking = new Rating();
+        System.out.println("Ranking was: " + entry.getEntry().getField(SpecialField.RANKING));
+        int rank = value.map(specialFieldValueViewModel -> specialFieldValueViewModel.getValue().toRating()).orElse(0);
+        ranking.setRating(rank);
 
-        if (value.isPresent()) {
-            ranking.setRating(value.get().getValue().toRating());
-        } else {
-            ranking.setRating(0);
-        }
+//        String keyword = "";
+//        switch (rank) {
+//            case 0 -> keyword = "CLEAR_RANK";
+//            case 1 -> keyword = "rank1";
+//            case 2 -> keyword = "rank2";
+//            case 3 -> keyword = "rank3";
+//            case 4 -> keyword = "rank4";
+//            case 5 -> keyword = "rank5";
+//        }
+
+//        String finalKeyword = keyword;
 
         ranking.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+            if (event.getButton().equals(MouseButton.PRIMARY)
+                    && event.getClickCount() == 1
+                    && entry.getEntry().hasField(SpecialField.RANKING)
+                    // && String.valueOf(entry.getEntry().getField(SpecialField.RANKING)).equals(finalKeyword)
+                    ) {
                 ranking.setRating(0);
+                System.out.println("IF 0");
                 event.consume();
             } else if (event.getButton().equals(MouseButton.SECONDARY)) {
+                System.out.println("IF 1");
                 event.consume();
             }
         });
-
+        System.out.println("FINISHED.");
+        System.out.println("value was" + rank);
         EasyBind.subscribe(ranking.ratingProperty(), rating ->
                 new SpecialFieldViewModel(SpecialField.RANKING, preferencesService, undoManager)
                         .setSpecialFieldValue(entry.getEntry(), SpecialFieldValue.getRating(rating.intValue())));
-
+        System.out.println("Ranking now is: " + entry.getEntry().getField(SpecialField.RANKING));
         return ranking;
     }
 
