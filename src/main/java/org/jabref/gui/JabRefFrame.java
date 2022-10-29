@@ -659,6 +659,15 @@ public class JabRefFrame extends BorderPane {
         Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
                 EasyBind.map(mainStage.getScene().focusOwnerProperty(), Optional::ofNullable)));
 
+        EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), selectedTab -> {
+            if (selectedTab instanceof LibraryTab libraryTab) {
+                stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
+            } else if (selectedTab == null) {
+                // All databases are closed
+                stateManager.setActiveDatabase(null);
+            }
+        });
+
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,

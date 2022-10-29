@@ -16,6 +16,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
@@ -214,8 +215,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void addFromURL() {
-        Optional<String> urlText = dialogService.showInputDialogAndWait(
-                Localization.lang("Download file"), Localization.lang("Enter URL to download"));
+        String clipText = ClipBoardManager.getContents();
+        Optional<String> urlText;
+        if (clipText.startsWith("http://") || clipText.startsWith("https://") || clipText.startsWith("ftp://")) {
+            urlText = dialogService.showInputDialogWithDefaultAndWait(
+                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), clipText);
+        } else {
+            urlText = dialogService.showInputDialogAndWait(
+                    Localization.lang("Download file"), Localization.lang("Enter URL to download"));
+        }
         if (urlText.isPresent()) {
             try {
                 URL url = new URL(urlText.get());
