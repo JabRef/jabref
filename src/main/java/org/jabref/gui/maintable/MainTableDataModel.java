@@ -1,8 +1,6 @@
 package org.jabref.gui.maintable;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -11,7 +9,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-
 import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
@@ -24,9 +21,10 @@ import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
+import java.util.List;
+import java.util.Optional;
 
-public class MainTableDataModel {
+public class   MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;

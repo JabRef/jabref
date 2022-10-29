@@ -1,14 +1,8 @@
 package org.jabref.gui;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-
+import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -22,7 +16,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
-
+import org.controlsfx.control.NotificationPane;
+import org.controlsfx.control.action.Action;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -33,11 +28,7 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.undo.*;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -68,15 +59,14 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.preferences.PreferencesService;
-
-import com.google.common.eventbus.Subscribe;
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.Subscription;
-import org.controlsfx.control.NotificationPane;
-import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
 
 public class LibraryTab extends Tab {
 
@@ -168,6 +158,9 @@ public class LibraryTab extends Tab {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
+
+            stateManager.getSelectedGroup(bibDatabaseContext).addListener((ListChangeListener<? super GroupTreeNode>) c ->
+                    entryEditorClosing());
         });
     }
 
@@ -513,13 +506,23 @@ public class LibraryTab extends Tab {
                 Globals.IMPORT_FORMAT_READER);
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
+
         mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
+
+
+
+        stateManager.getSelectedGroup(bibDatabaseContext).addListener((ListChangeListener<? super GroupTreeNode>) c ->
+                entryEditorClosing());
+
+
+
 
         // Update entry editor and preview according to selected entries
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
                                                          .stream()
                                                          .findFirst()
                                                          .ifPresent(entryEditor::setEntry));
+
     }
 
     public void setupMainPanel() {
@@ -581,6 +584,7 @@ public class LibraryTab extends Tab {
      */
     public void showAndEdit(BibEntry entry) {
         showBottomPane(BasePanelMode.SHOWING_EDITOR);
+
 
         if (entry != getShowing()) {
             entryEditor.setEntry(entry);
@@ -852,6 +856,7 @@ public class LibraryTab extends Tab {
             if (preferencesService.getGroupsPreferences().shouldAutoAssignGroup()) {
                 stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
+
             }
         }
     }
