@@ -19,18 +19,21 @@ public class GrobidOptInDialogHelper {
      * @return if the user enabled Grobid, either in the past or after being asked by the dialog.
      */
     public static boolean showAndWaitIfUserIsUndecided(DialogService dialogService, GrobidPreferences preferences) {
+        System.out.println(preferences.isGrobidEnabled());
+        System.out.println(preferences.isGrobidOptOut());
         if (preferences.isGrobidEnabled()) {
             return true;
         }
-        /*if (preferences.isGrobidOptOut()) {
-            return false;
-        }*/
+        if (preferences.isGrobidOptOut()) {
+            return preferences.isGrobidEnabled();
+        }
         boolean grobidEnabled = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remote services"),
                 Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."),
                 Localization.lang("Yes"),
                 Localization.lang("No"));
         preferences.grobidEnabledProperty().setValue(grobidEnabled);
+        preferences.grobidOptOutProperty().setValue(true);
         return grobidEnabled;
     }
 }
