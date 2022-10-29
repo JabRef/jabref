@@ -399,14 +399,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
     public void removeGroupKeepSubgroups(GroupNodeViewModel group) {
         boolean confirmed;
-        //check whether the group is in selectedGroups, if not, we clear all selected group and add the current group into it by default
+        // check whether the group is in selectedGroups, if not, we clear all selected group and add the current group into it by default
         if (!selectedGroups.contains(group)) {
             selectedGroups.clear();
             selectedGroups.add(group);
         }
-
         if (selectedGroups.size() <= 1) {
-
             confirmed = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Remove group"),
                     Localization.lang("Remove group \"%0\" and keep its subgroups?", group.getDisplayName()),
@@ -439,7 +437,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
             }
             writeGroupChangesToMetaData();
         }
-
     }
 
     /**
@@ -447,7 +444,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      */
     public void removeGroupAndSubgroups(GroupNodeViewModel group) {
         boolean confirmed;
-        //check whether the group is in selectedGroups, if not, we clear all selected group and add the current group into it by default
+        // check whether the group is in selectedGroups, if not, we clear all selected group and add the current group into it by default
         if (!selectedGroups.contains(group)) {
             selectedGroups.clear();
             selectedGroups.add(group);
