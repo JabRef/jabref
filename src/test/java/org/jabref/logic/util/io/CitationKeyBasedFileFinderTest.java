@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class CitationKeyBasedFileFinderTest {
 
@@ -101,15 +102,28 @@ class CitationKeyBasedFileFinderTest {
     }
 
     @Test
-    void findAssociatedFilesWithUnsafeCharacters() throws Exception {
+    void findAssociatedFilesWithUnsafeCharactersStartWithSearch() throws Exception {
         BibEntry entryWithUnsafeCitationKey = new BibEntry(StandardEntryType.Article);
-        entryWithUnsafeCitationKey.setCitationKey("test:test/*test?");
+        entryWithUnsafeCitationKey.setCitationKey("?test");
 
-        Path testFile = Files.createFile(pdfsDir.resolve("test_test__test_.pdf"));
+        Path testFile = Files.createFile(pdfsDir.resolve("_test_file.pdf"));
         FileFinder fileFinder = new CitationKeyBasedFileFinder(false);
 
         List<Path> results = fileFinder.findAssociatedFiles(entryWithUnsafeCitationKey, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
 
         assertEquals(Collections.singletonList(testFile), results);
+    }
+
+    @Test
+    void findAssociatedFilesWithUnsafeCharactersExactSearch() throws Exception {
+        BibEntry entryWithUnsafeCitationKey = new BibEntry(StandardEntryType.Article);
+        entryWithUnsafeCitationKey.setCitationKey("test:test/*test?");
+
+        Path testFile = Files.createFile(pdfsDir.resolve("test_test__test_.pdf"));
+        FileFinder fileFinder = new CitationKeyBasedFileFinder(true);
+
+        List<Path> results = fileFinder.findAssociatedFiles(entryWithUnsafeCitationKey, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
+
+        assertNotEquals(Collections.singletonList(testFile), results);
     }
 }
