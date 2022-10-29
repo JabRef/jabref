@@ -46,6 +46,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We modified the Directory of Open Access Books (DOAB) fetcher so that it will now also fetch the ISBN when possible. [#8708](https://github.com/JabRef/jabref/issues/8708)
 
 ### Fixed
+
+
 - We fixed the clicked group removal option present, but actions are taken on all selected groups [#9281](https://github.com/JabRef/jabref/issues/9281)
 - We fixed the Cleanup entries dialog is partially visible [#9223](https://github.com/JabRef/jabref/issues/9223)
 - We fixed the display of the "Customize Entry Types" dialogue title [#9198](https://github.com/JabRef/jabref/issues/9198)
