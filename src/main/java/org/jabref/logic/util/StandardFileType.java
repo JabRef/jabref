@@ -1,8 +1,9 @@
 package org.jabref.logic.util;
 
-import org.jabref.model.util.OptionalUtil;
 import java.util.Arrays;
 import java.util.List;
+
+import org.jabref.model.util.OptionalUtil;
 
 /**
  * @implNote Enter the extensions in lowercase without a dot! The dot is added implicitly.
@@ -46,7 +47,7 @@ public enum StandardFileType implements FileType {
     CER("SSL Certificate", "cer"),
     CITAVI("Citavi", "ctv6bak", "ctv5bak"),
     MARKDOWN("Markdown", "md");
-    ;
+
 
 
 
