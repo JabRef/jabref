@@ -29,6 +29,7 @@
 
     <Label styleClass="sectionHeader" text="%Remote services"/>
     <CheckBox fx:id="grobidEnabled" text="%Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."/>
+    <Label text="%Note: Enabling Grobid means you consent to your data in the pdf/string being sent to Grobid. This information will only be used to create a better citation."/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label text="%Grobid URL" />
         <TextField fx:id="grobidURL" HBox.hgrow="ALWAYS"/>
