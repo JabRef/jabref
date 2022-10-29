@@ -45,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where a message about changed metadata would occur on saving although nothing changed. [#9159](https://github.com/JabRef/jabref/issues/9159)
 - When adding or editing a subgroup it is placed w.r.t. to alphabetical ordering rather than at the end. [koppor#577](https://github.com/koppor/jabref/issues/577)
 - We modified the Directory of Open Access Books (DOAB) fetcher so that it will now also fetch the ISBN when possible. [#8708](https://github.com/JabRef/jabref/issues/8708)
+- We removed the opt out option for the Grobid dialogue box and added an extra privacy statement in prefs for Grobid. [koppor#566](https://github.com/koppor/jabref/issues/566)
 
 ### Fixed
 
@@ -72,12 +73,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where hitting enter on the search field within the preferences dialog closed the dialog. [koppor#630](https://github.com/koppor/jabref/issues/630)
 - We fixed a typo within a connection error message. [koppor#625](https://github.com/koppor/jabref/issues/625)
 - We fixed an issue where the 'close dialog' key binding was not closing the Preferences dialog. [#8888](https://github.com/jabref/jabref/issues/8888)
-- We fixed an issue where the dialogue window for sending to Grobid would not appear after importing a pdf the first time. [koppor#566](https://github.com/koppor/jabref/issues/566)
 
 ### Removed
 
 - We removed "last-search-date" from the SLR feature, because the last-search-date can be deducted from the git logs. [#9116](https://github.com/JabRef/jabref/pull/9116)
-
 
 
 
