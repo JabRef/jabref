@@ -21,10 +21,14 @@ import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Stores all user dialogs related to {@link BackupManager}.
  */
 public class BackupUIManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
 
     private BackupUIManager() {
     }
@@ -66,7 +70,7 @@ public class BackupUIManager {
                 return Optional.of(originalParserResult);
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error while loading backup or current database", e);
             return Optional.empty();
         }
     }
