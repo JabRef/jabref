@@ -56,6 +56,7 @@ public enum StandardField implements Field {
     EVENTTITLE("eventtitle"),
     EVENTTITLEADDON("eventtitleaddon"),
     FILE("file", FieldProperty.FILE_EDITOR, FieldProperty.VERBATIM),
+    FJOURNAL("fjournal"),
     FOREWORD("foreword", FieldProperty.PERSON_NAMES),
     FOLDER("folder"),
     GENDER("gender", FieldProperty.GENDER),
