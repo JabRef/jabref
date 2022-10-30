@@ -11,9 +11,9 @@ import org.jabref.gui.util.component.TemporalAccessorPicker;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.jabref.preferences.PreferencesService;
 
 public class DateEditor extends HBox implements FieldEditorFX {
 
