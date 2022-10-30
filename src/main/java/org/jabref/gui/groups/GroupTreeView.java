@@ -68,7 +68,6 @@ public class GroupTreeView extends BorderPane {
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
     private CustomTextField searchField;
-    private Button addNewGroup;
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -133,17 +132,6 @@ public class GroupTreeView extends BorderPane {
         this.setCenter(groupTree);
 
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(60d).subtract(15));
-
-        addNewGroup = new Button(Localization.lang("Add group"));
-        addNewGroup.setId("addNewGroup");
-        addNewGroup.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(addNewGroup, Priority.ALWAYS);
-        addNewGroup.setTooltip(new Tooltip(Localization.lang("New group")));
-        addNewGroup.setOnAction(event -> addNewGroup());
-
-        HBox groupBar = new HBox(addNewGroup);
-        groupBar.setId("groupBar");
-        this.setBottom(groupBar);
     }
 
     private void initialize() {
@@ -467,10 +455,6 @@ public class GroupTreeView extends BorderPane {
         // removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
 
         return menu;
-    }
-
-    private void addNewGroup() {
-        viewModel.addNewGroupToRoot();
     }
 
     /**

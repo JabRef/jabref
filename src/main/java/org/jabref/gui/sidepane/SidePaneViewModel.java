@@ -33,6 +33,7 @@ public class SidePaneViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final SidePaneContentFactory sidePaneContentFactory;
     private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
 
     public SidePaneViewModel(PreferencesService preferencesService,
                              StateManager stateManager,
@@ -41,6 +42,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                              UndoManager undoManager) {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.sidePaneContentFactory = new SidePaneContentFactory(
                 preferencesService,
@@ -71,6 +73,9 @@ public class SidePaneViewModel extends AbstractViewModel {
                         new MoveDownAction(pane),
                         sidePaneContentFactory,
                         preferencesService.getGroupsPreferences(),
+                        taskExecutor,
+                        stateManager,
+                        preferencesService,
                         dialogService);
                 case WEB_SEARCH, OPEN_OFFICE -> new SidePaneComponent(pane,
                         new ClosePaneAction(pane),

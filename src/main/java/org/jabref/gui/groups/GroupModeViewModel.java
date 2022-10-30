@@ -14,6 +14,14 @@ public class GroupModeViewModel {
         this.mode = mode;
     }
 
+    public Node getAddGroupGraphic() {
+        return JabRefIcons.ADD.getGraphicNode();
+    }
+
+    public Tooltip getAddGroupTooltip() {
+        return new Tooltip(Localization.lang("Add group"));
+    }
+
     public Node getUnionIntersectionGraphic() {
         if (mode == GroupViewMode.UNION) {
             return JabRefIcons.GROUP_UNION.getGraphicNode();
