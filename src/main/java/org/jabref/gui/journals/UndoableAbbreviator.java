@@ -8,6 +8,8 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.StandardField;
 
 public class UndoableAbbreviator {
 
@@ -43,10 +45,17 @@ public class UndoableAbbreviator {
             return false; // Unknown, cannot abbreviate anything.
         }
 
-        String newText = getAbbreviatedName(journalAbbreviationRepository.get(text).get());
+        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get();
+        String newText = getAbbreviatedName(abbreviation);
 
         if (newText.equals(origText)) {
             return false;
+        }
+
+        // Store full name into fjournal
+        if (fieldName.equals(StandardField.JOURNAL)) {
+            entry.setField(StandardField.FJOURNAL, abbreviation.getName());
+            ce.addEdit(new UndoableFieldChange(entry, StandardField.FJOURNAL, null, abbreviation.getName()));
         }
 
         entry.setField(fieldName, newText);
