@@ -92,9 +92,15 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
     private Rating createSpecialRating(BibEntryTableViewModel entry, Optional<SpecialFieldValueViewModel> value) {
         Rating ranking = new Rating();
-        System.out.println("Ranking was: " + entry.getEntry().getField(SpecialField.RANKING));
+
+        // rank is get from the new value
         int rank = value.map(specialFieldValueViewModel -> specialFieldValueViewModel.getValue().toRating()).orElse(0);
+
+        // set the rating as rank
         ranking.setRating(rank);
+
+        // Following code attempts to get the value of the rank (i.e., keyword) from the entry.
+        // However, the argument 'entry' was already updated, so it seems impossible to get the old value of ranking from updated entry.
 
 //        String keyword = "";
 //        switch (rank) {
@@ -105,29 +111,30 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 //            case 4 -> keyword = "rank4";
 //            case 5 -> keyword = "rank5";
 //        }
-
 //        String finalKeyword = keyword;
 
         ranking.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton().equals(MouseButton.PRIMARY)
+                    // ClickCount modified from 2 to 1, and it behaves like this:
+                    // When the rank is already set, clicking any of stars in the field will clear the current ranking.
                     && event.getClickCount() == 1
+                    // The following two conditions checks if the old value (which actually is the new value) is the
+                    // same as the new value.
                     && entry.getEntry().hasField(SpecialField.RANKING)
+                    // Since both the values are the new value and are the same, following condition does not work.
                     // && String.valueOf(entry.getEntry().getField(SpecialField.RANKING)).equals(finalKeyword)
                     ) {
                 ranking.setRating(0);
-                System.out.println("IF 0");
                 event.consume();
             } else if (event.getButton().equals(MouseButton.SECONDARY)) {
-                System.out.println("IF 1");
                 event.consume();
             }
         });
-        System.out.println("FINISHED.");
-        System.out.println("value was" + rank);
+
         EasyBind.subscribe(ranking.ratingProperty(), rating ->
                 new SpecialFieldViewModel(SpecialField.RANKING, preferencesService, undoManager)
                         .setSpecialFieldValue(entry.getEntry(), SpecialFieldValue.getRating(rating.intValue())));
-        System.out.println("Ranking now is: " + entry.getEntry().getField(SpecialField.RANKING));
+
         return ranking;
     }
 
