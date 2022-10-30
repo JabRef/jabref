@@ -125,7 +125,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .setOnDragExited(this::handleOnDragExited)
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .install(this);
-
+        stateManager.getSelectedGroup(database).addListener((ListChangeListener<? super GroupTreeNode>) c ->
+                libraryTab.entryEditorClosing());
         this.getSortOrder().clear();
 
         /* KEEP for debugging purposes

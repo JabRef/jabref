@@ -509,12 +509,8 @@ public class LibraryTab extends Tab {
 
         mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
 
-
-
-        stateManager.getSelectedGroup(bibDatabaseContext).addListener((ListChangeListener<? super GroupTreeNode>) c ->
-                entryEditorClosing());
-
-
+        // add listener that when main table change close the entry editor
+        mainTable.addSelectionListener(listEvent -> entryEditorClosing());
 
 
         // Update entry editor and preview according to selected entries
