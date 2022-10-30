@@ -45,7 +45,9 @@ public enum StandardFileType implements FileType {
     CFF("CFF", "cff"),
     ANY_FILE("Any", "*"),
     CER("SSL Certificate", "cer"),
-    CITAVI("Citavi", "ctv6bak", "ctv5bak");
+    CITAVI("Citavi", "ctv6bak", "ctv5bak"),
+    MARKDOWN("Markdown", "md");
+
 
 
 
