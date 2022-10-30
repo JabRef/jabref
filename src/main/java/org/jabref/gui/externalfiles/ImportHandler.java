@@ -87,8 +87,8 @@ public class ImportHandler {
         return linker;
     }
 
-    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files) {
-        return new BackgroundTask<>() {
+    public IndexingTaskManager<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files) {
+        return new IndexingTaskManager<>() {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
