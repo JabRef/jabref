@@ -440,7 +440,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (event.getDragboard().hasFiles()) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
             importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
-
+            importHandler.importFilesInBackground(files).updateProgress();
             success = true;
         }
 
