@@ -176,7 +176,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.1.2'
 
     implementation 'org.jsoup:jsoup:1.15.3'
-    implementation 'com.konghq:unirest-java:3.13.11'
+    implementation 'com.konghq:unirest-java:3.13.12'
 
     implementation 'org.slf4j:slf4j-api:2.0.3'
     implementation "org.tinylog:tinylog-api:2.5.0"
