@@ -23,12 +23,13 @@ public class BackupResolverDialog extends FXDialog {
 
         Path backupPath = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP).orElseThrow();
 
-        setContentText(Localization.lang("""
-                        A backup file for '%0' was found at '%1'.
+        // TODO: Localize this string once the localization consistency tests are updated to support Java 15 text blocks
+        setContentText("""
+                        A backup file for '%s' was found at '%s'.
                         This could indicate that JabRef did not shut down cleanly last time the file was used.
 
                         Do you want to recover the library from the backup file?
-                        """, originalPath.getFileName().toString(),
+                        """.formatted(originalPath.getFileName().toString(),
                 backupPath.getFileName().toString()));
 
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);

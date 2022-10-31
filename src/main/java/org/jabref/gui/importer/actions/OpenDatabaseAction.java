@@ -202,10 +202,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                 result = resultOpt.get();
             }
         }
-        if (result != null) {
-            System.out.println("Result: " + result);
-            System.out.println(result.getDatabaseContext().getEntries().size());
-        }
 
         try {
             if (result == null) {
