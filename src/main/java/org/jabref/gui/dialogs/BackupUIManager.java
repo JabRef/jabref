@@ -10,6 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChangeList;
+import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -58,9 +59,10 @@ public class BackupUIManager {
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
+            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase);
             return DefaultTaskExecutor.runInJavaFXThread(() -> {
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
-                        DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, null),
+                        DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory),
                         originalDatabase, dialogService, Globals.stateManager, Globals.getThemeManager(), Globals.prefs, "Review Backup"
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
