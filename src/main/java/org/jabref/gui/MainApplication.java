@@ -17,11 +17,11 @@ public class MainApplication extends Application {
     private static boolean isBlank;
     private static JabRefPreferences preferences;
 
-    public static void create(List<ParserResult> parserResults, boolean blank, JabRefPreferences preferences) {
+    public static void main(List<ParserResult> parserResults, boolean blank, JabRefPreferences preferences, String[] args) {
         MainApplication.parserResults = parserResults;
         MainApplication.isBlank = blank;
         MainApplication.preferences = preferences;
-        launch();
+        launch(args);
     }
 
     @Override
