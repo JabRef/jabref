@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -16,11 +17,9 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.util.JsonReader;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
@@ -31,8 +30,6 @@ import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 /**
  * Fetcher for Book-Info.com.
  * <a href="https://www.book-info.com/isbn/">book-info</a>.
@@ -53,19 +50,10 @@ public class BookInfoFetcher extends AbstractIsbnFetcher{
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
-        super.doPostCleanup(entry);
-    }
-
-    @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        return super.performSearchById(identifier);
-    }
-
-    @Override
     public String getName() {
         return "Book-Info";
     }
+
     @Override
     public Parser getParser() {
         return inputStream -> {
@@ -84,7 +72,7 @@ public class BookInfoFetcher extends AbstractIsbnFetcher{
         };
     }
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException{
-        try{
+        try {
             if (item.optJSONArray("Product").equals("book")){
                 BibEntry entry = new BibEntry(StandardEntryType.Book);
                 String authors = toAuthors(item.optJSONArray("authors"));
@@ -109,6 +97,7 @@ public class BookInfoFetcher extends AbstractIsbnFetcher{
         }
         return null;
     }
+
     private String toAuthors(JSONArray authors) {
         if (authors == null) {
             return "";
@@ -119,6 +108,7 @@ public class BookInfoFetcher extends AbstractIsbnFetcher{
                 .collect(AuthorList.collect())
                 .getAsLastFirstNamesWithAnd(false);
     }
+
     private Author toAuthor(String key) {
         JsonNode authorResponse = Unirest.get(BASE_URL + key + ".json").asJson().getBody();
         if (authorResponse == null) {
@@ -135,6 +125,7 @@ public class BookInfoFetcher extends AbstractIsbnFetcher{
         AuthorList authorList = authorListParser.parse(nameOptional.get());
         return authorList.getAuthor(0);
     }
+
     private String fromWorksToAuthors(JSONArray works) {
         if (works == null) {
             return "";
