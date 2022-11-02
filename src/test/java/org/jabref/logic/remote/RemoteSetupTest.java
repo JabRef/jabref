@@ -1,4 +1,4 @@
-package org.jabref.logic.tele;
+package org.jabref.logic.remote;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -6,9 +6,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-import org.jabref.logic.tele.client.TeleClient;
-import org.jabref.logic.tele.server.TeleMessageHandler;
-import org.jabref.logic.tele.server.TeleServerManager;
+import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.logic.util.OS;
 import org.jabref.support.DisabledOnCIServer;
 
@@ -24,13 +24,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @DisabledOnCIServer("Tests fails sporadically on CI server")
-class TeleSetupTest {
+class RemoteSetupTest {
 
-    private TeleMessageHandler messageHandler;
+    private RemoteMessageHandler messageHandler;
 
     @BeforeEach
     void setUp() {
-        messageHandler = mock(TeleMessageHandler.class);
+        messageHandler = mock(RemoteMessageHandler.class);
     }
 
     @Test
@@ -38,11 +38,11 @@ class TeleSetupTest {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
-        try (TeleServerManager server = new TeleServerManager()) {
+        try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
             server.openAndStart(messageHandler, port);
             assertTrue(server.isOpen());
-            assertTrue(new TeleClient(port).sendCommandLineArguments(message));
+            assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
             verify(messageHandler).handleCommandLineArguments(message);
             server.stop();
             assertFalse(server.isOpen());
@@ -54,7 +54,7 @@ class TeleSetupTest {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
-        try (TeleServerManager server = new TeleServerManager()) {
+        try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
             server.stop();
@@ -67,7 +67,7 @@ class TeleSetupTest {
             assertTrue(server.isOpen());
             assertFalse(server.isNotStartedBefore());
 
-            assertTrue(new TeleClient(port).sendCommandLineArguments(message));
+            assertTrue(new RemoteClient(port).sendCommandLineArguments(message));
             verify(messageHandler).handleCommandLineArguments(message);
             server.stop();
             assertFalse(server.isOpen());
@@ -84,7 +84,7 @@ class TeleSetupTest {
         try (ServerSocket socket = new ServerSocket(port)) {
             assertTrue(socket.isBound());
 
-            try (TeleServerManager server = new TeleServerManager()) {
+            try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
                 assertFalse(server.isOpen());
                 server.openAndStart(messageHandler, port);
                 assertFalse(server.isOpen());
@@ -98,7 +98,7 @@ class TeleSetupTest {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        assertFalse(new TeleClient(port).sendCommandLineArguments(new String[]{message}));
+        assertFalse(new RemoteClient(port).sendCommandLineArguments(new String[]{message}));
     }
 
     @Test
@@ -116,7 +116,7 @@ class TeleSetupTest {
             }).start();
             Thread.sleep(100);
 
-            assertFalse(new TeleClient(port).ping());
+            assertFalse(new RemoteClient(port).ping());
         }
     }
 
@@ -124,17 +124,17 @@ class TeleSetupTest {
     void pingReturnsFalseForNoServerListening() throws IOException, InterruptedException {
         final int port = 34567;
 
-        assertFalse(new TeleClient(port).ping());
+        assertFalse(new RemoteClient(port).ping());
     }
 
     @Test
     void pingReturnsTrueWhenServerIsRunning() {
         final int port = 34567;
 
-        try (TeleServerManager server = new TeleServerManager()) {
+        try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             server.openAndStart(messageHandler, port);
 
-            assertTrue(new TeleClient(port).ping());
+            assertTrue(new RemoteClient(port).ping());
         }
     }
 }

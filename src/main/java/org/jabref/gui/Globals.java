@@ -7,7 +7,7 @@ import javafx.stage.Screen;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.tele.CLIMessageHandler;
+import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
@@ -17,8 +17,8 @@ import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.tele.TelePreferences;
-import org.jabref.logic.tele.server.TeleServerManager;
+import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
@@ -43,8 +43,7 @@ public class Globals {
      */
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
-    public static final TeleServerManager TELE_SERVER = new TeleServerManager();
-
+    public static final RemoteListenerServerManager REMOTE_LISTENER = new RemoteListenerServerManager();
     /**
      * Manager for the state of the GUI.
      */
@@ -119,9 +118,9 @@ public class Globals {
       /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();
         } */
-        TelePreferences telePreferences = prefs.getTelePreferences();
-        if (telePreferences.shouldUseTeleServer()) {
-            Globals.TELE_SERVER.openAndStart(new CLIMessageHandler(prefs), telePreferences.getPort());
+        RemotePreferences remotePreferences = prefs.getRemotePreferences();
+        if (remotePreferences.useRemoteServer()) {
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs), remotePreferences.getPort());
         }
     }
 

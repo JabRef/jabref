@@ -1,7 +1,7 @@
-package org.jabref.logic.tele.server;
+package org.jabref.logic.remote.server;
 
 @FunctionalInterface
-public interface TeleMessageHandler {
+public interface RemoteMessageHandler {
 
     void handleCommandLineArguments(String[] message);
 }

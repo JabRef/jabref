@@ -1,8 +1,8 @@
-package org.jabref.logic.tele;
+package org.jabref.logic.remote;
 
-public class TeleUtil {
+public class RemoteUtil {
 
-    private TeleUtil() {
+    private RemoteUtil() {
     }
 
     public static boolean isUserPort(int portNumber) {

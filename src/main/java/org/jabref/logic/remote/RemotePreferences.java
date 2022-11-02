@@ -1,4 +1,4 @@
-package org.jabref.logic.tele;
+package org.jabref.logic.remote;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -11,14 +11,14 @@ import javafx.beans.property.SimpleIntegerProperty;
 /**
  * Place for handling the preferences for the tele communication
  */
-public class TelePreferences {
+public class RemotePreferences {
 
-    private IntegerProperty port;
-    private BooleanProperty shouldUseTeleServer;
+    private final IntegerProperty port;
+    private final BooleanProperty useRemoteServer;
 
-    public TelePreferences(int port, boolean shouldUseTeleServer) {
+    public RemotePreferences(int port, boolean useRemoteServer) {
         this.port = new SimpleIntegerProperty(port);
-        this.shouldUseTeleServer = new SimpleBooleanProperty(shouldUseTeleServer);
+        this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
     }
 
     public int getPort() {
@@ -33,16 +33,16 @@ public class TelePreferences {
         this.port.setValue(port);
     }
 
-    public boolean shouldUseTeleServer() {
-        return shouldUseTeleServer.getValue();
+    public boolean useRemoteServer() {
+        return useRemoteServer.getValue();
     }
 
-    public BooleanProperty shouldUseTeleServerProperty() {
-        return shouldUseTeleServer;
+    public BooleanProperty useRemoteServerProperty() {
+        return useRemoteServer;
     }
 
-    public void setShouldUseTeleServer(boolean shouldUseTeleServer) {
-        this.shouldUseTeleServer.setValue(shouldUseTeleServer);
+    public void setUseRemoteServer(boolean useRemoteServer) {
+        this.useRemoteServer.setValue(useRemoteServer);
     }
 
     public boolean isDifferentPort(int otherPort) {

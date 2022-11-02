@@ -36,7 +36,7 @@ import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
-import org.jabref.logic.tele.TelePreferences;
+import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
@@ -142,7 +142,7 @@ public interface PreferencesService {
     // Network preferences
     //*************************************************************************************************************
 
-    TelePreferences getTelePreferences();
+    RemotePreferences getRemotePreferences();
 
     ProxyPreferences getProxyPreferences();
 

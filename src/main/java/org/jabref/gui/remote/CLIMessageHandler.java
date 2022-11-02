@@ -1,4 +1,4 @@
-package org.jabref.gui.tele;
+package org.jabref.gui.remote;
 
 import java.util.List;
 
@@ -7,14 +7,14 @@ import javafx.application.Platform;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.tele.server.TeleMessageHandler;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CLIMessageHandler implements TeleMessageHandler {
+public class CLIMessageHandler implements RemoteMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CLIMessageHandler.class);
 
     private final PreferencesService preferencesService;
@@ -26,7 +26,7 @@ public class CLIMessageHandler implements TeleMessageHandler {
     @Override
     public void handleCommandLineArguments(String[] message) {
         try {
-            ArgumentProcessor argumentProcessor = new ArgumentProcessor(message, ArgumentProcessor.Mode.TELE_START, preferencesService);
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(message, ArgumentProcessor.Mode.REMOTE_START, preferencesService);
 
             List<ParserResult> loaded = argumentProcessor.getParserResults();
             for (int i = 0; i < loaded.size(); i++) {

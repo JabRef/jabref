@@ -1,4 +1,4 @@
-package org.jabref.logic.tele;
+package org.jabref.logic.remote;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,13 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TelePreferencesTest {
+public class RemotePreferencesTest {
 
-    private TelePreferences preferences;
+    private RemotePreferences preferences;
 
     @BeforeEach
     public void setUp() {
-        preferences = new TelePreferences(1000, true);
+        preferences = new RemotePreferences(1000, true);
     }
 
     @Test
@@ -28,14 +28,14 @@ public class TelePreferencesTest {
     }
 
     @Test
-    public void testUseTeleServer() {
-        assertTrue(preferences.shouldUseTeleServer());
+    public void testUseRemoteServer() {
+        assertTrue(preferences.useRemoteServer());
     }
 
     @Test
-    public void testSetUseTeleServer() {
-        preferences.setShouldUseTeleServer(false);
-        assertFalse(preferences.shouldUseTeleServer());
+    public void testSetUseRemoteServer() {
+        preferences.setUseRemoteServer(false);
+        assertFalse(preferences.useRemoteServer());
     }
 
     @Test

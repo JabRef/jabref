@@ -95,8 +95,8 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.tele.TelePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -389,9 +389,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final int EXPORTER_FILENAME_INDEX = 1;
     private static final int EXPORTER_EXTENSION_INDEX = 2;
 
-    // Tele Server
-    private static final String USE_TELE_SERVER = "useRemoteServer";
-    private static final String TELE_SERVER_PORT = "remoteServerPort";
+    // Remote
+    private static final String USE_REMOTE_SERVER = "useRemoteServer";
+    private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -441,7 +441,7 @@ public class JabRefPreferences implements PreferencesService {
     private EntryEditorPreferences entryEditorPreferences;
     private FilePreferences filePreferences;
     private GuiPreferences guiPreferences;
-    private TelePreferences telePreferences;
+    private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
     private SSLPreferences sslPreferences;
     private SearchPreferences searchPreferences;
@@ -660,8 +660,8 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
-        defaults.put(USE_TELE_SERVER, Boolean.TRUE);
-        defaults.put(TELE_SERVER_PORT, 6050);
+        defaults.put(USE_REMOTE_SERVER, Boolean.TRUE);
+        defaults.put(REMOTE_SERVER_PORT, 6050);
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
@@ -1549,19 +1549,19 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public TelePreferences getTelePreferences() {
-        if (Objects.nonNull(telePreferences)) {
-            return telePreferences;
+    public RemotePreferences getRemotePreferences() {
+        if (Objects.nonNull(remotePreferences)) {
+            return remotePreferences;
         }
 
-        telePreferences = new TelePreferences(
-                getInt(TELE_SERVER_PORT),
-                getBoolean(USE_TELE_SERVER));
+        remotePreferences = new RemotePreferences(
+                getInt(REMOTE_SERVER_PORT),
+                getBoolean(USE_REMOTE_SERVER));
 
-        EasyBind.listen(telePreferences.portProperty(), (obs, oldValue, newValue) -> putInt(TELE_SERVER_PORT, newValue));
-        EasyBind.listen(telePreferences.shouldUseTeleServerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_TELE_SERVER, newValue));
+        EasyBind.listen(remotePreferences.portProperty(), (obs, oldValue, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
+        EasyBind.listen(remotePreferences.useRemoteServerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
 
-        return telePreferences;
+        return remotePreferences;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.jabref.logic.tele.server;
+package org.jabref.logic.remote.server;
 
 import java.io.IOException;
 import java.net.BindException;
@@ -16,57 +16,57 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * Observer: isOpen, isNotStartedBefore
  */
-public class TeleServerManager implements AutoCloseable {
+public class RemoteListenerServerManager implements AutoCloseable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeleServerManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServerManager.class);
 
-    private TeleServerThread teleServerThread;
+    private RemoteServerThread remoteServerThread;
 
     public void stop() {
         if (isOpen()) {
-            teleServerThread.interrupt();
-            teleServerThread = null;
-            JabRefExecutorService.INSTANCE.stopTeleThread();
+            remoteServerThread.interrupt();
+            remoteServerThread = null;
+            JabRefExecutorService.INSTANCE.stopRemoteThread();
         }
     }
 
     /**
      * Acquire any resources needed for the server.
      */
-    public void open(TeleMessageHandler messageHandler, int port) {
+    public void open(RemoteMessageHandler messageHandler, int port) {
         if (isOpen()) {
             return;
         }
 
         try {
-            teleServerThread = new TeleServerThread(messageHandler, port);
+            remoteServerThread = new RemoteServerThread(messageHandler, port);
         } catch (BindException e) {
             LOGGER.error("There was an error opening the configured network port {}. Please ensure there isn't another" +
                     " application already using that port.", port);
-            teleServerThread = null;
+            remoteServerThread = null;
         } catch (IOException e) {
             LOGGER.error("Unknown error while opening the network port.", e);
-            teleServerThread = null;
+            remoteServerThread = null;
         }
     }
 
     public boolean isOpen() {
-        return teleServerThread != null;
+        return remoteServerThread != null;
     }
 
     public void start() {
         if (isOpen() && isNotStartedBefore()) {
             // threads can only be started when in state NEW
-            JabRefExecutorService.INSTANCE.startTeleThread(teleServerThread);
+            JabRefExecutorService.INSTANCE.startRemoteThread(remoteServerThread);
         }
     }
 
     public boolean isNotStartedBefore() {
         // threads can only be started when in state NEW
-        return (teleServerThread == null) || (teleServerThread.getState() == Thread.State.NEW);
+        return (remoteServerThread == null) || (remoteServerThread.getState() == Thread.State.NEW);
     }
 
-    public void openAndStart(TeleMessageHandler messageHandler, int port) {
+    public void openAndStart(RemoteMessageHandler messageHandler, int port) {
         open(messageHandler, port);
         start();
     }

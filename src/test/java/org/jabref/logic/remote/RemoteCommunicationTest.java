@@ -1,10 +1,10 @@
-package org.jabref.logic.tele;
+package org.jabref.logic.remote;
 
 import java.io.IOException;
 
-import org.jabref.logic.tele.client.TeleClient;
-import org.jabref.logic.tele.server.TeleMessageHandler;
-import org.jabref.logic.tele.server.TeleServerManager;
+import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.AfterEach;
@@ -17,24 +17,24 @@ import static org.mockito.Mockito.verify;
 
 /**
  * Tests for the case where the client and server are set-up correctly. Testing the exceptional cases happens in {@link
- * TeleSetupTest}.
+ * RemoteSetupTest}.
  */
 @DisabledOnCIServer("Tests fails sporadically on CI server")
-class TeleCommunicationTest {
+class RemoteCommunicationTest {
 
-    private TeleClient client;
-    private TeleServerManager serverLifeCycle;
-    private TeleMessageHandler server;
+    private RemoteClient client;
+    private RemoteListenerServerManager serverLifeCycle;
+    private RemoteMessageHandler server;
 
     @BeforeEach
     void setUp() {
         final int port = 34567;
 
-        server = mock(TeleMessageHandler.class);
-        serverLifeCycle = new TeleServerManager();
+        server = mock(RemoteMessageHandler.class);
+        serverLifeCycle = new RemoteListenerServerManager();
         serverLifeCycle.openAndStart(server, port);
 
-        client = new TeleClient(port);
+        client = new RemoteClient(port);
     }
 
     @AfterEach

@@ -1,4 +1,4 @@
-package org.jabref.logic.tele.server;
+package org.jabref.logic.remote.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -7,25 +7,25 @@ import java.net.SocketException;
 
 import javafx.util.Pair;
 
-import org.jabref.logic.tele.TeleMessage;
-import org.jabref.logic.tele.TelePreferences;
-import org.jabref.logic.tele.TeleProtocol;
+import org.jabref.logic.remote.RemoteMessage;
+import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.remote.RemoteProtocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TeleServer implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeleServer.class);
+public class RemoteListenerServer implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServer.class);
 
     private static final int BACKLOG = 1;
 
     private static final int TIMEOUT = 1000;
 
-    private final TeleMessageHandler messageHandler;
+    private final RemoteMessageHandler messageHandler;
     private final ServerSocket serverSocket;
 
-    public TeleServer(TeleMessageHandler messageHandler, int port) throws IOException {
-        this.serverSocket = new ServerSocket(port, BACKLOG, TelePreferences.getIpAddress());
+    public RemoteListenerServer(RemoteMessageHandler messageHandler, int port) throws IOException {
+        this.serverSocket = new ServerSocket(port, BACKLOG, RemotePreferences.getIpAddress());
         this.messageHandler = messageHandler;
     }
 
@@ -36,8 +36,8 @@ public class TeleServer implements Runnable {
                 try (Socket socket = serverSocket.accept()) {
                     socket.setSoTimeout(TIMEOUT);
 
-                    try (TeleProtocol protocol = new TeleProtocol(socket)) {
-                        Pair<TeleMessage, Object> input = protocol.receiveMessage();
+                    try (RemoteProtocol protocol = new RemoteProtocol(socket)) {
+                        Pair<RemoteMessage, Object> input = protocol.receiveMessage();
                         handleMessage(protocol, input.getKey(), input.getValue());
                     }
                 } catch (SocketException ex) {
@@ -51,15 +51,15 @@ public class TeleServer implements Runnable {
         }
     }
 
-    private void handleMessage(TeleProtocol protocol, TeleMessage type, Object argument) throws IOException {
+    private void handleMessage(RemoteProtocol protocol, RemoteMessage type, Object argument) throws IOException {
         switch (type) {
             case PING:
-                protocol.sendMessage(TeleMessage.PONG, TeleProtocol.IDENTIFIER);
+                protocol.sendMessage(RemoteMessage.PONG, RemoteProtocol.IDENTIFIER);
                 break;
             case SEND_COMMAND_LINE_ARGUMENTS:
                 if (argument instanceof String[]) {
                     messageHandler.handleCommandLineArguments((String[]) argument);
-                    protocol.sendMessage(TeleMessage.OK);
+                    protocol.sendMessage(RemoteMessage.OK);
                 } else {
                     throw new IOException("Argument for 'SEND_COMMAND_LINE_ARGUMENTS' is not of type String[]. Got " + argument);
                 }
