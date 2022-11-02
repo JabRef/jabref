@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import org.h2.mvstore.MVMap;
@@ -48,7 +49,7 @@ public class JournalAbbreviationRepository {
      * Letters) or its abbreviated form (e.g. Phys. Rev. Lett.).
      */
     public boolean isKnownName(String journalName) {
-        String journal = journalName.trim();
+        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         boolean isKnown = customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation));
         if (isKnown) {
@@ -75,7 +76,7 @@ public class JournalAbbreviationRepository {
      * @param input The journal name (either abbreviated or full name).
      */
     public Optional<Abbreviation> get(String input) {
-        String journal = input.trim();
+        String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
                                                                        .filter(abbreviation -> isMatched(journal, abbreviation))
