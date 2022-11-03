@@ -53,19 +53,18 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 
 		Map<String, String> metadata = getSharedMetaData();
 
-        Integer METADATA_VERSION = 0;
-
         if(metadata.get(MetaData.METADATA_VERSION) != null){
             try {
                 METADATA_VERSION = Integer.valueOf(metadata.get(MetaData.METADATA_VERSION));
             } catch (Exception e) {
                 // TODO: handle exception
+                LOGGER.error("[METADATA_VERSION] not Integer!");
             }
         }
 
         if(METADATA_VERSION < METADATA_CURRENT_VERSION){
             //We can to migrate from old table in new table
-            if(METADATA_VERSION==0 && METADATA_CURRENT_VERSION == 1 && checkTableAvailability(escape("ENTRY"), escape("FIELD"), escape("METADATA"))){
+            if(METADATA_VERSION==-1 && METADATA_CURRENT_VERSION == 1){
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM \"ENTRY\"");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM \"FIELD\"");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA") + " SELECT * FROM \"METADATA\"");
@@ -87,15 +86,15 @@ public class PostgreSQLProcessor extends DBMSProcessor {
      */
 	@Override
     public boolean checkBaseIntegrity() throws SQLException {
-		boolean value = checkTableAvailability(escape_Table("ENTRY"), escape_Table("FIELD"), escape_Table("METADATA"));
-		
+		// boolean value = checkTableAvailability(escape_Table("ENTRY"), escape_Table("FIELD"), escape_Table("METADATA"));
+		boolean value = true;
 		if(value){
 			Map<String, String> metadata = getSharedMetaData();
 			if(metadata.get(MetaData.METADATA_VERSION) == null){
 				value = false;
 			}else{
 				try {
-					int METADATA_VERSION = Integer.valueOf(metadata.get(MetaData.METADATA_VERSION));
+					METADATA_VERSION = Integer.valueOf(metadata.get(MetaData.METADATA_VERSION));
 					if(METADATA_VERSION < METADATA_CURRENT_VERSION){
 						value = false;
                         //We can to migrate from old table in new table

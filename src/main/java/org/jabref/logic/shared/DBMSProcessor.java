@@ -43,6 +43,8 @@ public abstract class DBMSProcessor {
 
     protected DatabaseConnectionProperties connectionProperties;
 
+    protected Integer METADATA_VERSION = -1;
+
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {
         this.connection = dbmsConnection.getConnection();
         this.connectionProperties = dbmsConnection.getProperties();
