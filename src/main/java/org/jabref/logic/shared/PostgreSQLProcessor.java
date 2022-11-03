@@ -19,6 +19,7 @@ import org.postgresql.PGConnection;
 public class PostgreSQLProcessor extends DBMSProcessor {
 
     private PostgresSQLNotificationListener listener;
+    private Integer METADATA_CURRENT_VERSION = 1;
 
     public PostgreSQLProcessor(DatabaseConnection connection) {
         super(connection);
@@ -51,8 +52,31 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                         + "\"VALUE\" TEXT)");
 
 		Map<String, String> metadata = getSharedMetaData();
-		metadata.put(MetaData.METADATA_VERSION, "1");
-		setSharedMetaData(metadata);
+
+        Integer METADATA_VERSION = 0;
+
+        if(metadata.get(MetaData.METADATA_VERSION) != null){
+            try {
+                METADATA_VERSION = Integer.valueOf(metadata.get(MetaData.METADATA_VERSION));
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+        }
+
+        if(METADATA_VERSION < METADATA_CURRENT_VERSION){
+            //We can to migrate from old table in new table
+            if(METADATA_VERSION==0 && METADATA_CURRENT_VERSION == 1 && checkTableAvailability(escape("ENTRY"), escape("FIELD"), escape("METADATA"))){
+                connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM \"ENTRY\"");
+                connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM \"FIELD\"");
+                connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA") + " SELECT * FROM \"METADATA\"");
+                metadata = getSharedMetaData();
+            }
+
+            metadata.put(MetaData.METADATA_VERSION, METADATA_CURRENT_VERSION.toString());
+            setSharedMetaData(metadata);
+        }
+
+
     }
 
 	/**
@@ -72,8 +96,9 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 			}else{
 				try {
 					int METADATA_VERSION = Integer.valueOf(metadata.get(MetaData.METADATA_VERSION));
-					if(METADATA_VERSION < 1){
+					if(METADATA_VERSION < METADATA_CURRENT_VERSION){
 						value = false;
+                        //We can to migrate from old table in new table
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
