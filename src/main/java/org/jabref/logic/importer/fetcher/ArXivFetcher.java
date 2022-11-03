@@ -6,7 +6,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +35,7 @@ import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
@@ -99,10 +99,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
+    private final ImportFormatPreferences importFormatPreferences;
 
     public ArXivFetcher(ImportFormatPreferences importFormatPreferences) {
         this.arXiv = new ArXiv(importFormatPreferences);
         this.doiFetcher = new DoiFetcher(importFormatPreferences);
+        this.importFormatPreferences = importFormatPreferences;
     }
 
     /**
@@ -112,6 +114,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     public ArXivFetcher(ImportFormatPreferences importFormatPreferences, DoiFetcher doiFetcher) {
         this.arXiv = new ArXiv(importFormatPreferences);
         this.doiFetcher = doiFetcher;
+        this.importFormatPreferences = importFormatPreferences;
     }
 
     @Override
@@ -139,7 +142,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      *
      * @param bibEntry A BibEntry to modify
      */
-    private static void adaptKeywordsFrom(BibEntry bibEntry) {
+    private void adaptKeywordsFrom(BibEntry bibEntry) {
         Optional<String> allKeywords = bibEntry.getField(StandardField.KEYWORDS);
         if (allKeywords.isPresent()) {
             // See https://github.com/JabRef/jabref/pull/9170/#issuecomment-1266042981
@@ -147,9 +150,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 allKeywords = Optional.of(allKeywords.get().replaceAll(entry.getKey(), entry.getValue()));
             }
 
-            String filteredKeywords = Arrays.stream(allKeywords.get().split(","))
-                                            .map(String::trim).distinct()
-                                            .collect(Collectors.joining(", "));
+            String filteredKeywords = KeywordList.merge(allKeywords.get(), "", importFormatPreferences.getKeywordSeparator()).toString();
             bibEntry.setField(StandardField.KEYWORDS, filteredKeywords);
         }
     }
@@ -245,7 +246,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * @param priorityFields Which fields from "bibEntryFuture" to prioritize, replacing them on "arXivEntry"
      * @param id Identifier used in initiating the "bibEntryFuture" future (for logging). This is usually a DOI, but can be anything.
      */
-    private static void mergeArXivEntryWithFutureDoiEntry(BibEntry arXivEntry, CompletableFuture<Optional<BibEntry>> bibEntryFuture, Set<Field> priorityFields, String id) {
+    private void mergeArXivEntryWithFutureDoiEntry(BibEntry arXivEntry, CompletableFuture<Optional<BibEntry>> bibEntryFuture, Set<Field> priorityFields, String id) {
         Optional<BibEntry> bibEntry;
         try {
             bibEntry = waitForBibEntryRetrieval(bibEntryFuture);
@@ -320,9 +321,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         Optional<CompletableFuture<Optional<BibEntry>>> manualDoiBibEntryFuture = manualDoi.map(doiFetcher::asyncPerformSearchById);
 
         automaticDoiBibEntryFuture.ifPresent(future ->
-                ArXivFetcher.mergeArXivEntryWithFutureDoiEntry(arXivBibEntry.get(), future, CHOSEN_AUTOMATIC_DOI_FIELDS, automaticDoi.get()));
+                mergeArXivEntryWithFutureDoiEntry(arXivBibEntry.get(), future, CHOSEN_AUTOMATIC_DOI_FIELDS, automaticDoi.get()));
         manualDoiBibEntryFuture.ifPresent(future ->
-                ArXivFetcher.mergeArXivEntryWithFutureDoiEntry(arXivBibEntry.get(), future, CHOSEN_MANUAL_DOI_FIELDS, manualDoi.get()));
+                mergeArXivEntryWithFutureDoiEntry(arXivBibEntry.get(), future, CHOSEN_MANUAL_DOI_FIELDS, manualDoi.get()));
     }
 
     /**
