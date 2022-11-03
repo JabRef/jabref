@@ -223,14 +223,10 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    testImplementation 'io.github.origin-energy:java-snapshot-testing-junit5:3.3.9'
-    /*
-    testImplementation ('io.github.origin-energy:java-snapshot-testing-plugin-jackson:3.3.9') {
-        exclude module: "io.github.origin-energy:java-snapshot-testing-core"
-    }
+    testImplementation 'io.github.origin-energy:java-snapshot-testing-junit5:3.4.0'
+    testImplementation 'io.github.origin-energy:java-snapshot-testing-plugin-jackson:3.4.0'
     testImplementation 'com.fasterxml.jackson.core:jackson-core:2.11.3'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
-    */
 
     checkstyle 'com.puppycrawl.tools:checkstyle:10.3.4'
     // xjc needs the runtime as well for the ant task, otherwise it fails

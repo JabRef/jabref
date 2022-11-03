@@ -24,7 +24,7 @@ public class JabRefOnlineServiceTest {
         var changes = new JabRefOnlineService().getChanges(
                                                            "ckn4oul7100004cv7y3t94n8j",
                                                            Optional.of(new SyncCheckpoint(ZonedDateTime.of(2022, 10, 1, 0, 0, 0, 0, ZoneId.of("Z")), "1")));
-        expect.toMatchSnapshot(changes);
+        expect.serializer("json").toMatchSnapshot(changes);
     }
 
     @Test
@@ -32,7 +32,7 @@ public class JabRefOnlineServiceTest {
         var changes = new JabRefOnlineService().getChanges(
                                                            "ckn4oul7100004cv7y3t94n8j",
                                                            Optional.empty());
-        expect.toMatchSnapshot(changes);
+        expect.serializer("json").toMatchSnapshot(changes);
     }
 
     @Test
