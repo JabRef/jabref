@@ -70,7 +70,7 @@ public class MetaData {
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
-	private String VersionDBStructure;
+    private String VersionDBStructure;
 
     /**
      * Constructs an empty metadata.
@@ -211,7 +211,7 @@ public class MetaData {
         postChange();
     }
 
-	public Optional<String> getVersionDBStructure() {
+    public Optional<String> getVersionDBStructure() {
         return Optional.ofNullable(VersionDBStructure);
     }
 

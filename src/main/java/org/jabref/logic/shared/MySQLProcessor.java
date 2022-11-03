@@ -42,19 +42,19 @@ public class MySQLProcessor extends DBMSProcessor {
 
         Map<String, String> metadata = getSharedMetaData();
 
-        if(metadata.get(MetaData.VERSION_DB_STRUCT) != null){
+        if (metadata.get(MetaData.VERSION_DB_STRUCT) != null) {
             try {
                 VERSION_DB_STRUCT_DEFAULT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
             } catch (Exception e) {
                 LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Integer!");
             }
-        }else{
+        } else {
             LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Exist!");
         }
 
-        if(VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT){
-            //We can to migrate from old table in new table
-            if(CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")){
+        if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
+            // We can to migrate from old table in new table
+            if (CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
                 LOGGER.info("Migrating from VersionDBStructure == 0");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM `ENTRY`");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM `FIELD`");
@@ -72,7 +72,7 @@ public class MySQLProcessor extends DBMSProcessor {
         return "`" + expression + "`";
     }
 
-	@Override
+    @Override
     String escape_Table(String expression) {
         return escape("JABREF_"+expression);
     }

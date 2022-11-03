@@ -69,18 +69,18 @@ public class OracleProcessor extends DBMSProcessor {
 
         Map<String, String> metadata = getSharedMetaData();
 
-        if(metadata.get(MetaData.VERSION_DB_STRUCT) != null){
+        if (metadata.get(MetaData.VERSION_DB_STRUCT) != null) {
             try {
                 VERSION_DB_STRUCT_DEFAULT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
             } catch (Exception e) {
                 LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Integer!");
             }
-        }else{
+        } else {
             LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Exist!");
         }
 
-        if(VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT){
-            //We can to migrate from old table in new table
+        if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
+            // We can to migrate from old table in new table
             metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
             setSharedMetaData(metadata);
         }
@@ -91,7 +91,7 @@ public class OracleProcessor extends DBMSProcessor {
         return expression;
     }
 
-	@Override
+    @Override
     String escape_Table(String expression) {
         return escape(expression);
     }

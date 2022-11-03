@@ -446,7 +446,7 @@ class DBMSProcessorTest {
         return dbmsProcessor.escape(expression);
     }
 
-	private static String escape_Table(String expression, DBMSProcessor dbmsProcessor) {
+    private static String escape_Table(String expression, DBMSProcessor dbmsProcessor) {
         return dbmsProcessor.escape_Table(expression);
     }
 

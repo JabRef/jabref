@@ -63,21 +63,21 @@ public abstract class DBMSProcessor {
         if (type == DBMSType.MYSQL || type == DBMSType.POSTGRESQL) {
             boolean value = true;
             Map<String, String> metadata = getSharedMetaData();
-            if(metadata.get(MetaData.VERSION_DB_STRUCT) == null){
+            if (metadata.get(MetaData.VERSION_DB_STRUCT) == null) {
                 value = false;
-            }else{
+            } else {
                 try {
                     CURRENT_VERSION_DB_STRUCT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
-                    if(VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT){
+                    if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
                         value = false;
-                        //We can to migrate from old table in new table
+                        // We can to migrate from old table in new table
                     }
                 } catch (Exception e) {
                     value = false;
                 }
             }
             return value;
-        }else{
+        } else {
             return checkTableAvailability(escape_Table("ENTRY"), escape_Table("FIELD"), escape_Table("METADATA"));
         }
     }
@@ -154,9 +154,9 @@ public abstract class DBMSProcessor {
      */
     abstract String escape(String expression);
 
-	String escape_Table(String expression) {
-		return escape(expression);
-	}
+    String escape_Table(String expression) {
+        return escape(expression);
+    }
 
     /**
      * For use in test only. Inserts the BibEntry into the shared database.
