@@ -10,7 +10,7 @@ import org.jabref.model.metadata.MetaData;
  */
 public class MySQLProcessor extends DBMSProcessor {
 
-    private Integer METADATA_CURRENT_VERSION = 1;
+    private Integer CURRENT_VERSION_DB_STRUCT = 1;
 
     public MySQLProcessor(DatabaseConnection connection) {
         super(connection);
@@ -43,27 +43,27 @@ public class MySQLProcessor extends DBMSProcessor {
 
         Map<String, String> metadata = getSharedMetaData();
 
-        if(metadata.get(MetaData.METADATA_VERSION) != null){
+        if(metadata.get(MetaData.VERSION_DB_STRUCT) != null){
             try {
-                METADATA_VERSION = Integer.valueOf(metadata.get(MetaData.METADATA_VERSION));
+                VERSION_DB_STRUCT_DEFALUT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
             } catch (Exception e) {
                 // TODO: handle exception
-                LOGGER.error("[METADATA_VERSION] not Integer!");
+                LOGGER.error("[VERSION_DB_STRUCT_DEFALUT] not Integer!");
             }
         }else{
-            LOGGER.error("[METADATA_VERSION] not Exists!");
+            LOGGER.error("[VERSION_DB_STRUCT_DEFALUT] not Exists!");
         }
 
-        if(METADATA_VERSION < METADATA_CURRENT_VERSION){
+        if(VERSION_DB_STRUCT_DEFALUT < CURRENT_VERSION_DB_STRUCT){
             //We can to migrate from old table in new table
-            if(METADATA_VERSION==-1 && METADATA_CURRENT_VERSION == 1){
+            if(VERSION_DB_STRUCT_DEFALUT==-1 && CURRENT_VERSION_DB_STRUCT == 1){
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM `ENTRY`");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM `FIELD`");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA") + " SELECT * FROM `METADATA`");
                 metadata = getSharedMetaData();
             }
 
-            metadata.put(MetaData.METADATA_VERSION, METADATA_CURRENT_VERSION.toString());
+            metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
             setSharedMetaData(metadata);
         }
     }
@@ -80,12 +80,12 @@ public class MySQLProcessor extends DBMSProcessor {
 		boolean value =  true;
 		if(value){
 			Map<String, String> metadata = getSharedMetaData();
-			if(metadata.get(MetaData.METADATA_VERSION) == null){
+			if(metadata.get(MetaData.VERSION_DB_STRUCT) == null){
 				value = false;
 			}else{
 				try {
-					METADATA_VERSION = Integer.valueOf(metadata.get(MetaData.METADATA_VERSION));
-					if(METADATA_VERSION < METADATA_CURRENT_VERSION){
+					VERSION_DB_STRUCT_DEFALUT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
+					if(VERSION_DB_STRUCT_DEFALUT < CURRENT_VERSION_DB_STRUCT){
 						value = false;
 					}
 				} catch (Exception e) {

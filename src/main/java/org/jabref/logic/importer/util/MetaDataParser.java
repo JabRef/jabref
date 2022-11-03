@@ -90,8 +90,8 @@ public class MetaDataParser {
                 metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
                 metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
-            } else if (entry.getKey().equals(MetaData.METADATA_VERSION)) {
-                metaData.setMetadataVersion(getSingleItem(value));
+            } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
+                metaData.setVersionDBStructure(getSingleItem(value));
             } else {
                 // Keep meta data items that we do not know in the file
                 metaData.putUnknownMetaDataItem(entry.getKey(), value);

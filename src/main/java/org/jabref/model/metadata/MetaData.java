@@ -40,7 +40,7 @@ public class MetaData {
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
     public static final String DATABASE_TYPE = "databaseType";
-    public static final String METADATA_VERSION = "metadataVersion";
+    public static final String VERSION_DB_STRUCT = "VersionDBStructure";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
     public static final String FILE_DIRECTORY = "fileDirectory";
@@ -70,7 +70,7 @@ public class MetaData {
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
-	private String metadataVersion;
+	private String VersionDBStructure;
 
     /**
      * Constructs an empty metadata.
@@ -211,12 +211,12 @@ public class MetaData {
         postChange();
     }
 
-	public Optional<String> getMetadataVersion() {
-        return Optional.ofNullable(metadataVersion);
+	public Optional<String> getVersionDBStructure() {
+        return Optional.ofNullable(VersionDBStructure);
     }
 
-    public void setMetadataVersion(String version) {
-        metadataVersion = Objects.requireNonNull(version).trim();
+    public void setVersionDBStructure(String version) {
+        VersionDBStructure = Objects.requireNonNull(version).trim();
         postChange();
     }
 

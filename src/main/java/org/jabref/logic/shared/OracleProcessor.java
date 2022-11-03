@@ -30,6 +30,8 @@ public class OracleProcessor extends DBMSProcessor {
 
     private DatabaseChangeRegistration databaseChangeRegistration;
 
+    private Integer CURRENT_VERSION_DB_STRUCT = 0;
+
     public OracleProcessor(DatabaseConnection connection) {
         super(connection);
     }
@@ -67,7 +69,7 @@ public class OracleProcessor extends DBMSProcessor {
                         "\"VALUE\"  CLOB NOT NULL)");
 
 		Map<String, String> metadata = getSharedMetaData();
-		metadata.put(MetaData.METADATA_VERSION, "0");
+		metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
 		setSharedMetaData(metadata);
     }
 
