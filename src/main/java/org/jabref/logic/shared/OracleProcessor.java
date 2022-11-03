@@ -99,9 +99,9 @@ public class OracleProcessor extends DBMSProcessor {
                 ((OracleStatement) statement).setDatabaseChangeRegistration(databaseChangeRegistration);
                 StringBuilder selectQuery = new StringBuilder()
                         .append("SELECT 1 FROM ")
-                        .append(escape("ENTRY"))
+                        .append(escape_Table("ENTRY"))
                         .append(", ")
-                        .append(escape("METADATA"));
+                        .append(escape_Table("METADATA"));
                 // this execution registers all tables mentioned in selectQuery
                 statement.executeQuery(selectQuery.toString());
             }
@@ -116,7 +116,7 @@ public class OracleProcessor extends DBMSProcessor {
             for (BibEntry entry : entries) {
                 String insertIntoEntryQuery =
                         "INSERT INTO " +
-                                escape("ENTRY") +
+                                escape_Table("ENTRY") +
                                 "(" +
                                 escape("TYPE") +
                                 ") VALUES(?)";
@@ -154,7 +154,7 @@ public class OracleProcessor extends DBMSProcessor {
             }
             for (int i = 0; i < numFields; i++) {
                 insertFieldQuery.append(" INTO ")
-                                .append(escape("FIELD"))
+                                .append(escape_Table("FIELD"))
                                 .append(" (")
                                 .append(escape("ENTRY_SHARED_ID"))
                                 .append(", ")
