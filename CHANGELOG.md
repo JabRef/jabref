@@ -52,6 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added HTML and Markdown files to Find Unlinked Files and removed BibTeX.[koppor#547](https://github.com/koppor/jabref/issues/547)
 - We changed the messages after importing unlinked local files to past tense. [koppor#548](https://github.com/koppor/jabref/issues/548)
 - We fixed an issue where the wrong icon for a successful import of a bib entry was shown [#9308](https://github.com/JabRef/jabref/pull/9308)
+- We changed database structure: in MySQL/MariaDB we renamed tables by adding a `JABREF_` prefix, and in PGSQL we moved tables in `jabref` schema. We added `VersionDBStructure` variable in `METADATA` table to indicate current version of structure, this variable is needed for automatic migration [#9312](https://github.com/JabRef/jabref/issues/9312)
 
 ### Fixed
 
