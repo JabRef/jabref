@@ -339,7 +339,7 @@ TextFlow > .tooltip-text-monospaced {
 .combo-box-base:editable > .arrow-button {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
-    -fx-background-radius: 0;
+    -fx-background-radius: 4px;
     -fx-text-fill: -fx-text-base-color;
 }
 
