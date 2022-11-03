@@ -30,10 +30,9 @@ public class OracleProcessor extends DBMSProcessor {
 
     private DatabaseChangeRegistration databaseChangeRegistration;
 
-    private Integer CURRENT_VERSION_DB_STRUCT = 0;
-
     public OracleProcessor(DatabaseConnection connection) {
         super(connection);
+        CURRENT_VERSION_DB_STRUCT = 0;
     }
 
     /**
@@ -68,9 +67,23 @@ public class OracleProcessor extends DBMSProcessor {
                         "\"KEY\"  VARCHAR2(255) NULL," +
                         "\"VALUE\"  CLOB NOT NULL)");
 
-		Map<String, String> metadata = getSharedMetaData();
-		metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
-		setSharedMetaData(metadata);
+        Map<String, String> metadata = getSharedMetaData();
+
+        if(metadata.get(MetaData.VERSION_DB_STRUCT) != null){
+            try {
+                VERSION_DB_STRUCT_DEFAULT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
+            } catch (Exception e) {
+                LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Integer!");
+            }
+        }else{
+            LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Exist!");
+        }
+
+        if(VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT){
+            //We can to migrate from old table in new table
+            metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
+            setSharedMetaData(metadata);
+        }
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.entry.SharedBibEntryData;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
@@ -43,7 +44,8 @@ public abstract class DBMSProcessor {
 
     protected DatabaseConnectionProperties connectionProperties;
 
-    protected Integer VERSION_DB_STRUCT_DEFALUT = -1;
+    protected Integer VERSION_DB_STRUCT_DEFAULT = -1;
+    protected Integer CURRENT_VERSION_DB_STRUCT = 0;
 
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {
         this.connection = dbmsConnection.getConnection();
@@ -57,7 +59,27 @@ public abstract class DBMSProcessor {
      * @throws SQLException
      */
     public boolean checkBaseIntegrity() throws SQLException {
-        return checkTableAvailability(escape_Table("ENTRY"), escape_Table("FIELD"), escape_Table("METADATA"));
+        DBMSType type = connectionProperties.getType();
+        if (type == DBMSType.MYSQL || type == DBMSType.POSTGRESQL) {
+            boolean value = true;
+            Map<String, String> metadata = getSharedMetaData();
+            if(metadata.get(MetaData.VERSION_DB_STRUCT) == null){
+                value = false;
+            }else{
+                try {
+                    CURRENT_VERSION_DB_STRUCT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
+                    if(VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT){
+                        value = false;
+                        //We can to migrate from old table in new table
+                    }
+                } catch (Exception e) {
+                    value = false;
+                }
+            }
+            return value;
+        }else{
+            return checkTableAvailability(escape_Table("ENTRY"), escape_Table("FIELD"), escape_Table("METADATA"));
+        }
     }
 
     /**
