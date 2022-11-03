@@ -6,11 +6,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.listener.OracleNotificationListener;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.entry.field.Field;
 
 import oracle.jdbc.OracleConnection;
@@ -63,11 +65,20 @@ public class OracleProcessor extends DBMSProcessor {
                 "CREATE TABLE \"METADATA\" (" +
                         "\"KEY\"  VARCHAR2(255) NULL," +
                         "\"VALUE\"  CLOB NOT NULL)");
+
+		Map<String, String> metadata = getSharedMetaData();
+		metadata.put(MetaData.METADATA_VERSION, "0");
+		setSharedMetaData(metadata);
     }
 
     @Override
     String escape(String expression) {
         return expression;
+    }
+
+	@Override
+    String escape_Table(String expression) {
+        return escape(expression);
     }
 
     @Override

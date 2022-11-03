@@ -80,7 +80,7 @@ public abstract class DBMSProcessor {
      * @param tableNames Table names to be checked
      * @return <code>true</code> if <b>all</b> given tables are present, else <code>false</code>.
      */
-    private boolean checkTableAvailability(String... tableNames) throws SQLException {
+    protected boolean checkTableAvailability(String... tableNames) throws SQLException {
         List<String> requiredTables = new ArrayList<>();
         for (String name : tableNames) {
             requiredTables.add(name.toUpperCase(Locale.ENGLISH));
