@@ -30,20 +30,22 @@ public class PostgreSQLProcessor extends DBMSProcessor {
      */
     @Override
     public void setUp() throws SQLException {
+		connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
+
         connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS \"ENTRY\" (" +
+                "CREATE TABLE IF NOT EXISTS " + escape_Table("ENTRY") + " (" +
                         "\"SHARED_ID\" SERIAL PRIMARY KEY, " +
                         "\"TYPE\" VARCHAR, " +
                         "\"VERSION\" INTEGER DEFAULT 1)");
 
         connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS \"FIELD\" (" +
-                        "\"ENTRY_SHARED_ID\" INTEGER REFERENCES \"ENTRY\"(\"SHARED_ID\") ON DELETE CASCADE, " +
+                "CREATE TABLE IF NOT EXISTS " + escape_Table("FIELD") + " (" +
+                        "\"ENTRY_SHARED_ID\" INTEGER REFERENCES " + escape_Table("ENTRY") + "(\"SHARED_ID\") ON DELETE CASCADE, " +
                         "\"NAME\" VARCHAR, " +
                         "\"VALUE\" TEXT)");
 
         connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS \"METADATA\" ("
+                "CREATE TABLE IF NOT EXISTS " + escape_Table("METADATA") + " ("
                         + "\"KEY\" VARCHAR,"
                         + "\"VALUE\" TEXT)");
     }
@@ -52,7 +54,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
         StringBuilder insertIntoEntryQuery = new StringBuilder()
                 .append("INSERT INTO ")
-                .append(escape("ENTRY"))
+                .append(escape_Table("ENTRY"))
                 .append("(")
                 .append(escape("TYPE"))
                 .append(") VALUES(?)");
@@ -86,6 +88,11 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     String escape(String expression) {
         return "\"" + expression + "\"";
+    }
+
+	@Override
+    String escape_Table(String expression) {
+        return "jabref." + escape(expression);
     }
 
     @Override

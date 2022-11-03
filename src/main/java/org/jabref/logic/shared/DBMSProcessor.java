@@ -55,7 +55,7 @@ public abstract class DBMSProcessor {
      * @throws SQLException
      */
     public boolean checkBaseIntegrity() throws SQLException {
-        return checkTableAvailability("ENTRY", "FIELD", "METADATA");
+        return checkTableAvailability(escape_Table("ENTRY"), escape_Table("FIELD"), escape_Table("METADATA"));
     }
 
     /**
@@ -130,6 +130,10 @@ public abstract class DBMSProcessor {
      */
     abstract String escape(String expression);
 
+	String escape_Table(String expression) {
+		return escape(expression);
+	}
+
     /**
      * For use in test only. Inserts the BibEntry into the shared database.
      *
@@ -161,7 +165,7 @@ public abstract class DBMSProcessor {
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
         StringBuilder insertIntoEntryQuery = new StringBuilder()
                 .append("INSERT INTO ")
-                .append(escape("ENTRY"))
+                .append(escape_Table("ENTRY"))
                 .append("(")
                 .append(escape("TYPE"))
                 .append(") VALUES(?)");
@@ -212,7 +216,7 @@ public abstract class DBMSProcessor {
         try {
             StringBuilder selectQuery = new StringBuilder()
                     .append("SELECT * FROM ")
-                    .append(escape("ENTRY"));
+                    .append(escape_Table("ENTRY"));
 
             try (ResultSet resultSet = connection.createStatement().executeQuery(selectQuery.toString())) {
                 while (resultSet.next()) {
@@ -242,7 +246,7 @@ public abstract class DBMSProcessor {
 
             StringBuilder insertFieldQuery = new StringBuilder()
                     .append("INSERT INTO ")
-                    .append(escape("FIELD"))
+                    .append(escape_Table("FIELD"))
                     .append("(")
                     .append(escape("ENTRY_SHARED_ID"))
                     .append(", ")
@@ -310,7 +314,7 @@ public abstract class DBMSProcessor {
                 // updating entry type
                 StringBuilder updateEntryTypeQuery = new StringBuilder()
                         .append("UPDATE ")
-                        .append(escape("ENTRY"))
+                        .append(escape_Table("ENTRY"))
                         .append(" SET ")
                         .append(escape("TYPE"))
                         .append(" = ?, ")
@@ -348,7 +352,7 @@ public abstract class DBMSProcessor {
         for (Field nullField : nullFields) {
             StringBuilder deleteFieldQuery = new StringBuilder()
                     .append("DELETE FROM ")
-                    .append(escape("FIELD"))
+                    .append(escape_Table("FIELD"))
                     .append(" WHERE ")
                     .append(escape("NAME"))
                     .append(" = ? AND ")
@@ -379,7 +383,7 @@ public abstract class DBMSProcessor {
 
             StringBuilder selectFieldQuery = new StringBuilder()
                     .append("SELECT * FROM ")
-                    .append(escape("FIELD"))
+                    .append(escape_Table("FIELD"))
                     .append(" WHERE ")
                     .append(escape("NAME"))
                     .append(" = ? AND ")
@@ -395,7 +399,7 @@ public abstract class DBMSProcessor {
                     if (selectFieldResultSet.next()) { // check if field already exists
                         StringBuilder updateFieldQuery = new StringBuilder()
                                 .append("UPDATE ")
-                                .append(escape("FIELD"))
+                                .append(escape_Table("FIELD"))
                                 .append(" SET ")
                                 .append(escape("VALUE"))
                                 .append(" = ? WHERE ")
@@ -414,7 +418,7 @@ public abstract class DBMSProcessor {
                     } else {
                         StringBuilder insertFieldQuery = new StringBuilder()
                                 .append("INSERT INTO ")
-                                .append(escape("FIELD"))
+                                .append(escape_Table("FIELD"))
                                 .append("(")
                                 .append(escape("ENTRY_SHARED_ID"))
                                 .append(", ")
@@ -448,7 +452,7 @@ public abstract class DBMSProcessor {
         }
         StringBuilder query = new StringBuilder()
                 .append("DELETE FROM ")
-                .append(escape("ENTRY"))
+                .append(escape_Table("ENTRY"))
                 .append(" WHERE ")
                 .append(escape("SHARED_ID"))
                 .append(" IN (");
@@ -506,19 +510,19 @@ public abstract class DBMSProcessor {
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT ")
-             .append(escape("ENTRY")).append(".").append(escape("SHARED_ID")).append(", ")
-             .append(escape("ENTRY")).append(".").append(escape("TYPE")).append(", ")
-             .append(escape("ENTRY")).append(".").append(escape("VERSION")).append(", ")
+             .append(escape_Table("ENTRY")).append(".").append(escape("SHARED_ID")).append(", ")
+             .append(escape_Table("ENTRY")).append(".").append(escape("TYPE")).append(", ")
+             .append(escape_Table("ENTRY")).append(".").append(escape("VERSION")).append(", ")
              .append("F.").append(escape("ENTRY_SHARED_ID")).append(", ")
              .append("F.").append(escape("NAME")).append(", ")
              .append("F.").append(escape("VALUE"))
              .append(" FROM ")
-             .append(escape("ENTRY"))
+             .append(escape_Table("ENTRY"))
              // Handle special case if entry does not have any fields (yet)
              .append(" left outer join ")
-             .append(escape("FIELD"))
+             .append(escape_Table("FIELD"))
              .append(" F on ")
-             .append(escape("ENTRY")).append(".").append(escape("SHARED_ID"))
+             .append(escape_Table("ENTRY")).append(".").append(escape("SHARED_ID"))
              .append(" = F.").append(escape("ENTRY_SHARED_ID"));
 
         if (!sharedIDs.isEmpty()) {
@@ -577,7 +581,7 @@ public abstract class DBMSProcessor {
         Map<Integer, Integer> sharedIDVersionMapping = new HashMap<>();
         StringBuilder selectEntryQuery = new StringBuilder()
                 .append("SELECT * FROM ")
-                .append(escape("ENTRY"))
+                .append(escape_Table("ENTRY"))
                 .append(" ORDER BY ")
                 .append(escape("SHARED_ID"));
 
@@ -598,7 +602,7 @@ public abstract class DBMSProcessor {
     public Map<String, String> getSharedMetaData() {
         Map<String, String> data = new HashMap<>();
 
-        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM " + escape("METADATA"))) {
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM " + escape_Table("METADATA"))) {
             while (resultSet.next()) {
                 data.put(resultSet.getString("KEY"), resultSet.getString("VALUE"));
             }
@@ -617,7 +621,7 @@ public abstract class DBMSProcessor {
     public void setSharedMetaData(Map<String, String> data) throws SQLException {
         StringBuilder updateQuery = new StringBuilder()
                 .append("UPDATE ")
-                .append(escape("METADATA"))
+                .append(escape_Table("METADATA"))
                 .append(" SET ")
                 .append(escape("VALUE"))
                 .append(" = ? ")
@@ -627,7 +631,7 @@ public abstract class DBMSProcessor {
 
         StringBuilder insertQuery = new StringBuilder()
                 .append("INSERT INTO ")
-                .append(escape("METADATA"))
+                .append(escape_Table("METADATA"))
                 .append("(")
                 .append(escape("KEY"))
                 .append(", ")
