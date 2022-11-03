@@ -49,8 +49,8 @@ class GroupNodeViewModelTest {
                 GroupViewMode.UNION,
                 true,
                 true,
-                new SimpleObjectProperty<>(',')
-        ));
+                new SimpleObjectProperty<>(','),
+                GroupHierarchyType.INDEPENDENT));
 
         viewModel = getViewModelForGroup(
                 new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));

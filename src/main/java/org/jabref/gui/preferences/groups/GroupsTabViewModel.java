@@ -1,14 +1,13 @@
 package org.jabref.gui.preferences.groups;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
+import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.model.groups.GroupHierarchyType;
 
 public class GroupsTabViewModel implements PreferenceTabViewModel {
 
@@ -17,6 +16,9 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autoAssignGroupProperty = new SimpleBooleanProperty();
     private final BooleanProperty displayGroupCountProperty = new SimpleBooleanProperty();
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
+    private final ListProperty<GroupHierarchyType> groupDefaultListProperty = new SimpleListProperty<>();
+
+    private final ObjectProperty<GroupHierarchyType> selectedGroupDefaultProperty = new SimpleObjectProperty<>();
 
     private final DialogService dialogService;
     private final GroupsPreferences groupsPreferences;
@@ -38,6 +40,10 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
                 groupViewModeUnionProperty.setValue(true);
             }
         }
+        groupDefaultListProperty.setValue(FXCollections.observableArrayList(GroupHierarchyType.values()));
+        selectedGroupDefaultProperty.setValue(groupsPreferences.getDefaultGroupMode());
+
+
         autoAssignGroupProperty.setValue(groupsPreferences.shouldAutoAssignGroup());
         displayGroupCountProperty.setValue(groupsPreferences.shouldDisplayGroupCount());
         keywordSeparatorProperty.setValue(groupsPreferences.getKeywordSeparator().toString());
@@ -49,6 +55,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
         groupsPreferences.setAutoAssignGroup(autoAssignGroupProperty.getValue());
         groupsPreferences.setDisplayGroupCount(displayGroupCountProperty.getValue());
         groupsPreferences.keywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue().charAt(0));
+        groupsPreferences.setDefaultGroupCreate(selectedGroupDefaultProperty.getValue());
     }
 
     public BooleanProperty groupViewModeIntersectionProperty() {
@@ -69,5 +76,13 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty keywordSeparatorProperty() {
         return keywordSeparatorProperty;
+    }
+
+    public ListProperty<GroupHierarchyType> defaultGroupsListProperty() {
+        return this.groupDefaultListProperty;
+    }
+
+    public Property<GroupHierarchyType> selectedDefaultGroup() {
+        return this.selectedGroupDefaultProperty;
     }
 }

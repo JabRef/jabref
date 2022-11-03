@@ -51,7 +51,7 @@ class GroupTreeViewModelTest {
                                                                                          GroupViewMode.UNION,
                                                                                          true,
                                                                                          true,
-                                                                                         new SimpleObjectProperty<>(',')));
+                                                                                         new SimpleObjectProperty<>(','), GroupHierarchyType.getByNumberOrDefault(0)));
         groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
     }
 

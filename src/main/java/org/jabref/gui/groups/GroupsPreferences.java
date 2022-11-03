@@ -4,6 +4,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.jabref.model.groups.GroupHierarchyType;
 
 public class GroupsPreferences {
 
@@ -12,15 +13,19 @@ public class GroupsPreferences {
     private final BooleanProperty shouldDisplayGroupCount;
     private final ObjectProperty<Character> keywordSeparator;
 
+    private final ObjectProperty<GroupHierarchyType> defaultGroupMode;
+
     public GroupsPreferences(GroupViewMode groupViewMode,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
-                             ObjectProperty<Character> keywordSeparator) {
+                             ObjectProperty<Character> keywordSeparator,
+                             GroupHierarchyType defaultGroupMode) {
 
         this.groupViewMode = new SimpleObjectProperty<>(groupViewMode);
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
         this.keywordSeparator = keywordSeparator;
+        this.defaultGroupMode = new SimpleObjectProperty<>(defaultGroupMode);
     }
 
     public GroupViewMode getGroupViewMode() {
@@ -69,5 +74,17 @@ public class GroupsPreferences {
 
     public void setKeywordSeparator(Character keywordSeparator) {
         this.keywordSeparator.set(keywordSeparator);
+    }
+
+    public GroupHierarchyType getDefaultGroupMode() {
+        return defaultGroupMode.get();
+    }
+
+    public ObjectProperty<GroupHierarchyType> defaultGroupCreateProperty() {
+        return defaultGroupMode;
+    }
+
+    public void setDefaultGroupCreate(GroupHierarchyType defaultGroup){
+        this.defaultGroupMode.set(defaultGroup);
     }
 }

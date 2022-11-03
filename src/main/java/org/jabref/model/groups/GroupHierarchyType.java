@@ -29,4 +29,15 @@ public enum GroupHierarchyType {
             return INDEPENDENT;
         }
     }
+
+    public String getFormattedName() {
+        if (this == INDEPENDENT) {
+            return "Independent";
+        } else if (this == REFINING) {
+            return "Intersection";
+        }
+        else {
+            return "Union";
+        }
+    }
 }

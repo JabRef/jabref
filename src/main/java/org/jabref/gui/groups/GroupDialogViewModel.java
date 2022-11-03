@@ -379,7 +379,7 @@ public class GroupDialogViewModel {
             // creating new group -> defaults!
             colorProperty.setValue(IconTheme.getDefaultGroupColor());
             typeExplicitProperty.setValue(true);
-            groupHierarchySelectedProperty.setValue(GroupHierarchyType.INDEPENDENT);
+            groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultGroupMode());
         } else {
             nameProperty.setValue(editedGroup.getName());
             colorProperty.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));

@@ -111,6 +111,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
@@ -376,6 +377,8 @@ public class JabRefPreferences implements PreferencesService {
     // GroupViewMode
     private static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
 
+    private static final String GROUP_CREATE_DEFAULT = "groupCreateDefault";
+
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
     private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
@@ -602,7 +605,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_UNION_VIEW_MODE, GroupViewMode.INTERSECTION.name());
+
         defaults.put(KEYWORD_SEPARATOR, ", ");
+        defaults.put(GROUP_CREATE_DEFAULT, GroupHierarchyType.INDEPENDENT.name());
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
@@ -1395,12 +1400,13 @@ public class JabRefPreferences implements PreferencesService {
                 GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE)),
                 getBoolean(AUTO_ASSIGN_GROUP),
                 getBoolean(DISPLAY_GROUP_COUNT),
-                getInternalPreferences().keywordSeparatorProperty()
-        );
+                getInternalPreferences().keywordSeparatorProperty(),
+                GroupHierarchyType.valueOf(get(GROUP_CREATE_DEFAULT)));
 
         EasyBind.listen(groupsPreferences.groupViewModeProperty(), (obs, oldValue, newValue) -> put(GROUP_INTERSECT_UNION_VIEW_MODE, newValue.name()));
         EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
         EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (obs, oldValue, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
+        EasyBind.listen(groupsPreferences.defaultGroupCreateProperty(), (obs, oldValue, newValue) -> put(GROUP_CREATE_DEFAULT, newValue.name()));
         // KeywordSeparator is handled by JabRefPreferences::getInternalPreferences
 
         return groupsPreferences;
