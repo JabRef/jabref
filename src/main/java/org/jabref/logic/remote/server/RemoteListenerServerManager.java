@@ -20,7 +20,7 @@ public class RemoteListenerServerManager implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServerManager.class);
 
-    private RemoteServerThread remoteServerThread;
+    private RemoteListenerServerThread remoteServerThread;
 
     public void stop() {
         if (isOpen()) {
@@ -39,7 +39,7 @@ public class RemoteListenerServerManager implements AutoCloseable {
         }
 
         try {
-            remoteServerThread = new RemoteServerThread(messageHandler, port);
+            remoteServerThread = new RemoteListenerServerThread(messageHandler, port);
         } catch (BindException e) {
             LOGGER.error("There was an error opening the configured network port {}. Please ensure there isn't another" +
                     " application already using that port.", port);

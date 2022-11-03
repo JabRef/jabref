@@ -9,7 +9,7 @@ import javafx.util.Pair;
 
 import org.jabref.logic.remote.RemoteMessage;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.RemoteProtocol;
+import org.jabref.logic.remote.Protocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +36,14 @@ public class RemoteListenerServer implements Runnable {
                 try (Socket socket = serverSocket.accept()) {
                     socket.setSoTimeout(TIMEOUT);
 
-                    try (RemoteProtocol protocol = new RemoteProtocol(socket)) {
+                    try (Protocol protocol = new Protocol(socket)) {
                         Pair<RemoteMessage, Object> input = protocol.receiveMessage();
                         handleMessage(protocol, input.getKey(), input.getValue());
                     }
                 } catch (SocketException ex) {
                     return;
                 } catch (IOException e) {
-                    LOGGER.warn("TeleServer crashed", e);
+                    LOGGER.warn("RemoteListenerServer crashed", e);
                 }
             }
         } finally {
@@ -51,10 +51,10 @@ public class RemoteListenerServer implements Runnable {
         }
     }
 
-    private void handleMessage(RemoteProtocol protocol, RemoteMessage type, Object argument) throws IOException {
+    private void handleMessage(Protocol protocol, RemoteMessage type, Object argument) throws IOException {
         switch (type) {
             case PING:
-                protocol.sendMessage(RemoteMessage.PONG, RemoteProtocol.IDENTIFIER);
+                protocol.sendMessage(RemoteMessage.PONG, Protocol.IDENTIFIER);
                 break;
             case SEND_COMMAND_LINE_ARGUMENTS:
                 if (argument instanceof String[]) {

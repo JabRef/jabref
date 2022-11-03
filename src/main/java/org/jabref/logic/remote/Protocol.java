@@ -14,7 +14,7 @@ import javafx.util.Pair;
  * @implNote The first byte of every message identifies its type as a {@link RemoteMessage}.
  * Every message is terminated with '\0'.
  */
-public class RemoteProtocol implements AutoCloseable {
+public class Protocol implements AutoCloseable {
 
     public static final String IDENTIFIER = "jabref";
 
@@ -22,7 +22,7 @@ public class RemoteProtocol implements AutoCloseable {
     private final ObjectOutputStream out;
     private final ObjectInputStream in;
 
-    public RemoteProtocol(Socket socket) throws IOException {
+    public Protocol(Socket socket) throws IOException {
         this.socket = socket;
         this.out = new ObjectOutputStream(socket.getOutputStream());
         this.in = new ObjectInputStream(socket.getInputStream());

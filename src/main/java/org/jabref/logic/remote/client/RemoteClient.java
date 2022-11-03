@@ -9,7 +9,7 @@ import javafx.util.Pair;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.remote.RemoteMessage;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.RemoteProtocol;
+import org.jabref.logic.remote.Protocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +26,11 @@ public class RemoteClient {
     }
 
     public boolean ping() {
-        try (RemoteProtocol protocol = openNewConnection()) {
+        try (Protocol protocol = openNewConnection()) {
             protocol.sendMessage(RemoteMessage.PING);
             Pair<RemoteMessage, Object> response = protocol.receiveMessage();
 
-            if (response.getKey() == RemoteMessage.PONG && RemoteProtocol.IDENTIFIER.equals(response.getValue())) {
+            if (response.getKey() == RemoteMessage.PONG && Protocol.IDENTIFIER.equals(response.getValue())) {
                 return true;
             } else {
                 String port = String.valueOf(this.port);
@@ -51,7 +51,7 @@ public class RemoteClient {
      * @return true if successful, false otherwise.
      */
     public boolean sendCommandLineArguments(String[] args) {
-        try (RemoteProtocol protocol = openNewConnection()) {
+        try (Protocol protocol = openNewConnection()) {
             protocol.sendMessage(RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS, args);
             Pair<RemoteMessage, Object> response = protocol.receiveMessage();
             return response.getKey() == RemoteMessage.OK;
@@ -61,10 +61,10 @@ public class RemoteClient {
         }
     }
 
-    private RemoteProtocol openNewConnection() throws IOException {
+    private Protocol openNewConnection() throws IOException {
         Socket socket = new Socket();
         socket.setSoTimeout(TIMEOUT);
         socket.connect(new InetSocketAddress(RemotePreferences.getIpAddress(), port), TIMEOUT);
-        return new RemoteProtocol(socket);
+        return new Protocol(socket);
     }
 }

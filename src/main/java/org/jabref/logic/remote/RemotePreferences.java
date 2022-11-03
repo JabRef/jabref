@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
 /**
- * Place for handling the preferences for the tele communication
+ * Place for handling the preferences for the remote communication
  */
 public class RemotePreferences {
 
@@ -50,7 +50,7 @@ public class RemotePreferences {
     }
 
     /**
-     * Gets the IP address where the tele server is listening.
+     * Gets the IP address where the remote server is listening.
      */
     public static InetAddress getIpAddress() throws UnknownHostException {
         return InetAddress.getByName("localhost");
