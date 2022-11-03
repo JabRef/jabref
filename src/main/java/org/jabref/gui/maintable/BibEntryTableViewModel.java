@@ -117,7 +117,6 @@ public class BibEntryTableViewModel {
                 specialFieldValues.put(field, value);
                 return value;
             }
-            // END WORKAROUND
         } else {
             value = getField(field).flatMapOpt(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
             specialFieldValues.put(field, value);
