@@ -1,5 +1,7 @@
 package org.jabref.gui.externalfiles;
 
+import java.nio.file.Path;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
@@ -88,7 +90,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
 
-    private BibDatabaseContext bibDatabase;
+    private BibDatabaseContext bibDatabaseContext;
     private MetaData metaData;
 
     public UnlinkedFilesDialogView() {
@@ -114,7 +116,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new UnlinkedFilesDialogViewModel(dialogService, undoManager, fileUpdateMonitor, preferencesService, stateManager, taskExecutor, importFormatReader);
 
-        this.bibDatabase = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+        this.bibDatabaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
 
         progressDisplay.progressProperty().bind(viewModel.progressValueProperty());
         progressText.textProperty().bind(viewModel.progressTextProperty());
@@ -168,8 +170,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
         fileSortCombo.getSelectionModel().selectFirst();
 
-
-        directoryPathField.setText(bibDatabase.getMetaData().getDefaultFileDirectory().isPresent() ? bibDatabase.getMetaData().getDefaultFileDirectory().get() : "");
+        directoryPathField.setText(bibDatabaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences()).map(Path::toString).orElse(""));
     }
 
     private void initUnlinkedFilesList() {
