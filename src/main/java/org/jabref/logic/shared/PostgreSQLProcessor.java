@@ -11,6 +11,7 @@ import org.jabref.gui.JabRefExecutorService;
 import org.jabref.logic.shared.listener.PostgresSQLNotificationListener;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
+
 import org.postgresql.PGConnection;
 
 /**
@@ -76,7 +77,6 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
             setSharedMetaData(metadata);
         }
-
     }
 
     @Override

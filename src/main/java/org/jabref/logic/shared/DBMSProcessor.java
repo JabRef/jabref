@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.entry.SharedBibEntryData;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.metadata.MetaData;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;

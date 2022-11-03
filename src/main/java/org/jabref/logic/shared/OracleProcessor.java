@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.listener.OracleNotificationListener;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.metadata.MetaData;
 
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OracleStatement;

@@ -74,6 +74,6 @@ public class MySQLProcessor extends DBMSProcessor {
 
     @Override
     String escape_Table(String expression) {
-        return escape("JABREF_"+expression);
+        return escape("JABREF_" + expression);
     }
 }
