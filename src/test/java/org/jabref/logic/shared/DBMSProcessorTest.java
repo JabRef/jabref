@@ -308,6 +308,7 @@ class DBMSProcessorTest {
         insertMetaData("protectedFlag", "true;", dbmsConnection, dbmsProcessor);
         insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;", dbmsConnection, dbmsProcessor);
         insertMetaData("saveOrderConfig", "specified;author;false;title;false;year;true;", dbmsConnection, dbmsProcessor);
+        insertMetaData("VersionDBStructure", "1", dbmsConnection, dbmsProcessor);
 
         Map<String, String> expectedMetaData = getMetaDataExample();
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
@@ -332,6 +333,7 @@ class DBMSProcessorTest {
         expectedMetaData.put("protectedFlag", "true;");
         expectedMetaData.put("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;");
         expectedMetaData.put("saveOrderConfig", "specified;author;false;title;false;year;true;");
+        expectedMetaData.put("VersionDBStructure", "1");
 
         return expectedMetaData;
     }
