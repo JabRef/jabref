@@ -55,6 +55,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed the readability of the file field in the dark dark theme [#9340](https://github.com/JabRef/jabref/issues/9340)
+- We fixed that sorting of entries in the maintable by special fields is updated immediately [#9334](https://github.com/JabRef/jabref/issues/9334)
 - We fixed the Cleanup entries dialog is partially visible [#9223](https://github.com/JabRef/jabref/issues/9223)
 - We fixed the display of the "Customize Entry Types" dialogue title [#9198](https://github.com/JabRef/jabref/issues/9198)
 - We fixed an issue where author names with tilde accents (for example ñ) were marked as "Names are not in the standard BibTex format" [#8071](https://github.com/JabRef/jabref/issues/8071)
