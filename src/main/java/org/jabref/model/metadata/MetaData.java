@@ -381,7 +381,8 @@ public class MetaData {
                 && Objects.equals(saveActions, metaData.saveActions)
                 && (mode == metaData.mode)
                 && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
-                && Objects.equals(contentSelectors, metaData.contentSelectors);
+                && Objects.equals(contentSelectors, metaData.contentSelectors)
+                && Objects.equals(VersionDBStructure, metaData.VersionDBStructure);
     }
 
     @Override
