@@ -33,6 +33,13 @@ public class PostgreSQLProcessor extends DBMSProcessor {
      */
     @Override
     public void setUp() throws SQLException {
+        
+        if (CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
+            // checkTableAvailability does not distinguish if same table name exists in different schemas
+            // VERSION_DB_STRUCT_DEFAULT must be forced
+            VERSION_DB_STRUCT_DEFAULT = 0;
+        }
+
         connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
 
         connection.createStatement().executeUpdate(
@@ -66,7 +73,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 
         if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
             // We can to migrate from old table in new table
-            if (CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
+            if (VERSION_DB_STRUCT_DEFAULT == 0 && CURRENT_VERSION_DB_STRUCT == 1) {
                 LOGGER.info("Migrating from VersionDBStructure == 0");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM \"ENTRY\"");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM \"FIELD\"");
