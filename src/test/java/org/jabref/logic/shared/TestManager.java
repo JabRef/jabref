@@ -21,16 +21,10 @@ public class TestManager {
         DBMSType dbmsType = dbmsConnection.getProperties().getType();
 
         if (dbmsType == DBMSType.MYSQL) {
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS `FIELD`");
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS `ENTRY`");
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS `METADATA`");
             dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS `JABREF_FIELD`");
             dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS `JABREF_ENTRY`");
             dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS `JABREF_METADATA`");
         } else if (dbmsType == DBMSType.POSTGRESQL) {
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS \"FIELD\"");
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS \"ENTRY\"");
-            dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS \"METADATA\"");
             dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS jabref.\"FIELD\"");
             dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS jabref.\"ENTRY\"");
             dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS jabref.\"METADATA\"");

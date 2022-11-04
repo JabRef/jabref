@@ -30,9 +30,11 @@ public class OracleProcessor extends DBMSProcessor {
 
     private DatabaseChangeRegistration databaseChangeRegistration;
 
+    private Integer VERSION_DB_STRUCT_DEFAULT = -1;
+    private Integer CURRENT_VERSION_DB_STRUCT = 0;
+
     public OracleProcessor(DatabaseConnection connection) {
         super(connection);
-        CURRENT_VERSION_DB_STRUCT = 0;
     }
 
     /**
@@ -94,6 +96,11 @@ public class OracleProcessor extends DBMSProcessor {
     @Override
     String escape_Table(String expression) {
         return escape(expression);
+    }
+
+    @Override
+    Integer getCURRENT_VERSION_DB_STRUCT() {
+        return CURRENT_VERSION_DB_STRUCT;
     }
 
     @Override

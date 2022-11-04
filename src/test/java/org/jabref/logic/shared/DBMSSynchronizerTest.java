@@ -148,6 +148,7 @@ public class DBMSSynchronizerTest {
 
         Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData, pattern);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
+        actualMap.remove("VersionDBStructure");
 
         assertEquals(expectedMap, actualMap);
     }

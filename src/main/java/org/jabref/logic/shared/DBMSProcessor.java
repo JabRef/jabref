@@ -44,9 +44,6 @@ public abstract class DBMSProcessor {
 
     protected DatabaseConnectionProperties connectionProperties;
 
-    protected Integer VERSION_DB_STRUCT_DEFAULT = -1;
-    protected Integer CURRENT_VERSION_DB_STRUCT = 0;
-
     protected DBMSProcessor(DatabaseConnection dbmsConnection) {
         this.connection = dbmsConnection.getConnection();
         this.connectionProperties = dbmsConnection.getProperties();
@@ -59,27 +56,23 @@ public abstract class DBMSProcessor {
      * @throws SQLException
      */
     public boolean checkBaseIntegrity() throws SQLException {
-        DBMSType type = connectionProperties.getType();
-        if (type == DBMSType.MYSQL || type == DBMSType.POSTGRESQL) {
-            boolean value = true;
-            Map<String, String> metadata = getSharedMetaData();
-            if (metadata.get(MetaData.VERSION_DB_STRUCT) == null) {
-                value = false;
-            } else {
-                try {
-                    CURRENT_VERSION_DB_STRUCT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
-                    if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
-                        value = false;
-                        // We can to migrate from old table in new table
-                    }
-                } catch (Exception e) {
-                    value = false;
+        boolean value;
+        value = false;
+        DBMSType type = this.connectionProperties.getType();
+        Map<String, String> metadata = getSharedMetaData();
+        if (type == DBMSType.POSTGRESQL || type == DBMSType.MYSQL) {
+            try {
+                Integer VERSION_DB_STRUCT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
+                if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
+                    value = true;
                 }
+            } catch (Exception e) {
+                value = false;
             }
-            return value;
         } else {
-            return checkTableAvailability(escape_Table("ENTRY"), escape_Table("FIELD"), escape_Table("METADATA"));
+            value = checkTableAvailability("ENTRY", "FIELD", "METADATA");
         }
+        return value;
     }
 
     /**
@@ -155,6 +148,8 @@ public abstract class DBMSProcessor {
     abstract String escape(String expression);
 
     abstract String escape_Table(String expression);
+
+    abstract Integer getCURRENT_VERSION_DB_STRUCT();
 
     /**
      * For use in test only. Inserts the BibEntry into the shared database.

@@ -21,9 +21,11 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 
     private PostgresSQLNotificationListener listener;
 
+    private Integer VERSION_DB_STRUCT_DEFAULT = -1;
+    private Integer CURRENT_VERSION_DB_STRUCT = 1;
+
     public PostgreSQLProcessor(DatabaseConnection connection) {
         super(connection);
-        CURRENT_VERSION_DB_STRUCT = 1;
     }
 
     /**
@@ -129,6 +131,11 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     String escape_Table(String expression) {
         return "jabref." + escape(expression);
+    }
+
+    @Override
+    Integer getCURRENT_VERSION_DB_STRUCT() {
+        return CURRENT_VERSION_DB_STRUCT;
     }
 
     @Override
