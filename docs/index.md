@@ -1,5 +1,6 @@
 ---
 nav_order: 1
+layout: home
 ---
 # Overview on Developing JabRef
 
