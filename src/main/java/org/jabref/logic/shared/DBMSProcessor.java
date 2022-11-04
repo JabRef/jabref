@@ -154,9 +154,7 @@ public abstract class DBMSProcessor {
      */
     abstract String escape(String expression);
 
-    String escape_Table(String expression) {
-        return escape(expression);
-    }
+    abstract String escape_Table(String expression);
 
     /**
      * For use in test only. Inserts the BibEntry into the shared database.
