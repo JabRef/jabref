@@ -45,7 +45,6 @@ import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -91,7 +90,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private UnlinkedFilesDialogViewModel viewModel;
 
     private BibDatabaseContext bibDatabaseContext;
-    private MetaData metaData;
 
     public UnlinkedFilesDialogView() {
         this.validationVisualizer = new ControlsFxVisualizer();
@@ -116,7 +114,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new UnlinkedFilesDialogViewModel(dialogService, undoManager, fileUpdateMonitor, preferencesService, stateManager, taskExecutor, importFormatReader);
 
-        this.bibDatabaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+        this.bibDatabaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("No active library"));
 
         progressDisplay.progressProperty().bind(viewModel.progressValueProperty());
         progressText.textProperty().bind(viewModel.progressTextProperty());
