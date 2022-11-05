@@ -26,6 +26,7 @@ import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.LuceneSearchResults;
@@ -44,6 +45,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
+    private final BibDatabaseContext context;
 
     private final TextFlow content;
 
@@ -51,10 +53,11 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private DocumentViewerView documentViewerView;
 
-    public FulltextSearchResultsTab(StateManager stateManager, PreferencesService preferencesService, DialogService dialogService) {
+    public FulltextSearchResultsTab(StateManager stateManager, PreferencesService preferencesService, DialogService dialogService, BibDatabaseContext context) {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
+        this.context = context;
         this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
 
         content = new TextFlow();
@@ -83,9 +86,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             documentViewerView = new DocumentViewerView();
         }
         this.entry = entry;
-        LuceneSearchResults searchResults = stateManager.getSearchResults().get(entry);
 
         content.getChildren().clear();
+
+        if (!stateManager.getSearchResults().containsKey(context)) {
+            return;
+        }
+
+        LuceneSearchResults searchResults = stateManager.getSearchResults().get(context).get(entry);
 
         if (searchResults.numSearchResults() == 0) {
             content.getChildren().add(new Text(Localization.lang("No search matches.")));

@@ -3,6 +3,7 @@ package org.jabref.gui.search;
 import java.lang.reflect.Field;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -60,6 +61,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.search.LuceneSearchResults;
@@ -72,7 +74,6 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import impl.org.controlsfx.skin.AutoCompletePopup;
-import org.apache.lucene.search.Query;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.reactfx.util.FxTimer;
@@ -200,14 +201,16 @@ public class GlobalSearchBar extends HBox {
                     // Async update
                     searchTask.restart();
                 },
-                query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)).getQuery())));
+                query -> setSearchTerm(query.orElse(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)))));
 
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldValue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
-        this.stateManager.getSearchResults().addListener((MapChangeListener<? super BibEntry, ? super LuceneSearchResults>) map -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
+        this.stateManager.getSearchResults().addListener((MapChangeListener<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>>) change -> {
+            stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery);
+        });
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
-        updateResults(this.stateManager.getSearchResults().size());
+        updateResults(this.stateManager.getSearchResults().values().stream().map(Map::size).reduce(0, Integer::sum));
     }
 
     private void initSearchModifierButtons() {
@@ -389,7 +392,7 @@ public class GlobalSearchBar extends HBox {
         setSearchFieldHintTooltip(null);
     }
 
-    public void setSearchTerm(Query searchQuery) {
+    public void setSearchTerm(SearchQuery searchQuery) {
         if (searchQuery.toString().equals(searchField.getText())) {
             return;
         }

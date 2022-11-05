@@ -73,9 +73,8 @@ public class MainTableDataModel {
     private void doSearch(Optional<SearchQuery> query) {
         if (query.isPresent()) {
             try {
-                stateManager.getSearchResults().clear();
                 for (ObjectProperty<BibDatabaseContext> context : stateManager.getOpenDatabases()) {
-                    stateManager.getSearchResults().putAll(LuceneSearcher.of(context.get()).search(query.get()));
+                    stateManager.getSearchResults().put(bibDatabaseContext, LuceneSearcher.of(context.get()).search(query.get()));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -95,7 +94,7 @@ public class MainTableDataModel {
         if (!query.isPresent() || !query.get().getSearchFlags().contains(SearchRules.SearchFlags.FILTERING_SEARCH)) {
             return true;
         }
-        return stateManager.getSearchResults().containsKey(entry.getEntry());
+        return entry.getSearchScore() > 0;
     }
 
     private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {

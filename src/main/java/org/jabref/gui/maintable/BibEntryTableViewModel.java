@@ -61,9 +61,9 @@ public class BibEntryTableViewModel {
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
 
-        stateManager.getSearchResults().addListener((MapChangeListener<BibEntry, LuceneSearchResults>) change -> {
-            if (stateManager.getSearchResults().containsKey(entry)) {
-                searchScore.set(stateManager.getSearchResults().get(entry).getSearchScore());
+        stateManager.getSearchResults().addListener((MapChangeListener<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>>) change -> {
+            if (stateManager.getSearchResults().containsKey(bibDatabaseContext) && stateManager.getSearchResults().get(bibDatabaseContext).containsKey(entry)) {
+                searchScore.set(stateManager.getSearchResults().get(bibDatabaseContext).get(entry).getSearchScore());
             } else {
                 searchScore.set(0);
             }

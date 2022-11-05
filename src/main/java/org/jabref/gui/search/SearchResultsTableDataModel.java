@@ -39,7 +39,7 @@ public class SearchResultsTableDataModel {
         }
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
-        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQueryProperty(), (query) -> entry -> stateManager.getSearchResults().containsKey(entry.getEntry())));
+        entriesFiltered.setPredicate(entry -> entry.getSearchScore() > 0);
 
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
