@@ -7,9 +7,9 @@ import java.net.SocketException;
 
 import javafx.util.Pair;
 
+import org.jabref.logic.remote.Protocol;
 import org.jabref.logic.remote.RemoteMessage;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.Protocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

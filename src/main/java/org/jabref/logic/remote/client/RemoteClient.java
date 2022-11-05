@@ -7,9 +7,9 @@ import java.net.Socket;
 import javafx.util.Pair;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.remote.Protocol;
 import org.jabref.logic.remote.RemoteMessage;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.Protocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class RemoteClient {
             protocol.sendMessage(RemoteMessage.PING);
             Pair<RemoteMessage, Object> response = protocol.receiveMessage();
 
-            if (response.getKey() == RemoteMessage.PONG && Protocol.IDENTIFIER.equals(response.getValue())) {
+            if ((response.getKey() == RemoteMessage.PONG) && Protocol.IDENTIFIER.equals(response.getValue())) {
                 return true;
             } else {
                 String port = String.valueOf(this.port);
