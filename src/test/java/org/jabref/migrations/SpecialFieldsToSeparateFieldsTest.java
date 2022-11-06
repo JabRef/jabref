@@ -87,7 +87,7 @@ class SpecialFieldsToSeparateFieldsTest {
                         SpecialField.PRIORITY, "prio1", new BibEntry().withField(SpecialField.PRIORITY, "prio1")
                 ),
                 Arguments.of(
-                        SpecialField.QUALITY, "qualityAssured", new BibEntry().withField(SpecialField.QUALITY, "qualityAssured")
+                        SpecialField.QUALITY, "quality1", new BibEntry().withField(SpecialField.QUALITY, "quality1")
                 ),
                 Arguments.of(
                         SpecialField.RANKING, "rank2", new BibEntry().withField(SpecialField.RANKING, "rank2")
@@ -96,7 +96,7 @@ class SpecialFieldsToSeparateFieldsTest {
                         SpecialField.READ_STATUS, "skimmed", new BibEntry().withField(SpecialField.READ_STATUS, "skimmed")
                 ),
                 Arguments.of(
-                        SpecialField.RELEVANCE, "relevant", new BibEntry().withField(SpecialField.RELEVANCE, "relevant")
+                        SpecialField.RELEVANCE, "relevant1", new BibEntry().withField(SpecialField.RELEVANCE, "relevant1")
                 )
         );
     }
