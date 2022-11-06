@@ -41,6 +41,7 @@ public class SpecialFieldValueViewModel {
 //            case QUALITY_ASSURED -> Localization.lang("Toggle quality assured");
             case LOW_QUALITY -> Localization.lang("Low Quality");
             case MEDIUM_QUALITY -> Localization.lang("Medium Quality");
+            case NOT_RELEVANT -> Localization.lang("Not Relevant");
             case CLEAR_RANK -> Localization.lang("No rank information");
             case RANK_1 -> Localization.lang("One star");
             case RANK_2 -> Localization.lang("Two stars");
@@ -77,6 +78,7 @@ public class SpecialFieldValueViewModel {
             case SKIMMED -> StandardActions.SKIMMED;
             case TO_BE_READ -> StandardActions.TO_BE_READ;
             case RELEVANT -> StandardActions.RELEVANT;
+            case NOT_RELEVANT -> StandardActions.NOT_RELEVANT;
         };
     }
 }

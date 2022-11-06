@@ -19,6 +19,7 @@ public enum SpecialFieldValue {
     LOW_QUALITY("lowQuality"),
     MEDIUM_QUALITY("mediumQuality"),
 
+    NOT_RELEVANT("notRelevant"),
 
     CLEAR_RANK(null),
     RANK_1("rank1"),

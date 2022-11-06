@@ -42,7 +42,8 @@ public enum SpecialField implements Field {
     ),
 
     RELEVANCE("relevance",
-            SpecialFieldValue.RELEVANT
+            SpecialFieldValue.RELEVANT,
+            SpecialFieldValue.NOT_RELEVANT
     );
 
     private final List<SpecialFieldValue> values;

@@ -219,6 +219,8 @@ public class IconTheme {
         MEDIUM_QUALITY(Color.ORANGE, MaterialDesignC.CERTIFICATE),
         LOW_QUALITY(Color.RED, MaterialDesignC.CERTIFICATE),
         RELEVANCE(MaterialDesignS.STAR_CIRCLE),
+        RELEVANT(Color.GREEN, MaterialDesignS.STAR_CIRCLE),
+        NOT_RELEVANT(Color.RED,MaterialDesignS.STAR_CIRCLE),
         MERGE_ENTRIES(MaterialDesignC.COMPARE),
         CONNECT_OPEN_OFFICE(MaterialDesignO.OPEN_IN_APP),
         PLAIN_TEXT_IMPORT_TODO(MaterialDesignC.CHECKBOX_BLANK_CIRCLE_OUTLINE),
