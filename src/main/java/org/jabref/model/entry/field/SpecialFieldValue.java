@@ -15,7 +15,10 @@ public enum SpecialFieldValue {
 
     HIGH_QUALITY("highQuality"),
 
-    QUALITY_ASSURED("qualityAssured"),
+//    QUALITY_ASSURED("qualityAssured"),
+    LOW_QUALITY("lowQuality"),
+    MEDIUM_QUALITY("mediumQuality"),
+
 
     CLEAR_RANK(null),
     RANK_1("rank1"),

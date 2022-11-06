@@ -38,9 +38,12 @@ public enum StandardActions implements Action {
     PRIORITY_MEDIUM(Localization.lang("Set priority to medium"), IconTheme.JabRefIcons.PRIORITY_MEDIUM),
     PRIORITY_LOW(Localization.lang("Set priority to low"), IconTheme.JabRefIcons.PRIORITY_LOW),
     QUALITY(Localization.lang("Quality"), IconTheme.JabRefIcons.QUALITY),
-    QUALITY_ASSURED(Localization.lang("Toggle quality assured"), IconTheme.JabRefIcons.QUALITY_ASSURED),
+//    QUALITY_ASSURED(Localization.lang("Toggle quality assured"), IconTheme.JabRefIcons.QUALITY_ASSURED),
 
-    HIGH_QUALITY(Localization.lang("High quality"),IconTheme.JabRefIcons.PRIORITY_HIGH),
+    HIGH_QUALITY(Localization.lang("High quality"),IconTheme.JabRefIcons.HIGH_QUALITY),
+    MEDIUM_QUALITY(Localization.lang("Medium quality"),IconTheme.JabRefIcons.MEDIUM_QUALITY),
+    LOW_QUALITY(Localization.lang("Low quality"),IconTheme.JabRefIcons.LOW_QUALITY),
+
     RANKING(Localization.lang("Rank"), IconTheme.JabRefIcons.RANKING),
     CLEAR_RANK(Localization.lang("Clear rank")),
     RANK_1(Localization.lang("Set rank to one"), IconTheme.JabRefIcons.RANK1),
@@ -54,7 +57,7 @@ public enum StandardActions implements Action {
     CLEAR_READ_STATUS(Localization.lang("Clear read status"), KeyBinding.CLEAR_READ_STATUS),
     READ(Localization.lang("Set read status to read"), IconTheme.JabRefIcons.READ_STATUS_READ, KeyBinding.READ),
     SKIMMED(Localization.lang("Set read status to skimmed"), IconTheme.JabRefIcons.READ_STATUS_SKIMMED, KeyBinding.SKIMMED),
-    TO_BE_READ(Localization.lang("To be read"),IconTheme.JabRefIcons.READ_STATUS_TOBE,KeyBinding.TO_BE_READ),
+    TO_BE_READ(Localization.lang("Set read status to be read"),IconTheme.JabRefIcons.READ_STATUS_TOBE,KeyBinding.TO_BE_READ),
     RELEVANCE(Localization.lang("Relevance"), IconTheme.JabRefIcons.RELEVANCE),
     RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE),
     NEW_LIBRARY(Localization.lang("New library"), IconTheme.JabRefIcons.NEW),

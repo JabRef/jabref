@@ -18,7 +18,10 @@ public enum SpecialField implements Field {
     ),
 
     QUALITY("qualityassured",
-            SpecialFieldValue.QUALITY_ASSURED
+            SpecialFieldValue.HIGH_QUALITY,
+            SpecialFieldValue.MEDIUM_QUALITY,
+            SpecialFieldValue.LOW_QUALITY
+//            SpecialFieldValue.QUALITY_ASSURED
 
     ),
 
