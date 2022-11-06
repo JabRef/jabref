@@ -1,14 +1,8 @@
 package org.jabref.model.entry.field;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.jabref.model.entry.KeywordList;
+
+import java.util.*;
 
 public enum SpecialField implements Field {
 
@@ -22,7 +16,7 @@ public enum SpecialField implements Field {
             SpecialFieldValue.PRIORITY_MEDIUM,
             SpecialFieldValue.PRIORITY_LOW
     ),
-
+    
     QUALITY("quality",
             SpecialFieldValue.CLEAR_QUALITY,
             SpecialFieldValue.QUALITY_LOW,
@@ -42,11 +36,13 @@ public enum SpecialField implements Field {
     READ_STATUS("readstatus",
             SpecialFieldValue.CLEAR_READ_STATUS,
             SpecialFieldValue.READ,
-            SpecialFieldValue.SKIMMED
+            SpecialFieldValue.SKIMMED,
+            SpecialFieldValue.TO_BE_READ
     ),
 
     RELEVANCE("relevance",
-            SpecialFieldValue.RELEVANT
+            SpecialFieldValue.RELEVANT,
+            SpecialFieldValue.NOT_RELEVANT
     );
 
     private final List<SpecialFieldValue> values;
