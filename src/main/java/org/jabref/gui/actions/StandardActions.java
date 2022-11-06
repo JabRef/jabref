@@ -38,12 +38,10 @@ public enum StandardActions implements Action {
     PRIORITY_MEDIUM(Localization.lang("Set priority to medium"), IconTheme.JabRefIcons.PRIORITY_MEDIUM),
     PRIORITY_LOW(Localization.lang("Set priority to low"), IconTheme.JabRefIcons.PRIORITY_LOW),
     QUALITY(Localization.lang("Quality"), IconTheme.JabRefIcons.QUALITY),
-//    QUALITY_ASSURED(Localization.lang("Toggle quality assured"), IconTheme.JabRefIcons.QUALITY_ASSURED),
-
-    HIGH_QUALITY(Localization.lang("High quality"),IconTheme.JabRefIcons.HIGH_QUALITY),
-    MEDIUM_QUALITY(Localization.lang("Medium quality"),IconTheme.JabRefIcons.MEDIUM_QUALITY),
-    LOW_QUALITY(Localization.lang("Low quality"),IconTheme.JabRefIcons.LOW_QUALITY),
-
+    CLEAR_QUALITY(Localization.lang("Clear Quality")),
+    QUALITY_HIGH(Localization.lang("Set quality to high"), IconTheme.JabRefIcons.QUALITY),
+    QUALITY_MEDIUM(Localization.lang("Set quality to medium"), IconTheme.JabRefIcons.QUALITY),
+    QUALITY_LOW(Localization.lang("Set quality to low"), IconTheme.JabRefIcons.QUALITY),
     RANKING(Localization.lang("Rank"), IconTheme.JabRefIcons.RANKING),
     CLEAR_RANK(Localization.lang("Clear rank")),
     RANK_1(Localization.lang("Set rank to one"), IconTheme.JabRefIcons.RANK1),

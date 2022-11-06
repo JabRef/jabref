@@ -204,7 +204,6 @@ public class IconTheme {
         DELETE_FILE(MaterialDesignD.DELETE_FOREVER),
         REMOVE_LINK(MaterialDesignL.LINK_OFF),
         AUTO_LINKED_FILE(MaterialDesignL.LINK_PLUS),
-//        QUALITY_ASSURED(MaterialDesignC.CERTIFICATE),
         QUALITY(MaterialDesignC.CERTIFICATE),
         OPEN(MaterialDesignF.FOLDER_OUTLINE),
         OPEN_LIST(MaterialDesignF.FOLDER_OPEN_OUTLINE),
