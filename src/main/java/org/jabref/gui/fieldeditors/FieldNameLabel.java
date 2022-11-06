@@ -237,7 +237,7 @@ public class FieldNameLabel extends Label {
                 case PRIORITY:
                     return Localization.lang("User-specific priority.");
                 case QUALITY:
-                    return Localization.lang("User-specific quality flag, in case its quality is assured.");
+                    return Localization.lang("User-specific quality.");
                 case RANKING:
                     return Localization.lang("User-specific ranking.");
                 case READ_STATUS:

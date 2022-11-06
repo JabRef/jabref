@@ -112,7 +112,7 @@ public enum KeyBinding {
     READ("Set read status to read", Localization.lang("Set read status to read"), "", KeyBindingCategory.EDIT),
     SKIMMED("Set read status to skimmed", Localization.lang("Set read status to skimmed"), "", KeyBindingCategory.EDIT),
 
-    TO_BE_READ("Set read status to to be read",Localization.lang("Set read status to to be read"),"",KeyBindingCategory.EDIT);
+    TO_BE_READ("Set read status to to be read", Localization.lang("Set read status to to be read"), "", KeyBindingCategory.EDIT);
 
 
     private final String constant;

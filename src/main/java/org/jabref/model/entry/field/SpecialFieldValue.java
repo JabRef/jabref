@@ -1,8 +1,8 @@
 package org.jabref.model.entry.field;
 
-import org.jabref.model.entry.Keyword;
-
 import java.util.Optional;
+
+import org.jabref.model.entry.Keyword;
 
 public enum SpecialFieldValue {
 
@@ -29,7 +29,8 @@ public enum SpecialFieldValue {
     SKIMMED("skimmed"),
 
     TO_BE_READ("to be read"),
-    RELEVANT("relevant");
+    RELEVANT("relevant1"),
+    NOT_RELEVANT("relevant2");
 
     // keyword used in keyword field
     private final Optional<Keyword> keyword;

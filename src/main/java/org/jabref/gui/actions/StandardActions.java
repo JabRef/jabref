@@ -1,11 +1,11 @@
 package org.jabref.gui.actions;
 
+import java.util.Optional;
+
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
-
-import java.util.Optional;
 
 public enum StandardActions implements Action {
 
@@ -55,7 +55,7 @@ public enum StandardActions implements Action {
     CLEAR_READ_STATUS(Localization.lang("Clear read status"), KeyBinding.CLEAR_READ_STATUS),
     READ(Localization.lang("Set read status to read"), IconTheme.JabRefIcons.READ_STATUS_READ, KeyBinding.READ),
     SKIMMED(Localization.lang("Set read status to skimmed"), IconTheme.JabRefIcons.READ_STATUS_SKIMMED, KeyBinding.SKIMMED),
-    TO_BE_READ(Localization.lang("Set read status to be read"),IconTheme.JabRefIcons.READ_STATUS_TOBE,KeyBinding.TO_BE_READ),
+    TO_BE_READ(Localization.lang("Set read status to be read"), IconTheme.JabRefIcons.READ_STATUS_TOBE, KeyBinding.TO_BE_READ),
     RELEVANCE(Localization.lang("Relevance"), IconTheme.JabRefIcons.RELEVANCE),
     RELEVANT(Localization.lang("Relevant"), IconTheme.JabRefIcons.RELEVANT),
     NOT_RELEVANT(Localization.lang("Not relevant"), IconTheme.JabRefIcons.NOT_RELEVANT),
