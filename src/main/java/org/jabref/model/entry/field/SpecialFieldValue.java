@@ -28,8 +28,8 @@ public enum SpecialFieldValue {
     CLEAR_READ_STATUS(null),
     READ("read"),
     SKIMMED("skimmed"),
+    NOT_READ("not read"),
 
-    TO_BE_READ("to be read"),
     RELEVANT("relevant1"),
     NOT_RELEVANT("relevant2");
 

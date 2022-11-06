@@ -43,7 +43,7 @@ public enum SpecialField implements Field {
             SpecialFieldValue.CLEAR_READ_STATUS,
             SpecialFieldValue.READ,
             SpecialFieldValue.SKIMMED,
-            SpecialFieldValue.TO_BE_READ
+            SpecialFieldValue.NOT_READ
     ),
 
     RELEVANCE("relevance",

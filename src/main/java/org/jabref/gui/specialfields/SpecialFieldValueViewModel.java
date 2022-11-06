@@ -50,8 +50,8 @@ public class SpecialFieldValueViewModel {
             case CLEAR_READ_STATUS -> Localization.lang("No read status information");
             case READ -> Localization.lang("Read status read");
             case SKIMMED -> Localization.lang("Read status skimmed");
-            case TO_BE_READ -> Localization.lang("Read status To be Read");
-            case RELEVANT -> Localization.lang("Toggle relevance");
+            case NOT_READ -> Localization.lang("Read status To be Read");
+            case RELEVANT -> Localization.lang("Relevant");
             case NOT_RELEVANT -> Localization.lang("Not Relevant");
         };
     }
@@ -76,7 +76,7 @@ public class SpecialFieldValueViewModel {
             case CLEAR_READ_STATUS -> StandardActions.CLEAR_READ_STATUS;
             case READ -> StandardActions.READ;
             case SKIMMED -> StandardActions.SKIMMED;
-            case TO_BE_READ -> StandardActions.TO_BE_READ;
+            case NOT_READ -> StandardActions.NOT_READ;
             case RELEVANT -> StandardActions.RELEVANT;
             case NOT_RELEVANT -> StandardActions.NOT_RELEVANT;
         };
