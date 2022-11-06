@@ -61,7 +61,8 @@ public class SearchQuery {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof SearchQuery) {
+        if (other instanceof SearchQuery searchQuery) {
+        return other.query...
             return ((SearchQuery) other).query.equals(this.query) && ((SearchQuery) other).searchFlags.equals(this.searchFlags);
         }
         return false;
