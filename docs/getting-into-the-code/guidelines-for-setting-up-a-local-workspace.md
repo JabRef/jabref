@@ -465,7 +465,7 @@ Also, set the "Scan Scope" to "Only Java sources (including tests)".
 ![Checkstyle is the highest version - and tests are also scanned](guidelines-intellij-checkstyle-final-settings.png)
 {% endfigure %}
 
-Save settings by clicking "Aply" and then "OK"
+Save settings by clicking "Apply" and then "OK"
 
 In the lower part of IntelliJ's window, click on "Checkstyle".
 In "Rules", change to "JabRef".
