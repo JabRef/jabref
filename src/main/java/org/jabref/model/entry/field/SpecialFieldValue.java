@@ -27,6 +27,8 @@ public enum SpecialFieldValue {
     CLEAR_READ_STATUS(null),
     READ("read"),
     SKIMMED("skimmed"),
+
+    TO_BE_READ("to be read"),
     RELEVANT("relevant");
 
     // keyword used in keyword field

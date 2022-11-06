@@ -34,7 +34,8 @@ public enum SpecialField implements Field {
     READ_STATUS("readstatus",
             SpecialFieldValue.CLEAR_READ_STATUS,
             SpecialFieldValue.READ,
-            SpecialFieldValue.SKIMMED
+            SpecialFieldValue.SKIMMED,
+            SpecialFieldValue.TO_BE_READ
     ),
 
     RELEVANCE("relevance",

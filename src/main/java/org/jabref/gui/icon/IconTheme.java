@@ -1,52 +1,22 @@
 package org.jabref.gui.icon;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.Set;
-
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.IkonProvider;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignD;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignE;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignG;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignH;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignI;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignK;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignL;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignN;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignO;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignR;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignS;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignT;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignU;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignV;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
+import org.kordamp.ikonli.materialdesign2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static java.util.EnumSet.allOf;
 
@@ -244,6 +214,7 @@ public class IconTheme {
         READ_STATUS_READ(Color.rgb(111, 204, 117, 1), MaterialDesignE.EYE),
         READ_STATUS_SKIMMED(Color.ORANGE, MaterialDesignE.EYE),
         READ_STATUS(MaterialDesignE.EYE),
+        READ_STATUS_TOBE(Color.GRAY, MaterialDesignE.EYE),
         RELEVANCE(MaterialDesignS.STAR_CIRCLE),
         MERGE_ENTRIES(MaterialDesignC.COMPARE),
         CONNECT_OPEN_OFFICE(MaterialDesignO.OPEN_IN_APP),
