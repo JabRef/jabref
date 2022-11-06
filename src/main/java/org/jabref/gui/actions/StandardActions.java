@@ -1,11 +1,11 @@
 package org.jabref.gui.actions;
 
-import java.util.Optional;
-
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
+
+import java.util.Optional;
 
 public enum StandardActions implements Action {
 
@@ -38,7 +38,10 @@ public enum StandardActions implements Action {
     PRIORITY_MEDIUM(Localization.lang("Set priority to medium"), IconTheme.JabRefIcons.PRIORITY_MEDIUM),
     PRIORITY_LOW(Localization.lang("Set priority to low"), IconTheme.JabRefIcons.PRIORITY_LOW),
     QUALITY(Localization.lang("Quality"), IconTheme.JabRefIcons.QUALITY),
-    QUALITY_ASSURED(Localization.lang("Toggle quality assured"), IconTheme.JabRefIcons.QUALITY_ASSURED),
+    CLEAR_QUALITY(Localization.lang("Clear Quality")),
+    QUALITY_HIGH(Localization.lang("Set quality to high"), IconTheme.JabRefIcons.QUALITY),
+    QUALITY_MEDIUM(Localization.lang("Set quality to medium"), IconTheme.JabRefIcons.QUALITY),
+    QUALITY_LOW(Localization.lang("Set quality to low"), IconTheme.JabRefIcons.QUALITY),
     RANKING(Localization.lang("Rank"), IconTheme.JabRefIcons.RANKING),
     CLEAR_RANK(Localization.lang("Clear rank")),
     RANK_1(Localization.lang("Set rank to one"), IconTheme.JabRefIcons.RANK1),
@@ -52,8 +55,10 @@ public enum StandardActions implements Action {
     CLEAR_READ_STATUS(Localization.lang("Clear read status"), KeyBinding.CLEAR_READ_STATUS),
     READ(Localization.lang("Set read status to read"), IconTheme.JabRefIcons.READ_STATUS_READ, KeyBinding.READ),
     SKIMMED(Localization.lang("Set read status to skimmed"), IconTheme.JabRefIcons.READ_STATUS_SKIMMED, KeyBinding.SKIMMED),
+    TO_BE_READ(Localization.lang("Set read status to be read"),IconTheme.JabRefIcons.READ_STATUS_TOBE,KeyBinding.TO_BE_READ),
     RELEVANCE(Localization.lang("Relevance"), IconTheme.JabRefIcons.RELEVANCE),
-    RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE),
+    RELEVANT(Localization.lang("Relevant"), IconTheme.JabRefIcons.RELEVANT),
+    NOT_RELEVANT(Localization.lang("Not relevant"), IconTheme.JabRefIcons.NOT_RELEVANT),
     NEW_LIBRARY(Localization.lang("New library"), IconTheme.JabRefIcons.NEW),
     OPEN_LIBRARY(Localization.lang("Open library"), IconTheme.JabRefIcons.OPEN, KeyBinding.OPEN_DATABASE),
     IMPORT(Localization.lang("Import"), IconTheme.JabRefIcons.IMPORT),

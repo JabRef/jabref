@@ -105,7 +105,7 @@ public class JabRefGUI {
 
         mainStage.setOnCloseRequest(event -> {
             if (!correctedWindowPos) {
-                // saves the window position only if its not  corrected -> the window will rest at the old Position,
+                // saves the window position only if it's not  corrected -> the window will rest at the old Position,
                 // if the external Screen is connected again.
                 saveWindowState(mainStage);
             }

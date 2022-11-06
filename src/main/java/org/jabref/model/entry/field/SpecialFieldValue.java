@@ -1,8 +1,8 @@
 package org.jabref.model.entry.field;
 
-import java.util.Optional;
-
 import org.jabref.model.entry.Keyword;
+
+import java.util.Optional;
 
 public enum SpecialFieldValue {
 
@@ -13,8 +13,10 @@ public enum SpecialFieldValue {
     PRIORITY_MEDIUM("prio2"),
     PRIORITY_LOW("prio3"),
 
-    QUALITY_ASSURED("qualityAssured"),
-
+    CLEAR_QUALITY(null),
+    QUALITY_LOW("quality1"),
+    QUALITY_MEDIUM("quality2"),
+    QUALITY_HIGH("quality3"),
     CLEAR_RANK(null),
     RANK_1("rank1"),
     RANK_2("rank2"),
@@ -25,6 +27,8 @@ public enum SpecialFieldValue {
     CLEAR_READ_STATUS(null),
     READ("read"),
     SKIMMED("skimmed"),
+
+    TO_BE_READ("to be read"),
     RELEVANT("relevant");
 
     // keyword used in keyword field
