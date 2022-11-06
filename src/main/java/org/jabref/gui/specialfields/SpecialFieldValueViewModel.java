@@ -37,7 +37,10 @@ public class SpecialFieldValueViewModel {
             case PRIORITY_HIGH -> Localization.lang("Priority high");
             case PRIORITY_MEDIUM -> Localization.lang("Priority medium");
             case PRIORITY_LOW -> Localization.lang("Priority low");
-            case QUALITY_ASSURED -> Localization.lang("Toggle quality assured");
+            case CLEAR_QUALITY -> Localization.lang("No quality information");
+            case QUALITY_HIGH -> Localization.lang("Quality High");
+            case QUALITY_MEDIUM -> Localization.lang("Quality Medium");
+            case QUALITY_LOW -> Localization.lang("Quality Low");
             case CLEAR_RANK -> Localization.lang("No rank information");
             case RANK_1 -> Localization.lang("One star");
             case RANK_2 -> Localization.lang("Two stars");
@@ -58,7 +61,10 @@ public class SpecialFieldValueViewModel {
             case PRIORITY_HIGH -> StandardActions.PRIORITY_HIGH;
             case PRIORITY_MEDIUM -> StandardActions.PRIORITY_MEDIUM;
             case PRIORITY_LOW -> StandardActions.PRIORITY_LOW;
-            case QUALITY_ASSURED -> StandardActions.QUALITY_ASSURED;
+            case QUALITY_HIGH -> StandardActions.QUALITY_HIGH;
+            case QUALITY_MEDIUM -> StandardActions.QUALITY_MEDIUM;
+            case CLEAR_QUALITY -> StandardActions.CLEAR_QUALITY;
+            case QUALITY_LOW -> StandardActions.QUALITY_LOW;
             case CLEAR_RANK -> StandardActions.CLEAR_RANK;
             case RANK_1 -> StandardActions.RANK_1;
             case RANK_2 -> StandardActions.RANK_2;

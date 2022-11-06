@@ -55,7 +55,9 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
         map.put("prio2", SpecialField.PRIORITY);
         map.put("prio3", SpecialField.PRIORITY);
 
-        map.put("qualityAssured", SpecialField.QUALITY);
+        map.put("quality1", SpecialField.QUALITY);
+        map.put("quality2", SpecialField.QUALITY);
+        map.put("quality3", SpecialField.QUALITY);
 
         map.put("rank1", SpecialField.RANKING);
         map.put("rank2", SpecialField.RANKING);

@@ -23,8 +23,11 @@ public enum SpecialField implements Field {
             SpecialFieldValue.PRIORITY_LOW
     ),
 
-    QUALITY("qualityassured",
-            SpecialFieldValue.QUALITY_ASSURED
+    QUALITY("quality",
+            SpecialFieldValue.CLEAR_QUALITY,
+            SpecialFieldValue.QUALITY_LOW,
+            SpecialFieldValue.QUALITY_MEDIUM,
+            SpecialFieldValue.QUALITY_HIGH
     ),
 
     RANKING("ranking",
