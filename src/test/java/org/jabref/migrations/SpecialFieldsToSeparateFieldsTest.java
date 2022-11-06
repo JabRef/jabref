@@ -20,7 +20,7 @@ class SpecialFieldsToSeparateFieldsTest {
     @ParameterizedTest
     @MethodSource("provideKeywordFieldPairs")
     public void migrateToCorrectField(SpecialField field, String fieldInKeyword, BibEntry expected) {
-        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, fieldInKeyword);
+        BibEntry entry = new BibEntry().withField(field, fieldInKeyword);
 
         new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 

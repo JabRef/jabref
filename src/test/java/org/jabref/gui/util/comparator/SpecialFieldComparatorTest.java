@@ -42,7 +42,7 @@ public class SpecialFieldComparatorTest {
 
     @Test
     public void compareUnrelatedFields() {
-        assertEquals(-11, comparator.compare(prio1, read));
+        assertEquals(-14, comparator.compare(prio1, read));
     }
 
     @Test
