@@ -42,7 +42,7 @@ public class SearchQuery {
 
         MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer(), boosts);
         queryParser.setAllowLeadingWildcard(true);
-        if (!query.contains("\"") && !query.contains(":") && !query.contains("*") && !query.contains("~")) {
+        if (!query.contains("\"") && !query.contains(":") && !query.contains("*") && !query.contains("~") & query.length() > 0) {
             query = Arrays.stream(query.split(" ")).map(s -> "*" + s + "*").collect(Collectors.joining(" "));
         }
         try {
@@ -57,6 +57,19 @@ public class SearchQuery {
     @Override
     public String toString() {
         return query;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof SearchQuery) {
+            return ((SearchQuery) other).query.equals(this.query) && ((SearchQuery) other).searchFlags.equals(this.searchFlags);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.query.hashCode();
     }
 
     public boolean isValid() {

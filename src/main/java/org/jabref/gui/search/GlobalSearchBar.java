@@ -203,7 +203,6 @@ public class GlobalSearchBar extends HBox {
                 },
                 query -> setSearchTerm(query.orElse(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)))));
 
-        this.stateManager.activeSearchQueryProperty().addListener((obs, oldValue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.getSearchResults().addListener((MapChangeListener<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>>) change -> {
             stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery);
         });

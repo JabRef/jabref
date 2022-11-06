@@ -49,6 +49,7 @@ public class BibEntryTableViewModel {
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
+    private final StateManager stateManager;
 
     private final FloatProperty searchScore = new SimpleFloatProperty(0);
 
@@ -60,13 +61,11 @@ public class BibEntryTableViewModel {
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
+        this.stateManager = stateManager;
 
+        updateSearchScore();
         stateManager.getSearchResults().addListener((MapChangeListener<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>>) change -> {
-            if (stateManager.getSearchResults().containsKey(bibDatabaseContext) && stateManager.getSearchResults().get(bibDatabaseContext).containsKey(entry)) {
-                searchScore.set(stateManager.getSearchResults().get(bibDatabaseContext).get(entry).getSearchScore());
-            } else {
-                searchScore.set(0);
-            }
+            updateSearchScore();
         });
     }
 
@@ -154,5 +153,13 @@ public class BibEntryTableViewModel {
 
     public FloatProperty searchScoreProperty() {
         return searchScore;
+    }
+
+    public void updateSearchScore() {
+        if (stateManager.getSearchResults().containsKey(bibDatabaseContext) && stateManager.getSearchResults().get(bibDatabaseContext).containsKey(entry)) {
+            searchScore.set(stateManager.getSearchResults().get(bibDatabaseContext).get(entry).getSearchScore());
+        } else {
+            searchScore.set(0);
+        }
     }
 }

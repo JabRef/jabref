@@ -35,6 +35,7 @@ public class MainTableDataModel {
     private final GroupsPreferences groupsPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final StateManager stateManager;
+    private Optional<SearchQuery> lastSearchQuery = Optional.empty();
 
     public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
         this.preferencesService = preferencesService;
@@ -66,16 +67,24 @@ public class MainTableDataModel {
         entriesSorted = new SortedList<>(entriesFiltered);
     }
 
+    public void removeBindings() {
+        entriesFiltered.predicateProperty().unbind();
+    }
+
     public static void updateSearchGroups(StateManager stateManager, BibDatabaseContext bibDatabaseContext) {
         stateManager.getSelectedGroups(bibDatabaseContext).stream().map(GroupTreeNode::getGroup).filter(g -> g instanceof SearchGroup).map(g -> ((SearchGroup) g)).forEach(g -> g.updateMatches(bibDatabaseContext));
     }
 
     private void doSearch(Optional<SearchQuery> query) {
-        if (query.isPresent()) {
+        if (lastSearchQuery != null && lastSearchQuery.equals(query)) {
+            return;
+        }
+        lastSearchQuery = query;
+        stateManager.getSearchResults().remove(bibDatabaseContext);
+        if (query.isPresent() && query.get().toString().length() > 0) {
             try {
-                for (ObjectProperty<BibDatabaseContext> context : stateManager.getOpenDatabases()) {
-                    stateManager.getSearchResults().put(bibDatabaseContext, LuceneSearcher.of(context.get()).search(query.get()));
-                }
+                // TODO btut: maybe do in background?
+                stateManager.getSearchResults().put(bibDatabaseContext, LuceneSearcher.of(bibDatabaseContext).search(query.get()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
