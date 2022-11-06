@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -62,6 +63,16 @@ public class MainTableDataModel {
                             };
                         })
         );
+        entriesViewModel.addListener((ListChangeListener<BibEntryTableViewModel>) c -> {
+            if (stateManager.activeSearchQueryProperty().isPresent().get()) {
+                while (c.next()) {
+                    if (c.wasAdded()) {
+                        doSearch(stateManager.activeSearchQueryProperty().get());
+                        return;
+                    }
+                }
+            }
+        });
 
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
