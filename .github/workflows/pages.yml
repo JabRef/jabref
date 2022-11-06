@@ -44,7 +44,8 @@ jobs:
         uses: actions/configure-pages@v2
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
-        path: docs/_site/
+        with:
+          path: docs/_site/
 
   deploy:
     if: github.ref == 'refs/heads/main'
