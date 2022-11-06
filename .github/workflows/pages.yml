@@ -38,7 +38,7 @@ jobs:
       - name: Build with Jekyll
         run: |
           cd docs
-          jekyll build
+          bundle exec jekyll build
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v2
