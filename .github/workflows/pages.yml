@@ -1,6 +1,10 @@
 name: Deploy Jekyll site to Pages
 
 on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/pages.yml'
   push:
     paths:
       - 'docs/**'
