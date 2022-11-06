@@ -35,13 +35,13 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 1 # Increment this number if you need to re-download cached gems
           working-directory: docs/
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v2
       - name: Build with Jekyll
         run: |
           cd docs
           bundle exec jekyll build
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v2
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
@@ -49,6 +49,9 @@ jobs:
 
   deploy:
     if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
     steps:
