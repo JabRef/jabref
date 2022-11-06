@@ -1,14 +1,8 @@
 package org.jabref.model.entry.field;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.jabref.model.entry.KeywordList;
+
+import java.util.*;
 
 public enum SpecialField implements Field {
 
@@ -25,6 +19,7 @@ public enum SpecialField implements Field {
 
     QUALITY("qualityassured",
             SpecialFieldValue.QUALITY_ASSURED
+
     ),
 
     RANKING("ranking",

@@ -1,8 +1,8 @@
 package org.jabref.model.entry.field;
 
-import java.util.Optional;
-
 import org.jabref.model.entry.Keyword;
+
+import java.util.Optional;
 
 public enum SpecialFieldValue {
 
@@ -12,6 +12,8 @@ public enum SpecialFieldValue {
     PRIORITY_HIGH("prio1"),
     PRIORITY_MEDIUM("prio2"),
     PRIORITY_LOW("prio3"),
+
+    HIGH_QUALITY("highQuality"),
 
     QUALITY_ASSURED("qualityAssured"),
 

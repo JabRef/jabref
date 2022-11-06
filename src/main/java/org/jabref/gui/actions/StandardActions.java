@@ -1,11 +1,11 @@
 package org.jabref.gui.actions;
 
-import java.util.Optional;
-
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
+
+import java.util.Optional;
 
 public enum StandardActions implements Action {
 
@@ -39,6 +39,8 @@ public enum StandardActions implements Action {
     PRIORITY_LOW(Localization.lang("Set priority to low"), IconTheme.JabRefIcons.PRIORITY_LOW),
     QUALITY(Localization.lang("Quality"), IconTheme.JabRefIcons.QUALITY),
     QUALITY_ASSURED(Localization.lang("Toggle quality assured"), IconTheme.JabRefIcons.QUALITY_ASSURED),
+
+    HIGH_QUALITY(Localization.lang("High quality"),IconTheme.JabRefIcons.PRIORITY_HIGH),
     RANKING(Localization.lang("Rank"), IconTheme.JabRefIcons.RANKING),
     CLEAR_RANK(Localization.lang("Clear rank")),
     RANK_1(Localization.lang("Set rank to one"), IconTheme.JabRefIcons.RANK1),
