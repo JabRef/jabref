@@ -44,7 +44,7 @@ class DateTest {
                 Arguments.of(Year.of(2015), "2015"),
                 Arguments.of(YearMonth.of(2020, Month.JANUARY), "Jan, 2020"),
                 Arguments.of(LocalDate.of(2015, Month.OCTOBER, 15), "2015.10.15"),
-                Arguments.of(LocalDate.of(-10000,Month.OCTOBER, 15), "-10000-10-15")
+                Arguments.of(LocalDate.of(-10000, Month.OCTOBER, 15), "-10000-10-15")
                 );
     }
 

@@ -62,7 +62,6 @@ public class Date {
         this(YearMonth.of(year, month));
     }
 
-
     public Date(int year) {
         this(Year.of(year));
     }
