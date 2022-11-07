@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.model.pdf.search.EnglishStemAnalyzer;
@@ -13,6 +14,10 @@ import org.jabref.model.search.rules.SearchRules;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
+
+import static org.jabref.model.search.rules.SearchRules.SearchFlags.FILTERING_SEARCH;
+import static org.jabref.model.search.rules.SearchRules.SearchFlags.KEEP_SEARCH_STRING;
+import static org.jabref.model.search.rules.SearchRules.SearchFlags.SORT_BY_SCORE;
 
 public class SearchQuery {
 
@@ -59,10 +64,23 @@ public class SearchQuery {
         return query;
     }
 
+    /**
+     * Equals, but only partially compares SearchFlags
+     *
+     * @return true if the search query is the same except for the filtering/sorting flags
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof SearchQuery searchQuery) {
-            return searchQuery.query.equals(this.query) && searchQuery.searchFlags.equals(this.searchFlags);
+            if (!searchQuery.query.equals(this.query)) {
+                return false;
+            }
+            Set<SearchRules.SearchFlags> thisSearchRulesWithoutFilterAndSort = this.searchFlags.clone();
+            Set<SearchRules.SearchFlags> otherSearchRulesWithoutFilterAndSort = searchQuery.searchFlags.clone();
+            Set<SearchRules.SearchFlags> filterAndSortFlags = EnumSet.of(SORT_BY_SCORE, FILTERING_SEARCH, KEEP_SEARCH_STRING);
+            thisSearchRulesWithoutFilterAndSort.removeAll(filterAndSortFlags);
+            otherSearchRulesWithoutFilterAndSort.removeAll(filterAndSortFlags);
+            return thisSearchRulesWithoutFilterAndSort.equals(otherSearchRulesWithoutFilterAndSort);
         }
         return false;
     }

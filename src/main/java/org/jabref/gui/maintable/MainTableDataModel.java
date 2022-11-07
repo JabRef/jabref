@@ -56,6 +56,7 @@ public class MainTableDataModel {
                         stateManager.activeSearchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
                         (groups, query, groupViewMode) -> {
+                            // TODO btut: do not repeat search if display mode changes. Check if the same can be done for groups
                             doSearch(query);
                             return entry -> {
                                 updateSearchGroups(stateManager, bibDatabaseContext);
