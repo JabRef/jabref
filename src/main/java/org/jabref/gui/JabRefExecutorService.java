@@ -117,9 +117,9 @@ public class JabRefExecutorService {
         }
     }
 
-    public void manageRemoteThread(Thread thread) {
+    public void startRemoteThread(Thread thread) {
         if (this.remoteThread != null) {
-            throw new IllegalStateException("Remote thread is already attached");
+            throw new IllegalStateException("Tele thread is already attached");
         } else {
             this.remoteThread = thread;
             remoteThread.start();
@@ -141,7 +141,6 @@ public class JabRefExecutorService {
      * Shuts everything down. After termination, this method returns.
      */
     public void shutdownEverything() {
-        // kill the remote thread
         stopRemoteThread();
 
         gracefullyShutdown(this.executorService);

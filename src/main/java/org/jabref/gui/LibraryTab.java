@@ -227,14 +227,6 @@ public class LibraryTab extends Tab {
         } catch (IOException e) {
             LOGGER.error("Cannot access lucene index", e);
         }
-
-        // a temporary workaround to update groups pane
-        stateManager.activeDatabaseProperty().bind(
-                EasyBind.map(frame.getTabbedPane().getSelectionModel().selectedItemProperty(),
-                        selectedTab -> Optional.ofNullable(selectedTab)
-                                               .filter(tab -> tab instanceof LibraryTab)
-                                               .map(tab -> (LibraryTab) tab)
-                                               .map(LibraryTab::getBibDatabaseContext)));
     }
 
     public void onDatabaseLoadingFailed(Exception ex) {
@@ -247,7 +239,12 @@ public class LibraryTab extends Tab {
     public void feedData(BibDatabaseContext bibDatabaseContext) {
         cleanUp();
 
-        this.bibDatabaseContext.setValue(Objects.requireNonNull(bibDatabaseContext));
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+        // When you open an existing library, a library tab with a loading animation is added immediately.
+        // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
+        // This line is necessary because, while there is already a binding that updates the active database when a new tab is added,
+        // it doesn't handle the case when a library is loaded asynchronously.
+        stateManager.setActiveDatabase(bibDatabaseContext);
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);

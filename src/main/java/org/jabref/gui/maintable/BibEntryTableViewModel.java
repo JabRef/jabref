@@ -118,13 +118,24 @@ public class BibEntryTableViewModel {
 
     public ObservableValue<Optional<SpecialFieldValueViewModel>> getSpecialField(SpecialField field) {
         OptionalBinding<SpecialFieldValueViewModel> value = specialFieldValues.get(field);
+        // Fetch possibly updated value from BibEntry entry
+        Optional<String> currentValue = this.entry.getField(field);
         if (value != null) {
-            return value;
+            if (currentValue.isEmpty() && value.getValue().isEmpty()) {
+                var zeroValue = getField(field).flatMapOpt(fieldValue -> field.parseValue("CLEAR_RANK").map(SpecialFieldValueViewModel::new));
+                specialFieldValues.put(field, zeroValue);
+                return zeroValue;
+            } else if (value.getValue().isEmpty() || !value.getValue().get().getValue().getFieldValue().equals(currentValue)) {
+                // specialFieldValues value and BibEntry value differ => Set specialFieldValues value to BibEntry value
+                value = getField(field).flatMapOpt(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
+                specialFieldValues.put(field, value);
+                return value;
+            }
         } else {
             value = getField(field).flatMapOpt(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
             specialFieldValues.put(field, value);
-            return value;
         }
+        return value;
     }
 
     public ObservableValue<String> getFields(OrFields fields) {

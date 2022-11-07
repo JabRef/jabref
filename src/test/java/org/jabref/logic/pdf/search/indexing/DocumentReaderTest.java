@@ -1,6 +1,5 @@
 package org.jabref.logic.pdf.search.indexing;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -36,12 +35,12 @@ public class DocumentReaderTest {
         when(databaseContext.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
         this.filePreferences = mock(FilePreferences.class);
         when(filePreferences.getUser()).thenReturn("test");
-        when(filePreferences.getFileDirectory()).thenReturn(Optional.empty());
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
     }
 
     @Test
-    public void unknownFileTestShouldReturnEmptyList() throws IOException {
+    public void unknownFileTestShouldReturnEmptyList() {
         // given
         BibEntry entry = new BibEntry();
         entry.setFiles(Collections.singletonList(new LinkedFile("Wrong path", "NOT_PRESENT.pdf", "Type")));

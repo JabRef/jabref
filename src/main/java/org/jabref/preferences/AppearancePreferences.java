@@ -12,11 +12,13 @@ import org.jabref.gui.theme.Theme;
 public class AppearancePreferences {
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
+    private final IntegerProperty defaultFontSize;
     private final ObjectProperty<Theme> theme;
 
-    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, Theme theme) {
+    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, int defaultFontSize, Theme theme) {
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
+        this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
     }
 
@@ -34,6 +36,10 @@ public class AppearancePreferences {
 
     public int getMainFontSize() {
         return mainFontSize.get();
+    }
+
+    public int getDefaultFontSize() {
+        return defaultFontSize.get();
     }
 
     public void setMainFontSize(int mainFontSize) {

@@ -1,6 +1,10 @@
 name: Deploy Jekyll site to Pages
 
 on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/pages.yml'
   push:
     paths:
       - 'docs/**'
@@ -27,19 +31,21 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0' # Not needed with a .ruby-version file
+          ruby-version: '2.7' # Not needed with a .ruby-version file
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 0 # Increment this number if you need to re-download cached gems
+          cache-version: 1 # Increment this number if you need to re-download cached gems
+          working-directory: docs/
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v1
+        uses: actions/configure-pages@v2
       - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: docs/
-          destination: ./_site
+        run: |
+          cd docs
+          bundle exec jekyll build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs/_site/
 
   deploy:
     if: github.ref == 'refs/heads/main'
