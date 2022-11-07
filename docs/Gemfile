@@ -1,4 +1,19 @@
 source 'https://rubygems.org'
 
-gem 'github-pages', group: :jekyll_plugins
-gem "webrick", "~> 1.7"
+gem "jekyll", "~> 4.3" # installed by `gem jekyll`
+
+# Homepage: https://github.com/paulrobertlloyd/jekyll-figure#jekyll-figure
+gem 'jekyll-figure'
+
+gem "just-the-docs", "0.4.0.rc3"
+
+gem "jekyll-remote-theme"
+
+# Added, because defualt layout with path "**/*.md" does not work at Jekyll
+#   Source: https://jekyllrb.com/docs/configuration/front-matter-defaults/#glob-patterns-in-front-matter-defaults
+# Homepage: https://github.com/benbalter/jekyll-default-layout#jekyll-default-layout
+gem 'jekyll-default-layout'
+
+# Somehow, "title" is set "magically" when on GitHub, but not when running locally
+# Homepage: https://github.com/benbalter/jekyll-titles-from-headings#jekyll-titles-from-headings
+gem 'jekyll-titles-from-headings'

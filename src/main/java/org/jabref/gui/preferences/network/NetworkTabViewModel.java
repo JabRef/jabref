@@ -21,7 +21,7 @@ import javafx.stage.FileChooser;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.gui.remote.JabRefMessageHandler;
+import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
@@ -73,7 +73,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final TrustStoreManager trustStoreManager;
 
-    private AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
+    private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
     public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -139,6 +139,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         this.trustStoreManager = new TrustStoreManager(Path.of(sslPreferences.getTruststorePath()));
     }
 
+    @Override
     public void setValues() {
         remoteServerProperty.setValue(remotePreferences.useRemoteServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
@@ -174,6 +175,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         });
     }
 
+    @Override
     public void storeSettings() {
         storeRemoteSettings();
         storeProxySettings(new ProxyPreferences(
@@ -201,7 +203,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(), preferences);
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences), remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
             Globals.REMOTE_LISTENER.stop();
@@ -256,6 +258,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         return proxyPasswordValidator.getValidationStatus();
     }
 
+    @Override
     public boolean validateSettings() {
         CompositeValidator validator = new CompositeValidator();
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="minimal" default-locale="en-US">
-  <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) -->
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="minimal" default-locale="en-US">
   <info>
     <title>The Journal of Pain</title>
     <title-short>J Pain</title-short>
@@ -17,7 +16,7 @@
     <category field="medicine"/>
     <issn>1526-5900</issn>
     <eissn>1528-8447</eissn>
-    <updated>2013-02-15T11:55:10+00:00</updated>
+    <updated>2022-08-31T11:55:10+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">

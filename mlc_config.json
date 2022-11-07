@@ -31,7 +31,7 @@
             "pattern": "tldrlegal.com"
         },
         {
-            "pattern": "^https://web\.archive\.org"
+            "pattern": "^https://web\\.archive\\.org"
         },
         {
             "pattern": "^https://www\\.slant\\.co/"

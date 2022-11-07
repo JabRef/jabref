@@ -1,6 +1,5 @@
 ---
 parent: Code Howtos
-nav_order: 4
 ---
 # Event Bus and Event System
 

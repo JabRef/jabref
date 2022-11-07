@@ -13,8 +13,8 @@ import javafx.beans.property.SimpleIntegerProperty;
  */
 public class RemotePreferences {
 
-    private IntegerProperty port;
-    private BooleanProperty useRemoteServer;
+    private final IntegerProperty port;
+    private final BooleanProperty useRemoteServer;
 
     public RemotePreferences(int port, boolean useRemoteServer) {
         this.port = new SimpleIntegerProperty(port);
