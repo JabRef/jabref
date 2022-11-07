@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
-import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
@@ -45,8 +44,10 @@ import org.tinylog.configuration.Configuration;
  */
 public class Launcher {
     private static Logger LOGGER;
+    private static String[] ARGUMENTS;
 
     public static void main(String[] args) {
+        ARGUMENTS = args;
         addLogToDisk();
         try {
             // Init preferences
@@ -74,7 +75,7 @@ public class Launcher {
                     return;
                 }
 
-                MainApplication.create(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences);
+                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage();
@@ -132,10 +133,6 @@ public class Launcher {
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");
                 }
-            } else {
-                // We are alone, so we start the server
-                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(),
-                        preferences);
             }
         }
         return true;

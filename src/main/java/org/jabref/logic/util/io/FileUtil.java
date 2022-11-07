@@ -380,10 +380,10 @@ public class FileUtil {
     }
 
     /**
-     * Test if the file is a bib file by simply checking the extension to be ".bib"
+     * Test if the file is a pdf file by simply checking the extension to be ".pdf"
      *
      * @param file The file to check
-     * @return True if file extension is ".bib", false otherwise
+     * @return True if file extension is ".pdf", false otherwise
      */
     public static boolean isPDFFile(Path file) {
         return getFileExtension(file).filter("pdf"::equals).isPresent();
