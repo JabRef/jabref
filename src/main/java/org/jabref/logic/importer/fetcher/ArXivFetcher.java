@@ -74,23 +74,23 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivFetcher.class);
 
-    // See https://github.com/JabRef/jabref/issues/9092#issuecomment-1251093262
+    // See https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/
     private static final String DOI_PREFIX = "10.48550/arXiv.";
 
-    // See https://github.com/JabRef/jabref/pull/9170 discussion
     /*
-    * Reason behind choice of these fields:
-    *   - KEYWORDS: More descriptive
-    *   - AUTHOR: Better formatted (last name, rest of name)
-    * */
+     * Reason behind choice of these fields:
+     *   - KEYWORDS: More descriptive
+     *   - AUTHOR: Better formatted (last name, rest of name)
+     */
     private static final Set<Field> CHOSEN_AUTOMATIC_DOI_FIELDS = Set.of(StandardField.KEYWORDS, StandardField.AUTHOR);
+
     /*
      * Reason behind choice of these fields:
      *   - DOI: give preference to DOIs manually inputted by users, instead of automatic ones
      *   - PUBLISHER: ArXiv-issued DOIs give 'ArXiv' as entry publisher. While this can be true, prefer using one from external sources,
      *      if applicable
      *   - KEY_FIELD: Usually, the KEY_FIELD retrieved from user-assigned DOIs are 'nicer' (instead of a DOI link, it's usually contains one author and the year)
-     * */
+     */
     private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER, InternalField.KEY_FIELD);
 
     private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = ImmutableMap.of(
@@ -102,14 +102,11 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     private final ImportFormatPreferences importFormatPreferences;
 
     public ArXivFetcher(ImportFormatPreferences importFormatPreferences) {
-        this.arXiv = new ArXiv(importFormatPreferences);
-        this.doiFetcher = new DoiFetcher(importFormatPreferences);
-        this.importFormatPreferences = importFormatPreferences;
+        this(importFormatPreferences, new DoiFetcher(importFormatPreferences));
     }
 
     /**
-     * NOTE: with this constructor, one can disable the additional search for more metadata (with related DOI) by passing
-     * a NULL DoiFetcher.
+     * @param doiFetcher The fetcher, maybe be NULL if no additional search is desired.
      */
     public ArXivFetcher(ImportFormatPreferences importFormatPreferences, DoiFetcher doiFetcher) {
         this.arXiv = new ArXiv(importFormatPreferences);
@@ -138,14 +135,16 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /**
-     * Remove duplicate values on "KEYWORD" field, if any.
+     * Remove duplicate values on "KEYWORD" field, if any. Al
      *
      * @param bibEntry A BibEntry to modify
      */
     private void adaptKeywordsFrom(BibEntry bibEntry) {
         Optional<String> allKeywords = bibEntry.getField(StandardField.KEYWORDS);
         if (allKeywords.isPresent()) {
-            // See https://github.com/JabRef/jabref/pull/9170/#issuecomment-1266042981
+            // With the use of ArXiv-issued DOI's KEYWORDS field, some of those keywords might contain comma. As this is the
+            // default keyword separator, replace the commas of these instances with some other character
+            // (see ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS variable)
             for (Map.Entry<String, String> entry : ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS.entrySet()) {
                 allKeywords = Optional.of(allKeywords.get().replaceAll(entry.getKey(), entry.getValue()));
             }

@@ -1076,12 +1076,11 @@ public class BibEntry implements Cloneable {
         Set<String> otherPrioritizedFieldsNames = otherPrioritizedFields.stream().map(Field::getName).collect(Collectors.toSet());
 
         for (Field otherField : otherFields) {
-            // As iterator only goes through non-null fields from OTHER, the value below can never be null
-            String otherFieldValue = other.getField(otherField).orElse(null);
-            if (!thisFieldsNames.contains(otherField.getName())) {
-                this.setField(otherField, otherFieldValue);
-            } else if (otherPrioritizedFieldsNames.contains(otherField.getName())) {
-                this.setField(otherField, otherFieldValue);
+            Optional<String> otherFieldValue = other.getField(otherField);
+            if (!thisFieldsNames.contains(otherField.getName()) ||
+                    otherPrioritizedFieldsNames.contains(otherField.getName())) {
+                // As iterator only goes through non-null fields from OTHER, otherFieldValue can never be empty
+                otherFieldValue.ifPresent(s -> this.setField(otherField, s));
             }
         }
     }

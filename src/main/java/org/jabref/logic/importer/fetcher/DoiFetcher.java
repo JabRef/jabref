@@ -119,8 +119,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 Optional<BibEntry> fetchedEntry;
 
                 // mEDRA does not return a parsable bibtex string
-                Optional<String> agency;
-                if ((agency = getAgency(doi.get())).isPresent() && "medra".equalsIgnoreCase(agency.get())) {
+                Optional<String> agency = getAgency(doi.get());
+                if (agency.isPresent() && "medra".equalsIgnoreCase(agency.get())) {
                     return new Medra().performSearchById(identifier);
                 }
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
