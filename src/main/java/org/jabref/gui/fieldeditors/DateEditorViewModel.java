@@ -21,7 +21,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
     }
 
     public StringConverter<TemporalAccessor> getDateToStringConverter() {
-        return new StringConverter<TemporalAccessor>() {
+        return new StringConverter<>() {
             @Override
             public String toString(TemporalAccessor date) {
                 if (date != null) {
@@ -36,7 +36,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
                 if (StringUtil.isNotBlank(string)) {
                     try {
                         return dateFormatter.parse(string);
-                    } catch (Exception exception) {
+                    } catch (DateTimeParseException exception) {
                         // We accept all kinds of dates (not just in the format specified)
                         return Date.parse(string).map(Date::toTemporalAccessor).orElse(null);
                     }
