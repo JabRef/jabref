@@ -112,8 +112,7 @@ public class TemporalAccessorPicker extends DatePicker {
                 if (StringUtil.isNotBlank(value)) {
                     try {
                         return defaultFormatter.parse(value);
-                    } catch (
-                            DateTimeParseException exception) {
+                    } catch (DateTimeParseException exception) {
                         return Date.parse(value).map(Date::toTemporalAccessor).orElse(null);
                     }
                 } else {
