@@ -52,12 +52,12 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     private static final RateLimiter DATA_CITE_DCN_RATE_LIMITER = RateLimiter.create(3.33);
 
     /*
-    *  By default, it seems that CrossRef DOI Content Negotiation responses are returned by their API pools, more specifically the public one
-    *  (by default). See https://www.crossref.org/documentation/retrieve-metadata/content-negotiation/
-    *  Experimentally, the rating applied to this pool is defined by response headers "X-Rate-Limit-Interval" and "X-Rate-Limit-Limit", which seems
-    *  to default to 50 request / second. However, because of its dynamic nature, this rate could change between API calls, so we need to update it
-    *  atomically when that happens (as multiple threads might access it at the same time)
-    * */
+     * By default, it seems that CrossRef DOI Content Negotiation responses are returned by their API pools, more specifically the public one
+     * (by default). See https://www.crossref.org/documentation/retrieve-metadata/content-negotiation/
+     * Experimentally, the rating applied to this pool is defined by response headers "X-Rate-Limit-Interval" and "X-Rate-Limit-Limit", which seems
+     * to default to 50 request / second. However, because of its dynamic nature, this rate could change between API calls, so we need to update it
+     * atomically when that happens (as multiple threads might access it at the same time)
+     */
     private static final RateLimiter CROSSREF_DCN_RATE_LIMITER = RateLimiter.create(50.0);
 
     private final ImportFormatPreferences preferences;

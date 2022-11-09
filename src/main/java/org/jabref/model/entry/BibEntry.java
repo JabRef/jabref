@@ -547,6 +547,7 @@ public class BibEntry implements Cloneable {
     public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
         Objects.requireNonNull(field, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
+        Objects.requireNonNull(eventSource, "field eventSource must not be null");
 
         if (value.isEmpty()) {
             return clearField(field);
@@ -564,9 +565,9 @@ public class BibEntry implements Cloneable {
         fields.put(field, value.intern());
 
         FieldChange change = new FieldChange(this, field, oldValue, value);
-        if (isNewField && eventSource != null) {
+        if (isNewField) {
             eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
-        } else if (eventSource != null) {
+        } else {
             eventBus.post(new FieldChangedEvent(change, eventSource));
         }
         return Optional.of(change);
@@ -1072,6 +1073,7 @@ public class BibEntry implements Cloneable {
         thisFields.addAll(this.getFields());
         otherFields.addAll(other.getFields());
 
+        // At the moment, "Field" interface does not provide explicit equality, so using their names instead.
         Set<String> thisFieldsNames = thisFields.stream().map(Field::getName).collect(Collectors.toSet());
         Set<String> otherPrioritizedFieldsNames = otherPrioritizedFields.stream().map(Field::getName).collect(Collectors.toSet());
 
