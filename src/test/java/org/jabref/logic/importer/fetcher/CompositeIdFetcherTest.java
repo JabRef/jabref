@@ -107,6 +107,8 @@ class CompositeIdFetcherTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         FieldContentFormatterPreferences fieldContentFormatterPreferences = mock(FieldContentFormatterPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
+        // Needed for ArXiv Fetcher keyword processing
+        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         compositeIdFetcher = new CompositeIdFetcher(importFormatPreferences);
     }
 
