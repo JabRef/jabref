@@ -17,3 +17,6 @@ gem 'jekyll-default-layout'
 # Somehow, "title" is set "magically" when on GitHub, but not when running locally
 # Homepage: https://github.com/benbalter/jekyll-titles-from-headings#jekyll-titles-from-headings
 gem 'jekyll-titles-from-headings'
+
+# Homepage: https://github.com/benbalter/jekyll-relative-links
+gem 'jekyll-relative-links'

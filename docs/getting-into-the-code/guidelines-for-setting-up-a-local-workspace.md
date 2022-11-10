@@ -135,6 +135,10 @@ upstream     https://github.com/jabref/jabref.git (push)
 
 ### Create generate source code
 
+{: .note }
+This is required for Eclipse only.
+In IntelliJ, this will be done in the IDE.
+
 Generate additional source code: `gradlew assemble` (on Linux/Mac: `./gradlew assemble`).
 
 The directory `src-gen` is now filled.
@@ -479,7 +483,7 @@ Then, you can run a check on all modified files.
 
 To have auto format working properly in the context of JavaDoc and line wrapping, "Wrap at right margin" has to be disabled. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-Go to **File > Settings... > Editor > Code Style > Java > JavaDoc".
+Go to **File > Settings... > Editor > Code Style > Java > JavaDoc**.
 
 At "Other", disable "Wrap at right margin"
 
@@ -517,6 +521,14 @@ Press "OK".
 > Finally, you have Checkstyle running locally so that you can check for styling errors before submitting the pull request.
 >
 > We wish you a successful contribution!
+
+### Key hints for IntelliJ
+
+* <kbd>Shift</kbd>+<kbd>Shift</kbd> (AKA double-shift): Open the search dialog.
+* <kbd>Ctrl</kbd>+<kbd>N</kbd>: Open the search dialog and select search for a class.
+* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>: Search everywhere in the code base.
+* <kbd>Alt</kbd>+<kbd>F1</kbd> and then <kbd>Enter</kbd>: Locate the file in the search bar on the left side.
+* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd>: Navigate from a class to the test class.
 
 ## Setup for Eclipse
 
@@ -696,7 +708,7 @@ Now you can use IntelliJ IDEA's internal build system by using **Build > Build P
 To run JabRef from IntelliJ, we let IntelliJ create a launch configuration:
 
 Locate the class `Launcher`:
-Press </kbd>Ctrl</kbd>+<kbd>N</kbd>.
+Press <kbd>Ctrl</kbd>+<kbd>N</kbd>.
 Then, the "Search for classes dialog" pops up.
 Enter `Launcher`.
 Now, only one class should have been found:
@@ -715,7 +727,7 @@ Hover on the green play button.
 
 Then, click on it.
 A popup menu opens.
-Choose the first entry "" and click on it.
+Choose the first entry and click on it.
 
 {% figure caption:"Run JabRef via launcher" %}
 ![Popup menu - Run JabRef via launcher](guidelines-intellij-run-jabref-from-launcher.png)
