@@ -7,7 +7,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.maintable.columns.MainTableColumn;
@@ -34,16 +33,13 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     public void show(boolean show) {
         // TODO: 20/10/2022 unknown bug where issue does not show unless parameter is passed through this method.
         mainTable.setOnContextMenuRequested(event -> {
+            // Display the menu if header is clicked, otherwise, remove from display.
             if (!(event.getTarget() instanceof StackPane) && show) {
                 this.show(mainTable, event.getScreenX(), event.getScreenY());
-            }
-            event.consume();
-        });
-        // Cancels right-click menu when middle mouse button clicked
-        mainTable.setOnMouseClicked(event -> {
-            if (event.getButton() != MouseButton.MIDDLE && !event.isControlDown()) {
+            } else if (this.isShowing()) {
                 this.hide();
             }
+            event.consume();
         });
     }
 
