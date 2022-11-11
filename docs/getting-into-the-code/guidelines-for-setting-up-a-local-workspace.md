@@ -6,27 +6,16 @@ nav_order: 2
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
-> **The most important step is to configure your IDE.**
-> **If you know how to fork and check out JabRef's code,**
-> **already have an IDE installed, then**
-> **please scroll down to the [IDE setup](#configure-your-ide).**
-> **Otherwise, please keep on reading**
+{: .highlight }
+The most important step is to configure your IDE.
+If you know how to fork and check out JabRef's code,
+already have an IDE installed, then
+please scroll down to the [IDE setup](#configure-your-ide).
+Otherwise, please keep on reading.
 
 ## Prerequisites
 
 This section list the prerequisites you need to get started to develop JabRef. After this section, you are ready to get the code.
-
-### Java Development Kit 18
-
-A working Java (Development Kit) 18 installation is required.
-In the case of IntelliJ, this will be downloaded inside the IDE.
-
-For Eclipse, you need to install it separately:
-
-In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 18 (e.g., `javac 18`).
-If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
-Please head to <https://adoptium.net/de/temurin/releases> to download JDK 18.
-Note that JDK 19 does not work.
 
 ### GitHub Account
 
@@ -59,25 +48,22 @@ It is strongly recommended that you have git installed.
 ### Installed IDE
 
 We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref).
-The community edition works.
+The Community Edition works well.
 Most contributors use the Ultimate Edition, because they are students getting that edition for free.
+
 For advanced users, [Eclipse](https://eclipse.org) (`2022-03` or newer) is also possible.
-
-#### Install IntelliJ
-
-We recommend installing IntelliJ IDEA using [JetBrains Toolbox App](https://www.jetbrains.com/toolbox-app/), because IDE updates are automatically installed.
-
-#### Install Eclipse
-
-Eclipse JEE 2022-03 or newer is required.
-
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download\_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse.
 On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
-### Other Tooling
+### Java Development Kit 18
 
-We collected some other tooling recommendations.
-We invite you to read on at our [tool recommendations](../code-howtos/tools.md).
+For Eclipse, a working Java (Development Kit) 18 installation is required.
+In the case of IntelliJ, this will be downloaded inside the IDE (if you follow the steps below).
+
+In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 18 (e.g., `javac 18`).
+If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+Please head to <https://adoptium.net/de/temurin/releases> to download JDK 18.
+Note that JDK 19 does not work.
 
 ## Get the code
 
@@ -585,6 +571,11 @@ To run the `LocalizationConsistencyTest` you need to add some extra module infor
 ## Final comments
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. Please make sure to also read our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md).
+
+### Other tooling
+
+We collected some other tooling recommendations.
+We invite you to read on at our [tool recommendations](../code-howtos/tools.md).
 
 ## Common issues
 
