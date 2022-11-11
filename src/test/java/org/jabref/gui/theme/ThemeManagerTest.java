@@ -53,7 +53,7 @@ class ThemeManagerTest {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         AppearancePreferences appearancePreferences =
-                new AppearancePreferences(false, 0, new Theme(testCss.toString()), false);
+                new AppearancePreferences(false, 0, 0, new Theme(testCss.toString()),false);
 
         ThemeManager themeManager = new ThemeManager(appearancePreferences, new DummyFileUpdateMonitor(), Runnable::run);
 
@@ -73,7 +73,7 @@ class ThemeManagerTest {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         AppearancePreferences appearancePreferences =
-                new AppearancePreferences(false, 0, new Theme(testCss.toString()), false);
+                new AppearancePreferences(false, 0, 0, new Theme(testCss.toString()),false);
 
         // ActiveTheme should provide the additionalStylesheet that was created before
         ThemeManager themeManagerCreatedBeforeFileDeleted = new ThemeManager(appearancePreferences, new DummyFileUpdateMonitor(), Runnable::run);
@@ -101,7 +101,7 @@ class ThemeManagerTest {
     public void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         AppearancePreferences appearancePreferences =
-                new AppearancePreferences(false, 0, new Theme(testCss.toString()), false);
+                new AppearancePreferences(false, 0, 0, new Theme(testCss.toString()), false);
 
         // ActiveTheme should provide no additionalStylesheet when no file exists
         ThemeManager themeManagerCreatedBeforeFileExists = new ThemeManager(appearancePreferences, new DummyFileUpdateMonitor(), Runnable::run);
@@ -132,7 +132,7 @@ class ThemeManagerTest {
         }
         Files.writeString(largeCssTestFile, " */", StandardOpenOption.APPEND);
         AppearancePreferences appearancePreferences =
-                new AppearancePreferences(false, 0, new Theme(largeCssTestFile.toString()), false);
+                new AppearancePreferences(false, 0, 0, new Theme(largeCssTestFile.toString()), false);
 
         // ActiveTheme should provide the large additionalStylesheet that was created before
         ThemeManager themeManager = new ThemeManager(appearancePreferences, new DummyFileUpdateMonitor(), Runnable::run);
@@ -165,7 +165,7 @@ class ThemeManagerTest {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         AppearancePreferences appearancePreferences =
-                new AppearancePreferences(false, 0, new Theme(testCss.toString()), false);
+                new AppearancePreferences(false, 0, 0, new Theme(testCss.toString()), false);
 
         ThemeManager themeManager = new ThemeManager(appearancePreferences, new DummyFileUpdateMonitor(), Runnable::run);
 
@@ -180,7 +180,7 @@ class ThemeManagerTest {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         AppearancePreferences appearancePreferences =
-                new AppearancePreferences(false, 0, new Theme(testCss.toString()), false);
+                new AppearancePreferences(false, 0, 0, new Theme(testCss.toString()), false);
 
         ThemeManager themeManager = new ThemeManager(appearancePreferences, new DummyFileUpdateMonitor(), Runnable::run);
 
@@ -209,7 +209,7 @@ class ThemeManagerTest {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         AppearancePreferences appearancePreferences =
-                new AppearancePreferences(false, 0, new Theme(testCss.toString()), false);
+                new AppearancePreferences(false, 0, 0, new Theme(testCss.toString()), false);
 
         final ThemeManager themeManager;
 

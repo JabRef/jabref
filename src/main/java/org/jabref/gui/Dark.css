@@ -170,3 +170,8 @@
 .rating > .container > .button.strong {
     -fx-icon-color: -fx-light-text-color;
 }
+
+
+.file-row-text {
+    -fx-text-fill: -fx-light-text-color;
+}
