@@ -13,7 +13,6 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
 
     public JournalEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, JournalAbbreviationRepository journalAbbreviationRepository, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
-
         this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
@@ -21,7 +20,6 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
         if (StringUtil.isBlank(text.get())) {
             return;
         }
-
         // Ignore brackets when matching abbreviations.
         final String name = StringUtil.ignoreCurlyBracket(text.get());
 
@@ -33,5 +31,4 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
                 // panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
             }
         }
-
 }
