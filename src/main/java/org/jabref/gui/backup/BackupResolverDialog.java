@@ -1,6 +1,7 @@
 package org.jabref.gui.backup;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -21,16 +22,19 @@ public class BackupResolverDialog extends FXDialog {
         setHeaderText(null);
         getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
-        Path backupPath = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP).orElseThrow();
+        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP);
 
-        // TODO: Localize this string once the localization consistency tests are updated to support Java 15 text blocks
-        setContentText("""
-                        A backup file for '%s' was found at '%s'.
-                        This could indicate that JabRef did not shut down cleanly last time the file was used.
-
-                        Do you want to recover the library from the backup file?
-                        """.formatted(originalPath.getFileName().toString(),
-                backupPath.getFileName().toString()));
+        String content = new StringBuilder()
+                .append(Localization.lang("A backup file for '%0' was found at '%1'.",
+                        originalPath.getFileName().toString(),
+                        // We need to determine the path "manually" as the path does not get passed through when a diff is detected.
+                        backupPathOpt.map(Path::toString).orElse(Localization.lang("File not found"))))
+                .append("\n")
+                .append(Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used."))
+                .append("\n\n")
+                .append(Localization.lang("Do you want to recover the library from the backup file?"))
+                .toString();
+        setContentText(content);
 
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
     }
