@@ -25,7 +25,6 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
         // Ignore brackets when matching abbreviations.
         final String name = StringUtil.ignoreCurlyBracket(text.get());
 
-        if (journalAbbreviationRepository.isKnownName(name)) {
             Optional<String> nextAbbreviation = journalAbbreviationRepository.getNextAbbreviation(name);
 
             if (nextAbbreviation.isPresent()) {
@@ -34,5 +33,5 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
                 // panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
             }
         }
-    }
+
 }

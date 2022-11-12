@@ -7,6 +7,7 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -31,7 +32,7 @@ public class UndoableUnabbreviator {
             return false;
         }
 
-        if (restoreFromFjournal(entry, field, ce)) {
+        if (restoreFromFJournal(entry, field, ce)) {
             return true;
         }
 
@@ -56,16 +57,17 @@ public class UndoableUnabbreviator {
         return true;
     }
 
-    public boolean restoreFromFjournal(BibEntry entry, Field field, CompoundEdit ce) {
-        if (!(field.equals(StandardField.JOURNAL) && entry.hasField(StandardField.FJOURNAL))) {
+    public boolean restoreFromFJournal(BibEntry entry, Field field, CompoundEdit ce) {
+
+        if ((!StandardField.JOURNAL.equals(field) && !StandardField.JOURNALTITLE.equals(field)) || !entry.hasField(AMSField.FJOURNAL)) {
             return false;
         }
 
         String origText = entry.getField(field).get();
-        String newText = entry.getField(StandardField.FJOURNAL).get().trim();
+        String newText = entry.getField(AMSField.FJOURNAL).get().trim();
 
-        entry.setField(StandardField.FJOURNAL, "");
-        ce.addEdit(new UndoableFieldChange(entry, StandardField.FJOURNAL, newText, ""));
+        entry.setField(AMSField.FJOURNAL, "");
+        ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, newText, ""));
 
         entry.setField(field, newText);
         ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));

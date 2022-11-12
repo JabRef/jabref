@@ -79,12 +79,14 @@ public class FieldFactory {
                OptionalUtil.<Field>orElse(
                 OptionalUtil.<Field>orElse(
                  OptionalUtil.<Field>orElse(
+                   OptionalUtil.<Field>orElse(
               InternalField.fromName(fieldName),
               StandardField.fromName(fieldName)),
               SpecialField.fromName(fieldName)),
               IEEEField.fromName(fieldName)),
               BiblatexSoftwareField.fromName(type, fieldName)),
-              BiblatexApaField.fromName(type, fieldName))
+              BiblatexApaField.fromName(type, fieldName)),
+              AMSField.fromName(type, fieldName))
               .orElse(new UnknownField(fieldName));
     }
 
