@@ -20,11 +20,15 @@
     <contributor>
       <name>Patrick O'Brien</name>
     </contributor>
+    <contributor>
+      <name>Andrei Bosco Bezerra Torres</name>
+      <email>andrei.torres@ontariotechu.net</email>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>1439-4456</issn>
     <eissn>1438-8871</eissn>
-    <updated>2017-06-02T10:20:48+00:00</updated>
+    <updated>2022-09-08T13:25:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -74,16 +78,19 @@
         <text variable="PMID" prefix=" PMID:"/>
       </if>
       <else-if variable="DOI" match="any">
-        <text variable="DOI" prefix="[doi: " suffix="]"/>
+        <text variable="DOI" prefix="doi: "/>
       </else-if>
       <else>
         <choose>
           <if variable="URL">
-            <group delimiter=": ">
-              <group delimiter=" ">
-                <text term="available at" text-case="capitalize-first"/>
+            <group delimiter=" ">
+              <group delimiter=": ">
+                <group delimiter=" ">
+                  <text term="available at" text-case="capitalize-first"/>
+                </group>
+                <text variable="URL" suffix=" "/>
               </group>
-              <text variable="URL"/>
+              <text macro="accessed-date"/>
             </group>
           </if>
         </choose>
@@ -96,29 +103,20 @@
     </choose>
   </macro>
   <macro name="accessed-date">
-    <choose>
-      <if variable="URL">
-        <group prefix="[" suffix="]" delimiter=" ">
-          <text term="cited"/>
-          <date variable="accessed">
-            <date-part name="year"/>
-            <date-part name="month" prefix=" " form="short" strip-periods="true"/>
-            <date-part name="day" prefix=" "/>
-          </date>
-        </group>
-      </if>
-    </choose>
+    <group prefix="[" suffix="]" delimiter=" ">
+      <text term="accessed"/>
+      <date variable="accessed">
+        <date-part name="month" prefix=" " form="short" strip-periods="true"/>
+        <date-part name="day" prefix=" " suffix=", "/>
+        <date-part name="year"/>
+      </date>
+    </group>
   </macro>
   <macro name="container-title">
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="any">
         <group delimiter=" ">
           <text variable="container-title" form="short"/>
-          <choose>
-            <if variable="URL">
-              <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
-            </if>
-          </choose>
         </group>
         <text macro="edition" prefix=" "/>
       </if>
@@ -143,11 +141,6 @@
     <text variable="title"/>
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="none">
-        <choose>
-          <if variable="URL">
-            <text term="internet" prefix=" [" suffix="]" text-case="capitalize-first"/>
-          </if>
-        </choose>
         <text macro="edition" prefix=". "/>
       </if>
     </choose>
@@ -179,7 +172,6 @@
             <date-part name="month" form="short" strip-periods="true"/>
             <date-part name="day"/>
           </date>
-          <text macro="accessed-date"/>
         </group>
       </if>
       <else-if type="bill legislation" match="any">
@@ -204,7 +196,6 @@
           <date variable="issued">
             <date-part name="year"/>
           </date>
-          <text macro="accessed-date" prefix=" "/>
         </group>
       </else>
     </choose>

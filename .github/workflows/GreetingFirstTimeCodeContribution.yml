@@ -15,7 +15,6 @@ jobs:
     - name: GreetingFirstTimeCodeContribution
       uses: peter-evans/create-or-update-comment@v2
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
         issue-number: ${{ github.event.issue.number }}
         body: |
             As a general advice for newcomers: check out [Contributing](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) for a start. Also, [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) is worth having a look at.

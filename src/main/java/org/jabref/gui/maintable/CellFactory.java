@@ -36,7 +36,7 @@ public class CellFactory {
         TABLE_ICONS.put(new UnknownField("citeseerurl"), icon);
 
         icon = IconTheme.JabRefIcons.WWW;
-        // icon.setToolTipText(Localization.lang("Open") + " ArXiv URL");
+        // icon.setToolTipText(Localization.lang("Open") + " ArXivFetcher URL");
         TABLE_ICONS.put(StandardField.EPRINT, icon);
 
         icon = IconTheme.JabRefIcons.DOI;
