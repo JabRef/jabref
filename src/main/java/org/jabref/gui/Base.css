@@ -292,6 +292,10 @@
     -fx-text-fill: -jr-accent;
 }
 
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
 .glyph-icon {
     /* This adjusts text alignment within the bounds of text nodes so that
        the text is always vertically centered within the bounds. Based on
@@ -1321,10 +1325,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-family: monospace;
     -fx-font-weight: bold;
     -fx-label-padding: 5 0 10 10;
-}
-
-TextFlow * {
-    -fx-fill: -fx-text-background-color;
 }
 
 .chips-pane > .editor {
