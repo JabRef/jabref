@@ -72,7 +72,7 @@ class MainArchitectureTests {
     @ArchIgnore
     // Fails currently
     public static void respectLayeredArchitecture(JavaClasses classes) {
-        layeredArchitecture()
+        layeredArchitecture().consideringOnlyDependenciesInLayers()
                              .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
                              .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
                              .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
@@ -115,6 +115,7 @@ class MainArchitectureTests {
     @ArchTest
     public static void restrictUsagesInLogic(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
+                   .and().areNotAnnotatedWith(AllowedToUseSwing.class)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);

@@ -23,6 +23,9 @@
 
     "onCreateCommand": "gradle assemble || true",
 
+    // Forward the noVNC port (desktop-lite: https://github.com/devcontainers/features/tree/main/src/desktop-lite)  
+    "forwardPorts": [6080],
+
     // Need to connect as root otherwise we run into issues with gradle.
     // default option is "vscode". More info: https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "root",

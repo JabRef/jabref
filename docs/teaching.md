@@ -17,13 +17,14 @@ By using JabRef as training object in exercises and labs, students can level-up 
 
 1. Choose task from the board [Candidates for university projects](https://github.com/orgs/JabRef/projects/3/views/3).
    There, new functionality is categorized in small, medium, and large effort.
-   Morevoer, categorization on the main focus (UI, logic, or both),
+   Moreover, categorization on the main focus (UI, logic, or both),
    implementation effort, testing effort, and "issue understanding effort".
    The latter category is important, because some issues are "quick wins" and others need thorough thinking.   
    In general, all issues of JabRef are free to take.
    Be aware that the difficulty of bugs and feature vary.
-   For the brave, the [Bug Board](https://github.com/JabRef/jabref/projects/5) or the [Feature Board](https://github.com/JabRef/jabref/projects/7) provide other issue sources.
+   For the brave, the [Bug Board](https://github.com/orgs/JabRef/projects/7) or the [Feature Board](https://github.com/JabRef/jabref/projects/6) provide other issue sources.
    Especially for Master students, these are excellent boards to find issues that train maintenance knowledge (which is essential for industry work).
+   Finally, there is a [collection of good first issues](https://github.com/orgs/JabRef/projects/5), if you search for something to start guiding you though a focused aspect of JabRef's code.
 2. Get in touch with the JabRef team to reserve issues for your student group and possibly to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discord. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
 3. Schedule tasks with students
 4. Students implement code
