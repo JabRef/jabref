@@ -1,5 +1,0 @@
-mutation addUserDocument($addUserDocumentInput: AddUserDocumentInput!) {
-  addUserDocument(input: $addUserDocumentInput) {
-    id
-  }
-}
