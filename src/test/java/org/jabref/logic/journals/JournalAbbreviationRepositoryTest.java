@@ -8,6 +8,7 @@ import org.jabref.gui.journals.UndoableAbbreviator;
 import org.jabref.gui.journals.UndoableUnabbreviator;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -195,12 +196,60 @@ class JournalAbbreviationRepositoryTest {
         JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT);
 
-        BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article);
-        entryWithoutEscapedAmpersandInJournal.setField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+        BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
 
         undoableAbbreviator.abbreviate(bibDatabase, entryWithoutEscapedAmpersandInJournal, StandardField.JOURNAL, new CompoundEdit());
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, entryWithoutEscapedAmpersandInJournal);
+    }
+
+    @Test
+    void testJournalAbbreviateWithEmptyFJournal() {
+        BibDatabase bibDatabase = new BibDatabase();
+        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
+        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT);
+
+        BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces")
+            .withField(AMSField.FJOURNAL, "&nbsp;");
+
+        undoableAbbreviator.abbreviate(bibDatabase, entryWithoutEscapedAmpersandInJournal, StandardField.JOURNAL, new CompoundEdit());
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
+                .withField(AMSField.FJOURNAL, "ACS Applied Materials & Interfaces");
+        assertEquals(expectedAbbreviatedJournalEntry, entryWithoutEscapedAmpersandInJournal);
+    }
+
+    @Test
+    void testUnabbreviateWithJournalExistsAndFJournalNot() {
+        BibDatabase bibDatabase = new BibDatabase();
+        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
+        UndoableUnabbreviator undoableUnabbreviator = new UndoableUnabbreviator(journalAbbreviationRepository);
+
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
+
+        undoableUnabbreviator.unabbreviate(bibDatabase, abbreviatedJournalEntry, StandardField.JOURNAL, new CompoundEdit());
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+        assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
+    }
+
+    @Test
+    void testUnabbreviateWithJournalExistsAndFJournalExists() {
+        BibDatabase bibDatabase = new BibDatabase();
+        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
+        UndoableUnabbreviator undoableUnabbreviator = new UndoableUnabbreviator(journalAbbreviationRepository);
+
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
+            .withField(AMSField.FJOURNAL, "ACS Applied Materials & Interfaces");
+
+        undoableUnabbreviator.unabbreviate(bibDatabase, abbreviatedJournalEntry, StandardField.JOURNAL, new CompoundEdit());
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+        assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
 }

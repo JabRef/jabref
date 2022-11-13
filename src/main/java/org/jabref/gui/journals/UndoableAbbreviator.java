@@ -52,8 +52,8 @@ public class UndoableAbbreviator {
             return false;
         }
 
-        // Store full name into fjournal
-        if (StandardField.JOURNAL.equals(fieldName) || StandardField.JOURNALTITLE.equals(fieldName)) {
+        // Store full name into fjournal but only if it exists
+        if (entry.hasField(AMSField.FJOURNAL) && (StandardField.JOURNAL.equals(fieldName) || StandardField.JOURNALTITLE.equals(fieldName))) {
             entry.setField(AMSField.FJOURNAL, abbreviation.getName());
             ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, abbreviation.getName()));
         }
