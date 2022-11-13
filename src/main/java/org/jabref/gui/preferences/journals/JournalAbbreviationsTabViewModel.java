@@ -49,6 +49,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isLoading = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
 
     private final PreferencesService preferences;
     private final DialogService dialogService;
@@ -359,7 +360,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     preferences.storeJournalAbbreviationPreferences(new JournalAbbreviationPreferences(
                             journalStringList,
                             abbreviationsPreferences.getDefaultEncoding(),
-                            abbreviationsPreferences.useAMSFJournalFieldForAbbrevAndUnabbrev()
+                            useFJournal.getValue()
                     ));
 
                     if (shouldWriteLists) {
@@ -407,5 +408,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     public SimpleBooleanProperty isFileRemovableProperty() {
         return isFileRemovable;
+    }
+
+    public SimpleBooleanProperty useFJournalProperty() {
+        return useFJournal;
     }
 }

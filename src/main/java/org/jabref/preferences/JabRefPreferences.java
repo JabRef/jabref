@@ -366,7 +366,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Journal
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
-    private static final String USE_AMS_FJOURNAL =  "useAMSFJournal";
+    private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
 
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";

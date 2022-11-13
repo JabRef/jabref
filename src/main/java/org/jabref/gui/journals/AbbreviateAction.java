@@ -45,7 +45,6 @@ public class AbbreviateAction extends SimpleCommand {
                             JabRefFrame frame,
                             DialogService dialogService,
                             StateManager stateManager, JournalAbbreviationPreferences journalAbbreviationPreferences) {
-
         this.action = action;
         this.frame = frame;
         this.dialogService = dialogService;
@@ -67,7 +66,6 @@ public class AbbreviateAction extends SimpleCommand {
         if ((action == StandardActions.ABBREVIATE_DEFAULT)
                 || (action == StandardActions.ABBREVIATE_MEDLINE)
                 || (action == StandardActions.ABBREVIATE_SHORTEST_UNIQUE)) {
-
             dialogService.notify(Localization.lang("Abbreviating..."));
             stateManager.getActiveDatabase().ifPresent(databaseContext ->
                     BackgroundTask.wrap(() -> abbreviate(stateManager.getActiveDatabase().get(), stateManager.getSelectedEntries()))
