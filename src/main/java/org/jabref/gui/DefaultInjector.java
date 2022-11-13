@@ -8,7 +8,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportFormatReader;
-import org.jabref.logic.jabrefonline.RemoteService;
+import org.jabref.logic.online.RemoteService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.entry.BibEntryTypesManager;

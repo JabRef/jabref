@@ -1,4 +1,4 @@
-package org.jabref.logic.jabrefonline;
+package org.jabref.logic.online;
 
 import java.util.List;
 import java.util.Optional;

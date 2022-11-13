@@ -1,4 +1,4 @@
-package org.jabref.logic.jabrefonline;
+package org.jabref.logic.online;
 
 import java.util.Optional;
 import java.util.function.Consumer;

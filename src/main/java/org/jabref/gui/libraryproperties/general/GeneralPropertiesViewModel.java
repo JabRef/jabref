@@ -20,7 +20,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.undo.UndoablePreambleChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.logic.jabrefonline.RemoteService;
+import org.jabref.logic.online.RemoteService;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;

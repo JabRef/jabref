@@ -364,7 +364,7 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
 apollo {
   packageName = "org.jabref.jabrefonline"
   schemaFile = file("src-gen/main/java/org/jabref/jabrefonline/graphql/schema.json")
-  mapScalar("DateTime", "java.time.ZonedDateTime", "org.jabref.logic.jabrefonline.JavaZonedDateTimeAdapter.INSTANCE")
+  mapScalar("DateTime", "java.time.ZonedDateTime", "org.jabref.logic.online.JavaZonedDateTimeAdapter.INSTANCE")
   generateModelBuilder = true
   introspection {
     endpointUrl = "https://mango-pebble-0224c3803-dev.westeurope.1.azurestaticapps.net/api"

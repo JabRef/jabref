@@ -1,4 +1,4 @@
-package org.jabref.logic.jabrefonline;
+package org.jabref.logic.online;
 
 import org.jabref.jabrefonline.UserChangesQuery.Node;
 import org.jabref.model.entry.BibEntry;

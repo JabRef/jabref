@@ -1,4 +1,4 @@
-package org.jabref.logic.jabrefonline;
+package org.jabref.logic.online;
 
 /**
  * This is essentially a [MVCC](http://en.wikipedia.org/wiki/Multiversion_concurrency_control) token value that corresponds to a version of the item saved in the server.

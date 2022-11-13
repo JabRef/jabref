@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.jabrefonline.RemoteSettings;
+import org.jabref.logic.online.RemoteSettings;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;

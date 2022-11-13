@@ -1,4 +1,4 @@
-org.jabref.logic.jabrefonline.JabRefOnlineServiceTest.getAllChanges=[
+org.jabref.logic.online.JabRefOnlineServiceTest.getAllChanges=[
   {
     "edges": [
       {
@@ -337,7 +337,7 @@ org.jabref.logic.jabrefonline.JabRefOnlineServiceTest.getAllChanges=[
 ]
 
 
-org.jabref.logic.jabrefonline.JabRefOnlineServiceTest.getChangesSinceCheckpoint=[
+org.jabref.logic.online.JabRefOnlineServiceTest.getChangesSinceCheckpoint=[
   {
     "edges": [
       {

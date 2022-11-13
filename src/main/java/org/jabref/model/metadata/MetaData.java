@@ -17,7 +17,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.jabrefonline.RemoteSettings;
+import org.jabref.logic.online.RemoteSettings;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;

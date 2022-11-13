@@ -1,4 +1,4 @@
-package org.jabref.logic.jabrefonline;
+package org.jabref.logic.online;
 
 import com.apollographql.apollo3.runtime.java.ApolloClient;
 import org.junit.jupiter.api.Test;

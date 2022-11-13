@@ -1,4 +1,4 @@
-package org.jabref.logic.jabrefonline;
+package org.jabref.logic.online;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

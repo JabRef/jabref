@@ -12,7 +12,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.jabrefonline.RemoteService;
+import org.jabref.logic.online.RemoteService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;

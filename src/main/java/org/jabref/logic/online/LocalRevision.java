@@ -1,4 +1,4 @@
-package org.jabref.logic.jabrefonline;
+package org.jabref.logic.online;
 
 public class LocalRevision extends RemoteRevision {
     /**
