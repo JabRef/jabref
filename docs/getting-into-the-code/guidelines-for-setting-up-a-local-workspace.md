@@ -74,7 +74,7 @@ This section explains how you get the JabRef code onto your machine in a form al
 1. Log into your GitHub account
 2. Go to [https://github.com/JabRef/jabref](https://github.com/JabRef/jabref)
 3. Create a fork by clicking at fork button on the right top corner
-4. A fork repository will be created under your account `https://github.com/YOUR\_USERNAME/jabref`.
+4. A fork repository will be created under your account `https://github.com/YOUR_USERNAME/jabref`.
 
 ### Clone your forked repository on your local machine
 
