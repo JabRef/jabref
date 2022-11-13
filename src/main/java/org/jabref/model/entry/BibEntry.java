@@ -552,10 +552,9 @@ public class BibEntry implements Cloneable {
      */
     public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
         Objects.requireNonNull(field, "field name must not be null");
-        Objects.requireNonNull(value, "field value must not be null");
         Objects.requireNonNull(eventSource, "field eventSource must not be null");
 
-        if (value.isEmpty()) {
+        if (value == null || value.isEmpty()) {
             return clearField(field);
         }
 
@@ -1062,7 +1061,7 @@ public class BibEntry implements Cloneable {
     public void setRevision(LocalRevision localRevision) {
         this.revision = Optional.ofNullable(localRevision);
     }
-    
+
     /**
      * Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
      * intersection, priority is given to THIS entry's field value.

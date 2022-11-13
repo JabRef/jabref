@@ -17,6 +17,9 @@ public class JabRefOnlineTransformer {
     public BibEntry toBibEntry(Node document) {
         BibEntry entry = new BibEntry();
 
+        // TODO: Add generation and hash
+        entry.setRevision(new LocalRevision(document.id, null, null));
+
         if (!document.citationKeys.isEmpty()) {
             entry.setCitationKey(document.citationKeys.get(0));
             if (document.citationKeys.size() > 1) {
