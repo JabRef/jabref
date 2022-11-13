@@ -164,7 +164,7 @@ class JournalAbbreviationRepositoryTest {
     void testJournalAbbreviationWithEscapedAmpersand() {
         BibDatabase bibDatabase = new BibDatabase();
         JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
-        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT);
+        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT, false);
 
         BibEntry entryWithEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article);
         entryWithEscapedAmpersandInJournal.setField(StandardField.JOURNAL, "ACS Applied Materials \\& Interfaces");
@@ -194,7 +194,7 @@ class JournalAbbreviationRepositoryTest {
     void testJournalAbbreviateWithoutEscapedAmpersand() {
         BibDatabase bibDatabase = new BibDatabase();
         JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
-        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT);
+        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT, false);
 
         BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
@@ -209,7 +209,7 @@ class JournalAbbreviationRepositoryTest {
     void testJournalAbbreviateWithEmptyFJournal() {
         BibDatabase bibDatabase = new BibDatabase();
         JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
-        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT);
+        UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(journalAbbreviationRepository, AbbreviationType.DEFAULT, true);
 
         BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces")

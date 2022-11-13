@@ -358,7 +358,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
                     preferences.storeJournalAbbreviationPreferences(new JournalAbbreviationPreferences(
                             journalStringList,
-                            abbreviationsPreferences.getDefaultEncoding()
+                            abbreviationsPreferences.getDefaultEncoding(),
+                            abbreviationsPreferences.useAMSFJournalFieldForAbbrevAndUnabbrev()
                     ));
 
                     if (shouldWriteLists) {

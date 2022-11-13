@@ -363,7 +363,10 @@ public class JabRefPreferences implements PreferencesService {
     private static final String BIND_NAMES = "bindNames";
     // User
     private static final String USER_ID = "userId";
+
+    // Journal
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
+    private static final String USE_AMS_FJOURNAL =  "useAMSFJournal";
 
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
@@ -664,6 +667,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(REMOTE_SERVER_PORT, 6050);
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
+        defaults.put(USE_AMS_FJOURNAL, true);
         defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
 
         defaults.put(LAST_USED_EXPORT, "");
@@ -1157,7 +1161,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), StandardCharsets.UTF_8);
+        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), StandardCharsets.UTF_8, getBoolean(USE_AMS_FJOURNAL));
     }
 
     @Override

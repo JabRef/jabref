@@ -7,10 +7,12 @@ public class JournalAbbreviationPreferences {
 
     private final Charset defaultEncoding;
     private List<String> externalJournalLists;
+    private boolean useFJournalField;
 
-    public JournalAbbreviationPreferences(List<String> externalJournalLists, Charset defaultEncoding) {
+    public JournalAbbreviationPreferences(List<String> externalJournalLists, Charset defaultEncoding, boolean useFJournalField) {
         this.externalJournalLists = externalJournalLists;
         this.defaultEncoding = defaultEncoding;
+        this.useFJournalField = useFJournalField;
     }
 
     public List<String> getExternalJournalLists() {
@@ -23,5 +25,13 @@ public class JournalAbbreviationPreferences {
 
     public Charset getDefaultEncoding() {
         return defaultEncoding;
+    }
+
+    public boolean useAMSFJournalFieldForAbbrevAndUnabbrev() {
+        return useFJournalField;
+    }
+
+    public void setUseAMSFJournalFieldForAbbrevAndUnabbrev(boolean useFJournalField) {
+        this.useFJournalField = useFJournalField;
     }
 }

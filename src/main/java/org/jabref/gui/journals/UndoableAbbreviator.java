@@ -15,10 +15,12 @@ public class UndoableAbbreviator {
 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final AbbreviationType abbreviationType;
+    private final boolean useFJournalField;
 
-    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType) {
+    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType, boolean useFJournalField) {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.abbreviationType = abbreviationType;
+        this.useFJournalField = useFJournalField;
     }
 
     /**
@@ -53,7 +55,7 @@ public class UndoableAbbreviator {
         }
 
         // Store full name into fjournal but only if it exists
-        if (entry.hasField(AMSField.FJOURNAL) && (StandardField.JOURNAL.equals(fieldName) || StandardField.JOURNALTITLE.equals(fieldName))) {
+        if (useFJournalField && (StandardField.JOURNAL.equals(fieldName) || StandardField.JOURNALTITLE.equals(fieldName))) {
             entry.setField(AMSField.FJOURNAL, abbreviation.getName());
             ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, abbreviation.getName()));
         }
