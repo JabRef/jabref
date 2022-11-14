@@ -13,14 +13,13 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
-
-import static org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.DiffMethod;
 
 public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
@@ -44,7 +43,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     private Button selectRightEntryValuesButton;
 
-    private final ObjectProperty<DiffHighlighter.DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
+    private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
     private EasyBinding<Boolean> showDiff;
 
     public ThreeWayMergeToolbar() {
@@ -91,9 +90,9 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable -> {
             if (diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightCharactersRadioButtons)) {
-                diffHighlightingMethod.set(DiffMethod.CHARS);
+                diffHighlightingMethod.set(BasicDiffMethod.CHARS);
             } else {
-                diffHighlightingMethod.set(DiffMethod.WORDS);
+                diffHighlightingMethod.set(BasicDiffMethod.WORDS);
             }
         }));
 

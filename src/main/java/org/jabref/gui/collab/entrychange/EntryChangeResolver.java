@@ -8,27 +8,30 @@ import org.jabref.gui.collab.ExternalChangeResolver;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.PreferencesService;
 
 public final class EntryChangeResolver extends ExternalChangeResolver {
     private final EntryChange entryChange;
     private final BibDatabaseContext databaseContext;
+    private final PreferencesService preferencesService;
 
-    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext) {
+    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, PreferencesService preferencesService) {
         super(dialogService);
         this.entryChange = entryChange;
         this.databaseContext = databaseContext;
+        this.preferencesService = preferencesService;
     }
 
     @Override
     public Optional<ExternalChange> askUserToResolveChange() {
-        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry());
+        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), preferencesService);
         mergeEntriesDialog.setLeftHeaderText(Localization.lang("On JabRef"));
         mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
-        mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, DiffHighlighter.DiffMethod.WORDS));
+        mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, BasicDiffMethod.WORDS));
 
         return dialogService.showCustomDialogAndWait(mergeEntriesDialog)
                             .map(this::mapMergeResultToExternalChange);

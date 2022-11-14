@@ -33,6 +33,7 @@ import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -41,10 +42,12 @@ public class SharedDatabaseUIManager {
     private final JabRefFrame jabRefFrame;
     private DatabaseSynchronizer dbmsSynchronizer;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
 
-    public SharedDatabaseUIManager(JabRefFrame jabRefFrame) {
+    public SharedDatabaseUIManager(JabRefFrame jabRefFrame, PreferencesService preferencesService) {
         this.jabRefFrame = jabRefFrame;
         this.dialogService = jabRefFrame.getDialogService();
+        this.preferencesService = preferencesService;
     }
 
     @Subscribe
@@ -99,7 +102,7 @@ public class SharedDatabaseUIManager {
         Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("Update refused"), message.toString(), ButtonType.CANCEL, merge);
 
         if (response.isPresent() && response.get().equals(merge)) {
-            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry);
+            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry, preferencesService);
             dialog.setTitle(Localization.lang("Update refused"));
             Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog).map(EntriesMergeResult::mergedEntry);
 

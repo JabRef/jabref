@@ -110,7 +110,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void fetchInformationByIdentifier(BibEntry entry) {
-        new FetchAndMergeEntry(JabRefGUI.getMainFrame().getCurrentLibraryTab(), taskExecutor).fetchAndMerge(entry, field);
+        new FetchAndMergeEntry(JabRefGUI.getMainFrame().getCurrentLibraryTab(), taskExecutor, preferences, dialogService).fetchAndMerge(entry, field);
     }
 
     public void lookupIdentifier(BibEntry entry) {

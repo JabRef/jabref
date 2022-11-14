@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
+
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 public abstract sealed class DiffHighlighter permits SplitDiffHighlighter, UnifiedDiffHighlighter {
@@ -39,15 +41,16 @@ public abstract sealed class DiffHighlighter permits SplitDiffHighlighter, Unifi
         return diffMethod.separator();
     }
 
-    public enum DiffMethod {
+    public enum BasicDiffMethod implements DiffMethod{
         WORDS(" "), CHARS(""), COMMA(",");
 
         private final String separator;
 
-        DiffMethod(String separator) {
+        BasicDiffMethod(String separator) {
             this.separator = separator;
         }
 
+        @Override
         public String separator() {
             return separator;
         }

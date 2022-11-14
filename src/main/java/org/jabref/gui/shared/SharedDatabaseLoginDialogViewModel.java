@@ -157,7 +157,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         loading.set(true);
 
         try {
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame);
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame, preferencesService);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 
@@ -253,7 +253,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         }
 
         rememberPassword.set(sharedDatabaseRememberPassword);
-        
+
         sharedDatabaseFolder.ifPresent(folder::set);
         autosave.set(sharedDatabaseAutosave);
     }

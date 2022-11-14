@@ -11,14 +11,13 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
-import org.jabref.gui.Globals;
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.preferences.PreferencesService;
 
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
@@ -39,12 +38,13 @@ public class ThreeWayMergeView extends VBox {
     private final List<FieldRowView> fieldRows = new ArrayList<>();
 
     private final FieldMergerFactory fieldMergerFactory;
+    private final String keywordSeparator;
 
-    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader) {
+    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, PreferencesService preferencesService) {
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
         viewModel = new ThreeWayMergeViewModel((BibEntry) leftEntry.clone(), (BibEntry) rightEntry.clone(), leftHeader, rightHeader);
-        // TODO: Inject 'preferenceService' into the constructor
-        this.fieldMergerFactory = new FieldMergerFactory(Globals.prefs);
+        this.fieldMergerFactory = new FieldMergerFactory(preferencesService);
+        this.keywordSeparator = preferencesService.getGroupsPreferences().getKeywordSeparator().toString();
 
         mergeGridPane = new GridPane();
         scrollPane = new ScrollPane();
@@ -63,8 +63,8 @@ public class ThreeWayMergeView extends VBox {
         getChildren().addAll(toolbar, headerView, scrollPane);
     }
 
-    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry) {
-        this(leftEntry, rightEntry, LEFT_DEFAULT_HEADER, RIGHT_DEFAULT_HEADER);
+    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, PreferencesService preferencesService) {
+        this(leftEntry, rightEntry, LEFT_DEFAULT_HEADER, RIGHT_DEFAULT_HEADER, preferencesService );
     }
 
     private void initializeToolbar() {
@@ -80,8 +80,8 @@ public class ThreeWayMergeView extends VBox {
         if (toolbar.isShowDiffEnabled()) {
             for (int i = 0; i < fieldRows.size(); i++) {
                 FieldRowView row = fieldRows.get(i);
-                if (row.getFieldNameCell().getText().equals("Groups") && (row.getLeftValueCell().getText().contains(",") || row.getRightValueCell().getText().contains(","))) {
-                    row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), DiffHighlighter.DiffMethod.COMMA));        
+                if (row.getFieldNameCell().getText().equals("Groups") && (row.getLeftValueCell().getText().contains(keywordSeparator) || row.getRightValueCell().getText().contains(keywordSeparator))) {
+                    row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), new GroupDiffMode(keywordSeparator)));
                 } else {
                     row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), toolbar.getDiffHighlightingMethod()));
                 }

@@ -26,7 +26,6 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -36,11 +35,7 @@ public class ChangeScanner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
     private final BibDatabaseContext database;
-    private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final StateManager stateManager;
-    private final ThemeManager themeManager;
-
     private final ExternalChangeResolverFactory externalChangeResolverFactory;
 
     public ChangeScanner(BibDatabaseContext database,
@@ -49,11 +44,8 @@ public class ChangeScanner {
                          StateManager stateManager,
                          ThemeManager themeManager) {
         this.database = database;
-        this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.stateManager = stateManager;
-        this.themeManager = themeManager;
-        this.externalChangeResolverFactory = new ExternalChangeResolverFactory(dialogService, database);
+        this.externalChangeResolverFactory = new ExternalChangeResolverFactory(dialogService, database, preferencesService);
     }
 
     public List<ExternalChange> scanForChanges() {
@@ -67,7 +59,7 @@ public class ChangeScanner {
             // Parse the modified file
             // Important: apply all post-load actions
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
-            GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
+            preferencesService.getGeneralPreferences();
             ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
