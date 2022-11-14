@@ -64,7 +64,7 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, PreferencesService preferencesService) {
-        this(leftEntry, rightEntry, LEFT_DEFAULT_HEADER, RIGHT_DEFAULT_HEADER, preferencesService );
+        this(leftEntry, rightEntry, LEFT_DEFAULT_HEADER, RIGHT_DEFAULT_HEADER, preferencesService);
     }
 
     private void initializeToolbar() {
@@ -74,6 +74,7 @@ public class ThreeWayMergeView extends VBox {
         toolbar.showDiffProperty().addListener(e -> updateDiff());
         toolbar.diffViewProperty().addListener(e -> updateDiff());
         toolbar.diffHighlightingMethodProperty().addListener(e -> updateDiff());
+        this.updateDiff();
     }
 
     private void updateDiff() {

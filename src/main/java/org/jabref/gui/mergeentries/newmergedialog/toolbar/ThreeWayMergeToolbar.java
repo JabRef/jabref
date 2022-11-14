@@ -55,7 +55,6 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     public void initialize() {
         showDiff = EasyBind.map(plainTextOrDiffComboBox.valueProperty(), plainTextOrDiff -> plainTextOrDiff == PlainTextOrDiff.Diff);
-
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
         plainTextOrDiffComboBox.getSelectionModel().select(PlainTextOrDiff.Diff);
         plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
@@ -97,6 +96,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }));
 
         diffHighlightingMethodToggleGroup.selectToggle(highlightWordsRadioButton);
+        plainTextOrDiffComboBox.valueProperty().set(PlainTextOrDiff.Diff);
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {

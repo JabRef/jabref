@@ -41,7 +41,7 @@ public abstract sealed class DiffHighlighter permits SplitDiffHighlighter, Unifi
         return diffMethod.separator();
     }
 
-    public enum BasicDiffMethod implements DiffMethod{
+    public enum BasicDiffMethod implements DiffMethod {
         WORDS(" "), CHARS(""), COMMA(",");
 
         private final String separator;
