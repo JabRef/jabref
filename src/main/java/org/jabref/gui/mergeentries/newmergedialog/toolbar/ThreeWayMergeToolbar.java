@@ -57,7 +57,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         showDiff = EasyBind.map(plainTextOrDiffComboBox.valueProperty(), plainTextOrDiff -> plainTextOrDiff == PlainTextOrDiff.Diff);
 
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
-        plainTextOrDiffComboBox.getSelectionModel().select(PlainTextOrDiff.PLAIN_TEXT);
+        plainTextOrDiffComboBox.getSelectionModel().select(PlainTextOrDiff.Diff);
         plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(PlainTextOrDiff plainTextOrDiff) {
