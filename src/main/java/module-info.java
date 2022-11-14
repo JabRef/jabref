@@ -114,6 +114,7 @@ open module org.jabref {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+    requires com.sun.jna;
     requires com.sun.jna.platform;
 
     requires org.eclipse.jgit;

@@ -66,7 +66,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
     }
 
     private boolean matches(String filename, String citeKey) {
-        boolean startsWithKey = filename.startsWith(citeKey);
+        boolean startsWithKey = filename.startsWith(FileNameCleaner.cleanFileName(citeKey));
         if (startsWithKey) {
             // The file name starts with the key, that's already a good start
             // However, we do not want to match "JabRefa" for "JabRef" since this is probably a file belonging to another entry published in the same time / same name
