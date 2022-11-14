@@ -170,7 +170,7 @@ dependencies {
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
-    implementation 'org.fxmisc.flowless:flowless:0.6.10'
+    implementation 'org.fxmisc.flowless:flowless:0.7.0'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.0'
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.2'
