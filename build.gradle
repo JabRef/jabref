@@ -171,7 +171,7 @@ dependencies {
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
     implementation 'org.fxmisc.flowless:flowless:0.6.10'
-    implementation 'org.fxmisc.richtext:richtextfx:0.10.9'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.0'
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.2'
 
