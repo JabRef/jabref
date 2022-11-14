@@ -146,7 +146,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.14.0'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.0'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.6'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.7'
 
     implementation 'org.postgresql:postgresql:42.5.0'
 
