@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
             displayName: linux
@@ -44,7 +44,7 @@ jobs:
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-          - os: macOS-latest
+          - os: macos-latest
             displayName: macOS
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
     runs-on: ${{ matrix.os }}
@@ -55,9 +55,9 @@ jobs:
         shell: bash
         run: |
           if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo ::set-output name=secretspresent::false
+            run: echo "secretspresent=false" >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=secretspresent::true
+            run: echo "secretspresent=true" >> $GITHUB_OUTPUT
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -158,9 +158,9 @@ jobs:
         shell: bash
         run: |
           if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo ::set-output name=secretspresent::false
+            run: echo "secretspresent=false" >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=secretspresent::true
+            run: echo "secretspresent=true" >> $GITHUB_OUTPUT
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}

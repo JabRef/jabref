@@ -22,10 +22,10 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          if [ "SNAPCRAFT_LOGIN_FILE" == "" ]; then
-            echo ::set-output name=secretspresent::false
+          if [ "$SNAPCRAFT_LOGIN_FILE" == "" ]; then
+            run: echo "secretspresent=false" >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=secretspresent::true
+            run: echo "secretspresent=true" >> $GITHUB_OUTPUT
           fi
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}

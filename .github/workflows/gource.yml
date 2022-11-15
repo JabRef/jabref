@@ -19,9 +19,9 @@ jobs:
       - name: Determine dates
         id: dates
         run: |
-          echo ::set-output name=start_date::`date -d "$(date +%Y-%m-01) -3 months" +%Y-%m-%d`
-          echo ::set-output name=stop_date::`date -d "$(date +%Y-%m-01) -1 day" +%Y-%m-%d`
-          echo ::set-output name=quarter::`date -d "$(date +%Y-%m-01) -1 day" +%Y`-Q$(( ((`date -d "$(date +%Y-%m-01) -1 day" +%m`)-1)/3+1 ))
+          echo "start_date=`date -d "$(date +%Y-%m-01) -3 months" +%Y-%m-%d`" >> $GITHUB_STATE
+          echo "stop_date=`date -d "$(date +%Y-%m-01) -1 day" +%Y-%m-%d`" >> $GITHUB_STATE
+          echo "quarter=`date -d "$(date +%Y-%m-01) -1 day" +%Y`-Q$(( ((`date -d "$(date +%Y-%m-01) -1 day" +%m`)-1)/3+1 ))" >> $GITHUB_STATE
       - name: 'Development history of last quarter'
         uses: nbprojekt/gource-action@v1
         with:
