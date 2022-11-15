@@ -44,7 +44,8 @@ public class AbbreviateAction extends SimpleCommand {
     public AbbreviateAction(StandardActions action,
                             JabRefFrame frame,
                             DialogService dialogService,
-                            StateManager stateManager, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+                            StateManager stateManager,
+                            JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.action = action;
         this.frame = frame;
         this.dialogService = dialogService;
