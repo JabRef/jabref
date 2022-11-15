@@ -20,15 +20,14 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
         if (StringUtil.isBlank(text.get())) {
             return;
         }
+
         // Ignore brackets when matching abbreviations.
         final String name = StringUtil.ignoreCurlyBracket(text.get());
 
-            Optional<String> nextAbbreviation = journalAbbreviationRepository.getNextAbbreviation(name);
-
-            if (nextAbbreviation.isPresent()) {
-                text.set(nextAbbreviation.get());
-                // TODO: Add undo
-                // panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
-            }
+        journalAbbreviationRepository.getNextAbbreviation(name).ifPresent(nextAbbreviation -> {
+            text.set(nextAbbreviation);
+            // TODO: Add undo
+            // panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
         }
+    }
 }
