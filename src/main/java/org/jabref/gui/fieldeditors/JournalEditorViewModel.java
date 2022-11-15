@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Optional;
-
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -28,6 +26,6 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
             text.set(nextAbbreviation);
             // TODO: Add undo
             // panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
-        }
+        });
     }
 }
