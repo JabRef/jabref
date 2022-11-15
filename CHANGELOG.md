@@ -21,7 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Implement a new ISBN Fetcher ([doi-to-bibtex-converter.herokuapp.com](http://doi-to-bibtex-converter.herokuapp.com) as source). [#9145](https://github.com/JabRef/jabref/pull/9145)
 - We added support for the Ukrainian and Arabic languages. [#9236](https://github.com/JabRef/jabref/pull/9236), [#9243](https://github.com/JabRef/jabref/pull/9243)
 - The default file directory of a library is used as default directory for [unlinked file lookup](https://docs.jabref.org/collect/findunlinkedfiles#link-the-pdfs-to-your-bib-library). [koppor#546](https://github.com/koppor/jabref/issues/546)
-- We added integrate `fjournal` support in article to abbreviation and unabbreviation functionalities. [#321](https://github.com/JabRef/jabref/pull/321)
+- We added support for the field `fjournal` (in `@article`) for abbreviation and unabbreviation functionalities. [#321](https://github.com/JabRef/jabref/pull/321)
 
 ### Changed
 
