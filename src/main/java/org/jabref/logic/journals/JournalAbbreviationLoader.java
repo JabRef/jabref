@@ -52,6 +52,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), StandardCharsets.UTF_8));
+        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), StandardCharsets.UTF_8, true));
     }
 }
