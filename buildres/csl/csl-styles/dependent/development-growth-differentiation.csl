@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>Development Growth &amp; Differentiation</title>
+    <title-short>DGD</title-short>
+    <id>http://www.zotero.org/styles/development-growth-differentiation</id>
+    <link href="http://www.zotero.org/styles/development-growth-differentiation" rel="self"/>
+    <link href="http://www.zotero.org/styles/apa-6th-edition" rel="independent-parent"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/1440169x/homepage/forauthors.html" rel="documentation"/>
+    <category citation-format="author-date"/>
+    <category field="science"/>
+    <eissn>1440-169X</eissn>
+    <summary>Style for the Development Growth &amp; Differentiation journal.</summary>
+    <updated>2022-09-15T22:06:38+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

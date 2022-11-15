@@ -14,7 +14,7 @@
     <category field="political_science"/>
     <issn>0260-2105</issn>
     <eissn>1469-9044</eissn>
-    <updated>2018-03-29T14:20:30+00:00</updated>
+    <updated>2022-10-24T16:26:57+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -131,9 +131,9 @@
       <choose>
         <if match="any" position="subsequent">
           <group delimiter=", ">
-            <group delimiter=" ">
+            <group delimiter=", ">
               <text macro="author-short"/>
-              <date date-parts="year" form="text" variable="issued" prefix="(" suffix=")"/>
+              <text variable="title-short" quotes="true"/>
             </group>
             <group delimiter=" ">
               <label variable="locator" form="short"/>

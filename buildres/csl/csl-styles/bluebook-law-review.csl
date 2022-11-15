@@ -40,9 +40,22 @@
   </macro>
   <macro name="author-short">
     <choose>
-      <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-        <text macro="name-short-macro" font-variant="small-caps"/>
+      <if type="legal_case">
+        <choose>
+          <if variable="title-short">
+            <text macro="name-short-macro" font-style="italic"/>
+          </if>
+          <else>
+            <text macro="name-short-macro"/>
+          </else>
+        </choose>
       </if>
+      <else-if type="bill legislation" match="any">
+        <text macro="name-macro"/>
+      </else-if>
+      <else-if type="book graphic motion_picture report song" match="any">
+        <text macro="name-short-macro" font-variant="small-caps"/>
+      </else-if>
       <else>
         <text macro="name-short-macro"/>
       </else>
@@ -59,10 +72,10 @@
   </macro>
   <macro name="author">
     <choose>
-      <if type="legal_case">
+      <if type="bill legal_case legislation" match="any">
         <text macro="name-macro"/>
       </if>
-      <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+      <else-if type="book graphic motion_picture report song" match="any">
         <text macro="name-macro" font-variant="small-caps"/>
       </else-if>
       <else>
