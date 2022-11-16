@@ -150,9 +150,9 @@ jobs:
         shell: bash
         run: |
           if [ "$CODECOV_TOKEN" == "" ]; then
-            run: echo "secretspresent=false" >> $GITHUB_OUTPUT
+            echo "secretspresent=false" >> $GITHUB_OUTPUT
           else
-            run: echo "secretspresent=true" >> $GITHUB_OUTPUT
+            echo "secretspresent=true" >> $GITHUB_OUTPUT
           fi
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
