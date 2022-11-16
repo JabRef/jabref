@@ -80,6 +80,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM \"ENTRY\"");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM \"FIELD\"");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA") + " SELECT * FROM \"METADATA\"");
+                connection.createStatement().execute("SELECT setval(\'jabref.\"ENTRY_SHARED_ID_seq\"\', (select max(\"SHARED_ID\") from jabref.\"ENTRY\"))");
                 metadata = getSharedMetaData();
             }
 
