@@ -14,9 +14,9 @@ jobs:
         shell: bash
         run: |
           if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            run: echo "secretspresent=false" >> $GITHUB_OUTPUT
+            echo "secretspresent=false" >> $GITHUB_OUTPUT
           else
-            run: echo "secretspresent=true" >> $GITHUB_OUTPUT
+            echo "secretspresent=true" >> $GITHUB_OUTPUT
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
