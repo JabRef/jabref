@@ -641,10 +641,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
             return false;
         } else if (group instanceof ExplicitGroup) {
             return true;
-        } else if (group instanceof LastNameGroup || group instanceof KeywordGroup || group instanceof RegexKeywordGroup) {
+        } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
             if (groupnode.getParent().isPresent()) {
                 AbstractGroup groupParent = groupnode.getParent().get().getGroup();
-                if (group instanceof KeywordGroup && groupParent instanceof AutomaticKeywordGroup) {
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
                     return true;
                 } else {
                     return false;
@@ -652,8 +652,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
             } else {
                 return false;
             }
-        } else if (group instanceof SearchGroup) {
+        } else if (group instanceof KeywordGroup) {
             return true;
+        } else if (group instanceof SearchGroup) {
+            return false;
         } else if (group instanceof AutomaticKeywordGroup) {
             return false;
         } else if (group instanceof AutomaticPersonsGroup) {
