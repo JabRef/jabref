@@ -631,7 +631,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         } else if (group instanceof TexGroup) {
             return true;
         } else {
-            throw new UnsupportedOperationException("AllowDragInto method not yet implemented in group: " + group.getClass().getName());
+            throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
         }
     }
 
