@@ -57,6 +57,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where importing from XMP would fail for certain PDFs [#9383](https://github.com/JabRef/jabref/issues/9383)
 - We fixed the readability of the file field in the dark dark theme [#9340](https://github.com/JabRef/jabref/issues/9340)
 - We fixed that sorting of entries in the maintable by special fields is updated immediately [#9334](https://github.com/JabRef/jabref/issues/9334)
 - We fixed the Cleanup entries dialog is partially visible [#9223](https://github.com/JabRef/jabref/issues/9223)
