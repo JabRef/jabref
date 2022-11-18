@@ -9,7 +9,6 @@ import org.jabref.model.entry.BibEntry;
 
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.xml.DomXmpParser;
-import org.apache.xmpbox.xml.XmpParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,8 @@ public class XmpUtilShared {
             DomXmpParser parser = new DomXmpParser();
             meta = parser.parse(is);
             return meta;
-        } catch (XmpParsingException e) {
+        } catch (Exception e) {
+            // bad style to catch Exception but as this is called in a loop we do not want to break here when any schema encounters an error
             throw new IOException(e);
         }
     }
