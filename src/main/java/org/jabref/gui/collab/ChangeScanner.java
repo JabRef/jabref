@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.collab.entrydelete.EntryDelete;
@@ -17,7 +16,6 @@ import org.jabref.gui.collab.stringadd.BibTexStringAdd;
 import org.jabref.gui.collab.stringchange.BibTexStringChange;
 import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.bibtex.comparator.BibStringDiff;
@@ -40,9 +38,7 @@ public class ChangeScanner {
 
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
-                         PreferencesService preferencesService,
-                         StateManager stateManager,
-                         ThemeManager themeManager) {
+                         PreferencesService preferencesService) {
         this.database = database;
         this.preferencesService = preferencesService;
         this.externalChangeResolverFactory = new ExternalChangeResolverFactory(dialogService, database, preferencesService);
@@ -59,7 +55,6 @@ public class ChangeScanner {
             // Parse the modified file
             // Important: apply all post-load actions
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
-            preferencesService.getGeneralPreferences();
             ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
