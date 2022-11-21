@@ -195,7 +195,7 @@ jobs:
           path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
-        if: ${{ steps.checksecrets.outputs.secretspresent == "YES" }}
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: Pendect/action-rsyncer@v1.1.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
