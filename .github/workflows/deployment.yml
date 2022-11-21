@@ -54,10 +54,12 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=false" >> $GITHUB_OUTPUT
+          if [ "$BUILDJABREFPRIVATEKEY_TEST" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo NO
           else
-            echo "secretspresent=true" >> $GITHUB_OUTPUT
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo YES
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -79,7 +81,7 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
       - name: Setup OSX key chain on OSX
-        if: (matrix.os == 'macos-latest') && steps.checksecrets.outputs.secretspresent
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v1
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
