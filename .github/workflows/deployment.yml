@@ -54,7 +54,7 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          if [ "$BUILDJABREFPRIVATEKEY_TEST" == "" ]; then
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
@@ -160,7 +160,7 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          if [ "$BUILDJABREFPRIVATEKEY_TEST" == "" ]; then
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
