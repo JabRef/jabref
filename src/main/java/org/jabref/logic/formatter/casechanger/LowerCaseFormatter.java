@@ -7,7 +7,7 @@ public class LowerCaseFormatter extends Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("lower case");
+        return Localization.lang("Lower case");
     }
 
     @Override
@@ -29,7 +29,7 @@ public class LowerCaseFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("changes all letters to lower case.");
+        return Localization.lang("Changes all letters to lower case.");
     }
 
     @Override

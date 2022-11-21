@@ -10,7 +10,7 @@ public class TitleCaseFormatter extends Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("Title Case");
+        return Localization.lang("Title case");
     }
 
     @Override
@@ -50,7 +50,7 @@ public class TitleCaseFormatter extends Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "Capitalize all Words, but Converts Articles, Prepositions, and Conjunctions to Lower Case.");
+                "Capitalize all words, but converts articles, prepositions, and conjunctions to lower case.");
     }
 
     @Override

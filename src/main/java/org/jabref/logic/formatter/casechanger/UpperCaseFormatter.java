@@ -10,7 +10,7 @@ public class UpperCaseFormatter extends Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("UPPER CASE");
+        return Localization.lang("Upper case");
     }
 
     @Override
@@ -30,7 +30,7 @@ public class UpperCaseFormatter extends Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "CHANGES ALL LETTER TO UPPERCASE.");
+                "Changes all letters to upper case.");
     }
 
     @Override
