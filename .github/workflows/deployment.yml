@@ -56,10 +56,8 @@ jobs:
         run: |
           if [ "$BUILDJABREFPRIVATEKEY_TEST" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
-            echo NO
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
-            echo YES
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -135,15 +133,18 @@ jobs:
           rm "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
           mv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
       - name: Package application image
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Rename files
+        if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: pwsh
         run: |
           get-childitem -Path build/distribution/*
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Upload to GitHub workflow artifacts store
+        if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: actions/upload-artifact@v3
         with:
           name: JabRef-${{ matrix.displayName }}
@@ -159,10 +160,10 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=false" >> $GITHUB_OUTPUT
+          if [ "$BUILDJABREFPRIVATEKEY_TEST" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
           else
-            echo "secretspresent=true" >> $GITHUB_OUTPUT
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -194,7 +195,7 @@ jobs:
           path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
-        if: ${{ steps.checksecrets.outputs.secretspresent }}
+        if: ${{ steps.checksecrets.outputs.secretspresent == "YES" }}
         uses: Pendect/action-rsyncer@v1.1.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
