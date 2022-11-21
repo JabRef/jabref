@@ -75,6 +75,15 @@ Course: Open Source Software Development
 * Summary: In this course, students will be introduced to the processes and tools specific to Open Source Software development, and they will analyze existing projects to understand the architecture and processes of these projects. Besides, students will attempt to contribute source code to a large existing Open Source Software project.
 * Course offered in 2018 and 2019. Examples of merged pull requests: [4217](https://github.com/JabRef/jabref/pull/4217), [4255](https://github.com/JabRef/jabref/pull/4255), [4227](https://github.com/JabRef/jabref/pull/4227), [4260](https://github.com/JabRef/jabref/pull/4260), [5150](https://github.com/JabRef/jabref/pull/5150)
 
+#### King's College London
+
+Course: BSc Computer Science Individual Project
+
+* Summary: Students experience the procedure of finding and fixing small and medium issues in an open source project.
+* Successfully run in 2022/2023
+
+Do you have additions/suggestions for improvement?
+
 #### Northern Arizona University (NAU), USA
 
 Course [CS499 - Open Source Software Development](https://github.com/igorsteinmacher/CS499-OSS)
@@ -89,7 +98,7 @@ Course [CS499 - Open Source Software Development](https://github.com/igorsteinma
 Course [10915-01: Software Engineering](https://dmi.unibas.ch/de/studium/computer-science-informatik/lehrangebot-hs18/vorlesung-software-engineering/)
 
 * Lecture Materials: [https://github.com/unibas-marcelluethi/software-engineering](https://github.com/unibas-marcelluethi/software-engineering)
-* Successfully run Q3 2019.
+* Successfully run 2019 to 2022.
 * Excercise touching JabRef:
   * General idea: identify a feature missing in JabRef and develop the specification, system design, and implementation of the feature.
   * Introduction to JabRef's code: [Exercise 5](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week5/exercises/practical-exercises.md): Introduction into JabRef code.

@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.support.DisabledOnCIServer;
+import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.UnirestException;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@FetcherTest
 public class URLDownloadTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
