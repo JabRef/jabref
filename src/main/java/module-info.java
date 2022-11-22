@@ -100,6 +100,9 @@ open module org.jabref {
     requires flexmark.util.data;
     requires com.h2database.mvstore;
 
+    // HTTP for web crawling
+    requires java.net.http;
+
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
