@@ -1,4 +1,4 @@
-package org.jabref.logic.integrity;
+package org.jabref.logic.journals;
 
 import java.io.IOException;
 
@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import org.h2.mvstore.MVStore;
-import org.h2.mvstore.MVMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,22 +20,16 @@ public class PredatoryJournalLoader {
     private static class PJSource {
         final String    URL;
         final String    ELEMENT_REGEX;
-        final String[]  BIB_FIELDS;
 
-        PJSource(String URL, String ELEMENT_REGEX, String... BIB_FIELDS) {
-            this.URL                    = URL;
-            this.ELEMENT_REGEX          = ELEMENT_REGEX;
-            this.BIB_FIELDS             = new String[BIB_FIELDS.length];
-
-            System.arraycopy(BIB_FIELDS, 0, this.BIB_FIELDS, 0, BIB_FIELDS.length);
+        PJSource(String URL, String ELEMENT_REGEX) {
+            this.URL            = URL;
+            this.ELEMENT_REGEX  = ELEMENT_REGEX;
         }
     }
 
     private static final List<PJSource> PREDATORY_SOURCES = List.of(
         new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv",
-                    null,
-                    null,
-                    "journal", "journalname", "bookname"),
+                    null),
         /*
         new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/hijacked.csv",
                     null,
@@ -46,41 +37,41 @@ public class PredatoryJournalLoader {
                     "journal", "journalname", "bookname"),
         */
         new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/publishers.csv",
-                    null,
-                    null,
-                    "publisher"),
+                    null),
         new PJSource("https://beallslist.net/",
-                    "<li>.*?</li>",
-                    "publisher"),
+                    "<li>.*?</li>"),
         new PJSource("https://beallslist.net/standalone-journals/",
-                    "<li>.*?</li>",
-                    "journal", "journalname", "bookname"),
+                    "<li>.*?</li>"),
         new PJSource("https://beallslist.net/hijacked-journals/",
-                    "<tr>.*?</tr>",
-                    "journal", "journalname", "bookname")
+                    "<tr>.*?</tr>")
     );
 
     private static final Logger                 LOGGER              = LoggerFactory.getLogger(PredatoryJournalLoader.class);
     private static HttpClient                   client;
     private static List<String>                 linkElements;
-    private static MVStore                      mvStore;
-    private static MVMap<String, List<String>>  predatoryJournals;
+    private static PredatoryJournalRepository   repository;
 
     public PredatoryJournalLoader() {
         this.client             = HttpClient.newHttpClient();
         this.linkElements       = new ArrayList<>();
-        this.mvStore            = MVStore.open(null);                       // if fileName is null, store is in-memory
-        this.predatoryJournals  = mvStore.openMap("predatoryJournals");
     }
 
-    public static void load() {
-        PREDATORY_SOURCES   .forEach(PredatoryJournalLoader::crawl);        // populates linkElements (and predatoryJournals if CSV)
-        linkElements        .forEach(PredatoryJournalLoader::clean);        // adds cleaned HTML to predatoryJournals
+    public static PredatoryJournalRepository loadRepository() {
+        // Initialize in-memory repository
+        repository = new PredatoryJournalRepository();
 
-        LOGGER.info("LOADED PREDATORY JOURNAL LIST");
+        // Update from external sources
+        update();
+
+        return repository;
     }
 
-    public static MVMap getMap() { return predatoryJournals; }
+    public static void update() {
+        PREDATORY_SOURCES   .forEach(PredatoryJournalLoader::crawl);            // populates linkElements (and predatoryJournals if CSV)
+        linkElements        .forEach(PredatoryJournalLoader::clean);            // adds cleaned HTML to predatoryJournals
+
+        LOGGER.info("UPDATED PREDATORY JOURNAL LIST");
+    }
 
     private static void crawl(PJSource source) {
         var uri     = URI.create(source.URL);
@@ -100,13 +91,13 @@ public class PredatoryJournalLoader {
     private static void handleCSV(String body) {
         var csvSplit = Pattern.compile("(\"[^\"]*\"|[^,]+)");
 
-        for (String line : body.split("\n")) {                          // TODO: skip header
+        for (String line : body.split("\n")) {                                  // TODO: skip header
             var matcher = csvSplit.matcher(line);
             String[] cells = new String[3];
 
             for (int i = 0; matcher.find() && i < 3; i++) cells[i] = matcher.group();
 
-            addToPredatoryJournals(cells[1], cells[2], cells[0]);       // change column order from CSV (source: url, name, abbr)
+            repository.addToPredatoryJournals(cells[1], cells[2], cells[0]);    // change column order from CSV (source: url, name, abbr)
         }
 
     }
@@ -129,23 +120,7 @@ public class PredatoryJournalLoader {
 
         // using `if` gets only first link in element, `while` gets all, but this may not be desirable
         // e.g. this way only the hijacked journals are recorded and not the authentic originals
-        if (m_name.find() && m_url.find()) addToPredatoryJournals(m_name.group(), m_abbr.find() ? m_abbr.group() : "", m_url.group());
-    }
-
-    private static void addToPredatoryJournals(String name, String abbr, String url) {
-        // computeIfAbsent -- more efficient if key is already present as list only created if absent
-        // predatoryJournals.computeIfAbsent(decode(name), (k, v) -> new ArrayList<String>()).addAll(List.of(decode(abbr), url));
-
-        predatoryJournals.put(decode(name), List.of(decode(abbr), url));
-    }
-
-    private static String decode(String s) {
-        if (s == null) return "";
-
-        return s.replace(",", "")
-                .replace("&amp;", "")
-                .replace("&#8217;", "'")
-                .replace("&#8211;", "-");
+        if (m_name.find() && m_url.find()) repository.addToPredatoryJournals(m_name.group(), m_abbr.find() ? m_abbr.group() : "", m_url.group());
     }
 
     private static void logException(Exception ex) { if (LOGGER.isErrorEnabled()) LOGGER.error(ex.getMessage(), ex); }
