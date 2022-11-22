@@ -16,7 +16,7 @@ public class PredatoryJournalRepository {
 
     public PredatoryJournalRepository() {
         // MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open();
-        MVStore store = MVStore.open(null);     // fileName is null gives in-memory map
+        MVStore store = MVStore.open(null);     // fileName is null gives in-memory map TODO: provide path for caching to disk!
         this.predatoryJournals = store.openMap("predatoryJournals");
     }
 
@@ -29,7 +29,7 @@ public class PredatoryJournalRepository {
         return predatoryJournals.containsKey(journal);
     }
 
-    public Set<String> getFullNames() {
+    public Set<String> getPredatoryJournals() {
         return predatoryJournals.keySet();
     }
 

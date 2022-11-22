@@ -66,7 +66,7 @@ public class PredatoryJournalLoader {
         return repository;
     }
 
-    public static void update() {
+    private static void update() {
         PREDATORY_SOURCES   .forEach(PredatoryJournalLoader::crawl);            // populates linkElements (and predatoryJournals if CSV)
         linkElements        .forEach(PredatoryJournalLoader::clean);            // adds cleaned HTML to predatoryJournals
 
