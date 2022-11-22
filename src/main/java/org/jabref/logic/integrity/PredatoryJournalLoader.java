@@ -81,6 +81,8 @@ public class PredatoryJournalLoader
     {
         PREDATORY_SOURCES   .forEach(PredatoryJournalLoader::crawl);        // populates linkElements (and predatoryJournals if CSV)
         linkElements        .forEach(PredatoryJournalLoader::clean);        // adds cleaned HTML to predatoryJournals
+
+        LOGGER.info("LOADED PREDATORY JOURNAL LIST");
     }
 
     public static MVMap getMap() { return predatoryJournals; }
