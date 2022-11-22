@@ -22,10 +22,9 @@ public class PredatoryJournalChecker implements EntryChecker {
         this.field = Objects.requireNonNull(field);
         this.pjLoader = new PredatoryJournalLoader();
         this.predatoryJournalRepository = pjLoader.getMap();
-    }
 
-    // decide appropriate time and place to call pjLoad() as this is an expensive operation
-    public void pjLoad() { this.pjLoader.load(); }
+        this.pjLoader.load();   // causes slowdown when running IntegrityCheckTest due to repeated crawling -- TODO: fix with better usage of MVStore
+    }
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
