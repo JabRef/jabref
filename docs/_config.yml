@@ -40,6 +40,7 @@ plugins:
   - jekyll-figure
   - jekyll-remote-theme
   - jekyll-titles-from-headings
+  - jekyll-relative-links
 
 jekyll-figure:
   paragraphs: false

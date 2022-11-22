@@ -2,6 +2,7 @@ package org.jabref.logic.importer;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,12 +24,17 @@ import io.github.classgraph.ScanResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class WebFetchersTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebFetchersTest.class);
+    private static final Set<String> IGNORED_INACCESSIBLE_FETCHERS = Set.of("ArXivFetcher$ArXiv");
 
     private ImportFormatPreferences importFormatPreferences;
     private ImporterPreferences importerPreferences;
@@ -42,6 +48,19 @@ class WebFetchersTest {
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
     }
 
+    private Set<Class<?>> getIgnoredInaccessibleClasses() {
+        return IGNORED_INACCESSIBLE_FETCHERS.stream()
+                     .map(className -> "org.jabref.logic.importer.fetcher." + className)
+                     .map(classPath -> {
+                         try {
+                             return Class.forName(classPath);
+                         } catch (ClassNotFoundException e) {
+                             LOGGER.error("Some of the ignored classes were not found {}", e);
+                             return null;
+                         }
+                     }).filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+
     @Test
     void getIdBasedFetchersReturnsAllFetcherDerivingFromIdBasedFetcher() {
         Set<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences, importerPreferences);
@@ -49,6 +68,9 @@ class WebFetchersTest {
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(IdBasedFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+
+            // Some classes implement IdBasedFetcher, but are only accessible to other fetcher, so ignore them
+            expected.removeAll(getIgnoredInaccessibleClasses());
 
             expected.remove(AbstractIsbnFetcher.class);
             expected.remove(IdBasedParserFetcher.class);
@@ -91,6 +113,9 @@ class WebFetchersTest {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
+            // Some classes implement SearchBasedFetcher, but are only accessible to other fetcher, so ignore them
+            expected.removeAll(getIgnoredInaccessibleClasses());
+
             // Remove interfaces
             expected.remove(SearchBasedParserFetcher.class);
 
@@ -116,6 +141,9 @@ class WebFetchersTest {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(FulltextFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
+            // Some classes implement FulltextFetcher, but are only accessible to other fetcher, so ignore them
+            expected.removeAll(getIgnoredInaccessibleClasses());
+
             // Remove the following, because they don't work atm
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
@@ -131,6 +159,9 @@ class WebFetchersTest {
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(IdFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+
+            // Some classes implement IdFetcher, but are only accessible to other fetcher, so ignore them
+            expected.removeAll(getIgnoredInaccessibleClasses());
 
             expected.remove(IdParserFetcher.class);
             // Remove the following, because they don't work at the moment
