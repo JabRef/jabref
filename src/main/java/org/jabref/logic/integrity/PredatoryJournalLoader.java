@@ -1,5 +1,7 @@
 package org.jabref.logic.integrity;
 
+import java.io.IOException;
+
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -96,6 +98,7 @@ public class PredatoryJournalLoader
             else if (source.URL.contains(".csv"))   { handleCSV(response.body()); }
             else                                    { handleHTML(source.ELEMENT_REGEX, response.body()); }
         }
+        catch (IOException ex)          { logException(ex); }
         catch (InterruptedException ex) { logException(ex); }
     }
 
