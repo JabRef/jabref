@@ -1,7 +1,10 @@
 package org.jabref.logic.integrity;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -14,12 +17,17 @@ import org.h2.mvstore.MVMap;
 
 public class PredatoryJournalChecker implements EntryChecker {
 
-    private final Field field;
+    private final List<Field> fieldsToCheck;
     private final PredatoryJournalLoader pjLoader;
     private final MVMap predatoryJournalRepository;
 
-    public PredatoryJournalChecker(Field field) {
-        this.field = Objects.requireNonNull(field);
+    private List<IntegrityMessage> results;
+
+    public PredatoryJournalChecker(Field... fieldsToCheck) {
+        this.fieldsToCheck = new ArrayList<>();
+        for (Field f : fieldsToCheck) { this.fieldsToCheck.add(Objects.requireNonNull(f)); }
+
+        this.results = new ArrayList<>();
         this.pjLoader = new PredatoryJournalLoader();
         this.predatoryJournalRepository = pjLoader.getMap();
 
@@ -28,17 +36,21 @@ public class PredatoryJournalChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        Optional<String> value = entry.getField(field);
-        if (value.isEmpty()) {
-            return Collections.emptyList();
+        Map<Field, String> fields = new HashMap();
+
+        for (Field f : fieldsToCheck) {
+            Optional<String> value = entry.getField(f);
+            if (!value.isEmpty()) fields.put(f, value.get());
         }
 
-        final String journal = value.get();
-        // if (predatoryJournalRepository.isKnownName(journal)) {
-        if (predatoryJournalRepository.containsKey(journal)) {
-            return Collections.singletonList(new IntegrityMessage(Localization.lang("journal match found in predatory journal list"), entry, field));
+        if (fields.isEmpty()) return Collections.emptyList();
+
+        for (Map.Entry<Field, String> field : fields.entrySet()) {
+            if (predatoryJournalRepository.containsKey(field.getValue())) {
+                results.add(new IntegrityMessage(Localization.lang("match found in predatory journal list"), entry, field.getKey()));
+            }
         }
 
-        return Collections.emptyList();
+        return results;
     }
 }

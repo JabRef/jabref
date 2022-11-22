@@ -18,7 +18,7 @@ public class PredatoryJournalCheckerTest {
 
     @BeforeEach
     void setUp() {
-        checker = new PredatoryJournalChecker(StandardField.JOURNAL);
+        checker = new PredatoryJournalChecker(StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE);
         entry = new BibEntry();
     }
 
@@ -31,6 +31,18 @@ public class PredatoryJournalCheckerTest {
     @Test
     void journalIsPredatory() {
         entry.setField(StandardField.JOURNAL, "European International Journal of Science and Technology");
-        assertEquals(List.of(new IntegrityMessage("journal match found in predatory journal list", entry, StandardField.JOURNAL)), checker.check(entry));
+        assertEquals(List.of(new IntegrityMessage("match found in predatory journal list", entry, StandardField.JOURNAL)), checker.check(entry));
+    }
+
+    @Test
+    void publisherIsPredatory() {
+        entry.setField(StandardField.PUBLISHER, "Academia Scholarly Journals");
+        assertEquals(List.of(new IntegrityMessage("match found in predatory journal list", entry, StandardField.PUBLISHER)), checker.check(entry));
+    }
+
+    @Test
+    void booktitleIsPredatory() {
+        entry.setField(StandardField.BOOKTITLE, "Biosciences International");
+        assertEquals(List.of(new IntegrityMessage("match found in predatory journal list", entry, StandardField.BOOKTITLE)), checker.check(entry));
     }
 }
