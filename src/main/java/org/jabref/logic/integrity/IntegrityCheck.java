@@ -48,7 +48,7 @@ public class IntegrityCheck {
         } else {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
-                    new PredatoryJournalChecker(StandardField.JOURNALTITLE),
+                    new PredatoryJournalChecker(StandardField.JOURNAL),
                     new ASCIICharacterChecker(),
                     new NoBibtexFieldChecker(),
                     new BibTeXEntryTypeChecker())
