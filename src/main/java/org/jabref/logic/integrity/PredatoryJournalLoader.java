@@ -12,11 +12,12 @@ import java.net.URI;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.h2.mvstore.MVMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class PJSource
 {
@@ -34,7 +35,7 @@ class PJSource
     }
 }
 
-public class PJDownloader
+public class PredatoryJournalLoader
 {
     private static final List<PJSource> PREDATORY_SOURCES = List.of(
         new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv",
@@ -62,26 +63,35 @@ public class PJDownloader
                     "journal", "journalname", "bookname")
     );
 
-    private static HttpClient                   client              = HttpClient.newHttpClient();
-    private static List<String>                 linkElements        = new ArrayList<>();
-    private static Map<String, List<String>>    predatoryJournals   = new LinkedHashMap<>();
-    private static Logger                       logger              = Logger.getLogger("PJDownloader", null);
+    private static final Logger                 LOGGER              = LoggerFactory.getLogger(PredatoryJournalLoader.class);
+    private static HttpClient                   client;
+    private static List<String>                 linkElements;
+    private static Map<String, List<String>>    predatoryJournals;
     private static Writer                       writer;
 
-    public static void main(String[] args)
+    public PredatoryJournalLoader()
+    {
+        this.client             = HttpClient.newHttpClient();
+        this.linkElements       = new ArrayList<>();
+        this.predatoryJournals  = new MVMap<>();
+    }
+
+    public static void load()
     {
         try { writer = new FileWriter("PJCache.csv"); }
         catch (IOException ex) { logException(ex); }
 
-        write("url", List.of("name", "abbr"));                  // write csv header
+        write("url", List.of("name", "abbr"));                              // write csv header
 
-        PREDATORY_SOURCES   .forEach(PJDownloader::crawl);      // populates linkElements
-        linkElements        .forEach(PJDownloader::clean);      // populates predatoryJournals
-        predatoryJournals   .forEach(PJDownloader::write);      // write to CSV
+        PREDATORY_SOURCES   .forEach(PredatoryJournalLoader::crawl);        // populates linkElements
+        linkElements        .forEach(PredatoryJournalLoader::clean);        // populates predatoryJournals
+        predatoryJournals   .forEach(PredatoryJournalLoader::write);        // write to CSV
 
         try { writer.close(); }
         catch (IOException ex) { logException(ex); }
     }
+
+    public static MVMap getMap() { return predatoryJournals; }
 
     private static void crawl(PJSource source)
     {
@@ -92,7 +102,7 @@ public class PJDownloader
         {
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
-            if (response.statusCode() != 200)       { logger.warning("BAD RESPONSE"); }
+            if (response.statusCode() != 200)       { LOGGER.warning("BAD RESPONSE"); }
             else if (source.URL.contains(".csv"))   { handleCSV(response.body()); }
             else                                    { handleHTML(source.ELEMENT_REGEX, response.body()); }
         }
@@ -100,24 +110,9 @@ public class PJDownloader
         catch (InterruptedException ex) { logException(ex); }
     }
 
-    private static void clean(String item)
-    {
-        var p_url  = Pattern.compile("http.*?(?=\")");
-        var p_name = Pattern.compile("(?<=\">).*?(?=<)");
-        var p_abbr = Pattern.compile("(?<=\\()[^\s]*(?=\\))");
-
-        var m_url  = p_url.matcher(item);
-        var m_name = p_name.matcher(item);
-        var m_abbr = p_abbr.matcher(item);
-
-        // using `if` gets only first link in element, `while` gets all, but this may not be desirable
-        // e.g. this way only the hijacked journals are recorded and not the authentic originals
-        if (m_url.find() && m_name.find()) addToPredatoryJournals(m_url.group(), m_name.group(), m_abbr.find() ? m_abbr.group() : "");
-    }
-
     private static void handleCSV(String body)
     {
-        logger.info("FOUND CSV");
+        LOGGER.info("FOUND CSV");
         var csvSplit = Pattern.compile("(\"[^\"]*\"|[^,]+)");
 
         for (String line : body.split("\n"))                    // TODO: skip header
@@ -139,16 +134,31 @@ public class PJDownloader
         while (matcher.find()) linkElements.add(matcher.group());
     }
 
-    private static void addToPredatoryJournals(String url, String name, String abbr)
+    private static void clean(String item)
     {
-        // compute vs. computeIfAbsent -- the former supercedes the old key, which in this case is desirable as it will override the non-standard CSV
-        predatoryJournals.compute(url, (k, v) -> new ArrayList<String>())
-                         .addAll(List.of(decode(name), decode(abbr)));
+        var p_name = Pattern.compile("(?<=\">).*?(?=<)");
+        var p_url  = Pattern.compile("http.*?(?=\")");
+        var p_abbr = Pattern.compile("(?<=\\()[^\s]*(?=\\))");
+
+        var m_name = p_name.matcher(item);
+        var m_url  = p_url.matcher(item);
+        var m_abbr = p_abbr.matcher(item);
+
+        // using `if` gets only first link in element, `while` gets all, but this may not be desirable
+        // e.g. this way only the hijacked journals are recorded and not the authentic originals
+        if (m_name.find() && m_url.find()) addToPredatoryJournals(m_name.group(), m_abbr.find() ? m_abbr.group() : "", m_url.group());
     }
 
-    private static void write(String url, List<String> attr)
+    private static void addToPredatoryJournals(String name, String abbr, String url)
     {
-        var line = String.join(",", url, attr.get(0), attr.get(1));
+        // compute vs. computeIfAbsent -- the former supercedes the old key, which in this case is desirable as it will override the non-standard CSV
+        predatoryJournals.compute(decode(name), (k, v) -> new ArrayList<String>())
+                         .addAll(List.of(decode(abbr), url));
+    }
+
+    private static void write(String name, List<String> attr)
+    {
+        var line = String.join(",", name, attr.get(0), attr.get(1));
 
         try { writer.write(line + "\n"); }
         catch (IOException ex) { logException(ex); }
@@ -166,6 +176,6 @@ public class PJDownloader
 
     private static void logException(Exception ex)
     {
-        if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, ex.getMessage(), ex);
+        if (LOGGER.isLoggable(Level.SEVERE)) LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
     }
 }

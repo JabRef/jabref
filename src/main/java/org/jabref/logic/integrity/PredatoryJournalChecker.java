@@ -5,19 +5,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.integrity.PredatoryJournalLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+import org.h2.mvstore.MVMap;
+
 public class PredatoryJournalChecker implements EntryChecker {
 
     private final Field field;
-    private final PredatoryJournalRepository predatoryJournalRepository;
+    private final PredatoryJournalLoader PJLoader;
+    private final MVMap predatoryJournalRepository;
 
-    public PredatoryJournalChecker(Field field, PredatoryJournalRepository predatoryJournalRepository) {
+    public PredatoryJournalChecker(Field field, PredatoryJournalLoader PJLoader) {
         this.field = Objects.requireNonNull(field);
-        this.predatoryJournalRepository = Objects.requireNonNull(predatoryJournalRepository);
+        this.PJLoader = Objects.requireNonNull(PJLoader);
+
+        this.PJLoader.load();
+        this.predatoryJournalRepository = PJLoader.getMap();
     }
 
     @Override
@@ -28,7 +34,8 @@ public class PredatoryJournalChecker implements EntryChecker {
         }
 
         final String journal = value.get();
-        if (predatoryJournalRepository.isKnownName(journal)) {
+        // if (predatoryJournalRepository.isKnownName(journal)) {
+        if (predatoryJournalRepository.containsKey(journal)) {
             return Collections.singletonList(new IntegrityMessage(Localization.lang("journal match found in predatory journal list"), entry, field));
         }
 
