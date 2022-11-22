@@ -19,16 +19,13 @@ import org.h2.mvstore.MVMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PredatoryJournalLoader
-{
-    private static class PJSource
-    {
+public class PredatoryJournalLoader {
+    private static class PJSource {
         final String    URL;
         final String    ELEMENT_REGEX;
         final String[]  BIB_FIELDS;
 
-        PJSource(String URL, String ELEMENT_REGEX, String... BIB_FIELDS)
-        {
+        PJSource(String URL, String ELEMENT_REGEX, String... BIB_FIELDS) {
             this.URL                    = URL;
             this.ELEMENT_REGEX          = ELEMENT_REGEX;
             this.BIB_FIELDS             = new String[BIB_FIELDS.length];
@@ -69,16 +66,14 @@ public class PredatoryJournalLoader
     private static MVStore                      mvStore;
     private static MVMap<String, List<String>>  predatoryJournals;
 
-    public PredatoryJournalLoader()
-    {
+    public PredatoryJournalLoader() {
         this.client             = HttpClient.newHttpClient();
         this.linkElements       = new ArrayList<>();
         this.mvStore            = MVStore.open(null);                       // if fileName is null, store is in-memory
         this.predatoryJournals  = mvStore.openMap("predatoryJournals");
     }
 
-    public static void load()
-    {
+    public static void load() {
         PREDATORY_SOURCES   .forEach(PredatoryJournalLoader::crawl);        // populates linkElements (and predatoryJournals if CSV)
         linkElements        .forEach(PredatoryJournalLoader::clean);        // adds cleaned HTML to predatoryJournals
 
@@ -87,13 +82,11 @@ public class PredatoryJournalLoader
 
     public static MVMap getMap() { return predatoryJournals; }
 
-    private static void crawl(PJSource source)
-    {
+    private static void crawl(PJSource source) {
         var uri     = URI.create(source.URL);
         var request = HttpRequest.newBuilder().uri(uri).build();
 
-        try
-        {
+        try {
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
             if (response.statusCode() != 200)       { LOGGER.warn("BAD RESPONSE"); }
@@ -104,12 +97,10 @@ public class PredatoryJournalLoader
         catch (InterruptedException ex) { logException(ex); }
     }
 
-    private static void handleCSV(String body)
-    {
+    private static void handleCSV(String body) {
         var csvSplit = Pattern.compile("(\"[^\"]*\"|[^,]+)");
 
-        for (String line : body.split("\n"))                            // TODO: skip header
-        {
+        for (String line : body.split("\n")) {                          // TODO: skip header
             var matcher = csvSplit.matcher(line);
             String[] cells = new String[3];
 
@@ -120,16 +111,14 @@ public class PredatoryJournalLoader
 
     }
 
-    private static void handleHTML(String regex, String body)
-    {
+    private static void handleHTML(String regex, String body) {
         var pattern = Pattern.compile(regex);
         var matcher = pattern.matcher(body);
 
         while (matcher.find()) linkElements.add(matcher.group());
     }
 
-    private static void clean(String item)
-    {
+    private static void clean(String item) {
         var p_name = Pattern.compile("(?<=\">).*?(?=<)");
         var p_url  = Pattern.compile("http.*?(?=\")");
         var p_abbr = Pattern.compile("(?<=\\()[^\s]*(?=\\))");
@@ -143,16 +132,14 @@ public class PredatoryJournalLoader
         if (m_name.find() && m_url.find()) addToPredatoryJournals(m_name.group(), m_abbr.find() ? m_abbr.group() : "", m_url.group());
     }
 
-    private static void addToPredatoryJournals(String name, String abbr, String url)
-    {
+    private static void addToPredatoryJournals(String name, String abbr, String url) {
         // computeIfAbsent -- more efficient if key is already present as list only created if absent
         // predatoryJournals.computeIfAbsent(decode(name), (k, v) -> new ArrayList<String>()).addAll(List.of(decode(abbr), url));
 
         predatoryJournals.put(decode(name), List.of(decode(abbr), url));
     }
 
-    private static String decode(String s)
-    {
+    private static String decode(String s) {
         if (s == null) return "";
 
         return s.replace(",", "")
@@ -161,7 +148,5 @@ public class PredatoryJournalLoader
                 .replace("&#8211;", "-");
     }
 
-    private static void logException(Exception ex) {
-        if (LOGGER.isErrorEnabled()) LOGGER.error(ex.getMessage(), ex);
-    }
+    private static void logException(Exception ex) { if (LOGGER.isErrorEnabled()) LOGGER.error(ex.getMessage(), ex); }
 }
