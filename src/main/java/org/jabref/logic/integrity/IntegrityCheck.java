@@ -42,11 +42,13 @@ public class IntegrityCheck {
         if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),
+                    new PredatoryJournalChecker(StandardField.JOURNALTITLE),
                     new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8))
             ));
         } else {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
+                    new PredatoryJournalChecker(StandardField.JOURNALTITLE),
                     new ASCIICharacterChecker(),
                     new NoBibtexFieldChecker(),
                     new BibTeXEntryTypeChecker())

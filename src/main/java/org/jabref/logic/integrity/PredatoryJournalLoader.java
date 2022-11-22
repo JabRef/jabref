@@ -1,3 +1,5 @@
+package org.jabref.logic.integrity;
+
 import java.io.Writer;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,29 +16,30 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.h2.mvstore.MVStore;
 import org.h2.mvstore.MVMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class PJSource
-{
-    final String    URL;
-    final String    ELEMENT_REGEX;
-    final String[]  BIB_FIELDS;
-
-    PJSource(String URL, String ELEMENT_REGEX, String... BIB_FIELDS)
-    {
-        this.URL                    = URL;
-        this.ELEMENT_REGEX          = ELEMENT_REGEX;
-        this.BIB_FIELDS             = new String[BIB_FIELDS.length];
-
-        System.arraycopy(BIB_FIELDS, 0, this.BIB_FIELDS, 0, BIB_FIELDS.length);
-    }
-}
-
 public class PredatoryJournalLoader
 {
+    private static class PJSource
+    {
+        final String    URL;
+        final String    ELEMENT_REGEX;
+        final String[]  BIB_FIELDS;
+
+        PJSource(String URL, String ELEMENT_REGEX, String... BIB_FIELDS)
+        {
+            this.URL                    = URL;
+            this.ELEMENT_REGEX          = ELEMENT_REGEX;
+            this.BIB_FIELDS             = new String[BIB_FIELDS.length];
+
+            System.arraycopy(BIB_FIELDS, 0, this.BIB_FIELDS, 0, BIB_FIELDS.length);
+        }
+    }
+
     private static final List<PJSource> PREDATORY_SOURCES = List.of(
         new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv",
                     null,
@@ -66,14 +69,16 @@ public class PredatoryJournalLoader
     private static final Logger                 LOGGER              = LoggerFactory.getLogger(PredatoryJournalLoader.class);
     private static HttpClient                   client;
     private static List<String>                 linkElements;
-    private static Map<String, List<String>>    predatoryJournals;
+    private static MVStore                      mvStore;
+    private static MVMap<String, List<String>>  predatoryJournals;
     private static Writer                       writer;
 
     public PredatoryJournalLoader()
     {
         this.client             = HttpClient.newHttpClient();
         this.linkElements       = new ArrayList<>();
-        this.predatoryJournals  = new MVMap<>();
+        this.mvStore            = MVStore.open(null);
+        this.predatoryJournals  = mvStore.openMap("predatoryJournals");
     }
 
     public static void load()
@@ -81,7 +86,7 @@ public class PredatoryJournalLoader
         try { writer = new FileWriter("PJCache.csv"); }
         catch (IOException ex) { logException(ex); }
 
-        write("url", List.of("name", "abbr"));                              // write csv header
+        write("name", List.of("abbr", "url"));                              // write csv header
 
         PREDATORY_SOURCES   .forEach(PredatoryJournalLoader::crawl);        // populates linkElements
         linkElements        .forEach(PredatoryJournalLoader::clean);        // populates predatoryJournals
@@ -102,7 +107,7 @@ public class PredatoryJournalLoader
         {
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
-            if (response.statusCode() != 200)       { LOGGER.warning("BAD RESPONSE"); }
+            if (response.statusCode() != 200)       { LOGGER.warn("BAD RESPONSE"); }
             else if (source.URL.contains(".csv"))   { handleCSV(response.body()); }
             else                                    { handleHTML(source.ELEMENT_REGEX, response.body()); }
         }
@@ -174,8 +179,5 @@ public class PredatoryJournalLoader
                 .replace("&#8211;", "-");
     }
 
-    private static void logException(Exception ex)
-    {
-        if (LOGGER.isLoggable(Level.SEVERE)) LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-    }
+    private static void logException(Exception ex) { LOGGER.error(ex.getMessage(), ex); }
 }

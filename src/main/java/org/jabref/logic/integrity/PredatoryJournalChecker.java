@@ -15,15 +15,18 @@ import org.h2.mvstore.MVMap;
 public class PredatoryJournalChecker implements EntryChecker {
 
     private final Field field;
-    private final PredatoryJournalLoader PJLoader;
+    private final PredatoryJournalLoader pjLoader;
     private final MVMap predatoryJournalRepository;
 
-    public PredatoryJournalChecker(Field field, PredatoryJournalLoader PJLoader) {
+    public PredatoryJournalChecker(Field field) {
         this.field = Objects.requireNonNull(field);
-        this.PJLoader = Objects.requireNonNull(PJLoader);
+        this.pjLoader = new PredatoryJournalLoader();
+        this.predatoryJournalRepository = pjLoader.getMap();
+    }
 
-        this.PJLoader.load();
-        this.predatoryJournalRepository = PJLoader.getMap();
+    public void pjLoad()
+    {
+        this.pjLoader.load();
     }
 
     @Override
