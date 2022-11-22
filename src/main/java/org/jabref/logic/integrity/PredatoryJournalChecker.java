@@ -21,13 +21,10 @@ public class PredatoryJournalChecker implements EntryChecker {
     private final PredatoryJournalLoader pjLoader;
     private final MVMap predatoryJournalRepository;
 
-    private List<IntegrityMessage> results;
-
     public PredatoryJournalChecker(Field... fieldsToCheck) {
         this.fieldsToCheck = new ArrayList<>();
         for (Field f : fieldsToCheck) { this.fieldsToCheck.add(Objects.requireNonNull(f)); }
 
-        this.results = new ArrayList<>();
         this.pjLoader = new PredatoryJournalLoader();
         this.predatoryJournalRepository = pjLoader.getMap();
 
@@ -36,6 +33,7 @@ public class PredatoryJournalChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
+        List<IntegrityMessage> results = new ArrayList<>();
         Map<Field, String> fields = new HashMap();
 
         for (Field f : fieldsToCheck) {

@@ -6,6 +6,7 @@ import java.util.List;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,12 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PredatoryJournalCheckerTest {
 
-    private PredatoryJournalChecker checker;
+    private static PredatoryJournalChecker checker;
     private BibEntry entry;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void initChecker() {
         checker = new PredatoryJournalChecker(StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE);
+    }
+
+    @BeforeEach
+    void initEntry() {
         entry = new BibEntry();
     }
 
