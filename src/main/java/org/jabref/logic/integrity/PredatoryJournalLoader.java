@@ -1,9 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.io.Writer;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -13,7 +9,6 @@ import java.net.URI;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.h2.mvstore.MVStore;
@@ -71,29 +66,19 @@ public class PredatoryJournalLoader
     private static List<String>                 linkElements;
     private static MVStore                      mvStore;
     private static MVMap<String, List<String>>  predatoryJournals;
-    private static Writer                       writer;
 
     public PredatoryJournalLoader()
     {
         this.client             = HttpClient.newHttpClient();
         this.linkElements       = new ArrayList<>();
-        this.mvStore            = MVStore.open(null);
+        this.mvStore            = MVStore.open(null);                       // if fileName is null, store is in-memory
         this.predatoryJournals  = mvStore.openMap("predatoryJournals");
     }
 
     public static void load()
     {
-        try { writer = new FileWriter("PJCache.csv"); }
-        catch (IOException ex) { logException(ex); }
-
-        write("name", List.of("abbr", "url"));                              // write csv header
-
-        PREDATORY_SOURCES   .forEach(PredatoryJournalLoader::crawl);        // populates linkElements
-        linkElements        .forEach(PredatoryJournalLoader::clean);        // populates predatoryJournals
-        predatoryJournals   .forEach(PredatoryJournalLoader::write);        // write to CSV
-
-        try { writer.close(); }
-        catch (IOException ex) { logException(ex); }
+        PREDATORY_SOURCES   .forEach(PredatoryJournalLoader::crawl);        // populates linkElements (and predatoryJournals if CSV)
+        linkElements        .forEach(PredatoryJournalLoader::clean);        // adds cleaned HTML to predatoryJournals
     }
 
     public static MVMap getMap() { return predatoryJournals; }
@@ -111,22 +96,21 @@ public class PredatoryJournalLoader
             else if (source.URL.contains(".csv"))   { handleCSV(response.body()); }
             else                                    { handleHTML(source.ELEMENT_REGEX, response.body()); }
         }
-        catch (IOException ex)          { logException(ex); }
         catch (InterruptedException ex) { logException(ex); }
     }
 
     private static void handleCSV(String body)
     {
-        LOGGER.info("FOUND CSV");
         var csvSplit = Pattern.compile("(\"[^\"]*\"|[^,]+)");
 
-        for (String line : body.split("\n"))                    // TODO: skip header
+        for (String line : body.split("\n"))                            // TODO: skip header
         {
             var matcher = csvSplit.matcher(line);
             String[] cells = new String[3];
 
             for (int i = 0; matcher.find() && i < 3; i++) cells[i] = matcher.group();
-            addToPredatoryJournals(cells[0], cells[1], cells[2]);
+
+            addToPredatoryJournals(cells[1], cells[2], cells[0]);       // change column order from CSV (source: url, name, abbr)
         }
 
     }
@@ -156,17 +140,10 @@ public class PredatoryJournalLoader
 
     private static void addToPredatoryJournals(String name, String abbr, String url)
     {
-        // compute vs. computeIfAbsent -- the former supercedes the old key, which in this case is desirable as it will override the non-standard CSV
-        predatoryJournals.compute(decode(name), (k, v) -> new ArrayList<String>())
-                         .addAll(List.of(decode(abbr), url));
-    }
+        // computeIfAbsent -- more efficient if key is already present as list only created if absent
+        // predatoryJournals.computeIfAbsent(decode(name), (k, v) -> new ArrayList<String>()).addAll(List.of(decode(abbr), url));
 
-    private static void write(String name, List<String> attr)
-    {
-        var line = String.join(",", name, attr.get(0), attr.get(1));
-
-        try { writer.write(line + "\n"); }
-        catch (IOException ex) { logException(ex); }
+        predatoryJournals.put(decode(name), List.of(decode(abbr), url));
     }
 
     private static String decode(String s)
@@ -179,5 +156,7 @@ public class PredatoryJournalLoader
                 .replace("&#8211;", "-");
     }
 
-    private static void logException(Exception ex) { LOGGER.error(ex.getMessage(), ex); }
+    private static void logException(Exception ex) {
+        if (LOGGER.isErrorEnabled()) LOGGER.error(ex.getMessage(), ex);
+    }
 }
