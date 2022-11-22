@@ -24,10 +24,8 @@ public class PredatoryJournalChecker implements EntryChecker {
         this.predatoryJournalRepository = pjLoader.getMap();
     }
 
-    public void pjLoad()
-    {
-        this.pjLoader.load();
-    }
+    // decide appropriate time and place to call pjLoad() as this is an expensive operation
+    public void pjLoad() { this.pjLoader.load(); }
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
