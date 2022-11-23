@@ -1,59 +1,64 @@
 package org.jabref.logic.journals;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-
-import java.net.URI;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
+
+import org.jabref.logic.net.URLDownload;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PredatoryJournalLoader {
     private static class PJSource {
-        final String    URL;
-        final String    ELEMENT_REGEX;
+        final URL URL;
+        final String ELEMENT_REGEX;
 
-        PJSource(String URL, String ELEMENT_REGEX) {
-            this.URL            = URL;
-            this.ELEMENT_REGEX  = ELEMENT_REGEX;
+        PJSource(String URL, String ELEMENT_REGEX) throws MalformedURLException {
+            this.URL = new URL(URL);
+            this.ELEMENT_REGEX = ELEMENT_REGEX;
         }
     }
 
-    private static final List<PJSource> PREDATORY_SOURCES = List.of(
-        new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv",
-                    null),
-        /*
-        new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/hijacked.csv",
-                    null,
-                    null,
-                    "journal", "journalname", "bookname"),
-        */
-        new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/publishers.csv",
-                    null),
-        new PJSource("https://beallslist.net/",
-                    "<li>.*?</li>"),
-        new PJSource("https://beallslist.net/standalone-journals/",
-                    "<li>.*?</li>"),
-        new PJSource("https://beallslist.net/hijacked-journals/",
-                    "<tr>.*?</tr>")
-    );
-
     private static final Logger                 LOGGER              = LoggerFactory.getLogger(PredatoryJournalLoader.class);
-    private static HttpClient                   client;
+    private static List<PJSource>               PREDATORY_SOURCES;
     private static List<String>                 linkElements;
     private static PredatoryJournalRepository   repository;
 
     public PredatoryJournalLoader() {
-        this.client             = HttpClient.newHttpClient();
-        this.linkElements       = new ArrayList<>();
+        try {
+            PREDATORY_SOURCES = List.of(
+                new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv",
+                            null),
+                /*
+                new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/hijacked.csv",
+                            null,
+                            null,
+                            "journal", "journalname", "bookname"),
+                */
+                new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/publishers.csv",
+                            null),
+                new PJSource("https://beallslist.net/",
+                            "<li>.*?</li>"),
+                new PJSource("https://beallslist.net/standalone-journals/",
+                            "<li>.*?</li>"),
+                new PJSource("https://beallslist.net/hijacked-journals/",
+                            "<tr>.*?</tr>")
+            );
+        }
+        catch (MalformedURLException ex) { logException(ex); }
+        this.linkElements = new ArrayList<>();
     }
 
     public static PredatoryJournalRepository loadRepository() {
@@ -74,30 +79,21 @@ public class PredatoryJournalLoader {
     }
 
     private static void crawl(PJSource source) {
-        var uri     = URI.create(source.URL);
-        var request = HttpRequest.newBuilder().uri(uri).build();
-
         try {
-            HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+            URLDownload download = new URLDownload(source.URL);
 
-            if (response.statusCode() != 200)       { LOGGER.warn("BAD RESPONSE"); }
-            else if (source.URL.contains(".csv"))   { handleCSV(response.body()); }
-            else                                    { handleHTML(source.ELEMENT_REGEX, response.body()); }
+            if (!download.canBeReached())                   { LOGGER.warn("URL UNREACHABLE"); }
+            else if (source.URL.getPath().contains(".csv")) { handleCSV(new InputStreamReader(download.asInputStream())); }
+            else                                            { handleHTML(source.ELEMENT_REGEX, download.asString()); }
         }
-        catch (IOException ex)          { logException(ex); }
-        catch (InterruptedException ex) { logException(ex); }
+        catch (IOException ex) { logException(ex); }
     }
 
-    private static void handleCSV(String body) {
-        var csvSplit = Pattern.compile("(\"[^\"]*\"|[^,]+)");
+    private static void handleCSV(Reader reader) throws IOException {
+        CSVParser csvParser = new CSVParser(reader, CSVFormat.EXCEL);
 
-        for (String line : body.split("\n")) {                                  // TODO: skip header
-            var matcher = csvSplit.matcher(line);
-            String[] cells = new String[3];
-
-            for (int i = 0; matcher.find() && i < 3; i++) cells[i] = matcher.group();
-
-            repository.addToPredatoryJournals(cells[1], cells[2], cells[0]);    // change column order from CSV (source: url, name, abbr)
+        for (CSVRecord record : csvParser) {
+            repository.addToPredatoryJournals(record.get(1), record.get(2), record.get(0));    // changes column order from CSV (source: url, name, abbr)
         }
 
     }
@@ -110,13 +106,9 @@ public class PredatoryJournalLoader {
     }
 
     private static void clean(String item) {
-        var p_name = Pattern.compile("(?<=\">).*?(?=<)");
-        var p_url  = Pattern.compile("http.*?(?=\")");
-        var p_abbr = Pattern.compile("(?<=\\()[^\s]*(?=\\))");
-
-        var m_name = p_name.matcher(item);
-        var m_url  = p_url.matcher(item);
-        var m_abbr = p_abbr.matcher(item);
+        var m_name = Pattern.compile("(?<=\">).*?(?=<)").matcher(item);
+        var m_url  = Pattern.compile("http.*?(?=\")").matcher(item);
+        var m_abbr = Pattern.compile("(?<=\\()[^\s]*(?=\\))").matcher(item);
 
         // using `if` gets only first link in element, `while` gets all, but this may not be desirable
         // e.g. this way only the hijacked journals are recorded and not the authentic originals
