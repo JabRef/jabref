@@ -41,7 +41,7 @@ public class PredatoryJournalChecker implements EntryChecker {
         if (fields.isEmpty()) return Collections.emptyList();
 
         for (Map.Entry<Field, String> field : fields.entrySet()) {
-            if (predatoryJournalRepository.isKnownName(field.getValue())) {
+            if (predatoryJournalRepository.isKnownName(field.getValue(), 0.95)) {
                 results.add(new IntegrityMessage(Localization.lang("match found in predatory journal list"), entry, field.getKey()));
             }
         }

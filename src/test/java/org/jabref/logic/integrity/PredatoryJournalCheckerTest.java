@@ -40,6 +40,18 @@ public class PredatoryJournalCheckerTest {
     }
 
     @Test
+    void journalIsPredatoryCaseInsensitive() {
+        entry.setField(StandardField.JOURNAL, "european international journal of science and technology");
+        assertEquals(List.of(new IntegrityMessage("match found in predatory journal list", entry, StandardField.JOURNAL)), checker.check(entry));
+    }
+
+    @Test
+    void journalIsPredatoryExtraCharacters() {
+        entry.setField(StandardField.JOURNAL, "European International Journal, of Science and Technology");
+        assertEquals(List.of(new IntegrityMessage("match found in predatory journal list", entry, StandardField.JOURNAL)), checker.check(entry));
+    }
+
+    @Test
     void publisherIsPredatory() {
         entry.setField(StandardField.PUBLISHER, "Academia Scholarly Journals");
         assertEquals(List.of(new IntegrityMessage("match found in predatory journal list", entry, StandardField.PUBLISHER)), checker.check(entry));
