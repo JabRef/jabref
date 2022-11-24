@@ -13,6 +13,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.PredatoryJournalLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -139,7 +140,9 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(), false)
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                PredatoryJournalLoader.loadRepository(false),
+                false)
                 .check();
 
         assertEquals(clonedEntry, entry);
@@ -172,7 +175,9 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(), false)
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                PredatoryJournalLoader.loadRepository(false),
+                false)
                 .check();
         assertNotEquals(Collections.emptyList(), messages);
     }
@@ -183,7 +188,9 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 filePreferencesMock,
                 createCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(), false
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                PredatoryJournalLoader.loadRepository(false),
+                false
         ).check();
         assertEquals(Collections.emptyList(), messages);
     }

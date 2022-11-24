@@ -19,55 +19,52 @@ import org.slf4j.LoggerFactory;
 
 public class PredatoryJournalLoader {
     private static class PJSource {
-        final URL URL;
+        URL URL = null;
         final String ELEMENT_REGEX;
 
-        PJSource(String URL, String ELEMENT_REGEX) throws MalformedURLException {
-            this.URL = new URL(URL);
+        PJSource(String URL, String ELEMENT_REGEX) {
+            try {
+                this.URL = new URL(URL);
+            } catch (MalformedURLException ex) {
+                PredatoryJournalLoader.logException(ex);
+            }
             this.ELEMENT_REGEX = ELEMENT_REGEX;
         }
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PredatoryJournalLoader.class);
-    private static List<PJSource> PREDATORY_SOURCES;
+    private static final List<PJSource> PREDATORY_SOURCES = List.of(
+        new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv",
+                    null),
+        /*
+        new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/hijacked.csv",
+                    null),
+        */
+        new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/publishers.csv",
+                    null),
+        new PJSource("https://beallslist.net/",
+                    "<li>.*?</li>"),
+        new PJSource("https://beallslist.net/standalone-journals/",
+                    "<li>.*?</li>"),
+        new PJSource("https://beallslist.net/hijacked-journals/",
+                    "<tr>.*?</tr>")
+    );
     private static PredatoryJournalRepository repository;
-    private static List<String> linkElements;
+    private static List<String> linkElements = new ArrayList<>();
 
-    public PredatoryJournalLoader() {
-        try {
-            PREDATORY_SOURCES = List.of(
-                new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/journals.csv",
-                            null),
-                /*
-                new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/hijacked.csv",
-                            null),
-                */
-                new PJSource("https://raw.githubusercontent.com/stop-predatory-journals/stop-predatory-journals.github.io/master/_data/publishers.csv",
-                            null),
-                new PJSource("https://beallslist.net/",
-                            "<li>.*?</li>"),
-                new PJSource("https://beallslist.net/standalone-journals/",
-                            "<li>.*?</li>"),
-                new PJSource("https://beallslist.net/hijacked-journals/",
-                            "<tr>.*?</tr>")
-            );
-        } catch (MalformedURLException ex) {
-            logException(ex);
-        }
-        linkElements = new ArrayList<>();
-    }
-
-    public PredatoryJournalRepository loadRepository() {
+    public static PredatoryJournalRepository loadRepository(boolean doUpdate) {
         // Initialize in-memory repository
         repository = new PredatoryJournalRepository();
 
         // Update from external sources
-        update();
+        if (doUpdate) {
+            update();
+        }
 
         return repository;
     }
 
-    private void update() {
+    private static void update() {
         PREDATORY_SOURCES.forEach(PredatoryJournalLoader::crawl);       // populates linkElements (and predatoryJournals if CSV)
         linkElements.forEach(PredatoryJournalLoader::clean);            // adds cleaned HTML to predatoryJournals
 

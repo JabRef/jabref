@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.journals.PredatoryJournalLoader;
 import org.jabref.logic.journals.PredatoryJournalRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -19,9 +18,8 @@ public class PredatoryJournalChecker implements EntryChecker {
     private final List<Field> fieldsToCheck;
     private final PredatoryJournalRepository predatoryJournalRepository;
 
-    public PredatoryJournalChecker(Field... fieldsToCheck) {
-        var pjLoader = new PredatoryJournalLoader();
-        this.predatoryJournalRepository = pjLoader.loadRepository(); // causes slowdown when running IntegrityCheckTest due to repeated crawling -- TODO: fix with better usage of MVStore
+    public PredatoryJournalChecker(PredatoryJournalRepository predatoryJournalRepository, Field... fieldsToCheck) {
+        this.predatoryJournalRepository = Objects.requireNonNull(predatoryJournalRepository);
 
         this.fieldsToCheck = new ArrayList<>();
         for (Field f : fieldsToCheck) {

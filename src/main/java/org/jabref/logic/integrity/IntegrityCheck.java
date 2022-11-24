@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.PredatoryJournalRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -22,6 +23,7 @@ public class IntegrityCheck {
                           FilePreferences filePreferences,
                           CitationKeyPatternPreferences citationKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
+                          PredatoryJournalRepository predatoryJournalRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
 
@@ -42,13 +44,13 @@ public class IntegrityCheck {
         if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),
-                    new PredatoryJournalChecker(StandardField.JOURNALTITLE, StandardField.PUBLISHER, StandardField.BOOKTITLE),
+                    new PredatoryJournalChecker(predatoryJournalRepository, StandardField.JOURNALTITLE, StandardField.PUBLISHER, StandardField.BOOKTITLE),
                     new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8))
             ));
         } else {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
-                    new PredatoryJournalChecker(StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE),
+                    new PredatoryJournalChecker(predatoryJournalRepository, StandardField.JOURNAL, StandardField.PUBLISHER, StandardField.BOOKTITLE),
                     new ASCIICharacterChecker(),
                     new NoBibtexFieldChecker(),
                     new BibTeXEntryTypeChecker())

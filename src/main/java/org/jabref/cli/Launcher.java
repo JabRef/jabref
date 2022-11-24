@@ -13,6 +13,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.PredatoryJournalLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
@@ -142,6 +143,10 @@ public class Launcher {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
+
+        // Read list(s) of predatory journal names
+        Globals.predatoryJournalRepository = PredatoryJournalLoader
+                .loadRepository(true);
 
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(

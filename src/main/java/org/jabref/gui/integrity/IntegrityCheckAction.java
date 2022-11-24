@@ -43,6 +43,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 Globals.prefs.getFilePreferences(),
                 Globals.prefs.getCitationKeyPatternPreferences(),
                 Globals.journalAbbreviationRepository,
+                Globals.predatoryJournalRepository,
                 Globals.prefs.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
 
         Task<List<IntegrityMessage>> task = new Task<>() {
