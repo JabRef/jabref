@@ -12,10 +12,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PredatoryJournalCheckerTest {
+class PredatoryJournalCheckerTest {
 
-    private static PredatoryJournalChecker checker;
-    private BibEntry entry;
+    static PredatoryJournalChecker checker;
+    BibEntry entry;
 
     @BeforeAll
     static void initChecker() {
