@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,9 +58,14 @@ public class PredatoryJournalLoader {
     public static PredatoryJournalRepository loadRepository(boolean doUpdate) {
         // Initialize repository
         try {
-            repository = new PredatoryJournalRepository(Path.of(PredatoryJournalRepository.class.getResource("/journals/predatoryJournalList.mv").toURI()));
-        } catch (URISyntaxException ex) {
-            logException(ex);
+            Path tempDir = Files.createTempDirectory("jabref-journal");
+            Path tempJournalList = tempDir.resolve("predatoryJournalList.mv");
+            Files.copy(JournalAbbreviationRepository.class.getResourceAsStream("/journals/predatoryJournalList.mv"), tempJournalList);
+            repository = new PredatoryJournalRepository(tempJournalList);
+            tempDir.toFile().deleteOnExit();
+            tempJournalList.toFile().deleteOnExit();
+        } catch (IOException e) {
+            LOGGER.error("Error while copying journal list", e);
             return null;
         }
 
