@@ -1,6 +1,8 @@
 package org.jabref.gui.importer;
 
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 
 import javax.swing.undo.UndoManager;
 
@@ -12,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -32,6 +35,7 @@ import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -49,6 +53,7 @@ import org.controlsfx.control.CheckListView;
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     public CheckListView<BibEntry> entriesListView;
+    public ComboBox<String> libraryListView;
     public ButtonType importButton;
     public Label totalItems;
     public Label selectedItems;
@@ -101,6 +106,16 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
         entriesListView.setItems(viewModel.getEntries());
+        List<String> databases = FileUtil.uniquePathSubstrings(stateManager.collectAllDatabasePaths()).stream().map(path -> {
+            if (path.isBlank()) {
+                return "Untitled";
+            }
+            return path;
+        }).toList();
+        libraryListView.getItems().addAll(databases);
+        new ViewModelListCellFactory<String>()
+                .withText(text -> text).install(libraryListView);
+        stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> libraryListView.setValue(FileUtil.uniquePathSubstrings(Collections.singletonList(path.toString())).get(0)));
 
         PseudoClass entrySelected = PseudoClass.getPseudoClass("entry-selected");
         new ViewModelListCellFactory<BibEntry>()

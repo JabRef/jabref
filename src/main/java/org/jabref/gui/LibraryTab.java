@@ -341,7 +341,7 @@ public class LibraryTab extends Tab {
             }
 
             // Unique path fragment
-            Optional<String> uniquePathPart = FileUtil.getUniquePathFragment(collectAllDatabasePaths(), databasePath);
+            Optional<String> uniquePathPart = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), databasePath);
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
@@ -370,16 +370,6 @@ public class LibraryTab extends Tab {
         if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             indexingTaskManager.updateDatabaseName(tabTitle.toString());
         }
-    }
-
-    private List<String> collectAllDatabasePaths() {
-        List<String> list = new ArrayList<>();
-        stateManager.getOpenDatabases().stream()
-                    .map(BibDatabaseContext::getDatabasePath)
-                    .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
-                            path -> list.add(path.toAbsolutePath().toString()),
-                            () -> list.add("")));
-        return list;
     }
 
     @Subscribe
