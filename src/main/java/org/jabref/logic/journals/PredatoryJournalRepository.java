@@ -1,5 +1,6 @@
 package org.jabref.logic.journals;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,9 +25,8 @@ public class PredatoryJournalRepository {
     private final MVMap<String, List<String>> predatoryJournals;
     private final Logger LOGGER = LoggerFactory.getLogger(PredatoryJournalRepository.class);
 
-    public PredatoryJournalRepository() {
-        // MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open();
-        MVStore store = MVStore.open(null);     // fileName is null gives in-memory map TODO: provide path for caching to disk!
+    public PredatoryJournalRepository(Path predatoryJournalList) {
+        MVStore store = new MVStore.Builder().fileName(predatoryJournalList.toAbsolutePath().toString()).open();
         this.predatoryJournals = store.openMap("predatoryJournals");
     }
 

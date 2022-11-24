@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.net.URLDownload;
 
+import kong.unirest.UnirestException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -53,8 +56,13 @@ public class PredatoryJournalLoader {
     private static List<String> linkElements = new ArrayList<>();
 
     public static PredatoryJournalRepository loadRepository(boolean doUpdate) {
-        // Initialize in-memory repository
-        repository = new PredatoryJournalRepository();
+        // Initialize repository
+        try {
+            repository = new PredatoryJournalRepository(Path.of(PredatoryJournalRepository.class.getResource("/journals/predatoryJournalList.mv").toURI()));
+        } catch (URISyntaxException ex) {
+            logException(ex);
+            return null;
+        }
 
         // Update from external sources
         if (doUpdate) {
@@ -83,6 +91,8 @@ public class PredatoryJournalLoader {
                 handleHTML(source.ELEMENT_REGEX, download.asString());
             }
         } catch (IOException ex) {
+            logException(ex);
+        } catch (UnirestException ex) {
             logException(ex);
         }
     }
