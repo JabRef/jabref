@@ -1,0 +1,9 @@
+assembly-versioning-format: '{major}.{minor}.{WeightedPreReleaseNumber}'
+assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
+mode: ContinuousDeployment
+
+branches:
+  main:
+    regex: ^main
+    tag: ''
+    pre-release-weight: 0  # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release

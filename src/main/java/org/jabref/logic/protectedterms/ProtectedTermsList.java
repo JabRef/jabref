@@ -5,26 +5,24 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.util.OS;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsList.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsList.class);
 
     private String description;
     private final List<String> termsList;
     private final String location;
     private final boolean internalList;
     private boolean enabled;
-
 
     public ProtectedTermsList(String description, List<String> termList, String location, boolean internalList) {
         this.description = Objects.requireNonNull(description);
@@ -86,7 +84,7 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
             return false;
         }
 
-        Path p = Paths.get(location);
+        Path p = Path.of(location);
         String s = OS.NEWLINE + term;
         try (BufferedWriter writer = Files.newBufferedWriter(p, StandardCharsets.UTF_8,
                 create ? StandardOpenOption.CREATE : StandardOpenOption.APPEND)) {

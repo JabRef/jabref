@@ -1,82 +1,87 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 public class AutoCompletePreferences {
 
-    private static final String DELIMITER = ";";
-    private boolean shouldAutoComplete;
-    private AutoCompleteFirstNameMode firstNameMode;
-    private boolean onlyCompleteLastFirst;
-    private boolean onlyCompleteFirstLast;
-    private List<String> completeNames;
-    private JournalAbbreviationPreferences journalAbbreviationPreferences;
-
-    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<String> completeNames, JournalAbbreviationPreferences journalAbbreviationPreferences) {
-        this.shouldAutoComplete = shouldAutoComplete;
-        this.firstNameMode = firstNameMode;
-        this.onlyCompleteLastFirst = onlyCompleteLastFirst;
-        this.onlyCompleteFirstLast = onlyCompleteFirstLast;
-        this.completeNames = completeNames;
-        this.journalAbbreviationPreferences = journalAbbreviationPreferences;
+    public enum NameFormat {
+        LAST_FIRST, FIRST_LAST, BOTH
     }
 
-    public void setShouldAutoComplete(boolean shouldAutoComplete) {
-        this.shouldAutoComplete = shouldAutoComplete;
+    private final BooleanProperty shouldAutoComplete;
+    private final ObjectProperty<AutoCompleteFirstNameMode> firstNameMode;
+    private final ObjectProperty<NameFormat> nameFormat;
+    private final ObservableSet<Field> completeFields;
+
+    public AutoCompletePreferences(boolean shouldAutoComplete,
+                                   AutoCompleteFirstNameMode firstNameMode,
+                                   NameFormat nameFormat,
+                                   Set<Field> completeFields) {
+        this.shouldAutoComplete = new SimpleBooleanProperty(shouldAutoComplete);
+        this.firstNameMode = new SimpleObjectProperty<>(firstNameMode);
+        this.nameFormat = new SimpleObjectProperty<>(nameFormat);
+        this.completeFields = FXCollections.observableSet(completeFields);
     }
 
     public boolean shouldAutoComplete() {
+        return shouldAutoComplete.get();
+    }
+
+    public BooleanProperty autoCompleteProperty() {
         return shouldAutoComplete;
+    }
+
+    public void setAutoComplete(boolean shouldAutoComplete) {
+        this.shouldAutoComplete.set(shouldAutoComplete);
     }
 
     /**
      * Returns how the first names are handled.
      */
     public AutoCompleteFirstNameMode getFirstNameMode() {
+        return firstNameMode.get();
+    }
+
+    public ObjectProperty<AutoCompleteFirstNameMode> firstNameModeProperty() {
         return firstNameMode;
     }
 
     public void setFirstNameMode(AutoCompleteFirstNameMode firstNameMode) {
-        this.firstNameMode = firstNameMode;
+        this.firstNameMode.set(firstNameMode);
     }
 
-    public boolean getOnlyCompleteLastFirst() {
-        return onlyCompleteLastFirst;
+    public NameFormat getNameFormat() {
+        return nameFormat.get();
     }
 
-    public void setOnlyCompleteLastFirst(boolean onlyCompleteLastFirst) {
-        this.onlyCompleteLastFirst = onlyCompleteLastFirst;
+    public ObjectProperty<NameFormat> nameFormatProperty() {
+        return nameFormat;
     }
 
-    public boolean getOnlyCompleteFirstLast() {
-        return onlyCompleteFirstLast;
+    public void setNameFormat(NameFormat nameFormat) {
+        this.nameFormat.set(nameFormat);
     }
 
-    public void setOnlyCompleteFirstLast(boolean onlyCompleteFirstLast) {
-        this.onlyCompleteFirstLast = onlyCompleteFirstLast;
-    }
-
-    public List<String> getCompleteNames() {
-        return completeNames;
-    }
-
-    public void setCompleteNames(List<String> completeNames) {
-        this.completeNames = completeNames;
-    }
-
-    public void setCompleteNames(String input) {
-        setCompleteNames(Arrays.asList(input.split(DELIMITER)));
+    /**
+     * Returns the list of fields for which autocomplete is enabled
+     *
+     * @return List of field names
+     */
+    public ObservableSet<Field> getCompleteFields() {
+        return completeFields;
     }
 
     public String getCompleteNamesAsString() {
-        return completeNames.stream().collect(Collectors.joining(DELIMITER));
-    }
-
-    public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return journalAbbreviationPreferences;
+        return FieldFactory.serializeFieldsList(completeFields);
     }
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanel?>
+<fx:root spacing="10.0" type="VBox"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="org.jabref.gui.libraryproperties.keypattern.KeyPatternPropertiesView">
+    <HBox>
+        <Label styleClass="sectionHeader" text="%Key patterns"/>
+        <HBox HBox.hgrow="ALWAYS"/>
+        <Button fx:id="keyPatternHelp" prefWidth="20.0"/>
+    </HBox>
+    <Label text="%( Note: Press return to commit changes in the table! )"/>
+    <AnchorPane VBox.vgrow="ALWAYS">
+        <CitationKeyPatternPanel fx:id="bibtexKeyPatternTable"
+                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                 AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"/>
+        <Button text="%Reset All" onAction="#resetAllKeyPatterns"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+    </AnchorPane>
+</fx:root>

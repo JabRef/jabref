@@ -5,20 +5,21 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;
+import org.jabref.model.entry.field.Field;
 
 public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
 
     private final BibDatabaseContext databaseContext;
     private final ListProperty<ParsedEntryLink> linkedEntries;
 
-    public LinkedEntriesEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers) {
-        super(fieldName, suggestionProvider, fieldCheckers);
+    public LinkedEntriesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers) {
+        super(field, suggestionProvider, fieldCheckers);
 
         this.databaseContext = databaseContext;
         linkedEntries = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -34,7 +35,7 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public StringConverter<ParsedEntryLink> getStringConverter() {
-        return new StringConverter<ParsedEntryLink>() {
+        return new StringConverter<>() {
             @Override
             public String toString(ParsedEntryLink linkedEntry) {
                 if (linkedEntry == null) {
@@ -45,7 +46,7 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
 
             @Override
             public ParsedEntryLink fromString(String key) {
-                return databaseContext.getDatabase().getEntryByKey(key).map(ParsedEntryLink::new).orElse(null);
+                return new ParsedEntryLink(key, databaseContext.getDatabase());
             }
         };
     }
@@ -56,8 +57,8 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
         // This feature was removed while converting the linked entries editor to JavaFX
         // Right now there is no nice way to re-implement it as we have no good interface to control the focus of the main table
         // (except directly using the JabRefFrame class as below)
-        //parsedEntryLink.getLinkedEntry().ifPresent(
+        // parsedEntryLink.getLinkedEntry().ifPresent(
         //        e -> frame.getCurrentBasePanel().highlightEntry(e)
-        //);
+        // );
     }
 }

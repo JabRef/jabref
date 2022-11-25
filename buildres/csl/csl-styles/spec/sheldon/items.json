@@ -1,0 +1,175 @@
+[
+	{
+		"id": "HanckevarietiescapitalismConflict2007",
+		"type": "book",
+		"title": "Beyond varieties of capitalism: Conflict, contradiction, and complementarities in the European economy",
+		"publisher": "Oxford University Press",
+		"publisher-place": "Oxford and New York",
+		"source": "Open WorldCat",
+		"event-place": "Oxford and New York",
+		"ISBN": "978-0-19-920648-3",
+		"title-short": "Beyond varieties of capitalism",
+		"language": "en",
+		"editor": [
+			{
+				"family": "Hancké",
+				"given": "Bob"
+			},
+			{
+				"family": "Rhodes",
+				"given": "Martin"
+			},
+			{
+				"family": "Thatcher",
+				"given": "Mark"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2007"
+				]
+			]
+		},
+		"citation-number": 1
+	},
+	{
+		"id": "CSLsearchexample2012",
+		"type": "webpage",
+		"title": "CSL search by example",
+		"container-title": "Citation Style Editor",
+		"URL": "http://editor.citationstyles.org/searchByExample/",
+		"issued": {
+			"date-parts": [
+				[
+					"2012"
+				]
+			]
+		},
+		"accessed": {
+			"date-parts": [
+				[
+					"2012",
+					12,
+					15
+				]
+			]
+		},
+		"citation-number": 2
+	},
+	{
+		"id": "MaresFirmswelfarestate2001",
+		"type": "chapter",
+		"title": "Firms and the welfare state: When, why, and how does social policy matter to employers?",
+		"container-title": "Varieties of capitalism. The institutional foundations of comparative advantage",
+		"publisher": "Oxford University Press",
+		"publisher-place": "New York",
+		"page": "184-213",
+		"event-place": "New York",
+		"author": [
+			{
+				"family": "Mares",
+				"given": "Isabela"
+			}
+		],
+		"editor": [
+			{
+				"family": "Hall",
+				"given": "Peter A."
+			},
+			{
+				"family": "Soskice",
+				"given": "David"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2001"
+				]
+			]
+		},
+		"citation-number": 3
+	},
+	{
+		"id": "Fennerdatacitationroadmap2019",
+		"type": "article-journal",
+		"title": "A data citation roadmap for scholarly data repositories",
+		"container-title": "Scientific Data",
+		"container-title-short": "Sci. Data",
+		"page": "28",
+		"volume": "6",
+		"issue": "1",
+		"source": "Nature",
+		"abstract": "This article presents a practical roadmap for scholarly data repositories to implement data citation in accordance with the Joint Declaration of Data Citation Principles, a synopsis and harmonization of the recommendations of major science policy bodies. The roadmap was developed by the Repositories Expert Group, as part of the Data Citation Implementation Pilot (DCIP) project, an initiative of FORCE11.org and the NIH-funded BioCADDIE (https://biocaddie.org) project. The roadmap makes 11 specific recommendations, grouped into three phases of implementation: a) required steps needed to support the Joint Declaration of Data Citation Principles, b) recommended steps that facilitate article/data publication workflows, and c) optional steps that further improve data citation support provided by data repositories. We describe the early adoption of these recommendations 18 months after they have first been published, looking specifically at implementations of machine-readable metadata on dataset landing pages.",
+		"URL": "http://www.nature.com/articles/s41597-019-0031-8",
+		"DOI": "10.1038/s41597-019-0031-8",
+		"ISSN": "2052-4463",
+		"language": "En",
+		"author": [
+			{
+				"family": "Fenner",
+				"given": "Martin"
+			},
+			{
+				"family": "Crosas",
+				"given": "Mercè"
+			},
+			{
+				"family": "Grethe",
+				"given": "Jeffrey S."
+			},
+			{
+				"family": "Kennedy",
+				"given": "David"
+			},
+			{
+				"family": "Hermjakob",
+				"given": "Henning"
+			},
+			{
+				"family": "Rocca-Serra",
+				"given": "Phillippe"
+			},
+			{
+				"family": "Durand",
+				"given": "Gustavo"
+			},
+			{
+				"family": "Berjon",
+				"given": "Robin"
+			},
+			{
+				"family": "Karcher",
+				"given": "Sebastian"
+			},
+			{
+				"family": "Martone",
+				"given": "Maryann"
+			},
+			{
+				"family": "Clark",
+				"given": "Tim"
+			}
+		],
+		"issued": {
+			"date-parts": [
+				[
+					"2019",
+					4,
+					10
+				]
+			]
+		},
+		"accessed": {
+			"date-parts": [
+				[
+					"2019",
+					4,
+					27
+				]
+			]
+		},
+		"citation-number": 4
+	}
+]

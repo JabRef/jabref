@@ -1,0 +1,30 @@
+<biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\editor} (\year)" xml:id="\citationkey">
+   <authorgroup>
+<!--EDITORS-->
+\begin{editor}\format[CreateDocBook5Editors]{\editor}\end{editor}
+   </authorgroup>
+   <!--TITLE-->
+    \begin{title}<citetitle pubwork="book">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
+<!--Collection booktitle, edition, series, (pages), publisher-->
+    <biblioset relation="book">\n
+        \begin{booktitle}<title>\format[XMLChars,RemoveLatexCommands]{\booktitle}</title>\end{booktitle}
+        \begin{edition}<edition>\format[XMLChars,RemoveLatexCommands]{\edition}</edition>\end{edition}
+        \begin{year}<pubdate>\year</pubdate>\end{year}
+        \begin{volume}<volumenum>\volume</volumenum> \end{volume}
+        \begin{chapter}<bibliomisc role="secnum">\chapter</bibliomisc> \end{chapter}
+        \begin{pages}<artpagenums>\format[FormatPagesForXML]{\pages}</artpagenums> \end{pages}
+        \begin{publisher}<publisher>\end{publisher}
+        \begin{publisher}<publishername>\format[XMLChars]{\publisher}</publishername> \end{publisher}
+        \begin{location}\begin{address}<address>\location</address>\end{address}\end{location}
+        \begin{publisher}</publisher>\end{publisher}
+    </biblioset>
+    \begin{series}<bibliomisc role="seriestitle">\format[XMLChars,RemoveLatexCommands]{\series}</bibliomisc>\end{series}
+    \begin{series}\begin{editora}<bibliomisc role="serieseditor">\format[XMLChars,RemoveLatexCommands]{\editora}</bibliomisc>\end{editora}\end{series}
+
+<!-- IDENTIFIERS-->
+    \begin{url}<bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>\end{url}
+    \begin{doi}<biblioid class="doi">\format[XMLChars]{\doi}</biblioid>\end{doi}
+    \begin{isbn}<biblioid class="isbn">\format[XMLChars]{\isbn}</biblioid>\end{isbn}
+<!--ABSTRACT-->
+    \begin{abstract}<abstract><para>\format[XMLChars,RemoveLatexCommands]{\abstract}</para></abstract>\end{abstract}
+</biblioentry>

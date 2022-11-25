@@ -1,0 +1,14 @@
+- id: \citationkey
+\begin{entrytype}  type: \format[CSLType]{\entrytype}\end{entrytype}
+\begin{author}
+  author:
+  - literal: "\author"
+\end{author}
+\begin{title}  title: "\title"\end{title}
+\begin{shorttitle}  title-short: "\shorttitle"\end{shorttitle}
+\begin{date}  issued: \date\end{date}
+\begin{url}  url: \url\end{url}
+\begin{doi}  doi: \doi\end{doi}
+\begin{volume}  volume: \volume\end{volume}
+\begin{number}  number: \number\end{number}
+\begin{urldate}  accessed: \urldate\end{urldate}

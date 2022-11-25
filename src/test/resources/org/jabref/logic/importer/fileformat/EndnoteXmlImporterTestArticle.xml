@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <records>
+        <record>
+            <database name="Library1.bdb" path="/Users/user/Documents/Bookends/Library1.bdb">Library1.bdb</database>
+            <source-app name="Bookends" version="13.0.5">Bookends</source-app>
+            <rec-number>2954</rec-number>
+            <ref-type name="Journal Article">17</ref-type>
+            <contributors>
+                <authors>
+                    <author>
+                        <style face="normal" size="100%">Ahmad, AS</style>
+                    </author>
+                    <author>
+                        <style face="normal" size="100%">Ormiston-Smith, N</style>
+                    </author>
+                    <author>
+                        <style face="normal" size="100%">Sasieni, PD</style>
+                    </author>
+                </authors>
+            </contributors>
+            <auth-address>
+                <style face="normal" size="100%">Queen Mary University of London, Centre for Cancer Prevention, Wolfson
+                    Institute of Preventive Medicine, Charterhouse Square, London EC1M 6BQ, UK.&#xA;Cancer Research UK,
+                    Head of Statistical Information, Angel Building, 407 St John Street, London EC1V 4AD, UK.
+                </style>
+            </auth-address>
+            <titles>
+                <title>
+                    <style face="normal" size="100%">Trends in the lifetime risk of developing cancer in Great Britain:
+                        comparison of risk for those born from 1930 to 1960
+                    </style>
+                </title>
+                <secondary-title>
+                    <style face="normal" size="100%">Br J Cancer</style>
+                </secondary-title>
+            </titles>
+            <pages>
+                <style face="normal" size="100%">943-7</style>
+            </pages>
+            <number>
+                <style face="normal" size="100%">5</style>
+            </number>
+            <volume>
+                <style face="normal" size="100%">112</style>
+            </volume>
+            <dates>
+                <year>
+                    <style face="normal" size="100%">2015</style>
+                </year>
+                <pub-dates>
+                    <date>
+                        <style face="normal" size="100%">Mar 3</style>
+                    </date>
+                </pub-dates>
+            </dates>
+            <keywords>
+                <keyword>
+                    <style face="normal" size="100%">Age Factors</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Aged</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Aged, 80 and over</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Female</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Great Britain/epidemiology</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Humans</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Male</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Middle Aged</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Models, Statistical</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Neoplasms/*epidemiology</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Risk Assessment</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Risk Factors</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="100%">Sex Characteristics</style>
+                </keyword>
+            </keywords>
+            <abstract>
+                <style face="normal" size="100%">test abstract
+                </style>
+            </abstract>
+            <notes>
+                <style face="normal" size="100%">some notes
+                </style>
+            </notes>
+            <urls>
+                <related-urls>
+                    <url>
+                        <style face="normal" size="100%">http://www.ncbi.nlm.nih.gov/pubmed/25647015</style>
+                    </url>
+                </related-urls>
+                <pdf-urls>
+                    <url>
+                        <style face="normal" size="100%">
+                            file://localhost/Users/user/Documents/Bookends/Attachments/Ahmad%20et%20al%202015.pdf
+                        </style>
+                    </url>
+                </pdf-urls>
+            </urls>
+            <isbn>
+                <style face="normal" size="100%">1532-1827 (Electronic)&#xD;0007-0920 (Linking)</style>
+            </isbn>
+            <electronic-resource-num>
+                <style face="normal" size="100%">10.1038/bjc.2014.606</style>
+            </electronic-resource-num>
+            <accession-num>
+                <style face="normal" size="100%">25647015</style>
+            </accession-num>
+        </record>
+    </records>
+</xml>

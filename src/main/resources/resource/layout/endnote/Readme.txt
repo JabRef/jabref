@@ -14,7 +14,7 @@ The EndNote Export Filter for JabRef (when combined with the "EndNote Import fro
 Installation:
 *********************************************************************************
 EndNote Import from JabRef.eni
-This file must be placed in your EndNote Filters directory. On a Mac OS X system, the default directory is /Applications/EndNote 7/Filters. On a Windows XP system, the default directory is C:\Program Files\EndNote\Filters. The default EndNote Import filter will be able to import the files from JabRef, but supports fewer fields. You should then open up the Filter Manager (Edit->Import Filters->Open Filter Manager) and add it to your Favorites.
+This file must be placed in your EndNote Filters directory. On a macOS system, the default directory is /Applications/EndNote 7/Filters. On a Windows XP system, the default directory is C:\Program Files\EndNote\Filters. The default EndNote Import filter will be able to import the files from JabRef, but supports fewer fields. You should then open up the Filter Manager (Edit->Import Filters->Open Filter Manager) and add it to your Favorites.
 
 EndNote Preferences
 The filter provided will only work if certain fields are added to EndNote's default Reference Types. Open up Preferences and click on Reference Types, then Modify Reference Types. The following table lists the field names that must be added to certain reference types for EndNote to support these fields. For example, the Publisher field for Journal Article is blank by default; Type in Publisher in this field. 
@@ -40,7 +40,7 @@ EndNote.tab:
 This is the tab-delimited spreadsheet containing a list of all the Refer codes, how they map to the Generic EndNote fields, and how the JabRef fields for the default BibTeX types are mapped to the Generic EndNote fields.
 
 BibTeX Export to JabRef, BibTeX Export to JabRef*
-These file are optional for if you wish to re-export these entries to JabRef. They must be placed in your EndNote Styles directory. On a Mac OS X system, the default directory is /Applications/EndNote 7/Styles. On a Windows XP system, the default directory is C:\Program Files\EndNote\Styles. You may then want to open up the Filter Manager (Edit->Output Styles->Open Style Manager) and add it to your Favorites.
+These file are optional for if you wish to re-export these entries to JabRef. They must be placed in your EndNote Styles directory. On a macOS system, the default directory is /Applications/EndNote 7/Styles. On a Windows XP system, the default directory is C:\Program Files\EndNote\Styles. You may then want to open up the Filter Manager (Edit->Output Styles->Open Style Manager) and add it to your Favorites.
 
 *********************************************************************************
 Usage

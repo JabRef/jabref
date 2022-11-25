@@ -11,8 +11,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.zip.CRC32;
@@ -26,43 +27,29 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * @author alver
- */
-public class OpenDocumentSpreadsheetCreator extends ExportFormat {
+public class OpenDocumentSpreadsheetCreator extends Exporter {
 
-    private static final Log LOGGER = LogFactory.getLog(OpenDocumentSpreadsheetCreator.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDocumentSpreadsheetCreator.class);
 
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super(Localization.lang("OpenDocument spreadsheet"), "ods", null, null, ".ods");
+        super("ods", Localization.lang("OpenDocument spreadsheet"), StandardFileType.ODS);
     }
 
-    @Override
-    public void performExport(final BibDatabaseContext databaseContext, final String file,
-            final Charset encoding, List<BibEntry> entries) throws IOException {
-        Objects.requireNonNull(databaseContext);
-        Objects.requireNonNull(entries);
-        if (!entries.isEmpty()) { // Only export if entries exists
-            OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), databaseContext.getDatabase(), entries);
-        }
-    }
+    private static void storeOpenDocumentSpreadsheetFile(Path file, InputStream source) throws IOException {
 
-    private static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws IOException {
-
-        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
-
-            //addResourceFile("mimetype", "/resource/ods/mimetype", out);
+        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
+            // addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");
             String mime = "application/vnd.oasis.opendocument.spreadsheet";
             ze.setMethod(ZipEntry.STORED);
@@ -77,7 +64,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             out.closeEntry();
 
             ZipEntry zipEntry = new ZipEntry("content.xml");
-            //zipEntry.setMethod(ZipEntry.DEFLATED);
+            // zipEntry.setMethod(ZipEntry.DEFLATED);
             out.putNextEntry(zipEntry);
             int c;
             while ((c = source.read()) >= 0) {
@@ -93,7 +80,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         }
     }
 
-    private static void exportOpenDocumentSpreadsheet(File file, BibDatabase database, List<BibEntry> entries)
+    private static void exportOpenDocumentSpreadsheet(Path file, BibDatabase database, List<BibEntry> entries)
             throws IOException {
 
         // First store the xml formatted content to a temporary file.
@@ -110,11 +97,20 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         }
     }
 
+    @Override
+    public void export(final BibDatabaseContext databaseContext, final Path file,
+                       List<BibEntry> entries) throws IOException {
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(entries);
+        if (!entries.isEmpty()) { // Only export if entries exists
+            OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(file, databaseContext.getDatabase(), entries);
+        }
+    }
+
     private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, List<BibEntry> entries) {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, entries);
 
         try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
-
             DOMSource source = new DOMSource(od.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);
             Transformer trans = TransformerFactory.newInstance().newTransformer();

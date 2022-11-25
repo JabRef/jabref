@@ -1,21 +1,21 @@
 package org.jabref.gui.desktop.os;
 
-import java.awt.Desktop;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 
+@AllowedToUseAwt("Requires AWT to open a file")
 public class OSX implements NativeDesktop {
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, Globals.prefs.getFilePreferences());
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
@@ -29,22 +29,18 @@ public class OSX implements NativeDesktop {
         // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
         String[] cmd = (application != null) && !application.isEmpty() ? new String[] {"/usr/bin/open", "-a",
                 application, filePath} : new String[] {"/usr/bin/open", filePath};
-        Runtime.getRuntime().exec(cmd);
+        new ProcessBuilder(cmd).start();
     }
 
     @Override
     public void openFolderAndSelectFile(Path file) throws IOException {
-        Desktop.getDesktop().open(file.getParent().toFile());
+        String[] cmd = {"/usr/bin/open", "-R", file.toString()};
+        Runtime.getRuntime().exec(cmd);
     }
 
     @Override
-    public void openConsole(String absolutePath) throws IOException {
-        Runtime.getRuntime().exec("open -a Terminal " + absolutePath, null, new File(absolutePath));
-    }
-
-    @Override
-    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
-        //TODO implement
+    public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
+         new ProcessBuilder("open", "-a", "Terminal", absolutePath).start();
     }
 
     @Override
@@ -54,6 +50,11 @@ public class OSX implements NativeDesktop {
 
     @Override
     public Path getApplicationDirectory() {
-        return Paths.get("/Applications");
+        return Path.of("/Applications");
+    }
+
+    @Override
+    public Path getDefaultFileChooserDirectory() {
+        return Path.of(System.getProperty("user.home") + "/Documents");
     }
 }

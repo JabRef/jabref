@@ -6,26 +6,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
 public class TreeNodeTest {
 
-    @Mock
     Consumer<TreeNodeTestData.TreeNodeMock> subscriber;
 
-    @Test(expected = UnsupportedOperationException.class)
+    @BeforeEach
+    public void setUp() {
+        subscriber = mock(Consumer.class);
+    }
+
+    @Test
     public void constructorChecksThatClassImplementsCorrectInterface() {
-        new WrongTreeNodeImplementation();
+        assertThrows(UnsupportedOperationException.class, () -> new WrongTreeNodeImplementation());
     }
 
     @Test
@@ -79,10 +82,10 @@ public class TreeNodeTest {
         assertEquals(Optional.empty(), root.getDescendant(Arrays.asList(1, 100, 0)));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void getPositionInParentForRootThrowsException() {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
-        root.getPositionInParent();
+        assertThrows(UnsupportedOperationException.class, () -> root.getPositionInParent());
     }
 
     @Test
@@ -102,7 +105,7 @@ public class TreeNodeTest {
     public void getIndexOfChild() {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
-        assertEquals((Integer)2, root.getIndexOfChild(node).get());
+        assertEquals((Integer) 2, root.getIndexOfChild(node).get());
     }
 
     @Test
@@ -140,7 +143,7 @@ public class TreeNodeTest {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInSimpleTree(root);
         node.moveTo(root);
-        assertEquals((Integer)2, root.getIndexOfChild(node).get());
+        assertEquals((Integer) 2, root.getIndexOfChild(node).get());
     }
 
     @Test
@@ -148,7 +151,7 @@ public class TreeNodeTest {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
         node.moveTo(root);
-        assertEquals((Integer)4, root.getIndexOfChild(node).get());
+        assertEquals((Integer) 4, root.getIndexOfChild(node).get());
     }
 
     @Test
@@ -478,11 +481,11 @@ public class TreeNodeTest {
         assertFalse(root.getChildren().contains(node));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void addThrowsExceptionIfNodeHasParent() {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
-        root.addChild(node);
+        assertThrows(UnsupportedOperationException.class, () -> root.addChild(node));
     }
 
     @Test
@@ -514,12 +517,12 @@ public class TreeNodeTest {
         assertEquals(root, child2.getParent().get());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void moveAllChildrenToDescendantThrowsException() {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
-        root.moveAllChildrenTo(node, 0);
+        assertThrows(UnsupportedOperationException.class, () -> root.moveAllChildrenTo(node, 0));
     }
 
     @Test
@@ -621,6 +624,7 @@ public class TreeNodeTest {
     }
 
     private static class WrongTreeNodeImplementation extends TreeNode<TreeNodeTestData.TreeNodeMock> {
+
         // This class is a wrong derived class of TreeNode<T>
         // since it does not extends TreeNode<WrongTreeNodeImplementation>
         // See test constructorChecksThatClassImplementsCorrectInterface

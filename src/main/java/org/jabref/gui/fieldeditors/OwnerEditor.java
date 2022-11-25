@@ -1,32 +1,38 @@
 package org.jabref.gui.fieldeditors;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
-import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.preferences.PreferencesService;
 
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import com.airhacks.afterburner.views.ViewLoader;
 
 public class OwnerEditor extends HBox implements FieldEditorFX {
 
     @FXML private OwnerEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    public OwnerEditor(String fieldName, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.viewModel = new OwnerEditorViewModel(fieldName, suggestionProvider, preferences, fieldCheckers);
+    public OwnerEditor(Field field,
+                       PreferencesService preferences,
+                       SuggestionProvider<?> suggestionProvider,
+                       FieldCheckers fieldCheckers) {
+        this.viewModel = new OwnerEditorViewModel(field, suggestionProvider, preferences, fieldCheckers);
 
-        ControlHelper.loadFXMLForControl(this);
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
 
-        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-        validationVisualizer.initVisualization(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        textArea.initContextMenu(EditorMenus.getNameMenu(textArea));
+
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public OwnerEditorViewModel getViewModel() {
@@ -44,7 +50,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void setOwner(ActionEvent event) {
+    private void setOwner() {
         viewModel.setOwner();
     }
 }

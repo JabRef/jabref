@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
+  <info>
+    <title>Biophysics and Physicobiology</title>
+    <title-short>BPPB</title-short>
+    <id>http://www.zotero.org/styles/biophysics-and-physicobiology</id>
+    <link href="http://www.zotero.org/styles/biophysics-and-physicobiology" rel="self"/>
+    <link href="http://www.zotero.org/styles/nature" rel="template"/>
+    <link href="https://www.biophys.jp/biophysics_and_physicobiology03.html" rel="documentation"/>
+    <contributor>
+      <name>Akihiko Ishijima</name>
+      <uri>https://www.mendeley.com/profiles/akihiko-ishijima/</uri>
+    </contributor>
+    <contributor>
+      <name>Haruki Nakamura</name>
+    </contributor>
+    <category citation-format="numeric"/>
+    <category field="biology"/>
+    <category field="physics"/>
+    <eissn>2189-4779</eissn>
+    <updated>2021-05-15T15:10:50+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <macro name="title">
+    <choose>
+      <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+        <text variable="title" font-style="italic"/>
+      </if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+      <label form="short" prefix=", "/>
+      <substitute>
+        <names variable="editor"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="access">
+    <text variable="DOI" prefix="https://doi.org/"/>
+  </macro>
+  <macro name="issuance">
+    <choose>
+      <if type="bill book graphic legal_case legislation motion_picture song thesis chapter paper-conference" match="any">
+        <group delimiter="; " suffix=".">
+          <group delimiter=", " prefix="(" suffix=")">
+            <text variable="publisher" form="long"/>
+            <date variable="issued">
+              <date-part name="year"/>
+            </date>
+          </group>
+        </group>
+      </if>
+      <else-if type="report webpage post post-weblog" match="any">
+        <group delimiter=" ">
+          <text variable="URL"/>
+          <date date-parts="year" form="text" variable="issued" prefix="(" suffix=")."/>
+        </group>
+      </else-if>
+      <else>
+        <date variable="issued" prefix="(" suffix=").">
+          <date-part name="year"/>
+        </date>
+      </else>
+    </choose>
+  </macro>
+  <macro name="container-title">
+    <choose>
+      <if type="article-journal article-magazine article" match="any">
+        <text variable="container-title" form="short" text-case="title"/>
+      </if>
+      <else>
+        <text variable="container-title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="editor">
+    <choose>
+      <if type="chapter paper-conference" match="any">
+        <names variable="editor" prefix="(" suffix=")">
+          <label form="short" suffix=" "/>
+          <name delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+        </names>
+      </if>
+    </choose>
+  </macro>
+  <macro name="volume">
+    <choose>
+      <if type="article-journal article-magazine article" match="any">
+        <text variable="volume" suffix=","/>
+      </if>
+      <else>
+        <group delimiter=" ">
+          <label variable="volume" form="short"/>
+          <text variable="volume"/>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <macro name="pages">
+    <choose>
+      <if type="article-journal article-magazine article" match="any">
+        <text variable="page" form="short"/>
+      </if>
+      <else>
+        <group delimiter=" ">
+          <label plural="always" variable="page" form="short"/>
+          <text variable="page" form="short"/>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <citation collapse="citation-number">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
+    <layout delimiter="," prefix="[" suffix="]">
+      <text variable="citation-number"/>
+    </layout>
+  </citation>
+  <bibliography et-al-min="7" et-al-use-first="6" second-field-align="flush">
+    <layout>
+      <text variable="citation-number" prefix="[" suffix="]"/>
+      <group delimiter=" ">
+        <text macro="author" suffix="."/>
+        <text macro="title" suffix="."/>
+        <choose>
+          <if type="chapter paper-conference" match="any">
+            <text term="in"/>
+          </if>
+        </choose>
+        <text macro="container-title"/>
+        <text macro="editor"/>
+        <text macro="volume" suffix=","/>
+        <text macro="pages"/>
+        <text macro="issuance"/>
+        <text macro="access"/>
+      </group>
+    </layout>
+  </bibliography>
+</style>

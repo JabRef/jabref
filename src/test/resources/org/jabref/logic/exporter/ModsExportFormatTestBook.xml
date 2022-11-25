@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<mods:modsCollection xmlns="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns3="http://www.w3.org/2001/XMLSchema-instance" ns3:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+<mods:modsCollection xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns2="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
     <mods:mods>
         <mods:genre>book</mods:genre>
+        <mods:identifier type="isbn">123456789</mods:identifier>
         <mods:identifier type="issn">987654321</mods:identifier>
         <mods:subject>
             <mods:topic>note</mods:topic>
@@ -9,7 +10,6 @@
         <mods:subject>
             <mods:topic>and another note</mods:topic>
         </mods:subject>
-        <mods:identifier type="isbn">123456789</mods:identifier>
         <mods:originInfo/>
         <mods:relatedItem type="host">
             <mods:part>

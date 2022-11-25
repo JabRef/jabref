@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<DialogPane minHeight="140.0" minWidth="550.0"
+            xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jabref.gui.linkedfile.LinkedFileEditDialogView">
+    <content>
+        <GridPane vgap="4" hgap="4">
+            <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints/>
+                <RowConstraints/>
+                <RowConstraints/>
+            </rowConstraints>
+
+            <Label text="%Link"/>
+            <TextField fx:id="link" prefHeight="25.0"
+                       GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+            <Button id="browse" onAction="#openBrowseDialog"
+                    styleClass="icon-button,narrow"
+                    prefHeight="20.0" prefWidth="20.0" GridPane.columnIndex="2">
+                <graphic>
+                    <JabRefIconView glyph="OPEN"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Browse"/>
+                </tooltip>
+            </Button>
+
+            <Label text="Description" GridPane.rowIndex="1"/>
+            <TextField fx:id="description" prefHeight="25.0"
+                       GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"/>
+
+            <Label text="Filetype" GridPane.rowIndex="2"/>
+            <ComboBox fx:id="fileType"
+                      GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2"/>
+        </GridPane>
+    </content>
+</DialogPane>

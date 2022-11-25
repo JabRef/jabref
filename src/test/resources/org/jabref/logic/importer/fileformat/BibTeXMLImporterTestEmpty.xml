@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<file xmlns="BibteXMLImporterEmpty.xml">
-<entry></entry>
-</file>
+<bibtex:file xmlns:bibtex="http://bibtexml.sf.net/">
+<bibtex:entry id="EmptyEntry"></bibtex:entry>
+</bibtex:file>

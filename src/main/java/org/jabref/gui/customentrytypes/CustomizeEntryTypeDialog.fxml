@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<DialogPane prefHeight="596.0" prefWidth="680"
+            xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jabref.gui.customentrytypes.CustomizeEntryTypeDialogView">
+    <content>
+        <HBox minHeight="-Infinity" minWidth="-Infinity"
+              prefHeight="400.0" prefWidth="400.0" spacing="10.0">
+            <children>
+                <VBox prefHeight="400.0" prefWidth="100.0" spacing="10.0">
+                    <children>
+                        <Label text="%Entry types"/>
+                        <TableView fx:id="entryTypes" minWidth="-Infinity"
+                                   VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="entryTypColumn" minWidth="100.0"
+                                             prefWidth="100.0" text="%Entry Type"/>
+                                <TableColumn fx:id="entryTypeActionsColumn"
+                                             maxWidth="40.0" minWidth="40.0" resizable="false"/>
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                        </TableView>
+                        <HBox spacing="10.0">
+                            <children>
+                                <TextField fx:id="addNewEntryType"/>
+                                <Button fx:id="addNewEntryTypeButton" prefHeight="20.0" prefWidth="20.0"
+                                        styleClass="icon-button,narrow" onAction="#addEntryType">
+                                    <graphic>
+                                        <JabRefIconView glyph="ADD_NOBOX"/>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="%Add new entry type"/>
+                                    </tooltip>
+                                </Button>
+                            </children>
+                            <VBox.margin>
+                                <Insets/>
+                            </VBox.margin>
+                        </HBox>
+                    </children>
+                </VBox>
+                <VBox prefHeight="400.0" prefWidth="100.0" spacing="10.0"
+                      HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="%Required and optional fields"/>
+                        <TableView fx:id="fields" minWidth="-Infinity"
+                                   VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="fieldNameColumn"
+                                             minWidth="150.0" prefWidth="-1.0" text="%Field"/>
+                                <TableColumn fx:id="fieldTypeColumn"
+                                             minWidth="100.0" prefWidth="100.0" text="%Field type"/>
+                                <TableColumn fx:id="fieldTypeActionColumn"
+                                             maxWidth="40.0" minWidth="40.0" resizable="false"/>
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                        </TableView>
+                        <HBox spacing="10.0">
+                            <children>
+                                <ComboBox fx:id="addNewField" editable="true"
+                                          prefWidth="150.0"/>
+                                <Button fx:id="addNewFieldButton" prefHeight="20.0" prefWidth="20.0"
+                                        styleClass="icon-button,narrow" onAction="#addNewField">
+                                    <graphic>
+                                        <JabRefIconView glyph="ADD_NOBOX"/>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="%Add new Field"/>
+                                    </tooltip>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </content>
+    <ButtonType fx:id="applyButton" buttonData="OK_DONE"
+                text="%Apply"/>
+    <ButtonType fx:constant="CANCEL"/>
+    <ButtonType fx:id="resetButton" buttonData="LEFT" text="%Reset" />
+</DialogPane>

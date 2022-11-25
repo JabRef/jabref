@@ -4,11 +4,8 @@ import org.jabref.logic.util.OS;
 
 public enum CitationStyleOutputFormat {
 
-    ASCII_DOC("asciidoc", ""),
     HTML("html", OS.NEWLINE + "<br>" + OS.NEWLINE),
-    RTF("rtf", "\\line" + OS.NEWLINE),
-    TEXT("text", ""),
-    XSL_FO("fo", OS.NEWLINE);
+    TEXT("text", "");
 
     private final String format;
     private final String lineSeparator;
@@ -30,5 +27,4 @@ public enum CitationStyleOutputFormat {
     public String toString() {
         return format;
     }
-
 }

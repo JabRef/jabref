@@ -1,132 +1,103 @@
 package org.jabref.model.database;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.model.Defaults;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.gui.LibraryTab;
+import org.jabref.logic.crawler.Crawler;
+import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.DatabaseSynchronizer;
+import org.jabref.logic.util.CoarseChangeFilter;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.shared.DBMSSynchronizer;
+import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.model.study.Study;
+import org.jabref.preferences.FilePreferences;
+
+import net.harawata.appdirs.AppDirsFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Represents everything related to a BIB file.
- * <p>
- * The entries are stored in BibDatabase, the other data in MetaData and the options relevant for this file in Defaults.
+ * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
+ * and the options relevant for this file in Defaults.
  */
+@AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+
     private final BibDatabase database;
-    private final Defaults defaults;
     private MetaData metaData;
-    /** The file where this database was last saved to. */
-    private File file;
-    private DBMSSynchronizer dbmsSynchronizer;
+
+    /**
+     * The path where this database was last saved to.
+     */
+    private Path path;
+
+    private DatabaseSynchronizer dbmsSynchronizer;
+    private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
     public BibDatabaseContext() {
-        this(new Defaults());
-    }
-
-    public BibDatabaseContext(Defaults defaults) {
-        this(new BibDatabase(), defaults);
+        this(new BibDatabase());
     }
 
     public BibDatabaseContext(BibDatabase database) {
-        this(database, new Defaults());
+        this(database, new MetaData());
     }
 
-    public BibDatabaseContext(BibDatabase database, Defaults defaults) {
-        this(database, new MetaData(), defaults);
-    }
-
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults) {
-        this.defaults = Objects.requireNonNull(defaults);
+    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
-        this(database, metaData, new Defaults());
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
+        this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults,
-            DatabaseLocation location) {
-        this(database, metaData, defaults);
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
+        this(database, metaData);
         Objects.requireNonNull(location);
-        this.setDatabaseFile(file);
+        this.path = path;
 
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
         }
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults) {
-        this(database, metaData, file, defaults, DatabaseLocation.LOCAL);
-    }
-
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file) {
-        this(database, metaData, file, new Defaults());
-    }
-
-    public BibDatabaseContext(Defaults defaults, DatabaseLocation location, Character keywordSeparator,
-            GlobalBibtexKeyPattern globalCiteKeyPattern) {
-        this(new BibDatabase(), new MetaData(), defaults);
-        if (location == DatabaseLocation.SHARED) {
-            convertToSharedDatabase(keywordSeparator, globalCiteKeyPattern);
-        }
-    }
-
     public BibDatabaseMode getMode() {
-        Optional<BibDatabaseMode> mode = metaData.getMode();
-
-        if (!mode.isPresent()) {
-            BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
-            BibDatabaseMode newMode = BibDatabaseMode.BIBTEX;
-            if ((defaults.mode == BibDatabaseMode.BIBLATEX) || (inferredMode == BibDatabaseMode.BIBLATEX)) {
-                newMode = BibDatabaseMode.BIBLATEX;
-            }
-            this.setMode(newMode);
-            return newMode;
-        }
-        return mode.get();
+        return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
     }
 
     public void setMode(BibDatabaseMode bibDatabaseMode) {
         metaData.setMode(bibDatabaseMode);
     }
 
+    public void setDatabasePath(Path file) {
+        this.path = file;
+    }
+
     /**
-     * Get the file where this database was last saved to or loaded from, if any.
+     * Get the path where this database was last saved to or loaded from, if any.
      *
-     * @return Optional of the relevant File, or Optional.empty() if none is defined.
-     * @deprecated use {@link #getDatabasePath()} instead
+     * @return Optional of the relevant Path, or Optional.empty() if none is defined.
      */
-    @Deprecated
-    public Optional<File> getDatabaseFile() {
-        return Optional.ofNullable(file);
-    }
-
-    public void setDatabaseFile(File file) {
-        this.file = file;
-    }
-
     public Optional<Path> getDatabasePath() {
-        return Optional.ofNullable(file).map(File::toPath);
+        return Optional.ofNullable(path);
     }
 
-    public void clearDatabaseFile() {
-        this.file = null;
+    public void clearDatabasePath() {
+        this.path = null;
     }
 
     public BibDatabase getDatabase() {
@@ -145,111 +116,90 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
-    public List<Path> getFileDirectoriesAsPaths(FileDirectoryPreferences preferences) {
-        // Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
-        return getFileDirectories(preferences).stream()
-                .filter(s -> !s.isEmpty())
-                .map(Paths::get)
-                .map(Path::toAbsolutePath)
-                .map(Path::normalize)
-                .collect(Collectors.toList());
-    }
-
     /**
-     * @deprecated use {@link #getFileDirectoriesAsPaths(FileDirectoryPreferences)} instead
+     * Returns whether this .bib file belongs to a {@link Study}
      */
-    @Deprecated
-    public List<String> getFileDirectories(FileDirectoryPreferences preferences) {
-        return getFileDirectories(FieldName.FILE, preferences);
+    public boolean isStudy() {
+        return this.getDatabasePath()
+                .map(path -> path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
+                        Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME)))
+                .orElse(false);
     }
 
     /**
-     * Returns the first existing file directory from  {@link #getFileDirectories(FileDirectoryPreferences)}
-     * @param preferences The FileDirectoryPreferences
-     * @return Optional of Path
-     */
-    public Optional<Path> getFirstExistingFileDir(FileDirectoryPreferences preferences) {
-        return getFileDirectoriesAsPaths(preferences).stream().filter(Files::exists).findFirst();
-    }
-
-    /**
-    * Look up the directories set up for the given field type for this database.
-    * If no directory is set up, return that defined in global preferences.
-    * There can be up to three directory definitions for these files:
-    * the database's metadata can specify a general directory and/or a user-specific directory
-    * or the preferences can specify one.
-    * <p>
-    * The settings are prioritized in the following order and the first defined setting is used:
-    * 1. metadata user-specific directory
-    * 2. metadata general directory
-    * 3. preferences directory
-    * 4. BIB file directory
-    *
-    * @param fieldName The field type
+     * Look up the directories set up for this database.
+     * There can be up to four directories definitions for these files:
+     * <ol>
+     * <li>next to the .bib file.</li>
+     * <li>the preferences can specify a default one.</li>
+     * <li>the database's metadata can specify a general directory.</li>
+     * <li>the database's metadata can specify a user-specific directory.</li>
+     * </ol>
+     * <p>
+     * The settings are prioritized in the following order, and the first defined setting is used:
+     * <ol>
+     *     <li>user-specific metadata directory</li>
+     *     <li>general metadata directory</li>
+     *     <li>BIB file directory (if configured in the preferences AND none of the two above directories are configured)</li>
+     *     <li>preferences directory (if .bib file directory should not be used according to the preferences)</li>
+     * </ol>
+     *
      * @param preferences The fileDirectory preferences
-     * @return The default directory for this field type.
-    */
-    public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
-        List<String> fileDirs = new ArrayList<>();
+     */
+    public List<Path> getFileDirectories(FilePreferences preferences) {
+        List<Path> fileDirs = new ArrayList<>();
 
-        // 1. metadata user-specific directory
-        Optional<String> userFileDirectory = metaData.getUserFileDirectory(preferences.getUser());
-        if (userFileDirectory.isPresent()) {
-            fileDirs.add(getFileDirectoryPath(userFileDirectory.get()));
+        // 1. Metadata user-specific directory
+        metaData.getUserFileDirectory(preferences.getUser())
+                .ifPresent(userFileDirectory -> fileDirs.add(getFileDirectoryPath(userFileDirectory)));
+
+        // 2. Metadata general directory
+        metaData.getDefaultFileDirectory()
+                .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
+
+        // 3. BIB file directory or Main file directory
+        // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
+        // (in the metadata of the bib file)
+        if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
+            getDatabasePath().ifPresent(dbPath -> {
+                Path parentPath = dbPath.getParent();
+                if (parentPath == null) {
+                    parentPath = Path.of(System.getProperty("user.dir"));
+                }
+                Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
+                fileDirs.add(parentPath);
+            });
+        } else {
+            // Main file directory
+            preferences.getMainFileDirectory().ifPresent(fileDirs::add);
         }
 
-        // 2. metadata general directory
-        Optional<String> metaDataDirectory = metaData.getDefaultFileDirectory();
-        if (metaDataDirectory.isPresent()) {
-            fileDirs.add(getFileDirectoryPath(metaDataDirectory.get()));
-        }
-
-        // 3. preferences directory
-        preferences.getFileDirectory(fieldName).ifPresent(path -> fileDirs.add(path.toAbsolutePath().toString()));
-
-        // 4. BIB file directory
-        getDatabasePath().ifPresent(dbPath -> {
-            Objects.requireNonNull(dbPath, "dbPath is null");
-            Path parentPath = dbPath.getParent();
-            if (parentPath == null) {
-                parentPath = Paths.get(System.getProperty("user.dir"));
-            }
-            Objects.requireNonNull(parentPath, "BibTex database parent path is null");
-            String parentDir = parentPath.toAbsolutePath().toString();
-            // Check if we should add it as primary file dir (first in the list) or not:
-            if (preferences.isBibLocationAsPrimary()) {
-                fileDirs.add(0, parentDir);
-            } else {
-                fileDirs.add(parentDir);
-            }
-        });
-
-        return fileDirs;
+        return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
     }
 
-    private String getFileDirectoryPath(String directoryName) {
-        String dir = directoryName;
+    /**
+     * Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}
+     *
+     * @return the path - or an empty optional, if none of the directories exists
+     */
+    public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
+        return getFileDirectories(preferences).stream()
+                                              .filter(Files::exists)
+                                              .findFirst();
+    }
+
+    private Path getFileDirectoryPath(String directoryName) {
+        Path directory = Path.of(directoryName);
         // If this directory is relative, we try to interpret it as relative to
         // the file path of this BIB file:
-        Optional<File> databaseFile = getDatabaseFile();
-        if (!new File(dir).isAbsolute() && databaseFile.isPresent()) {
-            String relDir;
-            if (".".equals(dir)) {
-                // if dir is only "current" directory, just use its parent (== real current directory) as path
-                relDir = databaseFile.get().getParent();
-            } else {
-                relDir = databaseFile.get().getParent() + File.separator + dir;
-            }
-            // If this directory actually exists, it is very likely that the
-            // user wants us to use it:
-            if (new File(relDir).exists()) {
-                dir = relDir;
-            }
+        Optional<Path> databaseFile = getDatabasePath();
+        if (!directory.isAbsolute() && databaseFile.isPresent()) {
+            return databaseFile.get().getParent().resolve(directory).normalize();
         }
-        return dir;
+        return directory;
     }
 
-    public DBMSSynchronizer getDBMSSynchronizer() {
+    public DatabaseSynchronizer getDBMSSynchronizer() {
         return this.dbmsSynchronizer;
     }
 
@@ -261,26 +211,19 @@ public class BibDatabaseContext {
         return this.location;
     }
 
-    public void convertToSharedDatabase(Character keywordSeparator, GlobalBibtexKeyPattern globalCiteKeyPattern) {
-        this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator, globalCiteKeyPattern);
-        this.database.registerListener(dbmsSynchronizer);
-        this.metaData.registerListener(dbmsSynchronizer);
+    public void convertToSharedDatabase(DatabaseSynchronizer dmbsSynchronizer) {
+        this.dbmsSynchronizer = dmbsSynchronizer;
+
+        this.dbmsListener = new CoarseChangeFilter(this);
+        dbmsListener.registerListener(dbmsSynchronizer);
 
         this.location = DatabaseLocation.SHARED;
     }
 
-    @Override
-    public String toString() {
-        return "BibDatabaseContext{" +
-                "file=" + file +
-                ", location=" + location +
-                '}';
-    }
-
     public void convertToLocalDatabase() {
-        if (Objects.nonNull(dbmsSynchronizer) && (location == DatabaseLocation.SHARED)) {
-            this.database.unregisterListener(dbmsSynchronizer);
-            this.metaData.unregisterListener(dbmsSynchronizer);
+        if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
+            dbmsListener.unregisterListener(dbmsSynchronizer);
+            dbmsListener.shutdown();
         }
 
         this.location = DatabaseLocation.LOCAL;
@@ -288,5 +231,40 @@ public class BibDatabaseContext {
 
     public List<BibEntry> getEntries() {
         return database.getEntries();
+    }
+
+    /**
+     * check if the database has any empty entries
+     *
+     * @return true if the database has any empty entries; otherwise false
+     */
+    public boolean hasEmptyEntries() {
+        return this.getEntries().stream().anyMatch(entry -> entry.getFields().isEmpty());
+    }
+
+    public static Path getFulltextIndexBasePath() {
+        return Path.of(AppDirsFactory.getInstance().getUserDataDir(OS.APP_DIR_APP_NAME, SearchFieldConstants.VERSION, OS.APP_DIR_APP_AUTHOR));
+    }
+
+    public Path getFulltextIndexPath() {
+        Path appData = getFulltextIndexBasePath();
+
+        if (getDatabasePath().isPresent()) {
+            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData);
+            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+        }
+
+        return appData.resolve("unsaved");
+    }
+
+    @Override
+    public String toString() {
+        return "BibDatabaseContext{" +
+                "metaData=" + metaData +
+                ", mode=" + getMode() +
+                ", databasePath=" + getDatabasePath() +
+                ", biblatexMode=" + isBiblatexMode() +
+                ", fulltextIndexPath=" + getFulltextIndexPath() +
+                '}';
     }
 }

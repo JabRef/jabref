@@ -1,0 +1,55 @@
+.merged-field .styled-text-area {
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-prompt-text-fill: -fx-mid-text-color;
+}
+.merged-field .styled-text-area:focused {
+    -fx-highlight-fill: derive(-jr-accent, 20%);
+    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+    -fx-highlight-text-fill: -fx-text-inner-color;
+}
+
+.merge-field-value:selected .selection-box {
+    -fx-background-color: -jr-accent-alt;
+    -fx-border-color: -jr-accent;
+}
+
+.merge-field-value .selection-box {
+    -fx-background-color: #0000;
+    -fx-border-color: #0000;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 2.5;
+}
+
+.styled-text-area .text{
+    -fx-fill: -fx-text-background-color;
+}
+
+.field-cell:odd {
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.field-cell:even {
+    -fx-background-color: -jr-row-even-background;
+}
+
+.field-cell {
+    -fx-padding: 8;
+}
+
+.merge-toolbox {
+    -fx-background-color: -jr-menu-background;
+}
+
+.merge-header-cell .label{
+    -fx-font-weight: bold;
+    -fx-padding: 1, 0, 1, 0;
+}
+
+.field-name .glyph-icon,
+.field-name .ikonli-font-icon {
+    -fx-icon-size: 17;
+    -fx-icon-color:  -jr-theme-text;
+}

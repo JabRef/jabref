@@ -1,61 +1,128 @@
 package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
-import javax.swing.SwingUtilities;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.StringProperty;
+import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.filelist.FileListEntryEditor;
-import org.jabref.logic.cleanup.MoveFilesCleanup;
-import org.jabref.logic.cleanup.RenamePdfCleanup;
+import org.jabref.gui.externalfiletype.StandardExternalFileType;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.linkedfile.LinkedFileEditDialogView;
+import org.jabref.gui.mergeentries.MultiMergeEntriesView;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.PdfContentImporter;
+import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
+import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
+import org.jabref.logic.importer.fileformat.PdfVerbatimBibTextImporter;
+import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.io.FileNameUniqueness;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileHelper;
+import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
-import de.jensd.fx.glyphs.GlyphIcons;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkedFileViewModel extends AbstractViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(LinkedFileViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileViewModel.class);
 
     private final LinkedFile linkedFile;
     private final BibDatabaseContext databaseContext;
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);
     private final BooleanProperty downloadOngoing = new SimpleBooleanProperty(false);
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
-
-    private final DialogService dialogService = new FXDialogService();
+    private final BooleanProperty isOfflinePdf = new SimpleBooleanProperty(false);
+    private final DialogService dialogService;
     private final BibEntry entry;
+    private final TaskExecutor taskExecutor;
+    private final PreferencesService preferences;
+    private final LinkedFileHandler linkedFileHandler;
 
-    public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext) {
+    private ObjectBinding<Node> linkedFileIconBinding;
+
+    private final Validator fileExistsValidator;
+
+    public LinkedFileViewModel(LinkedFile linkedFile,
+                               BibEntry entry,
+                               BibDatabaseContext databaseContext,
+                               TaskExecutor taskExecutor,
+                               DialogService dialogService,
+                               PreferencesService preferences) {
+
         this.linkedFile = linkedFile;
+        this.preferences = preferences;
+        this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());
         this.databaseContext = databaseContext;
         this.entry = entry;
+        this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
 
-        downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(100)));
+        fileExistsValidator = new FunctionBasedValidator<>(
+                linkedFile.linkProperty(),
+                link -> {
+                    if (linkedFile.isOnlineLink()) {
+                        return true;
+                    } else {
+                        Optional<Path> path = FileHelper.find(databaseContext, link, preferences.getFilePreferences());
+                        return path.isPresent() && Files.exists(path.get());
+                    }
+                },
+                ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink())));
+
+        downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
+        isOfflinePdf.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
+    }
+
+    public BooleanProperty isOfflinePdfProperty() {
+        return isOfflinePdf;
     }
 
     public boolean isAutomaticallyFound() {
@@ -74,28 +141,54 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return downloadProgress;
     }
 
-    public LinkedFile getFile() {
-        return linkedFile;
+    public StringProperty linkProperty() {
+        return linkedFile.linkProperty();
     }
 
-    public String getLink() {
-        return linkedFile.getLink();
+    public StringProperty descriptionProperty() {
+        return linkedFile.descriptionProperty();
     }
 
     public String getDescription() {
         return linkedFile.getDescription();
     }
 
+    public String getDescriptionAndLink() {
+        if (StringUtil.isBlank(linkedFile.getDescription())) {
+            return linkedFile.getLink();
+        } else {
+            return linkedFile.getDescription() + " (" + linkedFile.getLink() + ")";
+        }
+    }
+
+    public String getTruncatedDescriptionAndLink() {
+        if (StringUtil.isBlank(linkedFile.getDescription())) {
+            return ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
+                    ControlHelper.EllipsisPosition.CENTER);
+        } else {
+            return ControlHelper.truncateString(linkedFile.getDescription(), -1, "...",
+                    ControlHelper.EllipsisPosition.CENTER) + " (" +
+                    ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
+                    ControlHelper.EllipsisPosition.CENTER) + ")";
+        }
+    }
+
     public Optional<Path> findIn(List<Path> directories) {
         return linkedFile.findIn(directories);
     }
 
-    /**
-     * TODO: Be a bit smarter and try to infer correct icon, for example using {@link
-     * org.jabref.gui.externalfiletype.ExternalFileTypes#getExternalFileTypeByName(String)}
-     */
-    public GlyphIcons getTypeIcon() {
-        return MaterialDesignIcon.FILE_PDF;
+    public JabRefIcon getTypeIcon() {
+        return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, preferences.getFilePreferences())
+                                .map(ExternalFileType::getIcon)
+                                .orElse(IconTheme.JabRefIcons.FILE);
+    }
+
+    public ObjectBinding<Node> typeIconProperty() {
+        if (linkedFileIconBinding == null) {
+            linkedFileIconBinding = Bindings.createObjectBinding(() -> this.getTypeIcon().getGraphicNode(), linkedFile.fileTypeProperty());
+        }
+
+        return linkedFileIconBinding;
     }
 
     public void markAsAutomaticallyFound() {
@@ -107,80 +200,93 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public Observable[] getObservables() {
-        return new Observable[] {this.downloadProgress, this.isAutomaticallyFound};
+        List<Observable> observables = new ArrayList<>(Arrays.asList(linkedFile.getObservables()));
+        observables.add(downloadOngoing);
+        observables.add(downloadProgress);
+        observables.add(isAutomaticallyFound);
+        return observables.toArray(new Observable[0]);
     }
 
     public void open() {
         try {
-            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(linkedFile, true);
-            JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
+            Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferences.getFilePreferences());
+            boolean successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, preferences, linkedFile.getLink(), type);
+            if (!successful) {
+                dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+            }
         } catch (IOException e) {
-            LOGGER.warn("Cannot open selected file.", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file '%0'.", linkedFile.getLink()), e);
         }
     }
 
     public void openFolder() {
         try {
-            Path path = null;
-            // absolute path
-            if (Paths.get(linkedFile.getLink()).isAbsolute()) {
-                path = Paths.get(linkedFile.getLink());
-            } else {
-                // relative to file folder
-                for (Path folder : databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences())) {
-                    Path file = folder.resolve(linkedFile.getLink());
-                    if (Files.exists(file)) {
-                        path = file;
-                        break;
-                    }
+            if (!linkedFile.isOnlineLink()) {
+                Optional<Path> resolvedPath = FileHelper.find(
+                        databaseContext,
+                        linkedFile.getLink(),
+                        preferences.getFilePreferences());
+
+                if (resolvedPath.isPresent()) {
+                    JabRefDesktop.openFolderAndSelectFile(resolvedPath.get(), preferences, dialogService);
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
                 }
-            }
-            if (path != null) {
-                JabRefDesktop.openFolderAndSelectFile(path);
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
+                dialogService.showErrorDialogAndWait(Localization.lang("Cannot open folder as the file is an online link."));
             }
         } catch (IOException ex) {
             LOGGER.debug("Cannot open folder", ex);
         }
     }
 
-    public void rename() {
+    public void renameToSuggestion() {
+        renameFileToName(linkedFileHandler.getSuggestedFileName());
+    }
+
+    public void askForNameAndRename() {
+        String oldFile = this.linkedFile.getLink();
+        Path oldFilePath = Path.of(oldFile);
+        Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(
+                Localization.lang("Rename file"),
+                Localization.lang("New Filename"),
+                oldFilePath.getFileName().toString());
+        askedFileName.ifPresent(this::renameFileToName);
+    }
+
+    public void renameFileToName(String targetFileName) {
         if (linkedFile.isOnlineLink()) {
             // Cannot rename remote links
             return;
         }
-        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
-        if (!fileDir.isPresent()) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Rename file"),
-                    Localization.lang("File directory is not set or does not exist!"));
-            return;
+
+        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
+        if (file.isPresent()) {
+            performRenameWithConflictCheck(targetFileName);
+        } else {
+            dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+        }
+    }
+
+    private void performRenameWithConflictCheck(String targetFileName) {
+        Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
+        boolean overwriteFile = false;
+
+        if (existingFile.isPresent()) {
+            overwriteFile = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("File exists"),
+                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+                    Localization.lang("Overwrite"));
+
+            if (!overwriteFile) {
+                return;
+            }
         }
 
-        Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
-        if ((file.isPresent()) && Files.exists(file.get())) {
-            RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false,
-                    databaseContext,
-                    Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileNamePattern(),
-                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
-                    Globals.prefs.getFileDirectoryPreferences(), linkedFile);
-
-            String targetFileName = pdfCleanup.getTargetFileName(linkedFile, entry);
-
-            boolean confirm = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Rename file"),
-                    Localization.lang("Rename file to") + " " + targetFileName,
-                    Localization.lang("Rename file"),
-                    Localization.lang("Cancel"));
-
-            if (confirm) {
-                pdfCleanup.cleanup(entry);
-            }
-        } else {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("File not found"),
-                    Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+        try {
+            linkedFileHandler.renameToName(targetFileName, overwriteFile);
+        } catch (IOException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
         }
     }
 
@@ -191,80 +297,293 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         // Get target folder
-        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
-        if (!fileDir.isPresent()) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("Move file"),
-                    Localization.lang("File directory is not set or does not exist!"));
+        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+        if (fileDir.isEmpty()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist!"));
             return;
         }
 
-        Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
-        if ((file.isPresent()) && Files.exists(file.get())) {
-            // Linked file exists, so move it
-            MoveFilesCleanup moveFiles = new MoveFilesCleanup(databaseContext,
-                    Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
-                    Globals.prefs.getFileDirectoryPreferences(),
-                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader), linkedFile);
-
-            boolean confirm = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Move file"),
-                    Localization.lang("Move file to file directory?") + " " + fileDir.get(),
-                    Localization.lang("Move file"),
-                    Localization.lang("Cancel"));
-            if (confirm) {
-                moveFiles.cleanup(entry);
+        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
+        if ((file.isPresent())) {
+            // Found the linked file, so move it
+            try {
+                linkedFileHandler.moveToDefaultDirectory();
+            } catch (IOException exception) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Move file"),
+                        Localization.lang("Could not move file '%0'.", file.get().toString()),
+                        exception);
             }
         } else {
             // File doesn't exist, so we can't move it.
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("File not found"),
-                    Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+            dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
         }
     }
 
-    public boolean delete() {
-        Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
-        if (file.isPresent()) {
+    /**
+     * Gets the filename for the current linked file and compares it to the new suggested filename.
+     *
+     * @return true if the suggested filename is same as current filename.
+     */
+    public boolean isGeneratedNameSameAsOriginal() {
+        Path file = Path.of(this.linkedFile.getLink());
+        String currentFileName = file.getFileName().toString();
+        String suggestedFileName = this.linkedFileHandler.getSuggestedFileName();
 
-            ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
+        return currentFileName.equals(suggestedFileName);
+    }
 
-            ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
-            Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                    Localization.lang("Delete '%0'", file.get().toString()),
-                    Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
-                    deleteFromEntry, removeFromEntry, ButtonType.CANCEL);
-
-            if (buttonType.isPresent()) {
-                if (buttonType.get().equals(removeFromEntry)) {
-                    return true;
-                }
-                if (buttonType.get().equals(deleteFromEntry)) {
-
-                    try {
-                        Files.delete(file.get());
-                        return true;
-                    } catch (IOException ex) {
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("Cannot delete file"),
-                                Localization.lang("File permission error"));
-                        LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
-                    }
-                }
-            } else {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("File not found"),
-                        Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
-                return true;
-            }
+    /**
+     * Compares suggested directory of current linkedFile with existing filepath directory.
+     *
+     * @return true if suggested filepath is same as existing filepath.
+     */
+    public boolean isGeneratedPathSameAsOriginal() {
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        Optional<Path> baseDir = databaseContext.getFirstExistingFileDir(filePreferences);
+        if (baseDir.isEmpty()) {
+            // could not find default path
+            return false;
         }
 
+        // append File directory pattern if exits
+        String targetDirectoryName = FileUtil.createDirNameFromPattern(
+                databaseContext.getDatabase(),
+                entry,
+                filePreferences.getFileDirectoryPattern());
+
+        Optional<Path> targetDir = baseDir.map(dir -> dir.resolve(targetDirectoryName));
+
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).map(Path::getParent);
+        if (currentDir.isEmpty()) {
+            // Could not find file
+            return false;
+        }
+
+        BiPredicate<Path, Path> equality = (fileA, fileB) -> {
+            try {
+                return Files.isSameFile(fileA, fileB);
+            } catch (IOException e) {
+                return false;
+            }
+        };
+        return OptionalUtil.equals(targetDir, currentDir, equality);
+    }
+
+    public void moveToDefaultDirectoryAndRename() {
+        moveToDefaultDirectory();
+        renameToSuggestion();
+    }
+
+    /**
+     * Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link).
+     *
+     * @return true if the linked file should be removed afterwards from the entry (i.e because it was deleted
+     * successfully, does not exist in the first place or the user choose to remove it)
+     */
+    public boolean delete() {
+        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
+
+        if (file.isEmpty()) {
+            LOGGER.warn("Could not find file " + linkedFile.getLink());
+            return true;
+        }
+
+        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
+        ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+        Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
+                Localization.lang("Delete '%0'", file.get().getFileName().toString()),
+                Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk.", file.get().toString()),
+                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+
+        if (buttonType.isPresent()) {
+            if (buttonType.get().equals(removeFromEntry)) {
+                return true;
+            }
+
+            if (buttonType.get().equals(deleteFromEntry)) {
+                try {
+                    Files.delete(file.get());
+                    return true;
+                } catch (IOException ex) {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Cannot delete file"), Localization.lang("File permission error"));
+                    LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                }
+            }
+        }
         return false;
     }
 
     public void edit() {
-        FileListEntryEditor editor = new FileListEntryEditor(linkedFile, false, true, databaseContext);
-        SwingUtilities.invokeLater(() -> editor.setVisible(true, false));
+        Optional<LinkedFile> editedFile = dialogService.showCustomDialogAndWait(new LinkedFileEditDialogView(this.linkedFile));
+        editedFile.ifPresent(file -> {
+            this.linkedFile.setLink(file.getLink());
+            this.linkedFile.setDescription(file.getDescription());
+            this.linkedFile.setFileType(file.getFileType());
+        });
+    }
 
+    public WriteMetadataToPdfCommand createWriteMetadataToPdfCommand() {
+        return new WriteMetadataToPdfCommand(linkedFile, databaseContext, preferences, dialogService, entry, LOGGER, taskExecutor);
+    }
+
+    public void download() {
+        if (!linkedFile.isOnlineLink()) {
+            throw new UnsupportedOperationException("In order to download the file it has to be an online link");
+        }
+        try {
+            Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+            if (targetDirectory.isEmpty()) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory is not set or does not exist!"));
+                return;
+            }
+
+            URLDownload urlDownload = new URLDownload(linkedFile.getLink());
+            if (!checkSSLHandshake(urlDownload)) {
+                return;
+            }
+
+            BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
+            downloadTask.onSuccess(destination -> {
+                boolean isDuplicate;
+                try {
+                    isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory.get(), destination.getFileName(), dialogService);
+                } catch (IOException e) {
+                    LOGGER.error("FileNameUniqueness.isDuplicatedFile failed", e);
+                    return;
+                }
+
+                if (!isDuplicate) {
+                    // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
+                    LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
+                            destination,
+                            databaseContext.getFileDirectories(preferences.getFilePreferences()),
+                            preferences.getFilePreferences());
+                    entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
+
+                    // Notify in bar when the file type is HTML.
+                    if (newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
+                        dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
+                        LOGGER.debug("Downloaded website {} as an HTML file at {}", linkedFile.getLink(), destination);
+                    }
+                }
+            });
+            downloadProgress.bind(downloadTask.workDonePercentageProperty());
+            downloadTask.titleProperty().set(Localization.lang("Downloading"));
+            downloadTask.messageProperty().set(
+                    Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
+            downloadTask.showToUser(true);
+            downloadTask.onFailure(ex -> {
+                LOGGER.error("Error downloading", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Error downloading"), ex);
+            });
+            taskExecutor.execute(downloadTask);
+        } catch (MalformedURLException exception) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
+        }
+    }
+
+    public boolean checkSSLHandshake(URLDownload urlDownload) {
+        try {
+            urlDownload.canBeReached();
+        } catch (kong.unirest.UnirestException ex) {
+            if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
+                if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
+                        Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
+                                urlDownload.getSource().toString()))) {
+                    return true;
+                } else {
+                    dialogService.notify(Localization.lang("Download operation canceled."));
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
+        SSLSocketFactory defaultSSLSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
+        HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
+        BackgroundTask<Path> downloadTask = BackgroundTask
+                .wrap(() -> {
+                    Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
+                    ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
+                    String suggestedTypeName = externalFileType.getName();
+                    linkedFile.setFileType(suggestedTypeName);
+                    String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
+                    String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileDirectoryPattern());
+                    suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);
+                    return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
+                })
+                .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
+                .onFinished(() -> URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier));
+        return downloadTask;
+    }
+
+    private Optional<ExternalFileType> inferFileType(URLDownload urlDownload) {
+        Optional<ExternalFileType> suggestedType = inferFileTypeFromMimeType(urlDownload);
+
+        // If we did not find a file type from the MIME type, try based on extension:
+        if (suggestedType.isEmpty()) {
+            suggestedType = inferFileTypeFromURL(urlDownload.getSource().toExternalForm());
+        }
+        return suggestedType;
+    }
+
+    private Optional<ExternalFileType> inferFileTypeFromMimeType(URLDownload urlDownload) {
+        String mimeType = urlDownload.getMimeType();
+
+        if (mimeType != null) {
+            LOGGER.debug("MIME Type suggested: " + mimeType);
+            return ExternalFileTypes.getExternalFileTypeByMimeType(mimeType, preferences.getFilePreferences());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
+        return URLUtil.getSuffix(url, preferences.getFilePreferences())
+                      .flatMap(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, preferences.getFilePreferences()));
+    }
+
+    public LinkedFile getFile() {
+        return linkedFile;
+    }
+
+    public ValidationStatus fileExistsValidationStatus() {
+        return fileExistsValidator.getValidationStatus();
+    }
+
+    public void parsePdfMetadataAndShowMergeDialog() {
+        linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
+            MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
+            dialog.setTitle(Localization.lang("Merge PDF metadata"));
+            dialog.addSource(Localization.lang("Entry"), entry);
+            dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibTextImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
+            if (preferences.getGrobidPreferences().isGrobidEnabled()) {
+                dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));
+            }
+            dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
+            dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(preferences.getImportFormatPreferences()), filePath));
+            dialogService.showCustomDialogAndWait(dialog).ifPresent(newEntry -> {
+                databaseContext.getDatabase().removeEntry(entry);
+                databaseContext.getDatabase().insertEntry(newEntry);
+            });
+        });
+    }
+
+    private Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
+        return () -> {
+            try {
+                ParserResult parserResult = importer.importDatabase(filePath);
+                if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {
+                    return null;
+                }
+                return parserResult.getDatabase().getEntries().get(0);
+            } catch (IOException e) {
+                return null;
+            }
+        };
     }
 }

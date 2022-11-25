@@ -33,14 +33,14 @@ import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
+
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 /**
  * Represents a binding between a text input control and a auto-completion popup
  * This class is a slightly modified version of {@link impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding}
  * that works with general text input controls instead of just text fields.
- * @param <T>
- *
  */
 public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> {
 
@@ -98,7 +98,7 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
     }
 
     private static <T> StringConverter<T> defaultStringConverter() {
-        return new StringConverter<T>() {
+        return new StringConverter<>() {
             @Override
             public String toString(T t) {
                 return t == null ? null : t.toString();
@@ -133,7 +133,7 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
             newText = "";
         }
         AutoCompletionInput input = inputAnalyzer.analyze(newText);
-        setUserInput(input.getUnfinishedPart());
+        DefaultTaskExecutor.runInJavaFXThread(() -> setUserInput(input.getUnfinishedPart()));
     }
 
     @Override

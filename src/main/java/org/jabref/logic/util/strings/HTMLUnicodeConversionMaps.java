@@ -270,7 +270,7 @@ public class HTMLUnicodeConversionMaps {
             {"957", "nu", "$\\nu$"}, // greek small letter nu, U+03BD ISOgrk3
             {"958", "xi", "$\\xi$"}, // greek small letter xi, U+03BE ISOgrk3
             {"959", "omicron", "$\\omicron$"}, // greek small letter omicron, U+03BF NEW
-            {"960", "pi", "$\\phi$"}, // greek small letter pi, U+03C0 ISOgrk3
+            {"960", "pi", "$\\pi$"}, // greek small letter pi, U+03C0 ISOgrk3
             {"961", "rho", "$\\rho$"}, // greek small letter rho, U+03C1 ISOgrk3
             {"962", "sigmaf", "$\\varsigma$"}, // greek small letter final sigma,
             //                                   U+03C2 ISOgrk3
@@ -294,6 +294,8 @@ public class HTMLUnicodeConversionMaps {
             {"982", "piv", "$\\varphi$"}, // greek pi symbol, U+03D6 ISOgrk3
 
             /* General Punctuation */
+            {"8211", "ndash", "$\\textendash$"},
+            {"8212", "mdash", "$\\textemdash$"},
             {"8226", "bull", "$\\bullet$"}, // bullet = black small circle,
             //                                    U+2022 ISOpub
             /* bullet is NOT the same as bullet operator, U+2219 */
@@ -434,7 +436,6 @@ public class HTMLUnicodeConversionMaps {
             {"60", "lt", "$<$"}, // less-than sign, U+003C ISOnum
             {"62", "gt", "$>$"}, // greater-than sign, U+003E ISOnum
 
-
             /* General Punctuation */
             {"8194", "ensp", "\\hspace{0.5em}"}, // en space, U+2002 ISOpub
             {"8195", "emsp", "\\hspace{1em}"}, // em space, U+2003 ISOpub
@@ -471,7 +472,7 @@ public class HTMLUnicodeConversionMaps {
             /* Manually added */
             {"35", "", "\\#"}, // Hash
             {"36", "dollar", "\\$"}, // Dollar
-            {"37", "percnt", "\\%"}, // Percent
+            {"37", "#37", "\\%"}, // Percent (&percnt; is not displayed correctly in the entry preview)
             {"39", "apos", "'"}, // Apostrophe
             {"40", "lpar", "("}, // Left bracket
             {"41", "rpar", ")"}, // Right bracket
@@ -569,8 +570,8 @@ public class HTMLUnicodeConversionMaps {
             {"316", "", "{\\c{l}}"}, // small l with cedilla
             {"317", "", "{{\\v{L}}}"}, // capital L with caron
             {"318", "", "{\\v{l}}"}, // small l with caron
-            //{"319", "Lmidot", "{\\Lmidot}"}, // upper case L with mid dot
-            //{"320", "lmidot", "{\\lmidot}"}, // lower case l with mid dot
+            // {"319", "Lmidot", "{\\Lmidot}"}, // upper case L with mid dot
+            // {"320", "lmidot", "{\\lmidot}"}, // lower case l with mid dot
             {"321", "Lstrok", "{{\\L}}"}, // upper case L with stroke
             {"322", "lstrok", "{{\\l}}"}, // lower case l with stroke
             {"323", "Nacute", "{{\\'{N}}}"}, // upper case N with acute
@@ -667,8 +668,8 @@ public class HTMLUnicodeConversionMaps {
             {"733", "dblac", "{{\\H{}}}"}, // Double acute
             {"949", "epsi", "$\\epsilon$"}, // Epsilon - double check
             {"1013", "epsiv", "$\\varepsilonup$"}, // lunate epsilon, requires txfonts
-            //{"1055", "", "{{\\cyrchar\\CYRP}}"}, // Cyrillic capital Pe
-            //{"1082", "", "{\\cyrchar\\cyrk}"}, // Cyrillic small Ka
+            // {"1055", "", "{{\\cyrchar\\CYRP}}"}, // Cyrillic capital Pe
+            // {"1082", "", "{\\cyrchar\\cyrk}"}, // Cyrillic small Ka
             // {"2013", "", ""},    // NKO letter FA -- Maybe en dash = 0x2013?
             // {"2014", "", ""},    // NKO letter FA -- Maybe em dash = 0x2014?
             {"8192", "", "\\hspace{0.5em}"}, // en quad
@@ -743,7 +744,7 @@ public class HTMLUnicodeConversionMaps {
             {"8897", "xvee", "$\\bigvee$"}, // Big vee
             {"8942", "vdots", "$\\vdots$"}, // vertical ellipsis U+22EE
             {"8943", "cdots", "$\\cdots$"}, // midline horizontal ellipsis U+22EF
-            /*{"8944", "", "$\\ddots$"}, // up right diagonal ellipsis U+22F0 */
+            /* {"8944", "", "$\\ddots$"}, // up right diagonal ellipsis U+22F0 */
             {"8945", "ddots", "$\\ddots$"}, // down right diagonal ellipsis U+22F1
 
             {"9426", "circledc", "{\\copyright}"}, // circled small letter C
@@ -759,8 +760,9 @@ public class HTMLUnicodeConversionMaps {
             {"64259", "", "ffi"}, // ffi ligature (which LaTeX solves by itself)
             {"64260", "", "ffl"}, // ffl ligature (which LaTeX solves by itself)
             {"119978", "Oscr", "$\\mathcal{O}$"}, // script capital O -- possibly use \mathscr
-            {"119984", "Uscr", "$\\mathcal{U}$"} // script capital U -- possibly use \mathscr
-
+            {"119984", "Uscr", "$\\mathcal{U}$"}, // script capital U -- possibly use \mathscr
+            {"120598", "", "$\\epsilon$"}, // mathematical italic epsilon U+1D716 -- requires amsmath
+            {"120599", "", "{{\\˜{n}}}"}, // n with tide
     };
 
     // List of combining accents
@@ -887,13 +889,14 @@ public class HTMLUnicodeConversionMaps {
         // Manual corrections
         LATEX_HTML_CONVERSION_MAP.put("AA", "&Aring;"); // Overwritten by &angst; which is less supported
         LATEX_UNICODE_CONVERSION_MAP.put("AA", "Å"); // Overwritten by Ångstrom symbol
-        LATEX_UNICODE_CONVERSION_MAP.put("'n", "ń");
 
         // Manual additions
         // Support relax to the extent that it is simply removed
         LATEX_HTML_CONVERSION_MAP.put("relax", "");
         LATEX_UNICODE_CONVERSION_MAP.put("relax", "");
-
+        // Support a special version of apostrophe
+        LATEX_HTML_CONVERSION_MAP.put("textquotesingle", "&#39;");
+        LATEX_UNICODE_CONVERSION_MAP.put("textquotesingle", "'"); // apostrophe, U+00027
     }
 
     private HTMLUnicodeConversionMaps() {
@@ -903,5 +906,4 @@ public class HTMLUnicodeConversionMaps {
         // Get rid of \{}$ from the LaTeX-string
         return escapedString.replaceAll("[\\\\\\{\\}\\$]", "");
     }
-
 }

@@ -1,4 +1,4 @@
-\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbrCommas]{\author} 
+\format[Authors(LastFirst),RTFChars]{\author} 
 "\format[RTFChars]{\title}"
 \begin{journal}
 , }{\\i \format[RTFChars]{\journal}} {\volume}{
@@ -7,7 +7,7 @@
 (\number)
 \end{number}
 \begin{editor}
-, }{\\i in }{\format[RTFChars,AuthorLastFirst,AuthorLastFirstAbbrCommas]{\editor}, ed.,
+, }{\\i in }{\format[Authors(LastFirst),RTFChars]{\editor}, ed.,
 \end{editor}
 \begin{booktitle}
 '\format[RTFChars]{\booktitle}'

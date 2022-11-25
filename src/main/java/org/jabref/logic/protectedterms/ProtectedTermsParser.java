@@ -17,15 +17,15 @@ import java.util.Objects;
 
 import org.jabref.logic.l10n.Localization;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
  */
 public class ProtectedTermsParser {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsParser.class);
 
     private final List<String> terms = new ArrayList<>();
     private String description = Localization.lang("The text after the last line starting with # will be used");
@@ -58,7 +58,7 @@ public class ProtectedTermsParser {
     public void readTermsFromFile(File file, Charset encoding) throws FileNotFoundException {
         location = file.getAbsolutePath();
         try (FileInputStream stream = new FileInputStream(Objects.requireNonNull(file));
-                InputStreamReader reader = new InputStreamReader(stream, Objects.requireNonNull(encoding))) {
+             InputStreamReader reader = new InputStreamReader(stream, Objects.requireNonNull(encoding))) {
             readTermsList(reader);
         } catch (FileNotFoundException e) {
             throw e;
@@ -79,7 +79,6 @@ public class ProtectedTermsParser {
             while ((line = reader.readLine()) != null) {
                 addLine(line);
             }
-
         } catch (IOException ex) {
             LOGGER.info("Could not read journal list from file ", ex);
         }

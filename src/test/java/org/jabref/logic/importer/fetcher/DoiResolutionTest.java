@@ -4,65 +4,83 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.support.DevEnvironment;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Category(FetcherTests.class)
-public class DoiResolutionTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@FetcherTest
+class DoiResolutionTest {
 
     private DoiResolution finder;
     private BibEntry entry;
 
-    @Before
-    public void setUp() {
-        finder = new DoiResolution();
+    @BeforeEach
+    void setup() {
+        DOIPreferences doiPreferences = mock(DOIPreferences.class);
+        when(doiPreferences.isUseCustom()).thenReturn(false);
+        finder = new DoiResolution(doiPreferences);
         entry = new BibEntry();
     }
 
-    @Test(expected = NullPointerException.class)
-    public void rejectNullParameter() throws IOException {
-        finder.findFullText(null);
-        Assert.fail();
-    }
-
     @Test
-    public void doiNotPresent() throws IOException {
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
-    }
-
-    @Test
-    public void findByDOI() throws IOException {
-        // CI server is blocked
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
-        entry.setField("doi", "10.1051/0004-6361/201527330");
-
-        Assert.assertEquals(
-                Optional.of(new URL("http://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf")),
+    void linkWithPdfInTitleTag() throws IOException {
+        entry.setField(StandardField.DOI, "10.1051/0004-6361/201527330");
+        assertEquals(
+                Optional.of(new URL("https://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf")),
                 finder.findFullText(entry)
         );
     }
 
+    @Disabled("Cannot fetch due to Cloudflare protection")
     @Test
-    public void notReturnAnythingWhenMultipleLinksAreFound() throws IOException {
-        entry.setField("doi", "10.1051/0004-6361/201527330; 10.1051/0004-6361/20152711233");
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+    void linkWithPdfStringLeadsToFulltext() throws IOException {
+        entry.setField(StandardField.DOI, "10.1002/acr2.11101");
+        assertEquals(Optional.of(new URL("https://onlinelibrary.wiley.com/doi/pdf/10.1002/acr2.11101")), finder.findFullText(entry));
     }
 
     @Test
-    public void notFoundByDOI() throws IOException {
-        // CI server is blocked
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+    void citationMetaTagLeadsToFulltext() throws IOException {
+        entry.setField(StandardField.DOI, "10.1007/978-3-319-89963-3_28");
+        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007/978-3-319-89963-3_28.pdf")), finder.findFullText(entry));
+    }
 
-        entry.setField("doi", "10.1186/unknown-doi");
+    @Test
+    void notReturnAnythingWhenMultipleLinksAreFound() throws IOException {
+        entry.setField(StandardField.DOI, "10.1109/JXCDC.2019.2911135");
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
 
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+    @Test
+    void returnAnythingWhenBehindSpringerPayWall() throws IOException {
+        // Springer returns an HTML page instead of an empty page,
+        // even if the user does not have access
+        // We cannot easily handle this case, because other publisher return the wrong media type.
+        entry.setField(StandardField.DOI, "10.1007/978-3-319-62594-2_12");
+        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007/978-3-319-62594-2_12.pdf")), finder.findFullText(entry));
+    }
+
+    @Test
+    void notFoundByDOI() throws IOException {
+        entry.setField(StandardField.DOI, "10.1186/unknown-doi");
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void entityWithoutDoi() throws IOException {
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void trustLevel() {
+        assertEquals(TrustLevel.SOURCE, finder.getTrustLevel());
     }
 }

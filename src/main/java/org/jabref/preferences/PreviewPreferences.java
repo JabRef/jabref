@@ -2,103 +2,99 @@ package org.jabref.preferences;
 
 import java.util.List;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import org.jabref.logic.layout.TextBasedPreviewLayout;
+import org.jabref.logic.preview.PreviewLayout;
+
 public class PreviewPreferences {
 
-    private final List<String> previewCycle;
-    private final int previewCyclePosition;
-    private final int previewPanelHeight;
-    private final boolean previewPanelEnabled;
-    private final String previewStyle;
-    private final String previewStyleDefault;
+    private final ObservableList<PreviewLayout> layoutCycle;
+    private final IntegerProperty layoutCyclePosition;
+    private final ObjectProperty<TextBasedPreviewLayout> customPreviewLayout;
+    private final StringProperty defaultCustomPreviewLayout;
+    private final BooleanProperty showPreviewAsExtraTab;
 
-
-    public PreviewPreferences(List<String> previewCycle, int previeCyclePosition, int previewPanelHeight, boolean previewPanelEnabled, String previewStyle, String previewStyleDefault) {
-        this.previewCycle = previewCycle;
-        this.previewCyclePosition = previeCyclePosition;
-        this.previewPanelHeight = previewPanelHeight;
-        this.previewPanelEnabled = previewPanelEnabled;
-        this.previewStyle = previewStyle;
-        this.previewStyleDefault = previewStyleDefault;
+    public PreviewPreferences(List<PreviewLayout> layoutCycle,
+                              int layoutCyclePosition,
+                              TextBasedPreviewLayout customPreviewLayout,
+                              String defaultCustomPreviewLayout,
+                              boolean showPreviewAsExtraTab) {
+        this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
+        this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
+        this.customPreviewLayout = new SimpleObjectProperty<>(customPreviewLayout);
+        this.defaultCustomPreviewLayout = new SimpleStringProperty(defaultCustomPreviewLayout);
+        this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
     }
 
-    public List<String> getPreviewCycle() {
-        return previewCycle;
+    public ObservableList<PreviewLayout> getLayoutCycle() {
+        return layoutCycle;
     }
 
-    public int getPreviewCyclePosition() {
-        return previewCyclePosition;
+    public int getLayoutCyclePosition() {
+        return layoutCyclePosition.getValue();
     }
 
-    public int getPreviewPanelHeight() {
-        return previewPanelHeight;
+    public IntegerProperty layoutCyclePositionProperty() {
+        return layoutCyclePosition;
     }
 
-    public boolean isPreviewPanelEnabled() {
-        return previewPanelEnabled;
-    }
-
-    public String getPreviewStyle() {
-        return previewStyle;
-    }
-
-    public String getPreviewStyleDefault() {
-        return previewStyleDefault;
-    }
-
-    public Builder getBuilder() {
-        return new Builder(this);
-    }
-
-    public static class Builder {
-        private List<String> previewCycle;
-        private int previeCyclePosition;
-        private int previewPanelHeight;
-        private boolean previewPanelEnabled;
-        private String previewStyle;
-        private final String previewStyleDefault;
-
-
-        public Builder(PreviewPreferences previewPreferences) {
-            this.previewCycle = previewPreferences.getPreviewCycle();
-            this.previeCyclePosition = previewPreferences.getPreviewCyclePosition();
-            this.previewPanelHeight = previewPreferences.getPreviewPanelHeight();
-            this.previewPanelEnabled = previewPreferences.isPreviewPanelEnabled();
-            this.previewStyle = previewPreferences.getPreviewStyle();
-            this.previewStyleDefault = previewPreferences.getPreviewStyleDefault();
-        }
-
-        public Builder withPreviewCycle(List<String> previewCycle) {
-            this.previewCycle = previewCycle;
-            return withPreviewCyclePosition(previeCyclePosition);
-        }
-
-        public Builder withPreviewCyclePosition(int position) {
-            previeCyclePosition = position;
-            while (previeCyclePosition < 0) {
-                previeCyclePosition += previewCycle.size();
+    public void setLayoutCyclePosition(int position) {
+        if (layoutCycle.isEmpty()) {
+            this.layoutCyclePosition.setValue(0);
+        } else {
+            int previewCyclePosition = position;
+            while (previewCyclePosition < 0) {
+                previewCyclePosition += layoutCycle.size();
             }
-            previeCyclePosition %= previewCycle.size();
-            return this;
-        }
-
-        public Builder withPreviewPanelHeight(int previewPanelHeight) {
-            this.previewPanelHeight = previewPanelHeight;
-            return this;
-        }
-
-        public Builder withPreviewPanelEnabled(boolean previewPanelEnabled) {
-            this.previewPanelEnabled = previewPanelEnabled;
-            return this;
-        }
-
-        public Builder withPreviewStyle(String previewStyle) {
-            this.previewStyle = previewStyle;
-            return this;
-        }
-
-        public PreviewPreferences build() {
-            return new PreviewPreferences(previewCycle, previeCyclePosition, previewPanelHeight, previewPanelEnabled, previewStyle, previewStyleDefault);
+            this.layoutCyclePosition.setValue(previewCyclePosition % layoutCycle.size());
         }
     }
 
+    public PreviewLayout getSelectedPreviewLayout() {
+        if (layoutCycle.size() <= 0
+                || layoutCyclePosition.getValue() < 0
+                || layoutCyclePosition.getValue() >= layoutCycle.size()) {
+            return getCustomPreviewLayout();
+        } else {
+            return layoutCycle.get(layoutCyclePosition.getValue());
+        }
+    }
+
+    public TextBasedPreviewLayout getCustomPreviewLayout() {
+        return customPreviewLayout.getValue();
+    }
+
+    public ObjectProperty<TextBasedPreviewLayout> customPreviewLayoutProperty() {
+        return customPreviewLayout;
+    }
+
+    public void setCustomPreviewLayout(TextBasedPreviewLayout layout) {
+        this.customPreviewLayout.set(layout);
+    }
+
+    public String getDefaultCustomPreviewLayout() {
+        return defaultCustomPreviewLayout.getValue();
+    }
+
+    public boolean shouldShowPreviewAsExtraTab() {
+        return showPreviewAsExtraTab.getValue();
+    }
+
+    public BooleanProperty showPreviewAsExtraTabProperty() {
+        return showPreviewAsExtraTab;
+    }
+
+    public void setShowPreviewAsExtraTab(boolean showPreviewAsExtraTab) {
+        this.showPreviewAsExtraTab.set(showPreviewAsExtraTab);
+    }
 }

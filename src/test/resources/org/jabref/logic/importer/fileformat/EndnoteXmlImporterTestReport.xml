@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <records>
+    <record>
+      <database name="birdsurvival-Converted.enl" path="/Users/Seb/Downloads/birdsurvival-Converted.enl">birdsurvival-Converted.enl</database>
+      <source-app name="EndNote" version="20.0">EndNote</source-app>
+      <rec-number>1289</rec-number>
+      <foreign-keys>
+        <key app="EN" db-id="edzwwfxp95ffssewwsx5s95lrpzvz90at5x2">1289</key>
+      </foreign-keys>
+      <ref-type name="Report">27</ref-type>
+      <contributors>
+        <authors>
+          <author>
+            <style face="normal" font="default" size="100%">Wiggins, D. A.</style>
+          </author>
+        </authors>
+      </contributors>
+      <titles>
+        <title>
+          <style face="normal" font="default" size="100%">Purple Martin (Progne subis): a technical conservation assessment</style>
+        </title>
+      </titles>
+      <pages>
+        <style face="normal" font="default" size="100%">Available: http://www.fs.fed.us/r2/projects/scp/assessments/purplemartin.pdf</style>
+      </pages>
+      <dates>
+        <year>
+          <style face="normal" font="default" size="100%">2005</style>
+        </year>
+      </dates>
+      <publisher>
+        <style face="normal" font="default" size="100%">USDA Forest Service, Rocky Mountain Region</style>
+      </publisher>
+      <label>
+        <style face="normal" font="default" size="100%">B1040</style>
+      </label>
+      <urls />
+    </record>
+  </records>
+</xml>

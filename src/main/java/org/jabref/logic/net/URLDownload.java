@@ -2,6 +2,7 @@ package org.jabref.logic.net;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,42 +26,54 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
-import com.mashape.unirest.http.Unirest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * URL download to a string.
  * <p>
  * Example:
+ * <code>
  * URLDownload dl = new URLDownload(URL);
  * String content = dl.asString(ENCODING);
  * dl.toFile(Path); // available in FILE
  * String contentType = dl.getMimeType();
- *
- * Each call to a public method creates a new HTTP connection. Nothing is cached.
+ * </code>
+ * <br/><br/>
+ * Almost each call to a public method creates a new HTTP connection (except for {@link #asString(Charset, URLConnection) asString},
+ * which uses an already opened connection). Nothing is cached.
  */
 public class URLDownload {
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
 
-    private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0";
+    private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
+    private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
+
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
     private String postData = "";
+    private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
 
     /**
      * @param source the URL to download from
@@ -83,12 +96,15 @@ public class URLDownload {
      * thrown: sun.security.validator.ValidatorException: PKIX path building failed:
      * sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested
      * target JM > 8u101 may trust the certificate by default according to http://stackoverflow.com/a/34111150/873661
-     *
+     * <p>
      * We will fix this issue by accepting all (!) certificates. This is ugly; but as JabRef does not rely on
      * security-relevant information this is kind of OK (no, actually it is not...).
+     * <p>
+     * Taken from http://stackoverflow.com/a/6055903/873661 and https://stackoverflow.com/a/19542614/873661
      *
-     * Taken from http://stackoverflow.com/a/6055903/873661
+     * @deprecated
      */
+    @Deprecated
     public static void bypassSSLVerification() {
         LOGGER.warn("Fix SSL exceptions by accepting ALL certificates");
 
@@ -108,13 +124,31 @@ public class URLDownload {
             }
         }};
 
-        // Install the all-trusting trust manager
         try {
+            // Install all-trusting trust manager
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+
+            // Install all-trusting host verifier
+            HostnameVerifier allHostsValid = (hostname, session) -> true;
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
         } catch (Exception e) {
             LOGGER.error("A problem occurred when bypassing SSL verification", e);
+        }
+    }
+
+    /**
+     *
+     * @param socketFactory trust manager
+     * @param verifier host verifier
+     */
+    public static void setSSLVerification(SSLSocketFactory socketFactory, HostnameVerifier verifier) {
+        try {
+            HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory);
+            HttpsURLConnection.setDefaultHostnameVerifier(verifier);
+        } catch (Exception e) {
+            LOGGER.error("A problem occurred when reset SSL verification", e);
         }
     }
 
@@ -122,14 +156,14 @@ public class URLDownload {
         return source;
     }
 
-    public String getMimeType() throws IOException {
-        Unirest.setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+    public String getMimeType() {
+        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 
         String contentType;
         // Try to use HEAD request to avoid downloading the whole file
         try {
             contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").get(0);
-            if (contentType != null && !contentType.isEmpty()) {
+            if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
         } catch (Exception e) {
@@ -139,7 +173,7 @@ public class URLDownload {
         // Use GET request as alternative if no HEAD request is available
         try {
             contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").get(0);
-            if (contentType != null && !contentType.isEmpty()) {
+            if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
         } catch (Exception e) {
@@ -151,7 +185,7 @@ public class URLDownload {
             URLConnection connection = new URL(source.toString()).openConnection();
 
             contentType = connection.getContentType();
-            if (contentType != null && !contentType.isEmpty()) {
+            if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
         } catch (IOException e) {
@@ -161,7 +195,20 @@ public class URLDownload {
         return "";
     }
 
-    public boolean isMimeType(String type) throws IOException {
+    /**
+     * Check the connection by using the HEAD request.
+     * UnirestException can be thrown for invalid request.
+     *
+     * @return the status code of the response
+     */
+    public boolean canBeReached() throws UnirestException {
+        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+
+        int statusCode = Unirest.head(source.toString()).asString().getStatus();
+        return (statusCode >= 200) && (statusCode < 300);
+    }
+
+    public boolean isMimeType(String type) {
         String mime = getMimeType();
 
         if (mime.isEmpty()) {
@@ -171,7 +218,7 @@ public class URLDownload {
         return mime.startsWith(type);
     }
 
-    public boolean isPdf() throws IOException {
+    public boolean isPdf() {
         return isMimeType("application/pdf");
     }
 
@@ -186,27 +233,48 @@ public class URLDownload {
     }
 
     /**
+     * Downloads the web resource to a String. Uses UTF-8 as encoding.
+     *
+     * @return the downloaded string
+     */
+    public String asString() throws IOException {
+        return asString(StandardCharsets.UTF_8, this.openConnection());
+    }
+
+    /**
      * Downloads the web resource to a String.
      *
      * @param encoding the desired String encoding
      * @return the downloaded string
      */
     public String asString(Charset encoding) throws IOException {
-        try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream());
-             Writer output = new StringWriter()) {
-            copy(input, output, encoding);
-            return output.toString();
-        }
+        return asString(encoding, this.openConnection());
+    }
+
+    /**
+     * Downloads the web resource to a String from an existing connection. Uses UTF-8 as encoding.
+     *
+     * @param existingConnection an existing connection
+     * @return the downloaded string
+     */
+    public static String asString(URLConnection existingConnection) throws IOException {
+        return asString(StandardCharsets.UTF_8, existingConnection);
     }
 
     /**
      * Downloads the web resource to a String.
-     * Uses UTF-8 as encoding.
      *
+     * @param encoding the desired String encoding
+     * @param connection an existing connection
      * @return the downloaded string
      */
-    public String asString() throws IOException {
-        return asString(StandardCharsets.UTF_8);
+    public static String asString(Charset encoding, URLConnection connection) throws IOException {
+
+        try (InputStream input = new BufferedInputStream(connection.getInputStream());
+             Writer output = new StringWriter()) {
+            copy(input, output, encoding);
+            return output.toString();
+        }
     }
 
     public List<HttpCookie> getCookieFromUrl() throws IOException {
@@ -243,8 +311,13 @@ public class URLDownload {
      * Takes the web resource as the source for a monitored input stream.
      */
     public ProgressInputStream asInputStream() throws IOException {
-        URLConnection urlConnection = this.openConnection();
-        long fileSize = urlConnection.getContentLength();
+        HttpURLConnection urlConnection = (HttpURLConnection) this.openConnection();
+
+        if ((urlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) || (urlConnection.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST)) {
+            LOGGER.error("Response message {} returned for url {}", urlConnection.getResponseMessage(), urlConnection.getURL());
+            return new ProgressInputStream(new ByteArrayInputStream(new byte[0]), 0);
+        }
+        long fileSize = urlConnection.getContentLengthLong();
         return new ProgressInputStream(new BufferedInputStream(urlConnection.getInputStream()), fileSize);
     }
 
@@ -259,11 +332,12 @@ public class URLDownload {
 
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
-        String fileName = FileUtil.getFileName(fileNameWithExtension);
+        String fileName = "jabref-" + FileUtil.getBaseName(fileNameWithExtension);
         String extension = "." + FileHelper.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
+        file.toFile().deleteOnExit();
         toFile(file);
 
         return file;
@@ -274,11 +348,9 @@ public class URLDownload {
         return "URLDownload{" + "source=" + this.source + '}';
     }
 
-    private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
-        InputStream monitoredInputStream = in;
-        Reader r = new InputStreamReader(monitoredInputStream, encoding);
+    private static void copy(InputStream in, Writer out, Charset encoding) throws IOException {
+        Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
-
             String line;
             while ((line = read.readLine()) != null) {
                 out.write(line);
@@ -287,8 +359,15 @@ public class URLDownload {
         }
     }
 
-    private URLConnection openConnection() throws IOException {
+    /**
+     * Open a connection to this object's URL (with specified settings). If accessing an HTTP URL, don't forget
+     * to close the resulting connection after usage.
+     *
+     * @return an open connection
+     */
+    public URLConnection openConnection() throws IOException {
         URLConnection connection = this.source.openConnection();
+        connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
@@ -297,28 +376,38 @@ public class URLDownload {
             try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
                 wr.writeBytes(this.postData);
             }
-
         }
 
         if (connection instanceof HttpURLConnection) {
             // normally, 3xx is redirect
             int status = ((HttpURLConnection) connection).getResponseCode();
-            if (status != HttpURLConnection.HTTP_OK) {
-                if (status == HttpURLConnection.HTTP_MOVED_TEMP
-                        || status == HttpURLConnection.HTTP_MOVED_PERM
-                        || status == HttpURLConnection.HTTP_SEE_OTHER) {
-                    // get redirect url from "location" header field
-                    String newUrl = connection.getHeaderField("Location");
-                    // open the new connnection again
-                    connection = new URLDownload(newUrl).openConnection();
-                }
+
+            if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
+                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                // get redirect url from "location" header field
+                String newUrl = connection.getHeaderField("location");
+                // open the new connection again
+                connection = new URLDownload(newUrl).openConnection();
+            }
+            if ((status >= 400) && (status < 500)) {
+                throw new IOException(new FetcherClientException("Encountered HTTP Status code " + status));
+            }
+            if (status >= 500) {
+                throw new IOException(new FetcherServerException("Encountered HTTP Status Code " + status));
             }
         }
-
         // this does network i/o: GET + read returned headers
-        connection.connect();
-
         return connection;
     }
 
+    public void setConnectTimeout(Duration connectTimeout) {
+        if (connectTimeout != null) {
+            this.connectTimeout = connectTimeout;
+        }
+    }
+
+    public Duration getConnectTimeout() {
+        return connectTimeout;
+    }
 }

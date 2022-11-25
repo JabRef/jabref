@@ -2,32 +2,24 @@ package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
+
+import org.jabref.gui.DialogService;
 
 public interface NativeDesktop {
+
     void openFile(String filePath, String fileType) throws IOException;
 
     /**
      * Opens a file on an Operating System, using the given application.
      *
-     * @param filePath The filename.
+     * @param filePath    The filename.
      * @param application Link to the app that opens the file.
-     * @throws IOException
      */
     void openFileWithApplication(String filePath, String application) throws IOException;
 
     void openFolderAndSelectFile(Path file) throws IOException;
 
-    void openConsole(String absolutePath) throws IOException;
-
-    /**
-     * This method opens a pdf using the giving the parameters to the executing pdf reader
-     * @param filePath absolute path to the pdf file to be opened
-     * @param parameters console parameters depending on the pdf reader
-     * @throws IOException
-     */
-    void openPdfWithParameters(String filePath, List<String> parameters) throws  IOException;
+    void openConsole(String absolutePath, DialogService dialogService) throws IOException;
 
     String detectProgramPath(String programName, String directoryName);
 
@@ -39,11 +31,18 @@ public interface NativeDesktop {
     Path getApplicationDirectory();
 
     /**
+     * Get the user's default file chooser directory
+     *
+     * @return The path to the directory
+     */
+     Path getDefaultFileChooserDirectory();
+
+    /**
      * Returns the path to the system's user directory.
      *
      * @return the path to the user directory.
      */
     default Path getUserDirectory() {
-        return Paths.get(System.getProperty("user.home"));
+        return Path.of(System.getProperty("user.home"));
     }
 }

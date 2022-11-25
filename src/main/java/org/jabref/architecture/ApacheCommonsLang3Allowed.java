@@ -8,5 +8,4 @@ public @interface ApacheCommonsLang3Allowed {
 
     // The rationale
     String value();
-
 }

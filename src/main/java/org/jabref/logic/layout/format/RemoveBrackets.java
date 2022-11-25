@@ -14,7 +14,7 @@ public class RemoveBrackets implements LayoutFormatter {
     public String format(String fieldText) {
         StringBuilder builder = new StringBuilder(fieldText.length());
 
-        for (char c: fieldText.toCharArray()) {
+        for (char c : fieldText.toCharArray()) {
             if ((c != '{') && (c != '}')) {
                 builder.append(c);
             }

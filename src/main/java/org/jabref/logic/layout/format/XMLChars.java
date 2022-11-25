@@ -25,12 +25,12 @@ public class XMLChars implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-
         if (fieldText == null) {
             return fieldText;
         }
 
-        String formattedFieldText = firstFormat(fieldText);
+        String latexCommandFree = removeLatexCommands(fieldText);
+        String formattedFieldText = firstFormat(latexCommandFree);
 
         for (Map.Entry<String, String> entry : XML_CHARS.entrySet()) {
             String s = entry.getKey();
@@ -42,12 +42,16 @@ public class XMLChars implements LayoutFormatter {
         return restFormat(formattedFieldText);
     }
 
+    private String removeLatexCommands(String fieldText) {
+        LatexToUnicodeFormatter latexToUnicode = new LatexToUnicodeFormatter();
+        return latexToUnicode.format(fieldText);
+    }
+
     private static String firstFormat(String s) {
         return s.replaceAll("&|\\\\&", "&#x0026;").replace("--", "&#x2013;");
     }
 
     private String restFormat(String toFormat) {
-
         String fieldText = toFormat.replace("}", "").replace("{", "");
 
         // now some copy-paste problems most often occuring in abstracts when

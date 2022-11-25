@@ -6,8 +6,9 @@ import java.util.Objects;
 
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.InternalField;
 
 /**
  * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is
@@ -18,34 +19,37 @@ import org.jabref.model.entry.InternalBibtexFields;
  */
 public class EntryComparator implements Comparator<BibEntry> {
 
-    private final String sortField;
+    private final Field sortField;
     private final boolean descending;
     private final boolean binary;
-    private final boolean numeric;
     private final Comparator<BibEntry> next;
 
-
-    public EntryComparator(boolean binary, boolean descending, String field, Comparator<BibEntry> next) {
+    /**
+     *
+     * @param binary true: the presence of fields is checked; false: the content of the fields is compared
+     * @param descending true: if the most different entry should get the highest score
+     * @param field the field to sort on
+     * @param next the next comparator to use (if the current comparator results in equality)
+     */
+    public EntryComparator(boolean binary, boolean descending, Field field, Comparator<BibEntry> next) {
         this.binary = binary;
         this.sortField = field;
         this.descending = descending;
         this.next = next;
-        this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
-    public EntryComparator(boolean binary, boolean descending, String field) {
+    public EntryComparator(boolean binary, boolean descending, Field field) {
         this.binary = binary;
         this.sortField = field;
         this.descending = descending;
         this.next = null;
-        this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
         // default equals
         // TODO: with the new default equals this does not only return 0 for identical objects,
-        // but for all objects that have the same id and same fields
+        //       but for all objects that have the same id and same fields
         if (Objects.equals(e1, e2)) {
             return 0;
         }
@@ -62,21 +66,23 @@ public class EntryComparator implements Comparator<BibEntry> {
             }
         }
 
-        // If the field is author or editor, we rearrange names so they are
+        // If the field is author or editor, we rearrange names to achieve that they are
         // sorted according to last name.
-        if (InternalBibtexFields.getFieldProperties(sortField).contains(FieldProperty.PERSON_NAMES)) {
+        if (sortField.getProperties().contains(FieldProperty.PERSON_NAMES)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase(Locale.ROOT);
             }
             if (f2 != null) {
                 f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase(Locale.ROOT);
             }
-
-        } else if (sortField.equals(BibEntry.TYPE_HEADER)) {
+        } else if (sortField.equals(InternalField.TYPE_HEADER)) {
             // Sort by type.
             f1 = e1.getType();
             f2 = e2.getType();
-        } else if (numeric) {
+        } else if (sortField.equals(InternalField.KEY_FIELD)) {
+            f1 = e1.getCitationKey().orElse(null);
+            f2 = e2.getCitationKey().orElse(null);
+        } else if (sortField.isNumeric()) {
             try {
                 Integer i1 = Integer.parseInt((String) f1);
                 Integer i2 = Integer.parseInt((String) f2);
@@ -104,21 +110,21 @@ public class EntryComparator implements Comparator<BibEntry> {
         int result;
 
         if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
-            result = -((Integer) f1).compareTo((Integer) f2);
+            result = ((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
             Integer f1AsInteger = Integer.valueOf(f1.toString());
-            result = -f1AsInteger.compareTo((Integer) f2);
+            result = f1AsInteger.compareTo((Integer) f2);
         } else if (f1 instanceof Integer) {
             Integer f2AsInteger = Integer.valueOf(f2.toString());
-            result = -((Integer) f1).compareTo(f2AsInteger);
+            result = ((Integer) f1).compareTo(f2AsInteger);
         } else {
             String ours = ((String) f1).toLowerCase(Locale.ROOT);
             String theirs = ((String) f2).toLowerCase(Locale.ROOT);
             int comp = ours.compareTo(theirs);
-            result = -comp;
+            result = comp;
         }
         if (result != 0) {
-            return descending ? result : -result; // Primary sort.
+            return descending ? -result : result; // Primary sort.
         }
         if (next == null) {
             return idCompare(e1, e2); // If still equal, we use the unique IDs.
@@ -130,5 +136,4 @@ public class EntryComparator implements Comparator<BibEntry> {
     private static int idCompare(BibEntry b1, BibEntry b2) {
         return b1.getId().compareTo(b2.getId());
     }
-
 }

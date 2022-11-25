@@ -9,7 +9,6 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
     private final boolean considerRefs;
 
-
     /**
      * @param considerRefs Indicates whether the strings should be
      *                     sorted according to internal references in addition to
@@ -21,7 +20,6 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
     @Override
     public int compare(BibtexString s1, BibtexString s2) {
-
         int res;
 
         // First check their names:
@@ -37,7 +35,6 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
         // Then, if we are supposed to, see if the ordering needs
         // to be changed because of one string referring to the other.x
         if (considerRefs) {
-
             // First order them:
             BibtexString pre;
             BibtexString post;
@@ -58,10 +55,8 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
             if (textPre.contains("#" + namePost + "#")) {
                 res = -res;
             }
-
         }
 
         return res;
     }
-
 }

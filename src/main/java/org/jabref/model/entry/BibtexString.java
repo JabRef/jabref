@@ -7,6 +7,7 @@ import java.util.Objects;
  * This class models a BibTex String ("@String")
  */
 public class BibtexString implements Cloneable {
+
     /**
      * Type of a \@String.
      * <p>
@@ -95,6 +96,11 @@ public class BibtexString implements Cloneable {
         hasChanged = true;
     }
 
+    /**
+     * Returns the name/label of the string
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
@@ -135,26 +141,18 @@ public class BibtexString implements Cloneable {
     }
 
     /*
-    * Returns user comments (arbitrary text before the string) if there are any. If not returns the empty string
+     * Returns user comments (arbitrary text before the string) if there are any. If not returns the empty string
      */
     public String getUserComments() {
         if (parsedSerialization != null) {
-
             try {
                 // get the text before the string
                 String prolog = parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
-
-                // delete trailing whitespaces (between string and text)
-                prolog = prolog.replaceFirst("\\s+$", "");
-                // if there is any non whitespace text, write it with proper line separation
-                if (prolog.length() > 0) {
-                    return prolog;
-                }
+                return prolog;
             } catch (StringIndexOutOfBoundsException ignore) {
                 // if this occurs a broken parsed serialization has been set, so just do nothing
             }
         }
-
         return "";
     }
 
@@ -173,20 +171,23 @@ public class BibtexString implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
         BibtexString that = (BibtexString) o;
-        return hasChanged == that.hasChanged &&
+        return (
+                Objects.equals(hasChanged, that.hasChanged) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(content, that.content) &&
-                Objects.equals(id, that.id) &&
-                type == that.type &&
-                Objects.equals(parsedSerialization, that.parsedSerialization);
+                Objects.equals(type, that.type) &&
+                Objects.equals(parsedSerialization, that.parsedSerialization));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, content, id, type, parsedSerialization, hasChanged);
+        return Objects.hash(hasChanged, name, content, type, parsedSerialization);
     }
-
 }

@@ -5,14 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import javafx.concurrent.Task;
-
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.net.ProgressInputStream;
 import org.jabref.logic.net.URLDownload;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
-public class FileDownloadTask extends Task<Void> {
+public class FileDownloadTask extends BackgroundTask<Path> {
 
     private final URL source;
     private final Path destination;
@@ -23,15 +22,19 @@ public class FileDownloadTask extends Task<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
+    protected Path call() throws Exception {
         URLDownload download = new URLDownload(source);
         try (ProgressInputStream inputStream = download.asInputStream()) {
             EasyBind.subscribe(
                     inputStream.totalNumBytesReadProperty(),
                     bytesRead -> updateProgress(bytesRead.longValue(), inputStream.getMaxNumBytes()));
+
+            // Make sure directory exists since otherwise copy fails
+            Files.createDirectories(destination.getParent());
+
             Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        return null;
+        return destination;
     }
 }

@@ -1,4 +1,4 @@
-@\entrytype{\bibtexkey,
+@\entrytype{\citationkey,
 \begin{author}  author = {\author},\end{author}
 \begin{title}  title  = {\format[RemoveBrackets]{\title}},\end{title}
 \begin{journal}  journal = {\journal},\end{journal}

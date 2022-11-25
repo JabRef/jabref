@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.cleanup.Formatter;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a convenient interface for {@link IdFetcher}, which follow the usual three-step procedure:
@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
 
-    Log LOGGER = LogFactory.getLog(IdParserFetcher.class);
+    Logger LOGGER = LoggerFactory.getLogger(IdParserFetcher.class);
 
     /**
      * Constructs a URL based on the {@link BibEntry}.
@@ -48,7 +48,7 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
      * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
      *
      * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
+     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
      *
@@ -88,8 +88,10 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
             LOGGER.debug("Id not found");
             return Optional.empty();
         } catch (IOException e) {
-            // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
-            // TODO catch 503 service unavailable and alert user
+            // check for the case where we already have a FetcherException from UrlDownload
+            if (e.getCause() instanceof FetcherException fe) {
+                throw fe;
+            }
             throw new FetcherException("An I/O exception occurred", e);
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);

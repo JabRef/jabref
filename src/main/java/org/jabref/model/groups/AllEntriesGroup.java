@@ -9,7 +9,6 @@ import org.jabref.model.entry.BibEntry;
  */
 public class AllEntriesGroup extends AbstractGroup {
 
-
     public AllEntriesGroup(String name) {
         super(name, GroupHierarchyType.INDEPENDENT);
     }

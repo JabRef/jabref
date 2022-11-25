@@ -3,26 +3,27 @@ package org.jabref.gui.errorconsole;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.util.OS;
 
 import com.google.common.base.Throwables;
-import org.apache.logging.log4j.core.LogEvent;
+import org.tinylog.core.LogEntry;
 
 public class LogEventViewModel {
 
-    private LogEvent logEvent;
+    private final LogEntry logEvent;
 
-    public LogEventViewModel(LogEvent logEvent) {
+    public LogEventViewModel(LogEntry logEvent) {
         this.logEvent = Objects.requireNonNull(logEvent);
     }
 
     public String getDisplayText() {
-        return logEvent.getMessage().getFormattedMessage();
+        return logEvent.getMessage();
     }
 
     public String getStyleClass() {
-        switch (logEvent.getLevel().getStandardLevel()) {
+        switch (logEvent.getLevel()) {
             case ERROR:
                 return "exception";
             case WARN:
@@ -33,20 +34,20 @@ public class LogEventViewModel {
         }
     }
 
-    public IconTheme.JabRefIcon getIcon() {
-        switch (logEvent.getLevel().getStandardLevel()) {
+    public JabRefIcon getIcon() {
+        switch (logEvent.getLevel()) {
             case ERROR:
-                return (IconTheme.JabRefIcon.INTEGRITY_FAIL);
+                return (IconTheme.JabRefIcons.INTEGRITY_FAIL);
             case WARN:
-                return (IconTheme.JabRefIcon.INTEGRITY_WARN);
+                return (IconTheme.JabRefIcons.INTEGRITY_WARN);
             case INFO:
             default:
-                return (IconTheme.JabRefIcon.INTEGRITY_INFO);
+                return (IconTheme.JabRefIcons.INTEGRITY_INFO);
         }
     }
 
     public Optional<String> getStackTrace() {
-        return Optional.ofNullable(logEvent.getMessage().getThrowable()).map(Throwables::getStackTraceAsString);
+        return Optional.ofNullable(logEvent.getException()).map(Throwables::getStackTraceAsString);
     }
 
     public String getDetailedText() {

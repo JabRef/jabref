@@ -4,7 +4,7 @@ import org.jabref.logic.layout.LayoutFormatter;
 
 /**
  * Replace a non-command tilde ~ by a space.
- *
+ * <p>
  * Useful for formatting Latex code.
  */
 public class RemoveTilde implements LayoutFormatter {

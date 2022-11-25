@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<?import com.jfoenix.controls.JFXColorPicker?>
+<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.121"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.styletester.StyleTesterView">
+    <TabPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+             AnchorPane.topAnchor="0.0">
+        <Tab text="Buttons">
+            <GridPane hgap="32" style="-fx-padding: 20 30 20 30;" vgap="16">
+                <Label GridPane.columnIndex="0" GridPane.columnSpan="6" GridPane.rowIndex="0">Normal buttons:</Label>
+                <Button text="Normal" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="normalButtonHover" text="Hover" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="normalButtonPressed" text="Pressed" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="normalButtonFocused" text="Focused" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button disable="true" text="Disabled" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button defaultButton="true" text="Default" GridPane.columnIndex="5" GridPane.rowIndex="1">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button cancelButton="true" text="Cancel" GridPane.columnIndex="6" GridPane.rowIndex="1">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Label GridPane.columnIndex="0" GridPane.columnSpan="6" GridPane.rowIndex="2">Text buttons:</Label>
+                <Button styleClass="text-button" text="Normal" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="textButtonHover" styleClass="text-button" text="Hover" GridPane.columnIndex="1"
+                        GridPane.rowIndex="3">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="textButtonPressed" styleClass="text-button" text="Pressed" GridPane.columnIndex="2"
+                        GridPane.rowIndex="3">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="textButtonFocused" styleClass="text-button" text="Focused" GridPane.columnIndex="3"
+                        GridPane.rowIndex="3">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button disable="true" styleClass="text-button" text="Disabled" GridPane.columnIndex="4"
+                        GridPane.rowIndex="3">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button defaultButton="true" styleClass="text-button" text="Default" GridPane.columnIndex="5"
+                        GridPane.rowIndex="3">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button cancelButton="true" styleClass="text-button" text="Cancel" GridPane.columnIndex="6"
+                        GridPane.rowIndex="3">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Label GridPane.columnIndex="0" GridPane.columnSpan="6" GridPane.rowIndex="4">Contained buttons:</Label>
+                <Button styleClass="contained-button" text="Normal" GridPane.columnIndex="0" GridPane.rowIndex="5">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="containedButtonHover" styleClass="contained-button" text="Hover" GridPane.columnIndex="1"
+                        GridPane.rowIndex="5">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="containedButtonPressed" styleClass="contained-button" text="Pressed"
+                        GridPane.columnIndex="2" GridPane.rowIndex="5">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button fx:id="containedButtonFocused" styleClass="contained-button" text="Focused"
+                        GridPane.columnIndex="3" GridPane.rowIndex="5">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button disable="true" styleClass="contained-button" text="Disabled" GridPane.columnIndex="4"
+                        GridPane.rowIndex="5">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button defaultButton="true" styleClass="contained-button" text="Default" GridPane.columnIndex="5"
+                        GridPane.rowIndex="5">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <Button cancelButton="true" styleClass="contained-button" text="Cancel" GridPane.columnIndex="6"
+                        GridPane.rowIndex="5">
+                    <graphic>
+                        <JabRefIconView glyph="ADD_NOBOX"/>
+                    </graphic>
+                </Button>
+                <columnConstraints>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                    <ColumnConstraints/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                </rowConstraints>
+            </GridPane>
+        </Tab>
+        <Tab text="Switches">
+            <VBox spacing="10" style="-fx-padding: 1em">
+                <Label text="Checkboxes"/>
+                <VBox spacing="15" style="-fx-padding: 0em 0em 0em 1em">
+                    <CheckBox text="Unchecked"/>
+                    <CheckBox selected="true" text="Checked"/>
+                    <CheckBox disable="true" text="Unchecked disabled"/>
+                    <CheckBox disable="true" selected="true" text="Checked disabled"/>
+                </VBox>
+                <Label text="Radio-Buttons">
+                    <VBox.margin>
+                        <Insets top="20.0"/>
+                    </VBox.margin>
+                </Label>
+                <VBox spacing="15" style="-fx-padding: 0em 0em 0em 1em">
+                    <RadioButton text="Unchecked"/>
+                    <RadioButton selected="true" text="Checked"/>
+                    <RadioButton disable="true" text="Unchecked disabled"/>
+                    <RadioButton disable="true" selected="true" text="Checked disabled"/>
+                </VBox>
+            </VBox>
+        </Tab>
+        <Tab>
+            <VBox layoutX="194.0" layoutY="14.0" prefHeight="200.0" prefWidth="100.0">
+                <children>
+                    <MenuBar>
+                        <menus>
+                            <Menu mnemonicParsing="false" text="File">
+                                <items>
+                                    <MenuItem mnemonicParsing="false" text="Load Stylesheet...">
+                                        <accelerator>
+                                            <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP"
+                                                                shortcut="UP"/>
+                                        </accelerator>
+                                    </MenuItem>
+                                    <MenuItem mnemonicParsing="false" text="Reload Stylesheet">
+                                        <accelerator>
+                                            <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP"
+                                                                shortcut="UP"/>
+                                        </accelerator>
+                                    </MenuItem>
+                                </items>
+                            </Menu>
+                        </menus>
+                    </MenuBar>
+                    <HBox prefHeight="652.0" prefWidth="1124.0" spacing="5.0">
+                        <children>
+                            <VBox prefHeight="385.0" prefWidth="236.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <ComboBox maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                                              promptText="Combo Box">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                    <ComboBox disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                                              promptText="Combo Box (Disabled)">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                    <Separator prefWidth="200.0"/>
+                                    <ComboBox editable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0"
+                                              promptText="Combo Box">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                    <ComboBox disable="true" editable="true" maxWidth="1.7976931348623157E308"
+                                              prefWidth="150.0" promptText="Combo Box (Disabled)">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                    <Separator prefWidth="200.0"/>
+                                    <ChoiceBox maxWidth="1.7976931348623157E308" prefWidth="150.0">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ChoiceBox>
+                                    <ChoiceBox disable="true" maxWidth="1.7976931348623157E308" prefWidth="150.0">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Apple"/>
+                                                <String fx:value="Orange"/>
+                                                <String fx:value="Pear"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ChoiceBox>
+                                    <Separator prefWidth="200.0"/>
+                                    <TextField promptText="Text Field"/>
+                                    <TextField editable="false" text="Text Field (non-editable)"/>
+                                    <TextField disable="true" text="Text Field (disabled)"/>
+                                    <Separator prefWidth="200.0"/>
+                                    <PasswordField promptText="Password"/>
+                                    <PasswordField editable="false" promptText="Password (non-editable)"
+                                                   text="Password (non-editable)"/>
+                                    <PasswordField disable="true" text="Password (disabled)"/>
+                                    <Separator prefWidth="200.0"/>
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                        <children>
+                                            <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0"
+                                                  HBox.hgrow="SOMETIMES">
+                                                <children>
+                                                    <CheckBox allowIndeterminate="true" mnemonicParsing="false"
+                                                              text="CheckBox"/>
+                                                    <CheckBox allowIndeterminate="true" mnemonicParsing="false"
+                                                              selected="true" text="CheckBox"/>
+                                                    <CheckBox allowIndeterminate="true" disable="true"
+                                                              mnemonicParsing="false" text="CheckBox"/>
+                                                    <CheckBox allowIndeterminate="true" disable="true"
+                                                              mnemonicParsing="false" selected="true" text="CheckBox"/>
+                                                    <CheckBox allowIndeterminate="true" disable="true"
+                                                              indeterminate="true" mnemonicParsing="false"
+                                                              text="CheckBox"/>
+                                                </children>
+                                            </VBox>
+                                            <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0"
+                                                  HBox.hgrow="SOMETIMES">
+                                                <children>
+                                                    <RadioButton mnemonicParsing="false" text="RadioButton">
+                                                        <toggleGroup>
+                                                            <ToggleGroup fx:id="radios"/>
+                                                        </toggleGroup>
+                                                    </RadioButton>
+                                                    <RadioButton mnemonicParsing="false" selected="true"
+                                                                 text="RadioButton" toggleGroup="$radios"/>
+                                                    <RadioButton disable="true" mnemonicParsing="false"
+                                                                 text="RadioButton"/>
+                                                    <RadioButton disable="true" mnemonicParsing="false" selected="true"
+                                                                 text="RadioButton"/>
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                            <Separator orientation="VERTICAL" prefHeight="200.0"/>
+                            <VBox prefHeight="385.0" prefWidth="236.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <MenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                text="MenuButton">
+                                        <items>
+                                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                                        </items>
+                                    </MenuButton>
+                                    <MenuButton disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                text="MenuButton (Disabled)">
+                                        <items>
+                                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                                        </items>
+                                    </MenuButton>
+                                    <Separator prefWidth="200.0"/>
+                                    <SplitMenuButton maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                                     text="SplitMenuButton">
+                                        <items>
+                                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                                        </items>
+                                    </SplitMenuButton>
+                                    <SplitMenuButton disable="true" maxWidth="1.7976931348623157E308"
+                                                     mnemonicParsing="false" text="SplitMenuButton (Disabled)">
+                                        <items>
+                                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                                        </items>
+                                    </SplitMenuButton>
+                                    <Separator prefWidth="200.0"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Button"/>
+                                    <Button disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                            text="Button (Disabled)"/>
+                                    <Button defaultButton="true" maxWidth="1.7976931348623157E308"
+                                            mnemonicParsing="false" text="Button (Default)"/>
+                                    <Button cancelButton="true" maxWidth="1.7976931348623157E308"
+                                            mnemonicParsing="false" text="Button (Cancel)"/>
+                                    <Separator prefWidth="200.0"/>
+                                    <Hyperlink maxWidth="1.7976931348623157E308" text="Hyperlink"/>
+                                    <Hyperlink maxWidth="1.7976931348623157E308" text="Hyperlink (Visited)"
+                                               visited="true"/>
+                                    <Separator prefWidth="200.0"/>
+                                    <JFXColorPicker/>
+                                </children>
+                            </VBox>
+                            <Separator orientation="VERTICAL" prefHeight="200.0"/>
+                            <VBox prefHeight="385.0" prefWidth="236.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Slider value="35.0"/>
+                                    <Slider showTickMarks="true" snapToTicks="true" value="35.0"/>
+                                    <Slider showTickLabels="true" showTickMarks="true" snapToTicks="true" value="35.0"/>
+                                    <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0"
+                                              prefHeight="200.0" prefWidth="200.0" vgap="10.0">
+                                        <children>
+                                            <Slider orientation="VERTICAL"/>
+                                            <Slider orientation="VERTICAL" showTickMarks="true"/>
+                                            <Slider orientation="VERTICAL" showTickLabels="true" showTickMarks="true"/>
+                                        </children>
+                                    </FlowPane>
+                                    <Separator prefWidth="200.0"/>
+                                    <ProgressBar maxWidth="1.7976931348623157E308" prefWidth="200.0" progress="0.3"/>
+                                    <ProgressBar maxWidth="1.7976931348623157E308" prefWidth="200.0"/>
+                                    <ProgressIndicator progress="0.3"/>
+                                    <ProgressIndicator/>
+                                </children>
+                            </VBox>
+                            <Separator orientation="VERTICAL" prefHeight="200.0"/>
+                            <VBox prefHeight="385.0" prefWidth="236.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <TextArea prefHeight="71.0" prefWidth="268.0" promptText="Text Area"
+                                              wrapText="true"/>
+                                </children>
+                            </VBox>
+                        </children>
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        </padding>
+                    </HBox>
+                    <SplitPane dividerPositions="0.45566502463054187" prefHeight="160.0" prefWidth="200.0"
+                               VBox.vgrow="ALWAYS">
+                        <items>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                <children>
+                                    <TabPane prefHeight="173.0" prefWidth="259.0" side="BOTTOM"
+                                             AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <tabs>
+                                            <Tab text="Lorem">
+                                                <content>
+                                                    <AnchorPane/>
+                                                </content>
+                                            </Tab>
+                                            <Tab text="Ipsum">
+                                                <content>
+                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                                                prefWidth="200.0"/>
+                                                </content>
+                                            </Tab>
+                                            <Tab text="Dolor">
+                                                <content>
+                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                                                prefWidth="200.0"/>
+                                                </content>
+                                            </Tab>
+                                        </tabs>
+                                    </TabPane>
+                                </children>
+                            </AnchorPane>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                <children>
+                                    <TabPane prefHeight="173.0" prefWidth="294.0" side="LEFT"
+                                             AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <tabs>
+                                            <Tab text="Lorem">
+                                                <content>
+                                                    <AnchorPane/>
+                                                </content>
+                                            </Tab>
+                                            <Tab text="Ipsum">
+                                                <content>
+                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                                                prefWidth="200.0"/>
+                                                </content>
+                                            </Tab>
+                                            <Tab text="Dolor">
+                                                <content>
+                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                                                prefWidth="200.0"/>
+                                                </content>
+                                            </Tab>
+                                        </tabs>
+                                    </TabPane>
+                                </children>
+                            </AnchorPane>
+                        </items>
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        </padding>
+                    </SplitPane>
+                </children>
+            </VBox>
+        </Tab>
+    </TabPane>
+</AnchorPane>

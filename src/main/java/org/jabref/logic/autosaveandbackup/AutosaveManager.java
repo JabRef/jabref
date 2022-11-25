@@ -2,59 +2,68 @@ package org.jabref.logic.autosaveandbackup;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Saves the given {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent} by posting a new {@link AutosaveEvent}.
- * An intelligent {@link ExecutorService} with a {@link BlockingQueue} prevents a high load while saving and rejects all redundant save tasks.
+ * An intelligent {@link ScheduledThreadPoolExecutor} prevents a high load while saving and rejects all redundant save tasks.
+ * The scheduled action is stored and canceled if a newer save action is proposed.
  */
 public class AutosaveManager {
 
-    private static final Log LOGGER = LogFactory.getLog(AutosaveManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveManager.class);
+
+    private static final int DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS = 31;
 
     private static Set<AutosaveManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final BlockingQueue<Runnable> workerQueue;
-    private final ExecutorService executor;
-    private final EventBus eventBus;
 
+    private final EventBus eventBus;
+    private final CoarseChangeFilter changeFilter;
+    private final ScheduledThreadPoolExecutor executor;
+    private boolean needsSave = false;
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
-        this.workerQueue = new ArrayBlockingQueue<>(1);
-        this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
         this.eventBus = new EventBus();
+        this.changeFilter = new CoarseChangeFilter(bibDatabaseContext);
+        changeFilter.registerListener(this);
+
+        this.executor = new ScheduledThreadPoolExecutor(2);
+        this.executor.scheduleAtFixedRate(
+                () -> {
+                    if (needsSave) {
+                       eventBus.post(new AutosaveEvent());
+                       needsSave = false;
+                    }
+                },
+                DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
+                DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
+                TimeUnit.SECONDS);
     }
 
     @Subscribe
-    public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        try {
-            executor.submit(() -> {
-                eventBus.post(new AutosaveEvent());
-            });
-        } catch (RejectedExecutionException e) {
-            LOGGER.debug("Rejecting autosave while another save process is already running.");
+    public void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
+        if (!event.isFilteredOut()) {
+            this.needsSave = true;
         }
     }
 
     private void shutdown() {
-        bibDatabaseContext.getDatabase().unregisterListener(this);
-        bibDatabaseContext.getMetaData().unregisterListener(this);
+        changeFilter.unregisterListener(this);
+        changeFilter.shutdown();
         executor.shutdown();
     }
 
@@ -64,11 +73,9 @@ public class AutosaveManager {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static AutosaveManager start(BibDatabaseContext bibDatabaseContext) {
-        AutosaveManager autosaver = new AutosaveManager(bibDatabaseContext);
-        bibDatabaseContext.getDatabase().registerListener(autosaver);
-        bibDatabaseContext.getMetaData().registerListener(autosaver);
-        runningInstances.add(autosaver);
-        return autosaver;
+        AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext);
+        runningInstances.add(autosaveManager);
+        return autosaveManager;
     }
 
     /**
@@ -78,10 +85,10 @@ public class AutosaveManager {
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
         runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()
-                .ifPresent(instance -> {
-                    instance.shutdown();
-                    runningInstances.remove(instance);
-                });
+                        .ifPresent(instance -> {
+                            instance.shutdown();
+                            runningInstances.remove(instance);
+                        });
     }
 
     public void registerListener(Object listener) {
@@ -93,7 +100,7 @@ public class AutosaveManager {
             eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
+            LOGGER.debug("Problem unregistering", e);
         }
     }
 }

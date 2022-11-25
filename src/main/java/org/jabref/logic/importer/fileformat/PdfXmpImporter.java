@@ -2,26 +2,25 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Objects;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileExtensions;
-import org.jabref.logic.xmp.XMPPreferences;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.xmp.XmpUtilReader;
+import org.jabref.logic.xmp.XmpUtilShared;
 
 /**
  * Wraps the XMPUtility function to be used as an Importer.
  */
 public class PdfXmpImporter extends Importer {
 
-    private final XMPPreferences xmpPreferences;
+    private final XmpPreferences xmpPreferences;
 
-
-    public PdfXmpImporter(XMPPreferences xmpPreferences) {
+    public PdfXmpImporter(XmpPreferences xmpPreferences) {
         this.xmpPreferences = xmpPreferences;
     }
 
@@ -31,8 +30,8 @@ public class PdfXmpImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return FileExtensions.XMP;
+    public StandardFileType getFileType() {
+        return StandardFileType.PDF;
     }
 
     @Override
@@ -44,10 +43,18 @@ public class PdfXmpImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
+    public ParserResult importDatabase(String data) throws IOException {
+        Objects.requireNonNull(data);
+        throw new UnsupportedOperationException(
+                "PdfXmpImporter does not support importDatabase(String data)."
+                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+    }
+
+    @Override
+    public ParserResult importDatabase(Path filePath) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(XMPUtil.readXMP(filePath, xmpPreferences));
+            return new ParserResult(new XmpUtilReader().readXmp(filePath, xmpPreferences));
         } catch (IOException exception) {
             return ParserResult.fromError(exception);
         }
@@ -56,9 +63,7 @@ public class PdfXmpImporter extends Importer {
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException(
-                "PdfXmpImporter does not support isRecognizedFormat(BufferedReader reader)."
-                        + "Instead use isRecognizedFormat(Path filePath, Charset defaultEncoding).");
+        return false;
     }
 
     /**
@@ -66,9 +71,9 @@ public class PdfXmpImporter extends Importer {
      * contains at least one BibEntry.
      */
     @Override
-    public boolean isRecognizedFormat(Path filePath, Charset defaultEncoding) throws IOException {
+    public boolean isRecognizedFormat(Path filePath) throws IOException {
         Objects.requireNonNull(filePath);
-        return XMPUtil.hasMetadata(filePath, xmpPreferences);
+        return XmpUtilShared.hasMetadata(filePath, xmpPreferences);
     }
 
     @Override
@@ -80,5 +85,4 @@ public class PdfXmpImporter extends Importer {
     public String getDescription() {
         return "Wraps the XMPUtility function to be used as an Importer.";
     }
-
 }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<fx:root spacing="10.0" type="VBox"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="org.jabref.gui.preferences.entryeditor.EntryEditorTab">
+    <Label styleClass="titleHeader" text="%Entry editor"/>
+    <fx:define>
+        <ToggleGroup fx:id="nameFormat"/>
+        <ToggleGroup fx:id="firstNames"/>
+    </fx:define>
+
+    <CheckBox fx:id="openOnNewEntry" text="%Open editor when a new entry is created"/>
+    <CheckBox fx:id="defaultSource" text="%Show BibTeX source by default"/>
+    <CheckBox fx:id="enableRelatedArticlesTab" text="%Show 'Related Articles' tab"/>
+    <CheckBox fx:id="acceptRecommendations" text="%Accept recommendations from Mr. DLib"
+              disable="${!enableRelatedArticlesTab.selected}">
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </CheckBox>
+    <CheckBox fx:id="enableLatexCitationsTab" text="%Show 'LaTeX Citations' tab"/>
+    <CheckBox fx:id="enableValidation" text="%Show validation messages"/>
+    <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
+
+    <Label styleClass="sectionHeader" text="%Autocompletion"/>
+    <CheckBox fx:id="enableAutoComplete" text="%Use autocompletion"/>
+    <VBox spacing="10.0">
+        <HBox spacing="4.0">
+            <Label text="%Affected fields:" disable="${!enableAutoComplete.selected}"/>
+            <TextField fx:id="autoCompleteFields" HBox.hgrow="ALWAYS" disable="${!enableAutoComplete.selected}">
+                <HBox.margin>
+                    <Insets top="-4.0"/>
+                </HBox.margin>
+            </TextField>
+        </HBox>
+        <Label text="%Name format" disable="${!enableAutoComplete.selected}"/>
+        <RadioButton fx:id="autoCompleteFirstLast" text="%Autocomplete names in 'Firstname Lastname' format only"
+                     toggleGroup="$nameFormat" disable="${!enableAutoComplete.selected}"/>
+        <RadioButton fx:id="autoCompleteLastFirst" text="%Autocomplete names in 'Lastname, Firstname' format only"
+                     toggleGroup="$nameFormat" disable="${!enableAutoComplete.selected}"/>
+        <RadioButton fx:id="autoCompleteBoth" text="%Autocomplete names in both formats"
+                     toggleGroup="$nameFormat" disable="${!enableAutoComplete.selected}"/>
+        <Label text="%First names" disable="${!enableAutoComplete.selected}"/>
+        <RadioButton fx:id="firstNameModeAbbreviated" text="%Use abbreviated firstname whenever possible"
+                     toggleGroup="$firstNames" disable="${!enableAutoComplete.selected}"/>
+        <RadioButton fx:id="firstNameModeFull" text="%Use full firstname whenever possible"
+                     toggleGroup="$firstNames" disable="${!enableAutoComplete.selected}"/>
+        <RadioButton fx:id="firstNameModeBoth" text="%Use abbreviated and full firstname"
+                     toggleGroup="$firstNames" disable="${!enableAutoComplete.selected}"/>
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </VBox>
+</fx:root>

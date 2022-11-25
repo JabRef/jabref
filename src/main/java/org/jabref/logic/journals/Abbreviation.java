@@ -2,54 +2,40 @@ package org.jabref.logic.journals;
 
 import java.util.Objects;
 
-import javafx.beans.property.SimpleStringProperty;
-
 public class Abbreviation implements Comparable<Abbreviation> {
 
-    private static final String SPLITTER = ";"; // elements after SPLITTER are not used at the moment
-
-    private final SimpleStringProperty name = new SimpleStringProperty("");
-    private final SimpleStringProperty abbreviation = new SimpleStringProperty("");
+    private final String name;
+    private final String abbreviation;
+    private final String shortestUniqueAbbreviation;
 
     public Abbreviation(String name, String abbreviation) {
-        this.name.set(Objects.requireNonNull(name).trim());
-        this.abbreviation.set(Objects.requireNonNull(abbreviation).trim());
+        this(name, abbreviation, "");
+    }
+
+    public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
+        this.name = name;
+        this.abbreviation = abbreviation;
+        this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim();
     }
 
     public String getName() {
-        return name.get();
-    }
-
-    public void setName(String name) {
-        this.name.set(name);
-    }
-
-    public SimpleStringProperty nameProperty() {
         return name;
     }
 
     public String getAbbreviation() {
-        return this.abbreviation.get();
-    }
-
-    public void setAbbreviation(String abbreviation) {
-        this.abbreviation.set(abbreviation);
-    }
-
-    public SimpleStringProperty abbreviationProperty() {
         return abbreviation;
     }
 
-    public String getIsoAbbreviation() {
-        if (getAbbreviation().contains(SPLITTER)) {
-            String[] restParts = getAbbreviation().split(SPLITTER);
-            return restParts[0].trim();
+    public String getShortestUniqueAbbreviation() {
+        String result = shortestUniqueAbbreviation;
+        if (result.isEmpty()) {
+            return getAbbreviation();
         }
-        return getAbbreviation();
+        return result;
     }
 
     public String getMedlineAbbreviation() {
-        return getIsoAbbreviation().replace(".", " ").replace("  ", " ").trim();
+        return getAbbreviation().replace(".", " ").replace("  ", " ").trim();
     }
 
     @Override
@@ -61,9 +47,11 @@ public class Abbreviation implements Comparable<Abbreviation> {
         String currentTrimmed = current.trim();
 
         if (getMedlineAbbreviation().equals(currentTrimmed)) {
+            return getShortestUniqueAbbreviation().equals(getAbbreviation()) ? getName() : getShortestUniqueAbbreviation();
+        } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) && !getShortestUniqueAbbreviation().equals(getAbbreviation())) {
             return getName();
         } else if (getName().equals(currentTrimmed)) {
-            return getIsoAbbreviation();
+            return getAbbreviation();
         } else {
             return getMedlineAbbreviation();
         }
@@ -71,23 +59,30 @@ public class Abbreviation implements Comparable<Abbreviation> {
 
     @Override
     public String toString() {
-        return String.format("Abbreviation{name=%s, iso=%s, medline=%s}", getName(), getIsoAbbreviation(), getMedlineAbbreviation());
+        return String.format("Abbreviation{name=%s, abbreviation=%s, medlineAbbreviation=%s, shortestUniqueAbbreviation=%s}",
+                this.name,
+                this.abbreviation,
+                this.getMedlineAbbreviation(),
+                this.shortestUniqueAbbreviation);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o instanceof Abbreviation) {
-            Abbreviation that = (Abbreviation) o;
-            return Objects.equals(getName(), that.getName());
+
+        if ((obj == null) || (getClass() != obj.getClass())) {
+            return false;
         }
-        return false;
+
+        Abbreviation that = (Abbreviation) obj;
+
+        return Objects.equals(getName(), that.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getName());
+        return Objects.hash(getName());
     }
 }

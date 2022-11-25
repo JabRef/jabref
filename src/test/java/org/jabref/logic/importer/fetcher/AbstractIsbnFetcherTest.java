@@ -4,19 +4,20 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@FetcherTest
 public abstract class AbstractIsbnFetcherTest {
 
     protected AbstractIsbnFetcher fetcher;
-    protected BibEntry bibEntry;
+    protected BibEntry bibEntryEffectiveJava;
 
     public abstract void testName();
-
-    public abstract void testHelpPage();
 
     public abstract void authorsAreCorrectlyFormatted() throws Exception;
 
@@ -25,7 +26,7 @@ public abstract class AbstractIsbnFetcherTest {
     @Test
     public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-0321356680");
-        assertEquals(Optional.of(bibEntry), fetchedEntry);
+        assertEquals(Optional.of(bibEntryEffectiveJava), fetchedEntry);
     }
 
     @Test
@@ -34,20 +35,18 @@ public abstract class AbstractIsbnFetcherTest {
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
-    @Test(expected = FetcherException.class)
-    public void searchByIdThrowsExceptionForShortInvalidISBN() throws FetcherException {
-        fetcher.performSearchById("123456789");
+    @Test
+    public void searchByIdThrowsExceptionForShortInvalidISBN() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123456789"));
     }
 
-    @Test(expected = FetcherException.class)
-    public void searchByIdThrowsExceptionForLongInvalidISB() throws FetcherException {
-        fetcher.performSearchById("012345678910");
+    @Test
+    public void searchByIdThrowsExceptionForLongInvalidISB() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("012345678910"));
     }
 
-    @Test(expected = FetcherException.class)
-    public void searchByIdThrowsExceptionForInvalidISBN() throws FetcherException {
-        fetcher.performSearchById("jabref-4-ever");
+    @Test
+    public void searchByIdThrowsExceptionForInvalidISBN() {
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("jabref-4-ever"));
     }
-
-
 }

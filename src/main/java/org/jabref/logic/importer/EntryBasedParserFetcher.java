@@ -6,10 +6,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.model.cleanup.Formatter;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -22,6 +23,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
 
     /**
      * Constructs a URL based on the {@link BibEntry}.
+     *
      * @param entry the entry to look information for
      */
     URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
@@ -39,9 +41,10 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
      * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
      *
      * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
+     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
+     *
      * @param entry the entry to be cleaned-up
      */
     default void doPostCleanup(BibEntry entry) {
@@ -52,18 +55,25 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
     default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
-        try (InputStream stream = new BufferedInputStream(getURLForEntry(entry).openStream())) {
+        URL UrlForEntry;
+        try {
+            if ((UrlForEntry = getURLForEntry(entry)) == null) {
+                return Collections.emptyList();
+            }
+        } catch (MalformedURLException | URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        }
+
+        try (InputStream stream = new BufferedInputStream(UrlForEntry.openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
             fetchedEntries.forEach(this::doPostCleanup);
 
             return fetchedEntries;
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
-            throw new FetcherException("An I/O exception occurred", e);
+            throw new FetcherException("A network error occurred", e);
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }

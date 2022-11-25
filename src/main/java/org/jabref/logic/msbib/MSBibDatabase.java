@@ -15,8 +15,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -34,10 +34,9 @@ public class MSBibDatabase {
     public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
     public static final String PREFIX = "b:";
 
-    private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MSBibDatabase.class);
 
     private Set<MSBibEntry> entries;
-
 
     /**
      * Creates a {@link MSBibDatabase} for <b>import</b>
@@ -47,10 +46,12 @@ public class MSBibDatabase {
     }
 
     // TODO: why an additonal entry list? entries are included inside database!
+
     /**
      * Creates a new {@link MSBibDatabase} for <b>export</b>
+     *
      * @param database The bib database
-     * @param entries List of {@link BibEntry}
+     * @param entries  List of {@link BibEntry}
      */
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         if (entries == null) {
@@ -62,6 +63,7 @@ public class MSBibDatabase {
 
     /**
      * Imports entries from an office xml file
+     *
      * @param reader
      * @return List of {@link BibEntry}
      */
@@ -106,6 +108,7 @@ public class MSBibDatabase {
 
     /**
      * Gets the assembled dom for export
+     *
      * @return XML Document
      */
     public Document getDomForExport() {

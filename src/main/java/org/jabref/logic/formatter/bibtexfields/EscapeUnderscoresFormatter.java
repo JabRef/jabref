@@ -3,10 +3,10 @@ package org.jabref.logic.formatter.bibtexfields;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
-public class EscapeUnderscoresFormatter implements Formatter {
+public class EscapeUnderscoresFormatter extends Formatter {
 
     private static final Pattern UNDERSCORES = Pattern.compile("_");
 

@@ -1,4 +1,4 @@
-{[\Bibtexkey]:}	
+{[\Bibtexkey]:}
 {\\scaps \format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}}
 : \format[RTFChars]{\title}}
 . In: {\\i \format[RTFChars,RemoveLatexCommands]{\journal}}

@@ -5,14 +5,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileType;
 
 /**
  * Object with data for a custom importer.
@@ -24,10 +23,10 @@ public class CustomImporter extends Importer {
     private final String className;
     private final Path basePath;
 
-    private Importer importer;
+    private final Importer importer;
 
     public CustomImporter(String basePath, String className) throws ClassNotFoundException {
-        this.basePath = Paths.get(basePath);
+        this.basePath = Path.of(basePath);
         this.className = className;
         try {
             importer = load(this.basePath.toUri().toURL(), this.className);
@@ -58,7 +57,6 @@ public class CustomImporter extends Importer {
 
     @Override
     public boolean equals(Object other) {
-
         if (this == other) {
             return true;
         }
@@ -87,8 +85,8 @@ public class CustomImporter extends Importer {
     }
 
     @Override
-    public FileExtensions getExtensions() {
-        return importer.getExtensions();
+    public FileType getFileType() {
+        return importer.getFileType();
     }
 
     @Override

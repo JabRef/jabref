@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" page-range-format="minimal-two" demote-non-dropping-particle="never" default-locale="de-DE">
+  <info>
+    <title>Zeitschrift für Fantastikforschung (Deutsch)</title>
+    <title-short>ZFF</title-short>
+    <id>http://www.zotero.org/styles/zeitschrift-fur-fantastikforschung</id>
+    <link href="http://www.zotero.org/styles/zeitschrift-fur-fantastikforschung" rel="self"/>
+    <link href="http://www.zotero.org/styles/modern-language-association" rel="template"/>
+    <link href="https://zff.openlibhums.org/site/stylesheet/" rel="documentation"/>
+    <author>
+      <name>Simon Spiegel</name>
+      <email>simon@simifilm.ch</email>
+    </author>
+    <category citation-format="author"/>
+    <category field="generic-base"/>
+    <issn>2192-0885</issn>
+    <summary>Stil für die Zeitschrift für Fantastikforschung</summary>
+    <updated>2021-06-06T10:42:10+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="en">
+    <date form="text">
+      <date-part name="day" suffix=" "/>
+      <date-part name="month" suffix=" " form="short"/>
+      <date-part name="year"/>
+    </date>
+    <terms>
+      <term name="month-01" form="short">Jan.</term>
+      <term name="month-02" form="short">Feb.</term>
+      <term name="month-03" form="short">Mar.</term>
+      <term name="month-04" form="short">Apr.</term>
+      <term name="month-05" form="short">May</term>
+      <term name="month-06" form="short">June</term>
+      <term name="month-07" form="short">July</term>
+      <term name="month-08" form="short">Aug.</term>
+      <term name="month-09" form="short">Sept.</term>
+      <term name="month-10" form="short">Oct.</term>
+      <term name="month-11" form="short">Nov.</term>
+      <term name="month-12" form="short">Dec.</term>
+      <term name="translator" form="short">trans.</term>
+    </terms>
+  </locale>
+  <locale xml:lang="de">
+    <date form="text">
+      <date-part name="day" suffix=" "/>
+      <date-part name="month" suffix=" " form="short"/>
+      <date-part name="year"/>
+    </date>
+    <terms>
+      <term name="month-01" form="short">Jan.</term>
+      <term name="month-02" form="short">Feb.</term>
+      <term name="month-03" form="short">Mär.</term>
+      <term name="month-04" form="short">Apr.</term>
+      <term name="month-05" form="short">Mai</term>
+      <term name="month-06" form="short">Jun.</term>
+      <term name="month-07" form="short">Jul.</term>
+      <term name="month-08" form="short">Aug.</term>
+      <term name="month-09" form="short">Sept.</term>
+      <term name="month-10" form="short">Okt.</term>
+      <term name="month-11" form="short">Nov.</term>
+      <term name="month-12" form="short">Dez.</term>
+      <term name="translator" form="short">Übers. von</term>
+      <term name="et-al">et al.</term>
+      <term name="editor" form="short">
+        <single>Hg.</single>
+        <multiple>Hg.</multiple>
+      </term>
+      <term name="open-inner-quote">›</term>
+      <term name="close-inner-quote">‹</term>
+      <term name="open-quote">»</term>
+      <term name="close-quote">«</term>
+      <term name="accessed"/>
+    </terms>
+  </locale>
+  <macro name="author">
+    <choose>
+      <if type="motion_picture" match="any">
+        <text variable="title" font-variant="small-caps" suffix=". "/>
+        <names variable="author"/>
+      </if>
+      <else>
+        <names variable="author">
+          <name and="text" delimiter-precedes-et-al="never" delimiter-precedes-last="never" initialize="false" initialize-with=". " name-as-sort-order="first"/>
+          <label form="short" prefix=", "/>
+          <substitute>
+            <names variable="editor"/>
+            <names variable="translator"/>
+            <text macro="title"/>
+          </substitute>
+        </names>
+      </else>
+    </choose>
+  </macro>
+  <macro name="author-short">
+    <group delimiter=", ">
+      <names variable="author">
+        <name form="short" initialize-with=". " and="text"/>
+        <substitute>
+          <names variable="editor"/>
+          <names variable="translator"/>
+          <text macro="title-short"/>
+        </substitute>
+      </names>
+      <choose>
+        <if disambiguate="true">
+          <text macro="title-short"/>
+        </if>
+      </choose>
+    </group>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if variable="container-title" match="any">
+        <choose>
+          <if type="book" match="any">
+            <text variable="container-title" font-style="italic" text-case="title"/>
+            <label prefix=". " variable="volume" form="short"/>
+            <text variable="volume" prefix=" " suffix=": "/>
+            <text variable="title" strip-periods="false" font-style="italic" suffix=", "/>
+          </if>
+          <else>
+            <text variable="title" text-case="title" quotes="true" suffix="."/>
+          </else>
+        </choose>
+      </if>
+      <else-if type="motion_picture" match="any"/>
+      <else>
+        <choose>
+          <if variable="container-title" match="any">
+            <text variable="container-title" text-case="title" font-style="italic"/>
+            <label prefix=". " variable="volume" form="short"/>
+            <text variable="volume" prefix=" " suffix=": "/>
+          </if>
+        </choose>
+        <choose>
+          <if match="all" variable="author editor">
+            <text variable="title" font-style="italic" suffix=","/>
+          </if>
+          <else>
+            <text variable="title" text-case="title" font-style="italic" suffix="."/>
+          </else>
+        </choose>
+      </else>
+    </choose>
+  </macro>
+  <macro name="title-short">
+    <choose>
+      <if variable="container-title" match="any">
+        <text variable="title" form="short" text-case="title" quotes="false" prefix="»" suffix="«"/>
+      </if>
+      <else>
+        <text variable="title" form="short" font-style="italic" text-case="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="container-title">
+    <choose>
+      <if type="article article-journal" match="any">
+        <text variable="container-title" font-style="italic" suffix=" "/>
+      </if>
+      <else-if type="chapter" match="any">
+        <text variable="container-title" font-style="italic" suffix=", "/>
+        <choose>
+          <if match="any" variable="volume">
+            <label variable="volume" form="short"/>
+            <text variable="volume" prefix=" " suffix=". "/>
+          </if>
+        </choose>
+      </else-if>
+      <else-if type="book" match="any"/>
+      <else>
+        <text variable="container-title" text-case="title" font-style="italic" suffix=", "/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="other-contributors">
+    <group delimiter=" ">
+      <choose>
+        <if variable="container-title" match="any">
+          <names variable="container-author editor illustrator interviewer" delimiter=", " suffix=". ">
+            <label form="short" plural="never" suffix=" "/>
+            <name and="text"/>
+          </names>
+          <names variable="translator">
+            <label form="short" prefix=" " suffix=" "/>
+            <name suffix=". "/>
+          </names>
+        </if>
+        <else>
+          <choose>
+            <if match="all" variable="editor translator">
+              <names variable="editor">
+                <label form="short"/>
+                <name suffix="."/>
+              </names>
+              <names variable="translator" delimiter=", " suffix=". ">
+                <label form="short" text-case="capitalize-first" suffix=" "/>
+                <name and="text"/>
+              </names>
+            </if>
+            <else>
+              <names variable="container-author editor illustrator interviewer" delimiter=", " suffix=".">
+                <label form="short" text-case="capitalize-first" suffix=" "/>
+                <name and="text"/>
+              </names>
+            </else>
+          </choose>
+        </else>
+      </choose>
+      <names variable="director">
+        <label form="verb" suffix=" " text-case="capitalize-first"/>
+        <name and="text"/>
+      </names>
+    </group>
+  </macro>
+  <macro name="version">
+    <group delimiter=", ">
+      <choose>
+        <if is-numeric="edition">
+          <group delimiter=" ">
+            <number variable="edition" form="ordinal"/>
+            <text term="edition" form="short" suffix=", "/>
+          </group>
+        </if>
+        <else>
+          <text variable="edition" text-case="capitalize-first"/>
+        </else>
+      </choose>
+      <text variable="version"/>
+    </group>
+  </macro>
+  <macro name="volume-lowercase">
+    <group delimiter=" ">
+      <choose>
+        <if type="article article-journal" match="any">
+          <text variable="volume"/>
+        </if>
+      </choose>
+    </group>
+  </macro>
+  <macro name="number">
+    <group>
+      <group>
+        <choose>
+          <if variable="edition container-title" match="any">
+            <text macro="volume-lowercase"/>
+          </if>
+          <else-if variable="author" match="all">
+            <choose>
+              <if variable="editor translator container-author illustrator interviewer director" match="any">
+                <text macro="volume-lowercase"/>
+              </if>
+            </choose>
+          </else-if>
+          <else-if variable="editor" match="all">
+            <choose>
+              <if variable="translator container-author illustrator interviewer director" match="any">
+                <text macro="volume-lowercase"/>
+              </if>
+            </choose>
+          </else-if>
+          <else-if variable="container-author illustrator interviewer director" match="any">
+            <text macro="volume-lowercase"/>
+          </else-if>
+          <else>
+            <group delimiter=" ">
+              <text term="volume" form="short" text-case="capitalize-first"/>
+              <text variable="volume"/>
+            </group>
+          </else>
+        </choose>
+      </group>
+      <group delimiter=" ">
+        <choose>
+          <if match="any" variable="volume number">
+            <text variable="issue" prefix="."/>
+          </if>
+          <else>
+            <text variable="issue"/>
+          </else>
+        </choose>
+      </group>
+      <choose>
+        <if type="report">
+          <text variable="genre" suffix=". "/>
+        </if>
+      </choose>
+      <text variable="number" suffix=". "/>
+    </group>
+  </macro>
+  <macro name="publisher">
+    <text variable="publisher"/>
+    <choose>
+      <if type="motion_picture" match="any">
+        <text variable="publisher-place"/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="publication-date">
+    <choose>
+      <if type="book chapter paper-conference motion_picture" match="any">
+        <group>
+          <date date-parts="year" form="numeric" variable="issued" prefix=", "/>
+        </group>
+      </if>
+      <else-if type="article-journal" match="any">
+        <group prefix=" " suffix=": ">
+          <date date-parts="year-month" form="text" variable="issued" prefix="(" suffix=")"/>
+        </group>
+      </else-if>
+      <else-if type="article-magazine" match="any">
+        <group prefix=" " suffix="">
+          <date date-parts="year-month-day" form="text" variable="issued" prefix="" suffix=""/>
+        </group>
+      </else-if>
+      <else-if type="webpage post-weblog post" match="any">
+        <date form="text" variable="issued"/>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="location">
+    <group>
+      <group delimiter=" ">
+        <choose>
+          <if type="article article-journal" match="any">
+            <text variable="page" prefix=" "/>
+          </if>
+          <else>
+            <text variable="page" prefix=". "/>
+          </else>
+        </choose>
+      </group>
+      <choose>
+        <if variable="source" match="none">
+          <text macro="URI"/>
+        </if>
+      </choose>
+    </group>
+  </macro>
+  <macro name="container2-title">
+    <group delimiter=", ">
+      <choose>
+        <if type="speech">
+          <text variable="event"/>
+          <date variable="event-date" form="text"/>
+          <text variable="event-place"/>
+        </if>
+      </choose>
+      <text variable="archive"/>
+      <text variable="archive-place"/>
+      <text variable="archive_location"/>
+    </group>
+  </macro>
+  <macro name="container2-location">
+    <choose>
+      <if variable="source">
+        <choose>
+          <if variable="DOI URL" match="any">
+            <group delimiter=", " prefix=". ">
+              <text variable="source" font-style="normal"/>
+              <text macro="URI"/>
+            </group>
+          </if>
+        </choose>
+      </if>
+    </choose>
+  </macro>
+  <macro name="URI">
+    <choose>
+      <if variable="DOI">
+        <text variable="DOI" prefix=". DOI: https://doi.org/"/>
+      </if>
+      <else>
+        <choose>
+          <if type="book chapter" match="any">
+            <text value=", "/>
+          </if>
+        </choose>
+        <group delimiter=",a " prefix=", ">
+          <text variable="URL"/>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <macro name="accessed">
+    <choose>
+      <if variable="issued" match="none">
+        <group delimiter=" ">
+          <text term="accessed" text-case="capitalize-first"/>
+          <date form="text" variable="accessed" prefix=", "/>
+        </group>
+      </if>
+      <else>
+        <choose>
+          <if match="any" variable="DOI"/>
+          <else>
+            <date variable="accessed" form="text" date-parts="year-month-day" prefix=", "/>
+          </else>
+        </choose>
+      </else>
+    </choose>
+  </macro>
+  <macro name="cite-film">
+    <choose>
+      <if type="motion_picture broadcast" match="any">
+        <choose>
+          <if match="any" position="first">
+            <text variable="container-title" font-variant="small-caps" suffix=". "/>
+            <text variable="number" suffix=": "/>
+            <text variable="title" font-variant="small-caps"/>
+            <choose>
+              <if match="any" variable="original-title">
+                <text variable="original-title" font-variant="small-caps" prefix=" ("/>
+                <text variable="publisher-place" prefix=", " suffix=" "/>
+              </if>
+              <else>
+                <text variable="publisher-place" prefix=" (" suffix=" "/>
+              </else>
+            </choose>
+            <date date-parts="year" form="text" variable="issued"/>
+            <choose>
+              <if type="broadcast" match="all" variable="container-title">
+                <text value="Regie: " prefix=", "/>
+              </if>
+              <else-if type="broadcast" match="any">
+                <text value="Idee: " prefix=", "/>
+              </else-if>
+              <else-if type="motion_picture" match="any">
+                <text value="Regie: " prefix=", "/>
+              </else-if>
+            </choose>
+            <names variable="author">
+              <name and="text"/>
+            </names>
+            <text variable="locator" prefix="; "/>
+            <text value=")"/>
+          </if>
+          <else>
+            <choose>
+              <if match="any" variable="title-short">
+                <text variable="title-short" font-variant="small-caps"/>
+                <text variable="locator" prefix=" (" suffix=")"/>
+              </if>
+              <else>
+                <text variable="title" font-variant="small-caps"/>
+                <text variable="locator" prefix=" (" suffix=")"/>
+              </else>
+            </choose>
+          </else>
+        </choose>
+      </if>
+    </choose>
+  </macro>
+  <macro name="bib-film">
+    <choose>
+      <if match="any" variable="original-title">
+        <text variable="title" font-variant="small-caps"/>
+        <text variable="original-title" font-variant="small-caps" prefix=" (" suffix="). "/>
+      </if>
+      <else>
+        <text variable="container-title" font-variant="small-caps" suffix=". "/>
+        <text variable="number" suffix=": "/>
+        <text variable="title" font-variant="small-caps" suffix=". "/>
+      </else>
+    </choose>
+    <choose>
+      <if type="broadcast" match="all" variable="container-title">
+        <text value="Regie" prefix=" " suffix=": "/>
+      </if>
+      <else-if type="broadcast" match="any">
+        <text value="Idee" prefix=" " suffix=": "/>
+      </else-if>
+      <else>
+        <text value="Regie" prefix=" " suffix=": "/>
+      </else>
+    </choose>
+    <names variable="author" suffix=". ">
+      <label/>
+      <name and="text"/>
+    </names>
+    <text variable="publisher-place" suffix=" "/>
+    <date date-parts="year" form="text" variable="issued"/>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true">
+    <layout delimiter="; ">
+      <choose>
+        <if type="motion_picture broadcast" match="any">
+          <text macro="cite-film"/>
+        </if>
+        <else>
+          <choose>
+            <if locator="page line" match="any">
+              <group delimiter=" ">
+                <text macro="author-short"/>
+                <text variable="locator"/>
+              </group>
+            </if>
+            <else>
+              <group delimiter=", ">
+                <text macro="author-short"/>
+                <group>
+                  <label variable="locator" form="short"/>
+                  <text variable="locator"/>
+                </group>
+              </group>
+            </else>
+          </choose>
+        </else>
+      </choose>
+    </layout>
+  </citation>
+  <bibliography et-al-min="3" et-al-use-first="1" entry-spacing="0" line-spacing="2" hanging-indent="true">
+    <sort>
+      <key macro="author"/>
+      <key variable="title"/>
+    </sort>
+    <layout suffix=".">
+      <choose>
+        <if type="motion_picture broadcast" match="any">
+          <text macro="bib-film"/>
+        </if>
+        <else>
+          <group>
+            <text macro="author" suffix=". "/>
+            <text macro="title" font-variant="normal" suffix=" "/>
+            <date date-parts="year" form="numeric" variable="original-date" suffix=". "/>
+            <group>
+              <text macro="container-title"/>
+              <text macro="other-contributors"/>
+              <text macro="version"/>
+              <text macro="number"/>
+              <text macro="publisher"/>
+              <text macro="publication-date"/>
+              <text macro="location"/>
+            </group>
+            <group delimiter=", ">
+              <text macro="container2-title"/>
+              <text macro="container2-location"/>
+            </group>
+            <text macro="accessed"/>
+          </group>
+        </else>
+      </choose>
+    </layout>
+  </bibliography>
+</style>

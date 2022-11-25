@@ -11,9 +11,7 @@ public class NotFoundFormatter implements LayoutFormatter {
 
     private final String notFound;
 
-
     public NotFoundFormatter(String notFound) {
-
         this.notFound = notFound;
     }
 

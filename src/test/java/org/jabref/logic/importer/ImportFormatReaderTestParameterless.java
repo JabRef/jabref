@@ -1,47 +1,53 @@
 package org.jabref.logic.importer;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import org.jabref.logic.xmp.XMPPreferences;
+import javafx.collections.FXCollections;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ImportFormatReaderTestParameterless {
+class ImportFormatReaderTestParameterless {
 
     private ImportFormatReader reader;
+    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         reader = new ImportFormatReader();
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
+
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
-        reader.resetImportFormats(importFormatPreferences, mock(XMPPreferences.class));
+        reader.resetImportFormats(importerPreferences, importFormatPreferences, fileMonitor);
     }
 
-    @Test(expected = ImportException.class)
-    public void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound() throws Exception {
-        Path file = Paths.get(ImportFormatReaderTestParameterless.class.getResource("fileformat/emptyFile.xml").toURI());
-        reader.importUnknownFormat(file);
-        fail();
+    @Test
+    void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound() throws Exception {
+        Path file = Path.of(ImportFormatReaderTestParameterless.class.getResource("fileformat/emptyFile.xml").toURI());
+        assertThrows(ImportException.class, () -> reader.importUnknownFormat(file, fileMonitor));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testNullImportUnknownFormat() throws Exception {
-        reader.importUnknownFormat(null);
-        fail();
+    @Test
+    void importUnknownFormatThrowsExceptionIfPathIsNull() {
+        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null, fileMonitor));
     }
 
-    @Test(expected = ImportException.class)
-    public void importFromFileWithUnknownFormatThrowsException() throws Exception {
-        reader.importFromFile("someunknownformat", Paths.get("somepath"));
-        fail();
+    @Test
+    void importUnknownFormatThrowsExceptionIfDataIsNull() {
+        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null));
+    }
+
+    @Test
+    void importFromFileWithUnknownFormatThrowsException() {
+        assertThrows(ImportException.class, () -> reader.importFromFile("someunknownformat", Path.of("somepath")));
     }
 }

@@ -1,4 +1,4 @@
-\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer,RTFChars]{\author} (\year), 
+\format[Authors(LastFirst,Initials,FullPunc,Comma,And,inf),RTFChars]{\author} (\year), 
 '\format[RTFChars]{\title}'
 \begin{journal}
 , }{\\i \format[RTFChars]{\journal}} {\\b \volume}{
@@ -7,7 +7,7 @@
 (\number)
 \end{number}
 \begin{editor}
-, }{\\i in }{\format[AuthorFirstFirst,AuthorAndsReplacer,RTFChars]{\editor}, ed., \end{editor}
+, }{\\i in }{\format[Authors(FirstFirst,FullName,NoPunc,And),RTFChars]{\editor}, ed., \end{editor}
 \begin{booktitle}
 '\format[RTFChars]{\booktitle}'
 \end{booktitle}

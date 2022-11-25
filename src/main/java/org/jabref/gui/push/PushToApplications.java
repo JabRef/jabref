@@ -2,29 +2,44 @@ package org.jabref.gui.push;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import org.jabref.gui.DialogService;
+import org.jabref.preferences.PreferencesService;
 
 public class PushToApplications {
 
-    private final List<PushToApplication> applications;
+    public static final String EMACS = "Emacs";
+    public static final String LYX = "LyX/Kile";
+    public static final String TEXMAKER = "Texmaker";
+    public static final String TEXSTUDIO = "TeXstudio";
+    public static final String VIM = "Vim";
+    public static final String WIN_EDT = "WinEdt";
 
+    private static final List<PushToApplication> APPLICATIONS = new ArrayList<>();
 
-    public PushToApplications() {
-    /**
-     * Set up the current available choices:
-     */
-
-        applications = new ArrayList<>();
-
-        applications.add(new PushToEmacs());
-        applications.add(new PushToLatexEditor());
-        applications.add(new PushToLyx());
-        applications.add(new PushToTexmaker());
-        applications.add(new PushToTeXstudio());
-        applications.add(new PushToVim());
-        applications.add(new PushToWinEdt());
+    private PushToApplications() {
     }
 
-    public List<PushToApplication> getApplications() {
-        return applications;
+    public static List<PushToApplication> getAllApplications(DialogService dialogService, PreferencesService preferencesService) {
+        if (!APPLICATIONS.isEmpty()) {
+            return APPLICATIONS;
+        }
+
+        APPLICATIONS.addAll(List.of(
+                new PushToEmacs(dialogService, preferencesService),
+                new PushToLyx(dialogService, preferencesService),
+                new PushToTexmaker(dialogService, preferencesService),
+                new PushToTeXstudio(dialogService, preferencesService),
+                new PushToVim(dialogService, preferencesService),
+                new PushToWinEdt(dialogService, preferencesService)));
+
+        return APPLICATIONS;
+    }
+
+    public static Optional<PushToApplication> getApplicationByName(String applicationName, DialogService dialogService, PreferencesService preferencesService) {
+        return getAllApplications(dialogService, preferencesService).stream()
+                                                                    .filter(application -> application.getDisplayName().equals(applicationName))
+                                                                    .findAny();
     }
 }

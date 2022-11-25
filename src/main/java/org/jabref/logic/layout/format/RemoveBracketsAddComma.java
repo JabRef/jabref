@@ -10,7 +10,7 @@ public class RemoveBracketsAddComma implements LayoutFormatter {
     public String format(String fieldText) {
         StringBuilder builder = new StringBuilder(fieldText.length());
 
-        for (char c: fieldText.toCharArray()) {
+        for (char c : fieldText.toCharArray()) {
             if (c == '}') {
                 builder.append(',');
             } else if (c != '{') {

@@ -15,7 +15,6 @@ public class HTMLParagraphs implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-
         if (fieldText == null) {
             return fieldText;
         }
@@ -27,7 +26,7 @@ public class HTMLParagraphs implements LayoutFormatter {
         }
 
         Matcher m = HTMLParagraphs.BEFORE_NEW_LINES_PATTERN.matcher(trimmedFieldText);
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         while (m.find()) {
             String middle = m.group(1).trim();
             if (!middle.isEmpty()) {

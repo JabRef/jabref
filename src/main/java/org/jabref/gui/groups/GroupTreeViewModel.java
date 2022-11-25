@@ -1,5 +1,7 @@
 package org.jabref.gui.groups;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -7,10 +9,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.swing.SwingUtilities;
-
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -19,18 +17,34 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
+import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.KeywordGroup;
+import org.jabref.model.groups.LastNameGroup;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.PreferencesService;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -38,7 +52,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final PreferencesService preferences;
     private final TaskExecutor taskExecutor;
+    private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
@@ -46,21 +62,25 @@ public class GroupTreeViewModel extends AbstractViewModel {
             .compareToIgnoreCase(v2.getName());
     private Optional<BibDatabaseContext> currentDatabase;
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
+        this.preferences = Objects.requireNonNull(preferencesService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
+        this.localDragboard = Objects.requireNonNull(localDragboard);
 
         // Register listener
-        stateManager.activeDatabaseProperty()
-                .addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
-        selectedGroups.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
+        EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
+        EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
-        filterPredicate
-                .bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+        filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
 
         // Init
+        refresh();
+    }
+
+    private void refresh() {
         onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
     }
 
@@ -91,7 +111,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
 
         currentDatabase.ifPresent(database -> {
-            if (newValue == null) {
+            if ((newValue == null) || newValue.isEmpty()) {
                 stateManager.clearSelectedGroups(database);
             } else {
                 stateManager.setSelectedGroups(database, newValue.stream().map(GroupNodeViewModel::getGroupNode).collect(Collectors.toList()));
@@ -103,7 +123,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "New Group Dialog" and add the resulting group to the root
      */
     public void addNewGroupToRoot() {
-        addNewSubgroup(rootGroup.get());
+        if (currentDatabase.isPresent()) {
+            addNewSubgroup(rootGroup.get(), GroupDialogHeader.GROUP);
+        } else {
+            dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
+        }
     }
 
     /**
@@ -115,34 +139,47 @@ public class GroupTreeViewModel extends AbstractViewModel {
             GroupNodeViewModel newRoot = newDatabase
                     .map(BibDatabaseContext::getMetaData)
                     .flatMap(MetaData::getGroups)
-                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root))
-                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor));
+                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard, preferences))
+                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard, preferences));
 
             rootGroup.setValue(newRoot);
-            this.selectedGroups.setAll(
+            if (stateManager.getSelectedGroup(newDatabase.get()).isEmpty()) {
+                stateManager.setSelectedGroups(newDatabase.get(), Collections.singletonList(newRoot.getGroupNode()));
+            }
+            selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
-                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup))
-                            .collect(Collectors.toList()));
+                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
+                                .collect(Collectors.toList()));
+        } else {
+            rootGroup.setValue(null);
         }
-
         currentDatabase = newDatabase;
     }
 
     /**
-     * Opens "New Group Dialog" and add the resulting group to the specified group
+     * Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group while maintaining the
+     * alphabetical order
      */
-    public void addNewSubgroup(GroupNodeViewModel parent) {
-        SwingUtilities.invokeLater(() -> {
-            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
+    public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
+        currentDatabase.ifPresent(database -> {
+            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
+                    dialogService,
+                    database,
+                    preferences,
+                    null,
+                    groupDialogHeader));
+
             newGroup.ifPresent(group -> {
-                GroupTreeNode newGroupNode = parent.addSubgroup(group);
+                parent.addSubgroup(group);
 
                 // TODO: Add undo
-                //UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
-                //panel.getUndoManager().addEdit(undo);
+                // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
+                // panel.getUndoManager().addEdit(undo);
 
                 // TODO: Expand parent to make new group visible
-                //parent.expand();
+                // parent.expand();
+
+                sortAlphabeticallyRecursive(parent.getGroupNode());
 
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
@@ -150,54 +187,198 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-    private void writeGroupChangesToMetaData() {
-        currentDatabase.get().getMetaData().setGroups(rootGroup.get().getGroupNode());
+    public void writeGroupChangesToMetaData() {
+        currentDatabase.ifPresent(database -> database.getMetaData().setGroups(rootGroup.get().getGroupNode()));
+    }
+
+    private boolean isGroupTypeEqual(AbstractGroup oldGroup, AbstractGroup newGroup) {
+        return oldGroup.getClass().equals(newGroup.getClass());
+    }
+
+    /**
+     * Check if it is necessary to show a group modified, reassign entry dialog <br>
+     * Group name change is handled separately
+     *
+     * @param oldGroup Original Group
+     * @param newGroup Edited group
+     * @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
+     */
+    boolean onlyMinorChanges(AbstractGroup oldGroup, AbstractGroup newGroup) {
+        // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
+        if (oldGroup.getClass() == WordKeywordGroup.class) {
+            WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;
+            WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;
+
+            return Objects.equals(oldWordKeywordGroup.getSearchField().getName(), newWordKeywordGroup.getSearchField().getName())
+                   && Objects.equals(oldWordKeywordGroup.getSearchExpression(), newWordKeywordGroup.getSearchExpression())
+                   && Objects.equals(oldWordKeywordGroup.isCaseSensitive(), newWordKeywordGroup.isCaseSensitive());
+        } else if (oldGroup.getClass() == RegexKeywordGroup.class) {
+            RegexKeywordGroup oldRegexKeywordGroup = (RegexKeywordGroup) oldGroup;
+            RegexKeywordGroup newRegexKeywordGroup = (RegexKeywordGroup) newGroup;
+
+            return Objects.equals(oldRegexKeywordGroup.getSearchField().getName(), newRegexKeywordGroup.getSearchField().getName())
+                   && Objects.equals(oldRegexKeywordGroup.getSearchExpression(), newRegexKeywordGroup.getSearchExpression())
+                   && Objects.equals(oldRegexKeywordGroup.isCaseSensitive(), newRegexKeywordGroup.isCaseSensitive());
+        } else if ((oldGroup.getClass() == SearchGroup.class)) {
+            SearchGroup oldSearchGroup = (SearchGroup) oldGroup;
+            SearchGroup newSearchGroup = (SearchGroup) newGroup;
+
+            return Objects.equals(oldSearchGroup.getSearchExpression(), newSearchGroup.getSearchExpression())
+                   && Objects.equals(oldSearchGroup.getSearchFlags(), newSearchGroup.getSearchFlags());
+        } else if (oldGroup.getClass() == AutomaticKeywordGroup.class) {
+            AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
+            AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
+
+            return Objects.equals(oldAutomaticKeywordGroup.getKeywordDelimiter(), newAutomaticKeywordGroup.getKeywordDelimiter())
+                   && Objects.equals(oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter(), newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter())
+                   && Objects.equals(oldAutomaticKeywordGroup.getField().getName(), newAutomaticKeywordGroup.getField().getName());
+        } else if (oldGroup.getClass() == AutomaticPersonsGroup.class) {
+            AutomaticPersonsGroup oldAutomaticPersonsGroup = (AutomaticPersonsGroup) oldGroup;
+            AutomaticPersonsGroup newAutomaticPersonsGroup = (AutomaticPersonsGroup) newGroup;
+
+            return Objects.equals(oldAutomaticPersonsGroup.getField().getName(), newAutomaticPersonsGroup.getField().getName());
+        } else if (oldGroup.getClass() == TexGroup.class) {
+            TexGroup oldTexGroup = (TexGroup) oldGroup;
+            TexGroup newTexGroup = (TexGroup) newGroup;
+            return Objects.equals(oldTexGroup.getFilePath().toString(), newTexGroup.getFilePath().toString());
+        }
+        return true;
     }
 
     /**
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
     public void editGroup(GroupNodeViewModel oldGroup) {
-        SwingUtilities.invokeLater(() -> {
-            Optional<AbstractGroup> newGroup = dialogService
-                    .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
+        currentDatabase.ifPresent(database -> {
+            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
+                     dialogService,
+                     database,
+                     preferences,
+                     oldGroup.getGroupNode().getGroup(),
+                     GroupDialogHeader.SUBGROUP));
             newGroup.ifPresent(group -> {
 
-                Platform.runLater(() -> {
-                    // TODO: Keep assignments
-                    boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
-                            Localization.lang("Change of Grouping Method"),
-                            Localization.lang("Assign the original group's entries to this group?"));
-                    //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
-                    boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
-                            && (group instanceof ExplicitGroup);
+                AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
+                String oldGroupName = oldGroupDef.getName();
 
-                    List<FieldChange> addChange = oldGroup.getGroupNode().setGroup(
-                            group,
-                            keepPreviousAssignments,
-                            removePreviousAssignents,
-                            stateManager.getEntriesInCurrentDatabase());
+                boolean groupTypeEqual = isGroupTypeEqual(oldGroupDef, group);
+                boolean onlyMinorModifications = groupTypeEqual && onlyMinorChanges(oldGroupDef, group);
 
-                    // TODO: Add undo
-                    // Store undo information.
-                    // AbstractUndoableEdit undoAddPreviousEntries = null;
-                    // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
-                    // if (undoAddPreviousEntries == null) {
-                    //    panel.getUndoManager().addEdit(undo);
-                    //} else {
-                    //    NamedCompound nc = new NamedCompound("Modify Group");
-                    //    nc.addEdit(undo);
-                    //    nc.addEdit(undoAddPreviousEntries);
-                    //    nc.end();/
-                    //      panel.getUndoManager().addEdit(nc);
-                    //}
-                    //if (!addChange.isEmpty()) {
-                    //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
-                    //}
+                // dialog already warns us about this if the new group is named like another existing group
+                // We need to check if only the name changed as this is relevant for the entry's group field
+                if (groupTypeEqual && !group.getName().equals(oldGroupName) && onlyMinorModifications) {
+                    int groupsWithSameName = 0;
+                    Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
+                    if (databaseRootGroup.isPresent()) {
+                        // we need to check the old name for duplicates. If the new group name occurs more than once, it won't matter
+                        groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(oldGroupName)).size();
+                    }
+                    boolean removePreviousAssignments = true;
+                    // We found more than 2 groups, so we cannot simply remove old assignment
+                    if (groupsWithSameName >= 2) {
+                        removePreviousAssignments = false;
+                    }
+
+                    oldGroup.getGroupNode().setGroup(
+                                                     group,
+                                                     true,
+                                                     removePreviousAssignments,
+                                                     database.getEntries());
 
                     dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                     writeGroupChangesToMetaData();
+                    // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+                    refresh();
+                    return;
+                }
+
+                if (groupTypeEqual && onlyMinorChanges(oldGroup.getGroupNode().getGroup(), group)) {
+                    oldGroup.getGroupNode().setGroup(
+                                     group,
+                                     true,
+                                     true,
+                                     database.getEntries());
+
+                    writeGroupChangesToMetaData();
+                    refresh();
+                    return;
+                }
+
+                // Major modifications
+
+                String content = Localization.lang("Assign the original group's entries to this group?");
+                ButtonType keepAssignments = new ButtonType(Localization.lang("Assign"), ButtonBar.ButtonData.YES);
+                ButtonType removeAssignments = new ButtonType(Localization.lang("Do not assign"), ButtonBar.ButtonData.NO);
+                ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                if (newGroup.get().getClass() == WordKeywordGroup.class) {
+                    content = content + "\n\n" +
+                              Localization.lang("(Note: If original entries lack keywords to qualify for the new group configuration, confirming here will add them)");
+                }
+                Optional<ButtonType> previousAssignments = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.WARNING,
+                                                                                                       Localization.lang("Change of Grouping Method"),
+                                                                                                       content,
+                                                                                                       keepAssignments,
+                                                                                                       removeAssignments,
+                                                                                                       cancel);
+                boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
+                                                    && (group instanceof ExplicitGroup);
+
+                int groupsWithSameName = 0;
+                Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
+                if (databaseRootGroup.isPresent()) {
+                    String name = oldGroup.getGroupNode().getGroup().getName();
+                    groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
+                }
+                // okay we found more than 2 groups with the same name
+                // If we only found one we can still do it
+                if (groupsWithSameName >= 2) {
+                    removePreviousAssignments = false;
+                }
+
+                if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES)) {
+                    oldGroup.getGroupNode().setGroup(
+                                 group,
+                                 true,
+                                 removePreviousAssignments,
+                                 database.getEntries());
+                } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.NO)) {
+                    oldGroup.getGroupNode().setGroup(
+                                 group,
+                                 false,
+                                 removePreviousAssignments,
+                                 database.getEntries());
+                } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE)) {
+                    return;
+                }
+
+                // stateManager.getEntriesInCurrentDatabase());
+
+                // TODO: Add undo
+                // Store undo information.
+                // AbstractUndoableEdit undoAddPreviousEntries = null;
+                // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
+                // if (undoAddPreviousEntries == null) {
+                //    panel.getUndoManager().addEdit(undo);
+                // } else {
+                //    NamedCompound nc = new NamedCompound("Modify Group");
+                //    nc.addEdit(undo);
+                //    nc.addEdit(undoAddPreviousEntries);
+                //    nc.end();/
+                //      panel.getUndoManager().addEdit(nc);
+                // }
+                // if (!addChange.isEmpty()) {
+                //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
+                // }
+
+                oldGroup.getParent().ifPresent(parent -> {
+                    sortAlphabeticallyRecursive(parent);
                 });
+
+                dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
+                writeGroupChangesToMetaData();
+                // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+                refresh();
             });
         });
     }
@@ -208,8 +389,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
         if (confirmation) {
             /// TODO: Add undo
-            //final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
-            //panel.getUndoManager().addEdit(undo);
+            // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
+            // panel.getUndoManager().addEdit(undo);
+            for (GroupNodeViewModel child : group.getChildren()) {
+                removeGroupsAndSubGroupsFromEntries(child);
+            }
             group.getGroupNode().removeAllChildren();
             dialogService.notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
             writeGroupChangesToMetaData();
@@ -217,20 +401,38 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void removeGroupKeepSubgroups(GroupNodeViewModel group) {
-        boolean confirmation = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Remove group"),
-                Localization.lang("Remove group \"%0\"?", group.getDisplayName()));
+        boolean confirmed;
+        if (selectedGroups.size() <= 1) {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove group"),
+                    Localization.lang("Remove group \"%0\" and keep its subgroups?", group.getDisplayName()),
+                    Localization.lang("Remove"));
+        } else {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove groups"),
+                    Localization.lang("Remove all selected groups and keep their subgroups?"),
+                    Localization.lang("Remove all"));
+        }
 
-        if (confirmation) {
+        if (confirmed) {
             // TODO: Add undo
-            //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
-            //panel.getUndoManager().addEdit(undo);
-            GroupTreeNode groupNode = group.getGroupNode();
-            groupNode.getParent()
-                    .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
-            groupNode.removeFromParent();
+            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
+            // panel.getUndoManager().addEdit(undo);
 
-            dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+            List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+            selectedGroupNodes.forEach(eachNode -> {
+                GroupTreeNode groupNode = eachNode.getGroupNode();
+
+                groupNode.getParent()
+                         .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+                groupNode.removeFromParent();
+            });
+
+            if (selectedGroupNodes.size() > 1) {
+                dialogService.notify(Localization.lang("Removed all selected groups."));
+            } else {
+                dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+            }
             writeGroupChangesToMetaData();
         }
     }
@@ -239,19 +441,93 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Removes the specified group and its subgroups (after asking for confirmation).
      */
     public void removeGroupAndSubgroups(GroupNodeViewModel group) {
-        boolean confirmed = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Remove group and subgroups"),
-                Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
-                Localization.lang("Remove"));
+        boolean confirmed;
+        if (selectedGroups.size() <= 1) {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove group and subgroups"),
+                    Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
+                    Localization.lang("Remove"));
+        } else {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove groups and subgroups"),
+                    Localization.lang("Remove all selected groups and their subgroups?"),
+                    Localization.lang("Remove all"));
+        }
+
         if (confirmed) {
             // TODO: Add undo
-            //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
-            //panel.getUndoManager().addEdit(undo);
+            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
+            // panel.getUndoManager().addEdit(undo);
 
-            group.getGroupNode().removeFromParent();
+            ArrayList<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+            selectedGroupNodes.forEach(eachNode -> {
+                removeGroupsAndSubGroupsFromEntries(eachNode);
+                eachNode.getGroupNode().removeFromParent();
+            });
 
-            dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+            if (selectedGroupNodes.size() > 1) {
+                dialogService.notify(Localization.lang("Removed all selected groups and their subgroups."));
+            } else {
+                dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+            }
             writeGroupChangesToMetaData();
+        }
+    }
+
+    /**
+     * Removes the specified group (after asking for confirmation).
+     */
+    public void removeGroupNoSubgroups(GroupNodeViewModel group) {
+        boolean confirmed;
+        if (selectedGroups.size() <= 1) {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove group"),
+                    Localization.lang("Remove group \"%0\"?", group.getDisplayName()),
+                    Localization.lang("Remove"));
+        } else {
+            confirmed = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Remove groups and subgroups"),
+                    Localization.lang("Remove all selected groups and their subgroups?"),
+                    Localization.lang("Remove all"));
+        }
+
+        if (confirmed) {
+            // TODO: Add undo
+            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_WITHOUT_CHILDREN);
+            // panel.getUndoManager().addEdit(undo);
+
+            ArrayList<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
+            selectedGroupNodes.forEach(eachNode -> {
+                removeGroupsAndSubGroupsFromEntries(eachNode);
+                eachNode.getGroupNode().removeFromParent();
+            });
+
+            if (selectedGroupNodes.size() > 1) {
+                dialogService.notify(Localization.lang("Removed all selected groups."));
+            } else {
+                dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+            }
+            writeGroupChangesToMetaData();
+        }
+    }
+
+    void removeGroupsAndSubGroupsFromEntries(GroupNodeViewModel group) {
+        for (GroupNodeViewModel child : group.getChildren()) {
+            removeGroupsAndSubGroupsFromEntries(child);
+        }
+
+        // only remove explicit groups from the entries, keyword groups should not be deleted
+        if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
+            int groupsWithSameName = 0;
+            String name = group.getGroupNode().getGroup().getName();
+            Optional<GroupTreeNode> rootGroup = currentDatabase.get().getMetaData().getGroups();
+            if (rootGroup.isPresent()) {
+                groupsWithSameName = rootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
+            }
+            if (groupsWithSameName < 2) {
+                List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
+                group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
+            }
         }
     }
 
@@ -260,7 +536,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(node.getNode().getGroup(), panel.frame())) {
         //    return; // user aborted operation
 
-        List<FieldChange> addChange = group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries());
+        group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries());
 
         // TODO: Add undo
         // NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
@@ -268,11 +544,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // panel.getUndoManager().addEdit(undoAll);
 
         // TODO Display massages
-        //if (undo == null) {
+        // if (undo == null) {
         //    frame.output(Localization.lang("The group \"%0\" already contains the selection.",
         //            node.getGroup().getName()));
         //    return;
-        //}
+        // }
         // panel.getUndoManager().addEdit(undo);
         // final String groupName = node.getGroup().getName();
         // if (assignedEntries == 1) {
@@ -280,7 +556,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // } else {
         //    frame.output(Localization.lang("Assigned %0 entries to group \"%1\".", String.valueOf(assignedEntries),
         //            groupName));
-        //}
+        // }
     }
 
     public void removeSelectedEntries(GroupNodeViewModel group) {
@@ -288,15 +564,136 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
         //    return; // user aborted operation
 
-        List<FieldChange> removeChange = group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());
+        group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());
 
         // TODO: Add undo
         // if (!undo.isEmpty()) {
         //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
     }
 
-    public void sortAlphabeticallyRecursive(GroupNodeViewModel group) {
-        group.getGroupNode().sortChildren(compAlphabetIgnoreCase, true);
+    public void sortAlphabeticallyRecursive(GroupTreeNode group) {
+        group.sortChildren(compAlphabetIgnoreCase, true);
+    }
 
+    public boolean canBeDragged(GroupNodeViewModel groupnode) {
+        AbstractGroup group = groupnode.getGroupNode().getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof KeywordGroup || group instanceof RegexKeywordGroup) {
+            if (groupnode.getParent().isPresent()) {
+                AbstractGroup groupParent = groupnode.getParent().get().getGroup();
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return true;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return true;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("canBeDragged method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean canAddGroupsIn(GroupNodeViewModel groupnode) {
+        AbstractGroup group = groupnode.getGroupNode().getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return true;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof KeywordGroup || group instanceof RegexKeywordGroup) {
+            if (groupnode.getParent().isPresent()) {
+                AbstractGroup groupParent = groupnode.getParent().get().getGroup();
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return false;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return false;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean canAddEntriesIn(GroupNodeViewModel groupnode) {
+        AbstractGroup group = groupnode.getGroupNode().getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
+            if (groupnode.getParent().isPresent()) {
+                AbstractGroup groupParent = groupnode.getParent().get().getGroup();
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else if (group instanceof KeywordGroup) {
+            return true;
+        } else if (group instanceof SearchGroup) {
+            return false;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return false;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return false;
+        } else if (group instanceof TexGroup) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean isEditable(GroupNodeViewModel groupnode) {
+        AbstractGroup group = groupnode.getGroupNode().getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof KeywordGroup || group instanceof RegexKeywordGroup) {
+            if (groupnode.getParent().isPresent()) {
+                AbstractGroup groupParent = groupnode.getParent().get().getGroup();
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return true;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return true;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
+        }
     }
 }

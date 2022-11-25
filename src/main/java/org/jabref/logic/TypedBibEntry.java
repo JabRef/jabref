@@ -3,16 +3,15 @@ package org.jabref.logic;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 /**
- * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode} dependend results
+ * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode}-dependent results
  */
 public class TypedBibEntry {
 
@@ -21,25 +20,26 @@ public class TypedBibEntry {
     private final BibDatabaseMode mode;
 
     public TypedBibEntry(BibEntry entry, BibDatabaseMode mode) {
-        this(entry, Optional.empty(), mode);
-    }
-
-    private TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseMode mode) {
         this.entry = Objects.requireNonNull(entry);
-        this.database = Objects.requireNonNull(database);
+        this.database = Optional.empty();
+        // mode may be null
         this.mode = mode;
     }
 
     public TypedBibEntry(BibEntry entry, BibDatabaseContext databaseContext) {
-        this(entry, Optional.of(databaseContext.getDatabase()), databaseContext.getMode());
+        this.entry = Objects.requireNonNull(entry);
+        this.database = Optional.of(databaseContext.getDatabase());
+        this.mode = Objects.requireNonNull(databaseContext).getMode();
     }
 
     /**
-     * Returns true if this entry contains the fields it needs to be
-     * complete.
+     * Checks the fields of the entry whether all required fields are set.
+     * In other words: It is checked whether this entry contains all fields it needs to be complete.
+     *
+     * @return true if all required fields are set, false otherwise
      */
-    public boolean hasAllRequiredFields() {
-        Optional<EntryType> type = EntryTypes.getType(entry.getType(), this.mode);
+    public boolean hasAllRequiredFields(BibEntryTypesManager entryTypesManager) {
+        Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), this.mode);
         if (type.isPresent()) {
             return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
         } else {
@@ -51,11 +51,6 @@ public class TypedBibEntry {
      * Gets the display name for the type of the entry.
      */
     public String getTypeForDisplay() {
-        Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), mode);
-        if (entryType.isPresent()) {
-            return entryType.get().getName();
-        } else {
-            return StringUtil.capitalizeFirst(entry.getType());
-        }
+        return entry.getType().getDisplayName();
     }
 }

@@ -6,12 +6,13 @@ import java.util.Locale;
  * Operating system (OS) detection
  */
 public class OS {
-    // File separator obtained from system
-    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
+    public static final String NEWLINE = System.lineSeparator();
 
-    // Newlines
-    // will be overridden in initialization due to feature #857 @ JabRef.java
-    public static String NEWLINE = System.lineSeparator();
+    public static final String APP_DIR_APP_NAME = "JabRef";
+    public static final String APP_DIR_APP_AUTHOR = "org.jabref";
+
+    // File separator obtained from system
+    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
     // https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/SystemUtils.html
     private static final String OS_NAME = System.getProperty("os.name", "unknown").toLowerCase(Locale.ROOT);

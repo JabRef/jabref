@@ -18,15 +18,20 @@ public class PersonNameStringConverter extends StringConverter<Author> {
     }
 
     public PersonNameStringConverter(AutoCompletePreferences preferences) {
-        if (preferences.getOnlyCompleteFirstLast()) {
-            autoCompFF = true;
-            autoCompLF = false;
-        } else if (preferences.getOnlyCompleteLastFirst()) {
-            autoCompFF = false;
-            autoCompLF = true;
-        } else {
-            autoCompFF = true;
-            autoCompLF = true;
+        switch (preferences.getNameFormat()) {
+            case FIRST_LAST:
+                autoCompFF = true;
+                autoCompLF = false;
+                break;
+            case LAST_FIRST:
+                autoCompFF = false;
+                autoCompLF = true;
+                break;
+            default:
+            case BOTH:
+                autoCompFF = true;
+                autoCompLF = true;
+                break;
         }
 
         autoCompleteFirstNameMode = preferences.getFirstNameMode();
@@ -34,7 +39,6 @@ public class PersonNameStringConverter extends StringConverter<Author> {
 
     @Override
     public String toString(Author author) {
-
         if (autoCompLF) {
             switch (autoCompleteFirstNameMode) {
                 case ONLY_ABBREVIATED:
@@ -59,7 +63,7 @@ public class PersonNameStringConverter extends StringConverter<Author> {
                     break;
             }
         }
-        return author.getLastFirst(false);
+        return author.getLastOnly();
     }
 
     @Override

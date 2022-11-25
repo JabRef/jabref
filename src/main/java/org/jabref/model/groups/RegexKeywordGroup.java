@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 /**
  * Matches entries if the content of a given field is matched by a regular expression.
@@ -12,22 +13,19 @@ import org.jabref.model.entry.BibEntry;
 public class RegexKeywordGroup extends KeywordGroup {
     private Pattern pattern;
 
-    public RegexKeywordGroup(String name, GroupHierarchyType context, String searchField,
+    public RegexKeywordGroup(String name, GroupHierarchyType context, Field searchField,
                              String searchExpression, boolean caseSensitive) {
         super(name, context, searchField, searchExpression, caseSensitive);
         this.pattern = compilePattern(searchExpression, caseSensitive);
     }
 
     private static Pattern compilePattern(String searchExpression, boolean caseSensitive) {
-
         return caseSensitive ? Pattern.compile("\\b" + searchExpression + "\\b") : Pattern.compile(
                 "\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
-
     }
 
     @Override
     public boolean contains(BibEntry entry) {
-
         Optional<String> content = entry.getField(searchField);
         return content.map(value -> pattern.matcher(value).find()).orElse(false);
     }

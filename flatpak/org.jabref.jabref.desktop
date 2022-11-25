@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=JabRef
+GenericName=BibTeX Editor
+Comment=JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
+Type=Application
+Terminal=false
+Icon=org.jabref.jabref
+Exec=JabRef %U
+Keywords=bibtex;biblatex;latex;bibliography
+Categories=Office;
+StartupWMClass=org-jabref-JabRefMain
+MimeType=text/x-bibtex;

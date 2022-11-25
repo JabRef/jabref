@@ -15,7 +15,7 @@
             <month>February</month>
             <series>1</series>
             <publisher>Java Publisher</publisher>
-            <bibtexkey>Mustermann2016</bibtexkey>
+            <citationkey>Mustermann2016</citationkey>
         </inbook>
     </entry>
 </file>

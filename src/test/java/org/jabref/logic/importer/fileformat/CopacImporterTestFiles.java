@@ -1,61 +1,42 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.io.IOException;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.BibEntryAssert;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-
-@RunWith(Parameterized.class)
 public class CopacImporterTestFiles {
 
-    private CopacImporter copacImporter;
+    private static final String FILE_ENDING = ".txt";
 
-    @Parameter
-    public String fileName;
-
-
-    @Before
-    public void setUp() {
-        copacImporter = new CopacImporter();
+    private static Stream<String> fileNames() throws IOException {
+        Predicate<String> fileName = name -> name.startsWith("CopacImporterTest")
+                && name.endsWith(FILE_ENDING);
+        return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    @Parameters(name = "{0}")
-    public static Collection<String> fileNames() throws Exception {
-
-        try (Stream<Path> stream = Files.list(Paths.get(CopacImporterTestFiles.class.getResource("").toURI()))) {
-            return stream
-                    .filter(n -> n.getFileName().toString().startsWith("CopacImporterTest")
-                            && n.getFileName().toString().endsWith(".txt"))
-                    .map(f -> f.getFileName().toString()).collect(Collectors.toList());
-        }
+    private static Stream<String> nonCopacfileNames() throws IOException {
+        Predicate<String> fileName = name -> !name.startsWith("CopacImporterTest");
+        return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    @Test
-    public void testIsRecognizedFormat() throws Exception {
-        Path file = Paths.get(CopacImporterTest.class.getResource(fileName).toURI());
-        Assert.assertTrue(copacImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public void testIsRecognizedFormat(String fileName) throws IOException {
+        ImporterTestEngine.testIsRecognizedFormat(new CopacImporter(), fileName);
     }
 
-    @Test
-    public void testImportEntries() throws Exception {
-        String bibFileName = fileName.replace(".txt", ".bib");
+    @ParameterizedTest
+    @MethodSource("nonCopacfileNames")
+    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+        ImporterTestEngine.testIsNotRecognizedFormat(new CopacImporter(), fileName);
+    }
 
-        try (InputStream bibStream = BibtexImporterTest.class.getResourceAsStream(bibFileName)) {
-            BibEntryAssert.assertEquals(bibStream, CopacImporterTest.class.getResource(fileName), copacImporter);
-        }
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public void testImportEntries(String fileName) throws Exception {
+        ImporterTestEngine.testImportEntries(new CopacImporter(), fileName, FILE_ENDING);
     }
 }

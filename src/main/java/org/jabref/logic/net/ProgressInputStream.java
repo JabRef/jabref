@@ -12,16 +12,18 @@ import javafx.beans.property.SimpleLongProperty;
  * Code based on http://stackoverflow.com/a/1339589/873661, but converted to use JavaFX properties instead of listeners
  */
 public class ProgressInputStream extends FilterInputStream {
+
     private final long maxNumBytes;
     private final LongProperty totalNumBytesRead;
     private final LongProperty progress;
 
     public ProgressInputStream(InputStream in, long maxNumBytes) {
         super(in);
-        this.maxNumBytes = maxNumBytes;
         this.totalNumBytesRead = new SimpleLongProperty(0);
         this.progress = new SimpleLongProperty(0);
-        this.progress.bind(totalNumBytesRead.divide(maxNumBytes));
+
+        this.maxNumBytes = maxNumBytes <= 0 ? 1 : maxNumBytes;
+        this.progress.bind(totalNumBytesRead.divide(this.maxNumBytes));
     }
 
     public long getTotalNumBytesRead() {

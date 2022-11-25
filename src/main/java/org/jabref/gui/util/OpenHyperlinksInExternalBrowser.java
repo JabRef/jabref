@@ -10,8 +10,8 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.desktop.JabRefDesktop;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -26,7 +26,7 @@ import org.w3c.dom.html.HTMLAnchorElement;
  */
 public class OpenHyperlinksInExternalBrowser implements ChangeListener<Worker.State>, EventListener {
 
-    private static final Log LOGGER = LogFactory.getLog(OpenHyperlinksInExternalBrowser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenHyperlinksInExternalBrowser.class);
     private static final String CLICK_EVENT = "click";
     private static final String ANCHOR_TAG = "a";
 
@@ -57,9 +57,8 @@ public class OpenHyperlinksInExternalBrowser implements ChangeListener<Worker.St
         try {
             JabRefDesktop.openBrowser(href);
         } catch (IOException e) {
-            LOGGER.error(e);
+            LOGGER.error("Problem opening browser", e);
         }
         event.preventDefault();
     }
-
 }

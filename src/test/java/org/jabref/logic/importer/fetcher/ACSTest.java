@@ -5,58 +5,52 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.support.DevEnvironment;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.support.DisabledOnCIServer;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Category(FetcherTests.class)
-public class ACSTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@FetcherTest
+class ACSTest {
     private ACS finder;
     private BibEntry entry;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         finder = new ACS();
         entry = new BibEntry();
     }
 
     @Test
-    public void doiNotPresent() throws IOException {
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
-    }
+    @DisabledOnCIServer("CI server is unreliable")
+    void findByDOI() throws IOException {
+        entry.setField(StandardField.DOI, "10.1021/bk-2006-STYG.ch014");
 
-    @Test(expected = NullPointerException.class)
-    public void rejectNullParameter() throws IOException {
-        finder.findFullText(null);
-        Assert.fail();
-    }
-
-    @Test
-    public void findByDOI() throws IOException {
-        // CI server is unreliable
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
-        entry.setField("doi", "10.1021/bk-2006-STYG.ch014");
-
-        Assert.assertEquals(
-                Optional.of(new URL("http://pubs.acs.org/doi/pdf/10.1021/bk-2006-STYG.ch014")),
+        assertEquals(
+                Optional.of(new URL("https://pubs.acs.org/doi/pdf/10.1021/bk-2006-STYG.ch014")),
                 finder.findFullText(entry)
         );
     }
 
     @Test
-    public void notFoundByDOI() throws IOException {
-        // CI server is unreliable
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+    @DisabledOnCIServer("CI server is unreliable")
+    void notFoundByDOI() throws IOException {
+        entry.setField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
 
-        entry.setField("doi", "10.1021/bk-2006-WWW.ch014");
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
 
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+    @Test
+    void entityWithoutDoi() throws IOException {
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void trustLevel() {
+        assertEquals(TrustLevel.PUBLISHER, finder.getTrustLevel());
     }
 }

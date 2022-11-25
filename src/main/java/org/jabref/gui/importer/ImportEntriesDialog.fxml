@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.CheckListView?>
+<DialogPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.importer.ImportEntriesDialog">
+    <content>
+        <VBox spacing="10.0">
+            <Label text="%Select the entries to be imported:"/>
+            <CheckListView fx:id="entriesListView" VBox.vgrow="ALWAYS"/>
+            <HBox spacing="4">
+                <Button onAction="#selectAllNewEntries" styleClass="text-button" text="%Select all new entries"/>
+                <Button onAction="#selectAllEntries" styleClass="text-button" text="%Select all entries"/>
+                <Button onAction="#unselectAll" styleClass="text-button" text="%Unselect all"/>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <GridPane hgap="4.0" vgap="4.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="30" halignment="RIGHT"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0"/>
+                        <RowConstraints minHeight="10.0"/>
+                    </rowConstraints>
+                    <Label styleClass="info-section" text="%Total items found:"/>
+                    <Label fx:id="totalItems" GridPane.columnIndex="1"/>
+                    <Label styleClass="info-section" text="%Selected items:" GridPane.rowIndex="1"/>
+                    <Label fx:id="selectedItems" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                </GridPane>
+            </HBox>
+            <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
+        </VBox>
+    </content>
+    <ButtonType fx:id="importButton" buttonData="OK_DONE" text="%Import entries"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

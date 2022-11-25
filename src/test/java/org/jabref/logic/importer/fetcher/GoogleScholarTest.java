@@ -6,98 +6,96 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
-import org.jabref.support.DevEnvironment;
-import org.jabref.testutils.category.FetcherTests;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.support.DisabledOnCIServer;
+import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTests.class)
-public class GoogleScholarTest {
+@FetcherTest
+@DisabledOnCIServer("CI server is blocked by Google")
+class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     private GoogleScholar finder;
     private BibEntry entry;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
-                mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+                mock(FieldContentFormatterPreferences.class));
         finder = new GoogleScholar(importFormatPreferences);
         entry = new BibEntry();
     }
 
-    @Test(expected = NullPointerException.class)
-    public void rejectNullParameter() throws IOException, FetcherException {
-        finder.findFullText(null);
-        Assert.fail();
-    }
-
     @Test
-    public void requiresEntryTitle() throws IOException, FetcherException {
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
-    }
+    void linkFound() throws IOException, FetcherException {
+        entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service");
 
-    @Test
-    public void linkFound() throws IOException, FetcherException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
-        entry.setField("title", "Towards Application Portability in Platform as a Service");
-
-        Assert.assertEquals(
+        assertEquals(
                 Optional.of(new URL("https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/sose14-towards-application-portability-in-paas.pdf")),
                 finder.findFullText(entry)
         );
     }
 
     @Test
-    public void noLinkFound() throws IOException, FetcherException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+    void noLinkFound() throws IOException, FetcherException {
+        entry.setField(StandardField.TITLE, "Curriculum programme of career-oriented java specialty guided by principles of software engineering");
 
-        entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
-
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+        assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void findSingleEntry() throws FetcherException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+    void findSingleEntry() throws FetcherException {
+        entry.setType(StandardEntryType.InProceedings);
+        entry.setCitationKey("geiger2013detecting");
+        entry.setField(StandardField.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
+        entry.setField(StandardField.AUTHOR, "Geiger, Matthias and Wirtz, Guido");
+        entry.setField(StandardField.BOOKTITLE, "ZEUS");
+        entry.setField(StandardField.YEAR, "2013");
+        entry.setField(StandardField.PAGES, "41--44");
 
-        entry.setType(BibtexEntryTypes.INPROCEEDINGS.getName());
-        entry.setCiteKey("geiger2013detecting");
-        entry.setField(FieldName.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
-        entry.setField(FieldName.AUTHOR, "Geiger, Matthias and Wirtz, Guido");
-        entry.setField(FieldName.BOOKTITLE, "ZEUS");
-        entry.setField(FieldName.YEAR, "2013");
-        entry.setField(FieldName.PAGES, "41--44");
+        List<BibEntry> foundEntries = finder.performSearch("Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models");
 
-        List<BibEntry> foundEntries = finder.performSearch("info:RExzBa3OlkQJ:scholar.google.com");
-
-        Assert.assertEquals(Collections.singletonList(entry), foundEntries);
+        assertEquals(Collections.singletonList(entry), foundEntries);
     }
 
     @Test
-    public void find20Entries() throws FetcherException {
-        // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
+    void findManyEntries() throws FetcherException {
         List<BibEntry> foundEntries = finder.performSearch("random test string");
 
-        Assert.assertEquals(20, foundEntries.size());
+        assertEquals(20, foundEntries.size());
+    }
+
+    @Override
+    public SearchBasedFetcher getFetcher() {
+        return finder;
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return finder;
+    }
+
+    @Override
+    public List<String> getTestAuthors() {
+        return List.of("Mittermeier", "Myers");
+    }
+
+    @Override
+    public String getTestJournal() {
+        return "Nature";
     }
 }

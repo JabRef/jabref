@@ -4,36 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.preferences.CleanupPreferences;
+import org.jabref.preferences.FilePreferences;
 
 public class CleanupWorker {
 
     private final BibDatabaseContext databaseContext;
-    private final String fileNamePattern;
-    private final String fileDirPattern;
-    private final LayoutFormatterPreferences layoutPrefs;
-    private final FileDirectoryPreferences fileDirectoryPreferences;
-    private int unsuccessfulRenames;
+    private final FilePreferences filePreferences;
+    private final TimestampPreferences timestampPreferences;
 
-
-    public CleanupWorker(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
+    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
         this.databaseContext = databaseContext;
-        this.fileNamePattern = cleanupPreferences.getFileNamePattern();
-        this.fileDirPattern = cleanupPreferences.getFileDirPattern();
-        this.layoutPrefs = cleanupPreferences.getLayoutFormatterPreferences();
-        this.fileDirectoryPreferences = cleanupPreferences.getFileDirectoryPreferences();
+        this.filePreferences = filePreferences;
+        this.timestampPreferences = timestampPreferences;
     }
 
-    public int getUnsuccessfulRenames() {
-        return unsuccessfulRenames;
-    }
-
-    public List<FieldChange> cleanup(CleanupPreset preset, BibEntry entry) {
+    public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
         Objects.requireNonNull(preset);
         Objects.requireNonNull(entry);
 
@@ -47,40 +37,50 @@ public class CleanupWorker {
         return changes;
     }
 
-    private List<CleanupJob> determineCleanupActions(CleanupPreset preset) {
+    private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
-        if (preset.isConvertToBiblatex()) {
-            jobs.add(new BiblatexCleanup());
+        for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
+            jobs.add(toJob(action));
         }
-        if (preset.getFormatterCleanups().isEnabled()) {
-            jobs.addAll(preset.getFormatterCleanups().getConfiguredActions());
-        }
-        if (preset.isCleanUpUpgradeExternalLinks()) {
-            jobs.add(new UpgradePdfPsToFileCleanup());
-        }
-        if (preset.isCleanUpDOI()) {
-            jobs.add(new DoiCleanup());
-        }
-        if (preset.isCleanUpISSN()) {
-            jobs.add(new ISSNCleanup());
-        }
-        if (preset.isFixFileLinks()) {
-            jobs.add(new FileLinksCleanup());
-        }
-        if (preset.isMovePDF()) {
-            jobs.add(new MoveFilesCleanup(databaseContext, fileDirPattern, fileDirectoryPreferences, layoutPrefs));
-        }
-        if (preset.isMakePathsRelative()) {
-            jobs.add(new RelativePathsCleanup(databaseContext, fileDirectoryPreferences));
-        }
-        if (preset.isRenamePDF()) {
-            RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
-                    fileNamePattern, layoutPrefs, fileDirectoryPreferences);
-            jobs.add(cleaner);
-            unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
+
+        if (preset.getFieldFormatterCleanups().isEnabled()) {
+            jobs.addAll(preset.getFieldFormatterCleanups().getConfiguredActions());
         }
 
         return jobs;
+    }
+
+    private CleanupJob toJob(CleanupPreferences.CleanupStep action) {
+        return switch (action) {
+            case CLEAN_UP_DOI ->
+                    new DoiCleanup();
+            case CLEANUP_EPRINT ->
+                    new EprintCleanup();
+            case MAKE_PATHS_RELATIVE ->
+                    new RelativePathsCleanup(databaseContext, filePreferences);
+            case RENAME_PDF ->
+                    new RenamePdfCleanup(false, databaseContext, filePreferences);
+            case RENAME_PDF_ONLY_RELATIVE_PATHS ->
+                    new RenamePdfCleanup(true, databaseContext, filePreferences);
+            case CLEAN_UP_UPGRADE_EXTERNAL_LINKS ->
+                    new UpgradePdfPsToFileCleanup();
+            case CONVERT_TO_BIBLATEX ->
+                    new ConvertToBiblatexCleanup();
+            case CONVERT_TO_BIBTEX ->
+                    new ConvertToBibtexCleanup();
+            case CONVERT_TIMESTAMP_TO_CREATIONDATE ->
+                    new TimeStampToCreationDate(timestampPreferences);
+            case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE ->
+                    new TimeStampToModificationDate(timestampPreferences);
+            case MOVE_PDF ->
+                    new MoveFilesCleanup(databaseContext, filePreferences);
+            case FIX_FILE_LINKS ->
+                    new FileLinksCleanup();
+            case CLEAN_UP_ISSN ->
+                    new ISSNCleanup();
+            default ->
+                    throw new UnsupportedOperationException(action.name());
+        };
     }
 }

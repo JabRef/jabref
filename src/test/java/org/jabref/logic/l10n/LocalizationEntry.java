@@ -3,7 +3,10 @@ package org.jabref.logic.l10n;
 import java.nio.file.Path;
 import java.util.Objects;
 
-class LocalizationEntry implements Comparable<LocalizationEntry>{
+/**
+ * Representation of a localization key required for testing
+ */
+class LocalizationEntry implements Comparable<LocalizationEntry> {
 
     private final Path path;
     private final String key;
@@ -38,11 +41,10 @@ class LocalizationEntry implements Comparable<LocalizationEntry>{
 
         LocalizationEntry that = (LocalizationEntry) o;
 
-        if (key != null ? !key.equals(that.key) : that.key != null) {
+        if (!Objects.equals(key, that.key)) {
             return false;
         }
         return bundle == that.bundle;
-
     }
 
     @Override

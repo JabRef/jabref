@@ -1,9 +1,8 @@
 package org.jabref.logic.importer;
 
-import org.jabref.JabRefException;
+import org.jabref.logic.JabRefException;
 
 public class ImportException extends JabRefException {
-
 
     public ImportException(String errorMessage, Exception cause) {
         super(errorMessage, cause);

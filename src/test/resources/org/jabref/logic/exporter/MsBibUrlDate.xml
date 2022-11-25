@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+    <b:Source>
+        <b:Year>2009</b:Year>
+        <b:Volume>438</b:Volume>
+        <b:BIBTEX_Series>CEUR Workshop Proceedings</b:BIBTEX_Series>
+        <b:BIBTEX_Entry>www</b:BIBTEX_Entry>
+        <b:SourceType>Misc</b:SourceType>
+        <b:Title>1st Central-European Workshop on Services and their Composition, ZEUS 2009, Stuttgart, Germany, March 2-3, 2009. Proceedings</b:Title>
+        <b:Tag>KoppLohmann2009</b:Tag>
+        <b:Publisher>CEUR-WS.org</b:Publisher>
+        <b:URL>http://ceur-ws.org/Vol-438</b:URL>
+        <b:YearAccessed>2021</b:YearAccessed>
+        <b:MonthAccessed>January</b:MonthAccessed>
+        <b:DayAccessed>4</b:DayAccessed>
+        <b:Author>
+            <b:Editor>
+                <b:NameList>
+                    <b:Person>
+                        <b:Last>Kopp</b:Last>
+                        <b:First>Oliver</b:First>
+                    </b:Person>
+                    <b:Person>
+                        <b:Last>Lohmann</b:Last>
+                        <b:First>Niels</b:First>
+                    </b:Person>
+                </b:NameList>
+            </b:Editor>
+        </b:Author>
+        <b:PublicationTitle>1st Central-European Workshop on Services and their Composition, ZEUS 2009, Stuttgart, Germany, March 2-3, 2009. Proceedings</b:PublicationTitle>
+    </b:Source>
+</b:Sources>

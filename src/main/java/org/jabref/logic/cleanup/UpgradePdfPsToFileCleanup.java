@@ -1,17 +1,17 @@
 package org.jabref.logic.cleanup;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * Collects file links from the ps and pdf fields, and add them to the list contained in the file field.
@@ -19,12 +19,11 @@ import org.jabref.model.entry.LinkedFile;
 public class UpgradePdfPsToFileCleanup implements CleanupJob {
 
     // Field name and file type name (from ExternalFileTypes)
-    private final Map<String, String> fields = new HashMap<>();
-
+    private final Map<Field, String> fields = new HashMap<>();
 
     public UpgradePdfPsToFileCleanup() {
-        fields.put(FieldName.PDF, "PDF");
-        fields.put(FieldName.PS, "PostScript");
+        fields.put(StandardField.PDF, "PDF");
+        fields.put(StandardField.PS, "PostScript");
     }
 
     @Override
@@ -32,28 +31,28 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
 
         // If there are already links in the file field, keep those on top:
-        String oldFileContent = entry.getField(FieldName.FILE).orElse(null);
+        String oldFileContent = entry.getField(StandardField.FILE).orElse(null);
 
         List<LinkedFile> fileList = new ArrayList<>(entry.getFiles());
         int oldItemCount = fileList.size();
-        for (Map.Entry<String, String> field : fields.entrySet()) {
-            entry.getField(field.getKey()).ifPresent(o -> {
-                if (o.trim().isEmpty()) {
+        for (Map.Entry<Field, String> field : fields.entrySet()) {
+            entry.getField(field.getKey()).ifPresent(fieldContent -> {
+                if (fieldContent.trim().isEmpty()) {
                     return;
                 }
-                File f = new File(o);
-                LinkedFile flEntry = new LinkedFile(f.getName(), o, field.getValue());
+                Path path = Path.of(fieldContent);
+                LinkedFile flEntry = new LinkedFile(path.getFileName().toString(), path, field.getValue());
                 fileList.add(flEntry);
 
                 entry.clearField(field.getKey());
-                changes.add(new FieldChange(entry, field.getKey(), o, null));
+                changes.add(new FieldChange(entry, field.getKey(), fieldContent, null));
             });
         }
 
         if (fileList.size() != oldItemCount) {
             String newValue = FileFieldWriter.getStringRepresentation(fileList);
-            entry.setField(FieldName.FILE, newValue);
-            changes.add(new FieldChange(entry, FieldName.FILE, oldFileContent, newValue));
+            entry.setField(StandardField.FILE, newValue);
+            changes.add(new FieldChange(entry, StandardField.FILE, oldFileContent, newValue));
         }
 
         return changes;

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+
+<fx:root prefWidth="800.0" type="AnchorPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar">
+   <children>
+      <ToolBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="800.0" styleClass="merge-toolbox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <items>
+            <HBox fx:id="naviagetDifferencesContainer" fillHeight="false" maxHeight="-Infinity">
+               <children>
+                  <Button fx:id="selectLeftEntryValuesButton" focusTraversable="false" mnemonicParsing="false" styleClass="icon-button" text="Left">
+                     <graphic>
+                        <JabRefIconView glyph="ACCEPT_LEFT" /><!--glyph="ACCEPT_LEFT"-->
+                     </graphic>
+                  </Button>
+                  <Button fx:id="selectRightEntryValuesButton" focusTraversable="false" mnemonicParsing="false" styleClass="icon-button" text="Right">
+                     <graphic>
+                        <JabRefIconView glyph="ACCEPT_RIGHT"/><!--glyph="ACCEPT_RIGHT"-->
+                     </graphic>
+                  </Button>
+               </children></HBox>
+            <Separator maxHeight="-Infinity" minHeight="-Infinity" orientation="VERTICAL" prefHeight="40.0" />
+            <ComboBox fx:id="plainTextOrDiffComboBox" prefHeight="30.0" prefWidth="150.0" promptText="Plain text" />
+            <ComboBox fx:id="diffViewComboBox" disable="true" prefHeight="30.0" prefWidth="150.0" />
+            <Separator maxHeight="-Infinity" minHeight="-Infinity" orientation="VERTICAL" prefHeight="40.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </Separator>
+            <RadioButton fx:id="highlightWordsRadioButton" disable="true" mnemonicParsing="false" text="%Highlight words">
+               <toggleGroup>
+                  <ToggleGroup fx:id="diffHighlightingMethodToggleGroup" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="highlightCharactersRadioButtons" disable="true" mnemonicParsing="false" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
+         </items>
+      </ToolBar>
+   </children>
+</fx:root>

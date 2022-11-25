@@ -1,47 +1,78 @@
 package org.jabref.logic.importer;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import org.jabref.logic.importer.fetcher.ArXiv;
+import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
+import org.jabref.logic.importer.fetcher.ACS;
+import org.jabref.logic.importer.fetcher.ApsFetcher;
+import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
+import org.jabref.logic.importer.fetcher.CiteSeer;
+import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
+import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
+import org.jabref.logic.importer.fetcher.DOABFetcher;
+import org.jabref.logic.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.GoogleScholar;
+import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
-import org.jabref.logic.importer.fetcher.IsbnFetcher;
+import org.jabref.logic.importer.fetcher.IEEE;
+import org.jabref.logic.importer.fetcher.INSPIREFetcher;
+import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
+import org.jabref.logic.importer.fetcher.Medra;
+import org.jabref.logic.importer.fetcher.OpenAccessDoi;
+import org.jabref.logic.importer.fetcher.ResearchGate;
+import org.jabref.logic.importer.fetcher.RfcFetcher;
+import org.jabref.logic.importer.fetcher.ScienceDirect;
+import org.jabref.logic.importer.fetcher.SemanticScholar;
+import org.jabref.logic.importer.fetcher.SpringerFetcher;
+import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
-import org.jabref.logic.importer.fetcher.zbMATH;
-import org.jabref.model.entry.FieldName;
+import org.jabref.logic.importer.fetcher.ZbMATH;
+import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.preferences.FilePreferences;
+
+import static org.jabref.model.entry.field.StandardField.EPRINT;
+import static org.jabref.model.entry.field.StandardField.ISBN;
 
 public class WebFetchers {
 
     private WebFetchers() {
     }
 
-    public static Optional<IdBasedFetcher> getIdBasedFetcherForField(String field, ImportFormatPreferences preferences) {
+    public static Optional<IdBasedFetcher> getIdBasedFetcherForField(Field field, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
-        switch (field) {
-            case FieldName.DOI:
-                fetcher = new DoiFetcher(preferences);
-                break;
-            case FieldName.ISBN:
-                fetcher = new IsbnFetcher(preferences);
-                break;
-            case FieldName.EPRINT:
-                fetcher = new ArXiv(preferences);
-                break;
-            default:
-                return Optional.empty();
+
+        if (field == StandardField.DOI) {
+            fetcher = new DoiFetcher(importFormatPreferences);
+        } else if (field == ISBN) {
+            fetcher = new IsbnFetcher(importFormatPreferences)
+                    .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+                    .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences));
+        } else if (field == EPRINT) {
+            fetcher = new ArXivFetcher(importFormatPreferences);
+        } else {
+            return Optional.empty();
         }
         return Optional.of(fetcher);
     }
@@ -55,60 +86,137 @@ public class WebFetchers {
         }
     }
 
-    public static Optional<IdFetcher<? extends Identifier>> getIdFetcherForField(String fieldName) {
-        switch (fieldName) {
-            case FieldName.DOI:
-                return Optional.of(new CrossRef());
+    public static Optional<IdFetcher<? extends Identifier>> getIdFetcherForField(Field field) {
+        if (field == StandardField.DOI) {
+            return Optional.of(new CrossRef());
         }
         return Optional.empty();
     }
 
-    public static List<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences) {
-        ArrayList<SearchBasedFetcher> list = new ArrayList<>();
-        list.add(new ArXiv(importFormatPreferences));
-        list.add(new GvkFetcher());
-        list.add(new MedlineFetcher());
-        list.add(new AstrophysicsDataSystem(importFormatPreferences));
-        list.add(new MathSciNet(importFormatPreferences));
-        list.add(new zbMATH(importFormatPreferences));
-        list.add(new GoogleScholar(importFormatPreferences));
-        list.add(new DBLPFetcher(importFormatPreferences));
-        list.add(new CrossRef());
-        list.sort(Comparator.comparing(WebFetcher::getName));
-        return list;
+    /**
+     * @return sorted set containing search based fetchers
+     */
+    public static SortedSet<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        SortedSet<SearchBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+        set.add(new ArXivFetcher(importFormatPreferences));
+        set.add(new INSPIREFetcher(importFormatPreferences));
+        set.add(new GvkFetcher());
+        set.add(new MedlineFetcher());
+        set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
+        set.add(new MathSciNet(importFormatPreferences));
+        set.add(new ZbMATH(importFormatPreferences));
+        set.add(new ACMPortalFetcher());
+        // set.add(new GoogleScholar(importFormatPreferences));
+        set.add(new DBLPFetcher(importFormatPreferences));
+        set.add(new SpringerFetcher(importerPreferences));
+        set.add(new CrossRef());
+        set.add(new CiteSeer());
+        set.add(new DOAJFetcher(importFormatPreferences));
+        set.add(new IEEE(importFormatPreferences, importerPreferences));
+        set.add(new CompositeSearchBasedFetcher(set, 30));
+        set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
+        set.add(new DOABFetcher());
+        // set.add(new JstorFetcher(importFormatPreferences));
+        set.add(new SemanticScholar());
+        set.add(new ResearchGate(importFormatPreferences));
+        set.add(new BiodiversityLibrary(importerPreferences));
+        return set;
     }
 
-    public static List<IdBasedFetcher> getIdBasedFetchers(ImportFormatPreferences importFormatPreferences) {
-        ArrayList<IdBasedFetcher> list = new ArrayList<>();
-        list.add(new ArXiv(importFormatPreferences));
-        list.add(new AstrophysicsDataSystem(importFormatPreferences));
-        list.add(new IsbnFetcher(importFormatPreferences));
-        list.add(new DiVA(importFormatPreferences));
-        list.add(new DoiFetcher(importFormatPreferences));
-        list.add(new MedlineFetcher());
-        list.add(new TitleFetcher(importFormatPreferences));
-        list.add(new MathSciNet(importFormatPreferences));
-        list.add(new CrossRef());
-        list.add(new LibraryOfCongress());
-        list.sort(Comparator.comparing(WebFetcher::getName));
-        return list;
+    /**
+     * @return sorted set containing id based fetchers
+     */
+    public static SortedSet<IdBasedFetcher> getIdBasedFetchers(ImportFormatPreferences importFormatPreferences,
+                                                               ImporterPreferences importerPreferences) {
+        SortedSet<IdBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+        set.add(new ArXivFetcher(importFormatPreferences));
+        set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
+        set.add(new IsbnFetcher(importFormatPreferences)
+                .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+                .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+        set.add(new DiVA(importFormatPreferences));
+        set.add(new DoiFetcher(importFormatPreferences));
+        set.add(new MedlineFetcher());
+        set.add(new TitleFetcher(importFormatPreferences));
+        set.add(new MathSciNet(importFormatPreferences));
+        set.add(new ZbMATH(importFormatPreferences));
+        set.add(new CrossRef());
+        set.add(new LibraryOfCongress(importFormatPreferences));
+        set.add(new IacrEprintFetcher(importFormatPreferences));
+        set.add(new RfcFetcher(importFormatPreferences));
+        set.add(new Medra());
+        // set.add(new JstorFetcher(importFormatPreferences));
+        return set;
     }
 
-    public static List<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences) {
-        ArrayList<EntryBasedFetcher> list = new ArrayList<>();
-        list.add(new AstrophysicsDataSystem(importFormatPreferences));
-        list.add(new DoiFetcher(importFormatPreferences));
-        list.add(new MathSciNet(importFormatPreferences));
-        list.add(new CrossRef());
-        list.sort(Comparator.comparing(WebFetcher::getName));
-        return list;
+    /**
+     * @return sorted set containing entry based fetchers
+     */
+    public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImporterPreferences importerPreferences,
+                                                                     ImportFormatPreferences importFormatPreferences,
+                                                                     FilePreferences filePreferences,
+                                                                     BibDatabaseContext databaseContext) {
+        SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+        set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
+        set.add(new DoiFetcher(importFormatPreferences));
+        set.add(new IsbnFetcher(importFormatPreferences)
+                .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+                .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+        set.add(new MathSciNet(importFormatPreferences));
+        set.add(new CrossRef());
+        set.add(new ZbMATH(importFormatPreferences));
+        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
+        set.add(new SemanticScholar());
+        set.add(new ResearchGate(importFormatPreferences));
+        return set;
     }
 
-    public static List<IdFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
-        ArrayList<IdFetcher> list = new ArrayList<>();
-        list.add(new CrossRef());
-        list.add(new ArXiv(importFormatPreferences));
-        list.sort(Comparator.comparing(WebFetcher::getName));
-        return list;
+    /**
+     * @return sorted set containing id fetchers
+     */
+    public static SortedSet<IdFetcher<? extends Identifier>> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
+        SortedSet<IdFetcher<?>> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+        set.add(new CrossRef());
+        set.add(new ArXivFetcher(importFormatPreferences));
+        return set;
+    }
+
+    /**
+     * @return set containing fulltext fetchers
+     */
+    public static Set<FulltextFetcher> getFullTextFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        Set<FulltextFetcher> fetchers = new HashSet<>();
+
+        // Original
+        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
+
+        // Publishers
+        fetchers.add(new ScienceDirect(importerPreferences));
+        fetchers.add(new SpringerLink(importerPreferences));
+        fetchers.add(new ACS());
+        fetchers.add(new ArXivFetcher(importFormatPreferences));
+        fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
+        fetchers.add(new ApsFetcher());
+
+        // Meta search
+        // fetchers.add(new JstorFetcher(importFormatPreferences));
+        // fetchers.add(new GoogleScholar(importFormatPreferences));
+        fetchers.add(new OpenAccessDoi());
+        fetchers.add(new SemanticScholar());
+        fetchers.add(new ResearchGate(importFormatPreferences));
+        return fetchers;
+    }
+
+    /**
+     * @return set containing customizable api key fetchers
+     */
+    public static Set<CustomizableKeyFetcher> getCustomizableKeyFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        Set<CustomizableKeyFetcher> fetchers = new HashSet<>();
+        fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
+        fetchers.add(new SpringerFetcher(importerPreferences));
+        fetchers.add(new ScienceDirect(importerPreferences));
+        fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
+        fetchers.add(new BiodiversityLibrary(importerPreferences));
+        return fetchers;
     }
 }

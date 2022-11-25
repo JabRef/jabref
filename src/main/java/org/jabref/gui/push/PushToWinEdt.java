@@ -1,30 +1,31 @@
 package org.jabref.gui.push;
 
-import javax.swing.Icon;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.preferences.PreferencesService;
 
-import org.jabref.gui.IconTheme;
-import org.jabref.preferences.JabRefPreferences;
+public class PushToWinEdt extends AbstractPushToApplication {
 
-public class PushToWinEdt extends AbstractPushToApplication implements PushToApplication {
+    public static final String NAME = PushToApplications.WIN_EDT;
 
-    @Override
-    public String getApplicationName() {
-        return "WinEdt";
+    public PushToWinEdt(DialogService dialogService, PreferencesService preferencesService) {
+        super(dialogService, preferencesService);
     }
 
     @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("winedt");
+    public String getDisplayName() {
+        return NAME;
+    }
+
+    @Override
+    public JabRefIcon getApplicationIcon() {
+        return IconTheme.JabRefIcons.APPLICATION_WINEDT;
     }
 
     @Override
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath,
                 "\"[InsText('" + getCiteCommand() + "{" + keyString.replace("'", "''") + "}');]\""};
-    }
-
-    @Override
-    protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.WIN_EDT_PATH;
     }
 }

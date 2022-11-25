@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<?import org.controlsfx.control.MasterDetailPane?>
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
+            xmlns="http://javafx.com/javafx/8.0.112"
+            fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabView" styleClass="editorPane">
+    <MasterDetailPane dividerPosition="0.6">
+        <masterNode>
+            <BorderPane>
+                <top>
+                    <HBox alignment="BASELINE_LEFT" spacing="10">
+                        <Label alignment="BASELINE_LEFT" text="%File"/>
+                        <ComboBox fx:id="files" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                </top>
+                <center>
+                    <ListView fx:id="annotationList"/>
+                </center>
+            </BorderPane>
+        </masterNode>
+        <detailNode>
+            <VBox fx:id="details">
+                <HBox>
+                    <Label fx:id="author"/>
+                    <Pane HBox.hgrow="ALWAYS"/>
+                    <Button onAction="#copy" styleClass="icon-button">
+                        <graphic>
+                            <JabRefIconView glyph="COPY"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%Copy to clipboard"/>
+                        </tooltip>
+                    </Button>
+                </HBox>
+                <Label text="%Marking"/>
+                <TextArea fx:id="marking" editable="false" wrapText="true"/>
+                <Label text="%Content"/>
+                <TextArea fx:id="content" editable="false" wrapText="true"/>
+            </VBox>
+        </detailNode>
+    </MasterDetailPane>
+</ScrollPane>

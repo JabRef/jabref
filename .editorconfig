@@ -5,3 +5,9 @@ charset = utf-8
 indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
+
+[*.{fxml,java,properties,sh}]
+end_of_line = lf
+
+[*.md]
+trim_trailing_whitespace = false

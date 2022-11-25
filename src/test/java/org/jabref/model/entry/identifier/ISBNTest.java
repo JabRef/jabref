@@ -1,9 +1,9 @@
 package org.jabref.model.entry.identifier;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ISBNTest {
 
@@ -11,7 +11,6 @@ public class ISBNTest {
     public void testIsValidFormat10Correct() {
         assertTrue(new ISBN("0-123456-47-9").isValidFormat());
         assertTrue(new ISBN("0-9752298-0-X").isValidFormat());
-
     }
 
     @Test
@@ -71,5 +70,4 @@ public class ISBNTest {
     public void testIsIsbn13Incorrect() {
         assertFalse(new ISBN("0-123456-47-9").isIsbn13());
     }
-
 }

@@ -1,30 +1,43 @@
 package org.jabref.logic.citationstyle;
 
+import java.util.List;
+
 import org.jabref.logic.util.TestEntry;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class CitationStyleTest {
+class CitationStyleTest {
 
     @Test
-    public void getDefault() throws Exception {
-        Assert.assertNotNull(CitationStyle.getDefault());
+    void getDefault() throws Exception {
+        assertNotNull(CitationStyle.getDefault());
     }
 
     @Test
-    public void testDefaultCitation() {
-        String citation = CitationStyleGenerator.generateCitation(TestEntry.getTestEntry(), CitationStyle.getDefault());
+    void testDefaultCitation() {
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
+        context.setMode(BibDatabaseMode.BIBLATEX);
+        String citation = CitationStyleGenerator.generateCitation(TestEntry.getTestEntry(), CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager());
 
         // if the default citation style changes this has to be modified
-        String expected = "  <div class=\"csl-entry\">\n" +
-                "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">" +
-                "B. Smith, B. Jones, and J. Williams, “Title of the test entry,” " +
-                "<i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</div>\n" +
-                "  </div>\n";
+        String expected = "  <div class=\"csl-entry\">\n"
+                          + "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, 2016-07, doi: 10.1001/bla.blubb.</div>\n"
+                          + "  </div>\n"
+                          + "";
 
-        Assert.assertEquals(expected, citation);
+        assertEquals(expected, citation);
     }
 
+    @Test
+    void testDiscoverCitationStylesNotNull() throws Exception {
+        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
+        assertNotNull(styleList);
+    }
 }

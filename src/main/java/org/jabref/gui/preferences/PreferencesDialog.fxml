@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<?import org.controlsfx.control.textfield.CustomTextField?>
+<DialogPane prefHeight="700.0" prefWidth="1100.0" minHeight="400" minWidth="600"
+            xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jabref.gui.preferences.PreferencesDialogView">
+    <content>
+        <SplitPane dividerPositions="0.2">
+            <VBox id="sidepane">
+                <CustomTextField fx:id="searchBox" promptText="%Search" VBox.vgrow="NEVER">
+                    <VBox.margin>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
+                    </VBox.margin>
+                </CustomTextField>
+                <ListView fx:id="preferenceTabList" VBox.vgrow="ALWAYS"/>
+                <VBox prefHeight="10.0" VBox.vgrow="SOMETIMES"/>
+                <HBox alignment="BOTTOM_LEFT" spacing="3.0">
+                    <padding>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
+                    </padding>
+                    <Button styleClass="icon-button,narrow" maxWidth="Infinity" onAction="#importPreferences" HBox.hgrow="ALWAYS">
+                        <graphic>
+                            <JabRefIconView glyph="IMPORT"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%Import preferences from file"/>
+                        </tooltip>
+                    </Button>
+                    <Button styleClass="icon-button,narrow" maxWidth="Infinity" onAction="#exportPreferences" HBox.hgrow="ALWAYS">
+                        <graphic>
+                            <JabRefIconView glyph="EXPORT"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%Export preferences to file"/>
+                        </tooltip>
+                    </Button>
+                    <Button styleClass="icon-button,narrow" maxWidth="Infinity" onAction="#showAllPreferences" HBox.hgrow="ALWAYS">
+                        <graphic>
+                            <JabRefIconView glyph="SHOW_PREFERENCES_LIST"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%Show preferences"/>
+                        </tooltip>
+                    </Button>
+                    <Button styleClass="icon-button,narrow" maxWidth="Infinity" onAction="#resetPreferences" HBox.hgrow="ALWAYS">
+                        <graphic>
+                            <JabRefIconView glyph="REFRESH"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%Reset preferences"/>
+                        </tooltip>
+                    </Button>
+                </HBox>
+            </VBox>
+            <ScrollPane fx:id="preferencesContainer"/>
+        </SplitPane>
+    </content>
+    <ButtonType fx:id="saveButton" text="%Save" buttonData="OK_DONE"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

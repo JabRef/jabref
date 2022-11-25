@@ -1,28 +1,40 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Stream;
+
 import org.jabref.logic.layout.LayoutFormatter;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RemoveTildeTest {
     private LayoutFormatter formatter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         formatter = new RemoveTilde();
     }
 
-    @Test
-    public void testFormatString() {
-        Assert.assertEquals("", formatter.format(""));
-        Assert.assertEquals("simple", formatter.format("simple"));
-        Assert.assertEquals(" ", formatter.format("~"));
-        Assert.assertEquals("   ", formatter.format("~~~"));
-        Assert.assertEquals(" \\~ ", formatter.format("~\\~~"));
-        Assert.assertEquals("\\\\ ", formatter.format("\\\\~"));
-        Assert.assertEquals("Doe Joe and Jane, M. and Kamp, J. A.", formatter.format("Doe Joe and Jane, M. and Kamp, J.~A."));
-        Assert.assertEquals("T\\~olkien, J. R. R.", formatter.format("T\\~olkien, J.~R.~R."));
+    @ParameterizedTest
+    @MethodSource("provideArguments")
+    void formatText(String formattedString, String originalString) {
+        assertEquals(formattedString, formatter.format(originalString));
+    }
+
+    private static Stream<Arguments> provideArguments() {
+        return Stream.of(
+                Arguments.of("", ""),
+                Arguments.of("simple", "simple"),
+                Arguments.of(" ", "~"),
+                Arguments.of("   ", "~~~"),
+                Arguments.of(" \\~ ", "~\\~~"),
+                Arguments.of("\\\\ ", "\\\\~"),
+                Arguments.of("Doe Joe and Jane, M. and Kamp, J. A.", "Doe Joe and Jane, M. and Kamp, J.~A."),
+                Arguments.of("T\\~olkien, J. R. R.", "T\\~olkien, J.~R.~R.")
+        );
     }
 }

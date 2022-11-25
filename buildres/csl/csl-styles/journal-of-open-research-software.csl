@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" default-locale="en-US">
+  <info>
+    <title>Journal of Open Research Software</title>
+    <title-short>JORS</title-short>
+    <id>http://www.zotero.org/styles/journal-of-open-research-software</id>
+    <link href="http://www.zotero.org/styles/journal-of-open-research-software" rel="self"/>
+    <link href="http://www.zotero.org/styles/national-science-foundation-grant-proposals" rel="template"/>
+    <link href="https://openresearchsoftware.metajnl.com/about/submissions/#onlineSubmissions" rel="documentation"/>
+    <author>
+      <name>Patrick O'Brien</name>
+    </author>
+    <category citation-format="numeric"/>
+    <category field="science"/>
+    <eissn>2049-9647</eissn>
+    <updated>2021-02-03T17:11:15+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <macro name="title">
+    <choose>
+      <if type="book" match="any">
+        <text variable="title" quotes="false" font-style="italic"/>
+      </if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="locators">
+    <choose>
+      <if type="article-journal" match="any">
+        <group delimiter=": ">
+          <group delimiter=", ">
+            <text variable="container-title" font-style="italic"/>
+            <group>
+              <text variable="volume"/>
+              <text variable="issue" prefix="(" suffix=")"/>
+            </group>
+          </group>
+          <text variable="page"/>
+        </group>
+      </if>
+      <else-if type="book" match="any">
+        <text variable="publisher"/>
+      </else-if>
+      <else-if type="chapter paper-conference" match="any">
+        <group delimiter=". ">
+          <group delimiter=": ">
+            <text term="in" text-case="capitalize-first"/>
+            <text variable="container-title"/>
+          </group>
+          <text variable="publisher"/>
+        </group>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="access">
+    <choose>
+      <if match="any" variable="DOI">
+        <text variable="DOI" prefix="DOI: https://doi.org/"/>
+      </if>
+      <else>
+        <group delimiter=". ">
+          <text variable="URL" prefix="URL "/>
+          <group delimiter="; " prefix="[" suffix="]">
+            <text term="online" text-case="capitalize-first"/>
+            <group delimiter=" ">
+              <text term="accessed"/>
+              <date variable="accessed">
+                <date-part name="day" suffix="-"/>
+                <date-part name="month" suffix="-"/>
+                <date-part name="year"/>
+              </date>
+            </group>
+          </group>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <citation collapse="citation-number">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
+    <layout prefix="[" suffix="]" delimiter=", ">
+      <text variable="citation-number"/>
+    </layout>
+  </citation>
+  <bibliography second-field-align="margin">
+    <layout>
+      <text variable="citation-number" suffix=". "/>
+      <group delimiter=". " suffix=".">
+        <group delimiter=" ">
+          <names variable="author" font-weight="normal" suffix=" ">
+            <name and="text" initialize-with=" " name-as-sort-order="all">
+              <name-part name="family" font-weight="bold"/>
+              <name-part name="given" font-weight="bold"/>
+            </name>
+          </names>
+          <date variable="issued">
+            <date-part name="year" form="long"/>
+          </date>
+          <text macro="title"/>
+        </group>
+        <text macro="locators"/>
+      </group>
+      <text macro="access" prefix=" "/>
+    </layout>
+  </bibliography>
+</style>

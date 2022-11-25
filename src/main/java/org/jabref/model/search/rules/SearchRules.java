@@ -1,8 +1,14 @@
 package org.jabref.model.search.rules;
 
-import org.jabref.model.strings.StringUtil;
+import java.util.EnumSet;
+import java.util.regex.Pattern;
 
+/**
+ * This is a factory to instantiate the matching SearchRule implementation matching a given query
+ */
 public class SearchRules {
+
+    private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("[^\\p{Punct}]*");
 
     private SearchRules() {
     }
@@ -10,27 +16,34 @@ public class SearchRules {
     /**
      * Returns the appropriate search rule that fits best to the given parameter.
      */
-    public static SearchRule getSearchRuleByQuery(String query, boolean caseSensitive, boolean regex) {
-        if (StringUtil.isBlank(query)) {
-            return new ContainBasedSearchRule(caseSensitive);
+    public static SearchRule getSearchRuleByQuery(String query, EnumSet<SearchFlags> searchFlags) {
+        if (isSimpleQuery(query)) {
+            return new ContainsBasedSearchRule(searchFlags);
         }
 
         // this searches specified fields if specified,
         // and all fields otherwise
-        SearchRule searchExpression = new GrammarBasedSearchRule(caseSensitive, regex);
+        SearchRule searchExpression = new GrammarBasedSearchRule(searchFlags);
         if (searchExpression.validateSearchStrings(query)) {
             return searchExpression;
         } else {
-            return getSearchRule(caseSensitive, regex);
+            return getSearchRule(searchFlags);
         }
     }
 
-    private static SearchRule getSearchRule(boolean caseSensitive, boolean regex) {
-        if (regex) {
-            return new RegexBasedSearchRule(caseSensitive);
+    private static boolean isSimpleQuery(String query) {
+        return SIMPLE_EXPRESSION.matcher(query).matches();
+    }
+
+    static SearchRule getSearchRule(EnumSet<SearchFlags> searchFlags) {
+        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
+            return new RegexBasedSearchRule(searchFlags);
         } else {
-            return new ContainBasedSearchRule(caseSensitive);
+            return new ContainsBasedSearchRule(searchFlags);
         }
     }
 
+    public enum SearchFlags {
+        CASE_SENSITIVE, REGULAR_EXPRESSION, FULLTEXT, KEEP_SEARCH_STRING;
+    }
 }

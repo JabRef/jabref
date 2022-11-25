@@ -2,9 +2,6 @@ package org.jabref.gui.errorconsole;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -17,22 +14,21 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.tobiasdiez.easybind.EasyBind;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.logging.log4j.core.LogEvent;
-import org.fxmisc.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ErrorConsoleViewModel extends AbstractViewModel {
-    private static final Log LOGGER = LogFactory.getLog(ErrorConsoleViewModel.class);
 
-    private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-    private final Date date = new Date();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);
+
     private final DialogService dialogService;
     private final ClipBoardManager clipBoardManager;
     private final BuildInfo buildInfo;
@@ -42,7 +38,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         this.buildInfo = Objects.requireNonNull(buildInfo);
-        ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(LogMessages.getInstance().getMessages(), LogEventViewModel::new);
+        ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(BindingsHelper.forUI(LogMessages.getInstance().getMessages()), LogEventViewModel::new);
         allMessagesData = new ReadOnlyListWrapper<>(eventViewModels);
     }
 
@@ -57,8 +53,8 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
      */
     private String getLogMessagesAsString(List<LogEventViewModel> messages) {
         return messages.stream()
-                .map(LogEventViewModel::getDetailedText)
-                .collect(Collectors.joining(OS.NEWLINE));
+                       .map(LogEventViewModel::getDetailedText)
+                       .collect(Collectors.joining(OS.NEWLINE));
     }
 
     /**
@@ -75,7 +71,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         if (messages.isEmpty()) {
             return;
         }
-        clipBoardManager.setClipboardContents(getLogMessagesAsString(messages));
+        clipBoardManager.setContent(getLogMessagesAsString(messages));
         dialogService.notify(Localization.lang("Log copied to clipboard."));
     }
 
@@ -91,17 +87,16 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
      */
     public void reportIssue() {
         try {
-            String issueTitle = "Automatic Bug Report - " + dateFormat.format(date);
-            // system info
-            String systemInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.getVersion(), BuildInfo.OS,
+            // System info
+            String systemInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.version, BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
-            // steps to reproduce
+            // Steps to reproduce
             String howToReproduce = "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";
-            // log messages
+            // Log messages
             String issueDetails = "<details>\n" + "<summary>" + "Detail information:" + "</summary>\n\n```\n"
                     + getLogMessagesAsString(allMessagesData) + "\n```\n\n</details>";
-            clipBoardManager.setClipboardContents(issueDetails);
-            // bug report body
+            clipBoardManager.setContent(issueDetails);
+            // Bug report body
             String issueBody = systemInfo + "\n\n" + howToReproduce + "\n\n" + "Paste your log details here.";
 
             dialogService.notify(Localization.lang("Issue on GitHub successfully reported."));
@@ -114,11 +109,10 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
             URIBuilder uriBuilder = new URIBuilder()
                     .setScheme("https").setHost("github.com")
                     .setPath("/JabRef/jabref/issues/new")
-                    .setParameter("title", issueTitle)
                     .setParameter("body", issueBody);
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
         } catch (IOException | URISyntaxException e) {
-            LOGGER.error(e);
+            LOGGER.error("Problem opening url", e);
         }
     }
 }

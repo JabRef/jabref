@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -47,6 +48,9 @@ public class KeywordList implements Iterable<Keyword> {
             return new KeywordList();
         }
 
+        Objects.requireNonNull(delimiter);
+        Objects.requireNonNull(hierarchicalDelimiter);
+
         KeywordList keywordList = new KeywordList();
 
         StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
@@ -59,11 +63,21 @@ public class KeywordList implements Iterable<Keyword> {
     }
 
     /**
+     * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
+     *
      * @param keywordString a String of keywordChains
+     * @param delimiter     The delimiter used for separating the keywords
      * @return an parsed list containing the keywordChains
      */
     public static KeywordList parse(String keywordString, Character delimiter) {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
+    }
+
+    public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
+        KeywordList keywordListA = parse(keywordStringA, delimiter);
+        KeywordList keywordListB = parse(keywordStringB, delimiter);
+        List<Keyword> distinctKeywords = Stream.concat(keywordListA.stream(), keywordListB.stream()).distinct().toList();
+        return new KeywordList(distinctKeywords);
     }
 
     public KeywordList createClone() {
@@ -130,6 +144,10 @@ public class KeywordList implements Iterable<Keyword> {
         return keywordChains.contains(o);
     }
 
+    public boolean contains(String keywordString) {
+        return contains(new Keyword(keywordString));
+    }
+
     public boolean remove(Keyword o) {
         return keywordChains.remove(o);
     }
@@ -176,7 +194,7 @@ public class KeywordList implements Iterable<Keyword> {
             return false;
         }
         KeywordList keywords1 = (KeywordList) o;
-        return Objects.equals(keywordChains, keywords1.keywordChains);
+        return Objects.equals(new HashSet<>(keywordChains), new HashSet<>(keywords1.keywordChains));
     }
 
     @Override

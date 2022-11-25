@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.jabref.logic.bst.BibtexNameFormatter;
+import org.jabref.logic.bst.util.BstNameFormatter;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.AuthorList;
 
@@ -14,9 +14,9 @@ import org.jabref.model.entry.AuthorList;
  *
  * The formatter needs a parameter to be passed in that follows the following format:
  *
- * <case1>@<range11>@"<format>"@<range12>@"<format>"@<range13>...@@
+ * <code>&lt;case1>@&lt;range11>@"&lt;format>"@&lt;range12>@"&lt;format>"@&lt;range13>...@@
  *
- * <case2>@<range21>@... and so on.
+ * &lt;case2>@&lt;range21>@...</code> and so on.
  *
  * Individual cases are separated by @@ and items in a case by @.
  *
@@ -29,7 +29,7 @@ import org.jabref.model.entry.AuthorList;
  * case2 = 3
  * case3 = *
  *
- * Ranges are either <integer>..<integer>, <integer> or the character * using a 1 based index for indexing
+ * Ranges are either &lt;integer>..&lt;integer>, &lt;integer> or the character * using a 1 based index for indexing
  * authors from the given authorlist. Integer indexes can be negative to denote them to start from
  * the end of the list where -1 is the last author.
  *
@@ -43,7 +43,7 @@ import org.jabref.model.entry.AuthorList;
  *
  * 2..-1 will affect Mary, Bruce and Arthur
  *
- * The <format> uses the Bibtex formatter format:
+ * The &lt;format> uses the Bibtex formatter format:
  *
  * The four letter v, f, l, j indicate the name parts von, first, last, jr which
  * are used within curly braces. A single letter v, f, l, j indicates that the name should be abbreviated.
@@ -79,7 +79,6 @@ public class NameFormatter implements LayoutFormatter {
     private String parameter = NameFormatter.DEFAULT_FORMAT;
 
     private static String format(String toFormat, AuthorList al, String[] formats) {
-
         StringBuilder sb = new StringBuilder();
 
         int n = al.getNumberOfAuthors();
@@ -87,7 +86,7 @@ public class NameFormatter implements LayoutFormatter {
         for (int i = 1; i <= al.getNumberOfAuthors(); i++) {
             for (int j = 1; j < formats.length; j += 2) {
                 if ("*".equals(formats[j])) {
-                    sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
+                    sb.append(BstNameFormatter.formatName(toFormat, i, formats[j + 1]));
                     break;
                 } else {
                     String[] range = formats[j].split("\\.\\.");
@@ -113,18 +112,16 @@ public class NameFormatter implements LayoutFormatter {
                     }
 
                     if ((s <= i) && (i <= e)) {
-                        sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
+                        sb.append(BstNameFormatter.formatName(toFormat, i, formats[j + 1]));
                         break;
                     }
                 }
             }
         }
         return sb.toString();
-
     }
 
     public String format(String toFormat, String inParameters) {
-
         AuthorList al = AuthorList.parse(toFormat);
         String parameters;
 

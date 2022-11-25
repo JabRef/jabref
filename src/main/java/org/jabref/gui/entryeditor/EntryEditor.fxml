@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.112"
+         fx:controller="org.jabref.gui.entryeditor.EntryEditor" minHeight="50">
+    <left>
+        <ToolBar orientation="VERTICAL">
+            <Button styleClass="icon-button,narrow" onAction="#close">
+                <graphic>
+                    <JabRefIconView glyph="CLOSE"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Close window"/>
+                </tooltip>
+            </Button>
+            <Pane prefHeight="10" VBox.vgrow="ALWAYS"/>
+            <Group>
+                <Label fx:id="typeLabel" rotate="270">
+                    <tooltip>
+                        <Tooltip text="%Change entry type"/>
+                    </tooltip>
+                </Label>
+            </Group>
+            <Pane prefHeight="10" VBox.vgrow="ALWAYS"/>
+            <Button fx:id="typeChangeButton" styleClass="icon-button,narrow">
+                <graphic>
+                    <JabRefIconView glyph="ENTRY_TYPE"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Change entry type"/>
+                </tooltip>
+            </Button>
+            <Button styleClass="icon-button,narrow" onAction="#generateCiteKeyButton">
+                <graphic>
+                    <JabRefIconView glyph="MAKE_KEY"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Generate citation key"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="fetcherButton" styleClass="icon-button,narrow">
+                <graphic>
+                    <JabRefIconView glyph="REFRESH"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Update with bibliographic information from the web"/>
+                </tooltip>
+            </Button>
+            <Button styleClass="icon-button,narrow" onAction="#deleteEntry">
+                <graphic>
+                    <JabRefIconView glyph="DELETE_ENTRY"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Delete entry"/>
+                </tooltip>
+            </Button>
+            <Separator/>
+            <Button styleClass="icon-buttonNoSpaceBottom,narrow" onAction="#navigateToPreviousEntry">
+                <graphic>
+                    <JabRefIconView glyph="PREVIOUS_UP"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Previous entry"/>
+                </tooltip>
+            </Button>
+            <Button styleClass="icon-buttonNoSpaceTop,narrow" onAction="#navigateToNextEntry">
+                <graphic>
+                    <JabRefIconView glyph="NEXT_DOWN"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Next entry"/>
+                </tooltip>
+            </Button>
+        </ToolBar>
+    </left>
+    <center>
+        <TabPane fx:id="tabbed" tabClosingPolicy="UNAVAILABLE"/>
+    </center>
+</fx:root>

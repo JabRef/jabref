@@ -15,7 +15,6 @@ public class NoteChecker implements ValueChecker {
 
     private final BibDatabaseContext bibDatabaseContextEdition;
 
-
     public NoteChecker(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
     }
@@ -32,7 +31,7 @@ public class NoteChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        //BibTeX
+        // BibTeX
         if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
             return Optional.of(Localization.lang("should have the first letter capitalized"));
         }

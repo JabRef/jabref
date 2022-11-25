@@ -8,7 +8,7 @@ import javafx.util.converter.IntegerStringConverter;
 
 /**
  * Formatter that only accepts integer.
- *
+ * <p>
  * More or less taken from http://stackoverflow.com/a/36749659/873661
  */
 public class OnlyIntegerFormatter extends TextFormatter<Integer> {

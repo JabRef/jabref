@@ -6,6 +6,7 @@ import org.jabref.model.entry.BibEntry;
 
 /**
  * Searches web resources for bibliographic information based on an identifier.
+ * Examples are ISBN numbers and DOIs.
  */
 public interface IdBasedFetcher extends WebFetcher {
 
@@ -14,7 +15,6 @@ public interface IdBasedFetcher extends WebFetcher {
      *
      * @param identifier a string which uniquely identifies the item
      * @return a {@link BibEntry} containing the bibliographic information (or an empty optional if no data was found)
-     * @throws FetcherException
      */
     Optional<BibEntry> performSearchById(String identifier) throws FetcherException;
 }

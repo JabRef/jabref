@@ -2,13 +2,17 @@ package org.jabref.model.pdf;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileAnnotation {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotation.class);
 
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
     private static final String DATE_TIME_STRING = "^D:\\d{14}$";
@@ -48,7 +52,7 @@ public class FileAnnotation {
      * @param pageNumber The page of the pdf where the annotation occurs
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
-        this(annotation.getDictionary().getString(COSName.T),
+        this(annotation.getCOSObject().getString(COSName.T),
                 extractModifiedTime(annotation.getModifiedDate()),
                 pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.empty());
     }
@@ -62,7 +66,7 @@ public class FileAnnotation {
      * @param linkedFileAnnotation The corresponding note of a marked text area.
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
-        this(annotation.getDictionary().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
+        this(annotation.getCOSObject().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
                 pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.of(linkedFileAnnotation));
     }
 
@@ -83,7 +87,12 @@ public class FileAnnotation {
             dateTimeString = dateTimeString.substring(2);
         }
 
-        return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT));
+        try {
+            return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT));
+        } catch (DateTimeParseException e) {
+            LOGGER.info(String.format("Expected a parseable date string! However, this text could not be parsed: '%s'", dateTimeString));
+            return LocalDateTime.now();
+        }
     }
 
     private String parseContent(final String content) {

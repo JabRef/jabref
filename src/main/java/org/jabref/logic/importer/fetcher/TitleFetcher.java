@@ -8,8 +8,9 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.strings.StringUtil;
 
 public class TitleFetcher implements IdBasedFetcher {
 
@@ -25,22 +26,25 @@ public class TitleFetcher implements IdBasedFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_TITLE;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_TITLE);
     }
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        if (StringUtil.isBlank(identifier)) {
+            return Optional.empty();
+        }
+
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.TITLE, identifier);
+        entry.setField(StandardField.TITLE, identifier);
+
         Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entry);
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             return Optional.empty();
         }
 
         DoiFetcher doiFetcher = new DoiFetcher(this.preferences);
-
         return doiFetcher.performSearchById(doi.get().getDOI());
     }
-
 }

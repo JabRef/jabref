@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" initialize-with="." page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="en-GB">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
+  <info>
+    <title>International Union of Forest Research Organizations - Headquarters</title>
+    <title-short>IUFRO HQ</title-short>
+    <id>http://www.zotero.org/styles/international-union-of-forest-research-organizations-headquarters</id>
+    <link href="http://www.zotero.org/styles/international-union-of-forest-research-organizations-headquarters" rel="self"/>
+    <link href="https://www.iufro.org/fileadmin/material/publications/iufro-hq-citation-style.pdf" rel="documentation"/>
+    <author>
+      <name>Nelson Grima</name>
+      <email>grima@iufro.org</email>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="science"/>
+    <updated>2020-12-01T07:06:29+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" and="text" et-al-min="3" et-al-use-first="1"/>
+    </names>
+  </macro>
+  <macro name="author-count">
+    <names variable="author">
+      <name form="count"/>
+    </names>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name and="text" initialize-with="." name-as-sort-order="all" sort-separator=" "/>
+    </names>
+  </macro>
+  <macro name="issued">
+    <date variable="issued">
+      <date-part name="year"/>
+    </date>
+  </macro>
+  <macro name="publisher">
+    <group delimiter=": ">
+      <text variable="publisher"/>
+      <text variable="publisher-place" suffix="."/>
+    </group>
+  </macro>
+  <macro name="editor">
+    <names variable="editor" suffix=".">
+      <label form="short" text-case="capitalize-first" prefix="(" suffix=") "/>
+      <name and="text" et-al-min="5" et-al-use-first="2" initialize-with="."/>
+    </names>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
+    <sort>
+      <key macro="author-short" names-min="1" names-use-first="1"/>
+      <key macro="author-count" names-min="3" names-use-first="3"/>
+      <key macro="author" names-min="3" names-use-first="1"/>
+      <key macro="issued"/>
+      <key variable="title"/>
+    </sort>
+    <layout prefix="(" suffix=")" delimiter="; ">
+      <group delimiter=", ">
+        <text macro="author-short"/>
+        <text macro="issued"/>
+      </group>
+    </layout>
+  </citation>
+  <bibliography et-al-min="11" et-al-use-first="10">
+    <sort>
+      <key macro="author-short" names-min="1" names-use-first="1"/>
+      <key macro="author-count" names-min="3" names-use-first="3"/>
+      <key macro="author" names-min="3" names-use-first="1"/>
+      <key macro="issued"/>
+    </sort>
+    <layout suffix=".">
+      <group delimiter=" ">
+        <text macro="author"/>
+        <text macro="issued" prefix="(" suffix=")."/>
+        <choose>
+          <if type="article article-magazine article-newspaper article-journal review manuscript paper-conference" match="any">
+            <text variable="title" font-style="italic" suffix="."/>
+            <group delimiter=", ">
+              <text variable="container-title" suffix=","/>
+              <text variable="volume" font-style="normal"/>
+              <text variable="issue" suffix=","/>
+              <text variable="page"/>
+              <text variable="DOI" prefix="DOI: "/>
+            </group>
+          </if>
+          <else-if type="chapter" match="any">
+            <text variable="title" font-style="italic" suffix="."/>
+            <text variable="container-title" text-case="title" prefix="In: " suffix="."/>
+            <text macro="editor"/>
+            <text macro="publisher" suffix=","/>
+            <text variable="page" prefix="pp. " suffix="."/>
+            <text variable="DOI" prefix="DOI: " suffix="."/>
+            <text variable="ISBN" prefix="ISBN: " suffix="."/>
+            <text variable="ISSN" prefix="ISSN: " suffix="."/>
+          </else-if>
+          <else-if type="thesis">
+            <text variable="title" font-style="italic" suffix="."/>
+            <text variable="publisher" suffix="."/>
+            <text variable="publisher-place" suffix="."/>
+            <text variable="number-of-pages" prefix="pp. " suffix="."/>
+            <text variable="URL"/>
+          </else-if>
+          <else-if type="book report" match="any">
+            <text variable="title" font-style="italic" suffix="."/>
+            <text macro="editor"/>
+            <text macro="publisher" suffix="."/>
+            <text variable="number-of-pages" prefix="pp. " suffix="."/>
+            <text variable="DOI" prefix="DOI: " suffix="."/>
+            <text variable="ISBN" prefix="ISBN: " suffix="."/>
+            <text variable="ISSN" prefix="ISSN:" suffix="."/>
+            <text variable="URL"/>
+          </else-if>
+          <else-if type="webpage post-weblog" match="any">
+            <text variable="title" font-style="italic" suffix="."/>
+            <text variable="publisher" suffix="."/>
+            <text variable="URL" prefix="Available at: " suffix=" "/>
+            <date form="text" variable="accessed" prefix="[Accessed on " suffix="]"/>
+          </else-if>
+          <else>
+            <text variable="title" font-style="italic" suffix="."/>
+            <text macro="publisher"/>
+          </else>
+        </choose>
+      </group>
+    </layout>
+  </bibliography>
+</style>

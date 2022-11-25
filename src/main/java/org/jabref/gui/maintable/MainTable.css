@@ -1,0 +1,59 @@
+.column-icon {
+    -fx-alignment: baseline-center;
+    -fx-padding: 0;
+}
+
+.column-header.column-icon > .label {
+    -fx-padding: 0;
+    -fx-alignment: baseline-center;
+}
+
+.empty-special-field {
+    visibility: hidden;
+}
+
+.table-row-cell:hover .empty-special-field {
+    visibility: visible;
+    -fx-fill: -jr-gray-2;
+}
+
+.table-row-cell:dragOver-bottom {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 -2 0;
+}
+
+.table-row-cell:dragOver-center {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 1 1 1 1;
+    -fx-padding: -1 -1 -1 -1;
+    -fx-background-color: -jr-drag-target-hover;
+}
+
+.table-row-cell:dragOver-top {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 2 0 0 0;
+    -fx-padding: -2 0 0 0;
+}
+
+.rating > .container {
+    -fx-spacing: 2;
+}
+
+.rating > .container > .button {
+    -fx-pref-width: 16;
+    -fx-pref-height: 10;
+    -fx-background-repeat: no-repeat no-repeat;
+    -fx-background-size: 16 16;
+    -fx-border-style: none;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+.rating > .container > .button.strong {
+
+}
+
+.rating > .container > .button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 0);
+}

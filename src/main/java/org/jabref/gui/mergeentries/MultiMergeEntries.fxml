@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Control?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.ComboBox?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.mergeentries.MultiMergeEntriesView"
+            prefHeight="500.0" prefWidth="800.0">
+
+    <content>
+        <VBox styleClass="box">
+            <SplitPane dividerPositions="0.1, 0.6, 0.3" VBox.vgrow="ALWAYS">
+                <VBox>
+                    <Region prefHeight="${topScrollPane.height}" VBox.vgrow="NEVER">
+                        <minHeight><Control fx:constant="USE_PREF_SIZE" /></minHeight>
+                        <maxHeight><Control fx:constant="USE_PREF_SIZE" /></maxHeight>
+                   </Region>
+                    <ScrollPane fx:id="leftScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="fieldHeader" styleClass="box"/>
+                    </ScrollPane>
+                </VBox>
+                <VBox>
+                    <ScrollPane fx:id="topScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" VBox.vgrow="NEVER">
+                        <HBox fx:id="supplierHeader" styleClass="box"/>
+                    </ScrollPane>
+                    <ScrollPane fx:id="centerScrollPane" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                        <GridPane fx:id="optionsGrid" styleClass="grid-pane"/>
+                    </ScrollPane>
+                </VBox>
+               <VBox alignment="TOP_CENTER">
+                    <Label text="%Merged entry" prefHeight="${topScrollPane.height}" alignment="TOP_CENTER" VBox.vgrow="NEVER">
+                        <minHeight><Control fx:constant="USE_PREF_SIZE" /></minHeight>
+                        <maxHeight><Control fx:constant="USE_PREF_SIZE" /></maxHeight>
+                   </Label>
+                    <ScrollPane fx:id="rightScrollPane" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" fitToWidth="true">
+                        <VBox fx:id="fieldEditor" styleClass="box"/>
+                    </ScrollPane>
+                </VBox>
+            </SplitPane>
+            <Label fx:id="failedSuppliers"/>
+            <HBox styleClass="box">
+                <Label text="%Show diff" prefHeight="${diffMode.height}"/>
+                <ComboBox fx:id="diffMode"/>
+            </HBox>
+        </VBox>
+    </content>
+</DialogPane>

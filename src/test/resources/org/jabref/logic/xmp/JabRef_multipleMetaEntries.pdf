@@ -1,0 +1,189 @@
+%PDF-1.4
+%öäüß
+1 0 obj
+<<
+/Type /Catalog
+/Version /1.4
+/Pages 2 0 R
+/Metadata 3 0 R
+>>
+endobj
+4 0 obj
+<<
+/bibtex#2Fdate (2000)
+/bibtex#2Fowner (Christoph Schwentker)
+/Author (Vladimir N. Vapnik)
+/bibtex#2Fbibtexkey (Vapnik2000)
+/bibtex#2Fpublisher (Springer Science + Business Media)
+/Title (The Nature of Statistical Learning Theory)
+/bibtex#2Fdoi (10.1007/978-1-4757-3264-1)
+/bibtex#2Ftimestamp (2016.06.20)
+/bibtex#2Fentrytype (Book)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Kids [5 0 R]
+/Count 1
+>>
+endobj
+3 0 obj
+<<
+/Length 4390
+/Type /Metadata
+/Subtype /XML
+>>
+stream
+<?xpacket begin="ï»¿" id="W5M0MpCehiHzreSzNTczkc9d"?>
+
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
+      <dc:relation>
+        <rdf:Bag>
+          <rdf:li>bibtex/date/2000</rdf:li>
+          <rdf:li>bibtex/owner/Christoph Schwentker</rdf:li>
+          <rdf:li>bibtex/bibtexkey/Vapnik2000</rdf:li>
+          <rdf:li>bibtex/timestamp/2016.06.20</rdf:li>
+        </rdf:Bag>
+      </dc:relation>
+      <dc:creator>
+        <rdf:Seq>
+          <rdf:li>Vladimir N. Vapnik</rdf:li>
+        </rdf:Seq>
+      </dc:creator>
+      <dc:publisher>
+        <rdf:Bag>
+          <rdf:li>Springer Science + Business Media</rdf:li>
+        </rdf:Bag>
+      </dc:publisher>
+      <dc:title>
+        <rdf:Alt>
+          <rdf:li lang="x-default">The Nature of Statistical Learning Theory</rdf:li>
+        </rdf:Alt>
+      </dc:title>
+      <dc:identifier>10.1007/978-1-4757-3264-1</dc:identifier>
+      <dc:format>application/pdf</dc:format>
+      <dc:type>
+        <rdf:Bag>
+          <rdf:li>Book</rdf:li>
+        </rdf:Bag>
+      </dc:type>
+    </rdf:Description>
+    <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
+      <dc:relation>
+        <rdf:Bag>
+          <rdf:li>bibtex/owner/Me</rdf:li>
+          <rdf:li>bibtex/note/That's a note</rdf:li>
+          <rdf:li>bibtex/howpublished/Online</rdf:li>
+          <rdf:li>bibtex/groups/NO</rdf:li>
+          <rdf:li>bibtex/url/https://www.olly2018.edu</rdf:li>
+          <rdf:li>bibtex/volume/1</rdf:li>
+          <rdf:li>bibtex/number/1</rdf:li>
+          <rdf:li>bibtex/journal/Test Journal</rdf:li>
+          <rdf:li>bibtex/pages/1-2</rdf:li>
+          <rdf:li>bibtex/file/:article_dublinCore.pdf:PDF</rdf:li>
+          <rdf:li>bibtex/month/#mar#</rdf:li>
+          <rdf:li>bibtex/issn/978-123-123</rdf:li>
+          <rdf:li>bibtex/review/Here are the reviews</rdf:li>
+          <rdf:li>bibtex/bibtexkey/Olly2018</rdf:li>
+          <rdf:li>bibtex/comment/That's a comment</rdf:li>
+          <rdf:li>bibtex/timestamp/2018-02-15</rdf:li>
+        </rdf:Bag>
+      </dc:relation>
+      <dc:subject>
+        <rdf:Bag>
+          <rdf:li>Keyword1</rdf:li>
+          <rdf:li>Keyword2</rdf:li>
+        </rdf:Bag>
+      </dc:subject>
+      <dc:creator>
+        <rdf:Seq>
+          <rdf:li>Olly</rdf:li>
+          <rdf:li>Johannes</rdf:li>
+        </rdf:Seq>
+      </dc:creator>
+      <dc:description>
+        <rdf:Alt>
+          <rdf:li lang="x-default">That's an abstract</rdf:li>
+        </rdf:Alt>
+      </dc:description>
+      <dc:title>
+        <rdf:Alt>
+          <rdf:li lang="x-default">Stefan's palace</rdf:li>
+        </rdf:Alt>
+      </dc:title>
+      <dc:identifier>10/3212.3123</dc:identifier>
+      <dc:format>application/pdf</dc:format>
+      <dc:type>
+        <rdf:Bag>
+          <rdf:li>Article</rdf:li>
+        </rdf:Bag>
+      </dc:type>
+    </rdf:Description>
+    <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
+      <dc:relation>
+        <rdf:Bag>
+          <rdf:li>bibtex/date/2006</rdf:li>
+          <rdf:li>bibtex/owner/Christoph Schwentker</rdf:li>
+          <rdf:li>bibtex/eprinttype/asdf</rdf:li>
+          <rdf:li>bibtex/eventdate/2017-05-31</rdf:li>
+          <rdf:li>bibtex/url/asdfasdfas</rdf:li>
+          <rdf:li>bibtex/pages/56--61</rdf:li>
+          <rdf:li>bibtex/bibtexkey/Toral2006</rdf:li>
+          <rdf:li>bibtex/booktitle/Proceedings of EACL</rdf:li>
+          <rdf:li>bibtex/timestamp/2016.11.07</rdf:li>
+          <rdf:li>bibtex/urldate/2017-05-31</rdf:li>
+        </rdf:Bag>
+      </dc:relation>
+      <dc:creator>
+        <rdf:Seq>
+          <rdf:li>Antonio Toral</rdf:li>
+          <rdf:li>Rafael Munoz</rdf:li>
+        </rdf:Seq>
+      </dc:creator>
+      <dc:title>
+        <rdf:Alt>
+          <rdf:li lang="x-default">A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia</rdf:li>
+        </rdf:Alt>
+      </dc:title>
+      <dc:format>application/pdf</dc:format>
+      <dc:type>
+        <rdf:Bag>
+          <rdf:li>InProceedings</rdf:li>
+        </rdf:Bag>
+      </dc:type>
+    </rdf:Description>
+  </rdf:RDF>
+</x:xmpmeta>
+<?xpacket end="w"?>
+
+
+endstream
+endobj
+5 0 obj
+<<
+/Type /Page
+/MediaBox [0.0 0.0 612.0 792.0]
+/Parent 2 0 R
+>>
+endobj
+xref
+0 6
+0000000000 65535 f
+0000000015 00000 n
+0000000447 00000 n
+0000000504 00000 n
+0000000094 00000 n
+0000004978 00000 n
+trailer
+<<
+/Root 1 0 R
+/ID [<D25EBB6A8A54911A3D7C7D81DC2B0B5F> <D25EBB6A8A54911A3D7C7D81DC2B0B5F>]
+/Size 6
+/Info 4 0 R
+>>
+startxref
+5057
+%%EOF

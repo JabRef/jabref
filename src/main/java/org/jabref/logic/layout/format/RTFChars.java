@@ -5,8 +5,8 @@ import org.jabref.logic.layout.StringInt;
 import org.jabref.logic.util.strings.RtfCharMap;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Transform a LaTeX-String to RTF.
@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
  *
  *   1.) Remove LaTeX-Command sequences.
  *
- *   2.) Replace LaTeX-Special chars with RTF aquivalents.
+ *   2.) Replace LaTeX-Special chars with RTF equivalents.
  *
  *   3.) Replace emph and textit and textbf with their RTF replacements.
  *
@@ -25,26 +25,23 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RTFChars implements LayoutFormatter {
 
-    private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LayoutFormatter.class);
 
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 
     @Override
     public String format(String field) {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
         boolean escaped = false;
         boolean incommand = false;
         for (int i = 0; i < field.length(); i++) {
-
             char c = field.charAt(i);
 
             if (escaped && (c == '\\')) {
                 sb.append('\\');
                 escaped = false;
-            }
-
-            else if (c == '\\') {
+            } else if (c == '\\') {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuilder();
@@ -56,7 +53,8 @@ public class RTFChars implements LayoutFormatter {
                 if (incommand) {
                     // Else we are in a command, and should not keep the letter.
                     currentCommand.append(c);
-                    testCharCom: if ((currentCommand.length() == 1)
+                    testCharCom:
+                    if ((currentCommand.length() == 1)
                             && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
@@ -84,14 +82,13 @@ public class RTFChars implements LayoutFormatter {
 
                         incommand = false;
                         escaped = false;
-
                     }
                 } else {
                     sb.append(c);
                 }
-
             } else {
-                testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{') && (c != '}'))) {
+                testContent:
+                if (!incommand || (!Character.isWhitespace(c) && (c != '{') && (c != '}'))) {
                     sb.append(c);
                 } else {
                     assert incommand;
@@ -142,7 +139,6 @@ public class RTFChars implements LayoutFormatter {
                     } else {
                         sb.append(c);
                     }
-
                 }
                 incommand = false;
                 escaped = false;
@@ -161,12 +157,12 @@ public class RTFChars implements LayoutFormatter {
         }
 
         return sb.toString().replace("---", "{\\emdash}").replace("--", "{\\endash}").replace("``", "{\\ldblquote}")
-                .replace("''", "{\\rdblquote}");
+                 .replace("''", "{\\rdblquote}");
     }
 
     /**
-     * @param text the text to extract the part from
-     * @param i the position to start
+     * @param text                  the text to extract the part from
+     * @param i                     the position to start
      * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
      * @return a tuple of number of added characters and the extracted part
      */
@@ -175,24 +171,25 @@ public class RTFChars implements LayoutFormatter {
         int count = 0;
         int icount = i;
         StringBuilder part = new StringBuilder();
-        loop: while ((count >= 0) && (icount < text.length())) {
+        loop:
+        while ((count >= 0) && (icount < text.length())) {
             icount++;
             c = text.charAt(icount);
             switch (c) {
-            case '}':
-                count--;
-                break;
-            case '{':
-                count++;
-                break;
-            case ' ':
-                if (!commandNestedInBraces) {
-                    // in any case, a space terminates the loop
-                    break loop;
-                }
-                break;
-            default:
-                break;
+                case '}':
+                    count--;
+                    break;
+                case '{':
+                    count++;
+                    break;
+                case ' ':
+                    if (!commandNestedInBraces) {
+                        // in any case, a space terminates the loop
+                        break loop;
+                    }
+                    break;
+                default:
+                    break;
             }
             part.append(c);
         }
@@ -203,6 +200,7 @@ public class RTFChars implements LayoutFormatter {
 
     /**
      * This method transforms the unicode of a special character into its base character: 233 (é) - > e
+     *
      * @param c long
      * @return returns the basic character of the given unicode
      */

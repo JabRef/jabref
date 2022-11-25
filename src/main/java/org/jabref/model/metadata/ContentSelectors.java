@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.model.entry.field.Field;
+
 public class ContentSelectors {
 
     private final List<ContentSelector> contentSelectors;
@@ -20,9 +22,18 @@ public class ContentSelectors {
         this.contentSelectors.add(contentSelector);
     }
 
-    public List<String> getSelectorValuesForField(String fieldName) {
-        for (ContentSelector selector: contentSelectors) {
-            if (selector.getFieldName().equals(fieldName)) {
+    public static ContentSelector parse(Field key, String values) {
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(values);
+
+        List<String> valueList = Arrays.asList(values.split(";"));
+
+        return new ContentSelector(key, valueList);
+    }
+
+    public List<String> getSelectorValuesForField(Field field) {
+        for (ContentSelector selector : contentSelectors) {
+            if (selector.getField().equals(field)) {
                 return selector.getValues();
             }
         }
@@ -30,11 +41,15 @@ public class ContentSelectors {
         return Collections.emptyList();
     }
 
-    public void removeSelector(String fieldName) {
+    public List<ContentSelector> getContentSelectors() {
+        return Collections.unmodifiableList(contentSelectors);
+    }
+
+    public void removeSelector(Field field) {
         ContentSelector toRemove = null;
 
-        for (ContentSelector selector: contentSelectors) {
-            if (selector.getFieldName().equals(fieldName)) {
+        for (ContentSelector selector : contentSelectors) {
+            if (selector.getField().equals(field)) {
                 toRemove = selector;
                 break;
             }
@@ -45,24 +60,11 @@ public class ContentSelectors {
         }
     }
 
-    public List<ContentSelector> getContentSelectors() {
-        return Collections.unmodifiableList(contentSelectors);
-    }
+    public List<Field> getFieldsWithSelectors() {
+        List<Field> result = new ArrayList<>(contentSelectors.size());
 
-    public static ContentSelector parse(String key, String values) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(values);
-
-        List<String> valueList = Arrays.asList(values.split(";"));
-
-        return new ContentSelector(key, valueList);
-    }
-
-    public List<String> getFieldNamesWithSelectors() {
-        List<String> result = new ArrayList<>(contentSelectors.size());
-
-        for (ContentSelector selector: contentSelectors) {
-            result.add(selector.getFieldName());
+        for (ContentSelector selector : contentSelectors) {
+            result.add(selector.getField());
         }
 
         return result;
@@ -70,8 +72,12 @@ public class ContentSelectors {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ContentSelectors that = (ContentSelectors) o;
         return Objects.equals(contentSelectors, that.contentSelectors);
     }

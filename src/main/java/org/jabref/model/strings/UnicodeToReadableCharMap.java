@@ -237,5 +237,4 @@ public class UnicodeToReadableCharMap extends HashMap<String, String> {
 
         // UNICODE_CHARS.put("\u0100", "");
     }
-
 }

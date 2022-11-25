@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<DialogPane prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.groups.GroupDialogView">
+    <content>
+        <fx:define>
+            <ToggleGroup fx:id="hierarchicalContext"/>
+            <ToggleGroup fx:id="type"/>
+            <ToggleGroup fx:id="autoGroupOptions"/>
+        </fx:define>
+        <VBox spacing="10.0" minWidth="200">
+            <padding>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+            </padding>
+            <VBox>
+                <Label text="%Name"/>
+                <TextField fx:id="nameField"/>
+            </VBox>
+            <VBox>
+                <Label text="%Description"/>
+                <TextField fx:id="descriptionField"/>
+            </VBox>
+            <HBox spacing="10.0">
+                <VBox HBox.hgrow="ALWAYS">
+                    <Label text="%Icon"/>
+                    <HBox>
+                        <TextField fx:id="iconField"/>
+                        <Button fx:id="iconPickerButton" onAction="#openIconPicker" styleClass="icon-button,narrow">
+                            <graphic>
+                                <JabRefIconView glyph="SELECT_ICONS"/>
+                            </graphic>
+                        </Button>
+                    </HBox>
+                </VBox>
+                <VBox layoutX="10.0" layoutY="10.0" minWidth="130.0" maxWidth="130.0" prefWidth="130.0">
+                    <Label text="%Color"/>
+                    <ColorPicker fx:id="colorField"/>
+                </VBox>
+                <VBox>
+                    <Label text="%Hierarchical context"/>
+                    <ComboBox fx:id="hierarchicalContextCombo" minWidth="130.0" maxWidth="130.0" prefWidth="130.0"/>
+                </VBox>
+            </HBox>
+            <HBox alignment="BOTTOM_LEFT">
+                <Label text="%Collect by" styleClass="sectionHeader"/>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Button styleClass="icon-button,narrow" onAction="#openHelp">
+                    <graphic>
+                        <JabRefIconView glyph="HELP"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%Open Help page"/>
+                    </tooltip>
+                </Button>
+            </HBox>
+            <HBox>
+                <VBox spacing="10.0">
+                    <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Explicit selection">
+                        <tooltip>
+                            <Tooltip text="%Statically group entries by manual assignment"/>
+                        </tooltip>
+                    </RadioButton>
+                    <RadioButton fx:id="keywordsRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Searching for a keyword">
+                        <tooltip>
+                            <Tooltip text="%Dynamically group entries by searching a field for a keyword"/>
+                        </tooltip>
+                    </RadioButton>
+                    <RadioButton fx:id="searchRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Free search expression">
+                        <tooltip>
+                            <Tooltip text="%Dynamically group entries by a free-form search expression"/>
+                        </tooltip>
+                    </RadioButton>
+                    <RadioButton fx:id="autoRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Specified keywords">
+                        <tooltip>
+                            <Tooltip text="%Automatically create groups"/>
+                        </tooltip>
+                    </RadioButton>
+                    <RadioButton fx:id="texRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Cited entries">
+                        <tooltip>
+                            <Tooltip text="%Group containing entries cited in a given TeX file"/>
+                        </tooltip>
+                    </RadioButton>
+                </VBox>
+                <Separator orientation="VERTICAL"/>
+                <StackPane HBox.hgrow="ALWAYS">
+                    <VBox visible="${keywordsRadioButton.selected}" spacing="10.0">
+                        <VBox>
+                            <Label text="%Field"/>
+                            <TextField fx:id="keywordGroupSearchField"/>
+                        </VBox>
+                        <VBox>
+                            <Label text="%Keyword"/>
+                            <TextField fx:id="keywordGroupSearchTerm"/>
+                        </VBox>
+                        <HBox spacing="10.0">
+                            <CheckBox fx:id="keywordGroupCaseSensitive" text="%Case sensitive"/>
+                            <CheckBox fx:id="keywordGroupRegex" text="%Regular expression"/>
+                        </HBox>
+                    </VBox>
+                    <VBox visible="${searchRadioButton.selected}" spacing="10.0">
+                        <VBox>
+                            <Label text="%Search expression"/>
+                            <TextField fx:id="searchGroupSearchTerm"/>
+                        </VBox>
+                        <HBox spacing="10.0">
+                            <CheckBox fx:id="searchGroupCaseSensitive" text="%Case sensitive"/>
+                            <CheckBox fx:id="searchGroupRegex" text="%Regular expression"/>
+                        </HBox>
+                    </VBox>
+                    <VBox visible="${autoRadioButton.selected}" spacing="10.0">
+                        <RadioButton fx:id="autoGroupKeywordsOption" toggleGroup="$autoGroupOptions"
+                                     text="%Generate groups from keywords in the following field"/>
+                        <VBox spacing="10.0">
+                            <padding>
+                                <Insets left="20.0"/>
+                            </padding>
+                            <HBox spacing="10.0">
+                                <VBox HBox.hgrow="ALWAYS">
+                                    <Label text="%Field to group by"/>
+                                    <TextField fx:id="autoGroupKeywordsField"
+                                               disable="${!autoGroupKeywordsOption.selected}"/>
+                                </VBox>
+                                <VBox>
+                                    <Label text="%Delimiter(s)"/>
+                                    <HBox spacing="10.0">
+                                        <TextField fx:id="autoGroupKeywordsDeliminator" prefWidth="30.0"
+                                                   disable="${!autoGroupKeywordsOption.selected}">
+                                            <tooltip>
+                                                <Tooltip text="%Keyword delimiter"/>
+                                            </tooltip>
+                                        </TextField>
+                                        <TextField fx:id="autoGroupKeywordsHierarchicalDeliminator" prefWidth="30.0"
+                                                   disable="${!autoGroupKeywordsOption.selected}">
+                                            <tooltip>
+                                                <Tooltip text="%Hierarchical keyword delimiter"/>
+                                            </tooltip>
+                                        </TextField>
+                                    </HBox>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                        <RadioButton fx:id="autoGroupPersonsOption" toggleGroup="$autoGroupOptions"
+                                     text="%Generate groups for author last names"/>
+                        <VBox>
+                            <padding>
+                                <Insets left="20.0"/>
+                            </padding>
+                            <Label text="%Field to group by"/>
+                            <TextField fx:id="autoGroupPersonsField" disable="${!autoGroupPersonsOption.selected}"/>
+                        </VBox>
+                    </VBox>
+                    <VBox visible="${texRadioButton.selected}">
+                        <Label text="%Aux file"/>
+                        <HBox spacing="10.0">
+                            <TextField fx:id="texGroupFilePath" HBox.hgrow="ALWAYS" prefHeight="30.0"/>
+                            <Button onAction="#texGroupBrowse" text="%Browse" prefHeight="30.0"/>
+                        </HBox>
+                    </VBox>
+                </StackPane>
+            </HBox>
+        </VBox>
+    </content>
+</DialogPane>

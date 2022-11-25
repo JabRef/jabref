@@ -1,0 +1,8 @@
+default: true
+
+# allow arbitrary line length
+MD013: false
+
+MD033:
+  # we have <a> tags with ids and superscript
+  allowed_elements: ['a', 'kbd', 'sup']

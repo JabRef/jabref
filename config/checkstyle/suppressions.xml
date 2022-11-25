@@ -2,9 +2,11 @@
 
 <!DOCTYPE suppressions PUBLIC
         "-//Puppy Crawl//DTD Suppressions 1.1//EN"
-        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+        "http://www.checkstyle.org/dtds/suppressions_1_1.dtd">
 
 <suppressions>
-    <suppress checks="[a-zA-Z0-9]*" files="[\\/]gen[\\/]" />
-    <suppress checks="[a-zA-Z0-9]*" files="[\\/]test[\\/]" />
+    <suppress checks="[a-zA-Z0-9]*" files="[\\/]generated[\\/]" />
+    <suppress checks="[a-zA-Z0-9]*" files="[\\/]src-gen[\\/]" />
+    <!-- We ignore this file because it's a modification of the original java code https://github.com/openjdk/jfx/blob/jfx15/modules/javafx.controls/src/main/java/javafx/scene/control/skin/TitledPaneSkin.java -->
+    <suppress checks="[a-zA-Z0-9]*" files="CustomTitledPaneSkin.java" />
 </suppressions>

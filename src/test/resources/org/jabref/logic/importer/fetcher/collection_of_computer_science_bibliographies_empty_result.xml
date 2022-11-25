@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet title="XSL_formatting" type="text/xsl" href="http://liinwww.ira.uka.de/bibliography/rss.xsl"?><rss version="2.0">
+    
+    <channel xmlns:dc="http://purl.org/dc/elements/1.1/">
+        
+        <title>CCSB: "test string which returns no results"</title>
+        <link>http://liinwww.ira.uka.de/bibliography/#search</link>
+        <description>Search results in The Collection of Computer Science Bibliographies for query: "test string which returns no results"</description>
+        <language>en</language>
+        <copyright>The data is available for noncommercial or private use only, harvesting is prohibited (the data may be obtained using other means and not this RSS feed).</copyright>
+        <webMaster>liinwwwa@ira.uka.de</webMaster>
+        <lastBuildDate>Mon,  09  Mar 2020 03:14:28 +0100</lastBuildDate>
+        <ttl>5760</ttl>
+        
+    </channel>
+</rss>

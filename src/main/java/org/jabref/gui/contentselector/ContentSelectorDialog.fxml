@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<DialogPane minHeight="450.0" minWidth="375.0" prefHeight="450.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.contentselector.ContentSelectorDialogView">
+    <content>
+        <VBox>
+            <children>
+                <Label prefHeight="27.0" prefWidth="108.0" text="%Field names"/>
+                <HBox prefHeight="140.0" prefWidth="385.0">
+                    <children>
+                        <ListView fx:id="fieldsListView" prefHeight="140.0" prefWidth="297.0"/>
+                        <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                            <children>
+                                <Button fx:id="addFieldNameButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="72.0" text="%Add" onAction="#addNewFieldName">
+                                    <VBox.margin>
+                                        <Insets top="5.0"/>
+                                    </VBox.margin>
+                                </Button>
+                                <Button fx:id="removeFieldNameButton" mnemonicParsing="false" text="%Remove" onAction="#removeFieldName">
+                                    <VBox.margin>
+                                        <Insets top="5.0"/>
+                                    </VBox.margin>
+                                </Button>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+                <Separator prefWidth="200.0">
+                    <VBox.margin>
+                        <Insets top="20.0"/>
+                    </VBox.margin>
+                </Separator>
+                <Label prefHeight="27.0" prefWidth="108.0" text="%Keywords"/>
+                <HBox prefHeight="140.0" prefWidth="385.0">
+                    <children>
+                        <ListView fx:id="keywordsListView" prefHeight="140.0" prefWidth="297.0"/>
+                        <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
+                            <children>
+                                <Button fx:id="addKeywordButton" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="72.0" text="%Add" onAction="#addNewKeyword">
+                                    <VBox.margin>
+                                        <Insets top="5.0"/>
+                                    </VBox.margin>
+                                </Button>
+                                <Button fx:id="removeKeywordButton" mnemonicParsing="false" text="%Remove" onAction="#removeKeyword">
+                                    <VBox.margin>
+                                        <Insets top="5.0"/>
+                                    </VBox.margin>
+                                </Button>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </content>
+    <ButtonType fx:id="saveButton" buttonData="OK_DONE" text="%Save"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

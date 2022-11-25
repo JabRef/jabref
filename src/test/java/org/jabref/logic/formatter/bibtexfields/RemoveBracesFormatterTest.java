@@ -1,10 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -13,7 +12,7 @@ public class RemoveBracesFormatterTest {
 
     private RemoveBracesFormatter formatter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         formatter = new RemoveBracesFormatter();
     }
@@ -36,6 +35,11 @@ public class RemoveBracesFormatterTest {
     @Test
     public void formatKeepsShortString() {
         assertEquals("t", formatter.format("t"));
+    }
+
+    @Test
+    public void formatRemovesBracesOnly() {
+        assertEquals("", formatter.format("{}"));
     }
 
     @Test
@@ -73,5 +77,4 @@ public class RemoveBracesFormatterTest {
     public void formatExample() {
         assertEquals("In CDMA", formatter.format(formatter.getExampleInput()));
     }
-
 }

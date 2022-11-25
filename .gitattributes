@@ -1,14 +1,21 @@
 # unix  line endings at unix files
-gradlew eol=lf
-*.sh eol=lf
+gradlew text eol=lf
+*.sh text eol=lf
 
-AUTHORS eol=lf
+# windows line endings at windows files
+*.bat text eol=crlf
 
-# ensure that line endings of *.java and *.properties are normalized
-*.properties text
-*.java text
+# ensure that line endings of *.fxml, *.java, and *.properties are normalized
+*.fxml text eol=lf
+*.java text eol=lf
+*.properties text eol=lf
 
-# disable after a release
+# .bib files have to be written using OS specific line endings to enable our tests working
+*.bib text !eol
+
+# Citavi needs to be LF line ending
+# This overwrites the setting of "*.bib"
+Citavi*.bib eol=lf
+
+# disable after a release (otherwise, duplicate CHANGELOG.md entries will be generated)
 # CHANGELOG.md merge=union
-
-src/main/resources/l10n/*.properties merge=union

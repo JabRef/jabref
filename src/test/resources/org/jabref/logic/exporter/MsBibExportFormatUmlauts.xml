@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
-<b:Source>
-<b:SourceType>Report</b:SourceType>
-<b:BIBTEX_Entry>unpublished</b:BIBTEX_Entry>
-<b:Title>Umläuts are fünny</b:Title>
-<b:Author/>
-<b:ThesisType>unpublished</b:ThesisType>
-</b:Source>
+    <b:Source>
+        <b:BIBTEX_Entry>unpublished</b:BIBTEX_Entry>
+        <b:SourceType>Report</b:SourceType>
+        <b:Title>Umläuts are fünny</b:Title>
+        <b:Author/>
+        <b:ThesisType>unpublished</b:ThesisType>
+    </b:Source>
 </b:Sources>

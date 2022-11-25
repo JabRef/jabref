@@ -1,0 +1,35 @@
+{
+    "app-id" : "org.jabref.jabref",
+    "runtime" : "org.freedesktop.Platform",
+    "runtime-version" : "18.08",
+    "sdk" : "org.freedesktop.Sdk",
+    "command" : "JabRef",
+    "modules" : [
+        {
+            "name" : "JabRef",
+            "buildsystem" : "simple",
+            "build-commands" : [
+                "tar -xzf JabRef-portable_linux.tar.gz --directory=/app/ --strip-components=1",
+                "install -D -m0644 /app/lib/JabRef.png /app/share/icons/hicolor/64x64/apps/org.jabref.jabref.png",
+                "install -D -m0644 org.jabref.jabref.desktop /app/share/applications/org.jabref.jabref.desktop"
+            ],
+            "sources" : [
+                {
+                    "type" : "file",
+                    "url": "http://builds.jabref.org/master/JabRef-portable_linux.tar.gz",
+                    "sha256": "be69feee0536fa8500dda867290dbeeeda6191c60e636a0b6e254fbaac02d471"
+                },
+                {
+                    "type": "file",
+                    "path": "org.jabref.jabref.desktop"
+                }
+            ]
+        }
+    ],
+    "finish-args" : [
+        "--socket=wayland",
+        "--socket=fallback-x11",
+        "--share=network",
+        "--filesystem=home"
+    ]
+}

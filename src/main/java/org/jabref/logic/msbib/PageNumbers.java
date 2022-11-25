@@ -56,5 +56,4 @@ public class PageNumbers {
     public String toString() {
         return toString("-");
     }
-
 }
