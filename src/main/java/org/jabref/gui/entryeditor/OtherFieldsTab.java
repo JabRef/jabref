@@ -21,6 +21,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -67,12 +68,13 @@ public class OtherFieldsTab extends FieldsEditorTab {
 
     @Override
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
-        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
+        BibDatabaseMode mode = databaseContext.getMode();
+        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             Set<Field> allKnownFields = entryType.get().getAllFields();
             Set<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(LinkedHashSet::new));
 
-            otherFields.removeAll(entryType.get().getDeprecatedFields());
+            otherFields.removeAll(entryType.get().getDeprecatedFields(mode));
             otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet()));
             otherFields.remove(InternalField.KEY_FIELD);
             otherFields.removeAll(customTabFieldNames);

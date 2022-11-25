@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
@@ -82,19 +83,24 @@ public class BibEntryType implements Comparable<BibEntryType> {
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public Set<Field> getDeprecatedFields() {
-        Set<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
-        deprecatedFields.add(StandardField.YEAR);
-        deprecatedFields.add(StandardField.MONTH);
+    public Set<Field> getDeprecatedFields(BibDatabaseMode mode) {
+        Set<Field> deprecatedFields;
+        if(mode == BibDatabaseMode.BIBLATEX) {
+            deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
+            deprecatedFields.add(StandardField.YEAR);
+            deprecatedFields.add(StandardField.MONTH);
+        } else {
+            deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_LTX_TO_TEX.keySet());
+        }
 
         deprecatedFields.retainAll(getOptionalFieldsAndAliases());
 
         return deprecatedFields;
     }
 
-    public Set<Field> getSecondaryOptionalNotDeprecatedFields() {
+    public Set<Field> getSecondaryOptionalNotDeprecatedFields(BibDatabaseMode mode) {
         Set<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
-        optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields());
+        optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields(mode));
         return optionalFieldsNotPrimaryOrDeprecated;
     }
 
