@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -13,6 +14,7 @@ import org.jabref.gui.maintable.columns.MainTableColumn;
 
 public class MainTableHeaderContextMenu extends ContextMenu {
 
+    private static final int OUT_OF_BOUNDS = -1;
     MainTable mainTable;
     MainTableColumnFactory factory;
 
@@ -49,24 +51,29 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     private void constructItems(MainTable mainTable) {
         // Reset the right-click menu
         this.getItems().clear();
+        List<TableColumn<BibEntryTableViewModel, ?>> commonColumns = commonColumns();
 
-        // Populate the menu with the commonly used fields
-        for (TableColumn<BibEntryTableViewModel, ?> tableColumn:commonColumns()) {
-            RadioMenuItem itemToAdd = createMenuItem(tableColumn);
+        // Populate the menu with currently used fields
+        for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
+            // Append only if the column has not already been added (a common column)
+            RightClickMenuItem itemToAdd = createMenuItem(column, true);
             this.getItems().add(itemToAdd);
+
+            // Remove from remaining common columns pool
+            MainTableColumn searchCol = (MainTableColumn<?>) column;
+            if (isACommonColumn(searchCol)) {
+                commonColumns.removeIf(tableCol -> ((MainTableColumn) tableCol).getModel().equals(searchCol.getModel()));
+            }
         }
 
         SeparatorMenuItem separator = new SeparatorMenuItem();
         this.getItems().add(separator);
 
-        // Append to the menu the current remaining columns in the table.
-        for (TableColumn<BibEntryTableViewModel, ?> column :mainTable.getColumns()
-        ) {
-            // Append only if the column has not already been added (a common column)
-            if (!isACommonColumn((MainTableColumn) column)) {
-                RadioMenuItem itemToAdd = createMenuItem(column);
-                this.getItems().add(itemToAdd);
-            }
+        // Append to the menu the current remaining columns in the common columns.
+
+        for (TableColumn<BibEntryTableViewModel, ?> tableColumn : commonColumns) {
+            RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
+            this.getItems().add(itemToAdd);
         }
     }
 
@@ -75,36 +82,38 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      *
      */
     @SuppressWarnings("rawtypes")
-    private RadioMenuItem createMenuItem(TableColumn<BibEntryTableViewModel, ?> column) {
-        // Construct initial menuItem
+    private RightClickMenuItem createMenuItem(TableColumn<BibEntryTableViewModel, ?> column, boolean isDisplaying) {
+        // Gets display name and constructs Radio Menu Item.
         MainTableColumn tableColumn = (MainTableColumn) column;
-        String itemName = tableColumn.getDisplayName();
+        String displayName = tableColumn.getDisplayName();
+        return new RightClickMenuItem(displayName, tableColumn, isDisplaying);
+    }
 
-        RadioMenuItem returnItem = new RadioMenuItem(itemName);
-
-        // Flag item as selected if the item is already in the main table.
-        returnItem.setSelected(isInMainTable(tableColumn));
-
-        // Set action to toggle visibility from main table when item is clicked
-        returnItem.setOnAction(event -> {
-            if (isInMainTable(tableColumn)) {
-                removeColumn(tableColumn);
-            } else {
-                addColumn(tableColumn);
+    /**
+     * Returns the current position of the inputted column in the table (index).
+     *
+     */
+    private int obtainIndexOfColumn(MainTableColumn searchColumn) {
+        ObservableList<TableColumn<BibEntryTableViewModel, ?>> columns = mainTable.getColumns();
+        for (int i = 0; i < columns.size(); i++) {
+            TableColumn<BibEntryTableViewModel, ?> column = columns.get(i);
+            MainTableColumnModel model = ((MainTableColumn) column).getModel();
+            if (model.equals(searchColumn.getModel())) {
+                return i;
             }
-        });
-
-        return returnItem;
+        }
+        return OUT_OF_BOUNDS;
     }
 
     /**
      * Adds the column into the MainTable for display.
      */
     @SuppressWarnings("rawtypes")
-    private void addColumn(MainTableColumn tableColumn) {
-        // Do not add duplicate if table column is already within the table.
-        if (!isInMainTable(tableColumn)) {
+    private void addColumn(MainTableColumn tableColumn, int index) {
+        if (index <= OUT_OF_BOUNDS || index >= mainTable.getColumns().size()) {
             mainTable.getColumns().add(tableColumn);
+        } else {
+            mainTable.getColumns().add(index, tableColumn);
         }
     }
 
@@ -114,13 +123,6 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     @SuppressWarnings("rawtypes")
     private void removeColumn(MainTableColumn tableColumn) {
         mainTable.getColumns().removeIf(tableCol -> ((MainTableColumn) tableCol).getModel().equals(tableColumn.getModel()));
-    }
-
-    /**
-     * Determines if column already exists in the MainTable.
-     */
-    private boolean isInMainTable(MainTableColumn tableColumn) {
-        return isColumnInList(tableColumn, mainTable.getColumns());
     }
 
     /**
@@ -180,5 +182,47 @@ public class MainTableHeaderContextMenu extends ContextMenu {
             commonTableColumns.add(tableColumn);
         }
         return commonTableColumns;
+    }
+
+    /**
+     * RightClickMenuItem: RadioMenuItem holding position in MainTable and its visibility.
+     *
+     */
+    private class RightClickMenuItem extends RadioMenuItem {
+        private int index;
+        private boolean visibleInTable;
+
+        RightClickMenuItem(String displayName, MainTableColumn column, boolean isVisible) {
+            super(displayName);
+            setVisibleInTable(isVisible);
+            // Flag item as selected if the item is already in the main table.
+            this.setSelected(isVisible);
+
+            setIndex(OUT_OF_BOUNDS);
+
+            // Set action to toggle visibility from main table when item is clicked
+            this.setOnAction(event -> {
+                if (isVisibleInTable()) {
+                    setIndex(obtainIndexOfColumn(column));
+                    removeColumn(column);
+                } else {
+                    addColumn(column, this.index);
+                    setIndex(obtainIndexOfColumn(column));
+                }
+                setVisibleInTable(!this.visibleInTable);
+            });
+        }
+
+        public void setIndex(int index) {
+            this.index = index;
+        }
+
+        public void setVisibleInTable(boolean visibleInTable) {
+            this.visibleInTable = visibleInTable;
+        }
+
+        public boolean isVisibleInTable() {
+            return visibleInTable;
+        }
     }
 }
