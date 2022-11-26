@@ -119,7 +119,7 @@ upstream     https://github.com/jabref/jabref.git (fetch)
 upstream     https://github.com/jabref/jabref.git (push)
 ```
 
-### Create generate source code
+### Generate source code
 
 {: .note }
 This is required for Eclipse only.
