@@ -278,57 +278,6 @@ class FileUtilTest {
     }
 
     @Test
-    void testRenameFileWithFromFileIsNullAndToFileIsNull() {
-        assertThrows(NullPointerException.class, () -> FileUtil.renameFile(null, null));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndToFileIsNull() {
-        assertThrows(NullPointerException.class, () -> FileUtil.renameFile(existingTestFile, null));
-    }
-
-    @Test
-    void testRenameFileWithFromFileIsNullAndToFileExist() {
-        assertThrows(NullPointerException.class, () -> FileUtil.renameFile(null, existingTestFile));
-    }
-
-    @Test
-    void testRenameFileWithFromFileNotExistAndToFileNotExist() {
-        assertFalse(FileUtil.renameFile(nonExistingTestPath, nonExistingTestPath));
-    }
-
-    @Test
-    void testRenameFileWithFromFileNotExistAndToFileExist() {
-        assertFalse(FileUtil.renameFile(nonExistingTestPath, existingTestFile));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndToFileNotExist() {
-        assertTrue(FileUtil.renameFile(existingTestFile, nonExistingTestPath));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndToFileExist() {
-        assertTrue(FileUtil.renameFile(existingTestFile, existingTestFile));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndOtherToFileExist() {
-        assertFalse(FileUtil.renameFile(existingTestFile, otherExistingTestFile));
-    }
-
-    @Test
-    void testRenameFileSuccessful(@TempDir Path otherTemporaryFolder) {
-        // Be careful. This "otherTemporaryFolder" is the same as the "temporaryFolder"
-        // in the @BeforeEach method.
-        Path temp = Path.of(otherTemporaryFolder.resolve("123").toString());
-
-        LOGGER.debug("Temp dir {}", temp);
-        FileUtil.renameFile(existingTestFile, temp);
-        assertFalse(Files.exists(existingTestFile));
-    }
-
-    @Test
     void validFilenameShouldNotAlterValidFilename() {
         assertEquals("somename.pdf", FileUtil.getValidFileName("somename.pdf"));
     }

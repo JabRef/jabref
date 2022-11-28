@@ -203,49 +203,6 @@ public class FileUtil {
     }
 
     /**
-     * Renames a given file
-     *
-     * @param fromFile The source filename to rename
-     * @param toFile   The target fileName
-     * @return True if rename was successful, false if an exception occurred
-     */
-    public static boolean renameFile(Path fromFile, Path toFile) {
-        return renameFile(fromFile, toFile, false);
-    }
-
-    /**
-     * Renames a given file
-     *
-     * @param fromFile        The source filename to rename
-     * @param toFile          The target fileName
-     * @param replaceExisting Whether to replace existing files or not
-     * @return True if rename was successful, false if an exception occurred
-     * @deprecated Use {@link Files#move(Path, Path, CopyOption...)} instead and handle exception properly
-     */
-    @Deprecated
-    public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
-        try {
-            return renameFileWithException(fromFile, toFile, replaceExisting);
-        } catch (IOException e) {
-            LOGGER.error("Renaming Files failed", e);
-            return false;
-        }
-    }
-
-    /**
-     * @deprecated Directly use {@link Files#move(Path, Path, CopyOption...)}
-     */
-    @Deprecated
-    public static boolean renameFileWithException(Path fromFile, Path toFile, boolean replaceExisting) throws IOException {
-        if (replaceExisting) {
-            return Files.move(fromFile, fromFile.resolveSibling(toFile),
-                    StandardCopyOption.REPLACE_EXISTING) != null;
-        } else {
-            return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
-        }
-    }
-
-    /**
      * Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
      * possible.
      * <p>
