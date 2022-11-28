@@ -79,8 +79,7 @@ public class ThreeWayMergeView extends VBox {
 
     private void updateDiff() {
         if (toolbar.isShowDiffEnabled()) {
-            for (int i = 0; i < fieldRows.size(); i++) {
-                FieldRowView row = fieldRows.get(i);
+            for (FieldRowView row : fieldRows) {
                 if (row.getFieldNameCell().getText().equals("Groups") && (row.getLeftValueCell().getText().contains(keywordSeparator) || row.getRightValueCell().getText().contains(keywordSeparator))) {
                     row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), new GroupDiffMode(keywordSeparator)));
                 } else {
