@@ -1,8 +1,7 @@
 package org.jabref.gui.importer;
 
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -24,7 +23,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
@@ -53,7 +51,7 @@ import org.controlsfx.control.CheckListView;
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     public CheckListView<BibEntry> entriesListView;
-    public ComboBox<String> libraryListView;
+    public ComboBox<BibDatabaseContext> libraryListView;
     public ButtonType importButton;
     public Label totalItems;
     public Label selectedItems;
@@ -106,16 +104,28 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
         entriesListView.setItems(viewModel.getEntries());
-        List<String> databases = FileUtil.uniquePathSubstrings(stateManager.collectAllDatabasePaths()).stream().map(path -> {
-            if (path.isBlank()) {
-                return "Untitled";
-            }
-            return path;
-        }).toList();
-        libraryListView.getItems().addAll(databases);
-        new ViewModelListCellFactory<String>()
-                .withText(text -> text).install(libraryListView);
-        stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> libraryListView.setValue(FileUtil.uniquePathSubstrings(Collections.singletonList(path.toString())).get(0)));
+
+        libraryListView.setEditable(false);
+        libraryListView.getItems().addAll(stateManager.getOpenDatabases());
+        new ViewModelListCellFactory<BibDatabaseContext>()
+                .withText(database -> {
+                    Optional<String> dbOpt = Optional.empty();
+                    if (database.getDatabasePath().isPresent()) {
+                        dbOpt = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), database.getDatabasePath().get());
+                    }
+
+                    if (dbOpt.isEmpty()) {
+                        return "Untitled";
+                    }
+
+                    return dbOpt.get();
+                })
+                .install(libraryListView);
+
+        // FixMe: getActiveDatabase result object is different from the ones in getOpenDatabases.
+        //  Solution: Debug JabRef to find out, why there is a new object for the stateManager constructed (Must be done sooner or later)
+        //  Easy Workaround: Check the open databases for their path and select the matching one from getOpenDatabases
+        stateManager.getActiveDatabase().ifPresent(database -> libraryListView.getSelectionModel().select(database));
 
         PseudoClass entrySelected = PseudoClass.getPseudoClass("entry-selected");
         new ViewModelListCellFactory<BibEntry>()
@@ -144,7 +154,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                             duplicateButton.setOnAction(event -> viewModel.resolveDuplicate(entry));
                             container.getChildren().add(1, duplicateButton);
                         }
-                    }).executeWith(Globals.TASK_EXECUTOR);
+                    }).executeWith(taskExecutor);
 
                     /*
                     inserted the if-statement here, since a Platform.runLater() call did not work.
