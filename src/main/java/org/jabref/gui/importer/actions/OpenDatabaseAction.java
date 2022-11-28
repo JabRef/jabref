@@ -217,7 +217,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         if (result.getDatabase().isShared()) {
             try {
-                new SharedDatabaseUIManager(frame).openSharedDatabaseFromParserResult(result);
+                new SharedDatabaseUIManager(frame, preferencesService).openSharedDatabaseFromParserResult(result);
             } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                     NotASharedDatabaseException e) {
                 result.getDatabaseContext().clearDatabasePath(); // do not open the original file
