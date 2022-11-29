@@ -167,27 +167,34 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Checkout source
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: actions/checkout@v3
       - name: Fetch all history for all tags and branches
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         run: git fetch --prune --unshallow
       - name: Install GitVersion
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: gittools/actions/gitversion/setup@v0.9.15
         with:
           versionSpec: '5.x'
       - name: Run GitVersion
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.15
       - name: Get linux binaries
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: actions/download-artifact@master
         with:
           name: JabRef-linux
           path: build/distribution
       - name: Get windows binaries
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: actions/download-artifact@master
         with:
           name: JabRef-windows
           path: build/distribution
       - name: Get macOS binaries
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: actions/download-artifact@master
         with:
           name: JabRef-macOS
