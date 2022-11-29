@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -275,57 +274,6 @@ class FileUtilTest {
         Files.createFile(temp);
         FileUtil.copyFile(existingTestFile, temp, false);
         assertNotEquals(Files.readAllLines(existingTestFile, StandardCharsets.UTF_8), Files.readAllLines(temp, StandardCharsets.UTF_8));
-    }
-
-    @Test
-    void testRenameFileWithFromFileIsNullAndToFileIsNull() {
-        assertThrows(NullPointerException.class, () -> FileUtil.renameFile(null, null));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndToFileIsNull() {
-        assertThrows(NullPointerException.class, () -> FileUtil.renameFile(existingTestFile, null));
-    }
-
-    @Test
-    void testRenameFileWithFromFileIsNullAndToFileExist() {
-        assertThrows(NullPointerException.class, () -> FileUtil.renameFile(null, existingTestFile));
-    }
-
-    @Test
-    void testRenameFileWithFromFileNotExistAndToFileNotExist() {
-        assertFalse(FileUtil.renameFile(nonExistingTestPath, nonExistingTestPath));
-    }
-
-    @Test
-    void testRenameFileWithFromFileNotExistAndToFileExist() {
-        assertFalse(FileUtil.renameFile(nonExistingTestPath, existingTestFile));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndToFileNotExist() {
-        assertTrue(FileUtil.renameFile(existingTestFile, nonExistingTestPath));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndToFileExist() {
-        assertTrue(FileUtil.renameFile(existingTestFile, existingTestFile));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndOtherToFileExist() {
-        assertFalse(FileUtil.renameFile(existingTestFile, otherExistingTestFile));
-    }
-
-    @Test
-    void testRenameFileSuccessful(@TempDir Path otherTemporaryFolder) {
-        // Be careful. This "otherTemporaryFolder" is the same as the "temporaryFolder"
-        // in the @BeforeEach method.
-        Path temp = Path.of(otherTemporaryFolder.resolve("123").toString());
-
-        LOGGER.debug("Temp dir {}", temp);
-        FileUtil.renameFile(existingTestFile, temp);
-        assertFalse(Files.exists(existingTestFile));
     }
 
     @Test
