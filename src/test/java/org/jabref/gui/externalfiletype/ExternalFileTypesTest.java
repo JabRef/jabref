@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 class ExternalFileTypesTest {
     private static final Set<ExternalFileType> TEST_LIST = Set.of(
+            StandardExternalFileType.MARKDOWN,
             StandardExternalFileType.PDF,
             StandardExternalFileType.URL,
             StandardExternalFileType.JPG,

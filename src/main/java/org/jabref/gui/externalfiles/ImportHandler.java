@@ -29,7 +29,7 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.fetcher.ArXiv;
+import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
@@ -119,10 +119,10 @@ public class ImportHandler {
 
                             if (!pdfEntriesInFile.isEmpty()) {
                                 entriesToAdd.addAll(pdfEntriesInFile);
-                                addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
+                                addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                             } else {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
-                                addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
+                                addResultToList(file, false, Localization.lang("No metadata was found. An empty entry was created with file link"));
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
@@ -131,10 +131,10 @@ public class ImportHandler {
                             }
 
                             entriesToAdd.addAll(bibtexParserResult.getDatabaseContext().getEntries());
-                            addResultToList(file, false, Localization.lang("Importing bib entry"));
+                            addResultToList(file, true, Localization.lang("Bib entry was successfully imported"));
                         } else {
                             entriesToAdd.add(createEmptyEntryWithLink(file));
-                            addResultToList(file, false, Localization.lang("No BibTeX data found. Creating empty entry with file link"));
+                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link"));
                         }
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
@@ -301,7 +301,7 @@ public class ImportHandler {
 
     private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) throws FetcherException {
         LOGGER.info("Found arxiv identifier in clipboard");
-        Optional<BibEntry> entry = new ArXiv(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
+        Optional<BibEntry> entry = new ArXivFetcher(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
         return OptionalUtil.toList(entry);
     }
 }

@@ -2,7 +2,7 @@ package org.jabref.logic.importer;
 
 import java.util.Optional;
 
-import org.jabref.logic.importer.fetcher.ArXiv;
+import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
@@ -27,7 +27,7 @@ public class CompositeIdFetcher {
         }
         Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
         if (arXivIdentifier.isPresent()) {
-            return new ArXiv(importFormatPreferences).performSearchById(arXivIdentifier.get().getNormalized());
+            return new ArXivFetcher(importFormatPreferences).performSearchById(arXivIdentifier.get().getNormalized());
         }
         Optional<ISBN> isbn = ISBN.parse(identifier);
         if (isbn.isPresent()) {

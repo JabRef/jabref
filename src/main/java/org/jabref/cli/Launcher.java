@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
-import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
@@ -134,10 +133,6 @@ public class Launcher {
                 } else {
                     LOGGER.warn("Could not communicate with other running JabRef instance.");
                 }
-            } else {
-                // We are alone, so we start the server
-                Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(),
-                        preferences);
             }
         }
         return true;

@@ -856,7 +856,7 @@ class BibEntryWriterTest {
     @MethodSource("testGetFormattedFieldNameData")
     void testGetFormattedFieldName(String expected, String fieldName, int indent) {
         Field field = FieldFactory.parseField(fieldName);
-        assertEquals(expected, bibEntryWriter.getFormattedFieldName(field, indent));
+        assertEquals(expected, BibEntryWriter.getFormattedFieldName(field, indent));
     }
 
     static Stream<Arguments> testGetLengthOfLongestFieldNameData() {
@@ -871,6 +871,6 @@ class BibEntryWriterTest {
     @ParameterizedTest
     @MethodSource("testGetLengthOfLongestFieldNameData")
     void testGetLengthOfLongestFieldName(int expected, BibEntry entry) {
-        assertEquals(expected, bibEntryWriter.getLengthOfLongestFieldName(entry));
+        assertEquals(expected, BibEntryWriter.getLengthOfLongestFieldName(entry));
     }
 }

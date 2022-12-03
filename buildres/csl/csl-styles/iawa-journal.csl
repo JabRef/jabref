@@ -9,6 +9,9 @@
     <author>
       <name>Patrick O'Brien</name>
     </author>
+    <contributor>
+      <name>Ronald Visser</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="biology"/>
     <issn>0928-1541</issn>
@@ -131,7 +134,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="11" et-al-use-first="5">
+  <bibliography hanging-indent="true" et-al-min="11" et-al-use-first="5">
     <sort>
       <key macro="author"/>
       <key macro="year-date"/>

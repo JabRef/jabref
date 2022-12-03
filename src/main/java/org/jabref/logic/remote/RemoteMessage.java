@@ -1,4 +1,4 @@
-package org.jabref.logic.remote.shared;
+package org.jabref.logic.remote;
 
 public enum RemoteMessage {
     /**
