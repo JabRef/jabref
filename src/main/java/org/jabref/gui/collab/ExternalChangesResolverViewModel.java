@@ -94,8 +94,8 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         getSelectedChange().ifPresent(oldChange -> {
             changes.remove(oldChange);
             changes.add(databaseChange);
-            getVisibleChanges().remove(oldChange);
             databaseChange.accept();
+            getVisibleChanges().remove(oldChange);
         });
     }
 
