@@ -12,15 +12,19 @@ import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighte
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.PreferencesService;
 
 public final class EntryChangeResolver extends DatabaseChangeResolver {
     private final EntryChange entryChange;
     private final BibDatabaseContext databaseContext;
 
-    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext) {
+    private final PreferencesService preferencesService;
+
+    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, PreferencesService preferencesService) {
         super(dialogService);
         this.entryChange = entryChange;
         this.databaseContext = databaseContext;
+        this.preferencesService = preferencesService;
     }
 
     @Override

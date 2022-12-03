@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -21,24 +19,16 @@ public class ChangeScanner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
     private final BibDatabaseContext database;
-    private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final StateManager stateManager;
-    private final ThemeManager themeManager;
 
     private final DatabaseChangeResolverFactory databaseChangeResolverFactory;
 
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
-                         PreferencesService preferencesService,
-                         StateManager stateManager,
-                         ThemeManager themeManager) {
+                         PreferencesService preferencesService) {
         this.database = database;
-        this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.stateManager = stateManager;
-        this.themeManager = themeManager;
-        this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database);
+        this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database, preferencesService);
     }
 
     public List<DatabaseChange> scanForChanges() {

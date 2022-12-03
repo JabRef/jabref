@@ -21,6 +21,7 @@ import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +35,14 @@ public class BackupUIManager {
     private BackupUIManager() {
     }
 
-    public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService, Path originalPath) {
+    public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService, Path originalPath, PreferencesService preferencesService) {
         var actionOpt = showBackupResolverDialog(dialogService, originalPath);
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 BackupManager.restoreBackup(originalPath);
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath);
+                return showReviewBackupDialog(dialogService, originalPath, preferencesService);
             }
             return Optional.empty();
         });
@@ -51,7 +52,7 @@ public class BackupUIManager {
         return DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath)));
     }
 
-    private static Optional<ParserResult> showReviewBackupDialog(DialogService dialogService, Path originalPath) {
+    private static Optional<ParserResult> showReviewBackupDialog(DialogService dialogService, Path originalPath, PreferencesService preferencesService) {
         try {
             Path backupPath = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP).orElseThrow();
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
@@ -59,7 +60,7 @@ public class BackupUIManager {
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
-            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase);
+            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferencesService);
             return DefaultTaskExecutor.runInJavaFXThread(() -> {
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory),
@@ -67,7 +68,7 @@ public class BackupUIManager {
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
-                    return showRestoreBackupDialog(dialogService, originalPath);
+                    return showRestoreBackupDialog(dialogService, originalPath, preferencesService);
                 }
                 return Optional.of(originalParserResult);
             });

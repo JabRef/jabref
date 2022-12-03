@@ -197,7 +197,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         ParserResult result = null;
         if (BackupManager.backupFileDiffers(fileToLoad)) {
-            var resultOpt = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
+            var resultOpt = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService);
             if (resultOpt.isPresent()) {
                 result = resultOpt.get();
             }

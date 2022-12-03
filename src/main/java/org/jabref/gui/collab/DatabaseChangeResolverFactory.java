@@ -21,7 +21,7 @@ public class DatabaseChangeResolverFactory {
 
     public Optional<DatabaseChangeResolver> create(DatabaseChange change) {
         if (change instanceof EntryChange entryChange) {
-            return Optional.of(new EntryChangeResolver(entryChange, dialogService, databaseContext));
+            return Optional.of(new EntryChangeResolver(entryChange, dialogService, databaseContext, preferencesService));
         }
 
         return Optional.empty();
