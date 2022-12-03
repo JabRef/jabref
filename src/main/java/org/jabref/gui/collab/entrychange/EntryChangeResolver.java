@@ -8,7 +8,7 @@ import org.jabref.gui.collab.DatabaseChangeResolver;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,10 +25,10 @@ public final class EntryChangeResolver extends DatabaseChangeResolver {
 
     @Override
     public Optional<DatabaseChange> askUserToResolveChange() {
-        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry());
+        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), preferencesService);
         mergeEntriesDialog.setLeftHeaderText(Localization.lang("On JabRef"));
         mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
-        mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, DiffHighlighter.DiffMethod.WORDS));
+        mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, BasicDiffMethod.WORDS));
 
         return dialogService.showCustomDialogAndWait(mergeEntriesDialog)
                             .map(this::mapMergeResultToExternalChange);
