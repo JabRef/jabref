@@ -329,10 +329,17 @@ TextFlow > .tooltip-text-monospaced {
     -fx-font-family: monospace;
 }
 
+
+.radio-button > .radio,
+.check-box > .box {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-text-fill: -fx-text-base-color;
+}
+
 .button,
 .toggle-button,
-.radio-button > .radio,
-.check-box > .box,
 .menu-button,
 .choice-box,
 .combo-box-base,
@@ -342,6 +349,7 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-radius: 4px;
     -fx-text-fill: -fx-text-base-color;
 }
+
 
 .button {
     -fx-background-color: transparent;
