@@ -115,9 +115,9 @@ public class GroupTreeView extends BorderPane {
         mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
         numberColumn.getStyleClass().add("numberColumn");
-        numberColumn.setMinWidth(40d);
-        numberColumn.setMaxWidth(40d);
-        numberColumn.setPrefWidth(40d);
+        numberColumn.setMinWidth(50d);
+        numberColumn.setMaxWidth(60d);
+        numberColumn.setPrefWidth(50d);
         numberColumn.setResizable(false);
         expansionNodeColumn = new TreeTableColumn<>();
         expansionNodeColumn.getStyleClass().add("expansionNodeColumn");
