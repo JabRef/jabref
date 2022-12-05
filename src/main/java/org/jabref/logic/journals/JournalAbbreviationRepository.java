@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.h2.mvstore.MVMap;
@@ -87,7 +88,36 @@ public class JournalAbbreviationRepository {
 
         return Optional.ofNullable(fullToAbbreviation.get(journal))
                        .map(abbreviation -> new Abbreviation(journal, abbreviation))
-                       .or(() -> Optional.ofNullable(abbreviationToFull.get(journal)).map(fullName -> new Abbreviation(fullName, journal)));
+                       .or(() -> {
+                           // check for dot-less abbr
+                           Pattern p = Pattern.compile("\\.");
+                           Matcher m = p.matcher(journal);
+                           boolean hasDots = m.find();
+                           String foundKey = "";
+
+                           if (!hasDots) {
+                               // use dot-less abbr to find full name using regex
+                               String[] journalSplit = journal.split(" ");
+
+                               for (int i = 0; i < journalSplit.length; i++) {
+                                   String word = "(" + journalSplit[i] + ")+[\\.\\s]*";
+                                   journalSplit[i] = word;
+                               }
+
+                               String joined = String.join("", journalSplit);
+
+                               foundKey = abbreviationToFull.keySet().stream()
+                                                                   .filter(
+                                                                           s -> Pattern.compile(joined)
+                                                                                       .matcher(s)
+                                                                                       .find()
+                                                                   )
+                                                                   .collect(Collectors.joining());
+                           }
+
+                           return Optional.ofNullable(abbreviationToFull.get(foundKey.equals("") ? journal : foundKey))
+                                          .map(fullName -> new Abbreviation(fullName, journal));
+                       });
     }
 
     public void addCustomAbbreviation(Abbreviation abbreviation) {
