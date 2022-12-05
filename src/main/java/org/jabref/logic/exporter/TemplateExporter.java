@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -161,9 +162,12 @@ public class TemplateExporter extends Exporter {
         // Try loading as a resource first. This works for files inside the JAR:
         // If that did not work, try loading as a normal file URL:
         try {
-            Path reso = Path.of(TemplateExporter.class.getResource(name).toURI());
-            if (reso == null) {
+            URL res = TemplateExporter.class.getResource(name);
+            Path reso;
+            if (res == null) {
                 reso = Path.of(name);
+            } else {
+                reso = Path.of(res.toURI());
             }
             return Files.newBufferedReader(reso, StandardCharsets.UTF_8);
         } catch (FileNotFoundException | URISyntaxException ex) {
