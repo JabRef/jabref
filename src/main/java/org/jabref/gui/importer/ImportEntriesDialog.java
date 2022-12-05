@@ -121,6 +121,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                     return dbOpt.get();
                 })
                 .install(libraryListView);
+        viewModel.selectedDbProperty().bind(libraryListView.getSelectionModel().selectedItemProperty());
 
         // FixMe: getActiveDatabase result object is different from the ones in getOpenDatabases.
         //  Solution: Debug JabRef to find out, why there is a new object for the stateManager constructed (Must be done sooner or later)
