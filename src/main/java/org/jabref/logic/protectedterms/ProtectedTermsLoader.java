@@ -1,8 +1,7 @@
 package org.jabref.logic.protectedterms;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +46,7 @@ public class ProtectedTermsLoader {
             if (INTERNAL_LISTS.containsKey(filename)) {
                 mainList.add(readProtectedTermsListFromResource(filename, INTERNAL_LISTS.get(filename).get(), true));
             } else {
-                LOGGER.warn("Protected terms resource '" + filename + "' is no longer available.");
+                LOGGER.warn("Protected terms resource '{}' is no longer available.", filename);
             }
         }
         for (String filename : preferences.getDisabledInternalTermLists()) {
@@ -56,7 +55,7 @@ public class ProtectedTermsLoader {
                     mainList.add(readProtectedTermsListFromResource(filename, INTERNAL_LISTS.get(filename).get(), false));
                 }
             } else {
-                LOGGER.warn("Protected terms resource '" + filename + "' is no longer available.");
+                LOGGER.warn("Protected terms resource '{}' is no longer available.", filename);
             }
         }
 
@@ -66,43 +65,34 @@ public class ProtectedTermsLoader {
                     && !preferences.getDisabledInternalTermLists().contains(filename)) {
                 // New internal list, add it
                 mainList.add(readProtectedTermsListFromResource(filename, INTERNAL_LISTS.get(filename).get(), true));
-                LOGGER.warn("New protected terms resource '" + filename + "' is available and enabled by default.");
+                LOGGER.warn("New protected terms resource '{}' is available and enabled by default.", filename);
             }
         }
 
         // Read external lists
         for (String filename : preferences.getEnabledExternalTermLists()) {
-            try {
-                mainList.add(readProtectedTermsListFromFile(new File(filename), true));
-            } catch (FileNotFoundException e) {
-                // The file couldn't be found...
-                LOGGER.warn("Cannot find protected terms file " + filename, e);
+            Path filePath = Path.of(filename);
+            if (Files.exists(filePath)) {
+                mainList.add(readProtectedTermsListFromFile(filePath, true));
+            } else {
+                LOGGER.warn("Cannot find protected terms file {} ", filename);
             }
         }
 
         for (String filename : preferences.getDisabledExternalTermLists()) {
             if (!preferences.getEnabledExternalTermLists().contains(filename)) {
-                try {
-                    mainList.add(readProtectedTermsListFromFile(new File(filename), false));
-                } catch (FileNotFoundException e) {
-                    // The file couldn't be found...
-                    LOGGER.warn("Cannot find protected terms file " + filename, e);
-                }
+                mainList.add(readProtectedTermsListFromFile(Path.of(filename), false));
             }
         }
     }
 
     public void reloadProtectedTermsList(ProtectedTermsList list) {
-        try {
-            ProtectedTermsList newList = readProtectedTermsListFromFile(new File(list.getLocation()), list.isEnabled());
-            int index = mainList.indexOf(list);
-            if (index >= 0) {
-                mainList.set(index, newList);
-            } else {
-                LOGGER.warn("Problem reloading protected terms file");
-            }
-        } catch (IOException e) {
-            LOGGER.warn("Problem with protected terms file '" + list.getLocation() + "'", e);
+        ProtectedTermsList newList = readProtectedTermsListFromFile(Path.of(list.getLocation()), list.isEnabled());
+        int index = mainList.indexOf(list);
+        if (index >= 0) {
+            mainList.set(index, newList);
+        } else {
+            LOGGER.warn("Problem reloading protected terms file");
         }
     }
 
@@ -122,12 +112,7 @@ public class ProtectedTermsLoader {
     }
 
     public void addProtectedTermsListFromFile(String fileName, boolean enabled) {
-        try {
-            mainList.add(readProtectedTermsListFromFile(new File(fileName), enabled));
-        } catch (FileNotFoundException e) {
-            // The file couldn't be found...
-            LOGGER.warn("Cannot find protected terms file " + fileName, e);
-        }
+        mainList.add(readProtectedTermsListFromFile(Path.of(fileName), enabled));
     }
 
     public static ProtectedTermsList readProtectedTermsListFromResource(String resource, String description, boolean enabled) {
@@ -136,10 +121,10 @@ public class ProtectedTermsLoader {
         return parser.getProtectTermsList(enabled, true);
     }
 
-    public static ProtectedTermsList readProtectedTermsListFromFile(File file, boolean enabled) throws FileNotFoundException {
-        LOGGER.debug("Reading term list from file " + file);
+    public static ProtectedTermsList readProtectedTermsListFromFile(Path path, boolean enabled) {
+        LOGGER.debug("Reading term list from file {}", path);
         ProtectedTermsParser parser = new ProtectedTermsParser();
-        parser.readTermsFromFile(Objects.requireNonNull(file));
+        parser.readTermsFromFile(Objects.requireNonNull(path));
         return parser.getProtectTermsList(enabled, false);
     }
 
