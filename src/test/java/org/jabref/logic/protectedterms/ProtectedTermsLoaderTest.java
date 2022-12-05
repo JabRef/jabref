@@ -167,8 +167,7 @@ class ProtectedTermsLoaderTest {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
-        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list",
-                                                                          tempDir.resolve("MyNewList.terms").toAbsolutePath().toString());
+        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list", tempDir.resolve("MyNewList.terms").toAbsolutePath().toString());
         assertTrue(localLoader.getProtectedTermsLists().contains(newList));
     }
 
@@ -186,8 +185,7 @@ class ProtectedTermsLoaderTest {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
-        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list",
-                                                                          tempDir.resolve("MyNewList.terms").toAbsolutePath().toString());
+        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list", tempDir.resolve("MyNewList.terms").toAbsolutePath().toString());
         localLoader.removeProtectedTermsList(newList);
         assertEquals(ProtectedTermsLoader.getInternalLists().size(), localLoader.getProtectedTermsLists().size());
     }
@@ -197,8 +195,7 @@ class ProtectedTermsLoaderTest {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
                 new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
-        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list",
-                                                                          tempDir.resolve("MyNewList.terms").toAbsolutePath().toString());
+        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list", tempDir.resolve("MyNewList.terms").toAbsolutePath().toString());
         assertEquals("My new list", newList.getDescription());
     }
 }

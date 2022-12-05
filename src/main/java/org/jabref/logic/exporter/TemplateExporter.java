@@ -154,28 +154,21 @@ public class TemplateExporter extends Exporter {
         } else {
             dir = LAYOUT_PREFIX + (directory == null ? "" : directory + '/');
         }
-
         // Attempt to get a Reader for the file path given, either by
         // loading it as a resource (from within JAR), or as a normal file. If
         // unsuccessful (e.g. file not found), an IOException is thrown.
         String name = dir + filename;
         // Try loading as a resource first. This works for files inside the JAR:
-
-
         // If that did not work, try loading as a normal file URL:
         try {
             Path reso = Path.of(TemplateExporter.class.getResource(name).toURI());
-
             if (reso == null) {
                 reso = Path.of(name);
-
             }
             return Files.newBufferedReader(reso, StandardCharsets.UTF_8);
-
         } catch (FileNotFoundException | URISyntaxException ex) {
             throw new IOException("Cannot find layout file: '" + name + "'.");
         }
-
     }
 
     @Override
