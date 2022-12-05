@@ -176,8 +176,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         // Create the Table Columns from the models using factory methods.
         List<TableColumn<BibEntryTableViewModel, ?>> commonTableColumns = new ArrayList<>();
-        for (MainTableColumnModel columnModel: commonColumns
-             ) {
+        for (MainTableColumnModel columnModel: commonColumns) {
             TableColumn<BibEntryTableViewModel, ?> tableColumn = factory.createColumn(columnModel);
             commonTableColumns.add(tableColumn);
         }
