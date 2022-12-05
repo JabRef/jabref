@@ -275,7 +275,6 @@ public class TemplateExporter extends Exporter {
             }
 
             // Print footer
-
             // changed section - begin (arudert)
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {
@@ -308,7 +307,6 @@ public class TemplateExporter extends Exporter {
      * If so, read all the name formatters so they can be used by the filter layouts.
      */
     private void readFormatterFile() {
-
         Path formatterFile = Path.of(lfFileName + FORMATTERS_EXTENSION);
         if (Files.exists(formatterFile)) {
             try (Reader in = Files.newBufferedReader(formatterFile, StandardCharsets.UTF_8)) {
