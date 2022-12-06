@@ -53,7 +53,7 @@ public class Launcher {
             // Init preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
             Globals.prefs = preferences;
-            PreferencesMigrations.runMigrations();
+            PreferencesMigrations.runMigrations(preferences);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences)) {
