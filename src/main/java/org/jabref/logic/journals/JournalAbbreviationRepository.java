@@ -100,7 +100,7 @@ public class JournalAbbreviationRepository {
                                String[] journalSplit = journal.split(" ");
 
                                for (int i = 0; i < journalSplit.length; i++) {
-                                   String word = "(" + journalSplit[i] + ")+[\\.\\s]*";
+                                   String word = journalSplit[i] + "[\\.\\s]*";
                                    journalSplit[i] = word;
                                }
 
