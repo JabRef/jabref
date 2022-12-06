@@ -451,6 +451,7 @@ public class JabRefPreferences implements PreferencesService {
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
     private NameFormatterPreferences nameFormatterPreferences;
+    private BibEntryPreferences bibEntryPreferences;
     private InternalPreferences internalPreferences;
     private SpecialFieldsPreferences specialFieldsPreferences;
     private GroupsPreferences groupsPreferences;
@@ -1397,8 +1398,7 @@ public class JabRefPreferences implements PreferencesService {
         groupsPreferences = new GroupsPreferences(
                 GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE)),
                 getBoolean(AUTO_ASSIGN_GROUP),
-                getBoolean(DISPLAY_GROUP_COUNT),
-                getInternalPreferences().keywordSeparatorProperty()
+                getBoolean(DISPLAY_GROUP_COUNT)
         );
 
         EasyBind.listen(groupsPreferences.groupViewModeProperty(), (obs, oldValue, newValue) -> put(GROUP_INTERSECT_UNION_VIEW_MODE, newValue.name()));
@@ -2028,6 +2028,25 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
+    public BibEntryPreferences getBibEntryPreferences() {
+        if (Objects.nonNull(bibEntryPreferences)) {
+            return bibEntryPreferences;
+        }
+
+        bibEntryPreferences = new BibEntryPreferences(
+                get(KEYWORD_SEPARATOR).charAt(0)
+        );
+
+        EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), ((observable, oldValue, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue))));
+
+        return bibEntryPreferences;
+    }
+
+    //*************************************************************************************************************
+    // InternalPreferences
+    //*************************************************************************************************************
+
+    @Override
     public InternalPreferences getInternalPreferences() {
         if (Objects.nonNull(internalPreferences)) {
             return internalPreferences;
@@ -2035,12 +2054,10 @@ public class JabRefPreferences implements PreferencesService {
 
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
-                get(KEYWORD_SEPARATOR).charAt(0),
                 getUser()
         );
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(), (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
-        EasyBind.listen(internalPreferences.keywordSeparatorProperty(), ((observable, oldValue, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue))));
         // user is a static value, should only be changed for debugging
 
         return internalPreferences;
@@ -2062,7 +2079,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public Character getKeywordDelimiter() {
-        return getInternalPreferences().getKeywordSeparator();
+        return getBibEntryPreferences().getKeywordSeparator();
     }
 
     //*************************************************************************************************************
@@ -2096,7 +2113,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
-                getKeywordDelimiter(),
+                getBibEntryPreferences(),
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
                 getXmpPreferences(),
@@ -2646,7 +2663,7 @@ public class JabRefPreferences implements PreferencesService {
         xmpPreferences = new XmpPreferences(
                 getBoolean(USE_XMP_PRIVACY_FILTER),
                 getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getInternalPreferences().keywordSeparatorProperty());
+                getBibEntryPreferences().keywordSeparatorProperty());
 
         EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
                 (obs, oldValue, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));

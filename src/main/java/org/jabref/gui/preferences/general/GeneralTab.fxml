@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <fx:root spacing="10.0" type="VBox"
@@ -38,20 +34,4 @@
     <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>
     <CheckBox fx:id="showAdvancedHints"
               text="%Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"/>
-
-    <Label styleClass="sectionHeader" text="%Entry owner"/>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <CheckBox fx:id="markOwner" text="%Mark new entries with owner name"/>
-        <TextField fx:id="markOwnerName" HBox.hgrow="ALWAYS"/>
-        <CheckBox fx:id="markOwnerOverwrite" text="%Overwrite">
-            <tooltip>
-                <Tooltip text="%If a pasted or imported entry already has the field set, overwrite."/>
-            </tooltip>
-        </CheckBox>
-        <Button fx:id="markOwnerHelp" prefWidth="20.0"/>
-    </HBox>
-
-    <Label styleClass="sectionHeader" text="%Time stamp"/>
-    <CheckBox fx:id="addCreationDate" text="%Add timestamp to new entries (field &quot;creationdate&quot;)"/>
-    <CheckBox fx:id="addModificationDate" text="%Add timestamp to modified entries (field &quot;modificationdate&quot;)"/>
 </fx:root>

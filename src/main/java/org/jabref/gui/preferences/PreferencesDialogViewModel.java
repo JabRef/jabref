@@ -16,6 +16,7 @@ import org.jabref.gui.preferences.appearance.AppearanceTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
 import org.jabref.gui.preferences.customexporter.CustomExporterTab;
 import org.jabref.gui.preferences.customimporter.CustomImporterTab;
+import org.jabref.gui.preferences.entry.EntryTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
 import org.jabref.gui.preferences.external.ExternalTab;
@@ -64,6 +65,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new FileTab(),
+                new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
                 new ProtectedTermsTab(),

@@ -44,7 +44,7 @@ public class ThreeWayMergeView extends VBox {
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
         viewModel = new ThreeWayMergeViewModel((BibEntry) leftEntry.clone(), (BibEntry) rightEntry.clone(), leftHeader, rightHeader);
         this.fieldMergerFactory = new FieldMergerFactory(preferencesService);
-        this.keywordSeparator = preferencesService.getGroupsPreferences().getKeywordSeparator().toString();
+        this.keywordSeparator = preferencesService.getBibEntryPreferences().getKeywordSeparator().toString();
 
         mergeGridPane = new GridPane();
         scrollPane = new ScrollPane();
