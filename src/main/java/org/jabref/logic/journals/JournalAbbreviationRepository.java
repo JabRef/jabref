@@ -107,12 +107,8 @@ public class JournalAbbreviationRepository {
                                String joined = String.join("", journalSplit);
 
                                foundKey = abbreviationToFull.keySet().stream()
-                                                                   .filter(
-                                                                           s -> Pattern.compile(joined)
-                                                                                       .matcher(s)
-                                                                                       .find()
-                                                                   )
-                                                                   .collect(Collectors.joining());
+                                                            .filter(s -> Pattern.compile(joined).matcher(s).find())
+                                                            .collect(Collectors.joining());
                            }
 
                            return Optional.ofNullable(abbreviationToFull.get(foundKey.equals("") ? journal : foundKey))
