@@ -38,6 +38,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
@@ -217,9 +218,13 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     public void addFromURL() {
         String clipText = ClipBoardManager.getContents();
         Optional<String> urlText;
+        String urlField = entry.getField(StandardField.URL).orElse("");
         if (clipText.startsWith("http://") || clipText.startsWith("https://") || clipText.startsWith("ftp://")) {
             urlText = dialogService.showInputDialogWithDefaultAndWait(
                     Localization.lang("Download file"), Localization.lang("Enter URL to download"), clipText);
+        } else if (urlField.startsWith("http://") || urlField.startsWith("https://") || urlField.startsWith("ftp://")) {
+            urlText = dialogService.showInputDialogWithDefaultAndWait(
+                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), urlField);
         } else {
             urlText = dialogService.showInputDialogAndWait(
                     Localization.lang("Download file"), Localization.lang("Enter URL to download"));
