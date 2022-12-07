@@ -197,6 +197,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return result;
     }
 
+    public void downloadFile(Optional<String> urlText) {
+        try {
+            URL url = new URL(urlText.get());
+            addFromURL(url);
+        } catch (MalformedURLException exception) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Invalid URL"),
+                    exception);
+        }
+    }
+
     public void fetchFulltext() {
         FulltextFetchers fetcher = new FulltextFetchers(
                 preferences.getImportFormatPreferences(),
@@ -208,14 +219,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .onSuccess(url -> {
                     Optional<String> urlField = entry.getField(StandardField.URL);
                     if (urlField.isPresent()) {
-                        try {
-                            URL urlText = new URL(urlField.get());
-                            addFromURL(urlText);
-                        } catch (MalformedURLException exception) {
-                            dialogService.showErrorDialogAndWait(
-                                    Localization.lang("Invalid URL"),
-                                    exception);
-                        }
+                        downloadFile(urlField);
                     } else {
                         dialogService.notify(Localization.lang("No full text document found"));
                     }
@@ -238,14 +242,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     Localization.lang("Download file"), Localization.lang("Enter URL to download"));
         }
         if (urlText.isPresent()) {
-            try {
-                URL url = new URL(urlText.get());
-                addFromURL(url);
-            } catch (MalformedURLException exception) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Invalid URL"),
-                        exception);
-            }
+            downloadFile(urlText);
         }
     }
 
