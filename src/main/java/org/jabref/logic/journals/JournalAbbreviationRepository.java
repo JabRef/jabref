@@ -57,7 +57,8 @@ public class JournalAbbreviationRepository {
             return true;
         }
 
-        return fullToAbbreviation.containsKey(journal) || abbreviationToFull.containsKey(journal);
+        return fullToAbbreviation.containsKey(journal) || abbreviationToFull.containsKey(journal)
+                || findDottedAbbrFromDotless(journal).length() > 0;
     }
 
     /**
@@ -68,7 +69,7 @@ public class JournalAbbreviationRepository {
         String journal = journalName.trim();
 
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
-                || abbreviationToFull.containsKey(journal);
+                || abbreviationToFull.containsKey(journal) || findDottedAbbrFromDotless(journal).length() > 0;
     }
 
     public String findDottedAbbrFromDotless(String journalName) {
