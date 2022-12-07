@@ -71,6 +71,29 @@ public class JournalAbbreviationRepository {
                 || abbreviationToFull.containsKey(journal);
     }
 
+    public String findDottedAbbrFromDotless(String journalName) {
+        String foundKey = "";
+
+        // check for a dot-less abbreviation
+        if (!Pattern.compile("\\.").matcher(journalName).find()) {
+            // use dot-less abbr to find full name using regex
+            String[] journalSplit = journalName.split(" ");
+
+            for (int i = 0; i < journalSplit.length; i++) {
+                String word = journalSplit[i] + "[\\.\\s]*";
+                journalSplit[i] = word;
+            }
+
+            String joined = String.join("", journalSplit);
+
+            foundKey = abbreviationToFull.keySet().stream()
+                                         .filter(s -> Pattern.compile(joined).matcher(s).find())
+                                         .collect(Collectors.joining());
+        }
+
+        return foundKey;
+    }
+
     /**
      * Attempts to get the abbreviation of the journal given.
      *
@@ -89,29 +112,14 @@ public class JournalAbbreviationRepository {
         return Optional.ofNullable(fullToAbbreviation.get(journal))
                        .map(abbreviation -> new Abbreviation(journal, abbreviation))
                        .or(() -> {
+                           String abbr = "";
+
                            // check for dot-less abbr
-                           Pattern p = Pattern.compile("\\.");
-                           Matcher m = p.matcher(journal);
-                           boolean hasDots = m.find();
-                           String foundKey = "";
-
-                           if (!hasDots) {
-                               // use dot-less abbr to find full name using regex
-                               String[] journalSplit = journal.split(" ");
-
-                               for (int i = 0; i < journalSplit.length; i++) {
-                                   String word = journalSplit[i] + "[\\.\\s]*";
-                                   journalSplit[i] = word;
-                               }
-
-                               String joined = String.join("", journalSplit);
-
-                               foundKey = abbreviationToFull.keySet().stream()
-                                                            .filter(s -> Pattern.compile(joined).matcher(s).find())
-                                                            .collect(Collectors.joining());
+                           if (isKnownName(journal) && isAbbreviatedName(journal)) {
+                               abbr = findDottedAbbrFromDotless(journal);
                            }
 
-                           return Optional.ofNullable(abbreviationToFull.get(foundKey.equals("") ? journal : foundKey))
+                           return Optional.ofNullable(abbreviationToFull.get(abbr.equals("") ? journal : abbr))
                                           .map(fullName -> new Abbreviation(fullName, journal));
                        });
     }
