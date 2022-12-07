@@ -206,8 +206,16 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))
                 .onFinished(() -> fulltextLookupInProgress.setValue(false))
                 .onSuccess(url -> {
-                    if (url.isPresent()) {
-                        addFromURL(url.get());
+                    Optional<String> urlField = entry.getField(StandardField.URL);
+                    if (urlField.isPresent()) {
+                        try {
+                            URL urlText = new URL(urlField.get());
+                            addFromURL(urlText);
+                        } catch (MalformedURLException exception) {
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Invalid URL"),
+                                    exception);
+                        }
                     } else {
                         dialogService.notify(Localization.lang("No full text document found"));
                     }
