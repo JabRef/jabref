@@ -6,7 +6,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -197,9 +196,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return result;
     }
 
-    public void downloadFile(Optional<String> urlText) {
+    public void downloadFile(String urlText) {
         try {
-            URL url = new URL(urlText.get());
+            URL url = new URL(urlText);
             addFromURL(url);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(
@@ -217,10 +216,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))
                 .onFinished(() -> fulltextLookupInProgress.setValue(false))
                 .onSuccess(url -> {
-                    Optional<String> urlField = entry.getField(StandardField.URL);
-                    if (urlField.isPresent()) {
+                    String urlField = entry.getField(StandardField.URL).get();
+                    if (!urlField.isEmpty()) {
                         downloadFile(urlField);
                     } else {
+                        fetcher.findFullTextPDF(entry);
                         dialogService.notify(Localization.lang("No full text document found"));
                     }
                 })
@@ -229,19 +229,19 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     public void addFromURL() {
         String clipText = ClipBoardManager.getContents();
-        Optional<String> urlText;
+        String urlText;
         String urlField = entry.getField(StandardField.URL).orElse("");
         if (clipText.startsWith("http://") || clipText.startsWith("https://") || clipText.startsWith("ftp://")) {
             urlText = dialogService.showInputDialogWithDefaultAndWait(
-                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), clipText);
+                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), clipText).get();
         } else if (urlField.startsWith("http://") || urlField.startsWith("https://") || urlField.startsWith("ftp://")) {
             urlText = dialogService.showInputDialogWithDefaultAndWait(
-                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), urlField);
+                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), urlField).get();
         } else {
             urlText = dialogService.showInputDialogAndWait(
-                    Localization.lang("Download file"), Localization.lang("Enter URL to download"));
+                    Localization.lang("Download file"), Localization.lang("Enter URL to download")).get();
         }
-        if (urlText.isPresent()) {
+        if (!urlText.isEmpty()) {
             downloadFile(urlText);
         }
     }
