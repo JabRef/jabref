@@ -133,7 +133,9 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
@@ -1196,6 +1198,29 @@ public class JabRefFrame extends BorderPane {
             } catch (Throwable ex) {
                 LOGGER.error("A problem occurred when trying to save the file", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            }
+            // Save was cancelled or an error occurred.
+            return false;
+        }
+        if (response.isPresent() && response.get().equals(discardChanges)) {
+            //filename = filename + "--discarded.bak";
+
+            Path directory = Path.of(filename);
+            try {
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
+                String backUpPath = BackupFileUtil.getPathOfLatestExisingBackupFile(directory, BackupFileType.BACKUP).map(Path::toString).
+                        orElse(Localization.lang("File not found"));
+                backUpPath = backUpPath.replace(".bak","--discarded.bak");
+
+                if (saveAction.saveAs(Path.of(backUpPath))) {
+                    BackupManager.setDiscardedFileExists(true);
+                    return true;
+                }
+                // The action was either canceled or unsuccessful.
+                dialogService.notify(Localization.lang("Unable to save library"));
+            } catch (Throwable ex) {
+                LOGGER.error("A problem occurred when trying to save the backup file", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save backup file."), ex);
             }
             // Save was cancelled or an error occurred.
             return false;

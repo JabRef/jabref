@@ -66,6 +66,8 @@ public class BackupManager {
 
     private boolean needsBackup = true;
 
+    private static boolean discardedFileExists = false;
+
     private BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
@@ -127,6 +129,10 @@ public class BackupManager {
      * the user checks the output.
      */
     public static boolean backupFileDiffers(Path originalPath) {
+
+        if(discardedFileExists)
+            return false;
+
         return getLatestBackupPath(originalPath).map(latestBackupPath -> {
             FileTime latestBackupFileLastModifiedTime;
             try {
@@ -176,7 +182,10 @@ public class BackupManager {
             LOGGER.error("Error while restoring the backup file.", e);
         }
     }
-
+    public static void setDiscardedFileExists(boolean discardedFileFlag)
+    {
+        discardedFileExists = discardedFileFlag;
+    }
     private Optional<Path> determineBackupPathForNewBackup() {
         return bibDatabaseContext.getDatabasePath().map(BackupManager::getBackupPathForNewBackup);
     }
@@ -189,7 +198,8 @@ public class BackupManager {
      * @param backupPath the path where the library should be backed up to
      */
     private void performBackup(Path backupPath) {
-        if (!needsBackup) {
+
+        if (!needsBackup || discardedFileExists) {
             return;
         }
 
@@ -259,17 +269,26 @@ public class BackupManager {
 
     private void fillQueue() {
         Path backupDir = BackupFileUtil.getAppDataBackupDir();
+
         if (!Files.exists(backupDir)) {
             return;
         }
+
         bibDatabaseContext.getDatabasePath().ifPresent(databasePath -> {
             // code similar to {@link org.jabref.logic.util.io.BackupFileUtil.getPathOfLatestExisingBackupFile}
-            final String prefix = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+
             try {
+                if(databasePath.toString().endsWith("--discarded.bak"))
+                {
+                    Files.delete(databasePath);
+                }
+                final String prefix = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+
                 List<Path> allSavFiles = Files.list(backupDir)
                                               // just list the .sav belonging to the given targetFile
                                               .filter(p -> p.getFileName().toString().startsWith(prefix))
                                               .sorted().toList();
+
                 backupFilesQueue.addAll(allSavFiles);
             } catch (IOException e) {
                 LOGGER.error("Could not determine most recent file", e);
@@ -284,6 +303,7 @@ public class BackupManager {
     private void shutdown() {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
+
         executor.shutdown();
 
         // Ensure that backup is a recent one
