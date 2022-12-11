@@ -55,16 +55,16 @@ public class BackupUIManager {
     private static Optional<ParserResult> showReviewBackupDialog(DialogService dialogService, Path originalPath, PreferencesService preferencesService) {
         try {
             Path backupPath = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP).orElseThrow();
-            ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
+            ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
             ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, new DummyFileUpdateMonitor());
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
-            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferencesService);
+            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferencesService.getBibEntryPreferences());
             return DefaultTaskExecutor.runInJavaFXThread(() -> {
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory),
-                        originalDatabase, dialogService, Globals.stateManager, Globals.getThemeManager(), Globals.prefs, "Review Backup"
+                        originalDatabase, dialogService, Globals.stateManager, Globals.getThemeManager(), preferencesService, "Review Backup"
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
