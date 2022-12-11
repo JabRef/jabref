@@ -211,20 +211,23 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         FulltextFetchers fetcher = new FulltextFetchers(
                 preferences.getImportFormatPreferences(),
                 preferences.getImporterPreferences());
-        BackgroundTask
+        String urlField = entry.getField(StandardField.URL).get();
+        if (!urlField.isEmpty()) {
+            downloadFile(urlField);
+        } else {
+            BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))
                 .onFinished(() -> fulltextLookupInProgress.setValue(false))
                 .onSuccess(url -> {
-                    String urlField = entry.getField(StandardField.URL).get();
-                    if (!urlField.isEmpty()) {
-                        downloadFile(urlField);
+                    if (url.isPresent()) {
+                        addFromURL(url.get());
                     } else {
-                        fetcher.findFullTextPDF(entry);
                         dialogService.notify(Localization.lang("No full text document found"));
                     }
                 })
                 .executeWith(taskExecutor);
+        }
     }
 
     public void addFromURL() {
