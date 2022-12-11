@@ -8,6 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.BibEntryPreferences;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -38,7 +39,8 @@ class GroupDialogViewModelTest {
         when(group.getName()).thenReturn("Group");
 
         PreferencesService preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getKeywordDelimiter()).thenReturn(',');
+        when(preferencesService.getBibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
+        when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
         when(preferencesService.getFilePreferences().getUser()).thenReturn("MockedUser");
 

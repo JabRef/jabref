@@ -124,8 +124,6 @@ public interface PreferencesService {
     // GroupsPreferences
     //*************************************************************************************************************
 
-    Character getKeywordDelimiter();
-
     GroupsPreferences getGroupsPreferences();
 
     //*************************************************************************************************************

@@ -1701,7 +1701,7 @@ public class JabRefPreferences implements PreferencesService {
                 get(KEY_PATTERN_REPLACEMENT),
                 get(UNWANTED_CITATION_KEY_CHARACTERS),
                 getGlobalCitationKeyPattern(),
-                getKeywordDelimiter());
+                getBibEntryPreferences().getKeywordSeparator());
     }
 
     @Override
@@ -2077,11 +2077,6 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    @Override
-    public Character getKeywordDelimiter() {
-        return getBibEntryPreferences().getKeywordSeparator();
-    }
-
     //*************************************************************************************************************
     // AppearancePreferences
     //*************************************************************************************************************
@@ -2257,7 +2252,7 @@ public class JabRefPreferences implements PreferencesService {
                 citationKeyDependency,
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
                 getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
-                getKeywordDelimiter());
+                bibEntryPreferences.keywordSeparatorProperty());
 
         EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (obs, oldValue, newValue) -> {
             // Starts bibtex only omitted, as it is not being saved
