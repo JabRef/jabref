@@ -22,6 +22,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.BibEntryPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.fxmisc.richtext.CodeArea;
@@ -51,9 +52,12 @@ class SourceTabTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
+        BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
+        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
+        when(importFormatPreferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
         FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
 
         sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), fieldWriterPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
@@ -75,7 +79,7 @@ class SourceTabTest {
     }
 
     @Test
-    void switchingFromSourceTabDoesNotThrowException(FxRobot robot) throws Exception {
+    void switchingFromSourceTabDoesNotThrowException(FxRobot robot) {
         BibEntry entry = new BibEntry();
         entry.setField(new UnknownField("test"), "testvalue");
 
