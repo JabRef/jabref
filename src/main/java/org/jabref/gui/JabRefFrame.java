@@ -1115,8 +1115,8 @@ public class JabRefFrame extends BorderPane {
         tabbedPane.getTabs().add(libraryTab);
 
         libraryTab.setOnCloseRequest(event -> {
+            libraryTab.cancelLoading();
             closeTab(libraryTab);
-            libraryTab.getDataLoadingTask().cancel();
             event.consume();
         });
 
@@ -1129,13 +1129,10 @@ public class JabRefFrame extends BorderPane {
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
-    private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(
-                "OpenNewDatabase",
-                Map.of(),
-                Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
-    }
-
+    /**
+     * Opens a new tab with existing data.
+     * Asynchronous loading is done at {@link LibraryTab#createLibraryTab(JabRefFrame, PreferencesService, StateManager, ThemeManager, Path, BackgroundTask, ImportFormatReader)}.
+     */
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 

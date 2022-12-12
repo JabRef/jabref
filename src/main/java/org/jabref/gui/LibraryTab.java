@@ -115,8 +115,7 @@ public class LibraryTab extends Tab {
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
-    // initializing it so we prevent NullPointerException
-    private BackgroundTask<ParserResult> dataLoadingTask = BackgroundTask.wrap(() -> null);
+    private BackgroundTask<ParserResult> dataLoadingTask;
 
     private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
     private final ImportFormatReader importFormatReader;
@@ -189,15 +188,19 @@ public class LibraryTab extends Tab {
         text.append("]");
     }
 
-    public BackgroundTask<?> getDataLoadingTask() {
-        return dataLoadingTask;
-    }
-
     public void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
         this.dataLoadingTask = dataLoadingTask;
     }
 
-    /* The layout to display in the tab when it's loading*/
+    public void cancelLoading() {
+        if (dataLoadingTask != null) {
+            dataLoadingTask.cancel();
+        }
+    }
+
+    /**
+     * The layout to display in the tab when it's loading
+     */
     public Node createLoadingAnimationLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         BorderPane pane = new BorderPane();
@@ -209,7 +212,6 @@ public class LibraryTab extends Tab {
     public void onDatabaseLoadingStarted() {
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
-
         frame.addTab(this, true);
     }
 
@@ -819,21 +821,19 @@ public class LibraryTab extends Tab {
         this.changedProperty.setValue(false);
     }
 
-    public static class Factory {
-        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, ThemeManager themeManager, Path file, BackgroundTask<ParserResult> dataLoadingTask, ImportFormatReader importFormatReader) {
-            BibDatabaseContext context = new BibDatabaseContext();
-            context.setDatabasePath(file);
+    public static LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, ThemeManager themeManager, Path file, BackgroundTask<ParserResult> dataLoadingTask, ImportFormatReader importFormatReader) {
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.setDatabasePath(file);
 
-            LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, themeManager, context, importFormatReader);
-            newTab.setDataLoadingTask(dataLoadingTask);
+        LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, themeManager, context, importFormatReader);
 
-            dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
-                           .onSuccess(newTab::onDatabaseLoadingSucceed)
-                           .onFailure(newTab::onDatabaseLoadingFailed)
-                           .executeWith(Globals.TASK_EXECUTOR);
+        newTab.setDataLoadingTask(dataLoadingTask);
+        dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
+                       .onSuccess(newTab::onDatabaseLoadingSucceed)
+                       .onFailure(newTab::onDatabaseLoadingFailed)
+                       .executeWith(Globals.TASK_EXECUTOR);
 
-            return newTab;
-        }
+        return newTab;
     }
 
     private class GroupTreeListener {
