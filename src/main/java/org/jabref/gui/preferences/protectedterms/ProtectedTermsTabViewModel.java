@@ -1,8 +1,7 @@
 package org.jabref.gui.preferences.protectedterms;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +56,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
         termsFilesProperty.addAll(termsLoader.getProtectedTermsLists().stream().map(ProtectedTermsListItemModel::new).toList());
     }
 
+    @Override
     public void storeSettings() {
         List<String> enabledExternalList = new ArrayList<>();
         List<String> disabledExternalList = new ArrayList<>();
@@ -97,12 +97,8 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> {
-                         String fileName = file.toAbsolutePath().toString();
-                         try {
-                             termsFilesProperty.add(new ProtectedTermsListItemModel(ProtectedTermsLoader.readProtectedTermsListFromFile(new File(fileName), true)));
-                         } catch (FileNotFoundException e) {
-                             LOGGER.warn("Cannot find protected terms file " + fileName, e);
-                         }
+                         Path fileName = file.toAbsolutePath();
+                         termsFilesProperty.add(new ProtectedTermsListItemModel(ProtectedTermsLoader.readProtectedTermsListFromFile(fileName, true)));
                      });
     }
 
@@ -155,16 +151,12 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     public void reloadList(ProtectedTermsListItemModel oldItemModel) {
         ProtectedTermsList oldList = oldItemModel.getTermsList();
-        try {
-            ProtectedTermsList newList = ProtectedTermsLoader.readProtectedTermsListFromFile(new File(oldList.getLocation()), oldList.isEnabled());
-            int index = termsFilesProperty.indexOf(oldItemModel);
-            if (index >= 0) {
-                termsFilesProperty.set(index, new ProtectedTermsListItemModel(newList));
-            } else {
-                LOGGER.warn("Problem reloading protected terms file {}.", oldList.getLocation());
-            }
-        } catch (IOException e) {
-            LOGGER.warn("Problem reloading protected terms file {}.", oldList.getLocation(), e);
+        ProtectedTermsList newList = ProtectedTermsLoader.readProtectedTermsListFromFile(Path.of(oldList.getLocation()), oldList.isEnabled());
+        int index = termsFilesProperty.indexOf(oldItemModel);
+        if (index >= 0) {
+            termsFilesProperty.set(index, new ProtectedTermsListItemModel(newList));
+        } else {
+            LOGGER.warn("Problem reloading protected terms file {}.", oldList.getLocation());
         }
     }
 

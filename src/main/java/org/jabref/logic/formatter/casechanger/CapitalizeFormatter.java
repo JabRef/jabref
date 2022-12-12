@@ -30,7 +30,7 @@ public class CapitalizeFormatter extends Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "Changes the first letter of all words to capital case and the remaining letters to lower case.");
+                "Changes The First Letter Of All Words To Capital Case And The Remaining Letters To Lower Case.");
     }
 
     @Override

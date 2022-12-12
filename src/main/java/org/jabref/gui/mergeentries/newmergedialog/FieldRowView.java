@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
+import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selection;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
@@ -22,8 +23,6 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selection;
 
 /**
  * A controller class to control left, right and merged field values

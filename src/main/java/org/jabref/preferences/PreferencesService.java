@@ -65,8 +65,6 @@ public interface PreferencesService {
 
     OpenOfficePreferences getOpenOfficePreferences();
 
-    void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
-
     Map<String, Object> getPreferences();
 
     Map<String, Object> getDefaults();
