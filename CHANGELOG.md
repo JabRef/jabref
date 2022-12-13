@@ -56,6 +56,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added HTML and Markdown files to Find Unlinked Files and removed BibTeX.[koppor#547](https://github.com/koppor/jabref/issues/547)
 - We changed the messages after importing unlinked local files to past tense. [koppor#548](https://github.com/koppor/jabref/issues/548)
 - We fixed an issue where the wrong icon for a successful import of a bib entry was shown [#9308](https://github.com/JabRef/jabref/pull/9308)
+- We modified the Change case sub-menus and their corresponding tips (displayed when you stay long over the menu) to properly reflect exemplified cases. [#9339](https://github.com/Jabref/jabref/issues/9339)
 
 ### Fixed
 
@@ -85,6 +86,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue with the message that is displayed when fetcher returns an empty list of entries for given query. [#9195](https://github.com/JabRef/jabref/issues/9195)
 - We fixed an issue where an exception was not logged correctly. [koppor#627](https://github.com/JabRef/koppor/issues/627)
 - We fixed an issue where hitting enter on the search field within the preferences dialog closed the dialog. [koppor#630](https://github.com/koppor/jabref/issues/630)
+- We fixed an issue where a user could not open an attached file in a new unsaved library. [#9386](https://github.com/JabRef/jabref/issues/9386)
 - We fixed a typo within a connection error message. [koppor#625](https://github.com/koppor/jabref/issues/625)
 - We fixed an issue where the 'close dialog' key binding was not closing the Preferences dialog. [#8888](https://github.com/jabref/jabref/issues/8888)
 - We fixed an issue where editing entry's "date" field in library mode "biblatex" causes an uncaught exception. [#8747](https://github.com/JabRef/jabref/issues/8747)

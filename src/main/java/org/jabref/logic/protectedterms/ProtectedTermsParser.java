@@ -1,19 +1,15 @@
 package org.jabref.logic.protectedterms;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.Charset;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
 
@@ -33,63 +29,45 @@ public class ProtectedTermsParser {
     private String location;
 
     public void readTermsFromResource(String resourceFileName, String descriptionString) {
-        URL url = Objects
-                .requireNonNull(ProtectedTermsLoader.class.getResource(Objects.requireNonNull(resourceFileName)));
-        description = descriptionString;
-        location = resourceFileName;
         try {
-            readTermsList(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            LOGGER.info("Could not read protected terms from resource " + resourceFileName, e);
+            Path path = Path.of(Objects.requireNonNull(ProtectedTermsLoader.class.getResource(Objects.requireNonNull(resourceFileName))).toURI());
+            readTermsList(path);
+            description = descriptionString;
+            location = resourceFileName;
+        } catch (URISyntaxException e1) {
+            LOGGER.error("");
         }
     }
 
-    public void readTermsFromFile(File file) throws FileNotFoundException {
-        location = file.getAbsolutePath();
-        try (FileReader reader = new FileReader(Objects.requireNonNull(file))) {
-            readTermsList(reader);
-        } catch (FileNotFoundException e) {
-            throw e;
-        } catch (IOException e) {
-            LOGGER.warn("Could not read terms from file " + file.getAbsolutePath(), e);
-        }
+    public void readTermsFromFile(Path path) {
+        location = path.toAbsolutePath().toString();
+        readTermsList(path);
     }
 
-    public void readTermsFromFile(File file, Charset encoding) throws FileNotFoundException {
-        location = file.getAbsolutePath();
-        try (FileInputStream stream = new FileInputStream(Objects.requireNonNull(file));
-             InputStreamReader reader = new InputStreamReader(stream, Objects.requireNonNull(encoding))) {
-            readTermsList(reader);
-        } catch (FileNotFoundException e) {
-            throw e;
+    private void readTermsList(Path path) {
+        if (!Files.exists(path)) {
+            LOGGER.warn("Could not read terms from file {}", path);
+            return;
+        }
+        try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
+            this.terms.addAll(lines.map(this::setDescription).filter(line -> line != null).collect(Collectors.toList()));
         } catch (IOException e) {
-            LOGGER.warn("Could not read terms from file " + file.getAbsolutePath(), e);
+            LOGGER.warn("Could not read terms from file {}", path, e);
         }
     }
 
     /**
-     * Read the given file, which should contain a list of journal names and their
-     * abbreviations. Each line should be formatted as: "Full Journal Name=Abbr. Journal Name"
+     * Parse the description that starts after the # but don't include it in the terms
      *
-     * @param in
+     * @param line
+     * @return line or null if the line contains the description
      */
-    private void readTermsList(Reader in) {
-        try (BufferedReader reader = new BufferedReader(in)) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                addLine(line);
-            }
-        } catch (IOException ex) {
-            LOGGER.info("Could not read journal list from file ", ex);
-        }
-    }
-
-    private void addLine(String line) {
+    private String setDescription(String line) {
         if (line.startsWith("#")) {
             description = line.substring(1).trim();
-            return;
+            return null;
         }
-        this.terms.add(line);
+        return line;
     }
 
     public ProtectedTermsList getProtectTermsList(boolean enabled, boolean internal) {
