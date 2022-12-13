@@ -238,17 +238,15 @@ public class LibraryTab extends Tab {
     public void feedData(BibDatabaseContext bibDatabaseContextFromParserResult) {
         cleanUp();
 
-       // this.bibDatabaseContext.getDatabase().insertEntries(bibDatabaseContextFromParserResult.getEntries());
-
         // When you open an existing library, a library tab with a loading animation is added immediately.
         // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
         // This line is necessary because, while there is already a binding that updates the active database when a new tab is added,
         // it doesn't handle the case when a library is loaded asynchronously.
         stateManager.setActiveDatabase(bibDatabaseContextFromParserResult);
 
-        Optional<BibDatabaseContext> x = stateManager.getOpenDatabases().stream().filter(ctx -> ctx.equals(this.bibDatabaseContext)).findFirst();
-
-        x.ifPresent(s -> stateManager.getOpenDatabases().remove(s));
+        // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
+        Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
+        foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
 
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContextFromParserResult);
 
