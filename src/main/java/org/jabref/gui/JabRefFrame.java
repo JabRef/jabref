@@ -1130,12 +1130,12 @@ public class JabRefFrame extends BorderPane {
 
     /**
      * Opens a new tab with existing data.
-     * Asynchronous loading is done at {@link LibraryTab#createLibraryTab(JabRefFrame, PreferencesService, StateManager, ThemeManager, Path, BackgroundTask, ImportFormatReader)}.
+     * Asynchronous loading is done at {@link #createLibraryTab(BackgroundTask, Path, PreferencesService, StateManager, JabRefFrame, ThemeManager)}.
      */
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, importFormatReader);
+        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, themeManager);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }

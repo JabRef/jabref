@@ -43,7 +43,6 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
@@ -118,14 +117,12 @@ public class LibraryTab extends Tab {
     private BackgroundTask<ParserResult> dataLoadingTask;
 
     private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
-    private final ImportFormatReader importFormatReader;
 
-    public LibraryTab(JabRefFrame frame,
+    public LibraryTab(BibDatabaseContext bibDatabaseContext,
+                      JabRefFrame frame,
                       PreferencesService preferencesService,
                       StateManager stateManager,
-                      ThemeManager themeManager,
-                      BibDatabaseContext bibDatabaseContext,
-                      ImportFormatReader importFormatReader) {
+                      ThemeManager themeManager) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.undoManager = frame.getUndoManager();
@@ -133,7 +130,6 @@ public class LibraryTab extends Tab {
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.themeManager = Objects.requireNonNull(themeManager);
-        this.importFormatReader = importFormatReader;
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -831,11 +827,17 @@ public class LibraryTab extends Tab {
         this.changedProperty.setValue(false);
     }
 
-    public static LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager, ThemeManager themeManager, Path file, BackgroundTask<ParserResult> dataLoadingTask, ImportFormatReader importFormatReader) {
+    /**
+     * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
+     *
+     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link Globals.TASK_EXECUTOR}.
+     * @param file the path to the file (loaded by the dataLoadingTask)
+     */
+    public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask, Path file, PreferencesService preferencesService, StateManager stateManager, JabRefFrame frame, ThemeManager themeManager) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
-        LibraryTab newTab = new LibraryTab(frame, preferencesService, stateManager, themeManager, context, importFormatReader);
+        LibraryTab newTab = new LibraryTab(context, frame, preferencesService, stateManager, themeManager);
 
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
