@@ -19,6 +19,7 @@ import org.h2.mvstore.MVStore;
  */
 public class JournalAbbreviationRepository {
     static final Pattern DOT = Pattern.compile("\\.");
+    static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
     private final MVMap<String, String> fullToAbbreviation;
     private final MVMap<String, String> abbreviationToFull;
@@ -51,6 +52,11 @@ public class JournalAbbreviationRepository {
      * Letters) or its abbreviated form (e.g. Phys. Rev. Lett.).
      */
     public boolean isKnownName(String journalName) {
+        // check for at least one "?"
+        if (QUESTION_MARK.matcher(journalName).find()) {
+            return false;
+        }
+
         String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         boolean isKnown = customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation));
@@ -74,6 +80,11 @@ public class JournalAbbreviationRepository {
     }
 
     public String findDottedAbbrFromDotless(String journalName) {
+        // check for at least one "?"
+        if (QUESTION_MARK.matcher(journalName).find()) {
+            return "UNKNOWN";
+        }
+
         String foundKey = "";
 
         // check for a dot-less abbreviation
