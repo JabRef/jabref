@@ -236,7 +236,7 @@ public class LibraryTab extends Tab {
     public void feedData(BibDatabaseContext bibDatabaseContextFromParserResult) {
         cleanUp();
 
-        if (this.getTabPane().getSelectionModel().selectedItemProperty().equals(this)) {
+        if (this.getTabPane().getSelectionModel().selectedItemProperty().get().equals(this)) {
             // If you open an existing library, a library tab with a loading animation is added immediately.
             // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
             // This line is necessary because, while there is already a binding that updates the active database when a new tab is added,
