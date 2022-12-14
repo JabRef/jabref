@@ -237,26 +237,32 @@ public class LibraryTab extends Tab {
         dialogService.showErrorDialogAndWait(title, content, ex);
     }
 
-    public void feedData(BibDatabaseContext bibDatabaseContext) {
+    public void feedData(BibDatabaseContext bibDatabaseContextFromParserResult) {
         cleanUp();
 
-        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-
         if (this.getTabPane().getSelectionModel().selectedItemProperty().equals(this)) {
-            // When you open an existing library, a library tab with a loading animation is added immediately.
+            // If you open an existing library, a library tab with a loading animation is added immediately.
             // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
             // This line is necessary because, while there is already a binding that updates the active database when a new tab is added,
             // it doesn't handle the case when a library is loaded asynchronously.
             // See org.jabref.gui.LibraryTab.createLibraryTab for the asynchronous loading.
-            stateManager.setActiveDatabase(bibDatabaseContext);
+            stateManager.setActiveDatabase(bibDatabaseContextFromParserResult);
         }
 
-        bibDatabaseContext.getDatabase().registerListener(this);
-        bibDatabaseContext.getMetaData().registerListener(this);
+        // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
+        Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
+        foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
+
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContextFromParserResult);
+
+        stateManager.getOpenDatabases().add(bibDatabaseContextFromParserResult);
+
+        bibDatabaseContextFromParserResult.getDatabase().registerListener(this);
+        bibDatabaseContextFromParserResult.getMetaData().registerListener(this);
 
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
-        citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
+        citationStyleCache = new CitationStyleCache(bibDatabaseContextFromParserResult);
+        annotationCache = new FileAnnotationCache(bibDatabaseContextFromParserResult, preferencesService.getFilePreferences());
 
         setupMainPanel();
         setupAutoCompletion();
