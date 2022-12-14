@@ -18,6 +18,7 @@ import org.h2.mvstore.MVStore;
  * A repository for all journal abbreviations, including add and find methods.
  */
 public class JournalAbbreviationRepository {
+    static final Pattern DOT = Pattern.compile("\\.");
 
     private final MVMap<String, String> fullToAbbreviation;
     private final MVMap<String, String> abbreviationToFull;
@@ -76,7 +77,7 @@ public class JournalAbbreviationRepository {
         String foundKey = "";
 
         // check for a dot-less abbreviation
-        if (!Pattern.compile("\\.").matcher(journalName).find()) {
+        if (!DOT.matcher(journalName).find()) {
             // use dot-less abbr to find full name using regex
             String[] journalSplit = journalName.split(" ");
 
