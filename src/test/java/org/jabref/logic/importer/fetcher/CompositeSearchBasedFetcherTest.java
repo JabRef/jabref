@@ -100,7 +100,7 @@ public class CompositeSearchBasedFetcherTest {
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
 
         List<SearchBasedFetcher> list = List.of(
-                new ArXiv(importFormatPreferences),
+                new ArXivFetcher(importFormatPreferences),
                 new INSPIREFetcher(importFormatPreferences),
                 new GvkFetcher(),
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),

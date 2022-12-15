@@ -115,6 +115,7 @@ public class FileHelper {
      * @param fileName        The filename, may also be a relative path to the file
      */
     public static Optional<Path> find(final BibDatabaseContext databaseContext, String fileName, FilePreferences filePreferences) {
+        Objects.requireNonNull(fileName, "fileName");
         return find(fileName, databaseContext.getFileDirectories(filePreferences));
     }
 
@@ -126,6 +127,16 @@ public class FileHelper {
      * returning the first found file to match if any.
      */
     public static Optional<Path> find(String fileName, List<Path> directories) {
+        if (directories.isEmpty()) {
+            // Fallback, if no directories to resolve are passed
+            Path path = Path.of(fileName);
+            if (path.isAbsolute()) {
+                return Optional.of(path);
+            } else {
+                return Optional.empty();
+            }
+        }
+
         return directories.stream()
                           .flatMap(directory -> find(fileName, directory).stream())
                           .findFirst();

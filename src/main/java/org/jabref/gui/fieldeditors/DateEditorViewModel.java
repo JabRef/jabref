@@ -21,7 +21,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
     }
 
     public StringConverter<TemporalAccessor> getDateToStringConverter() {
-        return new StringConverter<TemporalAccessor>() {
+        return new StringConverter<>() {
             @Override
             public String toString(TemporalAccessor date) {
                 if (date != null) {
