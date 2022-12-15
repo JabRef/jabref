@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
@@ -132,7 +133,9 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
@@ -404,8 +407,8 @@ public class JabRefFrame extends BorderPane {
                 prefs.getGuiPreferences().getLastFilesOpened().clear();
             } else {
                 Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext()
-                                                             .getDatabasePath()
-                                                             .orElse(null);
+                        .getDatabasePath()
+                        .orElse(null);
                 prefs.getGuiPreferences().setLastFilesOpened(filenames);
                 prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
             }
@@ -608,9 +611,9 @@ public class JabRefFrame extends BorderPane {
      */
     public List<LibraryTab> getLibraryTabs() {
         return tabbedPane.getTabs().stream()
-                         .filter(LibraryTab.class::isInstance)
-                         .map(LibraryTab.class::cast)
-                         .collect(Collectors.toList());
+                .filter(LibraryTab.class::isInstance)
+                .map(LibraryTab.class::cast)
+                .collect(Collectors.toList());
     }
 
     public void showLibraryTabAt(int i) {
@@ -1068,10 +1071,10 @@ public class JabRefFrame extends BorderPane {
         } else {
             // only add tab if library is not already open
             Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
-                                                              .filter(p -> p.getBibDatabaseContext()
-                                                                            .getDatabasePath()
-                                                                            .equals(parserResult.getPath()))
-                                                              .findFirst();
+                    .filter(p -> p.getBibDatabaseContext()
+                            .getDatabasePath()
+                            .equals(parserResult.getPath()))
+                    .findFirst();
 
             if (libraryTab.isPresent()) {
                 tabbedPane.getSelectionModel().select(libraryTab.get());
@@ -1114,8 +1117,8 @@ public class JabRefFrame extends BorderPane {
         tabbedPane.getTabs().add(libraryTab);
 
         libraryTab.setOnCloseRequest(event -> {
-            libraryTab.cancelLoading();
             closeTab(libraryTab);
+            libraryTab.getDataLoadingTask().cancel();
             event.consume();
         });
 
@@ -1128,14 +1131,17 @@ public class JabRefFrame extends BorderPane {
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
-    /**
-     * Opens a new tab with existing data.
-     * Asynchronous loading is done at {@link #createLibraryTab(BackgroundTask, Path, PreferencesService, StateManager, JabRefFrame, ThemeManager)}.
-     */
+    private void trackOpenNewDatabase(LibraryTab libraryTab) {
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(
+                "OpenNewDatabase",
+                Map.of(),
+                Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
+    }
+
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, themeManager);
+        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, importFormatReader);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }
@@ -1166,10 +1172,10 @@ public class JabRefFrame extends BorderPane {
      */
     private boolean confirmClose(LibraryTab libraryTab) {
         String filename = libraryTab.getBibDatabaseContext()
-                                    .getDatabasePath()
-                                    .map(Path::toAbsolutePath)
-                                    .map(Path::toString)
-                                    .orElse(Localization.lang("untitled"));
+                .getDatabasePath()
+                .map(Path::toAbsolutePath)
+                .map(Path::toString)
+                .orElse(Localization.lang("untitled"));
 
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
@@ -1196,6 +1202,9 @@ public class JabRefFrame extends BorderPane {
             // Save was cancelled or an error occurred.
             return false;
         }
+        if (response.isPresent() && response.get().equals(discardChanges)) {
+            BackupManager.setDiscardedFileExists(true);
+        }
         return response.isEmpty() || !response.get().equals(cancel);
     }
 
@@ -1204,10 +1213,10 @@ public class JabRefFrame extends BorderPane {
      */
     private Boolean confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
         String filename = libraryTab.getBibDatabaseContext()
-                                    .getDatabasePath()
-                                    .map(Path::toAbsolutePath)
-                                    .map(Path::toString)
-                                    .orElse(Localization.lang("untitled"));
+                .getDatabasePath()
+                .map(Path::toAbsolutePath)
+                .map(Path::toString)
+                .orElse(Localization.lang("untitled"));
 
         ButtonType deleteEmptyEntries = new ButtonType(Localization.lang("Delete empty entries"), ButtonBar.ButtonData.YES);
         ButtonType keepEmptyEntries = new ButtonType(Localization.lang("Keep empty entries"), ButtonBar.ButtonData.NO);
