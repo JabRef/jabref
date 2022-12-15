@@ -2,6 +2,7 @@ package org.jabref.gui.dialogs;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.ButtonType;
@@ -9,6 +10,7 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.backup.BackupResolverDialog;
+import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
@@ -54,22 +56,31 @@ public class BackupUIManager {
 
     private static Optional<ParserResult> showReviewBackupDialog(DialogService dialogService, Path originalPath, PreferencesService preferencesService) {
         try {
-            Path backupPath = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP).orElseThrow();
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-            ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, new DummyFileUpdateMonitor());
+
+            // The database of the originalParserResult will be modified
+            ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, Globals.getFileUpdateMonitor());
+            // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
+
+            Path backupPath = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferencesService);
+
             return DefaultTaskExecutor.runInJavaFXThread(() -> {
+                List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
-                        DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory),
+                        changes,
                         originalDatabase, dialogService, Globals.stateManager, Globals.getThemeManager(), Globals.prefs, "Review Backup"
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
+                    // In case not all changes are resolved, start from scratch
                     return showRestoreBackupDialog(dialogService, originalPath, preferencesService);
                 }
+
+                // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
                 return Optional.of(originalParserResult);
             });
         } catch (IOException e) {

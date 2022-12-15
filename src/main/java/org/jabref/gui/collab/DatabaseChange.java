@@ -49,7 +49,7 @@ public sealed abstract class DatabaseChange permits EntryAdd, EntryChange, Entry
     }
 
     /**
-     * Convinience method for accepting changes
+     * Convenience method for accepting changes
      * */
     public void accept() {
         setAccepted(true);
