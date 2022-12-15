@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +53,8 @@ public class BackupManager {
 
     private static final int DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS = 19;
 
+    private static boolean discardedFileExists = false;
+
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
@@ -65,6 +69,8 @@ public class BackupManager {
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
 
     private boolean needsBackup = true;
+
+
 
     private BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -128,9 +134,12 @@ public class BackupManager {
      */
     public static boolean backupFileDiffers(Path originalPath) {
         return getLatestBackupPath(originalPath).map(latestBackupPath -> {
+            if(latestBackupPath.toString().endsWith("--discarded.bak")){
+                return false;
+            }
             FileTime latestBackupFileLastModifiedTime;
             try {
-                 latestBackupFileLastModifiedTime = Files.getLastModifiedTime(latestBackupPath);
+                latestBackupFileLastModifiedTime = Files.getLastModifiedTime(latestBackupPath);
             } catch (IOException e) {
                 LOGGER.debug("Could not get timestamp of backup file {}", latestBackupPath, e);
                 // If we cannot get the timestamp, we do show any warning
@@ -177,6 +186,10 @@ public class BackupManager {
         }
     }
 
+    public static void setDiscardedFileExists(boolean discardedFileFlag){
+        discardedFileExists = discardedFileFlag;
+    }
+
     private Optional<Path> determineBackupPathForNewBackup() {
         return bibDatabaseContext.getDatabasePath().map(BackupManager::getBackupPathForNewBackup);
     }
@@ -189,6 +202,7 @@ public class BackupManager {
      * @param backupPath the path where the library should be backed up to
      */
     private void performBackup(Path backupPath) {
+
         if (!needsBackup) {
             return;
         }
@@ -206,7 +220,7 @@ public class BackupManager {
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
         GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
         SavePreferences savePreferences = preferences.getSavePreferences()
-                                                     .withMakeBackup(false);
+                .withMakeBackup(false);
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         // We want to have successful backups only
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
@@ -259,24 +273,54 @@ public class BackupManager {
 
     private void fillQueue() {
         Path backupDir = BackupFileUtil.getAppDataBackupDir();
+
         if (!Files.exists(backupDir)) {
             return;
         }
+
         bibDatabaseContext.getDatabasePath().ifPresent(databasePath -> {
             // code similar to {@link org.jabref.logic.util.io.BackupFileUtil.getPathOfLatestExisingBackupFile}
-            final String prefix = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+
             try {
+                final String prefix = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+
                 List<Path> allSavFiles = Files.list(backupDir)
-                                              // just list the .sav belonging to the given targetFile
-                                              .filter(p -> p.getFileName().toString().startsWith(prefix))
-                                              .sorted().toList();
+                        // just list the .sav belonging to the given targetFile
+                        .filter(p -> p.getFileName().toString().startsWith(prefix))
+                        .sorted().toList();
+
                 backupFilesQueue.addAll(allSavFiles);
             } catch (IOException e) {
                 LOGGER.error("Could not determine most recent file", e);
             }
         });
     }
+    /**
+     * Saves a --discarded.bak version of the original file at backup path which was discarded by user before jabRef shuts down
+     * This is done to let jabRef know that the last changes were discarded, when application is opened again
+     */
+    private void saveDiscardedFile(){
+        bibDatabaseContext.getDatabasePath().ifPresent(databasePath -> {
+            getLatestBackupPath(databasePath).ifPresent(latestBackupPath -> {
+                String timeSuffix = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd--HH.mm.ss"));
+                GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
+                SavePreferences savePreferences = preferences.getSavePreferences()
+                        .withMakeBackup(false);
+                Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
+                String backupPathString = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName() + "--" + timeSuffix+ "--discarded.bak";
+                Path backupPath = latestBackupPath.getParent().resolve(backupPathString);
 
+                try (Writer writer = new AtomicFileWriter(backupPath, encoding, false)) {
+                    BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
+                    new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
+                            .saveDatabase(bibDatabaseContext);
+
+                } catch (IOException e) {
+                    logIfCritical(backupPath, e);
+                }
+            });
+        });
+    }
     /**
      * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
      * This method should only be used when closing a database/JabRef in a normal way.
@@ -284,8 +328,12 @@ public class BackupManager {
     private void shutdown() {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
+
         executor.shutdown();
 
+        if(discardedFileExists){
+            saveDiscardedFile();
+        }
         // Ensure that backup is a recent one
         determineBackupPathForNewBackup().ifPresent(this::performBackup);
     }
