@@ -54,6 +54,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Download from URL now automatically fills with URL from clipboard. [koppor#535](https://github.com/koppor/jabref/issues/535)
 - We added HTML and Markdown files to Find Unlinked Files and removed BibTeX.[koppor#547](https://github.com/koppor/jabref/issues/547)
 - We changed the messages after importing unlinked local files to past tense. [koppor#548](https://github.com/koppor/jabref/issues/548)
+- We fixed an issue where the wrong icon for a successful import of a bib entry was shown. [#9308](https://github.com/JabRef/jabref/pull/9308)
+- In the context of the [Cleanup dialog](https://docs.jabref.org/finding-sorting-and-cleaning-entries/cleanupentries) we changed the text of the conversion of BibTeX to biblatex (and vice versa) to make it more clear. [koppor#545](https://github.com/koppor/jabref/issues/545)
 - We fixed an issue where the wrong icon for a successful import of a bib entry was shown [#9308](https://github.com/JabRef/jabref/pull/9308)
 - We modified the Change case sub-menus and their corresponding tips (displayed when you stay long over the menu) to properly reflect exemplified cases. [#9339](https://github.com/Jabref/jabref/issues/9339)
 
@@ -91,6 +93,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where editing entry's "date" field in library mode "biblatex" causes an uncaught exception. [#8747](https://github.com/JabRef/jabref/issues/8747)
 - We fixed an issue where journal abbreviations would not abbreviate journal titles with escaped ampersands (\\&). [#8948](https://github.com/JabRef/jabref/issues/8948)
 - We fixed an issue where font size preferences did not apply correctly to preference dialog window and the menu bar. [#8386](https://github.com/JabRef/jabref/issues/8386) and [#9279](https://github.com/JabRef/jabref/issues/9279)
+- We fixed an issue that JabRef displayed the wrong group tree after loading. [koppor#637](https://github.com/koppor/jabref/issues/637)
 - We fixed an issue when using an unsafe character in the citation key, the auto-linking feature fails to link files. [#9267](https://github.com/JabRef/jabref/issues/9267)
 - We fixed an issue where a known journal's medline/dot-less abbreviation does not switch to the full name. [#9370](https://github.com/JabRef/jabref/issues/9370)
 

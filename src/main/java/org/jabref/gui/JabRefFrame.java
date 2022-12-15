@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
@@ -1115,8 +1114,8 @@ public class JabRefFrame extends BorderPane {
         tabbedPane.getTabs().add(libraryTab);
 
         libraryTab.setOnCloseRequest(event -> {
+            libraryTab.cancelLoading();
             closeTab(libraryTab);
-            libraryTab.getDataLoadingTask().cancel();
             event.consume();
         });
 
@@ -1129,17 +1128,14 @@ public class JabRefFrame extends BorderPane {
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
-    private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(
-                "OpenNewDatabase",
-                Map.of(),
-                Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
-    }
-
+    /**
+     * Opens a new tab with existing data.
+     * Asynchronous loading is done at {@link #createLibraryTab(BackgroundTask, Path, PreferencesService, StateManager, JabRefFrame, ThemeManager)}.
+     */
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, importFormatReader);
+        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, themeManager);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }
