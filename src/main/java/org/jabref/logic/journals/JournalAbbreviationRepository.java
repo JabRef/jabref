@@ -75,8 +75,12 @@ public class JournalAbbreviationRepository {
     public boolean isAbbreviatedName(String journalName) {
         String journal = journalName.trim();
 
+        // journal abbreviation must be at least 2 words
+        boolean isMoreThanTwoWords = journalName.split(" ").length >= 2;
+
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
-                || abbreviationToFull.containsKey(journal) || findDottedAbbrFromDotless(journal).length() > 0;
+                || abbreviationToFull.containsKey(journal)
+                || (isMoreThanTwoWords && findDottedAbbrFromDotless(journal).length() > 0);
     }
 
     public String findDottedAbbrFromDotless(String journalName) {
