@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+  <info>
+    <title>Constructivist Foundations</title>
+    <id>http://www.zotero.org/styles/constructivist-foundations</id>
+    <link href="http://www.zotero.org/styles/constructivist-foundations" rel="self"/>
+    <link href="http://www.zotero.org/styles/karstenia" rel="template"/>
+    <link href="https://constructivist.info/guidelines/" rel="documentation"/>
+    <link href="https://constructivist.info/guidelines/template.docx" rel="documentation"/>
+    <author>
+      <name>Patrick O'Brien</name>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="biology"/>
+    <issn>1782-348X</issn>
+    <updated>2022-10-19T08:29:53+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <macro name="access">
+    <text variable="URL"/>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name and="symbol" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all" sort-separator=" "/>
+      <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor director"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" and="symbol" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with=". "/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="edition">
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <text term="edition"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="editor">
+    <names variable="editor">
+      <name and="symbol" initialize-with=". " name-as-sort-order="all" sort-separator=" "/>
+      <label form="short" prefix=" (" suffix=")"/>
+    </names>
+  </macro>
+  <macro name="publisher">
+    <group delimiter=", ">
+      <text variable="publisher"/>
+      <text variable="publisher-place"/>
+    </group>
+  </macro>
+  <macro name="year-date">
+    <choose>
+      <if variable="issued">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </if>
+      <else>
+        <text term="no date"/>
+      </else>
+    </choose>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true">
+    <sort>
+      <key macro="year-date"/>
+      <key macro="author"/>
+    </sort>
+    <layout prefix="(" suffix=")" delimiter=", ">
+      <group delimiter=", ">
+        <group delimiter=" ">
+          <text macro="author-short"/>
+          <text macro="year-date"/>
+        </group>
+        <group delimiter=" ">
+          <label variable="locator" form="short"/>
+          <text variable="locator"/>
+        </group>
+      </group>
+    </layout>
+  </citation>
+  <bibliography hanging-indent="true">
+    <sort>
+      <key macro="author"/>
+      <key variable="title"/>
+    </sort>
+    <layout>
+      <group delimiter=" " suffix=".">
+        <group font-weight="bold" delimiter=" ">
+          <text macro="author"/>
+          <date date-parts="year" form="numeric" variable="issued" prefix="(" suffix=")"/>
+        </group>
+        <choose>
+          <if type="book thesis motion_picture article" match="any">
+            <group delimiter=". ">
+              <text variable="title"/>
+              <text macro="edition"/>
+              <text macro="publisher"/>
+            </group>
+          </if>
+          <else-if type="chapter">
+            <group delimiter=". ">
+              <text variable="title"/>
+              <group delimiter=" ">
+                <group delimiter=": ">
+                  <text term="in" text-case="capitalize-first"/>
+                  <text macro="editor"/>
+                </group>
+                <text variable="container-title"/>
+              </group>
+              <text variable="collection-title"/>
+              <group delimiter=": ">
+                <text macro="publisher"/>
+                <text variable="page"/>
+              </group>
+            </group>
+          </else-if>
+          <else>
+            <group delimiter=". ">
+              <text variable="title"/>
+              <group delimiter=" " prefix=" ">
+                <text variable="container-title"/>
+                <group delimiter=": ">
+                  <group>
+                    <text variable="volume"/>
+                    <text variable="issue" prefix="(" suffix=")"/>
+                  </group>
+                  <text variable="page"/>
+                </group>
+              </group>
+            </group>
+          </else>
+        </choose>
+      </group>
+      <text macro="access" prefix=" "/>
+    </layout>
+  </bibliography>
+</style>
