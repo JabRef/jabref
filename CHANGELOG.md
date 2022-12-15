@@ -51,7 +51,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Download from URL now automatically fills with URL from clipboard. [koppor#535](https://github.com/koppor/jabref/issues/535)
 - We added HTML and Markdown files to Find Unlinked Files and removed BibTeX.[koppor#547](https://github.com/koppor/jabref/issues/547)
 - We changed the messages after importing unlinked local files to past tense. [koppor#548](https://github.com/koppor/jabref/issues/548)
-- We fixed an issue where the wrong icon for a successful import of a bib entry was shown [#9308](https://github.com/JabRef/jabref/pull/9308)
+- We fixed an issue where the wrong icon for a successful import of a bib entry was shown. [#9308](https://github.com/JabRef/jabref/pull/9308)
+- In the context of the [Cleanup dialog](https://docs.jabref.org/finding-sorting-and-cleaning-entries/cleanupentries) we changed the text of the conversion of BibTeX to biblatex (and vice versa) to make it more clear. [koppor#545](https://github.com/koppor/jabref/issues/545)
 
 ### Fixed
 
