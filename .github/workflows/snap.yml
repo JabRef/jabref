@@ -23,9 +23,9 @@ jobs:
         shell: bash
         run: |
           if [ "$SNAPCRAFT_LOGIN_FILE" == "" ]; then
-            echo "secretspresent=false" >> $GITHUB_OUTPUT
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
           else
-            echo "secretspresent=true" >> $GITHUB_OUTPUT
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
           fi
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
@@ -39,7 +39,7 @@ jobs:
         with:
           snapcraft-args: "--debug"
       - name: Upload snap
-        if: ${{ steps.checksecrets.outputs.secretspresent }}
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: snapcore/action-publish@v1
         with:
           store_login: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}

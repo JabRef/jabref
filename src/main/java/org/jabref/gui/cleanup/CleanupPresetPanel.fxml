@@ -30,9 +30,9 @@
     </VBox>
 
     <CheckBox fx:id="cleanUpBiblatex"
-              text="%Convert to biblatex format (for example, move the value of the 'journal' field to 'journaltitle')"/>
+              text="%Convert to biblatex format (e.g., store publication date in date field)"/>
     <CheckBox fx:id="cleanUpBibtex"
-              text="%Convert to BibTeX format (for example, move the value of the 'journaltitle' field to 'journal')"/>
+              text="%Convert to BibTeX format (e.g., store publication date in year and month fields)"/>
     <CheckBox fx:id="cleanUpTimestampToCreationDate"
               text="%Convert timestamp field to field 'creationdate'"/>
     <CheckBox fx:id="cleanUpTimestampToModificationDate"

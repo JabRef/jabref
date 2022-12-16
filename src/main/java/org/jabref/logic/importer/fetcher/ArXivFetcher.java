@@ -47,7 +47,6 @@ import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
-import com.google.common.collect.ImmutableMap;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
@@ -93,9 +92,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      */
     private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER, InternalField.KEY_FIELD);
 
-    private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = ImmutableMap.of(
+    private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = Collections.unmodifiableMap(Map.of(
             "Computational Engineering, Finance, and Science", "Computational Engineering / Finance / Science",
-            "Distributed, Parallel, and Cluster Computing", "Distributed / Parallel / Cluster Computing");
+            "Distributed, Parallel, and Cluster Computing", "Distributed / Parallel / Cluster Computing"));
 
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
@@ -607,8 +606,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             return searchResult.stream()
                                .filter(entry -> entry.getField(StandardField.DATE).isPresent())
                                // Filter the date field for year only
-                               .filter(entry -> transformer.getEndYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= transformer.getEndYear().get())
-                               .filter(entry -> transformer.getStartYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= transformer.getStartYear().get())
+                               .filter(entry -> transformer.getEndYear().isEmpty() || (Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= transformer.getEndYear().get()))
+                               .filter(entry -> transformer.getStartYear().isEmpty() || (Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= transformer.getStartYear().get()))
                                .collect(Collectors.toList());
         }
 
