@@ -1,14 +1,13 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -156,28 +155,24 @@ public class TemplateExporter extends Exporter {
         } else {
             dir = LAYOUT_PREFIX + (directory == null ? "" : directory + '/');
         }
-
         // Attempt to get a Reader for the file path given, either by
         // loading it as a resource (from within JAR), or as a normal file. If
         // unsuccessful (e.g. file not found), an IOException is thrown.
         String name = dir + filename;
-        Reader reader;
         // Try loading as a resource first. This works for files inside the JAR:
-        URL reso = TemplateExporter.class.getResource(name);
-
         // If that did not work, try loading as a normal file URL:
         try {
-            if (reso == null) {
-                File f = new File(name);
-                reader = new FileReader(f);
+            URL res = TemplateExporter.class.getResource(name);
+            Path reso;
+            if (res == null) {
+                reso = Path.of(name);
             } else {
-                reader = new InputStreamReader(reso.openStream());
+                reso = Path.of(res.toURI());
             }
-        } catch (FileNotFoundException ex) {
+            return Files.newBufferedReader(reso, StandardCharsets.UTF_8);
+        } catch (FileNotFoundException | URISyntaxException ex) {
             throw new IOException("Cannot find layout file: '" + name + "'.");
         }
-
-        return reader;
     }
 
     @Override
@@ -280,7 +275,6 @@ public class TemplateExporter extends Exporter {
             }
 
             // Print footer
-
             // changed section - begin (arudert)
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {
@@ -313,9 +307,9 @@ public class TemplateExporter extends Exporter {
      * If so, read all the name formatters so they can be used by the filter layouts.
      */
     private void readFormatterFile() {
-        File formatterFile = new File(lfFileName + FORMATTERS_EXTENSION);
-        if (formatterFile.exists()) {
-            try (Reader in = new FileReader(formatterFile)) {
+        Path formatterFile = Path.of(lfFileName + FORMATTERS_EXTENSION);
+        if (Files.exists(formatterFile)) {
+            try (Reader in = Files.newBufferedReader(formatterFile, StandardCharsets.UTF_8)) {
                 // Ok, we found and opened the file. Read all contents:
                 StringBuilder sb = new StringBuilder();
                 int c;

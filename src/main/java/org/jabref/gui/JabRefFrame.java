@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
@@ -830,7 +829,7 @@ public class JabRefFrame extends BorderPane {
 
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager, prefs)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, prefs)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this, stateManager, Globals.TASK_EXECUTOR)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, this.prefs, dialogService, stateManager)),
 
@@ -841,11 +840,11 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, this, dialogService, stateManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new AbbreviateAction(StandardActions.ABBREVIATE_MEDLINE, this, dialogService, stateManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, this, dialogService, stateManager))),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, this, dialogService, stateManager, prefs.getJournalAbbreviationPreferences())),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new AbbreviateAction(StandardActions.ABBREVIATE_MEDLINE, this, dialogService, stateManager, prefs.getJournalAbbreviationPreferences())),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, this, dialogService, stateManager, prefs.getJournalAbbreviationPreferences()))),
 
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, this, dialogService, stateManager))
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, this, dialogService, stateManager, prefs.getJournalAbbreviationPreferences()))
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
@@ -1115,8 +1114,8 @@ public class JabRefFrame extends BorderPane {
         tabbedPane.getTabs().add(libraryTab);
 
         libraryTab.setOnCloseRequest(event -> {
+            libraryTab.cancelLoading();
             closeTab(libraryTab);
-            libraryTab.getDataLoadingTask().cancel();
             event.consume();
         });
 
@@ -1129,17 +1128,14 @@ public class JabRefFrame extends BorderPane {
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
-    private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(
-                "OpenNewDatabase",
-                Map.of(),
-                Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
-    }
-
+    /**
+     * Opens a new tab with existing data.
+     * Asynchronous loading is done at {@link #createLibraryTab(BackgroundTask, Path, PreferencesService, StateManager, JabRefFrame, ThemeManager)}.
+     */
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(this, prefs, stateManager, themeManager, databaseContext, importFormatReader);
+        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, themeManager);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }
@@ -1164,9 +1160,10 @@ public class JabRefFrame extends BorderPane {
     }
 
     /**
-     * Ask if the user really wants to close the given database
+     * Ask if the user really wants to close the given database.
+     * Offers to save or discard the changes -- or return to the library
      *
-     * @return true if the user choose to close the database
+     * @return <code>true</code> if the user choose to close the database
      */
     private boolean confirmClose(LibraryTab libraryTab) {
         String filename = libraryTab.getBibDatabaseContext()
@@ -1177,15 +1174,24 @@ public class JabRefFrame extends BorderPane {
 
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
-        ButtonType cancel = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType returnToLibrary = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
         Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
                 Localization.lang("Save before closing"),
                 Localization.lang("Library '%0' has changed.", filename),
-                saveChanges, discardChanges, cancel);
+                saveChanges, discardChanges, returnToLibrary);
 
-        if (response.isPresent() && response.get().equals(saveChanges)) {
-            // The user wants to save.
+        if (response.isEmpty()) {
+            return true;
+        }
+
+        ButtonType buttonType = response.get();
+
+        if (buttonType.equals(returnToLibrary)) {
+            return false;
+        }
+
+        if (buttonType.equals(saveChanges)) {
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
@@ -1200,7 +1206,13 @@ public class JabRefFrame extends BorderPane {
             // Save was cancelled or an error occurred.
             return false;
         }
-        return response.isEmpty() || !response.get().equals(cancel);
+
+        if (buttonType.equals(discardChanges)) {
+            BackupManager.discardBackup(libraryTab.getBibDatabaseContext());
+            return true;
+        }
+
+        return false;
     }
 
     /**

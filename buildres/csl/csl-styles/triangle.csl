@@ -20,7 +20,7 @@
     <category field="social_science"/>
     <summary>Derived from Style EHESS-histoire, available at http://www.boiteaoutils.info/2011/06/styles-francais-de-citation-sous-zotero.html
 		First version online in november 2012. Changes made to cover more documents types and to lighten URLS display. Should preferably be used ticking the quoting option (preferences/citer/styles): include URLs addresses in references.</summary>
-    <updated>2021-04-07T01:50:30+00:00</updated>
+    <updated>2022-09-29T01:50:30+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -62,27 +62,27 @@
     <choose>
       <if variable="collection-editor">
         <names variable="collection-editor">
-          <name form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" " font-style="normal">
+          <name form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
         </names>
         <text term="collection-editor" form="short" prefix="&#160;" suffix=",&#160;"/>
         <names variable="author">
-          <name form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" " font-style="normal">
+          <name form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
         </names>
       </if>
       <else-if variable="author">
         <names variable="author">
-          <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal">
+          <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
         </names>
       </else-if>
       <else-if variable="editor">
         <names variable="editor">
-          <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal">
+          <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
           <label form="short" prefix="&#160;"/>
@@ -95,27 +95,27 @@
     <choose>
       <if variable="collection-editor">
         <names variable="collection-editor">
-          <name name-as-sort-order="all" form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" " font-style="normal">
+          <name name-as-sort-order="all" form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
         </names>
         <text term="collection-editor" form="short" prefix="&#160;" suffix=",&#160;"/>
         <names variable="author">
-          <name name-as-sort-order="all" form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" " font-style="normal">
+          <name name-as-sort-order="all" form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
         </names>
       </if>
       <else-if variable="author">
         <names variable="author">
-          <name name-as-sort-order="all" form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal">
+          <name name-as-sort-order="all" form="long" and="text" delimiter-precedes-last="never" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
         </names>
       </else-if>
       <else-if variable="editor">
         <names variable="editor">
-          <name name-as-sort-order="all" form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal">
+          <name name-as-sort-order="all" form="long" and="text" delimiter-precedes-last="never" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
           <label form="short" prefix="&#160;"/>
@@ -126,7 +126,7 @@
   <!-- MACRO EDITEUR SCIENTIFIQUE APPELEE SEULEMENT PAR LA MACRO TITLE, type : chapitres d'ouvrage -->
   <macro name="editor">
     <names variable="editor">
-      <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal">
+      <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" ">
         <name-part name="family" font-variant="small-caps"/>
       </name>
       <label form="short" prefix="&#160;"/>
@@ -137,7 +137,7 @@
     <choose>
       <if variable="translator">
         <names variable="translator">
-          <name form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" " font-style="normal">
+          <name form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
         </names>
@@ -151,7 +151,7 @@
       <if variable="interviewer">
         <text term="interviewer" form="verb" prefix="&#160;"/>
         <names variable="interviewer">
-          <name form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" " font-style="normal">
+          <name form="long" and="text" delimiter-precedes-last="never" delimiter=", " sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
         </names>
@@ -174,7 +174,7 @@
       <!-- AJOUT DES TYPES PAGES WEB ET BILLETS DE BLOG POUR AFFICHAGE DE LEUR TITRE ET DU TITRE DE LEUR CONTAINER-->
       <else-if type="article-journal article-newspaper article-magazine webpage post-weblog" match="any">
         <group delimiter=", ">
-          <text variable="title" text-case="capitalize-first" prefix="«&#160;" suffix="&#160;»" font-style="normal"/>
+          <text variable="title" text-case="capitalize-first" prefix="«&#160;" suffix="&#160;»"/>
           <text variable="container-title" font-style="italic"/>
         </group>
       </else-if>
@@ -189,7 +189,7 @@
       </else-if>
       <else-if type="manuscript" match="any">
         <group delimiter=",">
-          <text variable="title" text-case="capitalize-first" prefix="«&#160;" suffix="&#160;»" font-style="normal"/>
+          <text variable="title" text-case="capitalize-first" prefix="«&#160;" suffix="&#160;»"/>
           <text variable="genre" prefix=" "/>
         </group>
       </else-if>
@@ -227,7 +227,7 @@
   <macro name="yearpage-ndbp">
     <choose>
       <if type="bill book graphic legal_case motion_picture paper-conference manuscript report song thesis" match="any">
-        <group delimiter=", " font-style="normal">
+        <group delimiter=", ">
           <date variable="issued">
             <date-part name="year"/>
           </date>
@@ -240,18 +240,18 @@
         </group>
       </if>
       <else-if type="chapter" match="any">
-        <group delimiter=", " font-style="normal">
+        <group delimiter=", ">
           <date variable="issued">
             <date-part name="year"/>
           </date>
-          <group delimiter=" " font-style="normal">
+          <group delimiter=" ">
             <label variable="page" form="short"/>
             <text variable="page"/>
           </group>
         </group>
       </else-if>
       <else-if type="entry-dictionary entry-encyclopedia" match="any">
-        <group delimiter=" " font-style="normal">
+        <group delimiter=" ">
           <date variable="issued">
             <date-part name="year"/>
           </date>
@@ -263,7 +263,7 @@
         </group>
       </else-if>
       <else-if type="article-journal article-newspaper article-magazine" match="any">
-        <group delimiter=" " font-style="normal">
+        <group delimiter=" ">
           <label variable="page" form="short"/>
           <text variable="page"/>
         </group>
@@ -275,18 +275,22 @@
     <choose>
       <if type="bill book graphic legal_case motion_picture manuscript report song thesis" match="any">
         <group delimiter=", ">
-          <group delimiter=", " font-style="normal">
-            <date variable="issued">
-              <date-part name="year"/>
-            </date>
-            <!-- UTILISATION DU CHAMP VOLUME POUR AFFICHAGE DU NUMERO POUR LES NUMEROS SPECIAUX DE REVUES QUI UTILISENT LE TYPE "BOOK"-->
-            <group>
-              <text term="issue" form="short" suffix="&#160;"/>
-              <text variable="number-of-volumes" prefix=". " suffix="/"/>
-              <text variable="volume"/>
-            </group>
-            <text variable="number-of-pages" suffix="&#160;p."/>
-            <text variable="page" suffix="&#160;p."/>
+          <date variable="issued">
+            <date-part name="year"/>
+          </date>
+          <!-- UTILISATION DU CHAMP VOLUME POUR AFFICHAGE DU NUMERO POUR LES NUMEROS SPECIAUX DE REVUES QUI UTILISENT LE TYPE "BOOK"-->
+          <group>
+            <text term="issue" form="short" suffix="&#160;"/>
+            <text variable="number-of-volumes" prefix=". " suffix="/"/>
+            <text variable="volume"/>
+          </group>
+          <group delimiter=" ">
+            <text variable="number-of-pages"/>
+            <label variable="number-of-pages" form="short" plural="never"/>
+          </group>
+          <group delimiter=" ">
+            <text variable="page"/>
+            <label variable="page" form="short" plural="never"/>
           </group>
           <group>
             <label variable="locator" form="short"/>
@@ -295,7 +299,7 @@
         </group>
       </if>
       <else-if type="chapter entry-dictionary entry-encyclopedia paper-conference" match="any">
-        <group delimiter=", " font-style="normal">
+        <group delimiter=", ">
           <date variable="issued">
             <date-part name="year"/>
           </date>
@@ -304,14 +308,14 @@
             <text variable="number-of-volumes" prefix=". " suffix="/"/>
             <text variable="volume"/>
           </group>
-          <group>
+          <group delimiter=" ">
             <label variable="page" form="short"/>
-            <text variable="page" prefix="&#160;"/>
+            <text variable="page"/>
           </group>
         </group>
       </else-if>
       <else-if type="article-journal article-newspaper article-magazine" match="any">
-        <group delimiter=" " font-style="normal">
+        <group delimiter=" ">
           <label variable="page" form="short"/>
           <text variable="page"/>
         </group>
@@ -337,7 +341,7 @@
         </choose>
       </if>
       <else-if type="article-journal article-magazine article-newspaper interview webpage post-weblog" match="any">
-        <group font-style="normal">
+        <group>
           <choose>
             <if variable="issued">
               <date variable="issued">
@@ -445,7 +449,10 @@
         <if position="ibid-with-locator">
           <group delimiter=",&#160;">
             <text term="ibid" text-case="capitalize-first" font-style="italic" suffix="."/>
-            <text variable="locator" prefix="p.&#160;"/>
+            <group delimiter=" ">
+              <label variable="locator" form="short"/>
+              <text variable="locator"/>
+            </group>
           </group>
         </if>
         <else-if position="ibid">
@@ -459,11 +466,14 @@
                 <text variable="title" form="short" font-style="italic"/>
               </if>
               <else>
-                <text variable="title" text-case="capitalize-first" form="short" prefix="«&#160;" suffix="&#160;»" font-style="normal"/>
+                <text variable="title" text-case="capitalize-first" form="short" prefix="«&#160;" suffix="&#160;»"/>
               </else>
             </choose>
             <text term="cited" font-style="italic" suffix="."/>
-            <text variable="locator" prefix="p.&#160;"/>
+            <group delimiter=" ">
+              <label variable="locator"/>
+              <text variable="locator"/>
+            </group>
           </group>
         </else-if>
         <else>
@@ -481,7 +491,10 @@
           <group>
             <text macro="yearpage-ndbp" prefix=",&#160;"/>
             <!-- intégration automatique de la localisation (pages indiqués)-->
-            <text variable="locator" prefix=",&#160;p.&#160;"/>
+            <group delimiter=" " prefix=", ">
+              <label variable="locator"/>
+              <text variable="locator"/>
+            </group>
             <!-- intégration de la macro-test pour les adresses internet-->
             <text macro="internet-ndbp" prefix=",&#160;"/>
           </group>
@@ -507,7 +520,10 @@
         <text macro="collection"/>
         <text macro="yearpage-bib"/>
         <!-- intégration automatique de la localisation (pages indiqués)-->
-        <text variable="locator" prefix="p.&#160;"/>
+        <group delimiter=" ">
+          <label variable="locator"/>
+          <text variable="locator"/>
+        </group>
         <!-- intégration de la macro-test pour les adresses internet-->
         <text macro="internet-bib"/>
       </group>
