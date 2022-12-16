@@ -39,6 +39,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -138,6 +139,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
@@ -235,7 +237,7 @@ public class JabRefFrame extends BorderPane {
                 // drag'n'drop on tabs covered dnd on tabbedPane, so dnd on tabs should contain all dnds on tabbedPane
                 tabbedPane.lookupAll(".tab").forEach(tab -> {
                     tab.setOnDragOver(tabDragEvent -> {
-                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
+                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard()) || tabDragEvent.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
                             tabDragEvent.acceptTransferModes(TransferMode.ANY);
                             if (!tabbedPane.getTabs().contains(dndIndicator)) {
                                 tabbedPane.getTabs().add(dndIndicator);
@@ -252,6 +254,8 @@ public class JabRefFrame extends BorderPane {
                     });
                     tab.setOnDragExited(event1 -> tabbedPane.getTabs().remove(dndIndicator));
                     tab.setOnDragDropped(tabDragEvent -> {
+                        Dragboard dragboard = tabDragEvent.getDragboard();
+
                         if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
                             tabbedPane.getTabs().remove(dndIndicator);
                             List<Path> bibFiles = DragAndDropHelper.getBibFiles(tabDragEvent.getDragboard());
@@ -263,7 +267,56 @@ public class JabRefFrame extends BorderPane {
                             for (Tab libraryTab : tabbedPane.getTabs()) {
                                 if (libraryTab.getId().equals(tab.getId()) &&
                                         !tabbedPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
-                                    ((LibraryTab) libraryTab).dropEntry(stateManager.getLocalDragboard().getBibEntries());
+
+                                    if(dragboard.hasContent(DragAndDropDataFormats.GROUP)){
+                                        List<String> groupPathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
+
+                                        if(((LibraryTab) libraryTab).getBibDatabaseContext().getMetaData().getGroups().isEmpty()){
+
+
+                                            // a root (all entries) GroupTreeNode
+                                            GroupTreeNode rootNode = getCurrentLibraryTab().getBibDatabaseContext()
+                                                    .getMetaData()
+                                                    .getGroups()
+                                                    .get()
+                                                    .copyNode();
+
+
+
+                                            //add rootNode to the Library if it does not have a root.
+                                            ((LibraryTab) libraryTab).getBibDatabaseContext()
+                                                    .getMetaData()
+                                                    .setGroups(rootNode);
+                                        }
+
+
+                                        Optional<GroupTreeNode> parentGroup = Optional.of(((LibraryTab) libraryTab)
+                                                .getBibDatabaseContext()
+                                                .getMetaData()
+                                                .getGroups().get());
+
+                                        for (String pathToSource : groupPathToSources) {
+                                            List<BibEntry> allEntries = getCurrentLibraryTab()
+                                                    .getBibDatabaseContext()
+                                                    .getEntries();
+
+                                            Optional<GroupTreeNode> groupTreeNodeToCopy =  getCurrentLibraryTab()
+                                                    .getBibDatabaseContext()
+                                                    .getMetaData()
+                                                    .getGroups()
+                                                    .get()
+                                                    .getChildByPath(pathToSource);
+
+                                            //call the copy function
+                                            copyGroupTreeNode((LibraryTab) libraryTab,parentGroup,groupTreeNodeToCopy, allEntries);
+
+                                        }
+
+
+                                    } else {
+                                        ((LibraryTab) libraryTab).dropEntry(stateManager.getLocalDragboard().getBibEntries());
+
+                                    }
                                 }
                             }
                             tabDragEvent.consume();
@@ -1410,4 +1463,30 @@ public class JabRefFrame extends BorderPane {
             */
         }
     }
+
+
+
+    private void copyGroupTreeNode(LibraryTab libraryTab, Optional<GroupTreeNode> parent, Optional<GroupTreeNode> groupTreeNodeToCopy, List<BibEntry> allEntries ){
+
+        //add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
+        GroupTreeNode copiedNode = parent.get().addSubgroup(groupTreeNodeToCopy.get().getGroup().deepCopy());
+
+        //add all entries of a groupTreeNode to the new library.
+        ((LibraryTab) libraryTab).dropEntry(groupTreeNodeToCopy.get().getEntriesInGroup(allEntries));
+
+        //List of all children of groupTreeNodeToCopy
+        List<GroupTreeNode> children = groupTreeNodeToCopy.get().getChildren();
+
+        if( !children.isEmpty() ) {
+            //use recursion to add all subgroups of the original groupTreeNodeToCopy
+            for ( GroupTreeNode child : children ){
+                copyGroupTreeNode(libraryTab,Optional.of(copiedNode), Optional.of(child),allEntries );
+
+            }
+        }
+    }
+
 }
+
+
+
