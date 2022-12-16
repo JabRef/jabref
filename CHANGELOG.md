@@ -62,7 +62,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Fixed
 
 - We fixed an issue where importing from XMP would fail for certain PDFs [#9383](https://github.com/JabRef/jabref/issues/9383)
-- We fixed the readability of the file field in the dark dark theme [#9340](https://github.com/JabRef/jabref/issues/9340)
+- We fixed the readability of the file field in the dark theme [#9340](https://github.com/JabRef/jabref/issues/9340)
 - We fixed that sorting of entries in the maintable by special fields is updated immediately [#9334](https://github.com/JabRef/jabref/issues/9334)
 - We fixed the Cleanup entries dialog is partially visible [#9223](https://github.com/JabRef/jabref/issues/9223)
 - We fixed the display of the "Customize Entry Types" dialogue title [#9198](https://github.com/JabRef/jabref/issues/9198)
@@ -93,6 +93,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where editing entry's "date" field in library mode "biblatex" causes an uncaught exception. [#8747](https://github.com/JabRef/jabref/issues/8747)
 - We fixed an issue where journal abbreviations would not abbreviate journal titles with escaped ampersands (\\&). [#8948](https://github.com/JabRef/jabref/issues/8948)
 - We fixed an issue where font size preferences did not apply correctly to preference dialog window and the menu bar. [#8386](https://github.com/JabRef/jabref/issues/8386) and [#9279](https://github.com/JabRef/jabref/issues/9279)
+- We fixed the behavior of "Discard changes" when reopening a modified library. [#9361](https://github.com/JabRef/jabref/issues/9361)
 - We fixed an issue that JabRef displayed the wrong group tree after loading. [koppor#637](https://github.com/koppor/jabref/issues/637)
 - We fixed an issue when using an unsafe character in the citation key, the auto-linking feature fails to link files. [#9267](https://github.com/JabRef/jabref/issues/9267)
 - We fixed an issue where a known journal's medline/dot-less abbreviation does not switch to the full name. [#9370](https://github.com/JabRef/jabref/issues/9370)
