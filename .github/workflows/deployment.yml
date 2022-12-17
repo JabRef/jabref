@@ -151,7 +151,7 @@ jobs:
         if: (matrix.os != 'macos-latest' && matrix.os != 'self-hosted') || (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: pwsh
         run: |
-          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}{{matrix.os.suffix}}"}
+          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.os.suffix }}"}
           # we do not need to add {{matrix.os.suffix}} here, because the ${{ matrix.archivePortable }} command already creates the right file pattern (minus the verison number, which is fixed below)
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Upload to GitHub workflow artifacts store
