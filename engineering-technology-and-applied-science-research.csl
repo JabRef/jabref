@@ -15,8 +15,8 @@
     <category field="engineering"/>
     <issn>2241-4487</issn>
     <eissn>1792-8036</eissn>
-    <summary>ETASR style largely based on IEEE 2018 guidelines, V 11.12.2018 without the use of abbreviations for containers.</summary>
-    <updated>2020-06-05T21:02:10+00:00</updated>
+    <summary>ETASR style largely based on IEEE 2018 guidelines, V 11.12.2018 without the use of abbreviations for containers and with the use of full URL for DOIs.</summary>
+    <updated>2022-09-25T12:59:16+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -187,7 +187,7 @@
         </choose>
       </if>
       <else-if match="any" variable="DOI">
-        <text variable="DOI" prefix="doi: "/>
+        <text variable="DOI" prefix="https://doi.org/"/>
       </else-if>
       <else>
         <group delimiter=". ">
