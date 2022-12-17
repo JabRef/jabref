@@ -13,7 +13,6 @@ import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
-import org.jabref.logic.importer.fetcher.CiteSeer;
 import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
@@ -41,7 +40,6 @@ import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
-import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
@@ -67,8 +65,8 @@ public class WebFetchers {
             fetcher = new DoiFetcher(importFormatPreferences);
         } else if (field == ISBN) {
             fetcher = new IsbnFetcher(importFormatPreferences)
-                    .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
-                    .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences));
+                    .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences));
+                    // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences));
         } else if (field == EPRINT) {
             fetcher = new ArXivFetcher(importFormatPreferences);
         } else {
@@ -110,7 +108,7 @@ public class WebFetchers {
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerFetcher(importerPreferences));
         set.add(new CrossRef());
-        set.add(new CiteSeer());
+        // set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences, importerPreferences));
         set.add(new CompositeSearchBasedFetcher(set, 30));
@@ -132,8 +130,8 @@ public class WebFetchers {
         set.add(new ArXivFetcher(importFormatPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new IsbnFetcher(importFormatPreferences)
-                .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
-                .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+                .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
+                // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new DiVA(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new MedlineFetcher());
@@ -160,8 +158,8 @@ public class WebFetchers {
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new IsbnFetcher(importFormatPreferences)
-                .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
-                .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+                .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
+                // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
