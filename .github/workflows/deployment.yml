@@ -82,6 +82,10 @@ jobs:
           java-version: 18
           distribution: 'temurin'
           cache: 'gradle'
+      - name: Clean up keychain
+        if: (matrix.os == 'self-hosted') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        run: |
+         security delete-keychain signing_temp.keychain   
       - name: Setup OSX key chain on OSX
         if: (matrix.os == 'macos-latest' || matrix.os == 'self-hosted') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v1
