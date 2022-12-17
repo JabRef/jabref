@@ -40,17 +40,20 @@ jobs:
         include:
           - os: ubuntu-latest
             displayName: linux
+            suffix: ''
             archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
           - os: windows-latest
             displayName: windows
+            suffix: ''
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
           - os: macos-latest
             displayName: macOS
+            suffix: ''
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
           - os: self-hosted
-            displayName: MacOsArm64
+            displayName: macOS (Arm64)
+            suffix: '_arm64'
             archivePortable: tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos_arm64.tar.gz && rm -R build/distribution/JabRef.app
-
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
@@ -148,7 +151,8 @@ jobs:
         if: (matrix.os != 'macos-latest' && matrix.os != 'self-hosted') || (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: pwsh
         run: |
-          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
+          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}{{matrix.os.suffix}}"}
+          # we do not need to add {{matrix.os.suffix}} here, because the ${{ matrix.archivePortable }} command already creates the right file pattern (minus the verison number, which is fixed below)
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Upload to GitHub workflow artifacts store
         if: (matrix.os != 'macos-latest' && matrix.os !='self-hosted') || (steps.checksecrets.outputs.secretspresent == 'YES')
