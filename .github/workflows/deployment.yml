@@ -155,7 +155,7 @@ jobs:
         shell: pwsh
         run: |
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace ".dmg", ".${{ matrix.suffix }}.dmg"}
-          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace ".img", ".${{ matrix.suffix }}.img"}
+          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace ".pkg", ".${{ matrix.suffix }}.pkg"}
       - name: Upload to GitHub workflow artifacts store
         if: (matrix.os != 'macos-latest' && matrix.os !='self-hosted') || (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: actions/upload-artifact@v3
