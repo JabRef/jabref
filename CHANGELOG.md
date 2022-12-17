@@ -102,7 +102,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Removed
 
 - We removed "last-search-date" from the SLR feature, because the last-search-date can be deducted from the git logs. [#9116](https://github.com/JabRef/jabref/pull/9116)
-
+- We removed the doi-to-bibtex fetcher based on <https://doi-to-bibtex-converter.herokuapp.com>, because the site is down.
 
 
 
