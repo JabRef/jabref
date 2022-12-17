@@ -49,8 +49,8 @@
       <if type="entry-encyclopedia" match="all" variable="author editor"/>
       <else>
         <names variable="editor translator" delimiter=", ">
-          <label form="verb-short" text-case="lowercase"/>
-          <name prefix=" " delimiter-precedes-last="always"/>
+          <label form="verb-short" text-case="lowercase" suffix=" "/>
+          <name delimiter-precedes-last="always"/>
         </names>
       </else>
     </choose>
