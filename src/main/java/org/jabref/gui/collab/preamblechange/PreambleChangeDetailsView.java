@@ -3,12 +3,12 @@ package org.jabref.gui.collab.preamblechange;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.collab.ExternalChangeDetailsView;
+import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.bibtex.comparator.PreambleDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
-public final class PreambleChangeDetailsView extends ExternalChangeDetailsView {
+public final class PreambleChangeDetailsView extends DatabaseChangeDetailsView {
 
     public PreambleChangeDetailsView(PreambleChange preambleChange) {
         PreambleDiff preambleDiff = preambleChange.getPreambleDiff();
