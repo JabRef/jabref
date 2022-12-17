@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="en-US">
   <info>
-    <title>Cambridge University Press, CambridgeB (author-date)</title>
-    <id>http://www.zotero.org/styles/cambridge-university-press-author-date</id>
-    <link href="http://www.zotero.org/styles/cambridge-university-press-author-date" rel="self"/>
+    <title>Cambridge University Press, CambridgeA (author-date)</title>
+    <id>http://www.zotero.org/styles/cambridge-university-press-author-date-cambridge-a</id>
+    <link href="http://www.zotero.org/styles/cambridge-university-press-author-date-cambridge-a" rel="self"/>
     <link href="http://www.zotero.org/styles/apa-no-doi-no-issue" rel="template"/>
     <link href="https://www.cambridge.org/core/services/aop-file-manager/file/610be5e3a1acae0932de3cca/Cambridge-Reference-Styles.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien, PhD</name>
       <email>obrienpat86@gmail.com</email>
     </author>
+    <contributor>
+      <name>Eric Marcon</name>
+      <email>eric.marcon@agroparistech.fr</email>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2017-09-05T18:57:18+00:00</updated>
+    <summary>CambridgeA style required by Journal of Tropical Ecology as of December 2022. Modified from 'cambridge-university-press-author-date' (which seems now to be CambridgeB) by Eric Marcon</summary>
+    <updated>2022-12-13T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -29,7 +34,7 @@
     <choose>
       <if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
         <names variable="editor translator container-author" delimiter=", " suffix=", ">
-          <name and="symbol" initialize-with=". " delimiter=", "/>
+          <name and="text" initialize-with=". " delimiter=", "/>
           <label form="short" prefix=", "/>
         </names>
       </if>
@@ -39,7 +44,7 @@
     <choose>
       <if type="article-journal chapter paper-conference entry-dictionary entry-encyclopedia" match="none">
         <names variable="translator editor container-author" delimiter=", " prefix=" (" suffix=")">
-          <name and="symbol" initialize-with=". " delimiter=", "/>
+          <name and="text" initialize-with=". " delimiter=", "/>
           <label form="short" prefix=", " text-case="title"/>
         </names>
       </if>
@@ -47,7 +52,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+      <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with="" delimiter=", " delimiter-precedes-last="always"/>
       <label form="short" prefix=" (" suffix=")" text-case="capitalize-first"/>
       <substitute>
         <names variable="editor"/>
@@ -66,7 +71,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="symbol" delimiter=", " initialize-with=". "/>
+      <name form="short" and="text" delimiter=", " initialize-with=". "/>
       <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>
@@ -112,34 +117,30 @@
       </if>
       <else>
         <choose>
-          <if variable="page" match="none">
+          <if variable="DOI">
+            <text variable="DOI" prefix="doi:" suffix="."/>
+          </if>
+          <else>
             <choose>
-              <if variable="DOI">
-                <text variable="DOI" prefix="doi:"/>
+              <if type="webpage">
+                <group delimiter=" ">
+                  <text term="retrieved" text-case="capitalize-first" suffix=" "/>
+                  <group>
+                    <date variable="accessed" form="text" suffix=", "/>
+                  </group>
+                  <text term="from"/>
+                  <text variable="URL"/>
+                </group>
               </if>
               <else>
-                <choose>
-                  <if type="webpage">
-                    <group delimiter=" ">
-                      <text term="retrieved" text-case="capitalize-first" suffix=" "/>
-                      <group>
-                        <date variable="accessed" form="text" suffix=", "/>
-                      </group>
-                      <text term="from"/>
-                      <text variable="URL"/>
-                    </group>
-                  </if>
-                  <else>
-                    <group>
-                      <text term="retrieved" text-case="capitalize-first" suffix=" "/>
-                      <text term="from" suffix=" "/>
-                      <text variable="URL"/>
-                    </group>
-                  </else>
-                </choose>
+                <group>
+                  <text term="retrieved" text-case="capitalize-first" suffix=" "/>
+                  <text term="from" suffix=" "/>
+                  <text variable="URL"/>
+                </group>
               </else>
             </choose>
-          </if>
+          </else>
         </choose>
       </else>
     </choose>
@@ -162,7 +163,14 @@
     </choose>
   </macro>
   <macro name="title-plus-extra">
-    <text macro="title"/>
+    <choose>
+      <if type="report thesis book graphic motion_picture report song manuscript speech" match="any">
+        <text macro="title"/>
+      </if>
+      <else>
+        <text macro="title" suffix="."/>
+      </else>
+    </choose>
     <choose>
       <if type="report thesis" match="any">
         <group prefix=" (" suffix=")" delimiter=" ">
@@ -220,7 +228,7 @@
                 <text variable="publisher"/>
               </group>
               <group>
-                <label variable="page" form="short" suffix=" "/>
+                <label variable="page" form="short" prefix=" " suffix=" "/>
                 <text variable="page"/>
               </group>
             </if>
@@ -509,7 +517,7 @@
     </sort>
     <layout>
       <group suffix=".">
-        <group delimiter=". ">
+        <group delimiter=" ">
           <text macro="author"/>
           <text macro="issued"/>
           <text macro="title-plus-extra"/>
