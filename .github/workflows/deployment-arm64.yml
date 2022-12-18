@@ -2,6 +2,10 @@ name: Deployment Release for ARM64 - Run manually!
 
 on:
   workflow_dispatch:
+  push:
+   branches:
+    - arm64mac-release
+  
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
