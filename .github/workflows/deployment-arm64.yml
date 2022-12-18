@@ -1,4 +1,4 @@
-name: Deployment all with ARM64
+name: Deployment Release with ARM64 - Run manually!
 
 on:
   workflow_dispatch:
