@@ -155,8 +155,11 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             }
         }
 
-        new DatabaseMerger(preferences.getKeywordDelimiter()).mergeStrings(databaseContext.getDatabase(), parserResult.getDatabase());
-        new DatabaseMerger(preferences.getKeywordDelimiter()).mergeMetaData(databaseContext.getMetaData(),
+        new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeStrings(
+                databaseContext.getDatabase(),
+                parserResult.getDatabase());
+        new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
+                databaseContext.getMetaData(),
                 parserResult.getMetaData(),
                 parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
