@@ -1453,7 +1453,7 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private void copyGroupTreeNode(LibraryTab libraryTab, Optional<GroupTreeNode> parent, Optional<GroupTreeNode> groupTreeNodeToCopy, List<BibEntry> allEntries ){
+    private void copyGroupTreeNode(LibraryTab libraryTab, Optional<GroupTreeNode> parent, Optional<GroupTreeNode> groupTreeNodeToCopy, List<BibEntry> allEntries) {
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
         GroupTreeNode copiedNode = parent.get().addSubgroup(groupTreeNodeToCopy.get().getGroup().deepCopy());
 
@@ -1470,8 +1470,4 @@ public class JabRefFrame extends BorderPane {
             }
         }
     }
-
 }
-
-
-
