@@ -66,7 +66,7 @@ public class BackupManager {
 
     private boolean needsBackup = true;
 
-    private BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
+    BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
@@ -106,6 +106,16 @@ public class BackupManager {
     }
 
     /**
+     * Marks the backup as discarded at the library which is associated with the given {@link BibDatabaseContext}.
+     *
+     * @param bibDatabaseContext Associated {@link BibDatabaseContext}
+     */
+    public static void discardBackup(BibDatabaseContext bibDatabaseContext) {
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(
+                BackupManager::discardBackup);
+    }
+
+    /**
      * Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
@@ -120,13 +130,25 @@ public class BackupManager {
      * Checks whether a backup file exists for the given database file. If it exists, it is checked whether it is
      * newer and different from the original.
      *
+     * In case a discarded file is present, the method also returns <code>false</code>, See also {@link #discardBackup()}.
+     *
      * @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
      *
      * @return <code>true</code> if backup file exists AND differs from originalPath. <code>false</code> is the
-     * "default" return value in the good case. In the case of an exception <code>true</code> is returned to ensure that
-     * the user checks the output.
+     * "default" return value in the good case. In case a discarded file exists, <code>false</code> is returned, too.
+     * In the case of an exception <code>true</code> is returned to ensure that the user checks the output.
      */
     public static boolean backupFileDiffers(Path originalPath) {
+        Path discardedFile = determineDiscardedFile(originalPath);
+        if (Files.exists(discardedFile)) {
+            try {
+                Files.delete(discardedFile);
+            } catch (IOException e) {
+                LOGGER.error("Could not remove discarded file {}", discardedFile, e);
+                return true;
+            }
+            return false;
+        }
         return getLatestBackupPath(originalPath).map(latestBackupPath -> {
             FileTime latestBackupFileLastModifiedTime;
             try {
@@ -177,7 +199,7 @@ public class BackupManager {
         }
     }
 
-    private Optional<Path> determineBackupPathForNewBackup() {
+    Optional<Path> determineBackupPathForNewBackup() {
         return bibDatabaseContext.getDatabasePath().map(BackupManager::getBackupPathForNewBackup);
     }
 
@@ -188,7 +210,7 @@ public class BackupManager {
      *
      * @param backupPath the path where the library should be backed up to
      */
-    private void performBackup(Path backupPath) {
+    void performBackup(Path backupPath) {
         if (!needsBackup) {
             return;
         }
@@ -223,6 +245,27 @@ public class BackupManager {
             this.needsBackup = false;
         } catch (IOException e) {
             logIfCritical(backupPath, e);
+        }
+    }
+
+    private static Path determineDiscardedFile(Path file) {
+        return BackupFileUtil.getAppDataBackupDir().resolve(
+                BackupFileUtil.getUniqueFilePrefix(file) + "--" + file.getFileName() + "--discarded"
+        );
+    }
+
+    /**
+     * Marks the backups as discarded.
+     *
+     * We do not delete any files, because the user might want to recover old backup files.
+     * Therefore, we mark discarded backups by a --discarded file.
+     */
+    public void discardBackup() {
+        Path path = determineDiscardedFile(bibDatabaseContext.getDatabasePath().get());
+        try {
+            Files.createFile(path);
+        } catch (IOException e) {
+            LOGGER.info("Could not create backup file {}", path, e);
         }
     }
 
