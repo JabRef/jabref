@@ -17,6 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- We changed database structure: in MySQL/MariaDB we renamed tables by adding a `JABREF_` prefix, and in PGSQL we moved tables in `jabref` schema. We added `VersionDBStructure` variable in `METADATA` table to indicate current version of structure, this variable is needed for automatic migration [#9312](https://github.com/JabRef/jabref/issues/9312)
 
 
 
@@ -73,6 +74,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the color of found text from red to high-contrast colors (background: yellow; font color: purple). [koppor#552](https://github.com/koppor/jabref/issues/552)
 - We fixed an issue where the wrong icon for a successful import of a bib entry was shown. [#9308](https://github.com/JabRef/jabref/pull/9308)
 - We changed the messages after importing unlinked local files to past tense. [koppor#548](https://github.com/koppor/jabref/issues/548)
+- We fixed an issue where the wrong icon for a successful import of a bib entry was shown [#9308](https://github.com/JabRef/jabref/pull/9308)
 - In the context of the [Cleanup dialog](https://docs.jabref.org/finding-sorting-and-cleaning-entries/cleanupentries) we changed the text of the conversion of BibTeX to biblatex (and vice versa) to make it more clear. [koppor#545](https://github.com/koppor/jabref/issues/545)
 - We removed wrapping of string constants when writing to a `.bib` file.
 - In the context of a systematic literature review (SLR), a user can now add arbitrary data into `study.yml`. JabRef just ignores this data. [#9124](https://github.com/JabRef/jabref/pull/9124)
