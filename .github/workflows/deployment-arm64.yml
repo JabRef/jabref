@@ -1,4 +1,4 @@
-name: Deployment Release with ARM64 - Run manually!
+name: Deployment Release for ARM64 - Run manually!
 
 on:
   workflow_dispatch:
@@ -21,21 +21,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, self-hosted]
+        os: [self-hosted]
         include:
           - os: self-hosted
             displayName: macOS (Arm64)
             suffix: '_arm64'
             archivePortable: tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos_arm64.tar.gz && rm -R build/distribution/JabRef.app
-          - os: ubuntu-latest
-            displayName: linux
-            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
-          - os: windows-latest
-            displayName: windows
-            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-          - os: macos-latest
-            displayName: macOS
-            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
