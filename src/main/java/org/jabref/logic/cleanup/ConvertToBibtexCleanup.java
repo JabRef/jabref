@@ -36,7 +36,7 @@ public class ConvertToBibtexCleanup implements CleanupJob {
             }
         });
 
-        for (Map.Entry<Field, Field> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
+        for (Map.Entry<Field, Field> alias : EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.entrySet()) {
             Field oldField = alias.getValue();
             Field newField = alias.getKey();
             entry.getField(oldField).ifPresent(oldValue -> {
