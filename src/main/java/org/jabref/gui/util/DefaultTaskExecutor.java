@@ -183,4 +183,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
             return new Exception(throwable);
         }
     }
+
+    @Override
+    public void runInFXThread(Runnable runnable) {
+       DefaultTaskExecutor.runInJavaFXThread(runnable);
+    }
 }

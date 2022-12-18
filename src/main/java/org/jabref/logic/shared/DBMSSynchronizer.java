@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -54,10 +56,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final Character keywordSeparator;
     private final GlobalCitationKeyPattern globalCiteKeyPattern;
     private final FileUpdateMonitor fileMonitor;
-    private Optional<BibEntry> lastEntryChanged;
+    private volatile Optional<BibEntry> lastEntryChanged;
+    private final TaskExecutor taskExecutor;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
-                            GlobalCitationKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
+                            GlobalCitationKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor, TaskExecutor taskExecutor) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -66,6 +69,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = Objects.requireNonNull(globalCiteKeyPattern);
         this.lastEntryChanged = Optional.empty();
+        this.taskExecutor = taskExecutor;
     }
 
     /**
@@ -82,9 +86,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             pullWithLastEntry();
             synchronizeLocalDatabase();
             dbmsProcessor.insertEntries(event.getBibEntries());
+
             // Reset last changed entry because it just has already been synchronized -> Why necessary?
             lastEntryChanged = Optional.empty();
         }
+
     }
 
     /**
@@ -134,10 +140,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
-            synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
-            synchronizeLocalDatabase();
-            applyMetaData();
-            dbmsProcessor.notifyClients();
+            BackgroundTask.wrap(() -> {
+                synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
+                synchronizeLocalDatabase();
+                applyMetaData();
+                dbmsProcessor.notifyClients();
+            }).executeWith(taskExecutor);
         }
     }
 
@@ -166,8 +174,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
 
         dbmsProcessor.startNotificationListener(this);
+
         synchronizeLocalMetaData();
         synchronizeLocalDatabase();
+
     }
 
     /**
@@ -175,7 +185,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * {@link BibEntry}.
      */
     @Override
-    public void synchronizeLocalDatabase() {
+    public synchronized void synchronizeLocalDatabase() {
         if (!checkCurrentConnection()) {
             return;
         }
@@ -190,38 +200,50 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         for (Map.Entry<Integer, Integer> idVersionEntry : idVersionMap.entrySet()) {
             boolean remoteEntryMatchingOneLocalEntryFound = false;
             for (BibEntry localEntry : localEntries) {
-                if (idVersionEntry.getKey().equals(localEntry.getSharedBibEntryData().getSharedID())) {
-                    remoteEntryMatchingOneLocalEntryFound = true;
-                    if (idVersionEntry.getValue() > localEntry.getSharedBibEntryData().getVersion()) {
-                        Optional<BibEntry> sharedEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
+                remoteEntryMatchingOneLocalEntryFound = true;
+
+
+                if (idVersionEntry.getValue() > localEntry.getSharedBibEntryData().getVersion()) {
+
+                    Optional<BibEntry> sharedEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
+
                         if (sharedEntry.isPresent()) {
                             // update fields
+
                             localEntry.setType(sharedEntry.get().getType(), EntriesEventSource.SHARED);
                             localEntry.getSharedBibEntryData()
                                       .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
+
                             sharedEntry.get().getFieldMap().forEach(
-                                    // copy remote values to local entry
-                                    (field, value) -> localEntry.setField(field, value, EntriesEventSource.SHARED)
-                            );
+                                                                    // copy remote values to local entry
+                                                                    (field, value) -> localEntry.setField(field, value, EntriesEventSource.SHARED));
 
                             // locally remove not existing fields
                             localEntry.getFields().stream()
                                       .filter(field -> !sharedEntry.get().hasField(field))
                                       .forEach(
-                                              field -> localEntry.clearField(field, EntriesEventSource.SHARED)
-                                      );
+                                               field -> localEntry.clearField(field, EntriesEventSource.SHARED));
                         }
                     }
                 }
-            }
+
+
             if (!remoteEntryMatchingOneLocalEntryFound) {
                 entriesToInsertIntoLocalDatabase.add(idVersionEntry.getKey());
             }
         }
+        // TODO: Update at once? or wrap whole method again in taskExecutor?
+        // Okay, we need to execute only the getting stuff from the database as completable future/background thread
 
         if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
-            // in case entries should be added into the local database, insert them
-            bibDatabase.insertEntries(dbmsProcessor.partitionAndGetSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
+
+            BackgroundTask.wrap(() -> dbmsProcessor.partitionAndGetSharedEntries(entriesToInsertIntoLocalDatabase))
+                          .onSuccess(entries-> {
+                // in case entries should be added into the local database, insert them
+                bibDatabase.insertEntries(entries, EntriesEventSource.SHARED);
+
+            }).executeWith(taskExecutor);
+
         }
     }
 
@@ -232,10 +254,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * @param sharedIDs    Set of all IDs which are present on shared database
      */
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
-        List<BibEntry> entriesToRemove =
-                localEntries.stream()
-                            .filter(localEntry -> !sharedIDs.contains(localEntry.getSharedBibEntryData().getSharedID()))
-                            .collect(Collectors.toList());
+        List<BibEntry> entriesToRemove = localEntries.stream()
+                                                     .filter(localEntry -> !sharedIDs.contains(localEntry.getSharedBibEntryData().getSharedID()))
+                                                     .collect(Collectors.toList());
         if (!entriesToRemove.isEmpty()) {
             eventBus.post(new SharedEntriesNotPresentEvent(entriesToRemove));
             // remove all non-shared entries without triggering listeners
@@ -268,7 +289,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         if (!checkCurrentConnection()) {
             return;
         }
-
         try {
             metaData.setEventPropagation(false);
             MetaDataParser parser = new MetaDataParser(fileMonitor);
@@ -354,7 +374,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      *
      * @return <code>true</code> if the connection is valid, else <code>false</code>.
      */
-    public boolean checkCurrentConnection() {
+    public synchronized boolean checkCurrentConnection() {
         try {
             boolean isValid = currentConnection.isValid(0);
             if (!isValid) {

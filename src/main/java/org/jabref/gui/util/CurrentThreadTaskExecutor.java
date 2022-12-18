@@ -106,4 +106,12 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
             return true;
         }
     }
+
+    /**
+     *  Executes the runnable on the current thread, used for testing
+     */
+    @Override
+    public void runInFXThread(Runnable runnable) {
+        runnable.run();
+    }
 }
