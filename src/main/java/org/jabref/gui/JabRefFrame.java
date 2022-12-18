@@ -292,7 +292,7 @@ public class JabRefFrame extends BorderPane {
                                             List<BibEntry> allEntries = getCurrentLibraryTab()
                                                     .getBibDatabaseContext()
                                                     .getEntries();
-                                                    
+
                                             Optional<GroupTreeNode> groupTreeNodeToCopy =  getCurrentLibraryTab()
                                                     .getBibDatabaseContext()
                                                     .getMetaData()
@@ -1454,7 +1454,6 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void copyGroupTreeNode(LibraryTab libraryTab, Optional<GroupTreeNode> parent, Optional<GroupTreeNode> groupTreeNodeToCopy, List<BibEntry> allEntries ){
-
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
         GroupTreeNode copiedNode = parent.get().addSubgroup(groupTreeNodeToCopy.get().getGroup().deepCopy());
 
@@ -1465,8 +1464,8 @@ public class JabRefFrame extends BorderPane {
         List<GroupTreeNode> children = groupTreeNodeToCopy.get().getChildren();
 
         if (!children.isEmpty()) { 
-            //use recursion to add all subgroups of the original groupTreeNodeToCopy
-            for ( GroupTreeNode child : children ){
+            // use recursion to add all subgroups of the original groupTreeNodeToCopy
+            for (GroupTreeNode child : children) {
                 copyGroupTreeNode(libraryTab, Optional.of(copiedNode), Optional.of(child), allEntries);
             }
         }
