@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -33,7 +32,7 @@ public class CompositeIdFetcher {
         if (isbn.isPresent()) {
             return new IsbnFetcher(importFormatPreferences)
                     .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
-                    .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
+                    // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
                     .performSearchById(isbn.get().getNormalized());
         }
         /* TODO: IACR is currently disabled, because it needs to be reworked: https://github.com/JabRef/jabref/issues/8876
