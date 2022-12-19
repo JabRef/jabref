@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
@@ -82,31 +83,38 @@ public class BibEntryType implements Comparable<BibEntryType> {
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public Set<Field> getDeprecatedFields() {
-        Set<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
-        deprecatedFields.add(StandardField.YEAR);
-        deprecatedFields.add(StandardField.MONTH);
+    public Set<Field> getDeprecatedFields(BibDatabaseMode mode) {
+        if (mode == BibDatabaseMode.BIBTEX) {
+            return Collections.emptySet();
+        }
+        Set<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.keySet());
 
+        // Only the optional fields which are mapped to another BibLaTeX name should be shown as "deprecated"
         deprecatedFields.retainAll(getOptionalFieldsAndAliases());
+
+        // BibLaTeX aims for that field "date" is used
+        // Thus, year + month is deprecated
+        // However, year is used in the wild very often, so we do not mark that as default as deprecated
+        deprecatedFields.add(StandardField.MONTH);
 
         return deprecatedFields;
     }
 
-    public Set<Field> getSecondaryOptionalNotDeprecatedFields() {
+    public Set<Field> getSecondaryOptionalNotDeprecatedFields(BibDatabaseMode mode) {
         Set<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
-        optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields());
+        optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields(mode));
         return optionalFieldsNotPrimaryOrDeprecated;
     }
 
     /**
-     * Get list of all optional fields of this entry and their aliases.
+     * Get list of all optional fields of this entry and all fields being source for a BibTeX to BibLaTeX conversion.
      */
     private Set<Field> getOptionalFieldsAndAliases() {
         Set<Field> optionalFieldsAndAliases = new LinkedHashSet<>(getOptionalFields().size());
         for (BibField field : getOptionalFields()) {
             optionalFieldsAndAliases.add(field.getField());
-            if (EntryConverter.FIELD_ALIASES_LTX_TO_TEX.containsKey(field.getField())) {
-                optionalFieldsAndAliases.add(EntryConverter.FIELD_ALIASES_LTX_TO_TEX.get(field.getField()));
+            if (EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.containsKey(field.getField())) {
+                optionalFieldsAndAliases.add(field.getField());
             }
         }
         return optionalFieldsAndAliases;

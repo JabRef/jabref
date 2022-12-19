@@ -14,7 +14,7 @@
     <category field="biology"/>
     <issn>0959-3985</issn>
     <eissn>1532-5040</eissn>
-    <updated>2022-01-11T08:37:50+00:00</updated>
+    <updated>2022-09-05T16:08:42+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -63,8 +63,8 @@
   </macro>
   <citation et-al-min="5" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
     <sort>
-      <key macro="issued"/>
       <key macro="author"/>
+      <key macro="issued"/>
     </sort>
     <layout delimiter="; " prefix="(" suffix=")">
       <group delimiter=", ">
@@ -73,7 +73,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="30" et-al-use-first="29">
+  <bibliography et-al-min="11" et-al-use-first="10">
     <sort>
       <key macro="author"/>
       <key macro="issued"/>
@@ -81,9 +81,11 @@
     </sort>
     <layout suffix=".">
       <group delimiter=". ">
-        <text macro="author"/>
-        <text macro="issued"/>
-        <text variable="title"/>
+        <group delimiter=" ">
+          <text macro="author"/>
+          <text macro="issued"/>
+          <text variable="title"/>
+        </group>
         <choose>
           <if type="article article-magazine article-newspaper article-journal review review-book" match="any">
             <group delimiter=" ">

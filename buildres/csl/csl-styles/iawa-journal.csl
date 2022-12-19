@@ -9,6 +9,9 @@
     <author>
       <name>Patrick O'Brien</name>
     </author>
+    <contributor>
+      <name>Ronald Visser</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="biology"/>
     <issn>0928-1541</issn>
@@ -127,11 +130,11 @@
           <text macro="author-short"/>
           <text macro="year-date"/>
         </group>
-        <text variable="locator" prefix="p."/>
+        <text variable="locator"/>
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="11" et-al-use-first="5">
+  <bibliography hanging-indent="false" et-al-min="11" et-al-use-first="5">
     <sort>
       <key macro="author"/>
       <key macro="year-date"/>
@@ -157,7 +160,7 @@
             <text macro="title"/>
             <text variable="event" prefix="presented at the "/>
             <text variable="event-place"/>
-            <text variable="page" suffix=" pp."/>
+            <text variable="page"/>
             <date variable="issued">
               <date-part name="day" suffix=" "/>
               <date-part name="month" form="long"/>
@@ -167,24 +170,24 @@
         <else-if type="chapter paper-conference" match="any">
           <group delimiter=". " prefix=" ">
             <text macro="title" suffix="."/>
-            <group delimiter=", ">
+            <group>
               <group>
                 <text term="in" text-case="capitalize-first" suffix=": "/>
-                <text macro="editor"/>
+                <text macro="editor" suffix="."/>
               </group>
-              <group delimiter=": ">
-                <text variable="container-title" font-style="italic"/>
+              <group>
+                <text variable="container-title" suffix=": "/>
               </group>
               <text macro="refpages"/>
             </group>
-            <text macro="publisher" suffix=";"/>
+            <text macro="publisher" suffix="."/>
           </group>
         </else-if>
         <else-if type="thesis">
-          <group delimiter=", " prefix=" ">
+          <group delimiter=". " prefix=" ">
             <text macro="title"/>
             <text variable="genre"/>
-            <text variable="page" suffix=" pp."/>
+            <text variable="page"/>
             <text macro="publisher"/>
             <date variable="issued">
               <date-part name="day" suffix=" "/>
@@ -193,9 +196,9 @@
           </group>
         </else-if>
         <else>
-          <group delimiter=". " prefix=" ">
-            <text macro="title"/>
-            <text macro="editor"/>
+          <group prefix=" ">
+            <text macro="title" suffix=". "/>
+            <text macro="editor" suffix=". "/>
             <group delimiter=": " prefix=" ">
               <group delimiter=" ">
                 <text variable="container-title" form="short"/>

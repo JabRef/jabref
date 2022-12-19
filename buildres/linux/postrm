@@ -25,12 +25,12 @@ case "$1" in
                                      "/etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json"\
                                      "/etc/opt/edge/native-messaging-hosts/org.jabref.jabref.json"; do
             if [ -e $NATIVE_MESSAGING_JSON ] && grep --quiet '"path": "/opt' $NATIVE_MESSAGING_JSON; then
-                rm $NATIVE_MESSAGING_JSON
+                rm -f $NATIVE_MESSAGING_JSON
             fi
         done
         # Remove the auto-install triggers of the browser addon for chrom/chromium
-        rm /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
-        rm /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
+        rm -f /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
+        rm -f /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
     ;;
 
     *)

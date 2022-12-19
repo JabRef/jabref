@@ -6,13 +6,13 @@ License: APPLICATION_LICENSE_TYPE
 Vendor: APPLICATION_VENDOR
 Prefix: %{dirname:APPLICATION_DIRECTORY}
 Provides: APPLICATION_PACKAGE
-%if "xAPPLICATION_GROUP" != x
+%if "xAPPLICATION_GROUP" != "x"
 Group: APPLICATION_GROUP
 %endif
 
 Autoprov: 0
 Autoreq: 0
-%if "xPACKAGE_DEFAULT_DEPENDENCIES" != x || "xPACKAGE_CUSTOM_DEPENDENCIES" != x
+%if "xPACKAGE_DEFAULT_DEPENDENCIES" != "x" || "xPACKAGE_CUSTOM_DEPENDENCIES" != "x"
 Requires: PACKAGE_DEFAULT_DEPENDENCIES PACKAGE_CUSTOM_DEPENDENCIES
 %endif
 
@@ -35,14 +35,14 @@ APPLICATION_DESCRIPTION
 rm -rf %{buildroot}
 install -d -m 755 %{buildroot}APPLICATION_DIRECTORY
 cp -r %{_sourcedir}APPLICATION_DIRECTORY/* %{buildroot}APPLICATION_DIRECTORY
-%if "xAPPLICATION_LICENSE_FILE" != x
+%if "xAPPLICATION_LICENSE_FILE" != "x"
   %define license_install_file %{_defaultlicensedir}/%{name}-%{version}/%{basename:APPLICATION_LICENSE_FILE}
   install -d -m 755 %{buildroot}%{dirname:%{license_install_file}}
   install -m 644 APPLICATION_LICENSE_FILE %{buildroot}%{license_install_file}
 %endif
 
 %files
-%if "xAPPLICATION_LICENSE_FILE" != x
+%if "xAPPLICATION_LICENSE_FILE" != "x"
   %license %{license_install_file}
   %{dirname:%{license_install_file}}
 %endif

@@ -2,13 +2,13 @@ package org.jabref.gui.collab.entryadd;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.collab.ExternalChangeDetailsView;
+import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
-public final class EntryAddDetailsView extends ExternalChangeDetailsView {
+public final class EntryAddDetailsView extends DatabaseChangeDetailsView {
 
     public EntryAddDetailsView(EntryAdd entryAdd, BibDatabaseContext bibDatabaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService) {
         PreviewViewer previewViewer = new PreviewViewer(bibDatabaseContext, dialogService, stateManager, themeManager);

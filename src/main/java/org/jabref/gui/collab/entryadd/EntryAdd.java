@@ -1,18 +1,18 @@
 package org.jabref.gui.collab.entryadd;
 
-import org.jabref.gui.collab.ExternalChange;
-import org.jabref.gui.collab.ExternalChangeResolverFactory;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public final class EntryAdd extends ExternalChange {
+public final class EntryAdd extends DatabaseChange {
     private final BibEntry addedEntry;
 
-    public EntryAdd(BibEntry addedEntry, BibDatabaseContext databaseContext, ExternalChangeResolverFactory externalChangeResolverFactory) {
-        super(databaseContext, externalChangeResolverFactory);
+    public EntryAdd(BibEntry addedEntry, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+        super(databaseContext, databaseChangeResolverFactory);
         this.addedEntry = addedEntry;
         setChangeName(addedEntry.getCitationKey()
                            .map(key -> Localization.lang("Added entry '%0'", key))

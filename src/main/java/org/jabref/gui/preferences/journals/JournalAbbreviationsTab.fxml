@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TableColumn?>
@@ -79,5 +80,9 @@
                 <JabRefIconView glyph="ADD_NOBOX"/>
             </graphic>
         </Button>
+    </HBox>
+    
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="useFJournal" text="%Use the field FJournal to store the full journal name for (un)abbreviations in the entry"/>
     </HBox>
 </fx:root>

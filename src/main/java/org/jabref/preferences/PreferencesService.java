@@ -49,6 +49,8 @@ public interface PreferencesService {
 
     InternalPreferences getInternalPreferences();
 
+    BibEntryPreferences getBibEntryPreferences();
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -64,8 +66,6 @@ public interface PreferencesService {
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
     OpenOfficePreferences getOpenOfficePreferences();
-
-    void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
 
     Map<String, Object> getPreferences();
 
@@ -123,8 +123,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // GroupsPreferences
     //*************************************************************************************************************
-
-    Character getKeywordDelimiter();
 
     GroupsPreferences getGroupsPreferences();
 

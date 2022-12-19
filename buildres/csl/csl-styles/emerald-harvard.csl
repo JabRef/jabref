@@ -30,7 +30,7 @@
     </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2020-08-26T12:00:00+00:00</updated>
+    <updated>2022-12-12T18:17:18+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -108,28 +108,23 @@
       </if>
       <else>
         <choose>
-          <if variable="page" match="none">
-            <choose>
-              <if variable="DOI">
-                <text term="available at" suffix=":"/>
-                <text variable="DOI" prefix="https://doi.org/"/>
-              </if>
-              <else>
-                <group delimiter=" ">
-                  <text term="available at" suffix=":"/>
-                  <text variable="URL"/>
-                  <group delimiter=" " prefix="(" suffix=")">
-                    <text term="accessed"/>
-                    <date variable="accessed" delimiter=" ">
-                      <date-part name="day"/>
-                      <date-part name="month"/>
-                      <date-part name="year"/>
-                    </date>
-                  </group>
-                </group>
-              </else>
-            </choose>
+          <if variable="DOI">
+            <text variable="DOI" prefix="doi: "/>
           </if>
+          <else-if type="webpage post post-weblog" match="any">
+            <group delimiter=" ">
+              <text term="available at" suffix=":"/>
+              <text variable="URL"/>
+              <group delimiter=" " prefix="(" suffix=")">
+                <text term="accessed"/>
+                <date variable="accessed" delimiter=" ">
+                  <date-part name="day"/>
+                  <date-part name="month"/>
+                  <date-part name="year"/>
+                </date>
+              </group>
+            </group>
+          </else-if>
         </choose>
       </else>
     </choose>

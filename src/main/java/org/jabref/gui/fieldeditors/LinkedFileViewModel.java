@@ -392,8 +392,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
         ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
         Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                Localization.lang("Delete '%0'", file.get().toString()),
-                Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                Localization.lang("Delete '%0'", file.get().getFileName().toString()),
+                Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk.", file.get().toString()),
                 removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
 
         if (buttonType.isPresent()) {
