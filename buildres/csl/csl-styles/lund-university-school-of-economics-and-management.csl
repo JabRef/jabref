@@ -364,7 +364,7 @@
       <key macro="author"/>
       <key macro="issued-sort" sort="ascending"/>
     </sort>
-    <layout suffix=".">
+    <layout>
       <group delimiter=". " suffix=". ">
         <text macro="author"/>
         <text macro="issued-year" prefix="(" suffix=")"/>

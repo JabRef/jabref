@@ -202,7 +202,7 @@ jobs:
       - name: Deploy to builds.jabref.org
         id: deploy
         if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: Pendect/action-rsyncer@v1.1.0
+        uses: Pendect/action-rsyncer@v2.0.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
           BRANCH: ${{ steps.gitversion.outputs.branchName }}
