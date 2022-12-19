@@ -22,12 +22,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.BibEntryPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.fxmisc.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
@@ -52,12 +52,8 @@ class SourceTabTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
-        BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
-        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences())
-                .thenReturn(mock(FieldContentFormatterPreferences.class));
-        when(importFormatPreferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
 
         sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), fieldWriterPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);

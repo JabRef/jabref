@@ -40,7 +40,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+        when(importFormatPreferences.fieldContentFormatterPreferences()).thenReturn(
                 mock(FieldContentFormatterPreferences.class));
         fetcher = new AstrophysicsDataSystem(importFormatPreferences, importerPreferences);
 

@@ -1,16 +1,13 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -40,17 +37,14 @@ class EmbeddedBibFilePdfExporterTest {
 
     @TempDir static Path tempDir;
 
-    private static BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
-    private static BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
-    private static BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
+    private static final BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
+    private static final BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
+    private static final BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
 
-    private PdfEmbeddedBibFileImporter importer;
     private EmbeddedBibFilePdfExporter exporter;
     private ImportFormatPreferences importFormatPreferences;
     private BibDatabaseMode bibDatabaseMode;
     private BibEntryTypesManager bibEntryTypesManager;
-    private FieldWriterPreferences fieldWriterPreferences;
-    private Charset encoding;
 
     private BibDatabaseContext databaseContext;
     private BibDatabase dataBase;
@@ -79,7 +73,7 @@ class EmbeddedBibFilePdfExporterTest {
         olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
 
         LinkedFile linkedFile = createDefaultLinkedFile("existing.pdf", tempDir);
-        olly2018.setFiles(Arrays.asList(linkedFile));
+        olly2018.setFiles(List.of(linkedFile));
 
         toral2006.setField(StandardField.AUTHOR, "Toral, Antonio and Munoz, Rafael");
         toral2006.setField(StandardField.TITLE, "A proposal to automatically build and maintain gazetteers for Named Entity Recognition by using Wikipedia");
@@ -89,7 +83,7 @@ class EmbeddedBibFilePdfExporterTest {
         toral2006.setField(StandardField.OWNER, "Ich");
         toral2006.setField(StandardField.URL, "www.url.de");
 
-        toral2006.setFiles(Arrays.asList(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
+        toral2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
 
         vapnik2000.setCitationKey("vapnik2000");
         vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
@@ -104,20 +98,20 @@ class EmbeddedBibFilePdfExporterTest {
      */
     @BeforeEach
     void setUp() throws IOException {
-        encoding = Charset.defaultCharset();
-
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.getUser()).thenReturn(tempDir.toAbsolutePath().toString());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
+        when(importFormatPreferences.fieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
 
         bibDatabaseMode = BibDatabaseMode.BIBTEX;
         bibEntryTypesManager = new BibEntryTypesManager();
-        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
+        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(
+                true,
+                List.of(StandardField.MONTH),
+                new FieldContentFormatterPreferences());
 
-        importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
         exporter = new EmbeddedBibFilePdfExporter(bibDatabaseMode, bibEntryTypesManager, fieldWriterPreferences);
 
         databaseContext = new BibDatabaseContext();
@@ -132,13 +126,13 @@ class EmbeddedBibFilePdfExporterTest {
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithValidPdfFileLinks")
     void successfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, Arrays.asList(olly2018)));
+        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018)));
     }
 
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithInvalidPdfFileLinks")
     void unsuccessfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, Arrays.asList(olly2018)));
+        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018)));
     }
 
     public static Stream<Arguments> provideBibEntriesWithValidPdfFileLinks() {
@@ -180,8 +174,6 @@ class EmbeddedBibFilePdfExporterTest {
             pdf.save(pdfFile.toAbsolutePath().toString());
         }
 
-        LinkedFile linkedFile = new LinkedFile("A linked pdf", pdfFile, "PDF");
-
-        return linkedFile;
+        return new LinkedFile("A linked pdf", pdfFile, "PDF");
     }
 }

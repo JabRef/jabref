@@ -29,7 +29,7 @@ class MathSciNetTest {
     @BeforeEach
     void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+        when(importFormatPreferences.fieldContentFormatterPreferences()).thenReturn(
                 mock(FieldContentFormatterPreferences.class));
         fetcher = new MathSciNet(importFormatPreferences);
 
