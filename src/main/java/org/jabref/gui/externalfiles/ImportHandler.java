@@ -290,7 +290,7 @@ public class ImportHandler {
             return unknownFormatImport.parserResult.getDatabase().getEntries();
         } catch (ImportException ex) {
             dialogService.notify(Localization.lang("ImportError: UnknownFormat"));
-            LOGGER.info("Detail: Found UnknownFormat in clipboard but it is not a suitable importer", ex);
+            LOGGER.info("Detail: Found UnknownFormat in clipboard but there is not a suitable importer", ex);
             return Collections.emptyList();
         }
     }

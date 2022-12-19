@@ -57,7 +57,7 @@ public class JabRefExecutorService {
         try {
             future.get();
         } catch (InterruptedException e) {
-            LOGGER.error("The thread is waiting, occupied or interrupted", e);
+            LOGGER.debug("The thread is waiting, occupied or interrupted", e);
         } catch (ExecutionException e) {
             LOGGER.error("Problem executing command", e);
         }

@@ -164,6 +164,7 @@ public class FileFieldParser {
                     field = new LinkedFile(entry.get(0), path, entry.get(2));
                 } catch (InvalidPathException e) {
                     // Ignored
+                    LOGGER.debug("Invalid path object, continueing with string", e);
                     field = new LinkedFile(entry.get(0), pathStr, entry.get(2));
                 }
             }
