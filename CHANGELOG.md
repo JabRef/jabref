@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added a dropdown menu to let users change the library they want to import into during import.[#6177](https://github.com/JabRef/jabref/issues/6177)
 
 
 
