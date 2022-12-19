@@ -119,7 +119,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                     }
 
                     if (dbOpt.isEmpty()) {
-                        return "Untitled";
+                        return Localization.lang("untitled");
                     }
 
                     return dbOpt.get();
