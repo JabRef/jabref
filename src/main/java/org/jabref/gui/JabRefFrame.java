@@ -300,7 +300,7 @@ public class JabRefFrame extends BorderPane {
                                                     .getChildByPath(pathToSource);
 
                                             // call the copy function
-                                            copyGroupTreeNode((LibraryTab) libraryTab,parentGroup,groupTreeNodeToCopy, allEntries);
+                                            copyGroupTreeNode((LibraryTab) libraryTab, parentGroup, groupTreeNodeToCopy, allEntries);
                                         }
                                     } else {
                                         ((LibraryTab) libraryTab).dropEntry(stateManager.getLocalDragboard().getBibEntries());
