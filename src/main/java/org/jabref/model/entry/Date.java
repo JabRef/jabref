@@ -14,12 +14,14 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.jabref.logic.importer.IdBasedParserFetcher.LOGGER;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Date {
 
     private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
     private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Date.class);
 
     static {
         List<String> formatStrings = Arrays.asList(

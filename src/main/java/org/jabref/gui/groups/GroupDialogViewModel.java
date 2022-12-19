@@ -177,8 +177,7 @@ public class GroupDialogViewModel {
                     try {
                         Pattern.compile(input);
                         return true;
-                    } catch (PatternSyntaxException e) {
-                        // Ignored
+                    } catch (PatternSyntaxException ignored) {
                         return false;
                     }
                 },

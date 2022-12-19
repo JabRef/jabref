@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
  * Every message is terminated with '\0'.
  */
 public class Protocol implements AutoCloseable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
-
     public static final String IDENTIFIER = "jabref";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Protocol.class);
 
     private final Socket socket;
     private final ObjectOutputStream out;
