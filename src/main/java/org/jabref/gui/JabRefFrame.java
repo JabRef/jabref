@@ -288,7 +288,10 @@ public class JabRefFrame extends BorderPane {
                                                 .getGroups().get());
 
                                         for (String pathToSource : groupPathToSources) {
-                                            List<BibEntry> allEntries = getCurrentLibraryTab().getBibDatabaseContext().getEntries();
+                                            List<BibEntry> allEntries = getCurrentLibraryTab()
+                                                    .getBibDatabaseContext()
+                                                    .getEntries();
+
                                             Optional<GroupTreeNode> groupTreeNodeToCopy =  getCurrentLibraryTab()
                                                     .getBibDatabaseContext()
                                                     .getMetaData()
@@ -297,7 +300,7 @@ public class JabRefFrame extends BorderPane {
                                                     .getChildByPath(pathToSource);
 
                                             // call the copy function
-                                            copyGroupTreeNode((LibraryTab) libraryTab, parentGroup, groupTreeNodeToCopy, allEntries);
+                                            copyGroupTreeNode((LibraryTab) libraryTab,parentGroup,groupTreeNodeToCopy, allEntries);
                                         }
                                     } else {
                                         ((LibraryTab) libraryTab).dropEntry(stateManager.getLocalDragboard().getBibEntries());
@@ -1467,6 +1470,3 @@ public class JabRefFrame extends BorderPane {
         }
     }
 }
-
-
-
