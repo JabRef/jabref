@@ -1454,7 +1454,7 @@ public class JabRefFrame extends BorderPane {
 
     private void copyGroupTreeNode(LibraryTab libraryTabCasted, Optional<GroupTreeNode> parent, Optional<GroupTreeNode> groupTreeNodeToCopy, List<BibEntry> allEntries) {
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
-        GroupTreeNode copiedNode = parent.get().addSubgroup(groupTreeNodeToCopy.get().getGroup().deepCopy());
+        GroupTreeNode copiedNode = parent.get().addSubgroup(groupTreeNodeToCopy.get().copyNode().getGroup());
 
         // add all entries of a groupTreeNode to the new library.
         libraryTabCasted.dropEntry(groupTreeNodeToCopy.get().getEntriesInGroup(allEntries));
