@@ -69,12 +69,12 @@ public class CitationKeyPatternPanelViewModel {
     }
 
     public void setItemToDefaultPattern(CitationKeyPatternPanelItemModel item) {
-        item.setPattern(preferences.getDefaultsDefaultCitationKeyPattern());
+        item.setPattern(preferences.getCitationKeyPatternPreferences().getDefaultPattern());
     }
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItemProperty.getValue().setPattern(preferences.getDefaultsDefaultCitationKeyPattern());
+        defaultItemProperty.getValue().setPattern(preferences.getCitationKeyPatternPreferences().getDefaultPattern());
     }
 
     public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {

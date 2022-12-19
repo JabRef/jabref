@@ -258,8 +258,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String GROBID_OPT_OUT = "grobidOptOut";
     public static final String GROBID_URL = "grobidURL";
 
-    // Currently, it is not possible to specify defaults for specific entry types
-    // When this should be made possible, the code to inspect is org.jabref.gui.preferences.CitationKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_DELETE = "confirmDelete";
@@ -423,7 +421,6 @@ public class JabRefPreferences implements PreferencesService {
     private OwnerPreferences ownerPreferences;
     private TimestampPreferences timestampPreferences;
 
-    private GlobalCitationKeyPattern globalCitationKeyPattern;
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
     private List<MainTableColumnModel> mainTableColumnSortOrder;
@@ -1166,12 +1163,6 @@ public class JabRefPreferences implements PreferencesService {
         return get(PREVIEW_STYLE);
     }
 
-    @Override
-    @Deprecated
-    public String getDefaultsDefaultCitationKeyPattern() {
-        return (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN);
-    }
-
     //*************************************************************************************************************
     // CustomEntryTypes
     //
@@ -1609,60 +1600,41 @@ public class JabRefPreferences implements PreferencesService {
     // CitationKeyPatternPreferences
     //*************************************************************************************************************
 
-    /**
-     * Creates the GlobalCitationKeyPattern from cache
-     *
-     * @return GlobalCitationKeyPattern containing all keys without a parent AbstractCitationKeyPattern
-     */
-    @Override
-    public GlobalCitationKeyPattern getGlobalCitationKeyPattern() {
-        if (this.globalCitationKeyPattern == null) {
-            updateGlobalCitationKeyPattern();
-        }
-        return this.globalCitationKeyPattern;
-    }
-
-    /**
-     * Reloads the GlobalCitationKeyPattern from scratch to cache
-     */
-    @Override
-    public void updateGlobalCitationKeyPattern() {
-        this.globalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
+    private GlobalCitationKeyPattern getGlobalCitationKeyPattern() {
+        GlobalCitationKeyPattern citationKeyPattern = GlobalCitationKeyPattern.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
             if (keys.length > 0) {
                 for (String key : keys) {
-                    this.globalCitationKeyPattern.addCitationKeyPattern(
+                    citationKeyPattern.addCitationKeyPattern(
                             EntryTypeFactory.parse(key),
                             preferences.get(key, null));
                 }
             }
-        } catch (BackingStoreException ex) {
+        } catch (
+                BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
+
+        return citationKeyPattern;
     }
 
-    /**
-     * Stores the given key pattern in the preferences
-     *
-     * @param pattern the pattern to store
-     */
+    // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPattern pattern) {
-        this.globalCitationKeyPattern = pattern;
-
-        if ((this.globalCitationKeyPattern.getDefaultValue() == null)
-                || this.globalCitationKeyPattern.getDefaultValue().isEmpty()) {
+        if ((pattern.getDefaultValue() == null)
+                || pattern.getDefaultValue().isEmpty()) {
             put(DEFAULT_CITATION_KEY_PATTERN, "");
         } else {
-            put(DEFAULT_CITATION_KEY_PATTERN, globalCitationKeyPattern.getDefaultValue().get(0));
+            put(DEFAULT_CITATION_KEY_PATTERN, pattern.getDefaultValue().get(0));
         }
 
         // Store overridden definitions to Preferences.
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
-        } catch (BackingStoreException ex) {
+        } catch (
+                BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences::putKeyPattern", ex);
         }
 
@@ -1672,14 +1644,12 @@ public class JabRefPreferences implements PreferencesService {
                 preferences.put(entryType.getName(), pattern.getValue(entryType).get(0));
             }
         }
-
-        updateGlobalCitationKeyPattern();
     }
 
     private void clearCitationKeyPatterns() throws BackingStoreException {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
-        updateGlobalCitationKeyPattern();
+        getCitationKeyPatternPreferences().setKeyPattern(getGlobalCitationKeyPattern());
     }
 
     @Override
@@ -1705,6 +1675,7 @@ public class JabRefPreferences implements PreferencesService {
                 get(KEY_PATTERN_REPLACEMENT),
                 get(UNWANTED_CITATION_KEY_CHARACTERS),
                 getGlobalCitationKeyPattern(),
+                (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN),
                 getBibEntryPreferences().keywordSeparatorProperty());
 
         EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),

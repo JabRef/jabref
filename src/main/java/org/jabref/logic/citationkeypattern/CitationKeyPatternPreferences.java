@@ -24,6 +24,7 @@ public class CitationKeyPatternPreferences {
     private final StringProperty keyPatternReplacement = new SimpleStringProperty();
     private final StringProperty unwantedCharacters = new SimpleStringProperty();
     private final ObjectProperty<GlobalCitationKeyPattern> keyPattern = new SimpleObjectProperty<>();
+    private final String defaultPattern;
     private final ReadOnlyObjectProperty<Character> keywordDelimiter;
 
     public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
@@ -34,6 +35,7 @@ public class CitationKeyPatternPreferences {
                                          String keyPatternReplacement,
                                          String unwantedCharacters,
                                          GlobalCitationKeyPattern keyPattern,
+                                         String defaultPattern,
                                          ReadOnlyObjectProperty<Character> keywordDelimiter) {
 
         this.shouldAvoidOverwriteCiteKey.set(shouldAvoidOverwriteCiteKey);
@@ -44,6 +46,8 @@ public class CitationKeyPatternPreferences {
         this.keyPatternReplacement.set(keyPatternReplacement);
         this.unwantedCharacters.set(unwantedCharacters);
         this.keyPattern.set(keyPattern);
+
+        this.defaultPattern = defaultPattern;
         this.keywordDelimiter = keywordDelimiter;
     }
 
@@ -58,6 +62,7 @@ public class CitationKeyPatternPreferences {
                                          String keyPatternReplacement,
                                          String unwantedCharacters,
                                          GlobalCitationKeyPattern keyPattern,
+                                         String defaultPattern,
                                          Character keywordDelimiter) {
 
         this(shouldAvoidOverwriteCiteKey,
@@ -68,6 +73,7 @@ public class CitationKeyPatternPreferences {
                 keyPatternReplacement,
                 unwantedCharacters,
                 keyPattern,
+                defaultPattern,
                 new SimpleObjectProperty<>(keywordDelimiter));
     }
 
@@ -165,6 +171,10 @@ public class CitationKeyPatternPreferences {
 
     public void setKeyPattern(GlobalCitationKeyPattern keyPattern) {
         this.keyPattern.set(keyPattern);
+    }
+
+    public String getDefaultPattern() {
+        return defaultPattern;
     }
 
     public Character getKeywordDelimiter() {
