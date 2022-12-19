@@ -53,6 +53,13 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     @Inject private UndoManager undoManager;
 
+    /**
+     * A dialog going through given <code>changes</code>, which are diffs to the provided <code>database</code>.
+     * Each accepted change is written to the provided <code>database</code>.
+     *
+     * @param changes The list of changes
+     * @param database The database to apply the changes to
+     */
     public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, String dialogTitle) {
         this.changes = changes;
         this.databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService);

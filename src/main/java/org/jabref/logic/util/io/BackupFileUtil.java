@@ -69,6 +69,8 @@ public class BackupFileUtil {
 
     /**
      * Finds the latest backup (.sav). If it does not exist, an empty optional is returned
+     *
+     * @param targetFile the full path of the file to backup
      */
     public static Optional<Path> getPathOfLatestExisingBackupFile(Path targetFile, BackupFileType fileType) {
         // The code is similar to "getPathForNewBackupFileAndCreateDirectory"

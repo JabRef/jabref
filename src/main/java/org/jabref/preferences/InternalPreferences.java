@@ -10,12 +10,10 @@ import org.jabref.logic.util.Version;
 public class InternalPreferences {
 
     private final ObjectProperty<Version> ignoredVersion;
-    private final ObjectProperty<Character> keywordSeparator;
     private final StringProperty user;
 
-    public InternalPreferences(Version ignoredVersion, Character keywordSeparator, String user) {
+    public InternalPreferences(Version ignoredVersion, String user) {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
-        this.keywordSeparator = new SimpleObjectProperty<>(keywordSeparator);
         this.user = new SimpleStringProperty(user);
     }
 
@@ -29,18 +27,6 @@ public class InternalPreferences {
 
     public void setIgnoredVersion(Version ignoredVersion) {
         this.ignoredVersion.set(ignoredVersion);
-    }
-
-    public Character getKeywordSeparator() {
-        return keywordSeparator.get();
-    }
-
-    public ObjectProperty<Character> keywordSeparatorProperty() {
-        return keywordSeparator;
-    }
-
-    public void setKeywordSeparator(Character keywordSeparator) {
-        this.keywordSeparator.set(keywordSeparator);
     }
 
     public String getUser() {
