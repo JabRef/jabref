@@ -291,7 +291,6 @@ public class JabRefFrame extends BorderPane {
                                             List<BibEntry> allEntries = getCurrentLibraryTab()
                                                     .getBibDatabaseContext()
                                                     .getEntries();
-
                                             Optional<GroupTreeNode> groupTreeNodeToCopy =  getCurrentLibraryTab()
                                                     .getBibDatabaseContext()
                                                     .getMetaData()
