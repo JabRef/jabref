@@ -33,6 +33,7 @@ import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -113,6 +114,9 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                     if (database.getDatabasePath().isPresent()) {
                         dbOpt = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), database.getDatabasePath().get());
                     }
+                    if (database.getLocation() == DatabaseLocation.SHARED) {
+                        return database.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+                    }
 
                     if (dbOpt.isEmpty()) {
                         return "Untitled";
@@ -122,11 +126,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 })
                 .install(libraryListView);
         viewModel.selectedDbProperty().bind(libraryListView.getSelectionModel().selectedItemProperty());
-
-        // FixMe: getActiveDatabase result object is different from the ones in getOpenDatabases.
-        //  Solution: Debug JabRef to find out, why there is a new object for the stateManager constructed (Must be done sooner or later)
-        //  Easy Workaround: Check the open databases for their path and select the matching one from getOpenDatabases
-        stateManager.getActiveDatabase().ifPresent(database -> libraryListView.getSelectionModel().select(database));
+        stateManager.getActiveDatabase().ifPresent(database1 -> libraryListView.getSelectionModel().select(database1));
 
         PseudoClass entrySelected = PseudoClass.getPseudoClass("entry-selected");
         new ViewModelListCellFactory<BibEntry>()
