@@ -30,6 +30,7 @@ class MakeLabelWithoutDatabaseTest {
                 "",
                 CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
+                "",
                 new SimpleObjectProperty<>(','));
 
         citationKeyGenerator = new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences);
