@@ -267,22 +267,23 @@ public class JabRefFrame extends BorderPane {
                             for (Tab libraryTab : tabbedPane.getTabs()) {
                                 if (libraryTab.getId().equals(tab.getId()) &&
                                         !tabbedPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
+                                    LibraryTab libraryTabCasted = (LibraryTab) libraryTab;
                                     if (dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
                                         List<String> groupPathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
-                                        if (((LibraryTab) libraryTab).getBibDatabaseContext().getMetaData().getGroups().isEmpty()) {
+                                        if (libraryTabCasted.getBibDatabaseContext().getMetaData().getGroups().isEmpty()) {
                                             // a root (all entries) GroupTreeNode
                                             GroupTreeNode rootNode = getCurrentLibraryTab().getBibDatabaseContext()
-                                                    .getMetaData()
-                                                    .getGroups()
-                                                    .get()
-                                                    .copyNode();
-                                                    
+                                                                                           .getMetaData()
+                                                                                           .getGroups()
+                                                                                           .get()
+                                                                                           .copyNode();
+
                                             // add rootNode to the Library if it does not have a root.
-                                            ((LibraryTab) libraryTab).getBibDatabaseContext()
-                                                    .getMetaData()
-                                                    .setGroups(rootNode);
+                                            libraryTabCasted.getBibDatabaseContext()
+                                                                     .getMetaData()
+                                                                     .setGroups(rootNode);
                                         }
-                                        Optional<GroupTreeNode> parentGroup = Optional.of(((LibraryTab) libraryTab)
+                                        Optional<GroupTreeNode> parentGroup = Optional.of(libraryTabCasted
                                                 .getBibDatabaseContext()
                                                 .getMetaData()
                                                 .getGroups().get());
@@ -291,7 +292,7 @@ public class JabRefFrame extends BorderPane {
                                             List<BibEntry> allEntries = getCurrentLibraryTab()
                                                     .getBibDatabaseContext()
                                                     .getEntries();
-                                            Optional<GroupTreeNode> groupTreeNodeToCopy =  getCurrentLibraryTab()
+                                            Optional<GroupTreeNode> groupTreeNodeToCopy = getCurrentLibraryTab()
                                                     .getBibDatabaseContext()
                                                     .getMetaData()
                                                     .getGroups()
@@ -302,7 +303,7 @@ public class JabRefFrame extends BorderPane {
                                             copyGroupTreeNode((LibraryTab) libraryTab, parentGroup, groupTreeNodeToCopy, allEntries);
                                         }
                                     } else {
-                                        ((LibraryTab) libraryTab).dropEntry(stateManager.getLocalDragboard().getBibEntries());
+                                        libraryTabCasted.dropEntry(stateManager.getLocalDragboard().getBibEntries());
                                     }
                                 }
                             }
@@ -1451,12 +1452,12 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private void copyGroupTreeNode(LibraryTab libraryTab, Optional<GroupTreeNode> parent, Optional<GroupTreeNode> groupTreeNodeToCopy, List<BibEntry> allEntries) {
+    private void copyGroupTreeNode(LibraryTab libraryTabCasted, Optional<GroupTreeNode> parent, Optional<GroupTreeNode> groupTreeNodeToCopy, List<BibEntry> allEntries) {
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
         GroupTreeNode copiedNode = parent.get().addSubgroup(groupTreeNodeToCopy.get().getGroup().deepCopy());
 
         // add all entries of a groupTreeNode to the new library.
-        ((LibraryTab) libraryTab).dropEntry(groupTreeNodeToCopy.get().getEntriesInGroup(allEntries));
+        libraryTabCasted.dropEntry(groupTreeNodeToCopy.get().getEntriesInGroup(allEntries));
 
         // List of all children of groupTreeNodeToCopy
         List<GroupTreeNode> children = groupTreeNodeToCopy.get().getChildren();
@@ -1464,7 +1465,7 @@ public class JabRefFrame extends BorderPane {
         if (!children.isEmpty()) {
             // use recursion to add all subgroups of the original groupTreeNodeToCopy
             for (GroupTreeNode child : children) {
-                copyGroupTreeNode(libraryTab, Optional.of(copiedNode), Optional.of(child), allEntries);
+                copyGroupTreeNode(libraryTabCasted, Optional.of(copiedNode), Optional.of(child), allEntries);
             }
         }
     }
