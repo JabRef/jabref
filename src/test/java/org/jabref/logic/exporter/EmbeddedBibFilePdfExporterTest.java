@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,14 +35,11 @@ class EmbeddedBibFilePdfExporterTest {
 
     @TempDir static Path tempDir;
 
-    private static final BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
-    private static final BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
-    private static final BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
+    private static BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
+    private static BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
+    private static BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
 
     private EmbeddedBibFilePdfExporter exporter;
-    private ImportFormatPreferences importFormatPreferences;
-    private BibDatabaseMode bibDatabaseMode;
-    private BibEntryTypesManager bibEntryTypesManager;
 
     private BibDatabaseContext databaseContext;
     private BibDatabase dataBase;
@@ -102,11 +97,8 @@ class EmbeddedBibFilePdfExporterTest {
         when(filePreferences.getUser()).thenReturn(tempDir.toAbsolutePath().toString());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.fieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
-
-        bibDatabaseMode = BibDatabaseMode.BIBTEX;
-        bibEntryTypesManager = new BibEntryTypesManager();
+        BibDatabaseMode bibDatabaseMode = BibDatabaseMode.BIBTEX;
+        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
         FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(
                 true,
                 List.of(StandardField.MONTH),
