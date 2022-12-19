@@ -172,6 +172,6 @@
 }
 
 
-.file-row-text {
+.file-row-text:opacity {
     -fx-text-fill: -fx-light-text-color;
 }
