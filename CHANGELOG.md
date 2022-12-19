@@ -123,7 +123,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where hitting enter on the search field within the preferences dialog closed the dialog. [koppor#630](https://github.com/koppor/jabref/issues/630)
 - We fixed the "Cleanup entries" dialog is partially visible. [#9223](https://github.com/JabRef/jabref/issues/9223)
 - We fixed an issue where font size preferences did not apply correctly to preference dialog window and the menu bar. [#8386](https://github.com/JabRef/jabref/issues/8386) and [#9279](https://github.com/JabRef/jabref/issues/9279)
-- We fixed an issue when using an unsafe character in the citation key, the auto-linking feature fails to link files. [#9267](https://github.com/JabRef/jabref/issues/9267)
 - We fixed the display of the "Customize Entry Types" dialog title. [#9198](https://github.com/JabRef/jabref/issues/9198)
 - We fixed an issue where the CSS styles are missing in some dialogs. [#9150](https://github.com/JabRef/jabref/pull/9150)
 - We fixed an issue where controls in the preferences dialog could outgrow the window. [#9017](https://github.com/JabRef/jabref/issues/9017)
