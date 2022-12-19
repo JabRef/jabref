@@ -460,6 +460,7 @@ public class JabRefPreferences implements PreferencesService {
     private CleanupPreferences cleanupPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
     private ExternalApplicationsPreferences externalApplicationsPreferences;
+    private CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1683,16 +1684,19 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
+        if (Objects.nonNull(citationKeyPatternPreferences)) {
+            return citationKeyPatternPreferences;
+        }
+
         CitationKeyPatternPreferences.KeySuffix keySuffix =
                 CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
-
         if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {
             keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;
         } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {
             keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
         }
 
-        return new CitationKeyPatternPreferences(
+        citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 getBoolean(AVOID_OVERWRITING_KEY),
                 getBoolean(WARN_BEFORE_OVERWRITING_KEY),
                 getBoolean(GENERATE_KEYS_BEFORE_SAVING),
@@ -1701,35 +1705,41 @@ public class JabRefPreferences implements PreferencesService {
                 get(KEY_PATTERN_REPLACEMENT),
                 get(UNWANTED_CITATION_KEY_CHARACTERS),
                 getGlobalCitationKeyPattern(),
-                getBibEntryPreferences().getKeywordSeparator());
-    }
+                getBibEntryPreferences().keywordSeparatorProperty());
 
-    @Override
-    public void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences) {
-        putBoolean(AVOID_OVERWRITING_KEY, preferences.shouldAvoidOverwriteCiteKey());
-        putBoolean(WARN_BEFORE_OVERWRITING_KEY, preferences.shouldWarnBeforeOverwriteCiteKey());
-        putBoolean(GENERATE_KEYS_BEFORE_SAVING, preferences.shouldGenerateCiteKeysBeforeSaving());
+        EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
+                (obs, oldValue, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
+                (obs, oldValue, newValue) -> putBoolean(WARN_BEFORE_OVERWRITING_KEY, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
+                (obs, oldValue, newValue) -> putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (obs, oldValue, newValue) -> {
+                    switch (newValue) {
+                        case ALWAYS -> {
+                            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, true);
+                            putBoolean(KEY_GEN_FIRST_LETTER_A, false);
+                        }
+                        case SECOND_WITH_A -> {
+                            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
+                            putBoolean(KEY_GEN_FIRST_LETTER_A, true);
+                        }
+                        case SECOND_WITH_B -> {
+                            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
+                            putBoolean(KEY_GEN_FIRST_LETTER_A, false);
+                        }
+                    }
+                }
+        );
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
+                (obs, oldValue, newValue) -> put(KEY_PATTERN_REGEX, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
+                (obs, oldValue, newValue) -> put(KEY_PATTERN_REPLACEMENT, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),
+                (obs, oldValue, newValue) -> put(UNWANTED_CITATION_KEY_CHARACTERS, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternProperty(),
+                (obs, oldValue, newValue) -> storeGlobalCitationKeyPattern(newValue));
 
-        switch (preferences.getKeySuffix()) {
-            case ALWAYS -> {
-                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, true);
-                putBoolean(KEY_GEN_FIRST_LETTER_A, false);
-            }
-            case SECOND_WITH_A -> {
-                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
-                putBoolean(KEY_GEN_FIRST_LETTER_A, true);
-            }
-            case SECOND_WITH_B -> {
-                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
-                putBoolean(KEY_GEN_FIRST_LETTER_A, false);
-            }
-        }
-
-        put(KEY_PATTERN_REGEX, preferences.getKeyPatternRegex());
-        put(KEY_PATTERN_REPLACEMENT, preferences.getKeyPatternReplacement());
-        put(UNWANTED_CITATION_KEY_CHARACTERS, preferences.getUnwantedCharacters());
-
-        storeGlobalCitationKeyPattern(preferences.getKeyPattern());
+        return citationKeyPatternPreferences;
     }
 
     //*************************************************************************************************************

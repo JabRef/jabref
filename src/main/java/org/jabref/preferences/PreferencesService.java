@@ -156,8 +156,6 @@ public interface PreferencesService {
 
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
 
-    void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences);
-
     //*************************************************************************************************************
     // ExternalApplicationsPreferences
     //*************************************************************************************************************
