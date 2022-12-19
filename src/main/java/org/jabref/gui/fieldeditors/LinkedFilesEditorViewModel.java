@@ -197,9 +197,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return result;
     }
 
-    public void downloadFile(Optional<String> urlText) {
+    public void downloadFile(String urlText) {
         try {
-            URL url = new URL(urlText.get());
+            URL url = new URL(urlText);
             addFromURL(url);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(
@@ -214,7 +214,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences.getImporterPreferences());
         Optional<String> urlField = entry.getField(StandardField.URL);
         if (urlField.isPresent()) {
-            downloadFile(urlField);
+            downloadFile(urlField.get());
         } else {
             BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
@@ -246,7 +246,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     Localization.lang("Download file"), Localization.lang("Enter URL to download"));
         }
         if (urlText.isPresent()) {
-            downloadFile(urlText);
+            downloadFile(urlText.get());
         }
     }
 

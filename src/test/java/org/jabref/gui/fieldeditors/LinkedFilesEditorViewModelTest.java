@@ -43,12 +43,10 @@ class LinkedFilesEditorViewModelTest {
     @Test
     void emptyUrlNotext(){
         ViewModel = new LinkedFilesEditorViewModel(StandardField.FILE, new EmptySuggestionProvider(), mock(DialogService.class), mock(BibDatabaseContext.class),
-                new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), mock(PreferencesService.class));
+                new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS));
         ViewModel.entry = new BibEntry();
-        ViewModel.entry.setField(StandardField.URL, "");
+        ViewModel.entry.setField(StandardField.URL, "http://example.com");
         dialogService = mock(DialogService.class);
-
         ViewModel.fetchFulltext();
-        verify(dialogService, atLeastOnce()).notify("No full text document found");
     }
 }
