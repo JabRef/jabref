@@ -306,6 +306,7 @@ public class PreferencesMigrations {
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addCitationKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
         }
+
         prefs.storeGlobalCitationKeyPattern(keyPattern);
     }
 
