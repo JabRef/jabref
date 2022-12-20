@@ -40,6 +40,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
+                "",
                 ',');
     }
 
@@ -71,6 +72,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
+                "",
                 ',');
 
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
@@ -88,6 +90,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
+                "",
                 ',');
 
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(bibtexKeyPattern, database, preferences);
@@ -110,6 +113,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
+                "",
                 ',');
 
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
@@ -127,6 +131,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
+                "",
                 ',');
 
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(bibtexKeyPattern, database, preferences);
@@ -427,6 +432,7 @@ class MakeLabelWithDatabaseTest {
                 "3",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
+                "",
                 ',');
 
         bibtexKeyPattern.setDefaultValue("[auth][year]");

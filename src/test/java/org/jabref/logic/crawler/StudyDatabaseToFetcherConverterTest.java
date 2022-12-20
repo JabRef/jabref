@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -49,8 +48,7 @@ class StudyDatabaseToFetcherConverterTest {
         timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         entryTypesManager = new BibEntryTypesManager();
         gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
