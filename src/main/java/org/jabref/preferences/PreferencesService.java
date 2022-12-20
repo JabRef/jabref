@@ -244,10 +244,6 @@ public interface PreferencesService {
 
     SearchPreferences getSearchPreferences();
 
-    String getLastPreferencesExportPath();
-
-    void storeLastPreferencesExportPath(Path exportFile);
-
     MrDlibPreferences getMrDlibPreferences();
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
