@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.CiteSeer;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class WebFetchersTest {
 
@@ -45,8 +43,6 @@ class WebFetchersTest {
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class);
-        FieldContentFormatterPreferences fieldContentFormatterPreferences = mock(FieldContentFormatterPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
     }
 
     private Set<Class<?>> getIgnoredInaccessibleClasses() {
@@ -56,7 +52,7 @@ class WebFetchersTest {
                          try {
                              return Class.forName(classPath);
                          } catch (ClassNotFoundException e) {
-                             LOGGER.error("Some of the ignored classes were not found {}", e);
+                             LOGGER.error("Some of the ignored classes were not found", e);
                              return null;
                          }
                      }).filter(Objects::nonNull).collect(Collectors.toSet());

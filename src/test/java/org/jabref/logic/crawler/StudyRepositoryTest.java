@@ -87,8 +87,8 @@ class StudyRepositoryTest {
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.fieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
         when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
         getTestStudyRepository();
@@ -211,7 +211,7 @@ class StudyRepositoryTest {
 
     private BibDatabase getNonDuplicateBibEntryResult() {
         BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResults());
-        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.getKeywordSeparator());
+        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
         merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResults()));
         merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResults()));
         return mockResults;

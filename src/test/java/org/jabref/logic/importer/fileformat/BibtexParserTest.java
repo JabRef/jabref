@@ -54,7 +54,6 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.BibEntryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,10 +77,7 @@ class BibtexParserTest {
     @BeforeEach
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
-
-        when(importFormatPreferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
-        when(importFormatPreferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
@@ -1133,7 +1129,7 @@ class BibtexParserTest {
 
     @Test
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
-        when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields())
+        when(importFormatPreferences.fieldContentFormatterPreferences().getNonWrappableFields())
                 .thenReturn(List.of(StandardField.FILE));
         BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
         ParserResult result = parser
