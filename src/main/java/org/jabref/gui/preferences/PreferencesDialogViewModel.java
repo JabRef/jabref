@@ -10,7 +10,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.preferences.appearance.AppearanceTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
@@ -36,10 +35,7 @@ import org.jabref.gui.preferences.table.TableTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.PreferencesFilter;
 import org.jabref.preferences.PreferencesService;
@@ -165,16 +161,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         preferences.updateMainTableColumns();
 
         setValues();
-
-        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
-        Globals.exportFactory = ExporterFactory.create(
-                customExporters,
-                layoutPreferences,
-                preferences.getSavePreferencesForExport(),
-                preferences.getXmpPreferences(),
-                preferences.getGeneralPreferences().getDefaultBibDatabaseMode(),
-                Globals.entryTypesManager);
 
         frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }

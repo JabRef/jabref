@@ -275,7 +275,6 @@ public class TemplateExporter extends Exporter {
             }
 
             // Print footer
-            // changed section - begin (arudert)
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {
                 layoutHelper = new LayoutHelper(reader, layoutPreferences);
@@ -295,9 +294,7 @@ public class TemplateExporter extends Exporter {
             layoutPreferences.clearCustomExportNameFormatters();
 
             if (!missingFormatters.isEmpty() && LOGGER.isWarnEnabled()) {
-                StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
-                sb.append(String.join(", ", missingFormatters));
-                LOGGER.warn("Formatters {} not found", sb.toString());
+                LOGGER.warn("Formatters {} not found", String.join(", ", missingFormatters));
             }
         }
     }

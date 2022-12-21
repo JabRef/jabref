@@ -291,13 +291,12 @@ public class JabRefCLI {
         System.out.println(getVersionInfo());
     }
 
-    public static void printUsage() {
+    public static void printUsage(String outFormats) {
         String header = "";
 
         String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
         String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
 
-        String outFormats = Globals.exportFactory.getExportersAsString(70, 20, "");
         String outFormatsList = String.format("%s: %s%n", Localization.lang("Available export formats"), outFormats);
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";

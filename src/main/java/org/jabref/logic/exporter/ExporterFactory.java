@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.preferences.PreferencesService;
 
 public class ExporterFactory {
 
@@ -26,6 +28,18 @@ public class ExporterFactory {
 
     private ExporterFactory(List<Exporter> exporters) {
         this.exporters = Objects.requireNonNull(exporters);
+    }
+
+    public static ExporterFactory create(PreferencesService preferencesService,
+                                         BibEntryTypesManager entryTypesManager,
+                                         JournalAbbreviationRepository abbreviationRepository) {
+        return ExporterFactory.create(
+                preferencesService.getCustomExportFormats(abbreviationRepository),
+                preferencesService.getLayoutFormatterPreferences(abbreviationRepository),
+                preferencesService.getSavePreferencesForExport(),
+                preferencesService.getXmpPreferences(),
+                preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
+                entryTypesManager);
     }
 
     public static ExporterFactory create(List<TemplateExporter> customFormats,
