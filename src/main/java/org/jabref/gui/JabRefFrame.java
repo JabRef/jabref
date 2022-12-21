@@ -295,7 +295,6 @@ public class JabRefFrame extends BorderPane {
                                         return;
                                     }
                                     destinationLibraryTab.dropEntry(stateManager.getLocalDragboard().getBibEntries());
-
                                 }
                             }
                             tabDragEvent.consume();
