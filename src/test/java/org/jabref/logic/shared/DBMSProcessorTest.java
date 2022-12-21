@@ -308,6 +308,7 @@ class DBMSProcessorTest {
         insertMetaData("protectedFlag", "true;", dbmsConnection, dbmsProcessor);
         insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;", dbmsConnection, dbmsProcessor);
         insertMetaData("saveOrderConfig", "specified;author;false;title;false;year;true;", dbmsConnection, dbmsProcessor);
+        insertMetaData("VersionDBStructure", "1", dbmsConnection, dbmsProcessor);
 
         Map<String, String> expectedMetaData = getMetaDataExample();
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
@@ -332,6 +333,7 @@ class DBMSProcessorTest {
         expectedMetaData.put("protectedFlag", "true;");
         expectedMetaData.put("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;");
         expectedMetaData.put("saveOrderConfig", "specified;author;false;title;false;year;true;");
+        expectedMetaData.put("VersionDBStructure", "1");
 
         return expectedMetaData;
     }
@@ -423,7 +425,7 @@ class DBMSProcessorTest {
 
     private ResultSet selectFrom(String table, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
         try {
-            return dbmsConnection.getConnection().createStatement().executeQuery("SELECT * FROM " + escape(table, dbmsProcessor));
+            return dbmsConnection.getConnection().createStatement().executeQuery("SELECT * FROM " + escape_Table(table, dbmsProcessor));
         } catch (SQLException e) {
             fail(e.getMessage());
             return null;
@@ -434,7 +436,7 @@ class DBMSProcessorTest {
     // Therefore this function was defined to improve the readability and to keep the code short.
     private void insertMetaData(String key, String value, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
         try {
-            dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape("METADATA", dbmsProcessor) + "("
+            dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA", dbmsProcessor) + "("
                     + escape("KEY", dbmsProcessor) + ", " + escape("VALUE", dbmsProcessor) + ") VALUES("
                     + escapeValue(key) + ", " + escapeValue(value) + ")");
         } catch (SQLException e) {
@@ -444,6 +446,10 @@ class DBMSProcessorTest {
 
     private static String escape(String expression, DBMSProcessor dbmsProcessor) {
         return dbmsProcessor.escape(expression);
+    }
+
+    private static String escape_Table(String expression, DBMSProcessor dbmsProcessor) {
+        return dbmsProcessor.escape_Table(expression);
     }
 
     private static String escapeValue(String value) {

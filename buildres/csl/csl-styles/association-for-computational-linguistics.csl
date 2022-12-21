@@ -68,8 +68,17 @@
     </choose>
   </macro>
   <macro name="edition">
-    <number variable="edition" form="ordinal"/>
-    <text term="edition" prefix=" "/>
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <text term="edition" form="short"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition"/>
+      </else>
+    </choose>
   </macro>
   <macro name="volume-or-number">
     <choose>

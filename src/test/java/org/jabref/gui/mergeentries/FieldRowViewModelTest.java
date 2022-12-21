@@ -2,7 +2,6 @@ package org.jabref.gui.mergeentries;
 
 import java.util.Optional;
 
-import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.model.entry.BibEntry;
@@ -10,7 +9,7 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.BibEntryPreferences;
 
 import org.jbibtex.ParseException;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,12 +32,9 @@ public class FieldRowViewModelTest {
 
     BibEntry mergedEntry;
 
-    FieldRowViewModel viewModel;
-
     FieldMergerFactory fieldMergerFactory;
 
-    PreferencesService mockedPrefs = mock(PreferencesService.class);
-    GroupsPreferences mockedGroupsPrefs = mock(GroupsPreferences.class);
+    BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
 
     @BeforeEach
     public void setup() throws ParseException {
@@ -76,10 +72,9 @@ public class FieldRowViewModelTest {
                 .withField(StandardField.YEAR, "2013");
 
         mergedEntry = new BibEntry();
-        fieldMergerFactory = new FieldMergerFactory(mockedPrefs);
+        fieldMergerFactory = new FieldMergerFactory(bibEntryPreferences);
 
-        when(mockedPrefs.getGroupsPreferences()).thenReturn(mockedGroupsPrefs);
-        when(mockedGroupsPrefs.getKeywordSeparator()).thenReturn(',');
+        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
     }
 
     @Test
