@@ -161,8 +161,8 @@ public class BibtexImporter extends Importer {
                     return Optional.empty();
                 }
             }
-        } catch (IOException ignored) {
-            LOGGER.error("Supplied encoding could not be determined", ignored);
+        } catch (IOException e) {
+            LOGGER.error("Supplied encoding could not be determined", e);
         }
         return Optional.empty();
     }

@@ -77,7 +77,7 @@ class BibtexParserTest {
     @BeforeEach
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
@@ -1129,7 +1129,7 @@ class BibtexParserTest {
 
     @Test
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
-        when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields())
+        when(importFormatPreferences.fieldContentFormatterPreferences().getNonWrappableFields())
                 .thenReturn(List.of(StandardField.FILE));
         BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
         ParserResult result = parser

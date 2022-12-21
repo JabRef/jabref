@@ -192,7 +192,7 @@ public class JabRefGUI {
 
             if (pr.getDatabase().isShared()) {
                 try {
-                    new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
+                    new SharedDatabaseUIManager(mainFrame, preferencesService).openSharedDatabaseFromParserResult(pr);
                 } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                         NotASharedDatabaseException e) {
                     pr.getDatabaseContext().clearDatabasePath(); // do not open the original file
