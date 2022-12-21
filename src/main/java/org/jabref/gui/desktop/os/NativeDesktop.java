@@ -45,4 +45,7 @@ public interface NativeDesktop {
     default Path getUserDirectory() {
         return Path.of(System.getProperty("user.home"));
     }
+
+    boolean isSystemDarkMode();
+
 }

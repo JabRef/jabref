@@ -20,6 +20,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,5 +176,10 @@ public class Linux implements NativeDesktop {
                 System.getenv("XDG_DOCUMENTS_DIR"),
                 System.getProperty("user.home") + "/Documents")
         );
+    }
+
+    @Override
+    public boolean isSystemDarkMode() {
+        throw new NotImplementedException();
     }
 }

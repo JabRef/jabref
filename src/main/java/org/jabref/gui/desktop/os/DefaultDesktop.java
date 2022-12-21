@@ -50,4 +50,9 @@ public class DefaultDesktop implements NativeDesktop {
     public Path getDefaultFileChooserDirectory() {
         return Path.of(System.getProperty("user.home"));
     }
+
+    @Override
+    public boolean isSystemDarkMode() {
+        return false;
+    }
 }

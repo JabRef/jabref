@@ -49,9 +49,4 @@
             </tooltip>
         </Button>
     </HBox>
-    <Label fx:id="restartJabRefHint" styleClass="text" text="${'\nRestarting JabRef may be required to display changes in theme preferences.'}">
-        <font>
-            <Font name="Italic" size="13.0"/>
-        </font>
-    </Label>
 </fx:root>

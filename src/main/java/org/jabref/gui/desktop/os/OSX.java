@@ -10,6 +10,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 
+
 @AllowedToUseAwt("Requires AWT to open a file")
 public class OSX implements NativeDesktop {
 
@@ -56,5 +57,10 @@ public class OSX implements NativeDesktop {
     @Override
     public Path getDefaultFileChooserDirectory() {
         return Path.of(System.getProperty("user.home") + "/Documents");
+    }
+
+    @Override
+    public boolean isSystemDarkMode() {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

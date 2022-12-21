@@ -110,4 +110,10 @@ public class Windows implements NativeDesktop {
         process.directory(new File(absolutePath));
         process.start();
     }
+
+    @Override
+    public boolean isSystemDarkMode() {
+        // https://learn.microsoft.com/en-us/answers/questions/715081/how-to-detect-windows-dark-mode.html
+         throw new UnsupportedOperationException();
+    }
 }
