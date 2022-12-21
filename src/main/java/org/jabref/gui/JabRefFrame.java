@@ -236,7 +236,7 @@ public class JabRefFrame extends BorderPane {
                 // drag'n'drop on tabs covered dnd on tabbedPane, so dnd on tabs should contain all dnds on tabbedPane
                 tabbedPane.lookupAll(".tab").forEach(destinationTabNode -> {
                     destinationTabNode.setOnDragOver(tabDragEvent -> {
-                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard()) || DragAndDropHelper.hasGroups(tabDragEvent.getDragboard()) ) {
+                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard()) || DragAndDropHelper.hasGroups(tabDragEvent.getDragboard())) {
                             tabDragEvent.acceptTransferModes(TransferMode.ANY);
                             if (!tabbedPane.getTabs().contains(dndIndicator)) {
                                 tabbedPane.getTabs().add(dndIndicator);
@@ -267,7 +267,6 @@ public class JabRefFrame extends BorderPane {
                             for (Tab libraryTab : tabbedPane.getTabs()) {
                                 if (libraryTab.getId().equals(destinationTabNode.getId()) &&
                                         !tabbedPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
-
                                     LibraryTab destinationLibraryTab = (LibraryTab) libraryTab;
                                     if (DragAndDropHelper.hasGroups(tabDragEvent.getDragboard())) {
                                         List<String> groupPathToSources = DragAndDropHelper.getGroups(tabDragEvent.getDragboard());
@@ -301,9 +300,7 @@ public class JabRefFrame extends BorderPane {
                 event.consume();
             });
 
-
             this.getScene().setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
-
             this.getScene().setOnDragDropped(event -> {
                 tabbedPane.getTabs().remove(dndIndicator);
                 List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
