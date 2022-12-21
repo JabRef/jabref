@@ -206,7 +206,6 @@ public class JabRefFrame extends BorderPane {
         });
     }
 
-    @SuppressWarnings("checkstyle:SingleSpaceSeparator")
     private void initDragAndDrop() {
         Tab dndIndicator = new Tab(Localization.lang("Open files..."), null);
         dndIndicator.getStyleClass().add("drop");
