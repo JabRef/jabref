@@ -13,6 +13,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -56,6 +57,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<FieldViewModel, String> fieldNameColumn;
     @FXML private TableColumn<FieldViewModel, FieldType> fieldTypeColumn;
     @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
+    @FXML private TableColumn<FieldViewModel, Boolean> fieldTypeMultilineColumn;
     @FXML private ComboBox<Field> addNewField;
     @FXML private ButtonType applyButton;
     @FXML private ButtonType resetButton;
@@ -151,6 +153,10 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         fieldTypeColumn.setOnEditCommit(event -> {
             event.getTableView().getItems().get(event.getTablePosition().getRow()).setFieldType(event.getNewValue());
         });
+
+        fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
+        fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multiline());
+        fieldTypeActionColumn.setEditable(true);
 
         fieldNameColumn.setCellValueFactory(item -> item.getValue().fieldName());
 

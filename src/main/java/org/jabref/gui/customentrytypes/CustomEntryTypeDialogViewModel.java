@@ -129,7 +129,7 @@ public class CustomEntryTypeDialogViewModel {
     public void addNewField(Boolean isMulti) {
         Field field = newFieldToAdd.getValue();
         String fieldName = newFieldToAdd.getValue().getName();
-        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT);
+        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT, false);
         ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
         boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel -> fieldViewModel.fieldName().getValue().equals(field.getDisplayName()));
 

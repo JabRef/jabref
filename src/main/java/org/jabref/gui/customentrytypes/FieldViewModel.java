@@ -1,6 +1,8 @@
 package org.jabref.gui.customentrytypes;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -15,16 +17,18 @@ public class FieldViewModel {
     private final StringProperty fieldName = new SimpleStringProperty("");
     private final Field field;
     private final FieldPriority fieldPriority;
+    private final BooleanProperty multiline = new SimpleBooleanProperty();
 
-    public FieldViewModel(Field field, FieldType fieldType, FieldPriority fieldPriority) {
+    public FieldViewModel(Field field, FieldType fieldType, FieldPriority fieldPriority, boolean multiline) {
         this.field = field;
         this.fieldName.setValue(field.getDisplayName());
         this.fieldType = new SimpleObjectProperty<>(fieldType);
         this.fieldPriority = fieldPriority;
+        this.multiline.setValue(multiline);
     }
 
-    public FieldViewModel(Field field, boolean required, FieldPriority fieldPriority) {
-        this(field, required ? FieldType.REQUIRED : FieldType.OPTIONAL, fieldPriority);
+    public FieldViewModel(Field field, boolean required, FieldPriority fieldPriority, boolean multiline) {
+        this(field, required ? FieldType.REQUIRED : FieldType.OPTIONAL, fieldPriority, multiline);
     }
 
     public ObjectProperty<FieldType> fieldType() {
@@ -49,6 +53,10 @@ public class FieldViewModel {
 
     public void setFieldType(FieldType type) {
         this.fieldType.setValue(type);
+    }
+
+    public BooleanProperty multiline() {
+        return this.multiline;
     }
 
     @Override
