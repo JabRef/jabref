@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.Globals;
@@ -288,8 +287,8 @@ public class ArgumentProcessor {
             return;
         }
 
-        Vector<String> citeKeys = new Vector<>();
-        Vector<String> pdfs = new Vector<>();
+        List<String> citeKeys = new ArrayList<>();
+        List<String> pdfs = new ArrayList<>();
         for (String fileOrCiteKey : filesAndCitekeys.split(",")) {
             if (fileOrCiteKey.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
                 pdfs.add(fileOrCiteKey);
@@ -323,7 +322,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadatatoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> citeKeys, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
+    private void writeMetadatatoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, List<String> citeKeys, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
         for (String citeKey : citeKeys) {
             List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
             if (bibEntryList.isEmpty()) {
@@ -336,8 +335,8 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadatatoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> fileNames, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
-        for (String fileName : fileNames) {
+    private void writeMetadatatoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, List<String> pdfs, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
+        for (String fileName : pdfs) {
             Path filePath = Path.of(fileName);
             if (!filePath.isAbsolute()) {
                 filePath = FileHelper.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileHelper.find(fileName, List.of(Path.of("").toAbsolutePath())).orElse(filePath));

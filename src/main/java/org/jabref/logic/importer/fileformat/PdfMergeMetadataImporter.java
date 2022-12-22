@@ -17,7 +17,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -47,10 +46,10 @@ public class PdfMergeMetadataImporter extends Importer {
         this.metadataImporters = new ArrayList<>();
         this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importFormatPreferences.getGrobidPreferences().isGrobidEnabled()) {
+        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             this.metadataImporters.add(new PdfGrobidImporter(importFormatPreferences));
         }
-        this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
+        this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         this.metadataImporters.add(new PdfContentImporter(importFormatPreferences));
     }
 
@@ -100,7 +99,7 @@ public class PdfMergeMetadataImporter extends Importer {
                 try {
                     new IsbnFetcher(importFormatPreferences)
                             .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
-                            .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
+                            // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
                             .performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
                     LOGGER.error("Fetching failed for ISBN \"{}\".", candidate.getField(StandardField.ISBN).get(), e);

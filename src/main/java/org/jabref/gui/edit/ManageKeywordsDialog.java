@@ -49,7 +49,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ManageKeywordsViewModel(preferences, entries);
+        viewModel = new ManageKeywordsViewModel(preferences.getBibEntryPreferences(), entries);
 
         viewModel.displayTypeProperty().bind(
                 EasyBind.map(displayType.selectedToggleProperty(), toggle -> {

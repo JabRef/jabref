@@ -10,17 +10,14 @@ public class GroupsPreferences {
     private final ObjectProperty<GroupViewMode> groupViewMode;
     private final BooleanProperty shouldAutoAssignGroup;
     private final BooleanProperty shouldDisplayGroupCount;
-    private final ObjectProperty<Character> keywordSeparator;
 
     public GroupsPreferences(GroupViewMode groupViewMode,
                              boolean shouldAutoAssignGroup,
-                             boolean shouldDisplayGroupCount,
-                             ObjectProperty<Character> keywordSeparator) {
+                             boolean shouldDisplayGroupCount) {
 
         this.groupViewMode = new SimpleObjectProperty<>(groupViewMode);
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
-        this.keywordSeparator = keywordSeparator;
     }
 
     public GroupViewMode getGroupViewMode() {
@@ -57,17 +54,5 @@ public class GroupsPreferences {
 
     public void setDisplayGroupCount(boolean shouldDisplayGroupCount) {
         this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
-    }
-
-    public Character getKeywordSeparator() {
-        return keywordSeparator.getValue();
-    }
-
-    public ObjectProperty<Character> keywordSeparatorProperty() {
-        return keywordSeparator;
-    }
-
-    public void setKeywordSeparator(Character keywordSeparator) {
-        this.keywordSeparator.set(keywordSeparator);
     }
 }

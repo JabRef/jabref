@@ -18,7 +18,6 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -49,6 +48,8 @@ public interface PreferencesService {
 
     InternalPreferences getInternalPreferences();
 
+    BibEntryPreferences getBibEntryPreferences();
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -66,8 +67,6 @@ public interface PreferencesService {
     void setNonWrappableFields(String newFieldGroup);
 
     OpenOfficePreferences getOpenOfficePreferences();
-
-    void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
 
     Map<String, Object> getPreferences();
 
@@ -105,9 +104,6 @@ public interface PreferencesService {
 
     CleanupPreferences getDefaultCleanupPreset();
 
-    @Deprecated
-    String getDefaultsDefaultCitationKeyPattern();
-
     //*************************************************************************************************************
     // GeneralPreferences
     //*************************************************************************************************************
@@ -125,8 +121,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // GroupsPreferences
     //*************************************************************************************************************
-
-    Character getKeywordDelimiter();
 
     GroupsPreferences getGroupsPreferences();
 
@@ -154,13 +148,7 @@ public interface PreferencesService {
     // CitationKeyPatternPreferences
     //*************************************************************************************************************
 
-    GlobalCitationKeyPattern getGlobalCitationKeyPattern();
-
-    void updateGlobalCitationKeyPattern();
-
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
-
-    void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences);
 
     //*************************************************************************************************************
     // ExternalApplicationsPreferences

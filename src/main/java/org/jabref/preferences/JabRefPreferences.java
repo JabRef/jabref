@@ -258,8 +258,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String GROBID_OPT_OUT = "grobidOptOut";
     public static final String GROBID_URL = "grobidURL";
 
-    // Currently, it is not possible to specify defaults for specific entry types
-    // When this should be made possible, the code to inspect is org.jabref.gui.preferences.CitationKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_DELETE = "confirmDelete";
@@ -305,7 +303,6 @@ public class JabRefPreferences implements PreferencesService {
      * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
-    public static final String OO_PATH = "ooPath";
     public static final String OO_SHOW_PANEL = "showOOPanel";
     public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
@@ -424,7 +421,6 @@ public class JabRefPreferences implements PreferencesService {
     private OwnerPreferences ownerPreferences;
     private TimestampPreferences timestampPreferences;
 
-    private GlobalCitationKeyPattern globalCitationKeyPattern;
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
     private List<MainTableColumnModel> mainTableColumnSortOrder;
@@ -435,6 +431,7 @@ public class JabRefPreferences implements PreferencesService {
     private String userName;
 
     private PreviewPreferences previewPreferences;
+    private OpenOfficePreferences openOfficePreferences;
     private SidePanePreferences sidePanePreferences;
     private AppearancePreferences appearancePreferences;
     private ImporterPreferences importerPreferences;
@@ -451,6 +448,7 @@ public class JabRefPreferences implements PreferencesService {
     private AutoLinkPreferences autoLinkPreferences;
     private ImportExportPreferences importExportPreferences;
     private NameFormatterPreferences nameFormatterPreferences;
+    private BibEntryPreferences bibEntryPreferences;
     private InternalPreferences internalPreferences;
     private SpecialFieldsPreferences specialFieldsPreferences;
     private GroupsPreferences groupsPreferences;
@@ -459,6 +457,7 @@ public class JabRefPreferences implements PreferencesService {
     private CleanupPreferences cleanupPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
     private ExternalApplicationsPreferences externalApplicationsPreferences;
+    private CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -620,13 +619,10 @@ public class JabRefPreferences implements PreferencesService {
 
         // OpenOffice/LibreOffice
         if (OS.WINDOWS) {
-            defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
         } else if (OS.OS_X) {
-            defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);
         } else { // Linux
-            defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
         }
 
@@ -749,7 +745,6 @@ public class JabRefPreferences implements PreferencesService {
 
         // set default theme
         defaults.put(FX_THEME, Theme.BASE_CSS);
-
         setLanguageDependentDefaultValues();
     }
 
@@ -781,8 +776,8 @@ public class JabRefPreferences implements PreferencesService {
             while ((rs = getNextUnit(reader)).isPresent()) {
                 result.add(rs.get());
             }
-        } catch (IOException ignored) {
-            // Ignored
+        } catch (IOException e) {
+            LOGGER.warn("Unable to convert String to List", e);
         }
         return result;
     }
@@ -1140,27 +1135,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public OpenOfficePreferences getOpenOfficePreferences() {
-        return new OpenOfficePreferences(
-                get(OO_EXECUTABLE_PATH),
-                get(OO_PATH),
-                getBoolean(OO_USE_ALL_OPEN_BASES),
-                getBoolean(OO_SYNC_WHEN_CITING),
-                getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE));
-    }
-
-    @Override
-    public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
-        put(OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
-        put(OO_PATH, openOfficePreferences.getInstallationPath());
-        putBoolean(OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
-        putBoolean(OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
-        putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
-        put(OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
-    }
-
-    @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), StandardCharsets.UTF_8, getBoolean(USE_AMS_FJOURNAL));
     }
@@ -1187,12 +1161,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public String getPreviewStyle() {
         return get(PREVIEW_STYLE);
-    }
-
-    @Override
-    @Deprecated
-    public String getDefaultsDefaultCitationKeyPattern() {
-        return (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN);
     }
 
     //*************************************************************************************************************
@@ -1261,6 +1229,29 @@ public class JabRefPreferences implements PreferencesService {
         } catch (BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
         }
+    }
+
+    @Override
+    public OpenOfficePreferences getOpenOfficePreferences() {
+        if (Objects.nonNull(openOfficePreferences)) {
+            return openOfficePreferences;
+        }
+
+        openOfficePreferences = new OpenOfficePreferences(
+                get(OO_EXECUTABLE_PATH),
+                getBoolean(OO_USE_ALL_OPEN_BASES),
+                getBoolean(OO_SYNC_WHEN_CITING),
+                getStringList(OO_EXTERNAL_STYLE_FILES),
+                get(OO_BIBLIOGRAPHY_STYLE_FILE));
+
+        EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
+        EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
+        EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (obs, oldValue, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
+        openOfficePreferences.getExternalStyles().addListener((InvalidationListener) change ->
+                putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles()));
+        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
+
+        return openOfficePreferences;
     }
 
     //*************************************************************************************************************
@@ -1399,8 +1390,7 @@ public class JabRefPreferences implements PreferencesService {
         groupsPreferences = new GroupsPreferences(
                 GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE)),
                 getBoolean(AUTO_ASSIGN_GROUP),
-                getBoolean(DISPLAY_GROUP_COUNT),
-                getInternalPreferences().keywordSeparatorProperty()
+                getBoolean(DISPLAY_GROUP_COUNT)
         );
 
         EasyBind.listen(groupsPreferences.groupViewModeProperty(), (obs, oldValue, newValue) -> put(GROUP_INTERSECT_UNION_VIEW_MODE, newValue.name()));
@@ -1610,60 +1600,41 @@ public class JabRefPreferences implements PreferencesService {
     // CitationKeyPatternPreferences
     //*************************************************************************************************************
 
-    /**
-     * Creates the GlobalCitationKeyPattern from cache
-     *
-     * @return GlobalCitationKeyPattern containing all keys without a parent AbstractCitationKeyPattern
-     */
-    @Override
-    public GlobalCitationKeyPattern getGlobalCitationKeyPattern() {
-        if (this.globalCitationKeyPattern == null) {
-            updateGlobalCitationKeyPattern();
-        }
-        return this.globalCitationKeyPattern;
-    }
-
-    /**
-     * Reloads the GlobalCitationKeyPattern from scratch to cache
-     */
-    @Override
-    public void updateGlobalCitationKeyPattern() {
-        this.globalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
+    private GlobalCitationKeyPattern getGlobalCitationKeyPattern() {
+        GlobalCitationKeyPattern citationKeyPattern = GlobalCitationKeyPattern.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
             if (keys.length > 0) {
                 for (String key : keys) {
-                    this.globalCitationKeyPattern.addCitationKeyPattern(
+                    citationKeyPattern.addCitationKeyPattern(
                             EntryTypeFactory.parse(key),
                             preferences.get(key, null));
                 }
             }
-        } catch (BackingStoreException ex) {
+        } catch (
+                BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
+
+        return citationKeyPattern;
     }
 
-    /**
-     * Stores the given key pattern in the preferences
-     *
-     * @param pattern the pattern to store
-     */
+    // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPattern pattern) {
-        this.globalCitationKeyPattern = pattern;
-
-        if ((this.globalCitationKeyPattern.getDefaultValue() == null)
-                || this.globalCitationKeyPattern.getDefaultValue().isEmpty()) {
+        if ((pattern.getDefaultValue() == null)
+                || pattern.getDefaultValue().isEmpty()) {
             put(DEFAULT_CITATION_KEY_PATTERN, "");
         } else {
-            put(DEFAULT_CITATION_KEY_PATTERN, globalCitationKeyPattern.getDefaultValue().get(0));
+            put(DEFAULT_CITATION_KEY_PATTERN, pattern.getDefaultValue().get(0));
         }
 
         // Store overridden definitions to Preferences.
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
-        } catch (BackingStoreException ex) {
+        } catch (
+                BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences::putKeyPattern", ex);
         }
 
@@ -1673,28 +1644,29 @@ public class JabRefPreferences implements PreferencesService {
                 preferences.put(entryType.getName(), pattern.getValue(entryType).get(0));
             }
         }
-
-        updateGlobalCitationKeyPattern();
     }
 
     private void clearCitationKeyPatterns() throws BackingStoreException {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
-        updateGlobalCitationKeyPattern();
+        getCitationKeyPatternPreferences().setKeyPattern(getGlobalCitationKeyPattern());
     }
 
     @Override
     public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
+        if (Objects.nonNull(citationKeyPatternPreferences)) {
+            return citationKeyPatternPreferences;
+        }
+
         CitationKeyPatternPreferences.KeySuffix keySuffix =
                 CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
-
         if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {
             keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;
         } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {
             keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
         }
 
-        return new CitationKeyPatternPreferences(
+        citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 getBoolean(AVOID_OVERWRITING_KEY),
                 getBoolean(WARN_BEFORE_OVERWRITING_KEY),
                 getBoolean(GENERATE_KEYS_BEFORE_SAVING),
@@ -1703,35 +1675,42 @@ public class JabRefPreferences implements PreferencesService {
                 get(KEY_PATTERN_REPLACEMENT),
                 get(UNWANTED_CITATION_KEY_CHARACTERS),
                 getGlobalCitationKeyPattern(),
-                getKeywordDelimiter());
-    }
+                (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN),
+                getBibEntryPreferences().keywordSeparatorProperty());
 
-    @Override
-    public void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences) {
-        putBoolean(AVOID_OVERWRITING_KEY, preferences.shouldAvoidOverwriteCiteKey());
-        putBoolean(WARN_BEFORE_OVERWRITING_KEY, preferences.shouldWarnBeforeOverwriteCiteKey());
-        putBoolean(GENERATE_KEYS_BEFORE_SAVING, preferences.shouldGenerateCiteKeysBeforeSaving());
+        EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
+                (obs, oldValue, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
+                (obs, oldValue, newValue) -> putBoolean(WARN_BEFORE_OVERWRITING_KEY, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
+                (obs, oldValue, newValue) -> putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (obs, oldValue, newValue) -> {
+                    switch (newValue) {
+                        case ALWAYS -> {
+                            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, true);
+                            putBoolean(KEY_GEN_FIRST_LETTER_A, false);
+                        }
+                        case SECOND_WITH_A -> {
+                            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
+                            putBoolean(KEY_GEN_FIRST_LETTER_A, true);
+                        }
+                        case SECOND_WITH_B -> {
+                            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
+                            putBoolean(KEY_GEN_FIRST_LETTER_A, false);
+                        }
+                    }
+                }
+        );
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
+                (obs, oldValue, newValue) -> put(KEY_PATTERN_REGEX, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
+                (obs, oldValue, newValue) -> put(KEY_PATTERN_REPLACEMENT, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),
+                (obs, oldValue, newValue) -> put(UNWANTED_CITATION_KEY_CHARACTERS, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternProperty(),
+                (obs, oldValue, newValue) -> storeGlobalCitationKeyPattern(newValue));
 
-        switch (preferences.getKeySuffix()) {
-            case ALWAYS -> {
-                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, true);
-                putBoolean(KEY_GEN_FIRST_LETTER_A, false);
-            }
-            case SECOND_WITH_A -> {
-                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
-                putBoolean(KEY_GEN_FIRST_LETTER_A, true);
-            }
-            case SECOND_WITH_B -> {
-                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
-                putBoolean(KEY_GEN_FIRST_LETTER_A, false);
-            }
-        }
-
-        put(KEY_PATTERN_REGEX, preferences.getKeyPatternRegex());
-        put(KEY_PATTERN_REPLACEMENT, preferences.getKeyPatternReplacement());
-        put(UNWANTED_CITATION_KEY_CHARACTERS, preferences.getUnwantedCharacters());
-
-        storeGlobalCitationKeyPattern(preferences.getKeyPattern());
+        return citationKeyPatternPreferences;
     }
 
     //*************************************************************************************************************
@@ -2030,6 +2009,25 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
+    public BibEntryPreferences getBibEntryPreferences() {
+        if (Objects.nonNull(bibEntryPreferences)) {
+            return bibEntryPreferences;
+        }
+
+        bibEntryPreferences = new BibEntryPreferences(
+                get(KEYWORD_SEPARATOR).charAt(0)
+        );
+
+        EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), ((observable, oldValue, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue))));
+
+        return bibEntryPreferences;
+    }
+
+    //*************************************************************************************************************
+    // InternalPreferences
+    //*************************************************************************************************************
+
+    @Override
     public InternalPreferences getInternalPreferences() {
         if (Objects.nonNull(internalPreferences)) {
             return internalPreferences;
@@ -2037,12 +2035,10 @@ public class JabRefPreferences implements PreferencesService {
 
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
-                get(KEYWORD_SEPARATOR).charAt(0),
                 getUser()
         );
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(), (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
-        EasyBind.listen(internalPreferences.keywordSeparatorProperty(), ((observable, oldValue, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue))));
         // user is a static value, should only be changed for debugging
 
         return internalPreferences;
@@ -2060,11 +2056,6 @@ public class JabRefPreferences implements PreferencesService {
             LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible problem resolution", ex);
             return get(DEFAULT_OWNER);
         }
-    }
-
-    @Override
-    public Character getKeywordDelimiter() {
-        return getInternalPreferences().getKeywordSeparator();
     }
 
     //*************************************************************************************************************
@@ -2098,7 +2089,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
-                getKeywordDelimiter(),
+                getBibEntryPreferences(),
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
                 getXmpPreferences(),
@@ -2249,7 +2240,7 @@ public class JabRefPreferences implements PreferencesService {
                 citationKeyDependency,
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
                 getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
-                getKeywordDelimiter());
+                bibEntryPreferences.keywordSeparatorProperty());
 
         EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (obs, oldValue, newValue) -> {
             // Starts bibtex only omitted, as it is not being saved
@@ -2580,7 +2571,7 @@ public class JabRefPreferences implements PreferencesService {
             if (newValue != null) {
                 put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
             } else {
-                remove(LAST_EDITED);
+                remove(LAST_FOCUSED);
             }
         });
         guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
@@ -2655,7 +2646,7 @@ public class JabRefPreferences implements PreferencesService {
         xmpPreferences = new XmpPreferences(
                 getBoolean(USE_XMP_PRIVACY_FILTER),
                 getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getInternalPreferences().keywordSeparatorProperty());
+                getBibEntryPreferences().keywordSeparatorProperty());
 
         EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
                 (obs, oldValue, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));

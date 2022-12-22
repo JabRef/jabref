@@ -46,6 +46,8 @@ public class MetaDataSerializer {
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
         metaData.getLatexFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + "Latex-" + user, Collections.singletonList(path.toString().trim())));
+        metaData.getVersionDBStructure().ifPresent(
+                VersionDBStructure -> stringyMetaData.put(MetaData.VERSION_DB_STRUCT, Collections.singletonList(VersionDBStructure.trim())));
 
         for (ContentSelector selector : metaData.getContentSelectorList()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());
@@ -77,7 +79,11 @@ public class MetaDataSerializer {
         for (Map.Entry<String, List<String>> metaItem : stringyMetaData.entrySet()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (String dataItem : metaItem.getValue()) {
-                stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER)).append(MetaData.SEPARATOR_STRING);
+                if (!metaItem.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
+                    stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER)).append(MetaData.SEPARATOR_STRING);
+                } else {
+                    stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER));
+                }
 
                 // in case of save actions, add an additional newline after the enabled flag
                 if (metaItem.getKey().equals(MetaData.SAVE_ACTIONS)

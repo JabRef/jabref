@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -200,5 +201,15 @@ public class StateManager {
 
     public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
         lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
+    }
+
+    public List<String> collectAllDatabasePaths() {
+        List<String> list = new ArrayList<>();
+        getOpenDatabases().stream()
+                          .map(BibDatabaseContext::getDatabasePath)
+                          .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                  path -> list.add(path.toAbsolutePath().toString()),
+                                  () -> list.add("")));
+        return list;
     }
 }

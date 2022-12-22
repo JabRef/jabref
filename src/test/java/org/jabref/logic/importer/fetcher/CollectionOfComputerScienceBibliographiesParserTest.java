@@ -39,7 +39,7 @@ public class CollectionOfComputerScienceBibliographiesParserTest {
 
     private void parseXmlAndCheckResults(String xmlName, List<String> resourceNames) throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         InputStream is = CollectionOfComputerScienceBibliographiesParserTest.class.getResourceAsStream(xmlName);
         CollectionOfComputerScienceBibliographiesParser parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences);

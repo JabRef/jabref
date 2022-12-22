@@ -7,6 +7,7 @@ import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.base.CaseFormat;
-import com.google.common.base.Charsets;
 import com.google.common.base.Enums;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -92,7 +92,7 @@ public class ACMPortalParser implements Parser {
         List<BibEntry> bibEntries = new ArrayList<>();
         CookieHandler.setDefault(new CookieManager());
         try (InputStream stream = new URLDownload(getUrlFromDoiList(doiList)).asInputStream()) {
-            String jsonString = new String((stream.readAllBytes()), Charsets.UTF_8);
+            String jsonString = new String((stream.readAllBytes()), StandardCharsets.UTF_8);
 
             JsonElement jsonElement = JsonParser.parseString(jsonString);
             if (jsonElement.isJsonObject()) {

@@ -5,10 +5,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.logic.shared.listener.PostgresSQLNotificationListener;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.metadata.MetaData;
 
 import org.postgresql.PGConnection;
 
@@ -18,6 +20,9 @@ import org.postgresql.PGConnection;
 public class PostgreSQLProcessor extends DBMSProcessor {
 
     private PostgresSQLNotificationListener listener;
+
+    private Integer VERSION_DB_STRUCT_DEFAULT = -1;
+    private Integer CURRENT_VERSION_DB_STRUCT = 1;
 
     public PostgreSQLProcessor(DatabaseConnection connection) {
         super(connection);
@@ -30,29 +35,65 @@ public class PostgreSQLProcessor extends DBMSProcessor {
      */
     @Override
     public void setUp() throws SQLException {
+        
+        if (CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
+            // checkTableAvailability does not distinguish if same table name exists in different schemas
+            // VERSION_DB_STRUCT_DEFAULT must be forced
+            VERSION_DB_STRUCT_DEFAULT = 0;
+        }
+
+        connection.createStatement().executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
+
         connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS \"ENTRY\" (" +
+                "CREATE TABLE IF NOT EXISTS " + escape_Table("ENTRY") + " (" +
                         "\"SHARED_ID\" SERIAL PRIMARY KEY, " +
                         "\"TYPE\" VARCHAR, " +
                         "\"VERSION\" INTEGER DEFAULT 1)");
 
         connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS \"FIELD\" (" +
-                        "\"ENTRY_SHARED_ID\" INTEGER REFERENCES \"ENTRY\"(\"SHARED_ID\") ON DELETE CASCADE, " +
+                "CREATE TABLE IF NOT EXISTS " + escape_Table("FIELD") + " (" +
+                        "\"ENTRY_SHARED_ID\" INTEGER REFERENCES " + escape_Table("ENTRY") + "(\"SHARED_ID\") ON DELETE CASCADE, " +
                         "\"NAME\" VARCHAR, " +
                         "\"VALUE\" TEXT)");
 
         connection.createStatement().executeUpdate(
-                "CREATE TABLE IF NOT EXISTS \"METADATA\" ("
+                "CREATE TABLE IF NOT EXISTS " + escape_Table("METADATA") + " ("
                         + "\"KEY\" VARCHAR,"
                         + "\"VALUE\" TEXT)");
+
+        Map<String, String> metadata = getSharedMetaData();
+
+        if (metadata.get(MetaData.VERSION_DB_STRUCT) != null) {
+            try {
+                VERSION_DB_STRUCT_DEFAULT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
+            } catch (Exception e) {
+                LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Integer!");
+            }
+        } else {
+            LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Exist!");
+        }
+
+        if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
+            // We can to migrate from old table in new table
+            if (VERSION_DB_STRUCT_DEFAULT == 0 && CURRENT_VERSION_DB_STRUCT == 1) {
+                LOGGER.info("Migrating from VersionDBStructure == 0");
+                connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM \"ENTRY\"");
+                connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM \"FIELD\"");
+                connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA") + " SELECT * FROM \"METADATA\"");
+                connection.createStatement().execute("SELECT setval(\'jabref.\"ENTRY_SHARED_ID_seq\"\', (select max(\"SHARED_ID\") from jabref.\"ENTRY\"))");
+                metadata = getSharedMetaData();
+            }
+
+            metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
+            setSharedMetaData(metadata);
+        }
     }
 
     @Override
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
         StringBuilder insertIntoEntryQuery = new StringBuilder()
                 .append("INSERT INTO ")
-                .append(escape("ENTRY"))
+                .append(escape_Table("ENTRY"))
                 .append("(")
                 .append(escape("TYPE"))
                 .append(") VALUES(?)");
@@ -86,6 +127,16 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     String escape(String expression) {
         return "\"" + expression + "\"";
+    }
+
+    @Override
+    String escape_Table(String expression) {
+        return "jabref." + escape(expression);
+    }
+
+    @Override
+    Integer getCURRENT_VERSION_DB_STRUCT() {
+        return CURRENT_VERSION_DB_STRUCT;
     }
 
     @Override
