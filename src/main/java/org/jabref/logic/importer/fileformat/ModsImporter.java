@@ -81,7 +81,7 @@ public class ModsImporter extends Importer implements Parser {
     private JAXBContext context;
 
     public ModsImporter(ImportFormatPreferences importFormatPreferences) {
-        keywordSeparator = importFormatPreferences.getKeywordSeparator() + " ";
+        keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
     }
 
     @Override
@@ -179,7 +179,7 @@ public class ModsImporter extends Importer implements Parser {
             nameDefinition.ifPresent(name -> handleAuthorsInNamePart(name, authors, fields));
 
             originInfoDefinition.ifPresent(originInfo -> originInfo
-                    .getPlaceOrPublisherOrDateIssued().stream()
+                    .getPlaceOrPublisherOrDateIssued()
                     .forEach(element -> putPlaceOrPublisherOrDate(fields, element.getName().getLocalPart(),
                             element.getValue())));
 
@@ -229,7 +229,7 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseIdentifier(Map<Field, String> fields, IdentifierDefinition identifier, BibEntry entry) {
         String type = identifier.getType();
-        if ("citekey".equals(type) && !entry.getCitationKey().isPresent()) {
+        if ("citekey".equals(type) && entry.getCitationKey().isEmpty()) {
             entry.setCitationKey(identifier.getValue());
         } else if (!"local".equals(type) && !"citekey".equals(type)) {
             // put all identifiers (doi, issn, isbn,...) except of local and citekey
@@ -381,8 +381,8 @@ public class ModsImporter extends Importer implements Parser {
 
         List<String> places = new ArrayList<>();
         placeDefinition
-                .ifPresent(place -> place.getPlaceTerm().stream().filter(placeTerm -> placeTerm.getValue() != null)
-                                         .map(PlaceTermDefinition::getValue).forEach(element -> places.add(element)));
+                .ifPresent(place -> place.getPlaceTerm().stream().map(PlaceTermDefinition::getValue)
+                                         .filter(Objects::nonNull).forEach(places::add));
         putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
 
         dateDefinition.ifPresent(date -> putDate(fields, elementName, date));

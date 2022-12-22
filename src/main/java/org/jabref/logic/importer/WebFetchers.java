@@ -186,7 +186,7 @@ public class WebFetchers {
         Set<FulltextFetcher> fetchers = new HashSet<>();
 
         // Original
-        fetchers.add(new DoiResolution(importFormatPreferences.getDoiPreferences()));
+        fetchers.add(new DoiResolution(importFormatPreferences.doiPreferences()));
 
         // Publishers
         fetchers.add(new ScienceDirect(importerPreferences));

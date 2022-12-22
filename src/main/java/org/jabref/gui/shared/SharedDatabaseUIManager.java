@@ -140,7 +140,7 @@ public class SharedDatabaseUIManager {
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(
                 bibDatabaseContext,
                 preferencesService.getBibEntryPreferences().getKeywordSeparator(),
-                preferencesService.getGlobalCitationKeyPattern(),
+                preferencesService.getCitationKeyPatternPreferences().getKeyPattern(),
                 Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
@@ -169,7 +169,7 @@ public class SharedDatabaseUIManager {
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(
                 bibDatabaseContext,
                 preferencesService.getBibEntryPreferences().getKeywordSeparator(),
-                preferencesService.getGlobalCitationKeyPattern(),
+                preferencesService.getCitationKeyPatternPreferences().getKeyPattern(),
                 Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 

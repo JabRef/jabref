@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added a dropdown menu to let users change the library they want to import into during import.[#6177](https://github.com/JabRef/jabref/issues/6177)
 
 
 
@@ -19,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We changed database structure: in MySQL/MariaDB we renamed tables by adding a `JABREF_` prefix, and in PGSQL we moved tables in `jabref` schema. We added `VersionDBStructure` variable in `METADATA` table to indicate current version of structure, this variable is needed for automatic migration [#9312](https://github.com/JabRef/jabref/issues/9312)
 - We moved some preferences options to a new tab in the preferences dialog. [#9442](https://github.com/JabRef/jabref/pull/9308)
+- Get full text button nows checks the file url.[#568](https://github.com/koppor/jabref/issues/568)
 
 
 
@@ -27,8 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Fixed
 
 - The tab "deprecated fields" is shown in biblatex-mode only. [#7757](https://github.com/JabRef/jabref/issues/7757)
-- We fixed an issue when press get full text button should check file url.[#568](https://github.com/koppor/jabref/issues/568)
-
+- We fixed an issue where the last opened libraries were not remembered when a new unsaved libray was open as well [#9190](https://github.com/JabRef/jabref/issues/9190)
 
 
 ### Removed

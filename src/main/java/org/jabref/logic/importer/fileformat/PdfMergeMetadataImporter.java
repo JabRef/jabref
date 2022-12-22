@@ -46,10 +46,10 @@ public class PdfMergeMetadataImporter extends Importer {
         this.metadataImporters = new ArrayList<>();
         this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importFormatPreferences.getGrobidPreferences().isGrobidEnabled()) {
+        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             this.metadataImporters.add(new PdfGrobidImporter(importFormatPreferences));
         }
-        this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
+        this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         this.metadataImporters.add(new PdfContentImporter(importFormatPreferences));
     }
 
