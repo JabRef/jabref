@@ -104,10 +104,7 @@ public class ExportCommand extends SimpleCommand {
                                   .orElse(Collections.emptyList());
         }
 
-        // Set the global variable for this database's file directory before exporting,
-        // so formatters can resolve linked files correctly.
-        // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = stateManager.getActiveDatabase()
+        List<Path> fileDirForDatabase = stateManager.getActiveDatabase()
                                                        .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
                                                        .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
@@ -122,7 +119,8 @@ public class ExportCommand extends SimpleCommand {
                 .wrap(() -> {
                     format.export(stateManager.getActiveDatabase().get(),
                             file,
-                            finEntries);
+                            finEntries,
+                            fileDirForDatabase);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {

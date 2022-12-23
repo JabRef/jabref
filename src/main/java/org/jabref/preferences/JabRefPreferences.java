@@ -81,7 +81,6 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
-import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
@@ -402,13 +401,6 @@ public class JabRefPreferences implements PreferencesService {
      * HashMap that contains all preferences which are set by default
      */
     public final Map<String, Object> defaults = new HashMap<>();
-
-    // The following field is used as a global variable during the export of a database.
-    // By setting this field to the path of the database's default file directory, formatters
-    // that should resolve external file paths can access this field. This is an ugly hack
-    // to solve the problem of formatters not having access to any context except for the
-    // string to be formatted and possible formatter arguments.
-    public List<Path> fileDirForDatabase;
 
     private final Preferences prefs;
 
@@ -1114,22 +1106,10 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public FileLinkPreferences getFileLinkPreferences() {
-        return new FileLinkPreferences(
-                getFilePreferences().mainFileDirectoryProperty().get(),
-                fileDirForDatabase);
-    }
-
-    @Override
-    public void storeFileDirForDatabase(List<Path> dirs) {
-        this.fileDirForDatabase = dirs;
-    }
-
-    @Override
     public LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository) {
         return new LayoutFormatterPreferences(
                 getNameFormatterPreferences(),
-                getFileLinkPreferences(),
+                getFilePreferences().mainFileDirectoryProperty(),
                 repository);
     }
 
@@ -1406,7 +1386,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Creates a list of defined tabs in the entry editor from cache
      *
-     * @return a list of defined tabs
+     * @return a map of defined tabs and associated fields
      */
     private Map<String, Set<Field>> getEntryEditorTabList() {
         if (entryEditorTabList == null) {
@@ -1603,12 +1583,10 @@ public class JabRefPreferences implements PreferencesService {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
-            if (keys.length > 0) {
-                for (String key : keys) {
-                    citationKeyPattern.addCitationKeyPattern(
-                            EntryTypeFactory.parse(key),
-                            preferences.get(key, null));
-                }
+            for (String key : keys) {
+                citationKeyPattern.addCitationKeyPattern(
+                        EntryTypeFactory.parse(key),
+                        preferences.get(key, null));
             }
         } catch (
                 BackingStoreException ex) {

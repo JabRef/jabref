@@ -26,7 +26,6 @@ import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
@@ -193,10 +192,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     AutoLinkPreferences getAutoLinkPreferences();
-
-    FileLinkPreferences getFileLinkPreferences();
-
-    void storeFileDirForDatabase(List<Path> dirs);
 
     //*************************************************************************************************************
     // Import/Export preferences

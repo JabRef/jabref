@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 
-import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -31,12 +31,16 @@ class LayoutTest {
         layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
-    private String layout(String layout, BibEntry entry) throws IOException {
+    private String layout(String layout, List<Path> fileDirForDatabase, BibEntry entry) throws IOException {
         StringReader layoutStringReader = new StringReader(layout.replace("__NEWLINE__", "\n"));
 
-        return new LayoutHelper(layoutStringReader, layoutFormatterPreferences)
+        return new LayoutHelper(layoutStringReader, fileDirForDatabase, layoutFormatterPreferences)
                 .getLayoutFromText()
                 .doLayout(entry, null);
+    }
+
+    private String layout(String layout, BibEntry entry) throws IOException {
+        return layout(layout, Collections.emptyList(), entry);
     }
 
     @Test
@@ -134,12 +138,13 @@ class LayoutTest {
      */
     @Test
     void wrapFileLinksExpandFile() throws IOException {
-        when(layoutFormatterPreferences.getFileLinkPreferences()).thenReturn(
-                new FileLinkPreferences("", Collections.singletonList(Path.of("src/test/resources/pdfs/"))));
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.addFile(new LinkedFile("Test file", Path.of("encrypted.pdf"), "PDF"));
 
-        String layoutText = layout("\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}", entry);
+        String layoutText = layout(
+                "\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}",
+                Collections.singletonList(Path.of("src/test/resources/pdfs/")),
+                entry);
 
         assertEquals(
                 "1. Test file (" + new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath() + ")",

@@ -102,12 +102,9 @@ public class ExportToClipboardAction extends SimpleCommand {
     }
 
     private ExportResult exportToClipboard(Exporter exporter) throws Exception {
-        // Set the global variable for this database's file directory before exporting,
-        // so formatters can resolve linked files correctly.
-        // (This is an ugly hack!)
-        preferences.storeFileDirForDatabase(stateManager.getActiveDatabase()
-                                                        .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
-                                                        .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory())));
+        List<Path> fileDirForDatabase = stateManager.getActiveDatabase()
+                                                    .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
+                                                    .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
         // Add chosen export type to last used preference, to become default
         preferences.getImportExportPreferences().setLastExportExtension(exporter.getName());
@@ -121,7 +118,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             entries.addAll(stateManager.getSelectedEntries());
 
             // Write to file:
-            exporter.export(stateManager.getActiveDatabase().get(), tmp, entries);
+            exporter.export(stateManager.getActiveDatabase().get(), tmp, entries, fileDirForDatabase);
             // Read the file and put the contents on the clipboard:
 
             return new ExportResult(Files.readString(tmp), exporter.getFileType());

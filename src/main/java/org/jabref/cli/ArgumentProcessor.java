@@ -413,7 +413,7 @@ public class ArgumentProcessor {
                 // We have an TemplateExporter instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    exporter.get().export(databaseContext, Path.of(data[1]), matches);
+                    exporter.get().export(databaseContext, Path.of(data[1]), matches, Collections.emptyList());
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
                             + Throwables.getStackTraceAsString(ex));
@@ -568,13 +568,10 @@ public class ArgumentProcessor {
             // format to the given file.
             ParserResult pr = loaded.get(loaded.size() - 1);
 
-            // Set the global variable for this database's file directory before exporting,
-            // so formatters can resolve linked files correctly.
-            // (This is an ugly hack!)
             Path path = pr.getPath().get().toAbsolutePath();
             BibDatabaseContext databaseContext = pr.getDatabaseContext();
             databaseContext.setDatabasePath(path);
-            Globals.prefs.fileDirForDatabase = databaseContext
+            List<Path> fileDirForDatabase = databaseContext
                     .getFileDirectories(preferencesService.getFilePreferences());
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
             ExporterFactory exporterFactory = ExporterFactory.create(
@@ -587,8 +584,11 @@ public class ArgumentProcessor {
             } else {
                 // We have an exporter:
                 try {
-                    exporter.get().export(pr.getDatabaseContext(), Path.of(data[0]),
-                            pr.getDatabaseContext().getDatabase().getEntries());
+                    exporter.get().export(
+                            pr.getDatabaseContext(),
+                            Path.of(data[0]),
+                            pr.getDatabaseContext().getDatabase().getEntries(),
+                            fileDirForDatabase);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                             + Throwables.getStackTraceAsString(ex));
