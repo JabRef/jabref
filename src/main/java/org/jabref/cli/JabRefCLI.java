@@ -17,7 +17,6 @@ import org.apache.commons.cli.ParseException;
 
 public class JabRefCLI {
     private static final int WIDTH = 100; // Number of characters per line before a line break must be added.
-    private static final int WRAPPED_FIRST_LINE_SUBTRACTION = 20;
     private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
 
     private final CommandLine cl;
@@ -292,16 +291,16 @@ public class JabRefCLI {
     public static void printUsage(PreferencesService preferencesService) {
         String header = "";
 
+        String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
+        String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
+
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferencesService,
                 Globals.entryTypesManager,
                 Globals.journalAbbreviationRepository);
-        String outFormats = wrapStringList(exporterFactory.getExporters().stream().map(Exporter::getId).toList());
-
-        String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
-        String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
-
-        String outFormatsList = String.format("%s: %s%n", Localization.lang("Available export formats"), outFormats);
+        String outFormatsIntro = Localization.lang("Available export formats");
+        String outFormats = wrapStringList(exporterFactory.getExporters().stream().map(Exporter::getId).toList(), outFormatsIntro.length());
+        String outFormatsList = String.format("%s: %s%n", outFormatsIntro, outFormats);
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
@@ -320,9 +319,9 @@ public class JabRefCLI {
     /**
      * Creates and wraps a multi-line and colon-seperated string from a List of Strings.
      */
-    private static String wrapStringList(List<String> list) {
+    protected static String wrapStringList(List<String> list, int firstLineIntroLength) {
         StringBuilder builder = new StringBuilder();
-        int lastBreak = -WRAPPED_FIRST_LINE_SUBTRACTION;
+        int lastBreak = -firstLineIntroLength;
 
         for (String line : list) {
             if (((builder.length() + 2 + line.length()) - lastBreak) > WIDTH) {
