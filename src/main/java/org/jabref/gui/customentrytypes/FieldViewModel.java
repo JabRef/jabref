@@ -10,6 +10,9 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.FieldProperty;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 public class FieldViewModel {
 
@@ -25,6 +28,14 @@ public class FieldViewModel {
         this.fieldType = new SimpleObjectProperty<>(fieldType);
         this.fieldPriority = fieldPriority;
         this.multiline.setValue(multiline);
+
+        EasyBind.subscribe(this.multiline, multi -> {
+            if (multi) {
+                this.field.getProperties().add(FieldProperty.MULTILINE_TEXT);
+            } else {
+                this.field.getProperties().remove(FieldProperty.MULTILINE_TEXT);
+            }
+        });
     }
 
     public FieldViewModel(Field field, boolean required, FieldPriority fieldPriority, boolean multiline) {
@@ -56,6 +67,7 @@ public class FieldViewModel {
     }
 
     public BooleanProperty multiline() {
+        // TODO: move to properties
         return this.multiline;
     }
 

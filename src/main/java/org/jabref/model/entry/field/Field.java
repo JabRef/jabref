@@ -39,4 +39,5 @@ public interface Field {
     default boolean isMultiLineDefined() {
         return getProperties().contains(FieldProperty.MULTILINE_TEXT);
     }
+    
 }

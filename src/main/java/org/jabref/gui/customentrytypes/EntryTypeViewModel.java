@@ -19,7 +19,7 @@ public class EntryTypeViewModel {
     public EntryTypeViewModel(BibEntryType entryType) {
         this.entryType.set(entryType);
 
-        List<FieldViewModel> allFieldsForType = entryType.getAllBibFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority(), false)).collect(Collectors.toList());
+        List<FieldViewModel> allFieldsForType = entryType.getAllBibFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority(), bibField.getField().isMultiLineDefined())).collect(Collectors.toList());
         fields = FXCollections.observableArrayList((allFieldsForType));
     }
 
