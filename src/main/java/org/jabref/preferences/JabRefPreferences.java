@@ -864,7 +864,6 @@ public class JabRefPreferences implements PreferencesService {
         return prefs.get(key, def);
     }
 
-
     public boolean getBoolean(String key) {
         return prefs.getBoolean(key, getBooleanDefault(key));
     }
@@ -2155,13 +2154,6 @@ public class JabRefPreferences implements PreferencesService {
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(
                 getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
-    }
-
-
-    public void setNonWrappableFields(String newFieldName){
-        String oldfield = get(NON_WRAPPABLE_FIELDS);
-        String newField = oldfield + ";" + newFieldName;
-        prefs.put(NON_WRAPPABLE_FIELDS,newField);
     }
 
     @Override

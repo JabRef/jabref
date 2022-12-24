@@ -12,7 +12,6 @@ public interface Field {
      * for instance a dropdown for selecting the month for the month field.
      */
     Set<FieldProperty> getProperties();
-
     /**
      * @return A version of the field name more suitable for display
      */
@@ -39,5 +38,4 @@ public interface Field {
     default boolean isMultiLineDefined() {
         return getProperties().contains(FieldProperty.MULTILINE_TEXT);
     }
-    
 }

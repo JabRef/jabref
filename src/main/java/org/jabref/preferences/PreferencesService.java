@@ -63,8 +63,6 @@ public interface PreferencesService {
 
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
-    void setNonWrappableFields(String newFieldGroup);
-
     OpenOfficePreferences getOpenOfficePreferences();
 
     Map<String, Object> getPreferences();
