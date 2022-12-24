@@ -248,24 +248,8 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
     @FXML
     void addNewField() {
-        defineMultiline();
+        viewModel.addNewField();
     }
-
-
-    private void defineMultiline(){
-        boolean addMultiline = dialogService.showConfirmationDialogAndWait(
-                                            Localization.lang("Config your new Entry"),
-                                            Localization.lang("Would you like to add this entry as multiline field(Click cancel will save as single line field)"),
-                                            Localization.lang("Yes"));
-        if (addMultiline){
-            viewModel.addNewField(Boolean.TRUE);
-        }
-        else{
-            viewModel.addNewField(Boolean.FALSE);
-        }
-    }
-
-
 
     private void resetEntryTypes() {
         boolean reset = dialogService.showConfirmationDialogAndWait(

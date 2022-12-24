@@ -67,7 +67,6 @@ public class FieldViewModel {
     }
 
     public BooleanProperty multiline() {
-        // TODO: move to properties
         return this.multiline;
     }
 
