@@ -141,6 +141,6 @@ class JabRefCLITest {
                 listrefs, tablerefsabsbib, harvard, iso690rtf, iso690txt, endnote, oocsv, ris, misq, yaml, bibtexml,
                 oocalc, ods, MSBib, mods, xmp, pdf, bib""";
 
-        assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given,26));
+        assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given, 26));
     }
 }
