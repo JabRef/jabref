@@ -87,32 +87,6 @@ public class ExporterFactory {
     }
 
     /**
-     * Build a string listing of all available exporters.
-     *
-     * @param maxLineLength The max line length before a line break must be added.
-     * @param linePrefix    If a line break is added, this prefix will be inserted at the beginning of the next line.
-     * @return The string describing available exporters.
-     */
-    public String getExportersAsString(int maxLineLength, int firstLineSubtraction, String linePrefix) {
-        StringBuilder builder = new StringBuilder();
-        int lastBreak = -firstLineSubtraction;
-
-        for (Exporter exporter : exporters) {
-            String name = exporter.getId();
-            if (((builder.length() + 2 + name.length()) - lastBreak) > maxLineLength) {
-                builder.append(",\n");
-                lastBreak = builder.length();
-                builder.append(linePrefix);
-            } else if (builder.length() > 0) {
-                builder.append(", ");
-            }
-            builder.append(name);
-        }
-
-        return builder.toString();
-    }
-
-    /**
      * Get a list of all exporters.
      *
      * @return A list containing all exporters

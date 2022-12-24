@@ -185,11 +185,7 @@ public class ArgumentProcessor {
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
-            ExporterFactory exporterFactory = ExporterFactory.create(
-                    preferencesService,
-                    Globals.entryTypesManager,
-                    Globals.journalAbbreviationRepository);
-            JabRefCLI.printUsage(exporterFactory.getExportersAsString(70, 20, ""));
+            JabRefCLI.printUsage(preferencesService);
             noGUINeeded = true;
             return Collections.emptyList();
         }

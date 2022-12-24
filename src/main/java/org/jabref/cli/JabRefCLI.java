@@ -3,7 +3,10 @@ package org.jabref.cli;
 import java.util.List;
 
 import org.jabref.gui.Globals;
+import org.jabref.logic.exporter.Exporter;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -11,13 +14,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JabRefCLI {
+    private static final int WIDTH = 100; // Number of characters per line before a line break must be added.
+    private static final int WRAPPED_FIRST_LINE_SUBTRACTION = 20;
+    private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
 
-    private static final int WIDTH = 100; // Number of characters per line
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCLI.class);
     private final CommandLine cl;
     private final List<String> leftOver;
 
@@ -45,10 +47,6 @@ public class JabRefCLI {
 
     public boolean isBlank() {
         return cl.hasOption("blank");
-    }
-
-    public boolean isLoadSession() {
-        return cl.hasOption("loads");
     }
 
     public boolean isDisableGui() {
@@ -291,8 +289,14 @@ public class JabRefCLI {
         System.out.println(getVersionInfo());
     }
 
-    public static void printUsage(String outFormats) {
+    public static void printUsage(PreferencesService preferencesService) {
         String header = "";
+
+        ExporterFactory exporterFactory = ExporterFactory.create(
+                preferencesService,
+                Globals.entryTypesManager,
+                Globals.journalAbbreviationRepository);
+        String outFormats = wrapStringList(exporterFactory.getExporters().stream().map(Exporter::getId).toList());
 
         String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
         String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
@@ -311,5 +315,26 @@ public class JabRefCLI {
 
     public List<String> getLeftOver() {
         return leftOver;
+    }
+
+    /**
+     * Creates and wraps a multi-line and colon-seperated string from a List of Strings.
+     */
+    private static String wrapStringList(List<String> list) {
+        StringBuilder builder = new StringBuilder();
+        int lastBreak = -WRAPPED_FIRST_LINE_SUBTRACTION;
+
+        for (String line : list) {
+            if (((builder.length() + 2 + line.length()) - lastBreak) > WIDTH) {
+                builder.append(",\n");
+                lastBreak = builder.length();
+                builder.append(WRAPPED_LINE_PREFIX);
+            } else if (builder.length() > 0) {
+                builder.append(", ");
+            }
+            builder.append(line);
+        }
+
+        return builder.toString();
     }
 }

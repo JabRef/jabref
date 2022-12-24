@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -78,11 +77,7 @@ public class Launcher {
                 MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
-                ExporterFactory exporterFactory = ExporterFactory.create(
-                        preferences,
-                        Globals.entryTypesManager,
-                        Globals.journalAbbreviationRepository);
-                JabRefCLI.printUsage(exporterFactory.getExportersAsString(70, 20, ""));
+                JabRefCLI.printUsage(preferences);
             }
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
