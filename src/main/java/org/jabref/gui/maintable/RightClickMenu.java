@@ -8,7 +8,6 @@ import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.SendAsEMailAction;
 import org.jabref.gui.StateManager;
@@ -116,7 +115,7 @@ public class RightClickMenu {
 
         copySpecialMenu.getItems().addAll(
                 new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, Globals.exportFactory, stateManager, clipBoardManager, taskExecutor, preferencesService)));
+                factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferencesService)));
 
         return copySpecialMenu;
     }
