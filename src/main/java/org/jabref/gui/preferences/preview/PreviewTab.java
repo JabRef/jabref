@@ -278,14 +278,14 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         viewModel.resetDefaultLayout();
     }
 
-    public void mouseClickedAvailable(MouseEvent event) {
+    ptivate void mouseClickedAvailable(MouseEvent event) {
         if (event.getClickCount() == 2) {
             viewModel.addToChosen();
             event.consume();
         }
     }
 
-    public void mouseClickedChosen(MouseEvent event) {
+    private void mouseClickedChosen(MouseEvent event) {
         if (event.getClickCount() == 2) {
             viewModel.removeFromChosen();
             event.consume();
