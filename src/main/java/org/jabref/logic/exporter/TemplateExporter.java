@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,8 +177,15 @@ public class TemplateExporter extends Exporter {
     }
 
     @Override
-    public void export(final BibDatabaseContext databaseContext, final Path file,
-                       List<BibEntry> entries) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
+        export(databaseContext, file, entries, Collections.emptyList());
+    }
+
+    @Override
+    public void export(final BibDatabaseContext databaseContext,
+                       final Path file,
+                       List<BibEntry> entries,
+                       List<Path> fileDirForDatabase) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 
@@ -198,7 +206,7 @@ public class TemplateExporter extends Exporter {
 
             // Print header
             try (Reader reader = getReader(lfFileName + BEGIN_INFIX + LAYOUT_EXTENSION)) {
-                LayoutHelper layoutHelper = new LayoutHelper(reader, layoutPreferences);
+                LayoutHelper layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences);
                 beginLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was cast, export filter doesn't have a begin
@@ -223,7 +231,7 @@ public class TemplateExporter extends Exporter {
             Layout defLayout;
             LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + LAYOUT_EXTENSION)) {
-                layoutHelper = new LayoutHelper(reader, layoutPreferences);
+                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences);
                 defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
@@ -245,7 +253,7 @@ public class TemplateExporter extends Exporter {
                 } else {
                     try (Reader reader = getReader(lfFileName + '.' + type.getName() + LAYOUT_EXTENSION)) {
                         // We try to get a type-specific layout for this entry.
-                        layoutHelper = new LayoutHelper(reader, layoutPreferences);
+                        layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences);
                         layout = layoutHelper.getLayoutFromText();
                         layouts.put(type, layout);
                         if (layout != null) {
@@ -275,10 +283,9 @@ public class TemplateExporter extends Exporter {
             }
 
             // Print footer
-            // changed section - begin (arudert)
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {
-                layoutHelper = new LayoutHelper(reader, layoutPreferences);
+                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences);
                 endLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was thrown, export filter doesn't have an end
@@ -295,9 +302,7 @@ public class TemplateExporter extends Exporter {
             layoutPreferences.clearCustomExportNameFormatters();
 
             if (!missingFormatters.isEmpty() && LOGGER.isWarnEnabled()) {
-                StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
-                sb.append(String.join(", ", missingFormatters));
-                LOGGER.warn("Formatters {} not found", sb.toString());
+                LOGGER.warn("Formatters {} not found", String.join(", ", missingFormatters));
             }
         }
     }

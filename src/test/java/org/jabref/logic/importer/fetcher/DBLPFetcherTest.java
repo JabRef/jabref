@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -14,10 +13,10 @@ import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @FetcherTest
 public class DBLPFetcherTest {
@@ -27,10 +26,7 @@ public class DBLPFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences())
-                .thenReturn(mock(FieldContentFormatterPreferences.class));
-        dblpFetcher = new DBLPFetcher(importFormatPreferences);
+        dblpFetcher = new DBLPFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
         entry = new BibEntry();
 
         entry.setType(StandardEntryType.Article);

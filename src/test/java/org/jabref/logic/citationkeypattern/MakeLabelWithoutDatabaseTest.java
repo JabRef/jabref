@@ -1,5 +1,10 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.util.Collections;
+
+import javafx.beans.property.SimpleObjectProperty;
+
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -10,30 +15,46 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MakeLabelWithoutDatabaseTest {
 
-    private BibEntry entry;
+    private CitationKeyGenerator citationKeyGenerator;
 
     @BeforeEach
     void setUp() {
-        entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "John Doe");
-        entry.setField(StandardField.YEAR, "2016");
-        entry.setField(StandardField.TITLE, "An awesome paper on JabRef");
+        GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
+        keyPattern.setDefaultValue("[auth]");
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
+                keyPattern,
+                "",
+                new SimpleObjectProperty<>(','));
+
+        citationKeyGenerator = new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences);
     }
 
     @Test
-    void makeLabelForFileSearch() {
-        String label = CitationKeyGenerator.generateKey(entry, "auth");
+    void makeAuthorLabelForFileSearch() {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "John Doe")
+        .withField(StandardField.YEAR, "2016")
+        .withField(StandardField.TITLE, "An awesome paper on JabRef");
+
+        String label = citationKeyGenerator.generateKey(entry);
         assertEquals("Doe", label);
     }
 
     @Test
     void makeEditorLabelForFileSearch() {
-        BibEntry localEntry = new BibEntry();
-        localEntry.setField(StandardField.EDITOR, "John Doe");
-        localEntry.setField(StandardField.YEAR, "2016");
-        localEntry.setField(StandardField.TITLE, "An awesome paper on JabRef");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.EDITOR, "John Doe")
+                .withField(StandardField.YEAR, "2016")
+                .withField(StandardField.TITLE, "An awesome paper on JabRef");
 
-        String label = CitationKeyGenerator.generateKey(localEntry, "auth");
+        String label = citationKeyGenerator.generateKey(entry);
         assertEquals("Doe", label);
     }
 }

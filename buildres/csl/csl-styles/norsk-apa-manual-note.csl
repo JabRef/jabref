@@ -163,8 +163,8 @@
               <if type="article-magazine article-newspaper broadcast interview motion_picture pamphlet personal_communication post post-weblog song speech webpage" match="any">
                 <!-- Many video and audio examples in manual give full dates. Err on the side of too much information. -->
                 <date variable="issued">
-                  <date-part prefix=", " name="month"/>
-                  <date-part prefix=" " name="day"/>
+                  <date-part prefix=", " name="day"/>
+                  <date-part prefix=". " name="month"/>
                 </date>
               </if>
               <else-if type="paper-conference">

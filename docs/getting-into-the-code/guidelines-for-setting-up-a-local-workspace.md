@@ -88,7 +88,7 @@ mkdir git-repositories
 cd git-reposiroties
 ```
 
-Note that using `c:\` and thus placing the folder `jabref` directly in the disk root directory may cause an error.
+**Note that putting the repo jabref directly under `C:\` or any other drive letter under windows causes compile errors**
 
 Run the respective `git clone` command:
 

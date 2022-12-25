@@ -73,10 +73,10 @@ public class ImportFormatReader {
         formats.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         formats.add(new PdfContentImporter(importFormatPreferences));
         formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importFormatPreferences.getGrobidPreferences().isGrobidEnabled()) {
+        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             formats.add(new PdfGrobidImporter(importFormatPreferences));
         }
-        formats.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
+        formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());

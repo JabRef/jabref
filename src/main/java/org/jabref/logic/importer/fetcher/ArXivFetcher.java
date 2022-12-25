@@ -148,7 +148,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 allKeywords = Optional.of(allKeywords.get().replaceAll(entry.getKey(), entry.getValue()));
             }
 
-            String filteredKeywords = KeywordList.merge(allKeywords.get(), "", importFormatPreferences.getKeywordSeparator()).toString();
+            String filteredKeywords = KeywordList.merge(
+                    allKeywords.get(),
+                    "",
+                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).toString();
             bibEntry.setField(StandardField.KEYWORDS, filteredKeywords);
         }
     }
@@ -596,9 +599,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
             ArXivQueryTransformer transformer = new ArXivQueryTransformer();
             String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
-            List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
-                                                                                        .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
-                                                                                        .collect(Collectors.toList());
+            List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber)
+                    .stream()
+                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                    .collect(Collectors.toList());
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
         }
 
@@ -624,7 +628,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         @Override
         public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
             return searchForEntryById(identifier)
-                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
+                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
         }
 
         @Override

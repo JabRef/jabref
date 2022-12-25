@@ -35,7 +35,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
             .withField(StandardField.DOI, "10.1145/2884781.2884806")
             .withField(StandardField.TITLE, "Overcoming Open Source Project Entry Barriers with a Portal for Newcomers")
             .withField(StandardField.URL, "https://www.semanticscholar.org/paper/4bea2b4029a895bf898701329409e5a784fc2090")
-            .withField(StandardField.VENUE, "2016 IEEE/ACM 38th International Conference on Software Engineering (ICSE)");
+            .withField(StandardField.VENUE, "International Conference on Software Engineering");
 
     private SemanticScholar fetcher;
     private BibEntry entry;
@@ -167,12 +167,19 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
                 .withField(StandardField.YEAR, "2018")
                 .withField(StandardField.DOI, "10.1007/978-3-030-02302-7_1")
                 .withField(StandardField.URL, "https://www.semanticscholar.org/paper/3bb026fd67db7d8e0e25de3189d6b7031b12783e")
-                .withField(StandardField.VENUE, "PoEM");
+                .withField(StandardField.VENUE, "The Practice of Enterprise Modeling");
 
         entry.withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns");
         BibEntry actual = fetcher.performSearch(entry).get(0);
         // Abstract should not be included in JabRef tests
         actual.clearField(StandardField.ABSTRACT);
         assertEquals(barrosEntry, actual);
+    }
+
+    @Test
+    @Override
+    @DisabledOnCIServer("Unstable on CI")
+    public void pageSearchReturnsUniqueResultsPerPage() throws Exception {
+        // Implementation is done in the interface
     }
 }
