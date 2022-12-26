@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -78,7 +77,7 @@ public class Launcher {
                 MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
-                JabRefCLI.printUsage();
+                JabRefCLI.printUsage(preferences);
             }
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
@@ -151,13 +150,6 @@ public class Launcher {
         Globals.entryTypesManager.addCustomOrModifiedTypes(
                 preferences.getBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
-        Globals.exportFactory = ExporterFactory.create(
-                preferences.getCustomExportFormats(Globals.journalAbbreviationRepository),
-                preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
-                preferences.getSavePreferencesForExport(),
-                preferences.getXmpPreferences(),
-                preferences.getGeneralPreferences().getDefaultBibDatabaseMode(),
-                Globals.entryTypesManager);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());

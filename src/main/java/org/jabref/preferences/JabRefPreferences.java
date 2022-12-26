@@ -81,7 +81,6 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
-import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
@@ -402,13 +401,6 @@ public class JabRefPreferences implements PreferencesService {
      * HashMap that contains all preferences which are set by default
      */
     public final Map<String, Object> defaults = new HashMap<>();
-
-    // The following field is used as a global variable during the export of a database.
-    // By setting this field to the path of the database's default file directory, formatters
-    // that should resolve external file paths can access this field. This is an ugly hack
-    // to solve the problem of formatters not having access to any context except for the
-    // string to be formatted and possible formatter arguments.
-    public List<Path> fileDirForDatabase;
 
     private final Preferences prefs;
 
@@ -1114,22 +1106,10 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public FileLinkPreferences getFileLinkPreferences() {
-        return new FileLinkPreferences(
-                getFilePreferences().mainFileDirectoryProperty().get(),
-                fileDirForDatabase);
-    }
-
-    @Override
-    public void storeFileDirForDatabase(List<Path> dirs) {
-        this.fileDirForDatabase = dirs;
-    }
-
-    @Override
     public LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository) {
         return new LayoutFormatterPreferences(
                 getNameFormatterPreferences(),
-                getFileLinkPreferences(),
+                getFilePreferences().mainFileDirectoryProperty(),
                 repository);
     }
 
@@ -1395,7 +1375,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(groupsPreferences.groupViewModeProperty(), (obs, oldValue, newValue) -> put(GROUP_INTERSECT_UNION_VIEW_MODE, newValue.name()));
         EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
         EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (obs, oldValue, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
-        // KeywordSeparator is handled by JabRefPreferences::getInternalPreferences
 
         return groupsPreferences;
     }
@@ -1407,7 +1386,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Creates a list of defined tabs in the entry editor from cache
      *
-     * @return a list of defined tabs
+     * @return a map of defined tabs and associated fields
      */
     private Map<String, Set<Field>> getEntryEditorTabList() {
         if (entryEditorTabList == null) {
@@ -1604,12 +1583,10 @@ public class JabRefPreferences implements PreferencesService {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
-            if (keys.length > 0) {
-                for (String key : keys) {
-                    citationKeyPattern.addCitationKeyPattern(
-                            EntryTypeFactory.parse(key),
-                            preferences.get(key, null));
-                }
+            for (String key : keys) {
+                citationKeyPattern.addCitationKeyPattern(
+                        EntryTypeFactory.parse(key),
+                        preferences.get(key, null));
             }
         } catch (
                 BackingStoreException ex) {
@@ -2004,7 +1981,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // InternalPreferences
+    // BibEntryPreferences
     //*************************************************************************************************************
 
     @Override
@@ -2034,10 +2011,14 @@ public class JabRefPreferences implements PreferencesService {
 
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
+                getPath(PREFS_EXPORT_PATH, JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory()),
                 getUser()
         );
 
-        EasyBind.listen(internalPreferences.ignoredVersionProperty(), (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
+        EasyBind.listen(internalPreferences.ignoredVersionProperty(),
+                (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
+        EasyBind.listen(internalPreferences.lastPreferencesExportPathProperty(),
+                (obs, oldValue, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()));
         // user is a static value, should only be changed for debugging
 
         return internalPreferences;
@@ -2721,16 +2702,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
 
         return specialFieldsPreferences;
-    }
-
-    @Override
-    public String getLastPreferencesExportPath() {
-        return get(PREFS_EXPORT_PATH);
-    }
-
-    @Override
-    public void storeLastPreferencesExportPath(Path exportFile) {
-        put(PREFS_EXPORT_PATH, exportFile.toString());
     }
 
     @Override

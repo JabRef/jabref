@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added a dropdown menu to let users change the library they want to import into during import.[#6177](https://github.com/JabRef/jabref/issues/6177)
+- We added the possibility to add/remove a preview style from the selected list using a double click [#9490](https://github.com/JabRef/jabref/issues/9490)
 
 
 
@@ -29,7 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - The tab "deprecated fields" is shown in biblatex-mode only. [#7757](https://github.com/JabRef/jabref/issues/7757)
 - We fixed an issue where the last opened libraries were not remembered when a new unsaved libray was open as well [#9190](https://github.com/JabRef/jabref/issues/9190)
-
+- We fixed an issue where no context menu for the group "All entries" was present [forum#3682](https://discourse.jabref.org/t/how-sort-groups-a-z-not-subgroups/3682)
 
 ### Removed
 
