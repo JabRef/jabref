@@ -14,7 +14,7 @@ plugins {
 
     id 'org.openjfx.javafxplugin' version '0.0.13'
 
-    id 'org.beryx.jlink' version '2.25.0'
+    id 'org.beryx.jlink' version '2.26.0'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
@@ -117,7 +117,7 @@ dependencies {
 
     implementation 'org.apache.lucene:lucene-core:9.4.1'
     implementation 'org.apache.lucene:lucene-queryparser:9.4.2'
-    implementation 'org.apache.lucene:lucene-queries:9.4.1'
+    implementation 'org.apache.lucene:lucene-queries:9.4.2'
     implementation 'org.apache.lucene:lucene-analysis-common:9.4.2'
     implementation 'org.apache.lucene:lucene-highlighter:9.4.2'
 
@@ -178,7 +178,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.15.3'
     implementation 'com.konghq:unirest-java:3.14.1'
 
-    implementation 'org.slf4j:slf4j-api:2.0.5'
+    implementation 'org.slf4j:slf4j-api:2.0.6'
     implementation "org.tinylog:tinylog-api:2.5.0"
     implementation "org.tinylog:slf4j-tinylog:2.5.0"
     implementation "org.tinylog:tinylog-impl:2.5.0"
@@ -204,7 +204,7 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.152'
+    testImplementation 'io.github.classgraph:classgraph:4.8.153'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.9.1'
 
