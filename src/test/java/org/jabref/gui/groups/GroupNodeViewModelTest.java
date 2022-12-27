@@ -2,7 +2,6 @@ package org.jabref.gui.groups;
 
 import java.util.Arrays;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -50,8 +49,7 @@ class GroupNodeViewModelTest {
                 true,
                 false,
                 true,
-                true,
-                new SimpleObjectProperty<>(',')
+                true
         ));
 
         viewModel = getViewModelForGroup(

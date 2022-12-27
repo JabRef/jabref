@@ -60,8 +60,9 @@ import org.slf4j.LoggerFactory;
  * dl.toFile(Path); // available in FILE
  * String contentType = dl.getMimeType();
  * </code>
- *
- * Each call to a public method creates a new HTTP connection. Nothing is cached.
+ * <br/><br/>
+ * Almost each call to a public method creates a new HTTP connection (except for {@link #asString(Charset, URLConnection) asString},
+ * which uses an already opened connection). Nothing is cached.
  */
 public class URLDownload {
 
@@ -232,26 +233,48 @@ public class URLDownload {
     }
 
     /**
+     * Downloads the web resource to a String. Uses UTF-8 as encoding.
+     *
+     * @return the downloaded string
+     */
+    public String asString() throws IOException {
+        return asString(StandardCharsets.UTF_8, this.openConnection());
+    }
+
+    /**
      * Downloads the web resource to a String.
      *
      * @param encoding the desired String encoding
      * @return the downloaded string
      */
     public String asString(Charset encoding) throws IOException {
-        try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream());
+        return asString(encoding, this.openConnection());
+    }
+
+    /**
+     * Downloads the web resource to a String from an existing connection. Uses UTF-8 as encoding.
+     *
+     * @param existingConnection an existing connection
+     * @return the downloaded string
+     */
+    public static String asString(URLConnection existingConnection) throws IOException {
+        return asString(StandardCharsets.UTF_8, existingConnection);
+    }
+
+    /**
+     * Downloads the web resource to a String.
+     *
+     * @param encoding the desired String encoding
+     * @param connection an existing connection
+     * @return the downloaded string
+     */
+    public static String asString(Charset encoding, URLConnection connection) throws IOException {
+
+        try (InputStream input = new BufferedInputStream(connection.getInputStream());
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
             return output.toString();
         }
-    }
-
-    /**
-     * Downloads the web resource to a String. Uses UTF-8 as encoding.
-     *
-     * @return the downloaded string
-     */
-    public String asString() throws IOException {
-        return asString(StandardCharsets.UTF_8);
     }
 
     public List<HttpCookie> getCookieFromUrl() throws IOException {
@@ -325,7 +348,7 @@ public class URLDownload {
         return "URLDownload{" + "source=" + this.source + '}';
     }
 
-    private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
+    private static void copy(InputStream in, Writer out, Charset encoding) throws IOException {
         Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
             String line;
@@ -336,7 +359,13 @@ public class URLDownload {
         }
     }
 
-    private URLConnection openConnection() throws IOException {
+    /**
+     * Open a connection to this object's URL (with specified settings). If accessing an HTTP URL, don't forget
+     * to close the resulting connection after usage.
+     *
+     * @return an open connection
+     */
+    public URLConnection openConnection() throws IOException {
         URLConnection connection = this.source.openConnection();
         connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {

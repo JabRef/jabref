@@ -25,7 +25,7 @@ public class PdfGrobidImporter extends Importer {
     private final ImportFormatPreferences importFormatPreferences;
 
     public PdfGrobidImporter(ImportFormatPreferences importFormatPreferences) {
-        this.grobidService = new GrobidService(importFormatPreferences.getGrobidPreferences());
+        this.grobidService = new GrobidService(importFormatPreferences.grobidPreferences());
         this.importFormatPreferences = importFormatPreferences;
     }
 

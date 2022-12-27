@@ -14,14 +14,12 @@ public class GroupsPreferences {
     private final SetProperty<GroupViewMode> groupViewMode;
     private final BooleanProperty shouldAutoAssignGroup;
     private final BooleanProperty shouldDisplayGroupCount;
-    private final ObjectProperty<Character> keywordSeparator;
 
     public GroupsPreferences(boolean viewModeIntersection,
                              boolean viewModeFilter,
                              boolean viewModeInvert,
                              boolean shouldAutoAssignGroup,
-                             boolean shouldDisplayGroupCount,
-                             ObjectProperty<Character> keywordSeparator) {
+                             boolean shouldDisplayGroupCount) {
 
         this.groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());
         if (viewModeIntersection) {
@@ -35,7 +33,6 @@ public class GroupsPreferences {
         }
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
-        this.keywordSeparator = keywordSeparator;
     }
 
     public EnumSet<GroupViewMode> getGroupViewMode() {
@@ -79,17 +76,5 @@ public class GroupsPreferences {
 
     public void setDisplayGroupCount(boolean shouldDisplayGroupCount) {
         this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
-    }
-
-    public Character getKeywordSeparator() {
-        return keywordSeparator.getValue();
-    }
-
-    public ObjectProperty<Character> keywordSeparatorProperty() {
-        return keywordSeparator;
-    }
-
-    public void setKeywordSeparator(Character keywordSeparator) {
-        this.keywordSeparator.set(keywordSeparator);
     }
 }

@@ -6,27 +6,16 @@ nav_order: 2
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
-> **The most important step is to configure your IDE.**
-> **If you know how to fork and check out JabRef's code,**
-> **already have an IDE installed, then**
-> **please scroll down to the [IDE setup](#configure-your-ide).**
-> **Otherwise, please keep on reading**
+{: .highlight }
+The most important step is to configure your IDE.
+If you know how to fork and check out JabRef's code,
+already have an IDE installed, then
+please scroll down to the [IDE setup](#Get the code into your IDE).
+Otherwise, please keep on reading.
 
 ## Prerequisites
 
 This section list the prerequisites you need to get started to develop JabRef. After this section, you are ready to get the code.
-
-### Java Development Kit 18
-
-A working Java (Development Kit) 18 installation is required.
-In the case of IntelliJ, this will be downloaded inside the IDE.
-
-For Eclipse, you need to install it separately:
-
-In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 18 (e.g., `javac 18`).
-If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
-Please head to <https://adoptium.net/de/temurin/releases> to download JDK 18.
-Note that JDK 19 does not work.
 
 ### GitHub Account
 
@@ -59,25 +48,22 @@ It is strongly recommended that you have git installed.
 ### Installed IDE
 
 We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref).
-The community edition works.
+The Community Edition works well.
 Most contributors use the Ultimate Edition, because they are students getting that edition for free.
-For advanced users, [Eclipse](https://eclipse.org) (`2022-03` or newer) is also possible.
 
-#### Install IntelliJ
-
-We recommend installing IntelliJ IDEA using [JetBrains Toolbox App](https://www.jetbrains.com/toolbox-app/), because IDE updates are automatically installed.
-
-#### Install Eclipse
-
-Eclipse JEE 2022-03 or newer is required.
-
+For advanced users, [Eclipse](https://eclipse.org) (`2022-09` or newer) is also possible. For JDK19 you need to install the addtional [support for jdk19 as extension](https://marketplace.eclipse.org/content/java-19-support-eclipse-2022-09-425)). 
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download\_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse.
 On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
-### Other Tooling
+### Java Development Kit 19
 
-We collected some other tooling recommendations.
-We invite you to read on at our [tool recommendations](../code-howtos/tools.md).
+For Eclipse, a working Java (Development Kit) 19 installation is required.
+In the case of IntelliJ, this will be downloaded inside the IDE (if you follow the steps below).
+
+In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 19 (e.g., `javac 19`).
+If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+Please head to <https://adoptium.net/de/temurin/releases> to download JDK 19.
+Note that JDK 19 does not work.
 
 ## Get the code
 
@@ -88,7 +74,7 @@ This section explains how you get the JabRef code onto your machine in a form al
 1. Log into your GitHub account
 2. Go to [https://github.com/JabRef/jabref](https://github.com/JabRef/jabref)
 3. Create a fork by clicking at fork button on the right top corner
-4. A fork repository will be created under your account `https://github.com/YOUR\_USERNAME/jabref`.
+4. A fork repository will be created under your account `https://github.com/YOUR_USERNAME/jabref`.
 
 ### Clone your forked repository on your local machine
 
@@ -102,7 +88,7 @@ mkdir git-repositories
 cd git-reposiroties
 ```
 
-Note that using `c:\` and thus placing the folder `jabref` directly in the disk root directory may cause an error.
+**Note that putting the repo jabref directly under `C:\` or any other drive letter under windows causes compile errors**
 
 Run the respective `git clone` command:
 
@@ -133,7 +119,11 @@ upstream     https://github.com/jabref/jabref.git (fetch)
 upstream     https://github.com/jabref/jabref.git (push)
 ```
 
-### Create generate source code
+### Generate source code
+
+{: .note }
+This is required for Eclipse only.
+In IntelliJ, this will be done in the IDE.
 
 Generate additional source code: `gradlew assemble` (on Linux/Mac: `./gradlew assemble`).
 
@@ -179,21 +169,21 @@ Once set up, IntelliJ IDEA's internal system can be used for subsequent builds.
 
 In case IntelliJ's internal build system does not work, just stick with using Gradle.
 
-### Ensure that JDK 18 is available to IntelliJ
+### Ensure that JDK 19 is available to IntelliJ
 
-Ensure you have a Java 18 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.
+Ensure you have a Java 19 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.
 
-{% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 18 is missing." %}
+{% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 19 is missing." %}
 ![Plattform Settings - SDKs](../images/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 {% endfigure %}
 
-If there is another JDK than JDK 18 selected, click on the plus button and choose "Download JDK..."
+If there is another JDK than JDK 19 selected, click on the plus button and choose "Download JDK..."
 
 {% figure caption:"Download JDK..." %}
 ![Plattform Settings - SDKs - plus button - Download JDK...](guidelines-select-download-jdk.png)
 {% endfigure %}
 
-Select JDK version 18 and then Eclipse Temurin.
+Select JDK version 19 and then Eclipse Temurin (showing JDK 18 as example).
 
 {% figure caption:"Example for JDK 18 - Choose Eclipse Temurin" %}
 ![Download Eclipse Temurin](guidelines-select-jdk-18-eclipse-temurin.png)
@@ -205,7 +195,7 @@ After clicking "Download", IntelliJ installs Eclipse Temurin:
 ![IntelliJ installs Eclipse Temurin](guidelines-intellij-installs-temurin.png)
 {% endfigure %}
 
-Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 18
+Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 19
 
 {% figure caption:"Project SDK is pinned to the downloaded SDK (showing JDK 18 as example)" %}
 ![Project SDK is JDK 18](guidelines-intellij-project-settings-jdk18.png)
@@ -215,7 +205,7 @@ Click "OK" to store the changes.
 
 ### Configure the Build System
 
-Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select a JDK 18.
+Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select a JDK 19.
 
 {% figure caption:"Gradle JVM is project SDK (showing JDK 18 as example)" %}
 ![Gradle JVM is project SDK](guidelines-settings-gradle-gradlejvm-is-projectjvm.png)
@@ -479,7 +469,7 @@ Then, you can run a check on all modified files.
 
 To have auto format working properly in the context of JavaDoc and line wrapping, "Wrap at right margin" has to be disabled. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-Go to **File > Settings... > Editor > Code Style > Java > JavaDoc".
+Go to **File > Settings... > Editor > Code Style > Java > JavaDoc**.
 
 At "Other", disable "Wrap at right margin"
 
@@ -517,6 +507,14 @@ Press "OK".
 > Finally, you have Checkstyle running locally so that you can check for styling errors before submitting the pull request.
 >
 > We wish you a successful contribution!
+
+### Key hints for IntelliJ
+
+* <kbd>Shift</kbd>+<kbd>Shift</kbd> (AKA double-shift): Open the search dialog.
+* <kbd>Ctrl</kbd>+<kbd>N</kbd>: Open the search dialog and select search for a class.
+* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>: Search everywhere in the code base.
+* <kbd>Alt</kbd>+<kbd>F1</kbd> and then <kbd>Enter</kbd>: Locate the file in the search bar on the left side.
+* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd>: Navigate from a class to the test class.
 
 ## Setup for Eclipse
 
@@ -574,11 +572,16 @@ To run the `LocalizationConsistencyTest` you need to add some extra module infor
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. Please make sure to also read our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md).
 
+### Other tooling
+
+We collected some other tooling recommendations.
+We invite you to read on at our [tool recommendations](../code-howtos/tools.md).
+
 ## Common issues
 
 ### Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 18 is installed is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 19 is installed is following error message:
 
 ```text
 compileJava FAILED
@@ -629,9 +632,9 @@ This can include different modules.
 There might be problems with building if you have OpenJFX libraries in local maven repository, resulting in errors like this:
 
 ```text
- > Could not find javafx-fxml-18-mac.jar (org.openjfx:javafx-fxml:18).
+ > Could not find javafx-fxml-19-mac.jar (org.openjfx:javafx-fxml:19).
      Searched in the following locations:
-         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/18/javafx-fxml-18-mac.jar
+         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/19/javafx-fxml-19-mac.jar
 ```
 
 As a workaround, you can remove all local OpenJFX artifacts by deleting the whole OpenJFX folder from specified location.
@@ -696,7 +699,7 @@ Now you can use IntelliJ IDEA's internal build system by using **Build > Build P
 To run JabRef from IntelliJ, we let IntelliJ create a launch configuration:
 
 Locate the class `Launcher`:
-Press </kbd>Ctrl</kbd>+<kbd>N</kbd>.
+Press <kbd>Ctrl</kbd>+<kbd>N</kbd>.
 Then, the "Search for classes dialog" pops up.
 Enter `Launcher`.
 Now, only one class should have been found:
@@ -715,7 +718,7 @@ Hover on the green play button.
 
 Then, click on it.
 A popup menu opens.
-Choose the first entry "" and click on it.
+Choose the first entry and click on it.
 
 {% figure caption:"Run JabRef via launcher" %}
 ![Popup menu - Run JabRef via launcher](guidelines-intellij-run-jabref-from-launcher.png)

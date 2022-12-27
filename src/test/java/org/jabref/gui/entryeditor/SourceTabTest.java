@@ -27,6 +27,7 @@ import org.jabref.testutils.category.GUITest;
 import org.fxmisc.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
@@ -51,9 +52,8 @@ class SourceTabTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences())
-                .thenReturn(mock(FieldContentFormatterPreferences.class));
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
 
         sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), fieldWriterPreferences, importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
@@ -75,7 +75,7 @@ class SourceTabTest {
     }
 
     @Test
-    void switchingFromSourceTabDoesNotThrowException(FxRobot robot) throws Exception {
+    void switchingFromSourceTabDoesNotThrowException(FxRobot robot) {
         BibEntry entry = new BibEntry();
         entry.setField(new UnknownField("test"), "testvalue");
 

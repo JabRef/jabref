@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -196,5 +197,15 @@ public class StateManager {
 
     public ObservableMap<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>> getSearchResults() {
         return searchResults;
+    }
+
+    public List<String> collectAllDatabasePaths() {
+        List<String> list = new ArrayList<>();
+        getOpenDatabases().stream()
+                          .map(BibDatabaseContext::getDatabasePath)
+                          .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                  path -> list.add(path.toAbsolutePath().toString()),
+                                  () -> list.add("")));
+        return list;
     }
 }

@@ -2,8 +2,6 @@ package org.jabref.gui.groups;
 
 import java.util.Optional;
 
-import javafx.beans.property.SimpleObjectProperty;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
@@ -48,10 +46,9 @@ class GroupTreeViewModelTest {
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
-                                                                                         GroupViewMode.UNION,
-                                                                                         true,
-                                                                                         true,
-                                                                                         new SimpleObjectProperty<>(',')));
+                GroupViewMode.UNION,
+                true,
+                true));
         groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
     }
 

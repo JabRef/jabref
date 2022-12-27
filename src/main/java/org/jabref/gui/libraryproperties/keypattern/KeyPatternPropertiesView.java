@@ -57,7 +57,7 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
                 bibEntryTypesManager.getAllTypes(databaseContext.getMetaData().getMode()
                                                                 .orElse(preferencesService.getGeneralPreferences()
                                                                                           .getDefaultBibDatabaseMode())),
-                databaseContext.getMetaData().getCiteKeyPattern(preferencesService.getGlobalCitationKeyPattern()));
+                databaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences().getKeyPattern()));
     }
 
     @FXML

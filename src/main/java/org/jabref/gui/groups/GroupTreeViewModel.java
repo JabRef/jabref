@@ -30,10 +30,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.KeywordGroup;
+import org.jabref.model.groups.LastNameGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
@@ -184,7 +187,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-    private void writeGroupChangesToMetaData() {
+    public void writeGroupChangesToMetaData() {
         currentDatabase.ifPresent(database -> database.getMetaData().setGroups(rootGroup.get().getGroupNode()));
     }
 
@@ -570,5 +573,127 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
     public void sortAlphabeticallyRecursive(GroupTreeNode group) {
         group.sortChildren(compAlphabetIgnoreCase, true);
+    }
+
+    public boolean canBeDragged(GroupNodeViewModel groupnode) {
+        AbstractGroup group = groupnode.getGroupNode().getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof KeywordGroup || group instanceof RegexKeywordGroup) {
+            if (groupnode.getParent().isPresent()) {
+                AbstractGroup groupParent = groupnode.getParent().get().getGroup();
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return true;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return true;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("canBeDragged method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean canAddGroupsIn(GroupNodeViewModel groupnode) {
+        AbstractGroup group = groupnode.getGroupNode().getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return true;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof KeywordGroup || group instanceof RegexKeywordGroup) {
+            if (groupnode.getParent().isPresent()) {
+                AbstractGroup groupParent = groupnode.getParent().get().getGroup();
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return false;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return false;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean canAddEntriesIn(GroupNodeViewModel groupnode) {
+        AbstractGroup group = groupnode.getGroupNode().getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
+            if (groupnode.getParent().isPresent()) {
+                AbstractGroup groupParent = groupnode.getParent().get().getGroup();
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else if (group instanceof KeywordGroup) {
+            return true;
+        } else if (group instanceof SearchGroup) {
+            return false;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return false;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return false;
+        } else if (group instanceof TexGroup) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean isEditable(GroupNodeViewModel groupnode) {
+        AbstractGroup group = groupnode.getGroupNode().getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof KeywordGroup || group instanceof RegexKeywordGroup) {
+            if (groupnode.getParent().isPresent()) {
+                AbstractGroup groupParent = groupnode.getParent().get().getGroup();
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return true;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return true;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
+        }
     }
 }

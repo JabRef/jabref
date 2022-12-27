@@ -18,7 +18,6 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -27,7 +26,6 @@ import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
@@ -49,6 +47,8 @@ public interface PreferencesService {
 
     InternalPreferences getInternalPreferences();
 
+    BibEntryPreferences getBibEntryPreferences();
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -64,8 +64,6 @@ public interface PreferencesService {
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
     OpenOfficePreferences getOpenOfficePreferences();
-
-    void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
 
     Map<String, Object> getPreferences();
 
@@ -103,9 +101,6 @@ public interface PreferencesService {
 
     CleanupPreferences getDefaultCleanupPreset();
 
-    @Deprecated
-    String getDefaultsDefaultCitationKeyPattern();
-
     //*************************************************************************************************************
     // GeneralPreferences
     //*************************************************************************************************************
@@ -123,8 +118,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // GroupsPreferences
     //*************************************************************************************************************
-
-    Character getKeywordDelimiter();
 
     GroupsPreferences getGroupsPreferences();
 
@@ -152,13 +145,7 @@ public interface PreferencesService {
     // CitationKeyPatternPreferences
     //*************************************************************************************************************
 
-    GlobalCitationKeyPattern getGlobalCitationKeyPattern();
-
-    void updateGlobalCitationKeyPattern();
-
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
-
-    void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences);
 
     //*************************************************************************************************************
     // ExternalApplicationsPreferences
@@ -206,10 +193,6 @@ public interface PreferencesService {
 
     AutoLinkPreferences getAutoLinkPreferences();
 
-    FileLinkPreferences getFileLinkPreferences();
-
-    void storeFileDirForDatabase(List<Path> dirs);
-
     //*************************************************************************************************************
     // Import/Export preferences
     //*************************************************************************************************************
@@ -255,10 +238,6 @@ public interface PreferencesService {
     SpecialFieldsPreferences getSpecialFieldsPreferences();
 
     SearchPreferences getSearchPreferences();
-
-    String getLastPreferencesExportPath();
-
-    void storeLastPreferencesExportPath(Path exportFile);
 
     MrDlibPreferences getMrDlibPreferences();
 

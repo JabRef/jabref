@@ -11,11 +11,11 @@ import sys
 from pathlib import Path
 
 # We assume that this python script is located in "jabref/lib" while the executable is "jabref/bin/JabRef"
-# Note that the `which` command does not work as intended on MacOs, so the path must be hardcoded.
+# Note that the package structure is different when installed as a .app bundle on MacOs, so the path must be altered.
 script_dir = Path(__file__).resolve().parent.parent
 JABREF_PATH = script_dir / "bin/JabRef"
 if not JABREF_PATH.exists():
-    JABREF_PATH = Path( "/Applications/JabRef.app/Contents/MacOS/JabRef")
+    JABREF_PATH = script_dir / "MacOS/JabRef"
 
 if not JABREF_PATH.exists():
     logging.error("Could not determine JABREF_PATH")

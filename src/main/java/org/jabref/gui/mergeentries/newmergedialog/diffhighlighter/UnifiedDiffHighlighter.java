@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
+
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.DeltaType;
@@ -89,7 +91,7 @@ public final class UnifiedDiffHighlighter extends DiffHighlighter {
                     appendToTextArea(targetTextview, getSeparator() + join(changeWords), "deletion");
                     changeInProgress = true;
                 }
-                position = position + changeWords.size() - 1;
+                position = (position + changeWords.size()) - 1;
             }
         }
         if (targetTextview.getLength() >= getSeparator().length()) {

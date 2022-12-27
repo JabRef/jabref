@@ -1,12 +1,12 @@
 package org.jabref.logic.openoffice.style;
 
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javafx.collections.FXCollections;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -29,13 +29,11 @@ public class StyleLoaderTest {
 
     private OpenOfficePreferences preferences;
     private LayoutFormatterPreferences layoutPreferences;
-    private Charset encoding;
 
     @BeforeEach
     public void setUp() {
         preferences = mock(OpenOfficePreferences.class, Answers.RETURNS_DEEP_STUBS);
         layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        encoding = StandardCharsets.UTF_8;
     }
 
     @Test
@@ -80,7 +78,7 @@ public class StyleLoaderTest {
     public void testInitalizeWithOneExternalFile() throws URISyntaxException {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
-        when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
+        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
         loader = new StyleLoader(preferences, layoutPreferences);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
@@ -97,7 +95,7 @@ public class StyleLoaderTest {
     public void testInitalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
-        when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
+        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
 
         loader = new StyleLoader(preferences, layoutPreferences);
         List<OOBibStyle> toremove = new ArrayList<>();
@@ -118,7 +116,7 @@ public class StyleLoaderTest {
     public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
-        when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
+        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
 
         loader = new StyleLoader(preferences, layoutPreferences);
         List<OOBibStyle> toremove = new ArrayList<>();
