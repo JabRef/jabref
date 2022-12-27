@@ -69,7 +69,7 @@ public class CustomEntryTypeDialogViewModel {
     private final Validator fieldValidator;
     private final Set<Field> multiLineFields = new HashSet<>();
 
-	Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
+    Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
 
     public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, DialogService dialogService) {
         this.mode = mode;
@@ -83,8 +83,8 @@ public class CustomEntryTypeDialogViewModel {
         Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
         entryTypeValidator = new FunctionBasedValidator<>(entryTypeToAdd, notEmpty, ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(newFieldToAdd,
-                                                      input -> (input != null) && !input.getDisplayName().isEmpty(),
-                                                      ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
+            input -> (input != null) && !input.getDisplayName().isEmpty(),
+            ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
     public void addAllTypes() {
@@ -188,7 +188,7 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void removeField(FieldViewModel focusedItem) {
-       selectedEntryType.getValue().removeField(focusedItem);
+        selectedEntryType.getValue().removeField(focusedItem);
     }
 
     public void resetAllCustomEntryTypes() {
@@ -199,13 +199,13 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void apply() {
-    	Set<Field> multilineFields = new HashSet<>();
+        Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeWithField : entryTypesWithFields) {
             BibEntryType type = typeWithField.entryType().getValue();
             List<FieldViewModel> allFields = typeWithField.fields();
 
-			List<Field> multilineFieldsForType = allFields.stream().map(FieldViewModel::getField).filter(Field::isMultiLineDefined).collect(Collectors.toList());
-			multilineFields.addAll(multilineFieldsForType);
+            List<Field> multilineFieldsForType = allFields.stream().map(FieldViewModel::getField).filter(Field::isMultiLineDefined).collect(Collectors.toList());
+            multilineFields.addAll(multilineFieldsForType);
 
             List<OrFields> requiredFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.REQUIRED).map(FieldViewModel::getField).map(OrFields::new).collect(Collectors.toList());
             List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
