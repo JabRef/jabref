@@ -58,18 +58,24 @@ public class CustomEntryTypeDialogViewModel {
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
-    private final PreferencesService preferencesService;
+    private final  PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
     private final DialogService dialogService;
 
     private final Validator entryTypeValidator;
     private final Validator fieldValidator;
+    private List<Field> multiLineFields = new ArrayList<>();
+
+	Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field);
+
 
     public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, DialogService dialogService) {
         this.mode = mode;
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
         this.dialogService = dialogService;
+        this.multiLineFields = preferencesService.getFieldContentParserPreferences().getNonWrappableFields();
+
 
         addAllTypes();
 
@@ -89,9 +95,9 @@ public class CustomEntryTypeDialogViewModel {
         for (BibEntryType entryType : allTypes) {
             EntryTypeViewModel viewModel;
             if (entryTypesManager.isCustomType(entryType.getType(), mode)) {
-                viewModel = new CustomEntryTypeViewModel(entryType);
+                viewModel = new CustomEntryTypeViewModel(entryType, isMultiline);
             } else {
-                viewModel = new EntryTypeViewModel(entryType);
+                viewModel = new EntryTypeViewModel(entryType, isMultiline);
             }
             this.entryTypesWithFields.add(viewModel);
         }
@@ -144,7 +150,7 @@ public class CustomEntryTypeDialogViewModel {
     public EntryTypeViewModel addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
-        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type);
+        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);
         this.entryTypesWithFields.add(viewModel);
         this.entryTypeToAdd.setValue("");
 
