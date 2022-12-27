@@ -61,7 +61,7 @@ public class CustomEntryTypeDialogViewModel {
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
-    private final  PreferencesService preferencesService;
+    private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
     private final DialogService dialogService;
 
@@ -77,7 +77,6 @@ public class CustomEntryTypeDialogViewModel {
         this.entryTypesManager = entryTypesManager;
         this.dialogService = dialogService;
         this.multiLineFields.addAll(preferencesService.getFieldContentParserPreferences().getNonWrappableFields());
-
 
         addAllTypes();
 
