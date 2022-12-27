@@ -3,7 +3,9 @@ package org.jabref.gui.customentrytypes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -64,17 +67,16 @@ public class CustomEntryTypeDialogViewModel {
 
     private final Validator entryTypeValidator;
     private final Validator fieldValidator;
-    private List<Field> multiLineFields = new ArrayList<>();
+    private final Set<Field> multiLineFields = new HashSet<>();
 
-	Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field);
-
+	Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
 
     public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, DialogService dialogService) {
         this.mode = mode;
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
         this.dialogService = dialogService;
-        this.multiLineFields = preferencesService.getFieldContentParserPreferences().getNonWrappableFields();
+        this.multiLineFields.addAll(preferencesService.getFieldContentParserPreferences().getNonWrappableFields());
 
 
         addAllTypes();
@@ -198,11 +200,13 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void apply() {
+    	Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeWithField : entryTypesWithFields) {
             BibEntryType type = typeWithField.entryType().getValue();
             List<FieldViewModel> allFields = typeWithField.fields();
 
-            allFields.stream().filter(f->f.getField().isMultiLineDefined()).collect(Collectors.toList());
+			List<Field> multilineFieldsForType = allFields.stream().map(FieldViewModel::getField).filter(Field::isMultiLineDefined).collect(Collectors.toList());
+			multilineFields.addAll(multilineFieldsForType);
 
             List<OrFields> requiredFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.REQUIRED).map(FieldViewModel::getField).map(OrFields::new).collect(Collectors.toList());
             List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
@@ -215,6 +219,7 @@ public class CustomEntryTypeDialogViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, mode);
         }
 
+        preferencesService.getImportExportPreferences().setNonWrappableFields(multilineFields.stream().map(Field::getDisplayName).collect(Collectors.joining(";")));
         preferencesService.storeCustomEntryTypes(entryTypesManager);
         // Reload types from preferences to make sure any modifications are present when reopening the dialog
         entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
