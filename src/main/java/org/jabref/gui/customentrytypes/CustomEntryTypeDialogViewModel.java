@@ -192,9 +192,11 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void apply() {
-        for (var typeWithField : entryTypesWithFields) {
+        for (EntryTypeViewModel typeWithField : entryTypesWithFields) {
             BibEntryType type = typeWithField.entryType().getValue();
             List<FieldViewModel> allFields = typeWithField.fields();
+
+            allFields.stream().filter(f->f.getField().isMultiLineDefined()).collect(Collectors.toList());
 
             List<OrFields> requiredFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.REQUIRED).map(FieldViewModel::getField).map(OrFields::new).collect(Collectors.toList());
             List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
