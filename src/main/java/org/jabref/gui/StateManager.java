@@ -54,7 +54,7 @@ public class StateManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StateManager.class);
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
-    private final ObservableList<ObjectProperty<BibDatabaseContext>> openDatabases = FXCollections.observableArrayList();
+    private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
@@ -83,7 +83,7 @@ public class StateManager {
         return localDragboard;
     }
 
-    public ObservableList<ObjectProperty<BibDatabaseContext>> getOpenDatabases() {
+    public ObservableList<BibDatabaseContext> getOpenDatabases() {
         return openDatabases;
     }
 

@@ -168,12 +168,12 @@ public class LuceneIndexer {
                 for (Map.Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
                     SearchFieldConstants.searchableBibFields.add(field.getKey().getName());
                     if (field.getKey() == StandardField.KEYWORDS) {
-                        KeywordList keywords = KeywordList.parse(field.getValue(), preferences.getKeywordDelimiter());
+                        KeywordList keywords = KeywordList.parse(field.getValue(), preferences.getBibEntryPreferences().getKeywordSeparator());
                         for (Keyword keyword : keywords) {
                             document.add(new StringField(field.getKey().getName(), keyword.toString(), org.apache.lucene.document.Field.Store.YES));
                         }
                     } else if (field.getKey() == StandardField.GROUPS) {
-                        List<String> groups = Arrays.stream(field.getValue().split(preferences.getKeywordDelimiter().toString())).map(String::trim).toList();
+                        List<String> groups = Arrays.stream(field.getValue().split(preferences.getBibEntryPreferences().getKeywordSeparator().toString())).map(String::trim).toList();
                         for (String group : groups) {
                             document.add(new StringField(field.getKey().getName(), group, org.apache.lucene.document.Field.Store.YES));
                         }

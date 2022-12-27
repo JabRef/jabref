@@ -12,9 +12,7 @@ import java.util.Random;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -220,8 +218,8 @@ public class LibraryTab extends Tab {
         feedData(context);
 
         try {
-            indexingTaskManager.manageFulltextIndexAccordingToPrefs(LuceneIndexer.of(bibDatabaseContext.get(), preferencesService, preferencesService.getFilePreferences()));
-            indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext.get(), preferencesService, preferencesService.getFilePreferences()));
+            indexingTaskManager.manageFulltextIndexAccordingToPrefs(LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences()));
+            indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences()));
         } catch (IOException e) {
             LOGGER.error("Cannot access lucene index", e);
         }
@@ -822,7 +820,7 @@ public class LibraryTab extends Tab {
     /**
      * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
      *
-     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link Globals.TASK_EXECUTOR}.
+     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link Globals#TASK_EXECUTOR}.
      * @param file the path to the file (loaded by the dataLoadingTask)
      */
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask, Path file, PreferencesService preferencesService, StateManager stateManager, JabRefFrame frame, ThemeManager themeManager) {
@@ -892,7 +890,7 @@ public class LibraryTab extends Tab {
         @Subscribe
         public void listen(EntriesAddedEvent addedEntryEvent) {
             try {
-                LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext.get(), preferencesService, preferencesService.getFilePreferences());
+                LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences());
                 for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
                     indexingTaskManager.addToIndex(luceneIndexer, addedEntry);
                 }
@@ -904,7 +902,7 @@ public class LibraryTab extends Tab {
         @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             try {
-                LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext.get(), preferencesService, preferencesService.getFilePreferences());
+                LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences());
                 for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
                     indexingTaskManager.removeFromIndex(luceneIndexer, removedEntry);
                 }
@@ -917,33 +915,16 @@ public class LibraryTab extends Tab {
         public void listen(FieldChangedEvent fieldChangedEvent) {
             for (BibEntry bibEntry : fieldChangedEvent.getBibEntries()) {
                 try {
-                    List<LinkedFile> removedFiles = new ArrayList<>();
+                    List<LinkedFile> toRemoveList = new ArrayList<>();
                     if (fieldChangedEvent.getField().equals(StandardField.FILE)) {
-                        List<LinkedFile> oldFileList = FileFieldParser.parse(fieldChangedEvent.getOldValue());
-                        List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
-                        removedFiles.remove(newFileList);
+                        toRemoveList.addAll(FileFieldParser.parse(fieldChangedEvent.getOldValue()));
+                        toRemoveList.removeAll(FileFieldParser.parse(fieldChangedEvent.getNewValue()));
                     }
-                    indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences()), bibEntry, removedFiles);
+                    indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences()), bibEntry, toRemoveList);
                 } catch (IOException e) {
                     LOGGER.warn("I/O error when writing lucene index", e);
                 }
             }
-//            if (fieldChangedEvent.getField().equals(StandardField.FILE)) {
-//                List<LinkedFile> oldFileList = FileFieldParser.parse(fieldChangedEvent.getOldValue());
-//                List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
-//
-//                List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
-//                addedFiles.remove(oldFileList);
-//                List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
-//                removedFiles.remove(newFileList);
-//
-//                try {
-//                    indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
-//                    indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
-//                } catch (IOException e) {
-//                    LOGGER.warn("I/O error when writing lucene index", e);
-//                }
-//            }
         }
     }
 

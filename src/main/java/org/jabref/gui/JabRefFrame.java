@@ -16,7 +16,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
-import javafx.beans.property.ObjectProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
@@ -168,7 +167,7 @@ public class JabRefFrame extends BorderPane {
 
     private final FileHistoryMenu fileHistory;
 
-    @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<ObjectProperty<BibDatabaseContext>> openDatabaseList;
+    @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<BibDatabaseContext> openDatabaseList;
 
     private final Stage mainStage;
     private final StateManager stateManager;
@@ -663,7 +662,7 @@ public class JabRefFrame extends BorderPane {
         filteredTabs.setPredicate(tab -> tab instanceof LibraryTab);
 
         // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
-        openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContextProperty());
+        openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
         EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
@@ -1158,7 +1157,7 @@ public class JabRefFrame extends BorderPane {
 
     /**
      * Opens a new tab with existing data.
-     * Asynchronous loading is done at {@link #createLibraryTab(BackgroundTask, Path, PreferencesService, StateManager, JabRefFrame, ThemeManager)}.
+     * Asynchronous loading is done at {@link LibraryTab#createLibraryTab(BackgroundTask, Path, PreferencesService, StateManager, JabRefFrame, ThemeManager)}.
      */
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
