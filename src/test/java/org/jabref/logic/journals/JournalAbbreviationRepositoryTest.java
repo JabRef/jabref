@@ -267,4 +267,19 @@ class JournalAbbreviationRepositoryTest {
                 .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
+
+    @Test
+    void testJournalDotlessAbbreviationWithCurlyBraces() {
+        BibDatabase bibDatabase = new BibDatabase();
+        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
+        UndoableUnabbreviator undoableUnabbreviator = new UndoableUnabbreviator(journalAbbreviationRepository);
+
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article);
+        abbreviatedJournalEntry.setField(StandardField.JOURNAL, "{ACS Appl Mater Interfaces}");
+
+        undoableUnabbreviator.unabbreviate(bibDatabase, abbreviatedJournalEntry, StandardField.JOURNAL, new CompoundEdit());
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+        assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
+    }
 }

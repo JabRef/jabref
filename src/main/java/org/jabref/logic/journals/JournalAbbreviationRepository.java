@@ -65,7 +65,7 @@ public class JournalAbbreviationRepository {
         }
 
         return fullToAbbreviation.containsKey(journal) || abbreviationToFull.containsKey(journal)
-                || findDottedAbbrFromDotless(journal).length() > 0;
+                || (findDottedAbbrFromDotless(journal).length() > 0);
     }
 
     /**
@@ -80,7 +80,7 @@ public class JournalAbbreviationRepository {
 
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
                 || abbreviationToFull.containsKey(journal)
-                || (isMoreThanTwoWords && findDottedAbbrFromDotless(journal).length() > 0);
+                || (isMoreThanTwoWords && (findDottedAbbrFromDotless(journal).length() > 0));
     }
 
     public String findDottedAbbrFromDotless(String journalName) {
@@ -94,6 +94,8 @@ public class JournalAbbreviationRepository {
         // check for a dot-less abbreviation
         if (!DOT.matcher(journalName).find()) {
             // use dot-less abbr to find full name using regex
+            journalName = journalName.replace("{", "\\{");
+            journalName = journalName.replace("}", "\\}");
             String[] journalSplit = journalName.split(" ");
 
             for (int i = 0; i < journalSplit.length; i++) {
