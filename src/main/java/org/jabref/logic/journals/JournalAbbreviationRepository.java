@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.h2.mvstore.MVMap;
@@ -105,7 +106,15 @@ public class JournalAbbreviationRepository {
             String joined = String.join("", journalSplit);
 
             foundKey = abbreviationToFull.keySet().stream()
-                                         .filter(s -> Pattern.compile(joined).matcher(s).find())
+                                         .filter(s ->  {
+                                             try {
+                                                return Pattern.compile(joined).matcher(s).find();
+                                             }
+                                             catch (PatternSyntaxException ignored){
+                                                 // if for some reason the latex free field still contains illegal chars we ignore the exception
+                                                 return false;
+                                             }
+                                         })
                                          .collect(Collectors.joining());
         }
 

@@ -30,32 +30,38 @@ class AbbreviationCheckerTest {
     }
 
     @Test
-    void checkValueComplainsAboutAbbreviatedJournalName() {
+    void checkEntryComplainsAboutAbbreviatedJournalName() {
         entry.setField(StandardField.BOOKTITLE, "T. J.");
         assertNotEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    void checkValueDoesNotComplainAboutJournalNameThatHasSameAbbreviation() {
+    void checkEntryDoesNotComplainAboutJournalNameThatHasSameAbbreviation() {
         entry.setField(StandardField.BOOKTITLE, "Journal");
         abbreviationRepository.addCustomAbbreviation(new Abbreviation("Journal", "Journal"));
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    void checkValueDoesNotComplainAboutJournalNameThatHasΝοAbbreviation() {
+    void checkEntryDoesNotComplainAboutJournalNameThatHasΝοAbbreviation() {
         entry.setField(StandardField.BOOKTITLE, "IEEE Software");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    void checkValueDoesNotComplainAboutJournalNameThatHasΝοInput() {
+    void checkEntryDoesNotComplainAboutJournalNameThatHasΝοInput() {
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
-    void checkValueWorksForLaTeXFields() {
-        entry.setField(StandardField.BOOKTITLE, "Subject-Oriented Business Process Management - Second International Conference, {S-BPM} {ONE} 2010, Karlsruhe, Germany, October 14, 2010. Selected Papers");
+    void checkEntryWorksForLaTeXField() {
+        entry.setField(StandardField.BOOKTITLE, "Reducing Complexity and Power of Digital Multibit Error-Feedback $\\Delta$$\\Sigma$ Modulators");
+        assertEquals(Collections.emptyList(), checker.check(entry));
+    }
+
+    @Test
+    void checkEntryWorksForLaTeXFieldStilContainingIllegalChars() {
+        entry.setField(StandardField.BOOKTITLE, "Proceedings of the 5\\({}^{\\mbox{th}}\\) Central-European Workshop on Services and their Composition, Rostock, Germany, February 21-22, 2013");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 }
