@@ -22,7 +22,6 @@ public class AbbreviationChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-
         List<IntegrityMessage> messages = new ArrayList<>();
         for (Field field : fields) {
             Optional<String> value = entry.getLatexFreeField(field);
