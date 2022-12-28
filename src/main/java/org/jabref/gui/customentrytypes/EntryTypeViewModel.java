@@ -22,10 +22,11 @@ public class EntryTypeViewModel {
         this.entryType.set(entryType);
 
         List<FieldViewModel> allFieldsForType = entryType.getAllBibFields()
-        		.stream().map(bibField -> new FieldViewModel(bibField.getField(),
-        				entryType.isRequired(bibField.getField()),
-        				bibField.getPriority(),
-        				isMultiline.test(bibField.getField()))).collect(Collectors.toList());
+                       .stream().map(bibField -> new FieldViewModel(bibField.getField(),
+                                   entryType.isRequired(bibField.getField()),
+                                   bibField.getPriority(),
+                                   isMultiline.test(bibField.getField())))
+                                                 .collect(Collectors.toList());
         fields = FXCollections.observableArrayList((allFieldsForType));
     }
 
