@@ -106,11 +106,10 @@ public class JournalAbbreviationRepository {
             String joined = String.join("", journalSplit);
 
             foundKey = abbreviationToFull.keySet().stream()
-                                         .filter(s ->  {
+                                         .filter(s -> {
                                              try {
-                                                return Pattern.compile(joined).matcher(s).find();
-                                             }
-                                             catch (PatternSyntaxException ignored){
+                                                 return Pattern.compile(joined).matcher(s).find();
+                                             } catch (PatternSyntaxException ignored) {
                                                  // if for some reason the latex free field still contains illegal chars we ignore the exception
                                                  return false;
                                              }
