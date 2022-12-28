@@ -94,8 +94,7 @@ public class JournalAbbreviationRepository {
         // check for a dot-less abbreviation
         if (!DOT.matcher(journalName).find()) {
             // use dot-less abbr to find full name using regex
-            journalName = journalName.replace("{", "\\{");
-            journalName = journalName.replace("}", "\\}");
+
             String[] journalSplit = journalName.split(" ");
 
             for (int i = 0; i < journalSplit.length; i++) {
