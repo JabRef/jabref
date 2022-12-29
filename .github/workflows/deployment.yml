@@ -143,7 +143,7 @@ jobs:
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Repack deb file for Debian (compression)
-        if: (matrix.os === 'ubuntu-latest')
+        if: (matrix.os == 'ubuntu-latest')
         shell: bash
         run: |
           cd build/distribution
