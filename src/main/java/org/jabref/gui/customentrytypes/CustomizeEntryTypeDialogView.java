@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -44,7 +45,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
-import org.tinylog.Logger;
 
 public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
@@ -113,13 +113,13 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         });
     }
 
-    private void makeColumnHeader(TableColumn<?,?> column) {
+    private void makeColumnHeader(TableColumn<?, ?> column, String text) {
         Label label = new Label();
-        label.textProperty().bind(column.textProperty());
+        label.setText(text);
         label.setRotate(-90);
-        column.setGraphic(label);
+        label.setMinWidth(80);
+        column.setGraphic(new Group(label));
         column.getStyleClass().add("rotated");
-        Logger.info("Classes", column.getStyleClass());
     }
 
     private void setupTable() {
@@ -181,7 +181,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         fieldTypeActionColumn.setReorderable(false);
         fieldTypeActionColumn.setEditable(false);
         fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().fieldName());
-        makeColumnHeader(fieldTypeMultilineColumn);
+        makeColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
         new ValueTableCellFactory<FieldViewModel, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())

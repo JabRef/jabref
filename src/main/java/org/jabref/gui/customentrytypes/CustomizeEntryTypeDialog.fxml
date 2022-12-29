@@ -66,7 +66,7 @@
                                              minWidth="120.0" prefWidth="-1.0" text="%Field"/>
                                 <TableColumn fx:id="fieldTypeColumn"
                                              minWidth="130.0" prefWidth="150.0" text="%Field type"/>
-                                <TableColumn fx:id="fieldTypeMultilineColumn" text="%Multiline"
+                                <TableColumn fx:id="fieldTypeMultilineColumn"
                                              prefWidth="40.0" minWidth="40.0" resizable="true"/>
                                 <TableColumn fx:id="fieldTypeActionColumn"
                                              maxWidth="40.0" minWidth="40.0" resizable="false"/>
