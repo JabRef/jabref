@@ -1384,6 +1384,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-icon-color: -fx-text-base-color;
 }
 
-.table-column .rotated > .group > .label {
+.table-column .rotated > .label {
     -fx-content-display: graphic-only;
 }
