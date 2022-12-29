@@ -66,10 +66,11 @@
                                              minWidth="120.0" prefWidth="-1.0" text="%Field"/>
                                 <TableColumn fx:id="fieldTypeColumn"
                                              minWidth="130.0" prefWidth="150.0" text="%Field type"/>
+                                <TableColumn fx:id="fieldTypeMultilineColumn" text="%Multiline"
+                                             prefWidth="40.0" minWidth="40.0" resizable="true"/>
                                 <TableColumn fx:id="fieldTypeActionColumn"
                                              maxWidth="40.0" minWidth="40.0" resizable="false"/>
-                                <TableColumn fx:id="fieldTypeMultilineColumn" text="%Multiline"
-                                             prefWidth="60.0" minWidth="50.0" resizable="true"/>
+                          
                             </columns>
                             <columnResizePolicy>
                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -43,6 +44,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
+import org.tinylog.Logger;
 
 public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
@@ -111,6 +113,15 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         });
     }
 
+    private void makeColumnHeader(TableColumn<?,?> column) {
+        Label label = new Label();
+        label.textProperty().bind(column.textProperty());
+        label.setRotate(-90);
+        column.setGraphic(label);
+        column.getStyleClass().add("rotated");
+        Logger.info("Classes", column.getStyleClass());
+    }
+
     private void setupTable() {
         // Table View must be editable, otherwise the change of the Radiobuttons does not propagate the commit event
         fields.setEditable(true);
@@ -170,6 +181,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         fieldTypeActionColumn.setReorderable(false);
         fieldTypeActionColumn.setEditable(false);
         fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().fieldName());
+        makeColumnHeader(fieldTypeMultilineColumn);
 
         new ValueTableCellFactory<FieldViewModel, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
