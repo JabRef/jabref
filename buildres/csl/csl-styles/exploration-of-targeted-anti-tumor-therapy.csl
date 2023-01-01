@@ -1,22 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" initialize-with-hyphen="false" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="minimal" default-locale="en-US">
   <info>
-    <title>Boletín de Pediatría (Español)</title>
-    <id>http://www.zotero.org/styles/boletin-de-pediatria</id>
-    <link href="http://www.zotero.org/styles/boletin-de-pediatria" rel="self"/>
+    <title>Exploration of Targeted Anti-tumor Therapy</title>
+    <title-short>ETAT</title-short>
+    <id>http://www.zotero.org/styles/exploration-of-targeted-anti-tumor-therapy</id>
+    <link href="http://www.zotero.org/styles/exploration-of-targeted-anti-tumor-therapy" rel="self"/>
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
-    <link href="http://www.sccalp.org/normas-para-la-presentacion-y-publicacion-de-trabajos-en-el-boletin-de-pediatria#Presentacion" rel="documentation"/>
+    <link href="https://www.explorationpub.com/Journals/etat/Author_Instructions" rel="documentation"/>
     <author>
-      <name>David Pérez Solís</name>
-      <email>david@perezsolis.es</email>
+      <name>Patrick O'Brien</name>
     </author>
     <category citation-format="numeric"/>
     <category field="medicine"/>
-    <issn>0214-2597</issn>
-    <summary>Vancouver parentheses style strip periods for use in Boletín de Pediatría</summary>
-    <updated>2022-11-20T15:23:08+00:00</updated>
+    <eissn>2692-3114</eissn>
+    <summary>Vancouver style as outlined by International Committee of Medical Journal Editors Uniform Requirements for Manuscripts Submitted to Biomedical Journals: Sample References</summary>
+    <updated>2022-10-20T15:45:08+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="en">
+    <date form="text" delimiter=" ">
+      <date-part name="year"/>
+      <date-part name="month" form="short" strip-periods="true"/>
+      <date-part name="day"/>
+    </date>
+    <terms>
+      <term name="collection-editor" form="long">
+        <single>editor</single>
+        <multiple>editors</multiple>
+      </term>
+      <term name="presented at">presented at</term>
+      <term name="available at">available from</term>
+      <term name="section" form="short">sect.</term>
+    </terms>
+  </locale>
   <macro name="author">
     <names variable="author">
       <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
@@ -41,7 +57,6 @@
   </macro>
   <macro name="publisher">
     <choose>
-      <!--discard publisher info for articles-->
       <if type="article-journal article-magazine article-newspaper" match="none">
         <group delimiter=": " suffix=";">
           <choose>
@@ -60,24 +75,17 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="page" match="none">
-        <choose>
-          <if variable="DOI" match="any">
-            <text variable="DOI" prefix="https://doi.org/"/>
-          </if>
-          <else>
-            <group delimiter=": ">
-              <text term="available at" text-case="capitalize-first"/>
-              <text variable="URL"/>
-            </group>
-          </else>
-        </choose>
+      <if match="any" type="article webpage post post-weblog">
+        <group delimiter=": ">
+          <text term="available at" text-case="capitalize-first"/>
+          <text variable="URL"/>
+        </group>
       </if>
     </choose>
   </macro>
   <macro name="accessed-date">
     <choose>
-      <if variable="URL">
+      <if type="article" match="any">
         <group prefix="[" suffix="]" delimiter=" ">
           <text term="cited" text-case="lowercase"/>
           <date variable="accessed" form="text"/>
@@ -88,7 +96,7 @@
   <macro name="container-title">
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper review review-book entry-dictionary entry-encyclopedia" match="any">
-        <group suffix="" delimiter=" ">
+        <group suffix="." delimiter=" ">
           <choose>
             <if type="article-journal review review-book" match="any">
               <text variable="container-title" form="short" strip-periods="true"/>
@@ -98,7 +106,7 @@
             </else>
           </choose>
           <choose>
-            <if variable="URL">
+            <if type="webpage post post-weblog" match="any">
               <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
             </if>
           </choose>
@@ -127,7 +135,7 @@
         </group>
       </else-if>
       <else>
-        <group delimiter=", " suffix="">
+        <group delimiter=", " suffix=".">
           <choose>
             <if variable="collection-title" match="none">
               <group delimiter=" ">
@@ -146,7 +154,7 @@
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper review review-book entry-dictionary entry-encyclopedia" match="none">
         <choose>
-          <if variable="URL">
+          <if match="any" type="webpage post post-weblog">
             <text term="internet" prefix=" [" suffix="]" text-case="capitalize-first"/>
           </if>
         </choose>
@@ -176,7 +184,7 @@
     <choose>
       <if type="article-journal article-magazine article-newspaper review review-book" match="any">
         <group suffix=";" delimiter=" ">
-          <date variable="issued" form="text" date-parts="year"/>
+          <date date-parts="year" form="text" variable="issued"/>
           <text macro="accessed-date"/>
         </group>
       </if>
@@ -237,14 +245,6 @@
       <if type="article-journal article-magazine article-newspaper review review-book" match="any">
         <text variable="page" prefix=":"/>
       </if>
-      <else-if type="book" match="any">
-        <text variable="number-of-pages" prefix=" "/>
-        <choose>
-          <if is-numeric="number-of-pages">
-            <label variable="number-of-pages" form="short" prefix=" " plural="never"/>
-          </if>
-        </choose>
-      </else-if>
       <else>
         <group prefix=" " delimiter=" ">
           <label variable="page" form="short" plural="never"/>
@@ -294,7 +294,7 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter=",">
+    <layout delimiter="," prefix="[" suffix="]">
       <text variable="citation-number"/>
     </layout>
   </citation>

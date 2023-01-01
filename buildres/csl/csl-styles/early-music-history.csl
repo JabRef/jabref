@@ -14,7 +14,7 @@
     <category field="humanities"/>
     <issn>0261-1279</issn>
     <eissn>1474-0559</eissn>
-    <updated>2021-10-25T13:43:56+00:00</updated>
+    <updated>2022-12-01T08:32:54+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -71,7 +71,7 @@
       </if>
       <else-if type="book" match="any">
         <group delimiter=", " prefix="(" suffix=")">
-          <text variable="publisher"/>
+          <text variable="publisher-place"/>
           <text macro="date"/>
         </group>
       </else-if>
@@ -130,8 +130,8 @@
   </macro>
   <macro name="editor">
     <names variable="editor translator">
-      <name initialize-with=". "/>
-      <label form="short" prefix=" (" suffix=")"/>
+      <name and="text" initialize-with=". "/>
+      <label form="short" strip-periods="false" prefix=" (" suffix=")"/>
     </names>
   </macro>
   <macro name="volumes">
@@ -164,26 +164,30 @@
         </else-if>
         <else>
           <group delimiter=", ">
-            <text macro="author"/>
-            <text macro="title"/>
             <group>
+              <group delimiter=", ">
+                <text macro="author"/>
+                <text macro="title"/>
+              </group>
               <choose>
                 <if type="article-journal" match="any">
-                  <group delimiter=", ">
+                  <group delimiter=", " prefix=", ">
                     <text macro="container"/>
                     <text macro="volref"/>
                     <text macro="pageno"/>
                   </group>
                 </if>
                 <else-if type="chapter paper-conference" match="any">
-                  <group delimiter=", " prefix=" ">
-                    <text macro="container"/>
-                    <text macro="publisher"/>
+                  <group delimiter=", " prefix=", ">
+                    <group delimiter=" ">
+                      <text macro="container"/>
+                      <text macro="publisher"/>
+                    </group>
                     <text macro="pageno"/>
                   </group>
                 </else-if>
                 <else-if type="book" match="any">
-                  <group delimiter=" ">
+                  <group delimiter=" " prefix=" ">
                     <group delimiter=", ">
                       <text macro="volumes"/>
                       <text macro="edition"/>
@@ -195,7 +199,7 @@
                   </group>
                 </else-if>
                 <else-if type="thesis" match="any">
-                  <group delimiter=", ">
+                  <group delimiter=", " prefix=", ">
                     <text variable="container-title"/>
                     <text variable="genre"/>
                     <group delimiter=" ">
@@ -205,7 +209,7 @@
                   </group>
                 </else-if>
                 <else>
-                  <text macro="publisher"/>
+                  <text macro="publisher" prefix=", "/>
                   <text macro="date" prefix="(" suffix=")"/>
                 </else>
               </choose>

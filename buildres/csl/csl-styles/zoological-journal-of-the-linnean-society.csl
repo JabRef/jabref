@@ -6,7 +6,7 @@
     <id>http://www.zotero.org/styles/zoological-journal-of-the-linnean-society</id>
     <link href="http://www.zotero.org/styles/zoological-journal-of-the-linnean-society" rel="self"/>
     <link href="http://www.zotero.org/styles/biological-journal-of-the-linnean-society" rel="template"/>
-    <link href="http://onlinelibrary.wiley.com/journal/10.1111/(ISSN)1096-3642/homepage/ForAuthors.html" rel="documentation"/>
+    <link href="https://academic.oup.com/zoolinnean/pages/General_Instructions" rel="documentation"/>
     <author>
       <name>Martin R. Smith</name>
       <email>martins@gmail.com</email>
@@ -16,7 +16,7 @@
     <category field="biology"/>
     <issn>0024-4082</issn>
     <eissn>1096-3642</eissn>
-    <updated>2013-10-28T11:00:12+00:00</updated>
+    <updated>2016-04-26T04:54:18+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor-translator">
@@ -27,7 +27,7 @@
     </names>
   </macro>
   <macro name="author">
-    <names variable="author">
+    <names variable="author" font-weight="bold">
       <name name-as-sort-order="all" sort-separator=" " initialize-with="" delimiter=", " delimiter-precedes-last="always"/>
       <et-al font-style="italic"/>
       <label form="short" prefix=" (" suffix=")" text-case="capitalize-first"/>
@@ -72,7 +72,7 @@
       <text variable="publisher"/>
     </group>
   </macro>
-  <citation collapse="year-suffix" and="symbol" et-al-min="4" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true" year-suffix-delimiter=",">
+  <citation collapse="year-suffix" and="symbol" et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" year-suffix-delimiter=",">
     <sort>
       <key variable="issued"/>
       <key variable="author"/>
@@ -97,7 +97,7 @@
     </sort>
     <layout>
       <text macro="author" text-case="capitalize-first" suffix="."/>
-      <date variable="issued" text-case="uppercase" prefix=" " suffix=".">
+      <date variable="issued" text-case="uppercase" font-weight="bold" prefix=" " suffix=".">
         <date-part name="year"/>
       </date>
       <choose>
