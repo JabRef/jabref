@@ -18,7 +18,6 @@ jobs:
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v3
         with:
-          ref: main
           persist-credentials: true
           # We need a full fetch - otherwise the action fails with following error:
           #     cp: target '/home/runner/work/jabref/jabref/buildSrc/src/copied/java/org/jabref/logic/journals' is not a directory
