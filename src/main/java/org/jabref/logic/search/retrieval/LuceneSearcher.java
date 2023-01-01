@@ -3,7 +3,6 @@ package org.jabref.logic.search.retrieval;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.jabref.gui.LibraryTab;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -21,8 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class LuceneSearcher {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LuceneSearcher.class);
 
     private final BibDatabaseContext databaseContext;
     private final Directory indexDirectory;

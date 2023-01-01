@@ -27,8 +27,12 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainTableDataModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainTableDataModel.class);
+
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
@@ -88,7 +92,7 @@ public class MainTableDataModel {
     }
 
     private void doSearch(Optional<SearchQuery> query) {
-        if (lastSearchQuery != null && lastSearchQuery.equals(query)) {
+        if (lastSearchQuery.isPresent() && lastSearchQuery.equals(query)) {
             return;
         }
         lastSearchQuery = query;
@@ -98,7 +102,7 @@ public class MainTableDataModel {
                 // TODO btut: maybe do in background?
                 stateManager.getSearchResults().put(bibDatabaseContext, LuceneSearcher.of(bibDatabaseContext).search(query.get()));
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.debug("Failed to run database search '{}'", query.get(), e);
             }
         }
     }
@@ -112,7 +116,7 @@ public class MainTableDataModel {
     }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        if (!query.isPresent() || !query.get().getSearchFlags().contains(SearchRules.SearchFlags.FILTERING_SEARCH)) {
+        if (query.isEmpty() || !query.get().getSearchFlags().contains(SearchRules.SearchFlags.FILTERING_SEARCH)) {
             return true;
         }
         return entry.getSearchScore() > 0;

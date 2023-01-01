@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;

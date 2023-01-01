@@ -244,7 +244,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
-    public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
