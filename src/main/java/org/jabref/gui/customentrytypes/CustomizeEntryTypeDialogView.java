@@ -1,7 +1,5 @@
 package org.jabref.gui.customentrytypes;
 
-import java.util.EnumSet;
-
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
@@ -25,13 +23,11 @@ import javafx.scene.input.TransferMode;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.RadioButtonCell;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
@@ -51,13 +47,13 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     private final BibDatabaseMode mode;
     private final BibEntryTypesManager entryTypesManager;
 
-    @FXML private TableView<EntryTypeViewModel> entryTypes;
+    @FXML private TableView<EntryTypeViewModel> entryTypesTable;
     @FXML private TableColumn<EntryTypeViewModel, String> entryTypColumn;
     @FXML private TableColumn<EntryTypeViewModel, String> entryTypeActionsColumn;
     @FXML private TextField addNewEntryType;
     @FXML private TableView<FieldViewModel> fields;
     @FXML private TableColumn<FieldViewModel, String> fieldNameColumn;
-    @FXML private TableColumn<FieldViewModel, FieldType> fieldTypeColumn;
+    @FXML private TableColumn<FieldViewModel, Boolean> fieldTypeColumn;
     @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
     @FXML private TableColumn<FieldViewModel, Boolean> fieldTypeMultilineColumn;
     @FXML private ComboBox<Field> addNewField;
@@ -102,7 +98,8 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         this.localDragboard = stateManager.getLocalDragboard();
 
         viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager, dialogService);
-        setupTable();
+        setupEntryTypesTable();
+        setupFieldsTable();
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
         addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
@@ -113,7 +110,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         });
     }
 
-    private void makeColumnHeader(TableColumn<?, ?> column, String text) {
+    private void makeRotatedColumnHeader(TableColumn<?, ?> column, String text) {
         Label label = new Label();
         label.setText(text);
         label.setRotate(-90);
@@ -122,12 +119,12 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         column.getStyleClass().add("rotated");
     }
 
-    private void setupTable() {
+    private void setupEntryTypesTable() {
         // Table View must be editable, otherwise the change of the Radiobuttons does not propagate the commit event
         fields.setEditable(true);
         entryTypColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
-        entryTypes.setItems(viewModel.entryTypes());
-        entryTypes.getSelectionModel().selectFirst();
+        entryTypesTable.setItems(viewModel.entryTypes());
+        entryTypesTable.getSelectionModel().selectFirst();
 
         entryTypeActionsColumn.setSortable(false);
         entryTypeActionsColumn.setReorderable(false);
@@ -149,7 +146,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                 })
                 .withOnMouseClickedEvent((type, name) -> {
                     if (type instanceof CustomEntryTypeViewModel) {
-                        return evt -> viewModel.removeEntryType(entryTypes.getSelectionModel().getSelectedItem());
+                        return evt -> viewModel.removeEntryType(entryTypesTable.getSelectionModel().getSelectedItem());
                     } else {
                         return evt -> {
                         };
@@ -157,31 +154,32 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                 })
                 .install(entryTypeActionsColumn);
 
-        fieldTypeColumn.setCellFactory(cellData -> new RadioButtonCell<>(EnumSet.allOf(FieldType.class)));
-        fieldTypeColumn.setCellValueFactory(item -> item.getValue().fieldType());
+        viewModel.selectedEntryTypeProperty().bind(entryTypesTable.getSelectionModel().selectedItemProperty());
+        viewModel.entryTypeToAddProperty().bindBidirectional(addNewEntryType.textProperty());
 
-        fieldTypeColumn.setEditable(true);
-        fieldTypeColumn.setOnEditCommit(event -> {
-            event.getTableView().getItems().get(event.getTablePosition().getRow()).setFieldType(event.getNewValue());
+        EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
+            if (type != null) {
+                var items = type.fields();
+                fields.setItems(items);
+            }
         });
+    }
+
+    private void setupFieldsTable() {
+        fieldNameColumn.setCellValueFactory(item -> item.getValue().fieldName());
+
+        fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));
+        fieldTypeColumn.setCellValueFactory(item -> item.getValue().fieldTypeRequired());
+        makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
 
         fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
         fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multiline());
-        fieldTypeActionColumn.setEditable(true);
-
-        fieldNameColumn.setCellValueFactory(item -> item.getValue().fieldName());
-
-        viewModel.selectedEntryTypeProperty().bind(entryTypes.getSelectionModel().selectedItemProperty());
-        viewModel.entryTypeToAddProperty().bindBidirectional(addNewEntryType.textProperty());
-
-        addNewField.setItems(viewModel.fieldsForAdding());
-        addNewField.setConverter(CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER);
+        makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
         fieldTypeActionColumn.setSortable(false);
         fieldTypeActionColumn.setReorderable(false);
         fieldTypeActionColumn.setEditable(false);
         fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().fieldName());
-        makeColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
         new ValueTableCellFactory<FieldViewModel, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
@@ -191,25 +189,21 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                 })
                 .install(fieldTypeActionColumn);
 
+        new ViewModelTableRowFactory<FieldViewModel>()
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragOver(this::handleOnDragOver)
+                .setOnDragExited(this::handleOnDragExited)
+                .install(fields);
+
+        addNewField.setItems(viewModel.fieldsForAdding());
+        addNewField.setConverter(CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER);
+
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
         // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
         // since the enabled/disabled state of addNewFieldButton won't update otherwise
         EasyBind.subscribe(addNewField.getEditor().textProperty(), text -> addNewField.setValue(CustomEntryTypeDialogViewModel.FIELD_STRING_CONVERTER.fromString(text)));
-
-        EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
-            if (type != null) {
-                var items = type.fields();
-                fields.setItems(items);
-            }
-        });
-
-        new ViewModelTableRowFactory<FieldViewModel>()
-              .setOnDragDetected(this::handleOnDragDetected)
-              .setOnDragDropped(this::handleOnDragDropped)
-              .setOnDragOver(this::handleOnDragOver)
-              .setOnDragExited(this::handleOnDragExited)
-              .install(fields);
-}
+    }
 
     private void handleOnDragOver(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.FIELD)) {
@@ -254,8 +248,8 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML
     void addEntryType() {
         EntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();
-        this.entryTypes.getSelectionModel().select(newlyAdded);
-        this.entryTypes.scrollTo(newlyAdded);
+        this.entryTypesTable.getSelectionModel().select(newlyAdded);
+        this.entryTypesTable.scrollTo(newlyAdded);
     }
 
     @FXML
@@ -271,7 +265,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         if (reset) {
             viewModel.resetAllCustomEntryTypes();
             viewModel.addAllTypes();
-            this.entryTypes.refresh();
+            this.entryTypesTable.refresh();
         }
     }
 }
