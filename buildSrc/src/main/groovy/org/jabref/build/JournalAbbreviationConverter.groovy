@@ -36,25 +36,39 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                 fullToAbbreviation.putAll(
                         abbreviations
                                 .stream()
-                                .collect(Collectors.toMap({ abbreviation -> abbreviation.getName() }, { abbreviation -> abbreviation }))
+                                .collect(Collectors.toMap(
+                                        { abbreviation -> abbreviation.getName() },
+                                        { abbreviation -> abbreviation }))
                 )
 
                 abbreviationToAbbreviation.putAll(
                         abbreviations
                                 .stream()
-                                .collect(Collectors.toMap({ abbreviation -> abbreviation.getAbbreviation() }, { abbreviation -> abbreviation }))
+                                .collect(Collectors.toMap(
+                                        { abbreviation -> abbreviation.getAbbreviation() },
+                                        { abbreviation -> abbreviation },
+                                        // dotless abbrevations might have duplicates - choose the last one in the list
+                                        (abbreviation1, abbreviation2) -> {abbreviation2}
+                                ))
                 )
 
                 shortestUniqueToAbbreviation.putAll(
                         abbreviations
                                 .stream()
-                                .collect(Collectors.toMap({ abbreviation -> abbreviation.getShortestUniqueAbbreviation() }, { abbreviation -> abbreviation }))
+                                .collect(Collectors.toMap(
+                                        { abbreviation -> abbreviation.getShortestUniqueAbbreviation() },
+                                        { abbreviation -> abbreviation }))
                 )
 
                 dotlessToAbbreviation.putAll(
                         abbreviations
                                 .stream()
-                                .collect(Collectors.toMap({ abbreviation -> abbreviation.getDotlessAbbreviation() }, { abbreviation -> abbreviation }))
+                                .collect(Collectors.toMap(
+                                        { abbreviation -> abbreviation.getDotlessAbbreviation() },
+                                        { abbreviation -> abbreviation },
+                                        // dotless abbrevations might have duplicates - choose the last one in the list
+                                        (abbreviation1, abbreviation2) -> {abbreviation2}
+                                ))
                 )
             }
         }
