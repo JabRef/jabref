@@ -1,8 +1,11 @@
 package org.jabref.logic.journals;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Abbreviation implements Comparable<Abbreviation> {
+public class Abbreviation implements Comparable<Abbreviation>, Serializable {
+
+    private static final long serialVersionUID = 1;
 
     private final String name;
     private final String abbreviation;
