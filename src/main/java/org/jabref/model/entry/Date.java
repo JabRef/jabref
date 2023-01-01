@@ -33,6 +33,7 @@ public class Date {
                 "uuuu-MM-dd'T'H[:ss][xxx][xx][X]",      // covers 2018-10-03T7
                 "uuuu-M-d",                             // covers 2009-1-15
                 "uuuu-M",                               // covers 2009-11
+                "uuuu/M",                               // covers 2020/10
                 "d-M-uuuu",                             // covers 15-1-2012
                 "M-uuuu",                               // covers 1-2012
                 "M/uuuu",                               // covers 9/2015 and 09/2015
@@ -43,7 +44,6 @@ public class Date {
                 "uuuu.M.d",                             // covers 2015.1.15
                 "uuuu",                                 // covers 2015
                 "MMM, uuuu",                            // covers Jan, 2020
-                "uuuu/M",                               // covers 2020/10
                 "uuuu.MM.d"                             // covers 2015.10.15
                 );
 
