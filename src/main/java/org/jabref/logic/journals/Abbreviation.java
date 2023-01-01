@@ -34,8 +34,8 @@ public class Abbreviation implements Comparable<Abbreviation> {
         return result;
     }
 
-    public String getMedlineAbbreviation() {
-        return getAbbreviation().replace(".", " ").replace("  ", " ").trim();
+    public String getDotlessAbbreviation() {
+        return getAbbreviation().replace(".", " ");
     }
 
     @Override
@@ -46,14 +46,14 @@ public class Abbreviation implements Comparable<Abbreviation> {
     public String getNext(String current) {
         String currentTrimmed = current.trim();
 
-        if (getMedlineAbbreviation().equals(currentTrimmed)) {
+        if (getDotlessAbbreviation().equals(currentTrimmed)) {
             return getShortestUniqueAbbreviation().equals(getAbbreviation()) ? getName() : getShortestUniqueAbbreviation();
         } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) && !getShortestUniqueAbbreviation().equals(getAbbreviation())) {
             return getName();
         } else if (getName().equals(currentTrimmed)) {
             return getAbbreviation();
         } else {
-            return getMedlineAbbreviation();
+            return getDotlessAbbreviation();
         }
     }
 
@@ -62,7 +62,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
         return String.format("Abbreviation{name=%s, abbreviation=%s, medlineAbbreviation=%s, shortestUniqueAbbreviation=%s}",
                 this.name,
                 this.abbreviation,
-                this.getMedlineAbbreviation(),
+                this.getDotlessAbbreviation(),
                 this.shortestUniqueAbbreviation);
     }
 
