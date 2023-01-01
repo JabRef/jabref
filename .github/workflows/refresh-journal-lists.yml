@@ -61,6 +61,7 @@ jobs:
           branch: update-journallist
           title: "[Bot] Update Journal abbrev list"
           commit-message: Update journal abbrev list
+      - run: git branch
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
         if: github.ref != 'refs/heads/main'
