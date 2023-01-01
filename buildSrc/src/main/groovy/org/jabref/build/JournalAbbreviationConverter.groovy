@@ -30,6 +30,7 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
             MVMap<String, Abbreviation> dotlessToAbbreviation = store.openMap("DotlessToAbbreviation")
 
             inputDir.getAsFileTree().filter({ File f -> f.name.endsWith(".csv") }).getFiles().each { file ->
+                System.out.println("Loading file " + file.toString() + "...")
 
                 def abbreviations = JournalAbbreviationLoader.readJournalListFromFile(file.toPath())
 
@@ -40,8 +41,6 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                                         { abbreviation -> abbreviation.getName() },
                                         { abbreviation -> abbreviation }))
                 )
-
-                System.out.println("1")
 
                 abbreviationToAbbreviation.putAll(
                         abbreviations
@@ -56,17 +55,18 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                                 ))
                 )
 
-                System.out.println("2")
-
                 shortestUniqueToAbbreviation.putAll(
                         abbreviations
                                 .stream()
                                 .collect(Collectors.toMap(
                                         { abbreviation -> abbreviation.getShortestUniqueAbbreviation() },
-                                        { abbreviation -> abbreviation }))
+                                        { abbreviation -> abbreviation },
+                                        (abbreviation1, abbreviation2) -> {
+                                            System.out.println(String.format("Double shortest 'unique' abbrevation %s in file %s", abbreviation1.getShortestUniqueAbbreviation(), file.toPath()))
+                                            return abbreviation2
+                                        }
+                                ))
                 )
-
-                System.out.println("3")
 
                 dotlessToAbbreviation.putAll(
                         abbreviations
