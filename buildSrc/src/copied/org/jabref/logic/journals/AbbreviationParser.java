@@ -1,4 +1,4 @@
-package java.org.jabref.logic.journals;
+package org.jabref.logic.journals;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.org.jabref.logic.journals.JournalAbbreviationRepository;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class AbbreviationParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviationParser.class);
 
-    private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
+    private final Set<org.jabref.logic.journals.Abbreviation> abbreviations = new HashSet<>(5000);
 
     public void readJournalListFromResource(String resourceFileName) {
         try (InputStream stream = JournalAbbreviationRepository.class.getResourceAsStream(resourceFileName);

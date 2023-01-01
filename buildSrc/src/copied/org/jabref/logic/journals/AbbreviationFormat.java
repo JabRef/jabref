@@ -1,4 +1,4 @@
-package java.org.jabref.logic.journals;
+package org.jabref.logic.journals;
 
 import org.apache.commons.csv.CSVFormat;
 

@@ -1,4 +1,4 @@
-package java.org.jabref.logic.journals;
+package org.jabref.logic.journals;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -24,10 +24,10 @@ public final class AbbreviationWriter {
      * @param path          to a file (doesn't have to exist just yet)
      * @param abbreviations as a list specifying which entries should be written
      */
-    public static void writeOrCreate(Path path, List<Abbreviation> abbreviations, Charset encoding) throws IOException {
+    public static void writeOrCreate(Path path, List<org.jabref.logic.journals.Abbreviation> abbreviations, Charset encoding) throws IOException {
         try (OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(path), encoding);
-             CSVPrinter csvPrinter = new CSVPrinter(writer, AbbreviationFormat.getCSVFormat())) {
-            for (Abbreviation entry : abbreviations) {
+             CSVPrinter csvPrinter = new CSVPrinter(writer, org.jabref.logic.journals.AbbreviationFormat.getCSVFormat())) {
+            for (org.jabref.logic.journals.Abbreviation entry : abbreviations) {
                 if (entry.getShortestUniqueAbbreviation().isEmpty()) {
                     csvPrinter.printRecord(entry.getName(), entry.getAbbreviation());
                 } else {
