@@ -1,4 +1,4 @@
-package org.jabref.logic.journals;
+package java.org.jabref.logic.journals;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.h2.mvstore.MVMap;
@@ -23,11 +24,13 @@ public class JournalAbbreviationRepository {
 
     private final MVMap<String, String> fullToAbbreviation;
     private final MVMap<String, String> abbreviationToFull;
+    private final MVMap<String, String> dotlessToFull;
     private final List<Abbreviation> customAbbreviations;
 
     public JournalAbbreviationRepository(Path journalList) {
         MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open();
         this.fullToAbbreviation = store.openMap("FullToAbbreviation");
+        this.dotlessToFull = store.openMap("DotlessToFull");
         this.abbreviationToFull = store.openMap("AbbreviationToFull");
         this.customAbbreviations = new ArrayList<>();
     }
@@ -35,13 +38,13 @@ public class JournalAbbreviationRepository {
     private static boolean isMatched(String name, Abbreviation abbreviation) {
         return name.equalsIgnoreCase(abbreviation.getName())
                 || name.equalsIgnoreCase(abbreviation.getAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getDotlessAbbreviation())
                 || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
     }
 
     private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
         boolean isAbbreviated = name.equalsIgnoreCase(abbreviation.getAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
+                || name.equalsIgnoreCase(abbreviation.getDotlessAbbreviation())
                 || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
         boolean isExpanded = name.equalsIgnoreCase(abbreviation.getName());
         return isAbbreviated && !isExpanded;
@@ -64,8 +67,9 @@ public class JournalAbbreviationRepository {
             return true;
         }
 
-        return fullToAbbreviation.containsKey(journal) || abbreviationToFull.containsKey(journal)
-                || findDottedAbbrFromDotless(journal).length() > 0;
+        return fullToAbbreviation.containsKey(journal)
+                || abbreviationToFull.containsKey(journal)
+                || (findDottedAbbrFromDotless(journal).length() > 0);
     }
 
     /**
@@ -80,7 +84,7 @@ public class JournalAbbreviationRepository {
 
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
                 || abbreviationToFull.containsKey(journal)
-                || (isMoreThanTwoWords && findDottedAbbrFromDotless(journal).length() > 0);
+                || (isMoreThanTwoWords && (findDottedAbbrFromDotless(journal).length() > 0));
     }
 
     public String findDottedAbbrFromDotless(String journalName) {
@@ -94,6 +98,7 @@ public class JournalAbbreviationRepository {
         // check for a dot-less abbreviation
         if (!DOT.matcher(journalName).find()) {
             // use dot-less abbr to find full name using regex
+
             String[] journalSplit = journalName.split(" ");
 
             for (int i = 0; i < journalSplit.length; i++) {
@@ -104,7 +109,14 @@ public class JournalAbbreviationRepository {
             String joined = String.join("", journalSplit);
 
             foundKey = abbreviationToFull.keySet().stream()
-                                         .filter(s -> Pattern.compile(joined).matcher(s).find())
+                                         .filter(s -> {
+                                             try {
+                                                 return Pattern.compile(joined).matcher(s).find();
+                                             } catch (PatternSyntaxException ignored) {
+                                                 // if for some reason the latex free field still contains illegal chars we ignore the exception
+                                                 return false;
+                                             }
+                                         })
                                          .collect(Collectors.joining());
         }
 
@@ -114,9 +126,10 @@ public class JournalAbbreviationRepository {
     /**
      * Attempts to get the abbreviation of the journal given.
      *
-     * @param input The journal name (either abbreviated or full name).
+     * @param input The journal name (either full name or abbreviated name).
      */
     public Optional<Abbreviation> get(String input) {
+        // Clean up input: trim and unescape ampersand
         String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
@@ -129,6 +142,8 @@ public class JournalAbbreviationRepository {
         return Optional.ofNullable(fullToAbbreviation.get(journal))
                        .map(abbreviation -> new Abbreviation(journal, abbreviation))
                        .or(() -> {
+                           // This case is if journal name is not a full name
+
                            String abbr = "";
 
                            // check for dot-less abbr
@@ -166,8 +181,8 @@ public class JournalAbbreviationRepository {
         return get(text).map(Abbreviation::getAbbreviation);
     }
 
-    public Optional<String> getMedlineAbbreviation(String text) {
-        return get(text).map(Abbreviation::getMedlineAbbreviation);
+    public Optional<String> getDotless(String text) {
+        return get(text).map(Abbreviation::getDotlessAbbreviation);
     }
 
     public Optional<String> getShortestUniqueAbbreviation(String text) {

@@ -1,4 +1,4 @@
-package org.jabref.logic.journals;
+package java.org.jabref.logic.journals;
 
 import java.nio.charset.Charset;
 import java.util.List;

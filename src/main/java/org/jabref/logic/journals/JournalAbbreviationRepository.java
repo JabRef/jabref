@@ -24,11 +24,13 @@ public class JournalAbbreviationRepository {
 
     private final MVMap<String, String> fullToAbbreviation;
     private final MVMap<String, String> abbreviationToFull;
+    private final MVMap<String, String> dotlessToFull;
     private final List<Abbreviation> customAbbreviations;
 
     public JournalAbbreviationRepository(Path journalList) {
         MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open();
         this.fullToAbbreviation = store.openMap("FullToAbbreviation");
+        this.dotlessToFull = store.openMap("DotlessToFull");
         this.abbreviationToFull = store.openMap("AbbreviationToFull");
         this.customAbbreviations = new ArrayList<>();
     }
