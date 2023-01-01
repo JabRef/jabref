@@ -48,7 +48,10 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                                         { abbreviation -> abbreviation.getAbbreviation() },
                                         { abbreviation -> abbreviation },
                                         // dotless abbrevations might have duplicates - choose the last one in the list
-                                        (abbreviation1, abbreviation2) -> {abbreviation2}
+                                        (abbreviation1, abbreviation2) -> {
+                                            System.out.println("duplicate key found!")
+                                            return abbreviation2
+                                        }
                                 ))
                 )
 
@@ -67,7 +70,10 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                                         { abbreviation -> abbreviation.getDotlessAbbreviation() },
                                         { abbreviation -> abbreviation },
                                         // dotless abbrevations might have duplicates - choose the last one in the list
-                                        (abbreviation1, abbreviation2) -> {abbreviation2}
+                                        (abbreviation1, abbreviation2) -> {
+                                            System.out.println("duplicate key found!")
+                                            return abbreviation2
+                                        }
                                 ))
                 )
             }
