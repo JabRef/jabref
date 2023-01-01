@@ -41,6 +41,8 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                                         { abbreviation -> abbreviation }))
                 )
 
+                System.out.println("1")
+
                 abbreviationToAbbreviation.putAll(
                         abbreviations
                                 .stream()
@@ -49,11 +51,12 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                                         { abbreviation -> abbreviation },
                                         // dotless abbrevations might have duplicates - choose the last one in the list
                                         (abbreviation1, abbreviation2) -> {
-                                            System.out.println("duplicate key found!")
                                             return abbreviation2
                                         }
                                 ))
                 )
+
+                System.out.println("2")
 
                 shortestUniqueToAbbreviation.putAll(
                         abbreviations
@@ -63,6 +66,8 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                                         { abbreviation -> abbreviation }))
                 )
 
+                System.out.println("3")
+
                 dotlessToAbbreviation.putAll(
                         abbreviations
                                 .stream()
@@ -71,7 +76,6 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                                         { abbreviation -> abbreviation },
                                         // dotless abbrevations might have duplicates - choose the last one in the list
                                         (abbreviation1, abbreviation2) -> {
-                                            System.out.println("duplicate key found!")
                                             return abbreviation2
                                         }
                                 ))
