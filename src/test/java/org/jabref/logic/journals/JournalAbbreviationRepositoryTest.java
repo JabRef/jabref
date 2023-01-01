@@ -290,4 +290,16 @@ class JournalAbbreviationRepositoryTest {
                 .withField(StandardField.BOOKTITLE, "2015 {IEEE} International Conference on Digital Signal Processing, {DSP} 2015, Singapore, July 21-24, 2015");
         assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
     }
+
+    @Test
+    void testDotlessForPhysRevB() {
+        BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "Phys Rev B");
+
+        undoableUnabbreviator.unabbreviate(bibDatabase, abbreviatedJournalEntry, StandardField.JOURNAL, new CompoundEdit());
+
+        BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, "Physical Review B");
+        assertEquals(expectedAbbreviatedJournalEntry, abbreviatedJournalEntry);
+    }
 }
