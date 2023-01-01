@@ -1,8 +1,9 @@
 name: Refresh Journal Lists
 
 on:
-  branches:
-    - fixJournalAbbrevChecker
+  push:
+    branches:
+      - fixJournalAbbrevChecker
   workflow_dispatch:
     # Allow to run manually
 
