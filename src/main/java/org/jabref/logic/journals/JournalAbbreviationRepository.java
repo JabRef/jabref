@@ -65,7 +65,8 @@ public class JournalAbbreviationRepository {
             return true;
         }
 
-        return fullToAbbreviation.containsKey(journal) || abbreviationToFull.containsKey(journal)
+        return fullToAbbreviation.containsKey(journal)
+                || abbreviationToFull.containsKey(journal)
                 || (findDottedAbbrFromDotless(journal).length() > 0);
     }
 
@@ -123,9 +124,10 @@ public class JournalAbbreviationRepository {
     /**
      * Attempts to get the abbreviation of the journal given.
      *
-     * @param input The journal name (either abbreviated or full name).
+     * @param input The journal name (either full name or abbreviated name).
      */
     public Optional<Abbreviation> get(String input) {
+        // Clean up input: trim and unescape ampersand
         String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
@@ -138,6 +140,8 @@ public class JournalAbbreviationRepository {
         return Optional.ofNullable(fullToAbbreviation.get(journal))
                        .map(abbreviation -> new Abbreviation(journal, abbreviation))
                        .or(() -> {
+                           // This case is if journal name is not a full name
+
                            String abbr = "";
 
                            // check for dot-less abbr
@@ -175,7 +179,7 @@ public class JournalAbbreviationRepository {
         return get(text).map(Abbreviation::getAbbreviation);
     }
 
-    public Optional<String> getMedlineAbbreviation(String text) {
+    public Optional<String> getDotless(String text) {
         return get(text).map(Abbreviation::getDotlessAbbreviation);
     }
 

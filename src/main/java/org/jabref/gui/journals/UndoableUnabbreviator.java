@@ -50,7 +50,7 @@ public class UndoableUnabbreviator {
             return false; // Cannot unabbreviate unabbreviated name.
         }
 
-        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get(); // Must be here.
+        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get();
         String newText = abbreviation.getName();
         entry.setField(field, newText);
         ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));

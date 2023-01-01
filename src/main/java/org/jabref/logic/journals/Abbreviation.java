@@ -6,6 +6,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
 
     private final String name;
     private final String abbreviation;
+    private final String dotlessAbbreviation;
     private final String shortestUniqueAbbreviation;
 
     public Abbreviation(String name, String abbreviation) {
@@ -13,8 +14,17 @@ public class Abbreviation implements Comparable<Abbreviation> {
     }
 
     public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
+        this(name,
+                abbreviation,
+                // "L. N." becomes "L  N ", we need to remove the double spaces inbetween
+                abbreviation.replace(".", " ").replace("  ", " ").trim(),
+                shortestUniqueAbbreviation.trim());
+    }
+
+    public Abbreviation(String name, String abbreviation, String dotlessAbbreviation, String shortestUniqueAbbreviation) {
         this.name = name;
         this.abbreviation = abbreviation;
+        this.dotlessAbbreviation = dotlessAbbreviation;
         this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim();
     }
 
@@ -35,7 +45,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
     }
 
     public String getDotlessAbbreviation() {
-        return getAbbreviation().replace(".", " ");
+        return this.dotlessAbbreviation;
     }
 
     @Override
@@ -59,10 +69,10 @@ public class Abbreviation implements Comparable<Abbreviation> {
 
     @Override
     public String toString() {
-        return String.format("Abbreviation{name=%s, abbreviation=%s, medlineAbbreviation=%s, shortestUniqueAbbreviation=%s}",
+        return String.format("Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}",
                 this.name,
                 this.abbreviation,
-                this.getDotlessAbbreviation(),
+                this.dotlessAbbreviation,
                 this.shortestUniqueAbbreviation);
     }
 

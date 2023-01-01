@@ -46,8 +46,8 @@ class JournalAbbreviationRepositoryTest {
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("UNKNOWN", repository.getDefaultAbbreviation("?").orElse("UNKNOWN"));
 
-        assertEquals("L N", repository.getMedlineAbbreviation("Long Name").orElse("WRONG"));
-        assertEquals("UNKNOWN", repository.getMedlineAbbreviation("?").orElse("UNKNOWN"));
+        assertEquals("L N", repository.getDotless("Long Name").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getDotless("?").orElse("UNKNOWN"));
 
         assertEquals("L. N.", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("UNKNOWN", repository.getShortestUniqueAbbreviation("?").orElse("UNKNOWN"));
@@ -71,8 +71,8 @@ class JournalAbbreviationRepositoryTest {
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("UNKNOWN", repository.getDefaultAbbreviation("?").orElse("UNKNOWN"));
 
-        assertEquals("L N", repository.getMedlineAbbreviation("Long Name").orElse("WRONG"));
-        assertEquals("UNKNOWN", repository.getMedlineAbbreviation("?").orElse("UNKNOWN"));
+        assertEquals("L N", repository.getDotless("Long Name").orElse("WRONG"));
+        assertEquals("UNKNOWN", repository.getDotless("?").orElse("UNKNOWN"));
 
         assertEquals("LN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("UNKNOWN", repository.getShortestUniqueAbbreviation("?").orElse("UNKNOWN"));
