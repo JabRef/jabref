@@ -20,7 +20,7 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
 
     @TaskAction
     def convert() {
-        def targetFile = outputDir.file("journalList.mv").get().asFile
+        def targetFile = outputDir.file("journal-list.mv").get().asFile
         targetFile.delete()
         MVStore.open(targetFile.toString()).withCloseable { store ->
 

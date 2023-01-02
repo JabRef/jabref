@@ -34,8 +34,8 @@ public class JournalAbbreviationLoader {
         // Initialize with built-in list
         try {
             Path tempDir = Files.createTempDirectory("jabref-journal");
-            Path tempJournalList = tempDir.resolve("journalList.mv");
-            Files.copy(JournalAbbreviationRepository.class.getResourceAsStream("/journals/journalList.mv"), tempJournalList);
+            Path tempJournalList = tempDir.resolve("journal-list.mv");
+            Files.copy(JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv"), tempJournalList);
             repository = new JournalAbbreviationRepository(tempJournalList);
             tempDir.toFile().deleteOnExit();
             tempJournalList.toFile().deleteOnExit();
