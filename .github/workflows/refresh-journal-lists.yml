@@ -37,7 +37,7 @@ jobs:
           # we use abbreviation lists containing dots in them only (to be consistent)
           rm journal_abbreviations_entrez.csv
           rm journal_abbreviations_medicus.csv
-          rm journal_abbreviations_webofscience-dots.csv
+          rm journal_abbreviations_webofscience-dotless.csv
 
           # prepare building
           mkdir -p $GITHUB_WORKSPACE/build/journals
