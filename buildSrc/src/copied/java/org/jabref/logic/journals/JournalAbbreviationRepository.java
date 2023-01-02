@@ -21,7 +21,7 @@ import org.h2.mvstore.MVStore;
 public class JournalAbbreviationRepository {
     static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
-    private final MVMap<String, Abbreviation> fullToAbbreviationObject;
+    private final Map<String, Abbreviation> fullToAbbreviationObject = new HashMap<>();
     private final Map<String, Abbreviation> abbreviationToAbbreviationObject = new HashMap<>();
     private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
     private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
@@ -29,14 +29,20 @@ public class JournalAbbreviationRepository {
 
     public JournalAbbreviationRepository(Path journalList) {
         MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open();
-        this.fullToAbbreviationObject = store.openMap("FullToAbbreviation");
+        MVMap<String, Abbreviation> mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
 
-        fullToAbbreviationObject.forEach((name, abbreviation) -> {
-            // Store "transient" name
-            abbreviation.setName(name);
-            abbreviationToAbbreviationObject.put(abbreviation.getAbbreviation(), abbreviation);
-            dotlessToAbbreviationObject.put(abbreviation.getDotlessAbbreviation(), abbreviation);
-            shortestUniqueToAbbreviationObject.put(abbreviation.getShortestUniqueAbbreviation(), abbreviation);
+        mvFullToAbbreviationObject.forEach((name, abbreviation) -> {
+            String abbrevationString = abbreviation.getAbbreviation();
+            String shortestUniqueAbbreviation = abbreviation.getShortestUniqueAbbreviation();
+            Abbreviation newAbbreviation = new Abbreviation(
+                    name,
+                    abbrevationString,
+                    shortestUniqueAbbreviation
+            );
+            fullToAbbreviationObject.put(name, newAbbreviation);
+            abbreviationToAbbreviationObject.put(abbrevationString, newAbbreviation);
+            dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
+            shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
         });
     }
 

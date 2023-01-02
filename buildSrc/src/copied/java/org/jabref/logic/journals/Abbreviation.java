@@ -9,7 +9,7 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     private transient String name;
     private final String abbreviation;
-    private final String dotlessAbbreviation;
+    private transient String dotlessAbbreviation;
     private final String shortestUniqueAbbreviation;
 
     public Abbreviation(String name, String abbreviation) {
@@ -25,7 +25,7 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
     }
 
     public Abbreviation(String name, String abbreviation, String dotlessAbbreviation, String shortestUniqueAbbreviation) {
-        this.name = name;
+        this.name = name.intern();
         this.abbreviation = abbreviation.intern();
         this.dotlessAbbreviation = dotlessAbbreviation.intern();
         this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim().intern();
@@ -33,13 +33,6 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
     public String getName() {
         return name;
-    }
-
-    /**
-     * May be used by the loading of the JournalAbbreviationRepository only
-     */
-    void setName(String name) {
-        this.name = name.intern();
     }
 
     public String getAbbreviation() {
