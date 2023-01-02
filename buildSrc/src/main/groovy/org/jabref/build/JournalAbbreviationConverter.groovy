@@ -36,11 +36,11 @@ abstract class JournalAbbreviationConverter extends DefaultTask {
                                 .stream()
                                 .collect(Collectors.toMap(
                                         { abbreviation -> abbreviation.getName() },
-                                        { abbreviation -> abbreviation }),
+                                        { abbreviation -> abbreviation },
                                         (abbreviation1, abbreviation2) -> {
                                             System.out.println("Double entry " + abbreviation1.getName())
                                             return abbreviation2
-                                        })
+                                        }))
                 )
             }
         }
