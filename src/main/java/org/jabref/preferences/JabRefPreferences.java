@@ -692,7 +692,7 @@ public class JabRefPreferences implements PreferencesService {
         // Download files by default
         defaults.put(DOWNLOAD_LINKED_FILES, true);
         // Create Fulltext-Index by default
-        defaults.put(FULLTEXT_INDEX_LINKED_FILES, true);
+        defaults.put(FULLTEXT_INDEX_LINKED_FILES, false);
 
         String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
