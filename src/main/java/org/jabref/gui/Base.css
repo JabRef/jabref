@@ -1383,3 +1383,7 @@ We want to have a look that matches our icons in the tool-bar */
 .rating > .container > .button.strong {
     -fx-icon-color: -fx-text-base-color;
 }
+
+.table-column .rotated > .label {
+    -fx-content-display: graphic-only;
+}

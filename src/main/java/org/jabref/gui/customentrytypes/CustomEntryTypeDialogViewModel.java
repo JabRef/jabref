@@ -3,7 +3,9 @@ package org.jabref.gui.customentrytypes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -64,20 +67,24 @@ public class CustomEntryTypeDialogViewModel {
 
     private final Validator entryTypeValidator;
     private final Validator fieldValidator;
+    private final Set<Field> multiLineFields = new HashSet<>();
+
+    Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
 
     public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, DialogService dialogService) {
         this.mode = mode;
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
         this.dialogService = dialogService;
+        this.multiLineFields.addAll(preferencesService.getFieldContentParserPreferences().getNonWrappableFields());
 
         addAllTypes();
 
         Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
         entryTypeValidator = new FunctionBasedValidator<>(entryTypeToAdd, notEmpty, ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(newFieldToAdd,
-                                                      input -> (input != null) && !input.getDisplayName().isEmpty(),
-                                                      ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
+            input -> (input != null) && !input.getDisplayName().isEmpty(),
+            ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
     public void addAllTypes() {
@@ -89,9 +96,9 @@ public class CustomEntryTypeDialogViewModel {
         for (BibEntryType entryType : allTypes) {
             EntryTypeViewModel viewModel;
             if (entryTypesManager.isCustomType(entryType.getType(), mode)) {
-                viewModel = new CustomEntryTypeViewModel(entryType);
+                viewModel = new CustomEntryTypeViewModel(entryType, isMultiline);
             } else {
-                viewModel = new EntryTypeViewModel(entryType);
+                viewModel = new EntryTypeViewModel(entryType, isMultiline);
             }
             this.entryTypesWithFields.add(viewModel);
         }
@@ -128,7 +135,8 @@ public class CustomEntryTypeDialogViewModel {
 
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
-        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT);
+        String fieldName = newFieldToAdd.getValue().getName();
+        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT, false);
         ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
         boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel -> fieldViewModel.fieldName().getValue().equals(field.getDisplayName()));
 
@@ -143,7 +151,7 @@ public class CustomEntryTypeDialogViewModel {
     public EntryTypeViewModel addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
-        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type);
+        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);
         this.entryTypesWithFields.add(viewModel);
         this.entryTypeToAdd.setValue("");
 
@@ -180,7 +188,7 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void removeField(FieldViewModel focusedItem) {
-       selectedEntryType.getValue().removeField(focusedItem);
+        selectedEntryType.getValue().removeField(focusedItem);
     }
 
     public void resetAllCustomEntryTypes() {
@@ -191,9 +199,13 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void apply() {
-        for (var typeWithField : entryTypesWithFields) {
+        Set<Field> multilineFields = new HashSet<>();
+        for (EntryTypeViewModel typeWithField : entryTypesWithFields) {
             BibEntryType type = typeWithField.entryType().getValue();
             List<FieldViewModel> allFields = typeWithField.fields();
+
+            List<Field> multilineFieldsForType = allFields.stream().map(FieldViewModel::getField).filter(Field::isMultiLineDefined).collect(Collectors.toList());
+            multilineFields.addAll(multilineFieldsForType);
 
             List<OrFields> requiredFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.REQUIRED).map(FieldViewModel::getField).map(OrFields::new).collect(Collectors.toList());
             List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
@@ -206,6 +218,7 @@ public class CustomEntryTypeDialogViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, mode);
         }
 
+        preferencesService.getImportExportPreferences().setNonWrappableFields(multilineFields.stream().map(Field::getDisplayName).collect(Collectors.joining(";")));
         preferencesService.storeCustomEntryTypes(entryTypesManager);
         // Reload types from preferences to make sure any modifications are present when reopening the dialog
         entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
