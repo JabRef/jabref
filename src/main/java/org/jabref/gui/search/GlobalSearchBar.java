@@ -14,6 +14,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.SetChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -221,6 +222,11 @@ public class GlobalSearchBar extends HBox {
         });
 
         fulltextButton.setSelected(searchPreferences.isFulltext());
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
+            fulltextButton.setManaged(searchPreferences.isFulltext());
+        });
+        fulltextButton.setManaged(searchPreferences.isFulltext());
+
         fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
         initSearchModifierButton(fulltextButton);
         fulltextButton.setOnAction(event -> {
