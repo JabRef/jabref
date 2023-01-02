@@ -21,8 +21,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We changed database structure: in MySQL/MariaDB we renamed tables by adding a `JABREF_` prefix, and in PGSQL we moved tables in `jabref` schema. We added `VersionDBStructure` variable in `METADATA` table to indicate current version of structure, this variable is needed for automatic migration. [#9312](https://github.com/JabRef/jabref/issues/9312)
 - We moved some preferences options to a new tab in the preferences dialog. [#9442](https://github.com/JabRef/jabref/pull/9308)
-- We renamed "Medline abbrevation" to "dotless abbreviation".
-- When loading dotless abbrevations, we realy on the quality of the input files (having no double spaces).
+- We renamed "Medline abbrevation" to "dotless abbreviation". [#9504](https://github.com/JabRef/jabref/pull/9504)
+
 
 
 
