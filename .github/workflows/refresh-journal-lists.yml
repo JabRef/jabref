@@ -63,4 +63,5 @@ jobs:
         with:
           message: 'Update journal abbrev list'
           committer_email: actions@github.com
+          fetch: false
           push: true
