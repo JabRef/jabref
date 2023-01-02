@@ -28,7 +28,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.jabref.logic.util.OS.NEWLINE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -52,30 +51,35 @@ class JournalAbbreviationsViewModelTabTest {
         return Stream.of(
                 // Mixed abbreviations
                 Arguments.of(
-                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE" + NEWLINE + ""),
-                                 List.of("testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + ""),
-                                 List.of("testFile4Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "Entry;E" + NEWLINE + ""),
-                                 List.of("testFile5Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + "")),
+                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE\n"),
+                                 List.of("testFile3Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE\nMoreEntries;ME;M\n"),
+                                 List.of("testFile4Entries.csv", "Abbreviations;Abb\nTest Entry;TE;T\nMoreEntries;ME;M\nEntry;E\n"),
+                                 // contains similar entry "Test Entry"
+                                 List.of("testFile5Entries.csv", "Abbreviations;Abb\nTest Entry;TE;T\nTest Entry;TE\nMoreEntries;ME;M\nEntryEntry;EE\n")),
                         List.of(
+                                // Entries of testFile4
                                 List.of("Abbreviations;Abb;Abb", "Test Entry;TE;T", "MoreEntries;ME;M", "JabRefTestEntry;JTE;JTE"),
-                                List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;T", "SomeOtherEntry;SOE;SOE"))),
+                                // Entries of testFile5
+                                List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;T", "Test Entry;TE", "SomeOtherEntry;SOE;SOE"))),
 
                 // No shortest unique abbreviations
                 Arguments.of(
-                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE" + NEWLINE + ""),
-                                List.of("testFile3Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + ""),
-                                List.of("testFile4Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "Entry;E" + NEWLINE + ""),
-                                List.of("testFile5Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "EntryEntry;EE" + NEWLINE + "")),
+                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE\n"),
+                                List.of("testFile3Entries.csv", "Abbreviations;Abb\nTest Entry;TE\nMoreEntries;ME\n"),
+                                List.of("testFile4Entries.csv", "Abbreviations;Abb\nTest Entry;TE\nMoreEntries;ME\nEntry;E\n"),
+                                // contains duplicate entry "Test Entry"
+                                List.of("testFile5Entries.csv", "Abbreviations;Abb\nTest Entry;TE\nTest Entry;TE\nMoreEntries;ME\nEntryEntry;EE\n")),
                         List.of(
                                 List.of("Abbreviations;Abb;Abb", "Test Entry;TE;TE", "MoreEntries;ME;ME", "JabRefTestEntry;JTE;JTE"),
                                List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;TE", "SomeOtherEntry;SOE;SOE"))),
 
                 // Shortest unique abbreviations
                 Arguments.of(
-                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE;T" + NEWLINE + ""),
-                                List.of("testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + ""),
-                                List.of("testFile4Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "Entry;En;E" + NEWLINE + ""),
-                                List.of("testFile5Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + "")),
+                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE;T\n"),
+                                List.of("testFile3Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE;T\nMoreEntries;ME;M\n"),
+                                List.of("testFile4Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE;T\nMoreEntries;ME;M\nEntry;En;E\n"),
+                                // contains duplicate entry "Test Entry"
+                                List.of("testFile5Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE;T\nTest Entry;TE;T\nMoreEntries;ME;M\nEntryEntry;EE\n")),
                         List.of(
                                 List.of("Abbreviations;Abb;A", "Test Entry;TE;T", "MoreEntries;ME;M", "JabRefTestEntry;JTE;JTE"),
                                 List.of("EntryEntry;EE;EE", "Abbreviations;Abb;A", "Test Entry;TE;T", "SomeOtherEntry;SOE;SOE")))
@@ -226,6 +230,7 @@ class JournalAbbreviationsViewModelTabTest {
         assertEquals(4, viewModel.journalFilesProperty().size());
 
         assertEquals(4, viewModel.abbreviationsProperty().size());
+
         // check some abbreviation
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation2)));
     }
@@ -426,11 +431,11 @@ class JournalAbbreviationsViewModelTabTest {
     }
 
     private void addAbbreviation(Abbreviation testAbbreviation) {
-        viewModel.addAbbreviation(testAbbreviation.getName(), testAbbreviation.getAbbreviation());
+        viewModel.addAbbreviation(testAbbreviation.getName(), testAbbreviation.getAbbreviation(), testAbbreviation.getShortestUniqueAbbreviation());
     }
 
     private void editAbbreviation(Abbreviation testAbbreviation) {
-        viewModel.editAbbreviation(testAbbreviation.getName(), testAbbreviation.getAbbreviation());
+        viewModel.editAbbreviation(testAbbreviation.getName(), testAbbreviation.getAbbreviation(), testAbbreviation.getShortestUniqueAbbreviation());
     }
 
     /**

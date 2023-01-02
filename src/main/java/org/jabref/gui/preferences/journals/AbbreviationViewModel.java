@@ -19,6 +19,8 @@ public class AbbreviationViewModel {
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty abbreviation = new SimpleStringProperty("");
     private final StringProperty shortestUniqueAbbreviation = new SimpleStringProperty("");
+
+    // Used when a "null" abbreviation object is added
     private final BooleanProperty pseudoAbbreviation = new SimpleBooleanProperty();
 
     public AbbreviationViewModel(Abbreviation abbreviationObject) {
@@ -87,13 +89,15 @@ public class AbbreviationViewModel {
             return false;
         }
         AbbreviationViewModel that = (AbbreviationViewModel) o;
-        return Objects.equals(getName(), that.getName()) &&
-                isPseudoAbbreviation() == that.isPseudoAbbreviation();
+        return getName().equals(that.getName())
+                && getAbbreviation().equals(that.getAbbreviation())
+                && getShortestUniqueAbbreviation().equals(that.getShortestUniqueAbbreviation())
+                && (isPseudoAbbreviation() == that.isPseudoAbbreviation());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), isPseudoAbbreviation());
+        return Objects.hash(getName(), getAbbreviation(), getShortestUniqueAbbreviation(), isPseudoAbbreviation());
     }
 
     public boolean containsCaseIndependent(String searchTerm) {

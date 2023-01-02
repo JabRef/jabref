@@ -331,14 +331,14 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     /**
      * Calls the {@link AbbreviationsFileViewModel#writeOrCreate()} method for each file in the journalFiles property
      * which will overwrite the existing files with the content of the abbreviations property of the AbbreviationsFile.
-     * Non existing files will be created.
+     * Non-existing files will be created.
      */
     public void saveJournalAbbreviationFiles() {
         journalFiles.forEach(file -> {
             try {
                 file.writeOrCreate();
             } catch (IOException e) {
-                LOGGER.debug(e.getLocalizedMessage());
+                LOGGER.debug("Error during writing journal CSV", e);
             }
         });
     }
