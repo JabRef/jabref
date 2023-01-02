@@ -5,6 +5,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.*
 import org.h2.mvstore.MVMap
 import org.h2.mvstore.MVStore
+import org.jabref.logic.journals.Abbreviation
 import org.jabref.logic.journals.JournalAbbreviationLoader
 
 import java.util.stream.Collectors
