@@ -9,9 +9,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.csv.CSVParser;
@@ -70,7 +70,7 @@ public class AbbreviationParser {
         }
     }
 
-    public List<Abbreviation> getAbbreviations() {
+    public Collection<Abbreviation> getAbbreviations() {
         return new LinkedList<>(abbreviations);
     }
 }
