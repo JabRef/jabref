@@ -32,13 +32,17 @@ public class JournalAbbreviationRepository {
         MVMap<String, Abbreviation> mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
 
         mvFullToAbbreviationObject.forEach((name, abbreviation) -> {
-            // Store "transient" name (we could also create a new object, but that would lead in a performance decrease)
-            abbreviation.setName(name);
-            // We need to create a new map, because at re-read of MVStore, a new Abbrevation object is created (which doesn't have a name)
-            fullToAbbreviationObject.put(name, abbreviation);
-            abbreviationToAbbreviationObject.put(abbreviation.getAbbreviation(), abbreviation);
-            dotlessToAbbreviationObject.put(abbreviation.getDotlessAbbreviation(), abbreviation);
-            shortestUniqueToAbbreviationObject.put(abbreviation.getShortestUniqueAbbreviation(), abbreviation);
+            String abbrevationString = abbreviation.getAbbreviation();
+            String shortestUniqueAbbreviation = abbreviation.getShortestUniqueAbbreviation();
+            Abbreviation newAbbreviation = new Abbreviation(
+                    name,
+                    abbrevationString,
+                    shortestUniqueAbbreviation
+            );
+            fullToAbbreviationObject.put(name, newAbbreviation);
+            abbreviationToAbbreviationObject.put(abbrevationString, newAbbreviation);
+            dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
+            shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
         });
     }
 
