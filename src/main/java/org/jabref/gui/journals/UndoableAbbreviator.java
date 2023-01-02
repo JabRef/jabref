@@ -69,8 +69,8 @@ public class UndoableAbbreviator {
         switch (abbreviationType) {
             case DEFAULT:
                 return text.getAbbreviation();
-            case MEDLINE:
-                return text.getMedlineAbbreviation();
+            case DOTLESS:
+                return text.getDotlessAbbreviation();
             case SHORTEST_UNIQUE:
                 return text.getShortestUniqueAbbreviation();
             default:

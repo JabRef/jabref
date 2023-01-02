@@ -54,7 +54,7 @@ public class AbbreviateAction extends SimpleCommand {
 
         switch (action) {
             case ABBREVIATE_DEFAULT -> abbreviationType = AbbreviationType.DEFAULT;
-            case ABBREVIATE_MEDLINE -> abbreviationType = AbbreviationType.MEDLINE;
+            case ABBREVIATE_DOTLESS -> abbreviationType = AbbreviationType.DOTLESS;
             case ABBREVIATE_SHORTEST_UNIQUE -> abbreviationType = AbbreviationType.SHORTEST_UNIQUE;
             default -> LOGGER.debug("Unknown action: " + action.name());
         }
@@ -65,7 +65,7 @@ public class AbbreviateAction extends SimpleCommand {
     @Override
     public void execute() {
         if ((action == StandardActions.ABBREVIATE_DEFAULT)
-                || (action == StandardActions.ABBREVIATE_MEDLINE)
+                || (action == StandardActions.ABBREVIATE_DOTLESS)
                 || (action == StandardActions.ABBREVIATE_SHORTEST_UNIQUE)) {
             dialogService.notify(Localization.lang("Abbreviating..."));
             stateManager.getActiveDatabase().ifPresent(databaseContext ->
