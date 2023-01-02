@@ -42,6 +42,9 @@ jobs:
           rm journal_abbreviations_medicus.csv
           rm journal_abbreviations_webofscience-dots.csv
 
+          # we currently do not have good support for BibTeX strings
+          rm journal_abbreviations_ieee_strings.csv
+
           # prepare building
           mkdir -p $GITHUB_WORKSPACE/build/journals
           cp * $GITHUB_WORKSPACE/build/journals/
