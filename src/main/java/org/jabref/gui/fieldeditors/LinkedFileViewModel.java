@@ -497,8 +497,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return false;
                 }
             } else {
-                LOGGER.error("Error downloading", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Error downloading"), ex);
+                LOGGER.error("Error while checking if the file can be downloaded", ex);
+                dialogService.notify(Localization.lang("Error downloading"));
                 return false;
             }
         }
