@@ -14,7 +14,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.SetChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -65,6 +64,7 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
@@ -222,13 +222,9 @@ public class GlobalSearchBar extends HBox {
         });
 
         fulltextButton.setSelected(searchPreferences.isFulltext());
-        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
-            fulltextButton.setManaged(searchPreferences.isFulltext());
-        });
-        fulltextButton.setManaged(searchPreferences.isFulltext());
-
         fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
         initSearchModifierButton(fulltextButton);
+        EasyBind.subscribe(preferencesService.getFilePreferences().fulltextIndexLinkedFilesProperty(), value -> fulltextButton.setDisable(!value));
         fulltextButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.FULLTEXT, fulltextButton.isSelected());
             performSearch();
