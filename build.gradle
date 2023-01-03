@@ -438,7 +438,9 @@ test {
 }
 
 testlogger {
+    theme 'standard-parallel'
     showPassed false
+    showSkipped false
 }
 
 task databaseTest(type: Test) {
