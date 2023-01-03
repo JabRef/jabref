@@ -39,7 +39,7 @@ public class AbbreviationsFileViewModel {
 
     /**
      * This constructor should only be called to create a pseudo abbreviation file for built in lists. This means it is
-     * a placeholder and its path will be null meaning it has no place on the filesystem. It's isPseudoFile property
+     * a placeholder and its path will be null meaning it has no place on the filesystem. Its isPseudoFile property
      * will therefore be set to true.
      */
     public AbbreviationsFileViewModel(List<AbbreviationViewModel> abbreviations, String name) {
