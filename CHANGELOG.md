@@ -37,7 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where entering a date in the format "YYYY/MM" in the entry editor date field caused an exception. [#9492](https://github.com/JabRef/jabref/issues/9492)
 - For portable versions, the `.deb` file now works on plain debian again. [#9472](https://github.com/JabRef/jabref/issues/9472)
 - We fixed an issue where the download of linked online files failed after an import of entries for certain urls [#9518](https://github.com/JabRef/jabref/issues/9518)
-
+- We fixe an issue where an exception occured when manually downloading a file from an URL in the entry editor [#9521](https://github.com/JabRef/jabref/issues/9521)
 
 ### Removed
 
