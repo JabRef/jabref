@@ -43,6 +43,25 @@ import static org.mockito.Mockito.when;
 @Execution(ExecutionMode.CONCURRENT)
 class JournalAbbreviationsViewModelTabTest {
 
+    private final static TestAbbreviation ABBREVIATION_0 = new TestAbbreviation("Full0", "Abb0");
+    private final static TestAbbreviation ABBREVIATION_0_OTHER_SHORT_UNIQUE = new TestAbbreviation("Full0", "Abb0", "A0");
+
+    private final static TestAbbreviation ABBREVIATION_1 = new TestAbbreviation("Full1", "Abb1");
+    private final static TestAbbreviation ABBREVIATION_1_SHOW = new TestAbbreviation("Full1", "Abb1", true);
+    private final static TestAbbreviation ABBREVIATION_1_OTHER_SHORT_UNIQUE = new TestAbbreviation("Full1", "Abb1", "A1");
+
+    private final static TestAbbreviation ABBREVIATION_2 = new TestAbbreviation("Full2", "Abb2");
+    private final static TestAbbreviation ABBREVIATION_2_OTHER_SHORT_UNIQUE = new TestAbbreviation("Full2", "Abb2", "A2");
+
+    private final static TestAbbreviation ABBREVIATION_3 = new TestAbbreviation("Full3", "Abb3");
+    private final static TestAbbreviation ABBREVIATION_3_OTHER_SHORT_UNIQUE = new TestAbbreviation("Full3", "Abb3", "A3");
+
+    private final static TestAbbreviation ABBREVIATION_4 = new TestAbbreviation("Full4", "Abb4");
+
+    private final static TestAbbreviation ABBREVIATION_5 = new TestAbbreviation("Full5", "Abb5");
+
+    private final static TestAbbreviation ABBREVIATION_6 = new TestAbbreviation("Full6", "Abb6");
+
     private JournalAbbreviationsTabViewModel viewModel;
     private Path emptyTestFile;
     private Path tempFolder;
@@ -76,34 +95,6 @@ class JournalAbbreviationsViewModelTabTest {
             return this.getName() + ";" + this.getAbbreviation();
         }
     }
-
-    private final static TestAbbreviation ABBREVIATION_0 = new TestAbbreviation("Full0", "Abb0");
-    private final static TestAbbreviation ABBREVIATION_0_SHOW = new TestAbbreviation("Full0", "Abb0", true);
-    private final static TestAbbreviation ABBREVIATION_0_OTHER_SHORT_UNIQUE = new TestAbbreviation("Full0", "Abb0", "A0");
-
-    private final static TestAbbreviation ABBREVIATION_1 = new TestAbbreviation("Full1", "Abb1");
-    private final static TestAbbreviation ABBREVIATION_1_SHOW = new TestAbbreviation("Full1", "Abb1", true);
-    private final static TestAbbreviation ABBREVIATION_1_OTHER_SHORT_UNIQUE = new TestAbbreviation("Full1", "Abb1", "A1");
-
-    private final static TestAbbreviation ABBREVIATION_2 = new TestAbbreviation("Full2", "Abb2");
-    private final static TestAbbreviation ABBREVIATION_2_SHOW = new TestAbbreviation("Full2", "Abb2", true);
-    private final static TestAbbreviation ABBREVIATION_2_OTHER_SHORT_UNIQUE = new TestAbbreviation("Full2", "Abb2", "A2");
-
-    // Entry
-    private final static TestAbbreviation ABBREVIATION_3 = new TestAbbreviation("Full3", "Abb3");
-    private final static TestAbbreviation ABBREVIATION_3_OTHER_SHORT_UNIQUE = new TestAbbreviation("Full3", "Abb3", "A3");
-
-    // EntryEntry
-    private final static TestAbbreviation ABBREVIATION_4 = new TestAbbreviation("Full4", "Abb4");
-    private final static TestAbbreviation ABBREVIATION_4_SHOW = new TestAbbreviation("Full4", "Abb4", true);
-
-    // JAbRefTstEntry
-    private final static TestAbbreviation ABBREVIATION_5 = new TestAbbreviation("Full5", "Abb5");
-    private final static TestAbbreviation ABBREVIATION_5_SHOW = new TestAbbreviation("Full5", "Abb5", true);
-
-    // SomeOtherEntry
-    private final static TestAbbreviation ABBREVIATION_6 = new TestAbbreviation("Full6", "Abb6");
-    private final static TestAbbreviation ABBREVIATION_6_SHOW = new TestAbbreviation("Full6", "Abb6", true);
 
     private static String csvListOfAbbreviations(List<TestAbbreviation> testAbbreviations) {
        return testAbbreviations.stream()
