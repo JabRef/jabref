@@ -14,6 +14,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,8 @@ public class LuceneSearcherTest {
     public void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
         // given
         BibDatabase database = new BibDatabase();
         BibDatabaseContext context = mock(BibDatabaseContext.class);
@@ -55,7 +58,7 @@ public class LuceneSearcherTest {
         exampleThesis.setCitationKey("ExampleThesis");
         database.insertEntry(exampleThesis);
 
-        LuceneIndexer indexer = LuceneIndexer.of(context, filePreferences);
+        LuceneIndexer indexer = LuceneIndexer.of(context, preferencesService);
         search = LuceneSearcher.of(context);
 
         indexer.createIndex();

@@ -59,17 +59,15 @@ public class LuceneIndexer {
     private final BibDatabaseContext databaseContext;
 
     private final PreferencesService preferences;
-    private final FilePreferences filePreferences;
 
-    public LuceneIndexer(BibDatabaseContext databaseContext, PreferencesService preferences, FilePreferences filePreferences) throws IOException {
+    public LuceneIndexer(BibDatabaseContext databaseContext, PreferencesService preferences) throws IOException {
         this.databaseContext = databaseContext;
         this.directoryToIndex = new NIOFSDirectory(databaseContext.getFulltextIndexPath());
         this.preferences = preferences;
-        this.filePreferences = filePreferences;
     }
 
-    public static LuceneIndexer of(BibDatabaseContext databaseContext, PreferencesService preferences, FilePreferences filePreferences) throws IOException {
-        return new LuceneIndexer(databaseContext, preferences, filePreferences);
+    public static LuceneIndexer of(BibDatabaseContext databaseContext, PreferencesService preferences) throws IOException {
+        return new LuceneIndexer(databaseContext, preferences);
     }
 
     public BibDatabaseContext getDatabaseContext() {
@@ -197,13 +195,13 @@ public class LuceneIndexer {
      * @param linkedFile the file to write to the index
      */
     private void writeFileToIndex(BibEntry entry, LinkedFile linkedFile) {
-        if (!filePreferences.shouldFulltextIndexLinkedFiles()) {
+        if (!preferences.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             return;
         }
         if (linkedFile.isOnlineLink() || !StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {
             return;
         }
-        Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
+        Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
         if (resolvedPath.isEmpty()) {
             LOGGER.warn("Could not find {}", linkedFile.getLink());
             return;
@@ -229,7 +227,7 @@ public class LuceneIndexer {
                 // if there is no index yet, don't need to check anything!
             }
             // If no document was found, add the new one
-            Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
+            Optional<List<Document>> pages = new DocumentReader(entry, preferences.getFilePreferences()).readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
                 try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
                                                                new IndexWriterConfig(
@@ -320,6 +318,6 @@ public class LuceneIndexer {
     }
 
     public FilePreferences getFilePreferences() {
-        return filePreferences;
+        return preferences.getFilePreferences();
     }
 }

@@ -25,6 +25,7 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -90,14 +91,14 @@ class GroupSerializerTest {
 
     @Test
     void serializeSingleSearchGroup() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "author=harrer", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "author=harrer", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(Collections.singletonList("0 SearchGroup:myExplicitGroup;0;author=harrer;1;1;1;;;;"), serialization);
     }
 
     @Test
     void serializeSingleSearchGroupWithRegex() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, "author=\"harrer\"", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, "author=\"harrer\"", EnumSet.noneOf(SearchRules.SearchFlags.class));
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(Collections.singletonList("0 SearchGroup:myExplicitGroup;2;author=\"harrer\";1;0;1;;;;"), serialization);
     }

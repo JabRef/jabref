@@ -3,7 +3,6 @@ package org.jabref.gui.groups;
 import java.util.EnumSet;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleSetProperty;
@@ -11,17 +10,15 @@ import javafx.collections.FXCollections;
 
 public class GroupsPreferences {
 
-    private final SetProperty<GroupViewMode> groupViewMode;
-    private final BooleanProperty shouldAutoAssignGroup;
-    private final BooleanProperty shouldDisplayGroupCount;
+    private final SetProperty<GroupViewMode> groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());;
+    private final BooleanProperty shouldAutoAssignGroup = new SimpleBooleanProperty();
+    private final BooleanProperty shouldDisplayGroupCount = new SimpleBooleanProperty();
 
     public GroupsPreferences(boolean viewModeIntersection,
                              boolean viewModeFilter,
                              boolean viewModeInvert,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount) {
-
-        this.groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());
         if (viewModeIntersection) {
             this.groupViewMode.add(GroupViewMode.INTERSECTION);
         }
@@ -31,8 +28,14 @@ public class GroupsPreferences {
         if (viewModeInvert) {
             this.groupViewMode.add(GroupViewMode.INVERT);
         }
-        this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
-        this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
+        this.shouldAutoAssignGroup.set(shouldAutoAssignGroup);
+        this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
+    }
+
+    public GroupsPreferences(EnumSet<GroupViewMode> groupViewModes, boolean shouldAutoAssignGroup, boolean shouldDisplayGroupCount) {
+        this.groupViewMode.addAll(groupViewModes);
+        this.shouldAutoAssignGroup.set(shouldAutoAssignGroup);
+        this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
     }
 
     public EnumSet<GroupViewMode> getGroupViewMode() {

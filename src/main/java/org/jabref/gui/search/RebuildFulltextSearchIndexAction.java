@@ -71,8 +71,8 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             return;
         }
         try {
-            currentLibraryTab.get().getIndexingTaskManager().createIndex(LuceneIndexer.of(databaseContext, preferencesService, filePreferences));
-            currentLibraryTab.get().getIndexingTaskManager().updateIndex(LuceneIndexer.of(databaseContext, preferencesService, filePreferences));
+            currentLibraryTab.get().getIndexingTaskManager().createIndex(LuceneIndexer.of(databaseContext, preferencesService));
+            currentLibraryTab.get().getIndexingTaskManager().updateIndex(LuceneIndexer.of(databaseContext, preferencesService));
         } catch (IOException e) {
             dialogService.notify(Localization.lang("Failed to access fulltext search index"));
             LOGGER.error("Failed to access fulltext search index", e);

@@ -82,7 +82,7 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, filePreferences), entry);
+            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }
@@ -100,7 +100,7 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, filePreferences), entry);
+            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }

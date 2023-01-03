@@ -218,8 +218,8 @@ public class LibraryTab extends Tab {
         feedData(context);
 
         try {
-            indexingTaskManager.manageFulltextIndexAccordingToPrefs(LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences()));
-            indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences()));
+            indexingTaskManager.manageFulltextIndexAccordingToPrefs(LuceneIndexer.of(bibDatabaseContext, preferencesService));
+            indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService));
         } catch (IOException e) {
             LOGGER.error("Cannot access lucene index", e);
         }
@@ -890,7 +890,7 @@ public class LibraryTab extends Tab {
         @Subscribe
         public void listen(EntriesAddedEvent addedEntryEvent) {
             try {
-                LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences());
+                LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext, preferencesService);
                 for (BibEntry addedEntry : addedEntryEvent.getBibEntries()) {
                     indexingTaskManager.addToIndex(luceneIndexer, addedEntry);
                 }
@@ -902,7 +902,7 @@ public class LibraryTab extends Tab {
         @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             try {
-                LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences());
+                LuceneIndexer luceneIndexer = LuceneIndexer.of(bibDatabaseContext, preferencesService);
                 for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
                     indexingTaskManager.removeFromIndex(luceneIndexer, removedEntry);
                 }
@@ -920,7 +920,7 @@ public class LibraryTab extends Tab {
                         toRemoveList.addAll(FileFieldParser.parse(fieldChangedEvent.getOldValue()));
                         toRemoveList.removeAll(FileFieldParser.parse(fieldChangedEvent.getNewValue()));
                     }
-                    indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService, preferencesService.getFilePreferences()), bibEntry, toRemoveList);
+                    indexingTaskManager.updateIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService), bibEntry, toRemoveList);
                 } catch (IOException e) {
                     LOGGER.warn("I/O error when writing lucene index", e);
                 }

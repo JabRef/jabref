@@ -17,7 +17,7 @@ import org.jabref.model.entry.LinkedFile;
 public class IndexingTaskManager extends BackgroundTask<Void> {
 
     private final ConcurrentLinkedDeque<Runnable> taskQueue = new ConcurrentLinkedDeque<>();
-    private TaskExecutor taskExecutor;
+    private final TaskExecutor taskExecutor;
     private int numOfIndexedFiles = 0;
 
     private final Object lock = new Object();
@@ -88,17 +88,17 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void createIndex(LuceneIndexer indexer) {
-        enqueueTask(() -> indexer.createIndex(), true);
+        enqueueTask(indexer::createIndex, true);
     }
 
     public void manageFulltextIndexAccordingToPrefs(LuceneIndexer indexer) {
         indexer.getFilePreferences().fulltextIndexLinkedFilesProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.booleanValue()) {
+            if (newValue) {
                 for (BibEntry bibEntry : indexer.getDatabaseContext().getEntries()) {
                     enqueueTask(() -> indexer.updateLinkedFilesInIndex(bibEntry, List.of()), false);
                 }
             } else {
-                enqueueTask(() -> indexer.deleteLinkedFilesIndex(), true);
+                enqueueTask(indexer::deleteLinkedFilesIndex, true);
             }
         });
     }
@@ -106,7 +106,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     public void updateIndex(LuceneIndexer indexer) {
         Set<String> pathsToRemove = indexer.getListOfFilePaths();
         Set<Integer> hashesOfEntriesToRemove = indexer.getListOfHashes();
-        indexer.getDatabaseContext().getEntries().stream().forEach(BibEntry::updateAndGetIndexHash);
+        indexer.getDatabaseContext().getEntries().forEach(BibEntry::updateAndGetIndexHash);
         for (BibEntry entry : indexer.getDatabaseContext().getEntries()) {
             enqueueTask(() -> indexer.addBibFieldsToIndex(entry), true);
             enqueueTask(() -> indexer.addLinkedFilesToIndex(entry), false);

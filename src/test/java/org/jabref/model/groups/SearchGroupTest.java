@@ -4,6 +4,7 @@ import java.util.EnumSet;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.rules.SearchRules;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,7 @@ public class SearchGroupTest {
 
     @Test
     public void containsFindsWordWithRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=rev*", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=rev*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         BibEntry entry = new BibEntry();
         entry.addKeyword("review", ',');
 
@@ -23,7 +24,7 @@ public class SearchGroupTest {
 
     @Test
     public void containsDoesNotFindsWordWithInvalidRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=*rev*", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=*rev*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         BibEntry entry = new BibEntry();
         entry.addKeyword("review", ',');
 

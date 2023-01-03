@@ -13,6 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -36,6 +37,8 @@ public class LuceneIndexerTest {
     public void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
         this.database = new BibDatabase();
 
         this.context = mock(BibDatabaseContext.class);
@@ -44,7 +47,7 @@ public class LuceneIndexerTest {
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
-        this.indexer = LuceneIndexer.of(context, filePreferences);
+        this.indexer = LuceneIndexer.of(context, preferencesService);
     }
 
     @Test
