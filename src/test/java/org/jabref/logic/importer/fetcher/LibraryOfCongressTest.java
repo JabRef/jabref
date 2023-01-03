@@ -7,6 +7,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.preferences.BibEntryPreferences;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,9 +25,11 @@ public class LibraryOfCongressTest {
 
     @BeforeEach
     public void setUp() {
-        ImportFormatPreferences prefs = mock(ImportFormatPreferences.class);
-        when(prefs.getKeywordSeparator()).thenReturn(',');
-        fetcher = new LibraryOfCongress(prefs);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
+        fetcher = new LibraryOfCongress(importFormatPreferences);
     }
 
     @Test
@@ -55,7 +58,7 @@ public class LibraryOfCongressTest {
     }
 
     @Test
-    public void performSearchByInvalidId() throws Exception {
+    public void performSearchByInvalidId() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("xxx"));
     }
 }

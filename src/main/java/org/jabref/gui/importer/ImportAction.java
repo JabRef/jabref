@@ -173,7 +173,7 @@ public class ImportAction {
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // additional treatment of BibTeX
-                new DatabaseMerger(prefs.getKeywordDelimiter()).mergeMetaData(
+                new DatabaseMerger(prefs.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
                         importResult.parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),

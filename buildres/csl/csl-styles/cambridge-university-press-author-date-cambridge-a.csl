@@ -17,7 +17,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>CambridgeA style required by Journal of Tropical Ecology as of December 2022. Modified from 'cambridge-university-press-author-date' (which seems now to be CambridgeB) by Eric Marcon</summary>
-    <updated>2022-12-13T12:00:00+00:00</updated>
+    <updated>2022-12-21T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -228,8 +228,7 @@
                 <text variable="publisher"/>
               </group>
               <group>
-                <label variable="page" form="short" prefix=" " suffix=" "/>
-                <text variable="page"/>
+                <text variable="page" prefix=", "/>
               </group>
             </if>
           </choose>

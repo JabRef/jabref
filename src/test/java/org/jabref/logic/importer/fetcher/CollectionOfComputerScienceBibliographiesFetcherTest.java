@@ -34,7 +34,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
     @BeforeEach
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         fetcher = new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences);
     }
 

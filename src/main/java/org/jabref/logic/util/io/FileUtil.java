@@ -119,15 +119,33 @@ public class FileUtil {
         return path.resolveSibling(path.getFileName() + extension);
     }
 
-    public static Optional<String> getUniquePathFragment(List<String> paths, Path databasePath) {
-        String fileName = databasePath.getFileName().toString();
+    /**
+     * Looks for the unique directory, if any, different to the provided paths
+     *
+     * @param paths List of paths as Strings
+     * @param comparePath The to be tested path
+     */
+    public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
+        String fileName = comparePath.getFileName().toString();
 
         List<String> uniquePathParts = uniquePathSubstrings(paths);
         return uniquePathParts.stream()
-                              .filter(part -> databasePath.toString().contains(part)
+                              .filter(part -> comparePath.toString().contains(part)
                                       && !part.equals(fileName) && part.contains(File.separator))
                               .findFirst()
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
+    }
+
+    /**
+     * Looks for the shortest unique path of the in a list of paths
+     *
+     * @param paths List of paths as Strings
+     * @param comparePath The to be shortened path
+     */
+    public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
+        return uniquePathSubstrings(paths).stream()
+                              .filter(part -> comparePath.toString().contains(part))
+                              .findFirst();
     }
 
     /**
@@ -148,7 +166,7 @@ public class FileUtil {
 
         List<String> pathSubstrings = new ArrayList<>(Collections.nCopies(paths.size(), ""));
 
-        // compute shortest folder substrings
+        // compute the shortest folder substrings
         while (!stackList.stream().allMatch(Vector::isEmpty)) {
             for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);

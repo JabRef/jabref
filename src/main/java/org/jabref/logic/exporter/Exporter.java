@@ -2,7 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,6 +60,10 @@ public abstract class Exporter {
      */
     public abstract void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception;
 
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries, List<Path> fileDirForDatabase) throws Exception {
+        export(databaseContext, file, entries);
+    }
+
     /**
      * Exports to all files linked to a given entry
      *
@@ -77,7 +81,7 @@ public abstract class Exporter {
             if (file.getFileType().equals(fileType.getName())) {
                 Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
                 if (filePath.isPresent()) {
-                    export(databaseContext, filePath.get(), entriesToWrite);
+                    export(databaseContext, filePath.get(), entriesToWrite, Collections.emptyList());
                     writtenToAFile = true;
                 }
             }
@@ -108,8 +112,8 @@ public abstract class Exporter {
             for (LinkedFile linkedFile : entry.getFiles()) {
                 if (linkedFile.getFileType().equals(fileType.getName())) {
                     Optional<Path> linkedFilePath = linkedFile.findIn(databaseContext.getFileDirectories(filePreferences));
-                    if (!linkedFilePath.isEmpty() && Files.exists(linkedFilePath.get()) && Files.isSameFile(linkedFilePath.get(), filePath)) {
-                        export(databaseContext, filePath, Arrays.asList((entry)));
+                    if (linkedFilePath.isPresent() && Files.exists(linkedFilePath.get()) && Files.isSameFile(linkedFilePath.get(), filePath)) {
+                        export(databaseContext, filePath, List.of(entry), Collections.emptyList());
                         writtenABibEntry = true;
                     }
                 }

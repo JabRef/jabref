@@ -288,7 +288,8 @@ public class ImportHandler {
         try {
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
             return unknownFormatImport.parserResult.getDatabase().getEntries();
-        } catch (ImportException ignored) {
+        } catch (ImportException ex) { // ex is already localized
+            dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
             return Collections.emptyList();
         }
     }

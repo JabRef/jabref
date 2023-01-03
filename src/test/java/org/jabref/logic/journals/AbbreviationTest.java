@@ -14,7 +14,7 @@ class AbbreviationTest {
 
         assertEquals("Long Name", abbreviation.getName());
         assertEquals("L. N.", abbreviation.getAbbreviation());
-        assertEquals("L N", abbreviation.getMedlineAbbreviation());
+        assertEquals("L N", abbreviation.getDotlessAbbreviation());
         assertEquals("L. N.", abbreviation.getShortestUniqueAbbreviation());
     }
 
@@ -24,7 +24,7 @@ class AbbreviationTest {
 
         assertEquals("Long Name", abbreviation.getName());
         assertEquals("L. N.", abbreviation.getAbbreviation());
-        assertEquals("L N", abbreviation.getMedlineAbbreviation());
+        assertEquals("L N", abbreviation.getDotlessAbbreviation());
         assertEquals("LN", abbreviation.getShortestUniqueAbbreviation());
     }
 
@@ -34,7 +34,7 @@ class AbbreviationTest {
 
         assertEquals("Long Name", abbreviation.getName());
         assertEquals("L. N.;LN;M", abbreviation.getAbbreviation());
-        assertEquals("L N ;LN;M", abbreviation.getMedlineAbbreviation());
+        assertEquals("L N ;LN;M", abbreviation.getDotlessAbbreviation());
         assertEquals("L. N.;LN;M", abbreviation.getShortestUniqueAbbreviation());
     }
 
@@ -44,7 +44,7 @@ class AbbreviationTest {
 
         assertEquals("Long Name", abbreviation.getName());
         assertEquals("L. N.;LN;M", abbreviation.getAbbreviation());
-        assertEquals("L N ;LN;M", abbreviation.getMedlineAbbreviation());
+        assertEquals("L N ;LN;M", abbreviation.getDotlessAbbreviation());
         assertEquals("LNLNM", abbreviation.getShortestUniqueAbbreviation());
     }
 
@@ -89,13 +89,13 @@ class AbbreviationTest {
     @Test
     void testDefaultAndMedlineAbbreviationsAreSame() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N");
-        assertEquals(abbreviation.getAbbreviation(), abbreviation.getMedlineAbbreviation());
+        assertEquals(abbreviation.getAbbreviation(), abbreviation.getDotlessAbbreviation());
     }
 
     @Test
     void testDefaultAndMedlineAbbreviationsAreSameWithShortestUniqueAbbreviation() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
-        assertEquals(abbreviation.getAbbreviation(), abbreviation.getMedlineAbbreviation());
+        assertEquals(abbreviation.getAbbreviation(), abbreviation.getDotlessAbbreviation());
     }
 
     @Test

@@ -57,7 +57,7 @@
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
-        <text variable="title-short"/>
+        <text variable="title" form="short"/>
       </substitute>
     </names>
   </macro>
