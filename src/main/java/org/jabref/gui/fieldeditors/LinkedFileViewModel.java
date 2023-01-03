@@ -494,13 +494,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return true;
                 } else {
                     dialogService.notify(Localization.lang("Download operation canceled."));
+                    return false;
                 }
             } else {
                 LOGGER.error("Error downloading", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Error downloading"), ex);
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
