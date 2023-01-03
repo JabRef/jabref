@@ -490,15 +490,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
-                                urlDownload.getSource().toString()))) {
+                                          urlDownload.getSource().toString()))) {
                     return true;
                 } else {
                     dialogService.notify(Localization.lang("Download operation canceled."));
                 }
+            } else {
+                LOGGER.error("Error downloading", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Error downloading"), ex);
             }
-            return false;
         }
-        return true;
+        return false;
     }
 
     public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
