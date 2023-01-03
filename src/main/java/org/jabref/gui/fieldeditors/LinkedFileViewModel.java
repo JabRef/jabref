@@ -41,7 +41,6 @@ import org.jabref.gui.linkedfile.LinkedFileEditDialogView;
 import org.jabref.gui.mergeentries.MultiMergeEntriesView;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.Importer;
@@ -513,10 +512,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
                     ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
-                    String suggestedTypeName = externalFileType.getName();
-
-                    // linkedFile is bound to the UI
-                    DefaultTaskExecutor.runInJavaFXThread(() -> linkedFile.setFileType(suggestedTypeName));
 
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
                     String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileDirectoryPattern());
