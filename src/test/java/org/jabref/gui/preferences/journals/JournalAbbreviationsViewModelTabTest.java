@@ -303,7 +303,7 @@ class JournalAbbreviationsViewModelTabTest {
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
-        addAbbreviation(testAbbreviation);
+        viewModel.addAbbreviation(testAbbreviation);
 
         assertEquals(5, viewModel.abbreviationsProperty().size());
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
@@ -315,8 +315,8 @@ class JournalAbbreviationsViewModelTabTest {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(1))));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
-        viewModel.addAbbreviation("YetAnotherEntry", "YAE");
-        viewModel.addAbbreviation("YetAnotherEntry", "YAE");
+        viewModel.addAbbreviation(new Abbreviation("YetAnotherEntry", "YAE"));
+        viewModel.addAbbreviation(new Abbreviation("YetAnotherEntry", "YAE"));
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
     }
 
@@ -326,8 +326,8 @@ class JournalAbbreviationsViewModelTabTest {
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
-        addAbbreviation(testAbbreviation);
-        editAbbreviation(testAbbreviation);
+        viewModel.addAbbreviation(testAbbreviation);
+        viewModel.editAbbreviation(testAbbreviation);
 
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
     }
@@ -342,7 +342,7 @@ class JournalAbbreviationsViewModelTabTest {
         viewModel.selectLastJournalFile();
         selectLastAbbreviation();
         Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
-        addAbbreviation(testAbbreviation);
+        viewModel.addAbbreviation(testAbbreviation);
 
         assertEquals(5, viewModel.abbreviationsProperty().size());
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
@@ -366,9 +366,9 @@ class JournalAbbreviationsViewModelTabTest {
 
         assertEquals(3, viewModel.abbreviationsProperty().size());
 
-        viewModel.editAbbreviation("YetAnotherEntry", "YAE");
+        viewModel.editAbbreviation(new Abbreviation("YetAnotherEntry", "YAE"));
         viewModel.currentAbbreviationProperty().set(viewModel.abbreviationsProperty().get(1));
-        viewModel.editAbbreviation("YetAnotherEntry", "YAE");
+        viewModel.editAbbreviation(new Abbreviation("YetAnotherEntry", "YAE"));
         verify(dialogService).showErrorDialogAndWait(anyString(), anyString());
     }
 
@@ -382,7 +382,7 @@ class JournalAbbreviationsViewModelTabTest {
 
         assertEquals(3, viewModel.abbreviationsProperty().size());
 
-        viewModel.editAbbreviation("", "YAE");
+        viewModel.editAbbreviation(new Abbreviation("", "YAE"));
         verify(dialogService).showErrorDialogAndWait(anyString());
     }
 
@@ -396,7 +396,7 @@ class JournalAbbreviationsViewModelTabTest {
 
         assertEquals(3, viewModel.abbreviationsProperty().size());
 
-        viewModel.editAbbreviation("YetAnotherEntry", "");
+        viewModel.editAbbreviation(new Abbreviation("YetAnotherEntry", ""));
         verify(dialogService).showErrorDialogAndWait(anyString());
     }
 
@@ -411,7 +411,7 @@ class JournalAbbreviationsViewModelTabTest {
         viewModel.selectLastJournalFile();
         selectLastAbbreviation();
         Abbreviation testAbbreviation = new Abbreviation("JabRefTestEntry", "JTE");
-        editAbbreviation(testAbbreviation);
+        viewModel.editAbbreviation(testAbbreviation);
 
         assertEquals(4, viewModel.abbreviationsProperty().size());
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
@@ -422,7 +422,7 @@ class JournalAbbreviationsViewModelTabTest {
         selectLastAbbreviation();
         viewModel.deleteAbbreviation();
         Abbreviation testAbbreviation1 = new Abbreviation("SomeOtherEntry", "SOE");
-        addAbbreviation(testAbbreviation1);
+        viewModel.addAbbreviation(testAbbreviation1);
 
         assertEquals(4, viewModel.abbreviationsProperty().size());
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation1)));
@@ -441,14 +441,6 @@ class JournalAbbreviationsViewModelTabTest {
     void testSaveExternalFilesListToPreferences(List<List<String>> testFiles) throws IOException {
         addFourTestFileToViewModelAndPreferences(testFiles);
         verify(preferencesService).storeJournalAbbreviationPreferences(any());
-    }
-
-    private void addAbbreviation(Abbreviation testAbbreviation) {
-        viewModel.addAbbreviation(testAbbreviation.getName(), testAbbreviation.getAbbreviation(), testAbbreviation.getShortestUniqueAbbreviation());
-    }
-
-    private void editAbbreviation(Abbreviation testAbbreviation) {
-        viewModel.editAbbreviation(testAbbreviation.getName(), testAbbreviation.getAbbreviation(), testAbbreviation.getShortestUniqueAbbreviation());
     }
 
     /**

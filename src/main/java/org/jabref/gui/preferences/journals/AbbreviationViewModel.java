@@ -28,7 +28,15 @@ public class AbbreviationViewModel {
         if (abbreviationObject != null) {
             this.name.setValue(abbreviationObject.getName());
             this.abbreviation.setValue(abbreviationObject.getAbbreviation());
-            this.shortestUniqueAbbreviation.setValue(abbreviationObject.getShortestUniqueAbbreviation());
+
+            // the view model stores the "real" values, not the default fallback
+            String shortestUniqueAbbreviationOfAbbreviation = abbreviationObject.getShortestUniqueAbbreviation();
+            boolean shortestUniqueAbbreviationIsDefaultValue = shortestUniqueAbbreviationOfAbbreviation.equals(abbreviationObject.getAbbreviation());
+            if (shortestUniqueAbbreviationIsDefaultValue) {
+                this.shortestUniqueAbbreviation.set("");
+            } else {
+                this.shortestUniqueAbbreviation.setValue(shortestUniqueAbbreviationOfAbbreviation);
+            }
         }
     }
 

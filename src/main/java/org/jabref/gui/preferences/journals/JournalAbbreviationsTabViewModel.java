@@ -185,7 +185,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
             try {
                 abbreviationsFile.readAbbreviations();
             } catch (IOException e) {
-                LOGGER.debug(e.getLocalizedMessage());
+                LOGGER.debug("Could not read abbreviations file", e);
             }
         }
         journalFiles.add(abbreviationsFile);
@@ -217,17 +217,12 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     /**
      * Method to add a new abbreviation to the abbreviations list property. It also sets the currentAbbreviation
      * property to the new abbreviation.
-     *
-     * @param name                       name of the abbreviation
-     * @param abbreviation               default abbreviation of the abbreviation
-     * @param shortestUniqueAbbreviation shortest unique abbreviation of the abbreviation
      */
-    public void addAbbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
-        Abbreviation abbreviationObject = new Abbreviation(name, abbreviation, shortestUniqueAbbreviation);
+    public void addAbbreviation(Abbreviation abbreviationObject) {
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviationObject);
         if (abbreviations.contains(abbreviationViewModel)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"),
-                    Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
+                    Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName()));
         } else {
             abbreviations.add(abbreviationViewModel);
             currentAbbreviation.set(abbreviationViewModel);
@@ -235,65 +230,49 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         }
     }
 
-    public void addAbbreviation(String name, String abbreviation) {
-        addAbbreviation(name, abbreviation, "");
-    }
-
     public void addAbbreviation() {
-        addAbbreviation(
+        addAbbreviation(new Abbreviation(
                 Localization.lang("Name"),
                 Localization.lang("Abbreviation"),
-                Localization.lang("Shortest unique abbreviation"));
+                Localization.lang("Shortest unique abbreviation")));
     }
 
     /**
      * Method to change the currentAbbreviation property to a new abbreviation.
-     *
-     * @param name                       name of the abbreviation
-     * @param abbreviation               default abbreviation of the abbreviation
-     * @param shortestUniqueAbbreviation shortest unique abbreviation of the abbreviation
      */
-    public void editAbbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
+    void editAbbreviation(Abbreviation abbreviationObject) {
         if (isEditableAndRemovable.get()) {
-            Abbreviation abbreviationObject = new Abbreviation(name, abbreviation, shortestUniqueAbbreviation);
             AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviationObject);
             if (abbreviations.contains(abbViewModel)) {
                 if (abbViewModel.equals(currentAbbreviation.get())) {
-                    setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, shortestUniqueAbbreviation);
+                    setCurrentAbbreviationNameAndAbbreviationIfValid(abbreviationObject);
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"),
-                            Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
+                            Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName()));
                 }
             } else {
-                setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, shortestUniqueAbbreviation);
+                setCurrentAbbreviationNameAndAbbreviationIfValid(abbreviationObject);
             }
         }
     }
 
-    public void editAbbreviation(String name, String abbreviation) {
-        editAbbreviation(name, abbreviation, "");
-    }
-
-    /**
-     * Sets the name and the abbreviation of the {@code currentAbbreviation} property to the values of the {@code name},
-     * {@code abbreviation}, and {@code shortestUniqueAbbreviation} properties.
-     *
-     * @param name                       name of the abbreviation
-     * @param abbreviation               default abbreviation of the abbreviation
-     * @param shortestUniqueAbbreviation shortest unique abbreviation of the abbreviation
-     */
-    private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation, String shortestUniqueAbbreviation) {
-        if (name.trim().isEmpty()) {
+    private void setCurrentAbbreviationNameAndAbbreviationIfValid(Abbreviation abbreviationObject) {
+        if (abbreviationObject.getName().trim().isEmpty()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Name cannot be empty"));
             return;
         }
-        if (abbreviation.trim().isEmpty()) {
+        if (abbreviationObject.getAbbreviation().trim().isEmpty()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Abbreviation cannot be empty"));
             return;
         }
-        currentAbbreviation.get().setName(name);
-        currentAbbreviation.get().setAbbreviation(abbreviation);
-        currentAbbreviation.get().setShortestUniqueAbbreviation(shortestUniqueAbbreviation);
+        AbbreviationViewModel abbreviationViewModel = currentAbbreviation.get();
+        abbreviationViewModel.setName(abbreviationObject.getName());
+        abbreviationViewModel.setAbbreviation(abbreviationObject.getAbbreviation());
+        if (abbreviationObject.isDefaultShortestUniqueAbbreviation()) {
+            abbreviationViewModel.setShortestUniqueAbbreviation("");
+        } else {
+            abbreviationViewModel.setShortestUniqueAbbreviation(abbreviationObject.getShortestUniqueAbbreviation());
+        }
         shouldWriteLists = true;
     }
 

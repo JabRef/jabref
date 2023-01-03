@@ -48,6 +48,10 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         return shortestUniqueAbbreviation;
     }
 
+    public boolean isDefaultShortestUniqueAbbreviation() {
+        return this.shortestUniqueAbbreviation.equals(this.abbreviation);
+    }
+
     public String getDotlessAbbreviation() {
         return this.dotlessAbbreviation;
     }
