@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.journals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -70,7 +69,7 @@ public class AbbreviationsFileViewModel {
                     abbreviations.stream().filter(abb -> !abb.isPseudoAbbreviation())
                                  .map(AbbreviationViewModel::getAbbreviationObject)
                                  .collect(Collectors.toList());
-            AbbreviationWriter.writeOrCreate(path.get(), actualAbbreviations, StandardCharsets.UTF_8);
+            AbbreviationWriter.writeOrCreate(path.get(), actualAbbreviations);
         }
     }
 

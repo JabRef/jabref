@@ -49,7 +49,7 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
     }
 
     public boolean isDefaultShortestUniqueAbbreviation() {
-        return this.shortestUniqueAbbreviation.equals(this.abbreviation);
+        return (shortestUniqueAbbreviation.isEmpty()) || this.shortestUniqueAbbreviation.equals(this.abbreviation);
     }
 
     public String getDotlessAbbreviation() {

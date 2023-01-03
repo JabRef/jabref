@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.csv.CSVParser;
@@ -26,9 +27,13 @@ public class AbbreviationParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviationParser.class);
 
-    private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
+    // List to ensure ordering
+    private final List<Abbreviation> abbreviations = new LinkedList<>();
 
-    public void readJournalListFromResource(String resourceFileName) {
+    // We need to check duplicates fast (!)
+    private final Set<Abbreviation> readAbbreviations = new HashSet<>();
+
+    void readJournalListFromResource(String resourceFileName) {
         try (InputStream stream = JournalAbbreviationRepository.class.getResourceAsStream(resourceFileName);
              BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             readJournalList(reader);
@@ -65,12 +70,16 @@ public class AbbreviationParser {
                     return;
                 }
 
-                abbreviations.add(new Abbreviation(name, abbreviation, shortestUniqueAbbreviation));
+                Abbreviation abbreviationToAdd = new Abbreviation(name, abbreviation, shortestUniqueAbbreviation);
+                if (!readAbbreviations.contains(abbreviationToAdd)) {
+                    readAbbreviations.add(abbreviationToAdd);
+                    abbreviations.add(abbreviationToAdd);
+                }
             }
         }
     }
 
     public Collection<Abbreviation> getAbbreviations() {
-        return new LinkedList<>(abbreviations);
+        return abbreviations;
     }
 }
