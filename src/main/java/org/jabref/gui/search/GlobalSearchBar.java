@@ -64,7 +64,6 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
-import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
@@ -224,7 +223,7 @@ public class GlobalSearchBar extends HBox {
         fulltextButton.setSelected(searchPreferences.isFulltext());
         fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
         initSearchModifierButton(fulltextButton);
-        EasyBind.subscribe(preferencesService.getFilePreferences().fulltextIndexLinkedFilesProperty(), value -> fulltextButton.setDisable(!value));
+        fulltextButton.disableProperty().bind(preferencesService.getFilePreferences().fulltextIndexLinkedFilesProperty().not());
         fulltextButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.FULLTEXT, fulltextButton.isSelected());
             performSearch();
