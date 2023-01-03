@@ -33,11 +33,11 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - In case a journal name of an IEEE journal is abbreviated, the "normal" abbreviation is used - and not the one of the IEEE BibTeX strings. [abbrv#91](https://github.com/JabRef/abbrv.jabref.org/issues/91)
 - We fixed an issue where the last opened libraries were not remembered when a new unsaved libray was open as well. [#9190](https://github.com/JabRef/jabref/issues/9190)
 - We fixed an issue where no context menu for the group "All entries" was present. [forum#3682](https://discourse.jabref.org/t/how-sort-groups-a-z-not-subgroups/3682)
-- We fixed an issue where extra curly braces in some fields would trigger an exception when selecting the entry or doing an integrity check [#9475](https://github.com/JabRef/jabref/issues/9475), [#9503](https://github.com/JabRef/jabref/issues/9503)
+- We fixed an issue where extra curly braces in some fields would trigger an exception when selecting the entry or doing an integrity check. [#9475](https://github.com/JabRef/jabref/issues/9475), [#9503](https://github.com/JabRef/jabref/issues/9503)
 - We fixed an issue where entering a date in the format "YYYY/MM" in the entry editor date field caused an exception. [#9492](https://github.com/JabRef/jabref/issues/9492)
 - For portable versions, the `.deb` file now works on plain debian again. [#9472](https://github.com/JabRef/jabref/issues/9472)
-- We fixed an issue where the download of linked online files failed after an import of entries for certain urls [#9518](https://github.com/JabRef/jabref/issues/9518)
-- We fixed an issue where an exception occured when manually downloading a file from an URL in the entry editor [#9521](https://github.com/JabRef/jabref/issues/9521)
+- We fixed an issue where the download of linked online files failed after an import of entries for certain urls. [#9518](https://github.com/JabRef/jabref/issues/9518)
+- We fixed an issue where an exception occured when manually downloading a file from an URL in the entry editor. [#9521](https://github.com/JabRef/jabref/issues/9521)
 
 ### Removed
 
