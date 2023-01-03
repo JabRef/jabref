@@ -24,6 +24,8 @@ import org.jabref.preferences.PreferencesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -38,6 +40,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.CONCURRENT)
 class JournalAbbreviationsViewModelTabTest {
 
     private JournalAbbreviationsTabViewModel viewModel;
@@ -49,41 +52,50 @@ class JournalAbbreviationsViewModelTabTest {
 
     public static Stream<Arguments> provideTestFiles() {
         return Stream.of(
-                // Mixed abbreviations
+                // No shortest unique abbreviations in files
+                // Shortest unique abbreviations in entries (being the same then the abbreviation)
                 Arguments.of(
-                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE\n"),
-                                 List.of("testFile3Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE\nMoreEntries;ME;M\n"),
-                                 List.of("testFile4Entries.csv", "Abbreviations;Abb\nTest Entry;TE;T\nMoreEntries;ME;M\nEntry;E\n"),
-                                 // contains similar entry "Test Entry"
-                                 List.of("testFile5Entries.csv", "Abbreviations;Abb\nTest Entry;TE;T\nTest Entry;TE\nMoreEntries;ME;M\nEntryEntry;EE\n")),
-                        List.of(
-                                // Entries of testFile4
-                                List.of("Abbreviations;Abb;Abb", "Test Entry;TE;T", "MoreEntries;ME;M", "JabRefTestEntry;JTE;JTE"),
-                                // Entries of testFile5
-                                List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;T", "Test Entry;TE", "SomeOtherEntry;SOE;SOE"))),
-
-                // No shortest unique abbreviations
-                Arguments.of(
-                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE\n"),
-                                List.of("testFile3Entries.csv", "Abbreviations;Abb\nTest Entry;TE\nMoreEntries;ME\n"),
-                                List.of("testFile4Entries.csv", "Abbreviations;Abb\nTest Entry;TE\nMoreEntries;ME\nEntry;E\n"),
-                                // contains duplicate entry "Test Entry"
-                                List.of("testFile5Entries.csv", "Abbreviations;Abb\nTest Entry;TE\nTest Entry;TE\nMoreEntries;ME\nEntryEntry;EE\n")),
+                        List.of(List.of("testFile0_1Entries.csv", "Test Entry;TE\n"),
+                                List.of("testFile1_3Entries.csv", "Abbreviations;Abb\nTest Entry;TE\nMoreEntries;ME\n"),
+                                List.of("testFile2_4Entries.csv", "Abbreviations;Abb\nTest Entry;TE\nMoreEntries;ME\nEntry;E\n"),
+                                // contains duplicate entry "Test Entry" (without shortest unique "T")
+                                List.of("testFile3_5Entries.csv", "Abbreviations;Abb\nTest Entry;TE\nTest Entry;TE\nMoreEntries;ME\nEntryEntry;EE\n")),
+                        true,
                         List.of(
                                 List.of("Abbreviations;Abb;Abb", "Test Entry;TE;TE", "MoreEntries;ME;ME", "JabRefTestEntry;JTE;JTE"),
-                               List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;TE", "SomeOtherEntry;SOE;SOE"))),
+                                List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;TE", "SomeOtherEntry;SOE;SOE")),
+                        new Abbreviation("Test Entry", "TE", "TE")),
 
                 // Shortest unique abbreviations
                 Arguments.of(
-                        List.of(List.of("testFile1Entries.csv", "Test Entry;TE;T\n"),
-                                List.of("testFile3Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE;T\nMoreEntries;ME;M\n"),
-                                List.of("testFile4Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE;T\nMoreEntries;ME;M\nEntry;En;E\n"),
-                                // contains duplicate entry "Test Entry"
-                                List.of("testFile5Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE;T\nTest Entry;TE;T\nMoreEntries;ME;M\nEntryEntry;EE\n")),
+                        List.of(List.of("testFile0_1Entries.csv", "Test Entry;TE;T\n"),
+                                List.of("testFile1_3Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE;T\nMoreEntries;ME;M\n"),
+                                List.of("testFile2_4Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE;T\nMoreEntries;ME;M\nEntry;En;E\n"),
+                                // contains duplicate entry "Test Entry" (with shortest unique "T")
+                                List.of("testFile3_5Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE;T\nTest Entry;TE;T\nMoreEntries;ME;M\nEntryEntry;EE\n")),
+                        true,
                         List.of(
                                 List.of("Abbreviations;Abb;A", "Test Entry;TE;T", "MoreEntries;ME;M", "JabRefTestEntry;JTE;JTE"),
-                                List.of("EntryEntry;EE;EE", "Abbreviations;Abb;A", "Test Entry;TE;T", "SomeOtherEntry;SOE;SOE")))
-        );
+                                List.of("EntryEntry;EE;EE", "Abbreviations;Abb;A", "Test Entry;TE;T", "SomeOtherEntry;SOE;SOE")),
+                        new Abbreviation("Test Entry", "TE", "T")),
+
+                // Mixed abbreviations (some have shortest unique, some have not)
+                Arguments.of(
+                        List.of(List.of("testFile0_1Entries.csv", "Test Entry;TE\n"),
+                                 List.of("testFile1_3Entries.csv", "Abbreviations;Abb;A\nTest Entry;TE\nMoreEntries;ME;M\n"),
+                                 // Here, "Test Entry" has "T" as shortest unique abbreviation (and not "TE" anymore)
+                                 List.of("testFile2_4Entries.csv", "Abbreviations;Abb\nTest Entry;TE;T\nMoreEntries;ME;M\nEntry;E\n"),
+                                 // contains "Test Entry" in two variants
+                                 List.of("testFile3_5Entries.csv", "Abbreviations;Abb\nTest Entry;TE;T\nTest Entry;TE\nMoreEntries;ME;M\nEntryEntry;EE\n")),
+                        false,
+                        List.of(
+                                // Entries of testFile4 plus "JabRefTestEntry"
+                                List.of("Abbreviations;Abb;Abb", "Test Entry;TE;T", "MoreEntries;ME;M", "JabRefTestEntry;JTE;JTE"),
+                                // Entries of testFile5 plus "SomeOtherEntry" minus MoreEntries minus EntryEntry
+                                List.of("EntryEntry;EE;EE", "Abbreviations;Abb;Abb", "Test Entry;TE;T", "Test Entry;TE", "SomeOtherEntry;SOE;SOE")),
+                        new Abbreviation("Test Entry", "TE", "T"))
+
+                );
     }
 
     @BeforeEach
@@ -167,15 +179,15 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testOpenValidFileContainsTheSpecificEntryAndEnoughAbbreviations(List<List<String>> testFiles) throws IOException {
-        Abbreviation testAbbreviation = new Abbreviation("Test Entry", "TE");
-        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(1))));
+    void testOpenValidFileContainsTheSpecificEntryAndEnoughAbbreviations(List<List<String>> testFiles, boolean containsDuplicate, List<List<String>> entries, Abbreviation abbreviationToContain) throws IOException {
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(2))));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
 
         assertEquals(1, viewModel.journalFilesProperty().size());
-        assertEquals(3, viewModel.abbreviationsProperty().size());
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
+        assertEquals(4, viewModel.abbreviationsProperty().size());
+
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(abbreviationToContain)));
     }
 
     @ParameterizedTest
@@ -193,10 +205,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testMixedFileUsage(List<List<String>> testFiles) throws IOException {
-        Abbreviation testAbbreviation = new Abbreviation("Entry", "E");
-        Abbreviation testAbbreviation2 = new Abbreviation("EntryEntry", "EE");
-
+    void testMixedFileUsage(List<List<String>> testFiles, boolean containsDuplicate, List<List<String>> entries, Abbreviation abbreviationToContain) throws IOException {
         // simulate open file button twice
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(createTestFile(testFiles.get(1))));
         viewModel.addNewFile();
@@ -206,10 +215,12 @@ class JournalAbbreviationsViewModelTabTest {
 
         // size of the list of journal files should be incremented by two
         assertEquals(2, viewModel.journalFilesProperty().size());
-        // our second test file has 4 abbreviations
+
+        // our third test file has 4 abbreviations
         assertEquals(4, viewModel.abbreviationsProperty().size());
-        // check some abbreviation
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
+
+        // check "arbitrary" abbreviation
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(abbreviationToContain)));
 
         // simulate add new file button
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
@@ -218,6 +229,7 @@ class JournalAbbreviationsViewModelTabTest {
 
         // size of the list of journal files should be incremented by one
         assertEquals(3, viewModel.journalFilesProperty().size());
+
         // a new file has zero abbreviations
         assertEquals(0, viewModel.abbreviationsProperty().size());
 
@@ -229,10 +241,11 @@ class JournalAbbreviationsViewModelTabTest {
         // size of the list of journal files should be incremented by one
         assertEquals(4, viewModel.journalFilesProperty().size());
 
-        assertEquals(4, viewModel.abbreviationsProperty().size());
+        // Fourth file has 5 entries, but "sometimes" has a duplicate entry
+        assertEquals(containsDuplicate ? 4 : 5, viewModel.abbreviationsProperty().size());
 
-        // check some abbreviation
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation2)));
+        // check "arbitrary" abbreviation
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(abbreviationToContain)));
     }
 
     @Test
@@ -389,7 +402,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void testSaveAbbreviationsToFilesCreatesNewFilesWithWrittenAbbreviations(List<List<String>> testFiles, List<List<String>> testEntries) throws Exception {
+    void testSaveAbbreviationsToFilesCreatesNewFilesWithWrittenAbbreviations(List<List<String>> testFiles, boolean containsDuplicate, List<List<String>> testEntries) throws Exception {
         Path testFile4Entries = createTestFile(testFiles.get(2));
         Path testFile5EntriesWithDuplicate = createTestFile(testFiles.get(3));
 
