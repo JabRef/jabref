@@ -13,7 +13,7 @@
     <category field="social_science"/>
     <issn>1465-4466</issn>
     <eissn>1569-206X</eissn>
-    <updated>2020-08-10T08:06:15+00:00</updated>
+    <updated>2022-11-10T15:25:15+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -193,8 +193,16 @@
   <macro name="locators">
     <choose>
       <if type="article-journal">
-        <text variable="volume" prefix=" "/>
-        <text variable="issue" prefix="(" suffix=")"/>
+        <group delimiter=" ">
+          <text variable="container-title" font-style="italic"/>
+          <group delimiter=": ">
+            <group delimiter=", ">
+              <text variable="volume" prefix=" "/>
+              <text variable="issue"/>
+            </group>
+            <text variable="page"/>
+          </group>
+        </group>
       </if>
       <else-if type="legal_case">
         <text variable="volume" prefix=", "/>
@@ -227,9 +235,6 @@
           </group>
         </group>
       </if>
-      <else-if type="article-journal">
-        <text variable="page"/>
-      </else-if>
     </choose>
   </macro>
   <macro name="point-locators">
@@ -245,7 +250,7 @@
       </if>
     </choose>
     <choose>
-      <if type="legal_case" match="none">
+      <if type="legal_case article-journal" match="none">
         <text variable="container-title" font-style="italic"/>
       </if>
     </choose>
@@ -269,8 +274,11 @@
           </else-if>
           <else>
             <group delimiter=": ">
-              <text variable="publisher-place"/>
-              <text variable="publisher"/>
+              <group delimiter=": ">
+                <text variable="publisher-place"/>
+                <text variable="publisher"/>
+              </group>
+              <text variable="page"/>
             </group>
           </else>
         </choose>

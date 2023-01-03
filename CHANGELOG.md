@@ -11,17 +11,19 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
-- We added a dropdown menu to let users change the library they want to import into during import.[#6177](https://github.com/JabRef/jabref/issues/6177)
-- We added the possibility to add/remove a preview style from the selected list using a double click [#9490](https://github.com/JabRef/jabref/issues/9490)
 - We reintroduced the floating search in the main table. [#8963](https://github.com/JabRef/jabref/pull/8963)
-
+- We added a dropdown menu to let users change the library they want to import into during import. [#6177](https://github.com/JabRef/jabref/issues/6177)
+- We added the possibility to add/remove a preview style from the selected list using a double click. [#9490](https://github.com/JabRef/jabref/issues/9490)
+- We added the option to define fields as "multine" directly in the custom entry types dialog. [#6448](https://github.com/JabRef/jabref/issues/6448)
 
 
 ### Changed
 
-- We changed database structure: in MySQL/MariaDB we renamed tables by adding a `JABREF_` prefix, and in PGSQL we moved tables in `jabref` schema. We added `VersionDBStructure` variable in `METADATA` table to indicate current version of structure, this variable is needed for automatic migration [#9312](https://github.com/JabRef/jabref/issues/9312)
-- We moved some preferences options to a new tab in the preferences dialog. [#9442](https://github.com/JabRef/jabref/pull/9308)
 - The search in the library now displays probable search hits instead of exact matches. Sorting by hit score can be done by the new score table column. [#8963](https://github.com/JabRef/jabref/pull/8963)
+- We changed database structure: in MySQL/MariaDB we renamed tables by adding a `JABREF_` prefix, and in PGSQL we moved tables in `jabref` schema. We added `VersionDBStructure` variable in `METADATA` table to indicate current version of structure, this variable is needed for automatic migration. [#9312](https://github.com/JabRef/jabref/issues/9312)
+- We moved some preferences options to a new tab in the preferences dialog. [#9442](https://github.com/JabRef/jabref/pull/9308)
+- We renamed "Medline abbrevation" to "dotless abbreviation". [#9504](https://github.com/JabRef/jabref/pull/9504)
+- We now have more "dots" in the offered journal abbrevations. [#9504](https://github.com/JabRef/jabref/pull/9504)
 
 
 
@@ -29,8 +31,14 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Fixed
 
 - The tab "deprecated fields" is shown in biblatex-mode only. [#7757](https://github.com/JabRef/jabref/issues/7757)
-- We fixed an issue where the last opened libraries were not remembered when a new unsaved libray was open as well [#9190](https://github.com/JabRef/jabref/issues/9190)
-- We fixed an issue where no context menu for the group "All entries" was present [forum#3682](https://discourse.jabref.org/t/how-sort-groups-a-z-not-subgroups/3682)
+- In case a journal name of an IEEE journal is abbreviated, the "normal" abbreviation is used - and not the one of the IEEE BibTeX strings. [abbrv#91](https://github.com/JabRef/abbrv.jabref.org/issues/91)
+- We fixed an issue where the last opened libraries were not remembered when a new unsaved libray was open as well. [#9190](https://github.com/JabRef/jabref/issues/9190)
+- We fixed an issue where no context menu for the group "All entries" was present. [forum#3682](https://discourse.jabref.org/t/how-sort-groups-a-z-not-subgroups/3682)
+- We fixed an issue where extra curly braces in some fields would trigger an exception when selecting the entry or doing an integrity check. [#9475](https://github.com/JabRef/jabref/issues/9475), [#9503](https://github.com/JabRef/jabref/issues/9503)
+- We fixed an issue where entering a date in the format "YYYY/MM" in the entry editor date field caused an exception. [#9492](https://github.com/JabRef/jabref/issues/9492)
+- For portable versions, the `.deb` file now works on plain debian again. [#9472](https://github.com/JabRef/jabref/issues/9472)
+- We fixed an issue where the download of linked online files failed after an import of entries for certain urls. [#9518](https://github.com/JabRef/jabref/issues/9518)
+- We fixed an issue where an exception occured when manually downloading a file from an URL in the entry editor. [#9521](https://github.com/JabRef/jabref/issues/9521)
 
 ### Removed
 

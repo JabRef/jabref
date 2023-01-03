@@ -1,11 +1,15 @@
 package org.jabref.logic.journals;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Abbreviation implements Comparable<Abbreviation> {
+public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
-    private final String name;
+    private static final long serialVersionUID = 1;
+
+    private transient String name;
     private final String abbreviation;
+    private transient String dotlessAbbreviation;
     private final String shortestUniqueAbbreviation;
 
     public Abbreviation(String name, String abbreviation) {
@@ -13,9 +17,18 @@ public class Abbreviation implements Comparable<Abbreviation> {
     }
 
     public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
-        this.name = name;
-        this.abbreviation = abbreviation;
-        this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim();
+        this(name,
+                abbreviation,
+                // "L. N." becomes "L  N ", we need to remove the double spaces inbetween
+                abbreviation.replace(".", " ").replace("  ", " ").trim(),
+                shortestUniqueAbbreviation.trim());
+    }
+
+    public Abbreviation(String name, String abbreviation, String dotlessAbbreviation, String shortestUniqueAbbreviation) {
+        this.name = name.intern();
+        this.abbreviation = abbreviation.intern();
+        this.dotlessAbbreviation = dotlessAbbreviation.intern();
+        this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim().intern();
     }
 
     public String getName() {
@@ -34,8 +47,8 @@ public class Abbreviation implements Comparable<Abbreviation> {
         return result;
     }
 
-    public String getMedlineAbbreviation() {
-        return getAbbreviation().replace(".", " ").replace("  ", " ").trim();
+    public String getDotlessAbbreviation() {
+        return this.dotlessAbbreviation;
     }
 
     @Override
@@ -46,23 +59,23 @@ public class Abbreviation implements Comparable<Abbreviation> {
     public String getNext(String current) {
         String currentTrimmed = current.trim();
 
-        if (getMedlineAbbreviation().equals(currentTrimmed)) {
+        if (getDotlessAbbreviation().equals(currentTrimmed)) {
             return getShortestUniqueAbbreviation().equals(getAbbreviation()) ? getName() : getShortestUniqueAbbreviation();
         } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) && !getShortestUniqueAbbreviation().equals(getAbbreviation())) {
             return getName();
         } else if (getName().equals(currentTrimmed)) {
             return getAbbreviation();
         } else {
-            return getMedlineAbbreviation();
+            return getDotlessAbbreviation();
         }
     }
 
     @Override
     public String toString() {
-        return String.format("Abbreviation{name=%s, abbreviation=%s, medlineAbbreviation=%s, shortestUniqueAbbreviation=%s}",
+        return String.format("Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}",
                 this.name,
                 this.abbreviation,
-                this.getMedlineAbbreviation(),
+                this.dotlessAbbreviation,
                 this.shortestUniqueAbbreviation);
     }
 

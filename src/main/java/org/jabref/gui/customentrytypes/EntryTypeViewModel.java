@@ -2,6 +2,7 @@ package org.jabref.gui.customentrytypes;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ObjectProperty;
@@ -10,16 +11,22 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.field.Field;
 
 public class EntryTypeViewModel {
 
     private final ObjectProperty<BibEntryType> entryType = new SimpleObjectProperty<>();
     private final ObservableList<FieldViewModel> fields;
 
-    public EntryTypeViewModel(BibEntryType entryType) {
+    public EntryTypeViewModel(BibEntryType entryType, Predicate<Field> isMultiline) {
         this.entryType.set(entryType);
 
-        List<FieldViewModel> allFieldsForType = entryType.getAllBibFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority())).collect(Collectors.toList());
+        List<FieldViewModel> allFieldsForType = entryType.getAllBibFields()
+                       .stream().map(bibField -> new FieldViewModel(bibField.getField(),
+                                   entryType.isRequired(bibField.getField()),
+                                   bibField.getPriority(),
+                                   isMultiline.test(bibField.getField())))
+                                                 .collect(Collectors.toList());
         fields = FXCollections.observableArrayList((allFieldsForType));
     }
 

@@ -14,7 +14,7 @@
     <category field="medicine"/>
     <issn>0214-2597</issn>
     <summary>Vancouver parentheses style strip periods for use in Boletín de Pediatría</summary>
-    <updated>2017-08-05T15:23:08+00:00</updated>
+    <updated>2022-11-20T15:23:08+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -257,7 +257,6 @@
     <choose>
       <if type="article-journal article-magazine review review-book" match="any">
         <text variable="volume"/>
-        <text variable="issue" prefix="(" suffix=")"/>
       </if>
     </choose>
   </macro>

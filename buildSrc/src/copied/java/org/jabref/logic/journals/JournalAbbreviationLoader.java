@@ -10,6 +10,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * <p>
+ *   This class loads abbreviations from a CSV file and stores them into a MV file
+ * </p>
+ * <p>
+ *   Abbreviations are available at <a href="https://github.com/JabRef/abbrv.jabref.org/">https://github.com/JabRef/abbrv.jabref.org/</a>.
+ * </p>
+ */
 public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
@@ -26,8 +34,8 @@ public class JournalAbbreviationLoader {
         // Initialize with built-in list
         try {
             Path tempDir = Files.createTempDirectory("jabref-journal");
-            Path tempJournalList = tempDir.resolve("journalList.mv");
-            Files.copy(JournalAbbreviationRepository.class.getResourceAsStream("/journals/journalList.mv"), tempJournalList);
+            Path tempJournalList = tempDir.resolve("journal-list.mv");
+            Files.copy(JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv"), tempJournalList);
             repository = new JournalAbbreviationRepository(tempJournalList);
             tempDir.toFile().deleteOnExit();
             tempJournalList.toFile().deleteOnExit();
@@ -39,12 +47,13 @@ public class JournalAbbreviationLoader {
         // Read external lists
         List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
         if (!(lists.isEmpty())) {
+            // reversing ensures that the latest lists overwrites the former one
             Collections.reverse(lists);
             for (String filename : lists) {
                 try {
                     repository.addCustomAbbreviations(readJournalListFromFile(Path.of(filename)));
                 } catch (IOException e) {
-                    LOGGER.error(String.format("Cannot read external journal list file %s", filename), e);
+                    LOGGER.error("Cannot read external journal list file {}", filename, e);
                 }
             }
         }
