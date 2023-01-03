@@ -18,6 +18,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.GeneralPreferences;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.eclipse.jgit.api.Git;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,9 @@ import static org.mockito.Mockito.when;
 
 /**
  * Integration test of the components used for SLR support
+ * Marked as FetcherTest as it calls fetcher
  */
+@FetcherTest
 class CrawlerTest {
     @TempDir
     Path tempRepositoryDirectory;
