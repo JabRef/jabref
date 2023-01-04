@@ -114,27 +114,23 @@ class JournalAbbreviationsViewModelTabTest {
 
     private record TestData(
             List<CsvFileNameAndContent> csvFiles,
-            boolean containsDuplicates,
+            TestAbbreviation abbreviationToCheck,
             List<String> finalContentsOfFile2,
-            List<String> finalContentsOfFile3,
-            TestAbbreviation abbreviationToCheck
+            List<String> finalContentsOfFile3
     ) {
         /**
          * Note that we have a **different** ordering at the constructor, because Java generics have "type erasure"
          */
         public TestData(
-                boolean containsDuplicates,
                 List<CsvFileNameAndContent> csvFiles,
                 List<TestAbbreviation> finalContentsOfFile2,
                 List<TestAbbreviation> finalContentsOfFile3,
                 TestAbbreviation abbreviationToCheck
         ) {
             this(csvFiles,
-                    containsDuplicates,
+                    abbreviationToCheck,
                     finalContentsOfFile2.stream().map(TestAbbreviation::toString).toList(),
-                    finalContentsOfFile3.stream().map(TestAbbreviation::toString).toList(),
-                    abbreviationToCheck
-                    );
+                    finalContentsOfFile3.stream().map(TestAbbreviation::toString).toList());
         }
     }
 
@@ -145,7 +141,6 @@ class JournalAbbreviationsViewModelTabTest {
                 // No shortest unique abbreviations in files
                 // Shortest unique abbreviations in entries (being the same then the abbreviation)
                 new TestData(
-                        true,
                         List.of(
                                 new CsvFileNameAndContent("testFile10.csv", ABBREVIATION_1),
                                 new CsvFileNameAndContent("testFile11.csv", ABBREVIATION_0, ABBREVIATION_1, ABBREVIATION_2),
@@ -157,7 +152,6 @@ class JournalAbbreviationsViewModelTabTest {
 
                 // Shortest unique abbreviations
                 new TestData(
-                        true,
                         List.of(
                                 new CsvFileNameAndContent("testFile20.csv", ABBREVIATION_1_OTHER_SHORT_UNIQUE),
                                 new CsvFileNameAndContent("testFile21.csv", ABBREVIATION_0_OTHER_SHORT_UNIQUE, ABBREVIATION_1_OTHER_SHORT_UNIQUE, ABBREVIATION_2_OTHER_SHORT_UNIQUE),
@@ -171,7 +165,6 @@ class JournalAbbreviationsViewModelTabTest {
 
                 // Mixed abbreviations (some have shortest unique, some have not)
                 new TestData(
-                        false,
                         List.of(
                                 new CsvFileNameAndContent("testFile30.csv", ABBREVIATION_1),
                                 new CsvFileNameAndContent("testFile31.csv", ABBREVIATION_0_OTHER_SHORT_UNIQUE, ABBREVIATION_1, ABBREVIATION_2_OTHER_SHORT_UNIQUE),
