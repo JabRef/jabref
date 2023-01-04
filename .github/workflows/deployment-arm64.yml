@@ -45,17 +45,14 @@ jobs:
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.15
-        with:
-          versionSpec: "5.x"
+      - uses: actions/checkout@v3
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.15
+        run: |
+          echo "AssemblySemVer=5.9.0" >> $GITHUB_OUTPUT
+          echo "InformationalVersion=5.9--2023-01-06" >> $GITHUB_OUTPUT
+          echo "Major=5" >> $GITHUB_OUTPUT
+          echo "Minor=9" >> $GITHUB_OUTPUT
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
