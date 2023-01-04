@@ -1,9 +1,8 @@
 name: Release binaries on GitHub
 
 on:
-  push:
-    tags:
-       - 'v*'
+  # due to synchronization with a complete build, we need a manual trigger
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.ref }}
