@@ -45,12 +45,15 @@ jobs:
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - uses: actions/checkout@v3
+      - name: Fetch all history for all tags and branches
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Run GitVersion
         id: gitversion
         shell: bash
         run: |
-          echo "AssemblySemVer=5.9.0" >> $GITHUB_OUTPUT
+          echo "AssemblySemVer=5.9.`git rev-list v5.8..HEAD --count`" >> $GITHUB_OUTPUT
           echo "InformationalVersion=5.9--`git log -1 --pretty='format:%cd' --date=format:'%Y-%m-%d'`--`git log -1 --format=%h`" >> $GITHUB_OUTPUT
           echo "Major=5" >> $GITHUB_OUTPUT
           echo "Minor=9" >> $GITHUB_OUTPUT
