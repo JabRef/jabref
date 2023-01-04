@@ -1,3 +1,4 @@
+next-version: 5.9
 assembly-versioning-format: '{major}.{minor}.{WeightedPreReleaseNumber}'
 assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
 mode: ContinuousDeployment
