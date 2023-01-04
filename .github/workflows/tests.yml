@@ -31,7 +31,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run check style reporter
@@ -57,7 +57,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
@@ -89,7 +89,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
@@ -123,7 +123,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
@@ -161,7 +161,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Update test coverage metrics

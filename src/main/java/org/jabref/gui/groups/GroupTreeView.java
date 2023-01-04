@@ -447,7 +447,7 @@ public class GroupTreeView extends BorderPane {
             menu.getItems().clear();
             if (viewModel.isEditable(group)) {
                 menu.getItems().add(editGroup);
-                if (group.getChildren().size() > 0 && viewModel.canAddGroupsIn(group)) {
+                if ((group.getChildren().size() > 0) && viewModel.canAddGroupsIn(group)) {
                     menu.getItems().add(removeGroupWithSubgroups);
                     menu.getItems().add(new SeparatorMenuItem());
                     menu.getItems().add(addSubgroup);
@@ -460,6 +460,11 @@ public class GroupTreeView extends BorderPane {
                         menu.getItems().add(addSubgroup);
                     }
                 }
+            }
+            if (group.isRoot()) {
+                menu.getItems().add(addSubgroup);
+                menu.getItems().add(removeSubgroups);
+                menu.getItems().add(sortSubgroups);
             }
 
             if (viewModel.canAddEntriesIn(group)) {

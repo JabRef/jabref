@@ -1,6 +1,7 @@
 package org.jabref.logic.layout;
 
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +21,7 @@ public class Layout {
 
     private final List<String> missingFormatters = new ArrayList<>();
 
-    public Layout(List<StringInt> parsedEntries, LayoutFormatterPreferences prefs) {
+    public Layout(List<StringInt> parsedEntries, List<Path> fileDirForDatabase, LayoutFormatterPreferences prefs) {
         List<LayoutEntry> tmpEntries = new ArrayList<>(parsedEntries.size());
 
         List<StringInt> blockEntries = null;
@@ -46,6 +47,7 @@ public class Layout {
                             blockEntries.add(parsedEntry);
                             le = new LayoutEntry(blockEntries,
                                     parsedEntry.i == LayoutHelper.IS_FIELD_END ? LayoutHelper.IS_FIELD_START : LayoutHelper.IS_GROUP_START,
+                                    fileDirForDatabase,
                                     prefs);
                             tmpEntries.add(le);
                             blockEntries = null;
@@ -61,7 +63,7 @@ public class Layout {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, prefs));
+                tmpEntries.add(new LayoutEntry(parsedEntry, fileDirForDatabase, prefs));
             } else {
                 blockEntries.add(parsedEntry);
             }

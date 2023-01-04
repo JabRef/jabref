@@ -5,6 +5,6 @@ package org.jabref.gui.journals;
  */
 public enum AbbreviationType {
     DEFAULT,
-    MEDLINE,
+    DOTLESS,
     SHORTEST_UNIQUE
 }

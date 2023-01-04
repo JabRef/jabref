@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
@@ -96,22 +97,21 @@ class LayoutEntry {
     private static final Logger LOGGER = LoggerFactory.getLogger(LayoutEntry.class);
 
     private List<LayoutFormatter> option;
-
     // Formatter to be run after other formatters:
     private LayoutFormatter postFormatter;
 
     private String text;
-
     private List<LayoutEntry> layoutEntries;
-
     private final int type;
-
     private final List<String> invalidFormatter = new ArrayList<>();
 
-    private final LayoutFormatterPreferences prefs;
+    private final List<Path> fileDirForDatabase;
+    private final LayoutFormatterPreferences preferences;
 
-    public LayoutEntry(StringInt si, LayoutFormatterPreferences prefs) {
-        this.prefs = prefs;
+    public LayoutEntry(StringInt si, List<Path> fileDirForDatabase, LayoutFormatterPreferences preferences) {
+        this.preferences = preferences;
+        this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, Collections.emptyList());
+
         type = si.i;
         switch (type) {
             case LayoutHelper.IS_LAYOUT_TEXT:
@@ -130,8 +130,10 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, LayoutFormatterPreferences prefs) {
-        this.prefs = prefs;
+    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, List<Path> fileDirForDatabase, LayoutFormatterPreferences preferences) {
+        this.preferences = preferences;
+        this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, Collections.emptyList());
+
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         String blockStart = parsedEntries.get(0).s;
         String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
@@ -156,7 +158,7 @@ class LayoutEntry {
                         blockEntries.add(parsedEntry);
                         int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :
                                 LayoutHelper.IS_FIELD_START;
-                        LayoutEntry le = new LayoutEntry(blockEntries, groupType, prefs);
+                        LayoutEntry le = new LayoutEntry(blockEntries, groupType, fileDirForDatabase, preferences);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
@@ -172,7 +174,7 @@ class LayoutEntry {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, prefs));
+                tmpEntries.add(new LayoutEntry(parsedEntry, fileDirForDatabase, preferences));
             } else {
                 blockEntries.add(parsedEntry);
             }
@@ -443,7 +445,7 @@ class LayoutEntry {
             case "HTMLParagraphs" -> new HTMLParagraphs();
             case "Iso690FormatDate" -> new Iso690FormatDate();
             case "Iso690NamesAuthors" -> new Iso690NamesAuthors();
-            case "JournalAbbreviator" -> new JournalAbbreviator(prefs.getJournalAbbreviationRepository());
+            case "JournalAbbreviator" -> new JournalAbbreviator(preferences.getJournalAbbreviationRepository());
             case "LastPage" -> new LastPage();
 // For backward compatibility
             case "FormatChars", "LatexToUnicode" -> new LatexToUnicodeFormatter();
@@ -462,14 +464,14 @@ class LayoutEntry {
             case "ToUpperCase" -> new ToUpperCase();
             case "XMLChars" -> new XMLChars();
             case "Default" -> new Default();
-            case "FileLink" -> new FileLink(prefs.getFileLinkPreferences());
+            case "FileLink" -> new FileLink(fileDirForDatabase, preferences.getMainFileDirectory());
             case "Number" -> new Number();
             case "RisAuthors" -> new RisAuthors();
             case "Authors" -> new Authors();
             case "IfPlural" -> new IfPlural();
             case "Replace" -> new Replace();
             case "WrapContent" -> new WrapContent();
-            case "WrapFileLinks" -> new WrapFileLinks(prefs.getFileLinkPreferences());
+            case "WrapFileLinks" -> new WrapFileLinks(fileDirForDatabase, preferences.getMainFileDirectory());
             case "Markdown" -> new MarkdownFormatter();
             case "CSLType" -> new CSLType();
             case "ShortMonth" -> new ShortMonthFormatter();
@@ -483,12 +485,12 @@ class LayoutEntry {
     private List<LayoutFormatter> getOptionalLayout(String formatterName) {
         List<List<String>> formatterStrings = parseMethodsCalls(formatterName);
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
-        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(prefs.getNameFormatterPreferences());
+        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(preferences.getNameFormatterPreferences());
         for (List<String> strings : formatterStrings) {
             String nameFormatterName = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
-            Optional<String> contents = prefs.getCustomExportNameFormatter(nameFormatterName);
+            Optional<String> contents = preferences.getCustomExportNameFormatter(nameFormatterName);
             if (contents.isPresent()) {
                 NameFormatter nf = new NameFormatter();
                 nf.setParameter(contents.get());

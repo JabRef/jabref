@@ -41,6 +41,10 @@
         <single>eqn.</single>
         <multiple>eqns.</multiple>
       </term>
+      <term name="collection-number" form="short">
+        <single>no.</single>
+        <multiple>nos.</multiple>
+      </term>
     </terms>
   </locale>
   <macro name="author">
@@ -252,7 +256,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="7" et-al-use-first="5" subsequent-author-substitute-rule="partial-each" hanging-indent="true">
+  <bibliography et-al-min="7" et-al-use-first="5" subsequent-author-substitute-rule="partial-each" hanging-indent="true" entry-spacing="1">
     <sort>
       <key macro="author"/>
       <key macro="year-date"/>
@@ -270,7 +274,8 @@
               <if is-numeric="volume">
                 <group delimiter=" " prefix=", ">
                   <text term="volume" form="short"/>
-                  <text variable="volume"/>
+                  <number variable="volume"/>
+                  <text variable="volume-title" text-case="title" prefix=": "/>
                 </group>
               </if>
             </choose>
@@ -282,6 +287,13 @@
                 </group>
               </if>
             </choose>
+            <group delimiter=", " prefix=", ">
+              <text variable="collection-title" text-case="title"/>
+              <group delimiter=" " prefix=", ">
+                <label variable="collection-number" form="short"/>
+                <number variable="collection-number"/>
+              </group>
+            </group>
           </if>
         </choose>
       </group>
