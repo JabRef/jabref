@@ -66,7 +66,7 @@ jobs:
         id: gitversion
         run: |
           echo "AssemblySemVer=5.9.0" >> $GITHUB_OUTPUT
-          echo "InformationalVersion=5.9--2023-01-06" >> $GITHUB_OUTPUT
+          echo "InformationalVersion=5.9--` git log -1 --pretty='format:%cd' --date=format:'%Y-%m-%d'`--`git show -s --format=%H`" >> $GITHUB_OUTPUT
           echo "Major=5" >> $GITHUB_OUTPUT
           echo "Minor=9" >> $GITHUB_OUTPUT
       - name: Set up JDK
