@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get binaries from builds.jabref.org
-        run:
+        run: |
           mkdir build
           cd build
-          wget -m -r -nH --cut-dirs 2 --no-parent --accept=tar.gz,dmg,pkg,deb,rpm,zip,msi https://builds.jabref.org/tags/
+          wget -q -m -r -nH --cut-dirs 2 --no-parent --accept=tar.gz,dmg,pkg,deb,rpm,zip,msi https://builds.jabref.org/tags/
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
