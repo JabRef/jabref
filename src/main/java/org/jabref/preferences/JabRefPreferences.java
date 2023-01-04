@@ -50,10 +50,10 @@ import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
+import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.SearchDisplayMode;
@@ -450,6 +450,7 @@ public class JabRefPreferences implements PreferencesService {
     private PushToApplicationPreferences pushToApplicationPreferences;
     private ExternalApplicationsPreferences externalApplicationsPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private NameDisplayPreferences nameDisplayPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1833,43 +1834,9 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXTRA_FILE_COLUMNS, mainTablePreferences.getExtraFileColumnsEnabled());
     }
 
-    @Override
-    public MainTableNameFormatPreferences getMainTableNameFormatPreferences() {
-        DisplayStyle displayStyle = DisplayStyle.LASTNAME_FIRSTNAME; // default
-        if (getBoolean(NAMES_NATBIB)) {
-            displayStyle = DisplayStyle.NATBIB;
-        } else if (getBoolean(NAMES_AS_IS)) {
-            displayStyle = DisplayStyle.AS_IS;
-        } else if (getBoolean(NAMES_FIRST_LAST)) {
-            displayStyle = DisplayStyle.FIRSTNAME_LASTNAME;
-        }
-
-        AbbreviationStyle abbreviationStyle = AbbreviationStyle.NONE; // default
-        if (getBoolean(ABBR_AUTHOR_NAMES)) {
-            abbreviationStyle = AbbreviationStyle.FULL;
-        } else if (getBoolean(NAMES_LAST_ONLY)) {
-            abbreviationStyle = AbbreviationStyle.LASTNAME_ONLY;
-        }
-
-        return new MainTableNameFormatPreferences(
-                displayStyle,
-                abbreviationStyle);
-    }
-
-    @Override
-    public void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences) {
-        putBoolean(NAMES_NATBIB, preferences.getDisplayStyle() == DisplayStyle.NATBIB);
-        putBoolean(NAMES_AS_IS, preferences.getDisplayStyle() == DisplayStyle.AS_IS);
-        putBoolean(NAMES_FIRST_LAST, preferences.getDisplayStyle() == DisplayStyle.FIRSTNAME_LASTNAME);
-
-        putBoolean(ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
-        putBoolean(NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
-    }
-
-    //*************************************************************************************************************
+   //*************************************************************************************************************
     // Generic Column Handling
     //*************************************************************************************************************
-
     private List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
         List<String> columnNames = getStringList(columnNamesList);
         List<Double> columnWidths = getStringList(columnWidthList)
@@ -1953,6 +1920,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     // MainTable and SearchResultTable use the same set of columnNames
+
     @SuppressWarnings("SameParameterValue")
     private List<MainTableColumnModel> storeColumnPreferences(ColumnPreferences columnPreferences,
                                                               String columnNamesList,
@@ -1978,6 +1946,45 @@ public class JabRefPreferences implements PreferencesService {
                 .collect(Collectors.toList()));
 
         return columnPreferences.getColumns();
+    }
+
+    @Override
+    public NameDisplayPreferences getNameDisplayPreferences() {
+        if (Objects.nonNull(nameDisplayPreferences)) {
+            return nameDisplayPreferences;
+        }
+
+        DisplayStyle displayStyle = DisplayStyle.LASTNAME_FIRSTNAME; // default
+        if (getBoolean(NAMES_NATBIB)) {
+            displayStyle = DisplayStyle.NATBIB;
+        } else if (getBoolean(NAMES_AS_IS)) {
+            displayStyle = DisplayStyle.AS_IS;
+        } else if (getBoolean(NAMES_FIRST_LAST)) {
+            displayStyle = DisplayStyle.FIRSTNAME_LASTNAME;
+        }
+
+        AbbreviationStyle abbreviationStyle = AbbreviationStyle.NONE; // default
+        if (getBoolean(ABBR_AUTHOR_NAMES)) {
+            abbreviationStyle = AbbreviationStyle.FULL;
+        } else if (getBoolean(NAMES_LAST_ONLY)) {
+            abbreviationStyle = AbbreviationStyle.LASTNAME_ONLY;
+        }
+
+        nameDisplayPreferences = new NameDisplayPreferences(
+                displayStyle,
+                abbreviationStyle);
+
+        EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(NAMES_NATBIB, newValue == DisplayStyle.NATBIB);
+            putBoolean(NAMES_AS_IS, newValue == DisplayStyle.AS_IS);
+            putBoolean(NAMES_FIRST_LAST, newValue == DisplayStyle.FIRSTNAME_LASTNAME);
+        });
+        EasyBind.listen(nameDisplayPreferences.abbreviationStyleProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(ABBR_AUTHOR_NAMES, newValue == AbbreviationStyle.FULL);
+            putBoolean(NAMES_LAST_ONLY, newValue == AbbreviationStyle.LASTNAME_ONLY);
+        });
+
+        return nameDisplayPreferences;
     }
 
     //*************************************************************************************************************

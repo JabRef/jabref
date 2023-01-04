@@ -11,8 +11,8 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
@@ -169,9 +169,7 @@ public interface PreferencesService {
 
     void storeMainTablePreferences(MainTablePreferences mainTablePreferences);
 
-    MainTableNameFormatPreferences getMainTableNameFormatPreferences();
-
-    void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+    NameDisplayPreferences getNameDisplayPreferences();
 
     //*************************************************************************************************************
     // SearchDialogColumnPreferences

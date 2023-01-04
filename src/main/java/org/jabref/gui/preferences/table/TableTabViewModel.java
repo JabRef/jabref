@@ -16,10 +16,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
+import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.NoSelectionModel;
@@ -76,11 +76,13 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     private ColumnPreferences initialColumnPreferences;
     private final SpecialFieldsPreferences specialFieldsPreferences;
+    private final NameDisplayPreferences nameDisplayPreferences;
 
     public TableTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
+        this.nameDisplayPreferences = preferences.getNameDisplayPreferences();
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -111,7 +113,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         MainTablePreferences initialMainTablePreferences = preferences.getMainTablePreferences();
         initialColumnPreferences = initialMainTablePreferences.getColumnPreferences();
-        MainTableNameFormatPreferences initialNameFormatPreferences = preferences.getMainTableNameFormatPreferences();
+        NameDisplayPreferences initialNameFormatPreferences = preferences.getNameDisplayPreferences();
 
         specialFieldsEnabledProperty.setValue(specialFieldsPreferences.isSpecialFieldsEnabled());
         extraFileColumnsEnabledProperty.setValue(initialMainTablePreferences.getExtraFileColumnsEnabled());
@@ -242,23 +244,23 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
         specialFieldsPreferences.setSpecialFieldsEnabled(specialFieldsEnabledProperty.getValue());
 
-        DisplayStyle displayStyle = DisplayStyle.LASTNAME_FIRSTNAME;
-        if (namesNatbibProperty.getValue()) {
-            displayStyle = DisplayStyle.NATBIB;
+        if (nameLastFirstProperty.getValue()) {
+            nameDisplayPreferences.setDisplayStyle(DisplayStyle.LASTNAME_FIRSTNAME);
+        } else if (namesNatbibProperty.getValue()) {
+            nameDisplayPreferences.setDisplayStyle(DisplayStyle.NATBIB);
         } else if (nameAsIsProperty.getValue()) {
-            displayStyle = DisplayStyle.AS_IS;
+            nameDisplayPreferences.setDisplayStyle(DisplayStyle.AS_IS);
         } else if (nameFirstLastProperty.getValue()) {
-            displayStyle = DisplayStyle.FIRSTNAME_LASTNAME;
+            nameDisplayPreferences.setDisplayStyle(DisplayStyle.FIRSTNAME_LASTNAME);
         }
 
-        AbbreviationStyle abbreviationStyle = AbbreviationStyle.NONE;
-        if (abbreviationEnabledProperty.getValue()) {
-            abbreviationStyle = AbbreviationStyle.FULL;
+        if (abbreviationDisabledProperty.getValue()) {
+            nameDisplayPreferences.setAbbreviationStyle(AbbreviationStyle.NONE);
+        } else if (abbreviationEnabledProperty.getValue()) {
+            nameDisplayPreferences.setAbbreviationStyle(AbbreviationStyle.FULL);
         } else if (abbreviationLastNameOnlyProperty.getValue()) {
-            abbreviationStyle = AbbreviationStyle.LASTNAME_ONLY;
+            nameDisplayPreferences.setAbbreviationStyle(AbbreviationStyle.LASTNAME_ONLY);
         }
-
-        preferences.storeMainTableNameFormatPreferences(new MainTableNameFormatPreferences(displayStyle, abbreviationStyle));
     }
 
     ValidationStatus columnsListValidationStatus() {
