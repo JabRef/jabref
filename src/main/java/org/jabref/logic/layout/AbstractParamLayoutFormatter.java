@@ -43,7 +43,7 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
                 } else if (arg.charAt(i) == 't') {
                     current.append('\t');
                 } else {
-                    if ((arg.charAt(i) != ',') && (arg.charAt(i) != '"')) {
+                    if (!((arg.charAt(i) == ',') || ((arg.charAt(i) == '"') && (i == (arg.length() - 1))))) {
                         current.append('\\');
                     }
                     current.append(arg.charAt(i));
