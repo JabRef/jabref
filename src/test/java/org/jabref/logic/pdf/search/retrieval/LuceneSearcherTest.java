@@ -3,7 +3,10 @@ package org.jabref.logic.pdf.search.retrieval;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
 
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.logic.util.StandardFileType;
@@ -13,10 +16,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.pdf.search.LuceneSearchResults;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
-import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -69,48 +72,49 @@ public class LuceneSearcherTest {
     }
 
     @Test
-    public void searchForTest() throws IOException, ParseException {
-        LuceneSearchResults result = search.search("test", 10);
-        assertEquals(8, result.numSearchResults());
+    public void searchForTest() {
+        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        assertEquals(8, hits);
     }
 
     @Test
-    public void searchForUniversity() throws IOException, ParseException {
-        LuceneSearchResults result = search.search("University", 10);
-        assertEquals(1, result.numSearchResults());
+    public void searchForUniversity() {
+        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("University", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        assertEquals(1, hits);
     }
 
     @Test
-    public void searchForStopWord() throws IOException, ParseException {
-        LuceneSearchResults result = search.search("and", 10);
-        assertEquals(0, result.numSearchResults());
+    public void searchForStopWord() {
+        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("and", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        assertEquals(0, hits);
     }
 
     @Test
-    public void searchForSecond() throws IOException, ParseException {
-        LuceneSearchResults result = search.search("second", 10);
-        assertEquals(4, result.numSearchResults());
+    public void searchForSecond() {
+        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("second", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        assertEquals(4, hits);
     }
 
     @Test
-    public void searchForAnnotation() throws IOException, ParseException {
-        LuceneSearchResults result = search.search("annotation", 10);
-        assertEquals(2, result.numSearchResults());
+    public void searchForAnnotation() {
+        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("annotation", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        assertEquals(2, hits);
     }
 
     @Test
-    public void searchForEmptyString() throws IOException {
-        LuceneSearchResults result = search.search("", 10);
-        assertEquals(0, result.numSearchResults());
+    public void searchForEmptyString() {
+        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        assertEquals(0, hits);
     }
 
     @Test
-    public void searchWithNullString() throws IOException {
-        assertThrows(NullPointerException.class, () -> search.search(null, 10));
-    }
-
-    @Test
-    public void searchForZeroResults() throws IOException {
-        assertThrows(IllegalArgumentException.class, () -> search.search("test", 0));
+    public void searchWithNullString() {
+        assertThrows(NullPointerException.class, () -> search.search(null));
     }
 }

@@ -2,6 +2,7 @@ package org.jabref.logic.search.retrieval;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
@@ -41,6 +42,8 @@ public final class LuceneSearcher {
      * @return a result map of all entries that have matches in any fields
      */
     public HashMap<BibEntry, LuceneSearchResults> search(SearchQuery query) {
+        Objects.requireNonNull(query);
+
         HashMap<BibEntry, LuceneSearchResults> results = new HashMap<>();
         try (IndexReader reader = DirectoryReader.open(indexDirectory)) {
             IndexSearcher searcher = new IndexSearcher(reader);
