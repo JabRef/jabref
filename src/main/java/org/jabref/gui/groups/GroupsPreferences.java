@@ -10,7 +10,7 @@ import javafx.collections.FXCollections;
 
 public class GroupsPreferences {
 
-    private final SetProperty<GroupViewMode> groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());;
+    private final SetProperty<GroupViewMode> groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());
     private final BooleanProperty shouldAutoAssignGroup = new SimpleBooleanProperty();
     private final BooleanProperty shouldDisplayGroupCount = new SimpleBooleanProperty();
 
