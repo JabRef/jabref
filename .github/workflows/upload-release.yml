@@ -10,9 +10,6 @@ concurrency:
 
 jobs:
   release:
-    strategy:
-      fail-fast: run
-    name: Release binaries on GitHub
     runs-on: ubuntu-latest
     steps:
       - name: Get binaries from builds.jabref.org
