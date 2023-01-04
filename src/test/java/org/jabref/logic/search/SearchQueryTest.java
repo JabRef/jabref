@@ -1,8 +1,6 @@
 package org.jabref.logic.search;
 
 import java.util.EnumSet;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -172,55 +170,5 @@ public class SearchQueryTest {
         entry.setField(StandardField.ABSTRACT, "text");
 
         assertTrue(new SearchQuery("text AND author=asdf", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)).isMatch(entry));
-    }
-
-    @Test
-    public void testSimpleTerm() {
-        String query = "progress";
-
-        SearchQuery result = new SearchQuery(query, EnumSet.noneOf(SearchRules.SearchFlags.class));
-    }
-
-    @Test
-    public void testGetPattern() {
-        String query = "progress";
-        SearchQuery result = new SearchQuery(query, EnumSet.noneOf(SearchFlags.class));
-        Pattern pattern = Pattern.compile("(\\Qprogress\\E)");
-        // We can't directly compare the pattern objects
-        assertEquals(Optional.of(pattern.toString()), result.getPatternForWords().map(Pattern::toString));
-    }
-
-    @Test
-    public void testGetRegexpPattern() {
-        String queryText = "[a-c]\\d* \\d*";
-        SearchQuery regexQuery = new SearchQuery(queryText, EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
-        Pattern pattern = Pattern.compile("([a-c]\\d* \\d*)");
-        assertEquals(Optional.of(pattern.toString()), regexQuery.getPatternForWords().map(Pattern::toString));
-    }
-
-    @Test
-    public void testGetRegexpJavascriptPattern() {
-        String queryText = "[a-c]\\d* \\d*";
-        SearchQuery regexQuery = new SearchQuery(queryText, EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
-        Pattern pattern = Pattern.compile("([a-c]\\d* \\d*)");
-        assertEquals(Optional.of(pattern.toString()), regexQuery.getJavaScriptPatternForWords().map(Pattern::toString));
-    }
-
-    @Test
-    public void testEscapingInPattern() {
-        // first word contain all java special regex characters
-        String queryText = "<([{\\\\^-=$!|]})?*+.> word1 word2.";
-        SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, EnumSet.noneOf(SearchRules.SearchFlags.class));
-        String pattern = "(\\Q<([{\\^-=$!|]})?*+.>\\E)|(\\Qword1\\E)|(\\Qword2.\\E)";
-        assertEquals(Optional.of(pattern), textQueryWithSpecialChars.getPatternForWords().map(Pattern::toString));
-    }
-
-    @Test
-    public void testEscapingInJavascriptPattern() {
-        // first word contain all javascript special regex characters that should be escaped individually in text based search
-        String queryText = "([{\\\\^$|]})?*+./ word1 word2.";
-        SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, EnumSet.noneOf(SearchRules.SearchFlags.class));
-        String pattern = "(\\(\\[\\{\\\\\\^\\$\\|\\]\\}\\)\\?\\*\\+\\.\\/)|(word1)|(word2\\.)";
-        assertEquals(Optional.of(pattern), textQueryWithSpecialChars.getJavaScriptPatternForWords().map(Pattern::toString));
     }
 }
