@@ -23,7 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved some preferences options to a new tab in the preferences dialog. [#9442](https://github.com/JabRef/jabref/pull/9308)
 - We renamed "Medline abbreviation" to "dotless abbreviation". [#9504](https://github.com/JabRef/jabref/pull/9504)
 - We now have more "dots" in the offered journal abbreviations. [#9504](https://github.com/JabRef/jabref/pull/9504)
-
+- We now disable the button "Full text search" in the Searchbar by default [#9527](https://github.com/JabRef/jabref/pull/9527)
 
 
 
