@@ -3,11 +3,10 @@ package org.jabref.gui.collab;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.entryadd.EntryAdd;
-import org.jabref.gui.collab.entryadd.EntryAddDetailsView;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.collab.entrychange.EntryChangeDetailsView;
+import org.jabref.gui.collab.entrychange.EntryWithPreviewAndSourceDetailsView;
 import org.jabref.gui.collab.entrydelete.EntryDelete;
-import org.jabref.gui.collab.entrydelete.EntryDeleteDetailsView;
 import org.jabref.gui.collab.groupchange.GroupChange;
 import org.jabref.gui.collab.groupchange.GroupChangeDetailsView;
 import org.jabref.gui.collab.metedatachange.MetadataChange;
@@ -46,9 +45,9 @@ public class DatabaseChangeDetailsViewFactory {
         if (databaseChange instanceof EntryChange entryChange) {
             return new EntryChangeDetailsView(entryChange, databaseContext, dialogService, stateManager, themeManager, preferencesService);
         } else if (databaseChange instanceof EntryAdd entryAdd) {
-            return new EntryAddDetailsView(entryAdd, databaseContext, dialogService, stateManager, themeManager, preferencesService);
+            return new EntryWithPreviewAndSourceDetailsView(entryAdd.getAddedEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService);
         } else if (databaseChange instanceof EntryDelete entryDelete) {
-            return new EntryDeleteDetailsView(entryDelete, databaseContext, dialogService, stateManager, themeManager, preferencesService);
+            return new EntryWithPreviewAndSourceDetailsView(entryDelete.getDeletedEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService);
         } else if (databaseChange instanceof BibTexStringAdd stringAdd) {
             return new BibTexStringAddDetailsView(stringAdd);
         } else if (databaseChange instanceof BibTexStringDelete stringDelete) {
