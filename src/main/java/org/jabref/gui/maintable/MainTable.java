@@ -130,7 +130,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         stateManager,
                         preferencesService,
                         undoManager,
-                        Globals.getClipboardManager(),
+                        clipBoardManager,
                         Globals.TASK_EXECUTOR,
                         Globals.entryTypesManager))
                 .setOnDragDetected(this::handleOnDragDetected)
@@ -251,7 +251,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (!selectedEntries.isEmpty()) {
             try {
-                Globals.getClipboardManager().setContent(selectedEntries);
+                clipBoardManager.setContent(selectedEntries);
                 dialogService.notify(libraryTab.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
             } catch (IOException e) {
                 LOGGER.error("Error while copying selected entries to clipboard", e);
@@ -321,7 +321,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void paste() {
-        List<BibEntry> entriesToAdd = new ArrayList<>();
+        List<BibEntry> entriesToAdd;
             entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipbaord()
             .map(importHandler::handleBibTeXData)
             .orElseGet(this::handleNonBibteXStringData);
@@ -335,7 +335,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private List<BibEntry> handleNonBibteXStringData() {
-        String data = this.clipBoardManager.getContents();
+        String data = ClipBoardManager.getContents();
         List<BibEntry> entries = new ArrayList<>();
         try {
             entries = this.importHandler.handleStringData(data);
