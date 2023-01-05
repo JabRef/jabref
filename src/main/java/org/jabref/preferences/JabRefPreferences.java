@@ -1120,9 +1120,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
-        putStringList(BIND_NAMES, keyBindingRepository.getBindNames());
-        putStringList(BINDINGS, keyBindingRepository.getBindings());
+    public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
+        putStringList(EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
     }
 
     @Override
@@ -1131,16 +1130,17 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
-        putStringList(EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
-    }
-
-    public void setPreviewStyle(String previewStyle) {
-        put(PREVIEW_STYLE, previewStyle);
+    public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
+        putStringList(BIND_NAMES, keyBindingRepository.getBindNames());
+        putStringList(BINDINGS, keyBindingRepository.getBindings());
     }
 
     public String getPreviewStyle() {
         return get(PREVIEW_STYLE);
+    }
+
+    public void setPreviewStyle(String previewStyle) {
+        put(PREVIEW_STYLE, previewStyle);
     }
 
     //*************************************************************************************************************
