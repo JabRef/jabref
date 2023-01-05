@@ -39,6 +39,7 @@ public final class EntryWithPreviewAndSourceDetailsView extends DatabaseChangeDe
 
         CodeArea codeArea = new CodeArea();
         codeArea.setWrapText(true);
+        codeArea.setDisable(true);
 
         TabPane tabPanePreviewCode = new TabPane();
         Tab previewTab = new Tab(Localization.lang("Entry preview"), previewViewer);
