@@ -159,15 +159,9 @@ public interface PreferencesService {
     // MainTablePreferences
     //*************************************************************************************************************
 
-    void updateMainTableColumns();
-
     ColumnPreferences getMainTableColumnPreferences();
 
-    void storeMainTableColumnPreferences(ColumnPreferences columnPreferences);
-
     MainTablePreferences getMainTablePreferences();
-
-    void storeMainTablePreferences(MainTablePreferences mainTablePreferences);
 
     NameDisplayPreferences getNameDisplayPreferences();
 
@@ -176,8 +170,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     ColumnPreferences getSearchDialogColumnPreferences();
-
-    void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences);
 
     //*************************************************************************************************************
     // AppearancePreferences

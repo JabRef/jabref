@@ -157,9 +157,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      * Reloads the preferences into the UI
      */
     private void updateAfterPreferenceChanges() {
-        // Reload internal preferences cache
-        preferences.updateMainTableColumns();
-
         setValues();
 
         frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());

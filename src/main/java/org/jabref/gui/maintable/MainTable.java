@@ -176,7 +176,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new PersistenceVisualStateTable(this, preferencesService);
+        new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences());
 
         setupKeyBindings(keyBindingRepository);
 

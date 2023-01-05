@@ -233,14 +233,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferences.storeMainTablePreferences(new MainTablePreferences(
-                new ColumnPreferences(
-                        columnsListProperty.getValue(),
-                        mainTablePreferences.getColumnPreferences().getColumnSortOrder()),
-                true,
-                true
-        ));
-
+        mainTablePreferences.getColumnPreferences().setColumns(columnsListProperty.getValue());
         mainTablePreferences.setResizeColumnsToFit(autoResizeColumnsProperty.getValue());
         mainTablePreferences.setExtraFileColumnsEnabled(extraFileColumnsEnabledProperty.getValue());
 

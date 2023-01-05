@@ -14,6 +14,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.PersistenceVisualStateTable;
 import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
@@ -65,7 +66,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new SearchResultsTablePersistenceVisualState(this, preferencesService);
+        new PersistenceVisualStateTable(this, preferencesService.getSearchDialogColumnPreferences());
 
         database.getDatabase().registerListener(this);
     }
