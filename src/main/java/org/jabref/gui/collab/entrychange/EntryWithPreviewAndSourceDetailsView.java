@@ -38,6 +38,7 @@ public final class EntryWithPreviewAndSourceDetailsView extends DatabaseChangeDe
         previewViewer.setEntry(entry);
 
         CodeArea codeArea = new CodeArea();
+        codeArea.setId("bibtexcodearea");
         codeArea.setWrapText(true);
         codeArea.setDisable(true);
 

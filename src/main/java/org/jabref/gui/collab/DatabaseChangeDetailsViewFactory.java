@@ -4,7 +4,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
-import org.jabref.gui.collab.entrychange.EntryChangeDetailsView;
 import org.jabref.gui.collab.entrychange.EntryWithPreviewAndSourceDetailsView;
 import org.jabref.gui.collab.entrydelete.EntryDelete;
 import org.jabref.gui.collab.groupchange.GroupChange;
@@ -43,7 +42,7 @@ public class DatabaseChangeDetailsViewFactory {
     public DatabaseChangeDetailsView create(DatabaseChange databaseChange) {
         // TODO: Use Pattern Matching for switch once it's out of preview
         if (databaseChange instanceof EntryChange entryChange) {
-            return new EntryChangeDetailsView(entryChange, databaseContext, dialogService, stateManager, themeManager, preferencesService);
+            return new EntryWithPreviewAndSourceDetailsView(entryChange.getNewEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService);
         } else if (databaseChange instanceof EntryAdd entryAdd) {
             return new EntryWithPreviewAndSourceDetailsView(entryAdd.getAddedEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService);
         } else if (databaseChange instanceof EntryDelete entryDelete) {
