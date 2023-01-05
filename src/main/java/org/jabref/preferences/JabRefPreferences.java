@@ -409,10 +409,6 @@ public class JabRefPreferences implements PreferencesService {
      */
     private Map<String, Set<Field>> entryEditorTabList;
     private String userName;
-//    private List<MainTableColumnModel> mainTableColumns;
-//    private List<MainTableColumnModel> mainTableColumnSortOrder;
-//    private List<MainTableColumnModel> searchDialogColumns;
-//    private List<MainTableColumnModel> searchDialogColumnSortOrder;
 
     private GeneralPreferences generalPreferences;
     private TelemetryPreferences telemetryPreferences;
