@@ -161,7 +161,7 @@ public interface PreferencesService {
 
     void updateMainTableColumns();
 
-    ColumnPreferences getColumnPreferences();
+    ColumnPreferences getMainTableColumnPreferences();
 
     void storeMainTableColumnPreferences(ColumnPreferences columnPreferences);
 

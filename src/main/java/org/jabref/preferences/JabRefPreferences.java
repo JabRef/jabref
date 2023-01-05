@@ -407,21 +407,18 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Cache variables
      */
+    private Map<String, Set<Field>> entryEditorTabList;
+    private String userName;
+    private List<MainTableColumnModel> mainTableColumns;
+    private List<MainTableColumnModel> mainTableColumnSortOrder;
+    private List<MainTableColumnModel> searchDialogColumns;
+    private List<MainTableColumnModel> searchDialogColumnSortOrder;
+
     private GeneralPreferences generalPreferences;
     private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
     private OwnerPreferences ownerPreferences;
     private TimestampPreferences timestampPreferences;
-
-    private Map<String, Set<Field>> entryEditorTabList;
-    private List<MainTableColumnModel> mainTableColumns;
-    private List<MainTableColumnModel> mainTableColumnSortOrder;
-
-    private List<MainTableColumnModel> searchDialogTableColunns;
-    private List<MainTableColumnModel> searchDialogColumnSortOrder;
-
-    private String userName;
-
     private PreviewPreferences previewPreferences;
     private OpenOfficePreferences openOfficePreferences;
     private SidePanePreferences sidePanePreferences;
@@ -1775,54 +1772,12 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // MainTablePreferences
+    // MainTablePreferences, SearchDialogColumnPreferences and ColumnPreferences
     //*************************************************************************************************************
-
-    private List<MainTableColumnModel> createMainTableColumns() {
-        if (this.mainTableColumns == null) {
-            this.mainTableColumns = updateColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-        }
-        return this.mainTableColumns;
-    }
-
-    @Override
-    public void updateMainTableColumns() {
-        mainTableColumns = updateColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-    }
-
-    /**
-     * Creates the ColumnSortOrder from cache
-     *
-     * @return List containing only the the columns in its proper sort order
-     */
-    private List<MainTableColumnModel> createMainTableColumnSortOrder() {
-        if (this.mainTableColumnSortOrder == null) {
-            this.mainTableColumnSortOrder = updateColumnSortOrder(COLUMN_SORT_ORDER, mainTableColumns);
-        }
-        return this.mainTableColumnSortOrder;
-    }
-
-    @Override
-    public ColumnPreferences getColumnPreferences() {
-        return new ColumnPreferences(
-                createMainTableColumns(),
-                createMainTableColumnSortOrder());
-    }
-
-    /**
-     * Stores the ColumnPreferences in the preferences
-     *
-     * @param columnPreferences the preferences to store
-     */
-    @Override
-    public void storeMainTableColumnPreferences(ColumnPreferences columnPreferences) {
-        // Update cache
-        mainTableColumns = storeColumnPreferences(columnPreferences, COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, COLUMN_SORT_ORDER);
-    }
 
     @Override
     public MainTablePreferences getMainTablePreferences() {
-        return new MainTablePreferences(getColumnPreferences(),
+        return new MainTablePreferences(getMainTableColumnPreferences(),
                 getBoolean(AUTO_RESIZE_MODE),
                 getBoolean(EXTRA_FILE_COLUMNS));
     }
@@ -1834,9 +1789,80 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXTRA_FILE_COLUMNS, mainTablePreferences.getExtraFileColumnsEnabled());
     }
 
-   //*************************************************************************************************************
-    // Generic Column Handling
-    //*************************************************************************************************************
+    // --- MainTableColumns ---
+
+    private List<MainTableColumnModel> createMainTableColumns() {
+        if (this.mainTableColumns == null) {
+            this.mainTableColumns = updateColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+        }
+        return this.mainTableColumns;
+    }
+
+    private List<MainTableColumnModel> createMainTableColumnSortOrder() {
+        if (this.mainTableColumnSortOrder == null) {
+            this.mainTableColumnSortOrder = updateColumnSortOrder(COLUMN_SORT_ORDER, mainTableColumns);
+        }
+        return this.mainTableColumnSortOrder;
+    }
+
+    @Override
+    public void updateMainTableColumns() {
+        mainTableColumns = updateColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+    }
+
+    @Override
+    public ColumnPreferences getMainTableColumnPreferences() {
+        return new ColumnPreferences(
+                createMainTableColumns(),
+                createMainTableColumnSortOrder());
+    }
+
+    @Override
+    public void storeMainTableColumnPreferences(ColumnPreferences columnPreferences) {
+        mainTableColumns = columnPreferences.getColumns();
+
+        putStringList(COLUMN_NAMES, getColumnNamesAsStringList(columnPreferences));
+        putStringList(COLUMN_WIDTHS, getColumnWidthsAsStringList(columnPreferences));
+        putStringList(COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(columnPreferences));
+        putStringList(COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(columnPreferences));
+    }
+
+    // --- SearchDialogColumns ---
+
+    private List<MainTableColumnModel> createSearchDialogColumns() {
+        if (this.searchDialogColumns == null) {
+            this.searchDialogColumns = updateColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+        }
+        return this.searchDialogColumns;
+    }
+
+    private List<MainTableColumnModel> createSearchDialogColumnSortOrder() {
+        if (this.searchDialogColumnSortOrder == null) {
+            this.searchDialogColumnSortOrder = updateColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, searchDialogColumns);
+        }
+        return this.searchDialogColumnSortOrder;
+    }
+
+    @Override
+    public ColumnPreferences getSearchDialogColumnPreferences() {
+        return new ColumnPreferences(
+                createSearchDialogColumns(),
+                createSearchDialogColumnSortOrder());
+    }
+
+    @Override
+    public void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences) {
+        searchDialogColumns = columnPreferences.getColumns();
+
+        // MainTable and SearchResultTable use the same set of columnNames
+        // putStringList(SEARCH_DIALOG_COLUMN_NAMES, getColumnNames(columnPreferences));
+        putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, getColumnWidthsAsStringList(columnPreferences));
+        putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(columnPreferences));
+        putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(columnPreferences));
+    }
+
+    // --- Generic column handling ---
+    @SuppressWarnings("SameParameterValue")
     private List<MainTableColumnModel> updateColumns(String columnNamesList, String columnWidthList, String sortTypeList, double defaultWidth) {
         List<String> columnNames = getStringList(columnNamesList);
         List<Double> columnWidths = getStringList(columnWidthList)
@@ -1871,25 +1897,6 @@ public class JabRefPreferences implements PreferencesService {
         return columns;
     }
 
-    private List<MainTableColumnModel> createSearchDialogColumns() {
-        if (this.searchDialogTableColunns == null) {
-            this.searchDialogTableColunns = updateColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-        }
-        return this.searchDialogTableColunns;
-    }
-
-    /**
-     * Creates the ColumnSortOrder from cache
-     *
-     * @return List containing only the the columns in its proper sort order
-     */
-    private List<MainTableColumnModel> createSearchDialogColumnSortOrder() {
-        if (this.searchDialogColumnSortOrder == null) {
-            this.searchDialogColumnSortOrder = updateColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, searchDialogTableColunns);
-        }
-        return this.searchDialogColumnSortOrder;
-    }
-
     /**
      * Reloads the ColumnSortOrder from scratch
      */
@@ -1902,51 +1909,33 @@ public class JabRefPreferences implements PreferencesService {
         return columnsOrdered;
     }
 
-    @Override
-    public ColumnPreferences getSearchDialogColumnPreferences() {
-        return new ColumnPreferences(
-                createSearchDialogColumns(),
-                createSearchDialogColumnSortOrder());
+    private static List<String> getColumnNamesAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumns().stream()
+                                .map(MainTableColumnModel::getName)
+                                .toList();
     }
 
-    /**
-     * Stores the {@link ColumnPreferences} in the preferences
-     *
-     * @param columnPreferences the preferences to store
-     */
-    @Override
-    public void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences) {
-        searchDialogTableColunns = storeColumnPreferences(columnPreferences, COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, SEARCH_DIALOG_COLUMN_SORT_ORDER);
+    private static List<String> getColumnWidthsAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumns().stream()
+                                .map(column -> column.widthProperty().getValue().toString())
+                                .toList();
     }
 
-    // MainTable and SearchResultTable use the same set of columnNames
-
-    @SuppressWarnings("SameParameterValue")
-    private List<MainTableColumnModel> storeColumnPreferences(ColumnPreferences columnPreferences,
-                                                              String columnNamesList,
-                                                              String columnWidthList,
-                                                              String sortTypeList,
-                                                              String sortOrderList) {
-
-        putStringList(columnNamesList, columnPreferences.getColumns().stream()
-                                                        .map(MainTableColumnModel::getName)
-                                                        .collect(Collectors.toList()));
-
-        List<String> columnWidthsInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
-        putStringList(columnWidthList, columnWidthsInOrder);
-
-        List<String> columnSortTypesInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
-        putStringList(sortTypeList, columnSortTypesInOrder);
-
-        putStringList(sortOrderList, columnPreferences
-                .getColumnSortOrder().stream()
-                .map(MainTableColumnModel::getName)
-                .collect(Collectors.toList()));
-
-        return columnPreferences.getColumns();
+    private static List<String> getColumnSortTypesAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumns().stream()
+                                .map(column -> column.sortTypeProperty().getValue().toString())
+                                .toList();
     }
+
+    private static List<String> getColumnSortOrderAsStringList(ColumnPreferences columnPreferences) {
+        return columnPreferences.getColumnSortOrder().stream()
+                                .map(MainTableColumnModel::getName)
+                                .collect(Collectors.toList());
+    }
+
+    //*************************************************************************************************************
+    // NameDisplayPreferences
+    //*************************************************************************************************************
 
     @Override
     public NameDisplayPreferences getNameDisplayPreferences() {

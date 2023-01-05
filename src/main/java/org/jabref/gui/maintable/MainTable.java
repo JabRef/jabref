@@ -110,7 +110,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 new MainTableColumnFactory(
                         database,
                         preferencesService,
-                        preferencesService.getColumnPreferences(),
+                        preferencesService.getMainTableColumnPreferences(),
                         libraryTab.getUndoManager(),
                         dialogService,
                         stateManager).createColumns());
@@ -192,7 +192,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         MainTableColumnFactory rightClickMenuFactory = new MainTableColumnFactory(
                 database,
                 preferencesService,
-                preferencesService.getColumnPreferences(),
+                preferencesService.getMainTableColumnPreferences(),
                 libraryTab.getUndoManager(),
                 dialogService,
                 stateManager);
