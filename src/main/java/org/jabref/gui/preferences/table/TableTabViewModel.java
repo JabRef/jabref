@@ -77,12 +77,14 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private ColumnPreferences initialColumnPreferences;
     private final SpecialFieldsPreferences specialFieldsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
+    private final MainTablePreferences mainTablePreferences;
 
     public TableTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
         this.nameDisplayPreferences = preferences.getNameDisplayPreferences();
+        this.mainTablePreferences = preferences.getMainTablePreferences();
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -111,13 +113,11 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        MainTablePreferences initialMainTablePreferences = preferences.getMainTablePreferences();
-        initialColumnPreferences = initialMainTablePreferences.getColumnPreferences();
-        NameDisplayPreferences initialNameFormatPreferences = preferences.getNameDisplayPreferences();
+        initialColumnPreferences = mainTablePreferences.getColumnPreferences();
 
         specialFieldsEnabledProperty.setValue(specialFieldsPreferences.isSpecialFieldsEnabled());
-        extraFileColumnsEnabledProperty.setValue(initialMainTablePreferences.getExtraFileColumnsEnabled());
-        autoResizeColumnsProperty.setValue(initialMainTablePreferences.getResizeColumnsToFit());
+        extraFileColumnsEnabledProperty.setValue(mainTablePreferences.getExtraFileColumnsEnabled());
+        autoResizeColumnsProperty.setValue(mainTablePreferences.getResizeColumnsToFit());
 
         fillColumnList();
 
@@ -143,18 +143,18 @@ public class TableTabViewModel implements PreferenceTabViewModel {
             insertSpecialFieldColumns();
         }
 
-        if (extraFileColumnsEnabledProperty.getValue()) {
+        if (mainTablePreferences.getExtraFileColumnsEnabled()) {
             insertExtraFileColumns();
         }
 
-        switch (initialNameFormatPreferences.getDisplayStyle()) {
+        switch (nameDisplayPreferences.getDisplayStyle()) {
             case NATBIB -> namesNatbibProperty.setValue(true);
             case AS_IS -> nameAsIsProperty.setValue(true);
             case FIRSTNAME_LASTNAME -> nameFirstLastProperty.setValue(true);
             case LASTNAME_FIRSTNAME -> nameLastFirstProperty.setValue(true);
         }
 
-        switch (initialNameFormatPreferences.getAbbreviationStyle()) {
+        switch (nameDisplayPreferences.getAbbreviationStyle()) {
             case FULL -> abbreviationEnabledProperty.setValue(true);
             case LASTNAME_ONLY -> abbreviationLastNameOnlyProperty.setValue(true);
             case NONE -> abbreviationDisabledProperty.setValue(true);
@@ -233,14 +233,16 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        MainTablePreferences newMainTablePreferences = preferences.getMainTablePreferences();
         preferences.storeMainTablePreferences(new MainTablePreferences(
                 new ColumnPreferences(
                         columnsListProperty.getValue(),
-                        newMainTablePreferences.getColumnPreferences().getColumnSortOrder()),
-                autoResizeColumnsProperty.getValue(),
-                extraFileColumnsEnabledProperty.getValue()
+                        mainTablePreferences.getColumnPreferences().getColumnSortOrder()),
+                true,
+                true
         ));
+
+        mainTablePreferences.setResizeColumnsToFit(autoResizeColumnsProperty.getValue());
+        mainTablePreferences.setExtraFileColumnsEnabled(extraFileColumnsEnabledProperty.getValue());
 
         specialFieldsPreferences.setSpecialFieldsEnabled(specialFieldsEnabledProperty.getValue());
 

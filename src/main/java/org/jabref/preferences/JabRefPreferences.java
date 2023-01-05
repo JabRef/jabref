@@ -448,6 +448,7 @@ public class JabRefPreferences implements PreferencesService {
     private ExternalApplicationsPreferences externalApplicationsPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
     private NameDisplayPreferences nameDisplayPreferences;
+    private MainTablePreferences mainTablePreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1777,16 +1778,26 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public MainTablePreferences getMainTablePreferences() {
-        return new MainTablePreferences(getMainTableColumnPreferences(),
+        if (Objects.nonNull(mainTablePreferences)) {
+            return mainTablePreferences;
+        }
+
+        mainTablePreferences = new MainTablePreferences(
+                getMainTableColumnPreferences(),
                 getBoolean(AUTO_RESIZE_MODE),
                 getBoolean(EXTRA_FILE_COLUMNS));
+
+        EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
+                (obs, oldValue, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
+        EasyBind.listen(mainTablePreferences.extraFileColumnsEnabledProperty(),
+                (obs, oldValue, newValue) -> putBoolean(EXTRA_FILE_COLUMNS, newValue));
+
+        return mainTablePreferences;
     }
 
     @Override
     public void storeMainTablePreferences(MainTablePreferences mainTablePreferences) {
         storeMainTableColumnPreferences(mainTablePreferences.getColumnPreferences());
-        putBoolean(AUTO_RESIZE_MODE, mainTablePreferences.getResizeColumnsToFit());
-        putBoolean(EXTRA_FILE_COLUMNS, mainTablePreferences.getExtraFileColumnsEnabled());
     }
 
     // --- MainTableColumns ---
