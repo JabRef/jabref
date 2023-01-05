@@ -981,7 +981,7 @@ public class JabRefPreferences implements PreferencesService {
     public void flush() {
         if (getBoolean(MEMORY_STICK_MODE)) {
             try {
-                exportPreferences("jabref.xml");
+                exportPreferences(Path.of("jabref.xml"));
             } catch (JabRefException e) {
                 LOGGER.warn("Could not export preferences for memory stick mode: " + e.getMessage(), e);
             }
@@ -1065,16 +1065,12 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Exports Preferences to an XML file.
      *
-     * @param filename String File to export to
+     * @param path Path to export to
      */
-    public void exportPreferences(String filename) throws JabRefException {
-        exportPreferences(Path.of(filename));
-    }
-
     @Override
-    public void exportPreferences(Path file) throws JabRefException {
-        LOGGER.debug("Exporting preferences {}", file.toAbsolutePath());
-        try (OutputStream os = Files.newOutputStream(file)) {
+    public void exportPreferences(Path path) throws JabRefException {
+        LOGGER.debug("Exporting preferences {}", path.toAbsolutePath());
+        try (OutputStream os = Files.newOutputStream(path)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
             throw new JabRefException(
