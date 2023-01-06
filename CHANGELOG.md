@@ -92,7 +92,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - In the context of a systematic literature review (SLR), we reworked the "Define study" parameters dialog. [#9123](https://github.com/JabRef/jabref/pull/9123)
 - We upgraded to Lucene 9.4 for the fulltext search. The search index will be rebuild. [#9213](https://github.com/JabRef/jabref/pull/9213)
 - We disabled the "change case" menu for empty fields. [#9214](https://github.com/JabRef/jabref/issues/9214)
-- We disabled the conversion menu for empty fields. [#9200](https://github.com/JabRef/jabref/issues/9200)
+- We disabled the conversion menu for empty fields. [#9200](https://github.com/JabRef/jabref/issues/9200) 
 
 ### Fixed
 
@@ -134,6 +134,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the display of the "Customize Entry Types" dialog title. [#9198](https://github.com/JabRef/jabref/issues/9198)
 - We fixed an issue where the CSS styles are missing in some dialogs. [#9150](https://github.com/JabRef/jabref/pull/9150)
 - We fixed an issue where controls in the preferences dialog could outgrow the window. [#9017](https://github.com/JabRef/jabref/issues/9017)
+- We fixed an issue where highlighted text color for entry merge dialogue was not clearly visible. [#9192](https://github.com/JabRef/jabref/issues/9192)
 
 ### Removed
 

@@ -9,10 +9,12 @@
     -jr-accent-alt: -jr-accent;
 
     -jr-red: #b71c1f;
+    -jr-dull-red: #db1d2b;
     -jr-light-red: #db1d2b;
     -jr-green: #1cb631;
     -jr-light-green: #28d93c;
     -jr-blue: #2c2cb7;
+    -jr-sky-blue: #006dff;
     -jr-light-blue: #3a3ad9;
     -jr-purple: #b72486;
     -jr-light-purple: #d927a8;
@@ -36,7 +38,7 @@
 
     -fx-dark-text-color: black;
     -fx-mid-text-color: #7d8591;
-    -fx-light-text-color: #9aa3af;
+    -fx-light-text-color: #e5e7ea;
     -jr-separator: #333744;
     -fx-outer-border: #424758;
 
@@ -68,11 +70,11 @@
 }
 
 .addition {
-    -rtfx-background-color: -jr-green;
+    -rtfx-background-color: -jr-dull-red;
 }
 
 .deletion {
-    -rtfx-background-color: -jr-red;
+    -rtfx-background-color: -jr-sky-blue;
 }
 
 #previewBody {
