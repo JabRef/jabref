@@ -145,6 +145,7 @@ public class FieldRowView {
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
+        showRow();
         if (!rightValueCell.isVisible() || StringUtil.isNullOrEmpty(viewModel.getLeftFieldValue()) || StringUtil.isNullOrEmpty(viewModel.getRightFieldValue())) {
             return;
         }
@@ -163,6 +164,31 @@ public class FieldRowView {
         }
     }
 
+    public void hideRow() {
+        this.leftValueCell.setVisible(false);
+        this.rightValueCell.setVisible(false);
+        this.fieldNameCell.setVisible(false);
+        this.mergedValueCell.setVisible(false);
+
+        // TODO restore style?
+        this.leftValueCell.setManaged(false);
+        this.rightValueCell.setManaged(false);
+        this.fieldNameCell.setManaged(false);
+        this.mergedValueCell.setManaged(false);
+    }
+
+    public void showRow() {
+        this.leftValueCell.setManaged(true);
+        this.rightValueCell.setManaged(true);
+        this.fieldNameCell.setManaged(true);
+        this.mergedValueCell.setManaged(true);
+
+        this.leftValueCell.setVisible(true);
+        this.rightValueCell.setVisible(true);
+        this.fieldNameCell.setVisible(true);
+        this.mergedValueCell.setVisible(true);
+    }
+
     public void hideDiff() {
         if (!rightValueCell.isVisible()) {
             return;
@@ -178,4 +204,11 @@ public class FieldRowView {
         getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
         getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());
     }
+
+    @Override
+    public String toString() {
+        return "FieldRowView [shouldShowDiffs=" + shouldShowDiffs.get() + ", fieldNameCell=" + fieldNameCell + ", leftValueCell=" + leftValueCell + ", rightValueCell=" + rightValueCell + ", mergedValueCell=" + mergedValueCell +"]";
+    }
+
+
 }

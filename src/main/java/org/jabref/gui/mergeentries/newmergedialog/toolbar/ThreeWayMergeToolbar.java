@@ -1,12 +1,13 @@
 package org.jabref.gui.mergeentries.newmergedialog.toolbar;
 
-import java.util.Arrays;
-
 import javafx.beans.binding.BooleanExpression;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
@@ -43,7 +44,11 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     private Button selectRightEntryValuesButton;
 
+    @FXML
+    private CheckBox showAllFieldsBox;
+
     private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
+    private final BooleanProperty showAllFields = new SimpleBooleanProperty();
     private EasyBinding<Boolean> showDiff;
 
     public ThreeWayMergeToolbar() {
@@ -97,6 +102,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         diffHighlightingMethodToggleGroup.selectToggle(highlightWordsRadioButton);
         plainTextOrDiffComboBox.valueProperty().set(PlainTextOrDiff.Diff);
+        showAllFields.bind(showAllFieldsBox.selectedProperty());
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {
@@ -117,6 +123,14 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
     public void setShowDiff(boolean showDiff) {
         plainTextOrDiffComboBox.valueProperty().set(showDiff ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT);
+    }
+
+    public BooleanProperty showAllFieldsProperty() {
+        return showAllFields;
+    }
+
+    public boolean isShowAllFields() {
+        return showAllFields.get();
     }
 
     /**
@@ -169,10 +183,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }
 
         public static PlainTextOrDiff fromString(String str) {
-            return Arrays.stream(values())
-                    .filter(plainTextOrDiff -> plainTextOrDiff.getValue().equals(str))
-                    .findAny()
-                    .orElseThrow(IllegalArgumentException::new);
+            return Enum.valueOf(PlainTextOrDiff.class, str);
         }
     }
 
@@ -190,10 +201,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }
 
         public static DiffView fromString(String str) {
-            return Arrays.stream(values())
-                    .filter(diffView -> diffView.getValue().equals(str))
-                    .findAny()
-                    .orElseThrow(IllegalArgumentException::new);
+            return Enum.valueOf(DiffView.class, str);
         }
     }
 }

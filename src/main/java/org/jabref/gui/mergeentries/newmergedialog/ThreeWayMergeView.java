@@ -74,12 +74,18 @@ public class ThreeWayMergeView extends VBox {
         toolbar.showDiffProperty().addListener(e -> updateDiff());
         toolbar.diffViewProperty().addListener(e -> updateDiff());
         toolbar.diffHighlightingMethodProperty().addListener(e -> updateDiff());
+        toolbar.showAllFieldsProperty().addListener(e -> updateDiff());
         this.updateDiff();
     }
 
     private void updateDiff() {
         if (toolbar.isShowDiffEnabled()) {
             for (FieldRowView row : fieldRows) {
+                if (!toolbar.isShowAllFields() &&
+                    row.getLeftValueCell().getText().trim().equals(row.getRightValueCell().getText().trim())) {
+                    row.hideRow();
+                    continue;
+                }
                 if (row.getFieldNameCell().getText().equals("Groups") && (row.getLeftValueCell().getText().contains(keywordSeparator) || row.getRightValueCell().getText().contains(keywordSeparator))) {
                     row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), new GroupDiffMode(keywordSeparator)));
                 } else {
@@ -87,7 +93,14 @@ public class ThreeWayMergeView extends VBox {
                 }
             }
         } else {
-            fieldRows.forEach(FieldRowView::hideDiff);
+            for(FieldRowView row: fieldRows) {
+                if (!toolbar.isShowAllFields() &&
+                    row.getLeftValueCell().getText().trim().equals(row.getRightValueCell().getText().trim())) {
+                    row.hideRow();
+                    continue;
+                }
+                row.hideDiff();
+            }
         }
     }
 
