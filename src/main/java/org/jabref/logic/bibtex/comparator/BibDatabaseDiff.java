@@ -2,13 +2,14 @@ package org.jabref.logic.bibtex.comparator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -30,7 +31,7 @@ public class BibDatabaseDiff {
         List<BibEntry> originalEntriesSorted = originalDatabase.getDatabase().getEntriesSorted(comparator);
         List<BibEntry> newEntriesSorted = newDatabase.getDatabase().getEntriesSorted(comparator);
 
-        entryDiffs = compareEntries(originalEntriesSorted, newEntriesSorted);
+        entryDiffs = compareEntries(originalEntriesSorted, newEntriesSorted, originalDatabase.getMode());
     }
 
     private static EntryComparator getEntryComparator() {
@@ -40,7 +41,7 @@ public class BibDatabaseDiff {
         return comparator;
     }
 
-    private static List<BibEntryDiff> compareEntries(List<BibEntry> originalEntries, List<BibEntry> newEntries) {
+    private static List<BibEntryDiff> compareEntries(List<BibEntry> originalEntries, List<BibEntry> newEntries, BibDatabaseMode mode) {
         List<BibEntryDiff> differences = new ArrayList<>();
 
         // Create a HashSet where we can put references to entries in the new
@@ -68,10 +69,11 @@ public class BibDatabaseDiff {
         }
 
         // Now we've found all exact matches, look through the remaining entries, looking for close matches.
+        DuplicateCheck duplicateCheck = new DuplicateCheck(Globals.entryTypesManager);
         for (BibEntry originalEntry : notMatched) {
             // These two variables will keep track of which entry most closely matches the one we're looking at.
             double bestMatch = 0;
-            int bestMatchIndex = -1;
+            int bestMatchIndex = 0;
             for (int i = 0; i < newEntries.size(); i++) {
                 if (!used.contains(i)) {
                     double score = DuplicateCheck.compareEntriesStrictly(originalEntry, newEntries.get(i));
@@ -82,7 +84,10 @@ public class BibDatabaseDiff {
                 }
             }
 
-            if (bestMatch > MATCH_THRESHOLD) {
+            BibEntry bestEntry = newEntries.get(bestMatchIndex);
+            if (bestMatch > MATCH_THRESHOLD
+                    || hasEqualCitationKey(originalEntry, bestEntry)
+                    || duplicateCheck.isDuplicate(originalEntry, bestEntry, mode)) {
                 used.add(bestMatchIndex);
                 differences.add(new BibEntryDiff(originalEntry, newEntries.get(bestMatchIndex)));
             } else {
@@ -98,6 +103,10 @@ public class BibDatabaseDiff {
         }
 
         return differences;
+    }
+
+    private static boolean hasEqualCitationKey(BibEntry oneEntry, BibEntry twoEntry) {
+        return oneEntry.getCitationKey().equals(twoEntry.getCitationKey());
     }
 
     public static BibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext changed) {
