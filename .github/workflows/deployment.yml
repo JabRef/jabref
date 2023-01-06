@@ -132,7 +132,7 @@ jobs:
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb  jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
-      - name: Upload to GitHub workflow artifacts store
+      - name: Upload to GitHub workflow artifacts store (non-Mac)
         if: (matrix.os != 'macos-latest')
         uses: actions/upload-artifact@v3
         with:
@@ -160,6 +160,20 @@ jobs:
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Fetch all history for all tags and branches
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Run GitVersion
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        id: gitversion
+        shell: bash
+        run: |
+          echo "AssemblySemVer=5.9.`git rev-list v5.8..HEAD --count`" >> $GITHUB_OUTPUT
+          echo "InformationalVersion=5.9--`git log -1 --pretty='format:%cd' --date=format:'%Y-%m-%d'`--`git log -1 --format=%h`" >> $GITHUB_OUTPUT
+          echo "Major=5" >> $GITHUB_OUTPUT
+          echo "Minor=9" >> $GITHUB_OUTPUT
       - name: Get macOS binaries
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: actions/download-artifact@master
