@@ -145,7 +145,7 @@ jobs:
           name: JabRef-macOS-signed
           path: build/distribution
   notarize:
-    name: Notarize and pacakge Mac OS binaries
+    name: Notarize and package Mac OS binaries
     runs-on: macos-latest
     needs: [build]
     steps:
