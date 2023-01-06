@@ -68,9 +68,7 @@ public class BibDatabaseDiff {
         }
 
         // Now we've found all exact matches, look through the remaining entries, looking for close matches.
-        for (Iterator<BibEntry> iteratorNotMatched = notMatched.iterator(); iteratorNotMatched.hasNext(); ) {
-            BibEntry originalEntry = iteratorNotMatched.next();
-
+        for (BibEntry originalEntry : notMatched) {
             // These two variables will keep track of which entry most closely matches the one we're looking at.
             double bestMatch = 0;
             int bestMatchIndex = -1;
@@ -86,7 +84,6 @@ public class BibDatabaseDiff {
 
             if (bestMatch > MATCH_THRESHOLD) {
                 used.add(bestMatchIndex);
-                iteratorNotMatched.remove();
                 differences.add(new BibEntryDiff(originalEntry, newEntries.get(bestMatchIndex)));
             } else {
                 differences.add(new BibEntryDiff(originalEntry, null));
