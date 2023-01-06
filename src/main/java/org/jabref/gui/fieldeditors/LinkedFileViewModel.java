@@ -490,13 +490,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
-                                urlDownload.getSource().toString()))) {
+                                          urlDownload.getSource().toString()))) {
                     return true;
                 } else {
                     dialogService.notify(Localization.lang("Download operation canceled."));
+                    return false;
                 }
+            } else {
+                LOGGER.error("Error while checking if the file can be downloaded", ex);
+                dialogService.notify(Localization.lang("Error downloading"));
+                return false;
             }
-            return false;
         }
         return true;
     }
@@ -508,8 +512,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
                     ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
-                    String suggestedTypeName = externalFileType.getName();
-                    linkedFile.setFileType(suggestedTypeName);
+
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
                     String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileDirectoryPattern());
                     suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);

@@ -3,8 +3,7 @@ package org.jabref.logic.journals;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class AbbreviationTest {
 
@@ -108,7 +107,14 @@ class AbbreviationTest {
     void testEquals() {
       Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
       Abbreviation otherAbbreviation = new Abbreviation("Long Name", "L N", "LN");
-      assertTrue(abbreviation.equals(otherAbbreviation));
-      assertFalse(abbreviation.equals("String"));
+      assertEquals(abbreviation, otherAbbreviation);
+      assertNotEquals(abbreviation, "String");
+    }
+
+    @Test
+    void equalAbbrevationsWithFourComponentsAreAlsoCompareZero() {
+        Abbreviation abbreviation1 = new Abbreviation("Long Name", "L. N.", "LN");
+        Abbreviation abbreviation2 = new Abbreviation("Long Name", "L. N.", "LN");
+        assertEquals(0, abbreviation1.compareTo(abbreviation2));
     }
 }

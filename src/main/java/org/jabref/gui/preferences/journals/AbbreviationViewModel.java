@@ -19,6 +19,8 @@ public class AbbreviationViewModel {
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty abbreviation = new SimpleStringProperty("");
     private final StringProperty shortestUniqueAbbreviation = new SimpleStringProperty("");
+
+    // Used when a "null" abbreviation object is added
     private final BooleanProperty pseudoAbbreviation = new SimpleBooleanProperty();
 
     public AbbreviationViewModel(Abbreviation abbreviationObject) {
@@ -26,7 +28,15 @@ public class AbbreviationViewModel {
         if (abbreviationObject != null) {
             this.name.setValue(abbreviationObject.getName());
             this.abbreviation.setValue(abbreviationObject.getAbbreviation());
-            this.shortestUniqueAbbreviation.setValue(abbreviationObject.getShortestUniqueAbbreviation());
+
+            // the view model stores the "real" values, not the default fallback
+            String shortestUniqueAbbreviationOfAbbreviation = abbreviationObject.getShortestUniqueAbbreviation();
+            boolean shortestUniqueAbbreviationIsDefaultValue = shortestUniqueAbbreviationOfAbbreviation.equals(abbreviationObject.getAbbreviation());
+            if (shortestUniqueAbbreviationIsDefaultValue) {
+                this.shortestUniqueAbbreviation.set("");
+            } else {
+                this.shortestUniqueAbbreviation.setValue(shortestUniqueAbbreviationOfAbbreviation);
+            }
         }
     }
 
@@ -87,13 +97,15 @@ public class AbbreviationViewModel {
             return false;
         }
         AbbreviationViewModel that = (AbbreviationViewModel) o;
-        return Objects.equals(getName(), that.getName()) &&
-                isPseudoAbbreviation() == that.isPseudoAbbreviation();
+        return getName().equals(that.getName())
+                && getAbbreviation().equals(that.getAbbreviation())
+                && getShortestUniqueAbbreviation().equals(that.getShortestUniqueAbbreviation())
+                && (isPseudoAbbreviation() == that.isPseudoAbbreviation());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), isPseudoAbbreviation());
+        return Objects.hash(getName(), getAbbreviation(), getShortestUniqueAbbreviation(), isPseudoAbbreviation());
     }
 
     public boolean containsCaseIndependent(String searchTerm) {
