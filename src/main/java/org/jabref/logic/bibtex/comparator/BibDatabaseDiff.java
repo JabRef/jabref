@@ -15,14 +15,14 @@ import org.jabref.model.entry.field.StandardField;
 public class BibDatabaseDiff {
 
     private static final double MATCH_THRESHOLD = 0.4;
-    private final Optional<MetaDataDiff> metaDataDiff;
-    private final Optional<PreambleDiff> preambleDiff;
+    private final MetaDataDiff metaDataDiff;
+    private final PreambleDiff preambleDiff;
     private final List<BibStringDiff> bibStringDiffs;
     private final List<BibEntryDiff> entryDiffs;
 
     private BibDatabaseDiff(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {
-        metaDataDiff = MetaDataDiff.compare(originalDatabase.getMetaData(), newDatabase.getMetaData());
-        preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase);
+        metaDataDiff = MetaDataDiff.compare(originalDatabase.getMetaData(), newDatabase.getMetaData()).orElse(null);
+        preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase).orElse(null);
         bibStringDiffs = BibStringDiff.compare(originalDatabase.getDatabase(), newDatabase.getDatabase());
 
         // Sort both databases according to a common sort key.
@@ -108,11 +108,11 @@ public class BibDatabaseDiff {
     }
 
     public Optional<MetaDataDiff> getMetaDataDifferences() {
-        return metaDataDiff;
+        return Optional.ofNullable(metaDataDiff);
     }
 
     public Optional<PreambleDiff> getPreambleDifferences() {
-        return preambleDiff;
+        return Optional.ofNullable(preambleDiff);
     }
 
     public List<BibStringDiff> getBibStringDifferences() {
