@@ -1,14 +1,13 @@
 package org.jabref.logic.journals;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +24,7 @@ public class JournalAbbreviationRepository {
     private final Map<String, Abbreviation> abbreviationToAbbreviationObject = new HashMap<>();
     private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
     private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
-    private final List<Abbreviation> customAbbreviations = new ArrayList<>();
+    private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
 
     public JournalAbbreviationRepository(Path journalList) {
         MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open();
@@ -106,7 +105,7 @@ public class JournalAbbreviationRepository {
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
                                                                        .filter(abbreviation -> isMatched(journal, abbreviation))
-                                                                       .findAny();
+                                                                       .findFirst();
         if (customAbbreviation.isPresent()) {
             return customAbbreviation;
         }
@@ -120,13 +119,13 @@ public class JournalAbbreviationRepository {
     public void addCustomAbbreviation(Abbreviation abbreviation) {
         Objects.requireNonNull(abbreviation);
 
-        // We do not want to keep duplicates, thus remove the old abbreviation
-        // (abbreviation equality is tested on name only, so we cannot use a Set instead)
-        customAbbreviations.remove(abbreviation);
+        // We do NOT want to keep duplicates
+        // The set automatically "removes" duplicates
+        // What is a duplicate? An abbreviation is NOT the same if any field is NOT equal (e.g., if the shortest unique differs, the abbreviation is NOT the same)
         customAbbreviations.add(abbreviation);
     }
 
-    public List<Abbreviation> getCustomAbbreviations() {
+    public Collection<Abbreviation> getCustomAbbreviations() {
         return customAbbreviations;
     }
 
