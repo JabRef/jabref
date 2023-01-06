@@ -133,7 +133,7 @@ jobs:
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb  jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
       - name: Upload to GitHub workflow artifacts store
-        if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os != 'macos-latest')
         uses: actions/upload-artifact@v3
         with:
           name: JabRef-${{ matrix.displayName }}
