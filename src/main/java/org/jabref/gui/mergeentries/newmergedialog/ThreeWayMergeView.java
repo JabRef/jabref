@@ -93,7 +93,7 @@ public class ThreeWayMergeView extends VBox {
                 }
             }
         } else {
-            for(FieldRowView row: fieldRows) {
+            for (FieldRowView row : fieldRows) {
                 if (!toolbar.isShowAllFields() &&
                     row.getLeftValueCell().getText().trim().equals(row.getRightValueCell().getText().trim())) {
                     row.hideRow();
