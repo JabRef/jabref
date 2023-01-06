@@ -43,11 +43,6 @@ public class BibDatabaseDiff {
     private static List<BibEntryDiff> compareEntries(List<BibEntry> originalEntries, List<BibEntry> newEntries) {
         List<BibEntryDiff> differences = new ArrayList<>();
 
-        // Create pointers that are incremented as the entries of each base are used in
-        // successive order from the beginning. Entries "further down" in the new database
-        // can also be matched.
-        int positionNew = 0;
-
         // Create a HashSet where we can put references to entries in the new
         // database that we have matched. This is to avoid matching them twice.
         Set<Integer> used = new HashSet<>(newEntries.size());
@@ -58,17 +53,7 @@ public class BibDatabaseDiff {
         // match being "stolen" from another entry.
         mainLoop:
         for (BibEntry originalEntry : originalEntries) {
-            // First check if the similarly placed entry in the other base matches exactly.
-            if (!used.contains(positionNew) && (positionNew < newEntries.size())) {
-                double score = DuplicateCheck.compareEntriesStrictly(originalEntry, newEntries.get(positionNew));
-                if (score > 1) {
-                    used.add(positionNew);
-                    positionNew++;
-                    continue;
-                }
-            }
-            // No? Then check if another entry matches exactly.
-            for (int i = positionNew + 1; i < newEntries.size(); i++) {
+            for (int i = 0; i < newEntries.size(); i++) {
                 if (!used.contains(i)) {
                     double score = DuplicateCheck.compareEntriesStrictly(originalEntry, newEntries.get(i));
                     if (score > 1) {
@@ -89,14 +74,12 @@ public class BibDatabaseDiff {
             // These two variables will keep track of which entry most closely matches the one we're looking at.
             double bestMatch = 0;
             int bestMatchIndex = -1;
-            if (positionNew < (newEntries.size() - 1)) {
-                for (int i = positionNew; i < newEntries.size(); i++) {
-                    if (!used.contains(i)) {
-                        double score = DuplicateCheck.compareEntriesStrictly(originalEntry, newEntries.get(i));
-                        if (score > bestMatch) {
-                            bestMatch = score;
-                            bestMatchIndex = i;
-                        }
+            for (int i = 0; i < newEntries.size(); i++) {
+                if (!used.contains(i)) {
+                    double score = DuplicateCheck.compareEntriesStrictly(originalEntry, newEntries.get(i));
+                    if (score > bestMatch) {
+                        bestMatch = score;
+                        bestMatchIndex = i;
                     }
                 }
             }
@@ -104,7 +87,6 @@ public class BibDatabaseDiff {
             if (bestMatch > MATCH_THRESHOLD) {
                 used.add(bestMatchIndex);
                 iteratorNotMatched.remove();
-
                 differences.add(new BibEntryDiff(originalEntry, newEntries.get(bestMatchIndex)));
             } else {
                 differences.add(new BibEntryDiff(originalEntry, null));
