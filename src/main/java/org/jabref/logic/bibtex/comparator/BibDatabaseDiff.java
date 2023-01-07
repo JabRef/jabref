@@ -106,7 +106,7 @@ public class BibDatabaseDiff {
     }
 
     private static boolean hasEqualCitationKey(BibEntry oneEntry, BibEntry twoEntry) {
-        return oneEntry.getCitationKey().equals(twoEntry.getCitationKey());
+        return oneEntry.hasCitationKey() && twoEntry.hasCitationKey() && oneEntry.getCitationKey().equals(twoEntry.getCitationKey());
     }
 
     public static BibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext changed) {
