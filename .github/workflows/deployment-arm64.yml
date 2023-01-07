@@ -53,14 +53,14 @@ jobs:
         id: gitversion
         shell: bash
         run: |
-          echo "AssemblySemVer=5.9.`git rev-list v5.8..HEAD --count`" >> $GITHUB_OUTPUT
+          echo "AssemblySemVer=5.9.6000" >> $GITHUB_OUTPUT
           echo "InformationalVersion=5.9--`git log -1 --pretty='format:%cd' --date=format:'%Y-%m-%d'`--`git log -1 --format=%h`" >> $GITHUB_OUTPUT
           echo "Major=5" >> $GITHUB_OUTPUT
           echo "Minor=9" >> $GITHUB_OUTPUT
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Clean up keychain
