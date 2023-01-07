@@ -170,7 +170,7 @@ jobs:
         id: gitversion
         shell: bash
         run: |
-          echo "AssemblySemVer=5.9.6000" >> $GITHUB_OUTPUT
+          echo "AssemblySemVer=5.9.60000" >> $GITHUB_OUTPUT
           echo "InformationalVersion=5.9--`git log -1 --pretty='format:%cd' --date=format:'%Y-%m-%d'`--`git log -1 --format=%h`" >> $GITHUB_OUTPUT
           echo "Major=5" >> $GITHUB_OUTPUT
           echo "Minor=9" >> $GITHUB_OUTPUT
