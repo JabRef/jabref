@@ -40,6 +40,8 @@ public class FieldRowView {
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
+    private GridPane parent;
+
     public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
@@ -47,6 +49,13 @@ public class FieldRowView {
         leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex);
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
+
+        // We need to have a reference to the parent grid pane to be able to show/hide the row. F**** you JavaFX
+        leftValueCell.parentProperty().addListener(e -> {
+            if (leftValueCell.getParent() instanceof GridPane grid) {
+                parent = grid;
+            }
+        });
 
         if (FieldMergerFactory.canMerge(field)) {
             ToggleMergeUnmergeButton toggleMergeUnmergeButton = new ToggleMergeUnmergeButton(field);
@@ -165,28 +174,17 @@ public class FieldRowView {
     }
 
     public void hideRow() {
-        this.leftValueCell.setVisible(false);
-        this.rightValueCell.setVisible(false);
-        this.fieldNameCell.setVisible(false);
-        this.mergedValueCell.setVisible(false);
-
-        // TODO restore style?
-        this.leftValueCell.setManaged(false);
-        this.rightValueCell.setManaged(false);
-        this.fieldNameCell.setManaged(false);
-        this.mergedValueCell.setManaged(false);
+        if (parent != null) {
+            parent.getChildren().removeAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
+        }
     }
 
     public void showRow() {
-        this.leftValueCell.setManaged(true);
-        this.rightValueCell.setManaged(true);
-        this.fieldNameCell.setManaged(true);
-        this.mergedValueCell.setManaged(true);
-
-        this.leftValueCell.setVisible(true);
-        this.rightValueCell.setVisible(true);
-        this.fieldNameCell.setVisible(true);
-        this.mergedValueCell.setVisible(true);
+        if (parent != null) {
+            if (!parent.getChildren().contains(leftValueCell)) {
+                parent.getChildren().addAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
+            }
+        }
     }
 
     public void hideDiff() {
