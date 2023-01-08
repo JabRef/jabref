@@ -265,7 +265,7 @@ jobs:
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: actions/download-artifact@master
         with:
-          name: JabRef-macOS
+          name: JabRef-macOS-signed
           path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
