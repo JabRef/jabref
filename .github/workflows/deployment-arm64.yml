@@ -53,7 +53,7 @@ jobs:
         id: gitversion
         shell: bash
         run: |
-          echo "AssemblySemVer=5.9.6000" >> $GITHUB_OUTPUT
+          echo "AssemblySemVer=5.9.60000" >> $GITHUB_OUTPUT
           echo "InformationalVersion=5.9--`git log -1 --pretty='format:%cd' --date=format:'%Y-%m-%d'`--`git log -1 --format=%h`" >> $GITHUB_OUTPUT
           echo "Major=5" >> $GITHUB_OUTPUT
           echo "Minor=9" >> $GITHUB_OUTPUT
@@ -104,20 +104,13 @@ jobs:
         if: (matrix.os == 'macos-latest' || matrix.os == 'self-hosted' ) && startsWith(github.ref, 'refs/tags/') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          REQUEST_UUID_DMG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "6792V39SK3" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg" | grep RequestUUID | awk '{print $3}')
-          while xcrun altool --notarization-info "$REQUEST_UUID_DMG" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
-            echo "Verification in progress..."
-            sleep 30
-          done
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "${{ secrets.OSX_NOTARIZATION_APP_USERNAME }}" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
+          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
           spctl -vvv --assess --type exec build/distribution/JabRef.app
           codesign -vvv --deep --strict "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
           codesign -dvv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
-          REQUEST_UUID_PKG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "6792V39SK3" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" | grep RequestUUID | awk '{print $3}')
-          while xcrun altool --notarization-info "$REQUEST_UUID_PKG" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
-            echo "Verification in progress..."
-            sleep 30
-          done
+          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
           rm "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
           mv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
