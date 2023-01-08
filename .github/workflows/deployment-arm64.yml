@@ -60,7 +60,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Clean up keychain
@@ -100,20 +100,6 @@ jobs:
           codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" --options runtime --entitlements buildres/mac/jabref.entitlements -vvvv --deep "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
           jpackage --type pkg --dest build/distribution --name JabRef --mac-package-identifier JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type pkg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
           productsign --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
-      - name: Notarize dmg and pkg installer
-        if: (matrix.os == 'macos-latest' || matrix.os == 'self-hosted' ) && startsWith(github.ref, 'refs/tags/') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "${{ secrets.OSX_NOTARIZATION_APP_USERNAME }}" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
-          spctl -vvv --assess --type exec build/distribution/JabRef.app
-          codesign -vvv --deep --strict "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
-          codesign -dvv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
-          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
-          rm "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
-          mv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
       - name: Package application image
         if: (matrix.os != 'macos-latest' && matrix.os != 'self-hosted') || (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
