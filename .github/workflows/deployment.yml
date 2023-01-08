@@ -116,7 +116,6 @@ jobs:
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Rename files
-        if: (matrix.os != 'macos-latest')
         shell: pwsh
         run: |
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
@@ -144,7 +143,8 @@ jobs:
         with:
           name: JabRef-macOS-signed
           path: build/distribution
-  notarize:
+  notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
+    if: ${{ false }}  # disable for v5.9 since apple notarization fails
     name: Notarize and package Mac OS binaries
     runs-on: macos-latest
     needs: [build]
