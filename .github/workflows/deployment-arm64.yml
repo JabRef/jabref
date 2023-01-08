@@ -5,7 +5,7 @@ on:
   push:
    branches:
     - arm64mac-release
-  
+
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -49,14 +49,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.15
+        with:
+          versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        shell: bash
-        run: |
-          echo "AssemblySemVer=5.9.60000" >> $GITHUB_OUTPUT
-          echo "InformationalVersion=5.9--`git log -1 --pretty='format:%cd' --date=format:'%Y-%m-%d'`--`git log -1 --format=%h`" >> $GITHUB_OUTPUT
-          echo "Major=5" >> $GITHUB_OUTPUT
-          echo "Minor=9" >> $GITHUB_OUTPUT
+        uses: gittools/actions/gitversion/execute@v0.9.15
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -66,7 +65,7 @@ jobs:
       - name: Clean up keychain
         if: (matrix.os == 'self-hosted') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: |
-         security delete-keychain signing_temp.keychain   
+         security delete-keychain signing_temp.keychain
       - name: Setup OSX key chain on OSX
         if: (matrix.os == 'macos-latest' || matrix.os == 'self-hosted') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v1
@@ -160,7 +159,7 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: JabRef-macOS (Arm64)
-          path: build/distribution/    
+          path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
         if: steps.checksecrets.outputs.secretspresent == 'YES'
