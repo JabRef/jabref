@@ -1,5 +1,7 @@
 package org.jabref.logic.journals;
 
+import java.util.Set;
+
 import javax.swing.undo.CompoundEdit;
 
 import org.jabref.architecture.AllowedToUseSwing;
@@ -120,26 +122,36 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void testDuplicateKeys() {
-        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
-        assertEquals(1, repository.getCustomAbbreviations().size());
+        Abbreviation abbreviationOne = new Abbreviation("Long Name", "L. N.");
+        repository.addCustomAbbreviation(abbreviationOne);
+        assertEquals(Set.of(abbreviationOne), repository.getCustomAbbreviations());
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
 
-        repository.addCustomAbbreviation(new Abbreviation("Long Name", "LA. N."));
-        assertEquals(1, repository.getCustomAbbreviations().size());
-        assertEquals("LA. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
+        Abbreviation abbreviationTwo = new Abbreviation("Long Name", "LA. N.");
+        repository.addCustomAbbreviation(abbreviationTwo);
+        assertEquals(Set.of(abbreviationOne, abbreviationTwo), repository.getCustomAbbreviations());
+
+        // Both abbreviations are kept in the repository
+        // "L. N." is smaller than "LA. N.", therefore "L. N." is returned
+        assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
     }
 
     @Test
     void testDuplicateKeysWithShortestUniqueAbbreviation() {
-        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
-        assertEquals(1, repository.getCustomAbbreviations().size());
+        Abbreviation abbreviationOne = new Abbreviation("Long Name", "L. N.", "LN");
+        repository.addCustomAbbreviation(abbreviationOne);
+        assertEquals(Set.of(abbreviationOne), repository.getCustomAbbreviations());
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("LN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
 
-        repository.addCustomAbbreviation(new Abbreviation("Long Name", "LA. N.", "LAN"));
-        assertEquals(1, repository.getCustomAbbreviations().size());
-        assertEquals("LA. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
-        assertEquals("LAN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
+        Abbreviation abbreviationTwo = new Abbreviation("Long Name", "LA. N.", "LAN");
+        repository.addCustomAbbreviation(abbreviationTwo);
+        assertEquals(Set.of(abbreviationOne, abbreviationTwo), repository.getCustomAbbreviations());
+
+        // Both abbreviations are kept in the repository
+        // "L. N." is smaller than "LA. N.", therefore "L. N." is returned
+        assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
+        assertEquals("LN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
     }
 
     @Test
