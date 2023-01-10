@@ -26,13 +26,18 @@ public class ContentSelector {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 
         ContentSelector that = (ContentSelector) o;
         return Objects.equals(field, that.field) &&
                 Objects.equals(values, that.values);
+    }
+
+    @Override
+    public String toString() {
+        return "ContentSelector [field=" + field + ", values=" + values + "]";
     }
 
     @Override

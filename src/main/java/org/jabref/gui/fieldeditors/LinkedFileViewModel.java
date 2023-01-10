@@ -392,8 +392,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
         ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
         Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                Localization.lang("Delete '%0'", file.get().toString()),
-                Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                Localization.lang("Delete '%0'", file.get().getFileName().toString()),
+                Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk.", file.get().toString()),
                 removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
 
         if (buttonType.isPresent()) {
@@ -490,13 +490,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
-                                urlDownload.getSource().toString()))) {
+                                          urlDownload.getSource().toString()))) {
                     return true;
                 } else {
                     dialogService.notify(Localization.lang("Download operation canceled."));
+                    return false;
                 }
+            } else {
+                LOGGER.error("Error while checking if the file can be downloaded", ex);
+                dialogService.notify(Localization.lang("Error downloading"));
+                return false;
             }
-            return false;
         }
         return true;
     }
@@ -508,8 +512,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
                     ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
-                    String suggestedTypeName = externalFileType.getName();
-                    linkedFile.setFileType(suggestedTypeName);
+
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
                     String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileDirectoryPattern());
                     suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);
@@ -557,6 +560,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void parsePdfMetadataAndShowMergeDialog() {
         linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresent(filePath -> {
             MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
+            dialog.setTitle(Localization.lang("Merge PDF metadata"));
             dialog.addSource(Localization.lang("Entry"), entry);
             dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibTextImporter(preferences.getImportFormatPreferences()), filePath));
             dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
@@ -565,7 +569,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
             dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
             dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(preferences.getImportFormatPreferences()), filePath));
-            dialog.showAndWait().ifPresent(newEntry -> {
+            dialogService.showCustomDialogAndWait(dialog).ifPresent(newEntry -> {
                 databaseContext.getDatabase().removeEntry(entry);
                 databaseContext.getDatabase().insertEntry(newEntry);
             });

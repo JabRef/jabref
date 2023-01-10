@@ -5,8 +5,6 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -35,6 +33,7 @@ import org.jabref.model.study.Study;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -35,6 +35,10 @@
     -fx-background-color: -jr-row-even-background;
 }
 
+.field-cell {
+    -fx-padding: 8;
+}
+
 .merge-toolbox {
     -fx-background-color: -jr-menu-background;
 }

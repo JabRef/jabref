@@ -1,6 +1,5 @@
 ---
 parent: Code Howtos
-nav_order: 15
 ---
 # UI Design Recommendations
 

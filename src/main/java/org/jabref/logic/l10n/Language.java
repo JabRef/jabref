@@ -8,34 +8,38 @@ import java.util.Optional;
  * Contains all supported languages.
  */
 public enum Language {
-
+    ARABIC("العربية (Arabic)", "ar"),
     BAHASA_INDONESIA("Bahasa Indonesia", "id"),
     BRAZILIAN_PORTUGUESE("Brazilian Portuguese", "pt_BR"),
     DANISH("Dansk", "da"),
-    GERMAN("Deutsch", "de"),
+    DUTCH("Nederlands", "nl"),
     ENGLISH("English", "en"),
-    SPANISH("Español", "es"),
     FRENCH("Français", "fr"),
+    GERMAN("Deutsch", "de"),
+    GREEK("ελληνικά (Greek)", "el"),
     ITALIAN("Italiano", "it"),
     JAPANESE("Japanese", "ja"),
-    DUTCH("Nederlands", "nl"),
+    KOREAN("한국어 (Korean)", "ko"),
     NORWEGIAN("Norsk", "no"),
-    PERSIAN("Persian (فارسی)", "fa"),
+    PERSIAN("فارسی (Farsi)", "fa"),
+    POLISH("Polish", "pl"),
     PORTUGUESE("Português", "pt"),
     RUSSIAN("Russian", "ru"),
     SIMPLIFIED_CHINESE("Chinese (Simplified)", "zh_CN"),
-    TRADITIONAL_CHINESE("Chinese (Traditional)", "zh_TW"),
-    SVENSKA("Svenska", "sv"),
-    TURKISH("Turkish", "tr"),
-    VIETNAMESE("Vietnamese", "vi"),
-    GREEK("ελληνικά", "el"),
+    SPANISH("Español", "es"),
+    SWEDISH("Svenska", "sv"),
     TAGALOG("Tagalog/Filipino", "tl"),
-    POLISH("Polish", "pl"),
-    KOREAN("Korean (한국어)", "ko");
+    TRADITIONAL_CHINESE("Chinese (Traditional)", "zh_TW"),
+    TURKISH("Turkish", "tr"),
+    UKRAINIAN("украї́нська (Ukrainian)", "uk"),
+    VIETNAMESE("Vietnamese", "vi");
 
     private final String displayName;
     private final String id;
 
+    /**
+     * @param id Typically as 639-1 code
+     */
     Language(String displayName, String id) {
         this.displayName = displayName;
         this.id = id;

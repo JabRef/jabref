@@ -3,11 +3,9 @@ package org.jabref.logic.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.CopyOption;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,15 +119,33 @@ public class FileUtil {
         return path.resolveSibling(path.getFileName() + extension);
     }
 
-    public static Optional<String> getUniquePathFragment(List<String> paths, Path databasePath) {
-        String fileName = databasePath.getFileName().toString();
+    /**
+     * Looks for the unique directory, if any, different to the provided paths
+     *
+     * @param paths List of paths as Strings
+     * @param comparePath The to be tested path
+     */
+    public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
+        String fileName = comparePath.getFileName().toString();
 
         List<String> uniquePathParts = uniquePathSubstrings(paths);
         return uniquePathParts.stream()
-                              .filter(part -> databasePath.toString().contains(part)
+                              .filter(part -> comparePath.toString().contains(part)
                                       && !part.equals(fileName) && part.contains(File.separator))
                               .findFirst()
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
+    }
+
+    /**
+     * Looks for the shortest unique path of the in a list of paths
+     *
+     * @param paths List of paths as Strings
+     * @param comparePath The to be shortened path
+     */
+    public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
+        return uniquePathSubstrings(paths).stream()
+                              .filter(part -> comparePath.toString().contains(part))
+                              .findFirst();
     }
 
     /**
@@ -150,7 +166,7 @@ public class FileUtil {
 
         List<String> pathSubstrings = new ArrayList<>(Collections.nCopies(paths.size(), ""));
 
-        // compute shortest folder substrings
+        // compute the shortest folder substrings
         while (!stackList.stream().allMatch(Vector::isEmpty)) {
             for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
@@ -199,49 +215,6 @@ public class FileUtil {
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
             return false;
-        }
-    }
-
-    /**
-     * Renames a given file
-     *
-     * @param fromFile The source filename to rename
-     * @param toFile   The target fileName
-     * @return True if rename was successful, false if an exception occurred
-     */
-    public static boolean renameFile(Path fromFile, Path toFile) {
-        return renameFile(fromFile, toFile, false);
-    }
-
-    /**
-     * Renames a given file
-     *
-     * @param fromFile        The source filename to rename
-     * @param toFile          The target fileName
-     * @param replaceExisting Whether to replace existing files or not
-     * @return True if rename was successful, false if an exception occurred
-     * @deprecated Use {@link Files#move(Path, Path, CopyOption...)} instead and handle exception properly
-     */
-    @Deprecated
-    public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
-        try {
-            return renameFileWithException(fromFile, toFile, replaceExisting);
-        } catch (IOException e) {
-            LOGGER.error("Renaming Files failed", e);
-            return false;
-        }
-    }
-
-    /**
-     * @deprecated Directly use {@link Files#move(Path, Path, CopyOption...)}
-     */
-    @Deprecated
-    public static boolean renameFileWithException(Path fromFile, Path toFile, boolean replaceExisting) throws IOException {
-        if (replaceExisting) {
-            return Files.move(fromFile, fromFile.resolveSibling(toFile),
-                    StandardCopyOption.REPLACE_EXISTING) != null;
-        } else {
-            return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
         }
     }
 
@@ -380,10 +353,10 @@ public class FileUtil {
     }
 
     /**
-     * Test if the file is a bib file by simply checking the extension to be ".bib"
+     * Test if the file is a pdf file by simply checking the extension to be ".pdf"
      *
      * @param file The file to check
-     * @return True if file extension is ".bib", false otherwise
+     * @return True if file extension is ".pdf", false otherwise
      */
     public static boolean isPDFFile(Path file) {
         return getFileExtension(file).filter("pdf"::equals).isPresent();

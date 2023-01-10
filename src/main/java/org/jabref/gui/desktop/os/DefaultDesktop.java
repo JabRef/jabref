@@ -45,4 +45,9 @@ public class DefaultDesktop implements NativeDesktop {
     public Path getApplicationDirectory() {
         return getUserDirectory();
     }
+
+    @Override
+    public Path getDefaultFileChooserDirectory() {
+        return Path.of(System.getProperty("user.home"));
+    }
 }

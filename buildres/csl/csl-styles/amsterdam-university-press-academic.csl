@@ -15,7 +15,7 @@
     <category citation-format="note"/>
     <category field="generic-base"/>
     <summary>AUP format with full notes and bibliography</summary>
-    <updated>2020-04-12T17:07:57+00:00</updated>
+    <updated>2022-10-07T12:18:32+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -94,6 +94,9 @@
         <group delimiter=" " prefix=", ">
           <text term="version" form="short"/>
           <text variable="version" form="short"/>
+        </group>
+        <group prefix=", ">
+          <text variable="volume" form="short"/>
         </group>
       </else-if>
       <else-if type="legal_case interview" match="any">

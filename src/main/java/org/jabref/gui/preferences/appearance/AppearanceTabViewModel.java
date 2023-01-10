@@ -164,7 +164,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSS)
                 .withDefaultExtension(StandardFileType.CSS)
-                .withInitialDirectory(preferences.getLastPreferencesExportPath()).build();
+                .withInitialDirectory(preferences.getInternalPreferences().getLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file ->
                 customPathToThemeProperty.setValue(file.toAbsolutePath().toString()));

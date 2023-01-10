@@ -3,8 +3,6 @@ package org.jabref.gui.preferences.preview;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;
@@ -42,6 +40,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -132,6 +131,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         availableListView.setOnDragDetected(this::dragDetectedInAvailable);
         availableListView.setOnDragDropped(event -> dragDropped(viewModel.availableListProperty(), event));
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
+        availableListView.setOnMouseClicked(this::mouseClickedAvailable);
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.setPreviewLayout(newValue));
@@ -146,6 +146,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         chosenListView.setOnDragDetected(this::dragDetectedInChosen);
         chosenListView.setOnDragDropped(event -> dragDropped(viewModel.chosenListProperty(), event));
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
+        chosenListView.setOnMouseClicked(this::mouseClickedChosen);
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.setPreviewLayout(newValue));
@@ -275,5 +276,19 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     public void resetDefaultButtonAction() {
         viewModel.resetDefaultLayout();
+    }
+
+    private void mouseClickedAvailable(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            viewModel.addToChosen();
+            event.consume();
+        }
+    }
+
+    private void mouseClickedChosen(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            viewModel.removeFromChosen();
+            event.consume();
+        }
     }
 }

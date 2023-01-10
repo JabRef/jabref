@@ -3,11 +3,9 @@ nav_order: 2
 ---
 # Contributing
 
-After reading through this guide, check out some good first issues to contribute to by clicking here: [Good First Issues](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-
-In case you are aiming to contribute other improvements, please head over to our general [JabRef contribution page](https://docs.jabref.org/faqcontributing).
-
-In case you are an instructor and want to use **JabRef as a software engineering example**, please head to [https://devdocs.jabref.org/teaching](https://devdocs.jabref.org/teaching).
+* After reading through this guide, check out some good first issues to contribute to by goind to our [list of good first issues](https://github.com/orgs/JabRef/projects/5/views/1).
+* In case you are aiming to contribute other improvements, please head over to our [general JabRef contribution page](https://docs.jabref.org/faqcontributing).
+* In case you are an instructor and want to use **JabRef as a software engineering example**, please head to [https://devdocs.jabref.org/teaching](https://devdocs.jabref.org/teaching).
 
 ## Contribute code
 
@@ -54,7 +52,7 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 
 #### Write a good commit message
 
-See [good commit message](https://github.com/joelparkerhenderson/git\_commit\_message) or [commit guidelines section of Pro Git](http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines). The first line of your commit message is automatically taken as the title for the pull-request. All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
+See [good commit message](https://github.com/joelparkerhenderson/git-commit-message) or [commit guidelines section of Pro Git](http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines). For the curious: [Why good commit messages matter!](https://cbea.ms/git-commit/). The first line of your commit message is automatically taken as the title for the pull-request. All other lines make up the body of the pull request. Add the words `fixes #xxx` to your PR to auto-close the corresponding issue.
 
 #### Test your code
 
@@ -78,7 +76,7 @@ Actual   :[Opens\ JabRef's\ Twitter\ page (src\main\java\org\jabref\gui\JabRefFr
 
 Add the above snippet to the English translation file located at `src/main/resources/l10n/JabRef_en.properties`. [Crowdin](https://crowdin.com/project/jabref) will automatically pick up the new string and add it to the other translations.
 
-You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`. Find more information in the [JabRef developer docs](https://devdocs.jabref.org/getting-into-the-code/code-howtos#using-localization-correctly).
+You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/org.jabref.logic.l10n/LocalizationConsistencyTest.java`. Find more information in the [JabRef developer docs](https://devdocs.jabref.org/getting-into-the-code/code-howtos#using-localization-correctly).
 
 #### When adding a library
 
@@ -112,11 +110,3 @@ If you want to indicate that a pull request is not yet complete **before** creat
 
 For improving developer's documentation, go on at the [docs/ subdirectory of JabRef's code](https://github.com/JabRef/jabref/tree/main/docs) and edit the file.
 GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
-
-You can also host Jekyll locally.
-
-    docker run --rm -it \
-      --volume="$pwd:/srv/jekyll" \
-      jekyll/builder:latest /bin/bash -c "gem install && bundle exec jekyll build && bundle exec rake search:init && jekyll serve"
-
-Then, you can see a near-to-reality rendering of the development documentation at <http://localhost:4000>.

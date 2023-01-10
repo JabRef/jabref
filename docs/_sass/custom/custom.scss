@@ -1,0 +1,8 @@
+figcaption {
+    font-size: .75em;
+    font-weight: 550;
+}
+
+figcaption:before {
+    content: "Figure: "
+}

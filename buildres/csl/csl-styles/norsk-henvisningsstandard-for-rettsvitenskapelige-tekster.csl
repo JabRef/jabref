@@ -95,7 +95,7 @@
         <text quotes="true" variable="title"/>
       </if>
       <else-if type="legislation">
-        <text variable="title-short"/>
+        <text variable="title-short" text-case="capitalize-first"/>
       </else-if>
       <else>
         <text font-style="italic" variable="title-short"/>

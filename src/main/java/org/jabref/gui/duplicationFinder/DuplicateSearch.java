@@ -34,6 +34,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -51,10 +52,13 @@ public class DuplicateSearch extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public DuplicateSearch(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+    private final PreferencesService prefs;
+
+    public DuplicateSearch(JabRefFrame frame, DialogService dialogService, StateManager stateManager, PreferencesService prefs) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.prefs = prefs;
 
         this.executable.bind(needsDatabase(stateManager));
     }
@@ -142,7 +146,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentLibraryTab().getBibDatabaseContext(), stateManager, dialogService);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentLibraryTab().getBibDatabaseContext(), stateManager, dialogService, prefs);
 
         dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
 

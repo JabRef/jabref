@@ -16,6 +16,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
@@ -37,7 +38,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -88,7 +88,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
      * TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
      */
     public static LinkedFile fromFile(Path file, List<Path> fileDirectories, FilePreferences filePreferences) {
-        String fileExtension = FileHelper.getFileExtension(file).orElse("");
+        String fileExtension = FileUtil.getFileExtension(file).orElse("");
         ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, filePreferences)
                                                               .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
@@ -214,8 +214,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void addFromURL() {
-        Optional<String> urlText = dialogService.showInputDialogAndWait(
-                Localization.lang("Download file"), Localization.lang("Enter URL to download"));
+        String clipText = ClipBoardManager.getContents();
+        Optional<String> urlText;
+        if (clipText.startsWith("http://") || clipText.startsWith("https://") || clipText.startsWith("ftp://")) {
+            urlText = dialogService.showInputDialogWithDefaultAndWait(
+                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), clipText);
+        } else {
+            urlText = dialogService.showInputDialogAndWait(
+                    Localization.lang("Download file"), Localization.lang("Enter URL to download"));
+        }
         if (urlText.isPresent()) {
             try {
                 URL url = new URL(urlText.get());

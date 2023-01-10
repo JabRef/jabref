@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
-import javax.inject.Inject;
+import java.nio.file.Path;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
@@ -43,12 +44,14 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.CheckTreeView;
 
 public class UnlinkedFilesDialogView extends BaseDialog<Void> {
@@ -86,6 +89,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
 
+    private BibDatabaseContext bibDatabaseContext;
+
     public UnlinkedFilesDialogView() {
         this.validationVisualizer = new ControlsFxVisualizer();
 
@@ -108,6 +113,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         viewModel = new UnlinkedFilesDialogViewModel(dialogService, undoManager, fileUpdateMonitor, preferencesService, stateManager, taskExecutor, importFormatReader);
+
+        this.bibDatabaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("No active library"));
 
         progressDisplay.progressProperty().bind(viewModel.progressValueProperty());
         progressText.textProperty().bind(viewModel.progressTextProperty());
@@ -160,6 +167,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileSortCombo.setItems(viewModel.getSorters());
         fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
         fileSortCombo.getSelectionModel().selectFirst();
+
+        directoryPathField.setText(bibDatabaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences()).map(Path::toString).orElse(""));
     }
 
     private void initUnlinkedFilesList() {

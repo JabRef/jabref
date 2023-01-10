@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -80,7 +81,7 @@ public class ModsImporter extends Importer implements Parser {
     private JAXBContext context;
 
     public ModsImporter(ImportFormatPreferences importFormatPreferences) {
-        keywordSeparator = importFormatPreferences.getKeywordSeparator() + " ";
+        keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
     }
 
     @Override
@@ -167,7 +168,7 @@ public class ModsImporter extends Importer implements Parser {
             abstractDefinition
                     .ifPresent(abstractDef -> putIfValueNotNull(fields, StandardField.ABSTRACT, abstractDef.getValue()));
 
-            genreDefinition.ifPresent(genre -> entry.setType(EntryTypeFactory.parse(genre.getValue())));
+            genreDefinition.ifPresent(genre -> entry.setType(EntryTypeFactory.parse(mapGenre(genre.getValue()))));
 
             languageDefinition.ifPresent(
                     languageDef -> languageDef.getLanguageTerm().stream().map(LanguageTermDefinition::getValue)
@@ -178,7 +179,7 @@ public class ModsImporter extends Importer implements Parser {
             nameDefinition.ifPresent(name -> handleAuthorsInNamePart(name, authors, fields));
 
             originInfoDefinition.ifPresent(originInfo -> originInfo
-                    .getPlaceOrPublisherOrDateIssued().stream()
+                    .getPlaceOrPublisherOrDateIssued()
                     .forEach(element -> putPlaceOrPublisherOrDate(fields, element.getName().getLocalPart(),
                             element.getValue())));
 
@@ -203,6 +204,16 @@ public class ModsImporter extends Importer implements Parser {
         putIfListIsNotEmpty(fields, notes, StandardField.NOTE, ", ");
     }
 
+    private String mapGenre(String genre) {
+        return switch (genre.toLowerCase(Locale.ROOT)) {
+            case "conference publication" -> "proceedings";
+            case "database" -> "dataset";
+            case "yearbook", "handbook" -> "book";
+            case "law report or digest", "technical report", "reporting" -> "report";
+            default -> genre;
+        };
+    }
+
     private void parseTitle(Map<Field, String> fields, List<Object> titleOrSubTitleOrPartNumber) {
         for (Object object : titleOrSubTitleOrPartNumber) {
             if (object instanceof JAXBElement) {
@@ -218,7 +229,7 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseIdentifier(Map<Field, String> fields, IdentifierDefinition identifier, BibEntry entry) {
         String type = identifier.getType();
-        if ("citekey".equals(type) && !entry.getCitationKey().isPresent()) {
+        if ("citekey".equals(type) && entry.getCitationKey().isEmpty()) {
             entry.setCitationKey(identifier.getValue());
         } else if (!"local".equals(type) && !"citekey".equals(type)) {
             // put all identifiers (doi, issn, isbn,...) except of local and citekey
@@ -370,8 +381,8 @@ public class ModsImporter extends Importer implements Parser {
 
         List<String> places = new ArrayList<>();
         placeDefinition
-                .ifPresent(place -> place.getPlaceTerm().stream().filter(placeTerm -> placeTerm.getValue() != null)
-                                         .map(PlaceTermDefinition::getValue).forEach(element -> places.add(element)));
+                .ifPresent(place -> place.getPlaceTerm().stream().map(PlaceTermDefinition::getValue)
+                                         .filter(Objects::nonNull).forEach(places::add));
         putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
 
         dateDefinition.ifPresent(date -> putDate(fields, elementName, date));

@@ -11,7 +11,7 @@ public class HeaderCell extends ThreeWayMergeCell {
     private final Label label = new Label();
 
     public HeaderCell(String text) {
-        super(text, ThreeWayMergeCell.NO_ROW_NUMBER);
+        super(text, ThreeWayMergeCell.HEADER_ROW);
         initialize();
     }
 

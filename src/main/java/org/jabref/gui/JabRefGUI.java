@@ -135,7 +135,7 @@ public class JabRefGUI {
         // Remove invalid databases
         List<ParserResult> invalidDatabases = bibDatabases.stream()
                                                           .filter(ParserResult::isInvalid)
-                                                          .collect(Collectors.toList());
+                                                          .toList();
         failed.addAll(invalidDatabases);
         bibDatabases.removeAll(invalidDatabases);
 
@@ -157,7 +157,7 @@ public class JabRefGUI {
 
             if (pr.getDatabase().isShared()) {
                 try {
-                    new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
+                    new SharedDatabaseUIManager(mainFrame, preferencesService).openSharedDatabaseFromParserResult(pr);
                 } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                         NotASharedDatabaseException e) {
                     pr.getDatabaseContext().clearDatabasePath(); // do not open the original file

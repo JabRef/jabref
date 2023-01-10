@@ -111,7 +111,11 @@ public class GroupDialogViewModel {
     private final AbstractGroup editedGroup;
     private final GroupDialogHeader groupDialogHeader;
 
-    public GroupDialogViewModel(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup, GroupDialogHeader groupDialogHeader) {
+    public GroupDialogViewModel(DialogService dialogService,
+                                BibDatabaseContext currentDatabase,
+                                PreferencesService preferencesService,
+                                AbstractGroup editedGroup,
+                                GroupDialogHeader groupDialogHeader) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
@@ -130,11 +134,11 @@ public class GroupDialogViewModel {
 
         nameContainsDelimiterValidator = new FunctionBasedValidator<>(
                 nameProperty,
-                name -> !name.contains(Character.toString(preferencesService.getKeywordDelimiter())),
+                name -> !name.contains(Character.toString(preferencesService.getBibEntryPreferences().getKeywordSeparator())),
                 ValidationMessage.warning(
                         Localization.lang(
                                 "The group name contains the keyword separator \"%0\" and thus probably does not work as expected.",
-                                Character.toString(preferencesService.getKeywordDelimiter())
+                                Character.toString(preferencesService.getBibEntryPreferences().getKeywordSeparator())
                         )));
 
         sameNameValidator = new FunctionBasedValidator<>(
@@ -210,7 +214,8 @@ public class GroupDialogViewModel {
                     try {
                         Pattern.compile(input);
                         return true;
-                    } catch (PatternSyntaxException ignored) {
+                    } catch (PatternSyntaxException e) {
+                        // Ignored
                         return false;
                     }
                 },
@@ -299,7 +304,7 @@ public class GroupDialogViewModel {
                 resultingGroup = new ExplicitGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        preferencesService.getKeywordDelimiter());
+                        preferencesService.getBibEntryPreferences().getKeywordSeparator());
             } else if (typeKeywordsProperty.getValue()) {
                 if (keywordGroupRegexProperty.getValue()) {
                     resultingGroup = new RegexKeywordGroup(
@@ -315,7 +320,7 @@ public class GroupDialogViewModel {
                             FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
                             keywordGroupSearchTermProperty.getValue().trim(),
                             keywordGroupCaseSensitiveProperty.getValue(),
-                            preferencesService.getKeywordDelimiter(),
+                            preferencesService.getBibEntryPreferences().getKeywordSeparator(),
                             false);
                 }
             } else if (typeSearchProperty.getValue()) {

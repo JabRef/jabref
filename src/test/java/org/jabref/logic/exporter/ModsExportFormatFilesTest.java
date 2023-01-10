@@ -14,18 +14,19 @@ import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.BibEntryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ModsExportFormatFilesTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ModsExportFormatFilesTest.class);
@@ -52,16 +53,19 @@ public class ModsExportFormatFilesTest {
 
     @BeforeEach
     public void setUp(@TempDir Path testFolder) throws Exception {
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         exporter = new ModsExporter();
+        bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+        modsImporter = new ModsImporter(importFormatPreferences);
+
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
         Files.createFile(path);
         exportedFile = path.toAbsolutePath();
-        ImportFormatPreferences mock = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        bibtexImporter = new BibtexImporter(mock, new DummyFileUpdateMonitor());
-        Mockito.when(mock.getKeywordSeparator()).thenReturn(',');
-        modsImporter = new ModsImporter(mock);
     }
 
     @ParameterizedTest

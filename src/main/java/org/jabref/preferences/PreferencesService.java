@@ -11,14 +11,13 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -26,9 +25,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
@@ -50,6 +47,8 @@ public interface PreferencesService {
 
     InternalPreferences getInternalPreferences();
 
+    BibEntryPreferences getBibEntryPreferences();
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -65,8 +64,6 @@ public interface PreferencesService {
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
     OpenOfficePreferences getOpenOfficePreferences();
-
-    void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
 
     Map<String, Object> getPreferences();
 
@@ -104,16 +101,9 @@ public interface PreferencesService {
 
     CleanupPreferences getDefaultCleanupPreset();
 
-    @Deprecated
-    String getDefaultsDefaultCitationKeyPattern();
-
     //*************************************************************************************************************
     // GeneralPreferences
     //*************************************************************************************************************
-
-    Language getLanguage();
-
-    void setLanguage(Language language);
 
     GeneralPreferences getGeneralPreferences();
 
@@ -128,8 +118,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // GroupsPreferences
     //*************************************************************************************************************
-
-    Character getKeywordDelimiter();
 
     GroupsPreferences getGroupsPreferences();
 
@@ -157,13 +145,7 @@ public interface PreferencesService {
     // CitationKeyPatternPreferences
     //*************************************************************************************************************
 
-    GlobalCitationKeyPattern getGlobalCitationKeyPattern();
-
-    void updateGlobalCitationKeyPattern();
-
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
-
-    void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences);
 
     //*************************************************************************************************************
     // ExternalApplicationsPreferences
@@ -177,27 +159,17 @@ public interface PreferencesService {
     // MainTablePreferences
     //*************************************************************************************************************
 
-    void updateMainTableColumns();
-
-    ColumnPreferences getColumnPreferences();
-
-    void storeMainTableColumnPreferences(ColumnPreferences columnPreferences);
+    ColumnPreferences getMainTableColumnPreferences();
 
     MainTablePreferences getMainTablePreferences();
 
-    void storeMainTablePreferences(MainTablePreferences mainTablePreferences);
-
-    MainTableNameFormatPreferences getMainTableNameFormatPreferences();
-
-    void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+    NameDisplayPreferences getNameDisplayPreferences();
 
     //*************************************************************************************************************
     // SearchDialogColumnPreferences
     //*************************************************************************************************************
 
     ColumnPreferences getSearchDialogColumnPreferences();
-
-    void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences);
 
     //*************************************************************************************************************
     // AppearancePreferences
@@ -210,10 +182,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
 
     AutoLinkPreferences getAutoLinkPreferences();
-
-    FileLinkPreferences getFileLinkPreferences();
-
-    void storeFileDirForDatabase(List<Path> dirs);
 
     //*************************************************************************************************************
     // Import/Export preferences
@@ -247,8 +215,6 @@ public interface PreferencesService {
 
     GuiPreferences getGuiPreferences();
 
-    void clearEditedFiles();
-
     //*************************************************************************************************************
     // Misc preferences
     //*************************************************************************************************************
@@ -262,10 +228,6 @@ public interface PreferencesService {
     SpecialFieldsPreferences getSpecialFieldsPreferences();
 
     SearchPreferences getSearchPreferences();
-
-    String getLastPreferencesExportPath();
-
-    void storeLastPreferencesExportPath(Path exportFile);
 
     MrDlibPreferences getMrDlibPreferences();
 

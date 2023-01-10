@@ -1228,13 +1228,16 @@
           </else>
         </choose>
         <choose>
-          <if variable="page">
-            <text variable="page"/>
-          </if>
-          <else>
+          <if variable="number">
             <!-- Ex. 6: Journal article with article number or eLocator -->
             <!-- This should be localized -->
-            <text variable="number" prefix="Article "/>
+            <group delimiter=" ">
+              <text term="article-locator" text-case="capitalize-first"/>
+              <text variable="number"/>
+            </group>
+          </if>
+          <else>
+            <text variable="page"/>
           </else>
         </choose>
       </group>

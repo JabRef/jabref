@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Can be used stand-alone.
  * <p>
- * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.preferences.GeneralPreferences, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
+ * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
  * <p>
  * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
  */
@@ -83,7 +83,7 @@ public class BibtexParser implements Parser {
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.getFieldContentFormatterPreferences());
+        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldContentFormatterPreferences());
         metaDataParser = new MetaDataParser(fileMonitor);
     }
 
@@ -228,7 +228,7 @@ public class BibtexParser implements Parser {
 
         // Instantiate meta data
         try {
-            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
+            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }
@@ -611,7 +611,7 @@ public class BibtexParser implements Parser {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
                 } else if (StandardField.KEYWORDS.equals(field)) {
                     // multiple keywords fields should be combined to one
-                    entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
+                    entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
             } else {
                 entry.setField(field, content);

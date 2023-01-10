@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.keybindings;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -22,6 +20,7 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabViewModel> implements PreferencesTab {
 

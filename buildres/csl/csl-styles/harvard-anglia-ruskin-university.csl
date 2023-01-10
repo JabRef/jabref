@@ -16,9 +16,14 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Anglia Ruskin University Harvard style</summary>
-    <updated>2022-08-22T08:06:04+00:00</updated>
+    <updated>2022-08-25T13:44:56+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="interview">interview by</term>
+    </terms>
+  </locale>
   <macro name="cite-author">
     <choose>
       <if type="broadcast" match="any">
@@ -267,14 +272,14 @@
   </macro>
   <macro name="locator">
     <choose>
-      <if type="article-journal article-newspaper article-magazine interview" match="any">
+      <if type="article-journal article-newspaper article-magazine" match="any">
         <group delimiter=", " suffix=".">
           <group>
             <text variable="volume"/>
             <text variable="issue" prefix="(" suffix=")"/>
           </group>
           <choose>
-            <if type="article-magazine article-newspaper interview" match="any">
+            <if type="article-magazine article-newspaper" match="any">
               <date variable="issued" delimiter=" ">
                 <date-part name="day"/>
                 <date-part name="month" form="short"/>
@@ -312,6 +317,22 @@
               <date-part name="day"/>
               <date-part name="month" form="short"/>
             </date>
+          </group>
+        </group>
+      </else-if>
+      <else-if type="interview" match="any">
+        <group delimiter=". ">
+          <group delimiter=" ">
+            <text term="interview" text-case="capitalize-first"/>
+            <names variable="interviewer"/>
+          </group>
+          <group delimiter=", ">
+            <group delimiter=" ">
+              <text variable="medium" prefix="[" suffix="]"/>
+              <text variable="publisher"/>
+            </group>
+            <date form="text" date-parts="year-month-day" variable="issued"/>
+            <text variable="dimensions"/>
           </group>
         </group>
       </else-if>

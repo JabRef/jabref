@@ -58,13 +58,13 @@ public class ActionHelper {
                                                 .mapObservable(entry -> Bindings.createBooleanBinding(() -> {
                                                     return entry.getFields().stream().anyMatch(fields::contains);
                                                 }, entry.getFieldsObservable()))
-                                                .orElse(false);
+                                                .orElseOpt(false);
         return BooleanExpression.booleanExpression(fieldsAreSet);
     }
 
     public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).map(entry -> {
+        Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).mapOpt(entry -> {
             List<LinkedFile> files = entry.getFiles();
 
             if ((entry.getFiles().size() > 0) && stateManager.getActiveDatabase().isPresent()) {
@@ -80,7 +80,7 @@ public class ActionHelper {
             } else {
                 return false;
             }
-        }).orElse(false);
+        }).orElseOpt(false);
 
         return BooleanExpression.booleanExpression(fileIsPresent);
     }
