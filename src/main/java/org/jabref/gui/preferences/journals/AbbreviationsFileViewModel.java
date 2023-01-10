@@ -2,9 +2,9 @@ package org.jabref.gui.preferences.journals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,7 +39,7 @@ public class AbbreviationsFileViewModel {
 
     /**
      * This constructor should only be called to create a pseudo abbreviation file for built in lists. This means it is
-     * a placeholder and it's path will be null meaning it has no place on the filesystem. It's isPseudoFile property
+     * a placeholder and its path will be null meaning it has no place on the filesystem. Its isPseudoFile property
      * will therefore be set to true.
      */
     public AbbreviationsFileViewModel(List<AbbreviationViewModel> abbreviations, String name) {
@@ -51,7 +51,7 @@ public class AbbreviationsFileViewModel {
 
     public void readAbbreviations() throws IOException {
         if (path.isPresent()) {
-            List<Abbreviation> abbreviationList = JournalAbbreviationLoader.readJournalListFromFile(path.get());
+            Collection<Abbreviation> abbreviationList = JournalAbbreviationLoader.readJournalListFromFile(path.get());
             abbreviationList.forEach(abbreviation -> abbreviations.addAll(new AbbreviationViewModel(abbreviation)));
         } else {
             throw new FileNotFoundException();
@@ -60,15 +60,16 @@ public class AbbreviationsFileViewModel {
 
     /**
      * This method will write all abbreviations of this abbreviation file to the file on the file system.
-     * It essentially will check if the current file is a built in list and if not it will call
+     * It essentially will check if the current file is a builtin list and if not it will call
      * {@link AbbreviationWriter#writeOrCreate}.
      */
     public void writeOrCreate() throws IOException {
         if (!isBuiltInList.get()) {
             List<Abbreviation> actualAbbreviations =
                     abbreviations.stream().filter(abb -> !abb.isPseudoAbbreviation())
-                                 .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList());
-            AbbreviationWriter.writeOrCreate(path.get(), actualAbbreviations, StandardCharsets.UTF_8);
+                                 .map(AbbreviationViewModel::getAbbreviationObject)
+                                 .collect(Collectors.toList());
+            AbbreviationWriter.writeOrCreate(path.get(), actualAbbreviations);
         }
     }
 

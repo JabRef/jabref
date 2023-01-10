@@ -472,7 +472,7 @@ public class JabRefPreferences implements PreferencesService {
         Localization.setLanguage(getLanguage());
 
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
-        defaults.put(SEARCH_FULLTEXT, Boolean.TRUE);
+        defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
         defaults.put(SEARCH_SORT_BY_SCORE, Boolean.TRUE);
