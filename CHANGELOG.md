@@ -153,6 +153,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the display of the "Customize Entry Types" dialog title. [#9198](https://github.com/JabRef/jabref/issues/9198)
 - We fixed an issue where the CSS styles are missing in some dialogs. [#9150](https://github.com/JabRef/jabref/pull/9150)
 - We fixed an issue where controls in the preferences dialog could outgrow the window. [#9017](https://github.com/JabRef/jabref/issues/9017)
+- We fixed an issue where highlighted text color for entry merge dialogue was not clearly visible. [#9192](https://github.com/JabRef/jabref/issues/9192)
 
 ### Removed
 
