@@ -198,6 +198,4 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
     public StyleClassedTextArea getStyleClassedLabel() {
         return label;
     }
-
-
 }
