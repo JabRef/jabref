@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 
 public class BibDatabaseDiff {
@@ -69,7 +69,7 @@ public class BibDatabaseDiff {
         }
 
         // Now we've found all exact matches, look through the remaining entries, looking for close matches.
-        DuplicateCheck duplicateCheck = new DuplicateCheck(Globals.entryTypesManager);
+        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         for (BibEntry originalEntry : notMatched) {
             // These two variables will keep track of which entry most closely matches the one we're looking at.
             double bestMatch = 0;
