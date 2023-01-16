@@ -50,7 +50,8 @@ public class FieldRowView {
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
 
-        // We need to have a reference to the parent grid pane to be able to show/hide the row. F**** you JavaFX
+        // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
+        // This won't be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
         leftValueCell.parentProperty().addListener(e -> {
             if (leftValueCell.getParent() instanceof GridPane grid) {
                 parent = grid;
