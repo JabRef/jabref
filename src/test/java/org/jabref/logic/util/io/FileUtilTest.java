@@ -217,6 +217,18 @@ class FileUtilTest {
     }
 
     @Test
+    void testUniquePathFragmentWithSameSuffix() {
+       List<String> dirs =  List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliograsphy.bib");
+       assertEquals(Optional.of("bibliography.bib"), FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/bibliography.bib")));
+    }
+
+    @Test
+    void testUniquePathFragmentWithSameSuffixAndLongerName() {
+       List<String> dirs =  List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliography.bib");
+       assertEquals(Optional.of("koppor-bibliography.bib"), FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/koppor-bibliography.bib")));
+    }
+
+    @Test
     void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithOverrideExistFile() {
         assertFalse(FileUtil.copyFile(nonExistingTestPath, nonExistingTestPath, true));
     }
