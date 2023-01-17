@@ -144,13 +144,10 @@ public class FileUtil {
      * @param comparePath The to be shortened path
      */
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
-
-
         return uniquePathSubstrings(paths).stream()
                               .filter(part -> comparePath.toString().contains(part))
                                .sorted(Comparator.comparingInt(String::length).reversed())
                                .findFirst();
-
     }
 
     /**
