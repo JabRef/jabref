@@ -16,7 +16,6 @@ public final class EntryWithPreviewAndSourceDetailsView extends DatabaseChangeDe
     private final PreviewWithSourceTab previewWithSourceTab = new PreviewWithSourceTab();
 
     public EntryWithPreviewAndSourceDetailsView(BibEntry entry, BibDatabaseContext bibDatabaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
-
         TabPane tabPanePreviewCode = previewWithSourceTab.getPreviewWithSourceTab(entry, bibDatabaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
         setLeftAnchor(tabPanePreviewCode, 8d);
         setTopAnchor(tabPanePreviewCode, 8d);
