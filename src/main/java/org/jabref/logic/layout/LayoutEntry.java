@@ -81,6 +81,7 @@ import org.jabref.logic.layout.format.ToUpperCase;
 import org.jabref.logic.layout.format.WrapContent;
 import org.jabref.logic.layout.format.WrapFileLinks;
 import org.jabref.logic.layout.format.XMLChars;
+import org.jabref.logic.layout.format.ReplaceWithEscapedDoubleQuotes;
 import org.jabref.logic.openoffice.style.OOPreFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -475,6 +476,7 @@ class LayoutEntry {
             case "Markdown" -> new MarkdownFormatter();
             case "CSLType" -> new CSLType();
             case "ShortMonth" -> new ShortMonthFormatter();
+            case "ReplaceWithEscapedDoubleQuotes" -> new ReplaceWithEscapedDoubleQuotes();
             default -> null;
         };
     }
