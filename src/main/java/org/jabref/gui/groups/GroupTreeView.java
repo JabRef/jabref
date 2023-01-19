@@ -28,7 +28,6 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -266,10 +265,7 @@ public class GroupTreeView extends BorderPane {
                             .mapOpt(this::createContextMenuForGroup)
                             .orElseOpt((ContextMenu) null));
             row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    // Prevent right-click to select group
-                    event.consume();
-                } else if (event.getTarget() instanceof StackPane pane) {
+                if (event.getTarget() instanceof StackPane pane) {
                     if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
                         event.consume();
                     }
