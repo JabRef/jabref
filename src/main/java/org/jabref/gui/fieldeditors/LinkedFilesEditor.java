@@ -219,8 +219,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 switch (keyBinding.get()) {
                     case DELETE_ENTRY:
                         List<LinkedFileViewModel> toBeDeleted = List.copyOf(listView.getSelectionModel().getSelectedItems());
-                        for (LinkedFileViewModel selectedItem : toBeDeleted) {
-                            viewModel.deleteFile(selectedItem);
+                        if (toBeDeleted.size() == 1) {
+                            viewModel.deleteFile(toBeDeleted.get(0));
+                        } else {
+                            viewModel.deleteFiles(toBeDeleted);
                         }
                         event.consume();
                         break;

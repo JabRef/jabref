@@ -15,6 +15,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -248,12 +251,39 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void deleteFile(LinkedFileViewModel file) {
+        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonBar.ButtonData.YES);
+        ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+        Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION,
+                Localization.lang("Delete '%0'", file.getDir().get().getFileName().toString()),
+                Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk.", file.getDir().get().getFileName().toString()),
+                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+
         if (file.getFile().isOnlineLink()) {
             removeFileLink(file);
         } else {
-            boolean deleteSuccessful = file.delete();
+            boolean deleteSuccessful = file.delete(buttonType, removeFromEntry, deleteFromEntry);
             if (deleteSuccessful) {
                 files.remove(file);
+            }
+        }
+    }
+
+    public void deleteFiles(List<LinkedFileViewModel> toBeDeleted) {
+        ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonBar.ButtonData.YES);
+        ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+        Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION,
+                Localization.lang("Delete %0 files", toBeDeleted.size()),
+                Localization.lang("Delete %0 files permanently from disk, or just remove the files from the entry? Pressing Delete will delete the files permanently from disk.", toBeDeleted.size()),
+                removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
+
+        for (LinkedFileViewModel file : toBeDeleted) {
+            if (file.getFile().isOnlineLink()) {
+                removeFileLink(file);
+            } else {
+                boolean deleteSuccessful = file.delete(buttonType, removeFromEntry, deleteFromEntry);
+                if (deleteSuccessful) {
+                    files.remove(file);
+                }
             }
         }
     }
