@@ -1,6 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
+
 public class ReplaceWithEscapedDoubleQuotes implements LayoutFormatter {
     @Override
     public String format(String fieldText) {
@@ -9,8 +10,7 @@ public class ReplaceWithEscapedDoubleQuotes implements LayoutFormatter {
         for (char c : fieldText.toCharArray()) {
             if (c == '\"') {
                 builder.append("\"\"");
-            }
-            else{
+            } else {
                 builder.append(c);
             }
         }
