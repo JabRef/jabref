@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 public class ReplaceWithEscapedDoubleQuotesTest {
 
     private ReplaceWithEscapedDoubleQuotes formatter;
@@ -23,9 +22,10 @@ public class ReplaceWithEscapedDoubleQuotesTest {
     }
 
     @Test
-    public void replacingMultipleDoubleQuote(){
+    public void replacingMultipleDoubleQuote() {
         assertEquals("multiple \"\"double\"\" quote", formatter.format("multiple \"double\" quote"));
     }
+    
     @Test
     public void replacingSingleDoubleQuoteHavingCommas() {
         assertEquals("this \"\"is\"\", a test", formatter.format("this \"is\", a test"));
