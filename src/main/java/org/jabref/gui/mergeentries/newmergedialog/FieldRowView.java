@@ -155,7 +155,6 @@ public class FieldRowView {
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
-        show();
         if (!rightValueCell.isVisible() || StringUtil.isNullOrEmpty(viewModel.getLeftFieldValue()) || StringUtil.isNullOrEmpty(viewModel.getRightFieldValue())) {
             return;
         }
@@ -202,6 +201,10 @@ public class FieldRowView {
         int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
         getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
         getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());
+    }
+
+    public boolean hasEqualLeftAndRightValues() {
+        return viewModel.hasEqualLeftAndRightValues();
     }
 
     @Override

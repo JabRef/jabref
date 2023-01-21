@@ -129,7 +129,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         return hideEqualFields;
     }
 
-    public boolean hideEqualsField() {
+    public boolean shouldHideEqualFields() {
         return hideEqualFields.get();
     }
 
@@ -145,7 +145,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         return showDiffProperty().map(showDiff -> !showDiff);
     }
 
-    public Boolean isShowDiffEnabled() {
+    public Boolean shouldShowDiffs() {
         return showDiffProperty().get();
     }
 
