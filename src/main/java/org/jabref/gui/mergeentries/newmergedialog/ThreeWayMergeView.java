@@ -81,7 +81,7 @@ public class ThreeWayMergeView extends VBox {
     private void updateDiff() {
         if (toolbar.isShowDiffEnabled()) {
             for (FieldRowView row : fieldRows) {
-                if (toolbar.hideEqualsField()&&
+                if (toolbar.hideEqualsField() &&
                     row.getLeftValueCell().getText().trim().equals(row.getRightValueCell().getText().trim())) {
                     row.hideRow();
                     continue;

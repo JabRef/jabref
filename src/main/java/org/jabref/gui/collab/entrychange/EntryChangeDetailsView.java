@@ -17,11 +17,13 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
 
-    private final PreviewWithSourceTab previewWithSourceTab = new PreviewWithSourceTab();
+    private final PreviewWithSourceTab oldPreviewWithSourcesTab = new PreviewWithSourceTab();
+    private final PreviewWithSourceTab newPreviewWithSourcesTab = new PreviewWithSourceTab();
 
     public EntryChangeDetailsView(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
-        TabPane oldEntryTabPane = previewWithSourceTab.getPreviewWithSourceTab(oldEntry, databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
-        TabPane newEntryTabPane = previewWithSourceTab.getPreviewWithSourceTab(newEntry, databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
+
+        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
+        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
 
         EasyBind.subscribe(oldEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> {
             newEntryTabPane.getSelectionModel().select(selectedIndex.intValue());
