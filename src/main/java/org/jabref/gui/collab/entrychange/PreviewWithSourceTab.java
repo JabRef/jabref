@@ -31,6 +31,8 @@ public class PreviewWithSourceTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewWithSourceTab.class);
 
     public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
+        // TODO: Optimization: Each PreviewViewer instance creates a WebView on initialization. WebView instances are
+        //   very heavy on CPU and memory. Thus, we should consider sharing PreviewViewer between entry changes.
         PreviewViewer previewViewer = new PreviewViewer(bibDatabaseContext, dialogService, stateManager, themeManager);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setEntry(entry);
