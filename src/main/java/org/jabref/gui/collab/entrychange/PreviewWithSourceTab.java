@@ -48,7 +48,7 @@ public class PreviewWithSourceTab {
         try {
             codeArea.appendText(getSourceString(entry, bibDatabaseContext.getMode(), preferencesService.getFieldWriterPreferences(), entryTypesManager));
         } catch (IOException e) {
-            LOGGER.error("Error getting Bibtex", entry);
+            LOGGER.error("Error getting Bibtex: {}", entry);
         }
         codeArea.setEditable(true);
         Tab codeTab = new Tab(Localization.lang("%0 source", bibDatabaseContext.getMode().getFormattedName()), codeArea);
