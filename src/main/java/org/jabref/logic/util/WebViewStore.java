@@ -48,6 +48,7 @@ public class WebViewStore {
         if (!isInitialized) {
             throw new IllegalStateException("WebViewStore is uninitialized");
         }
+        LOGGER.info("Creating Webview instance...");
         if (WEB_VIEWS.size() <= config.getMinimumNumberOfInstances()) {
             addWebViewLater();
         }
@@ -61,7 +62,7 @@ public class WebViewStore {
     private static void addWebViewLater() {
         Platform.runLater(() -> {
             WEB_VIEWS.add(new WebView());
-            LOGGER.debug("Cached Web views: {}", WEB_VIEWS.size());
+            LOGGER.info("Cached Web views: {}", WEB_VIEWS.size());
         });
     }
 

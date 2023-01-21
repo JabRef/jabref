@@ -226,6 +226,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setEntry(BibEntry newEntry) {
+        LOGGER.info("Set Entry: " + newEntry.getCitationKey());
         // Remove update listener for old entry
         entry.ifPresent(oldEntry -> {
             for (Observable observable : oldEntry.getObservables()) {
@@ -244,14 +245,19 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void update() {
         if (entry.isEmpty() || (layout == null)) {
+            LOGGER.info("Entry is empty or layout is null {} {}", entry, layout);
             // Nothing to do
             return;
         }
+        LOGGER.info("Updating entry: " + entry.get().getCitationKey());
 
         ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
         BackgroundTask
-                .wrap(() -> layout.generatePreview(entry.get(), database))
+                .wrap(() -> {
+                    Thread.sleep(500);
+                    return layout.generatePreview(entry.get(), database);
+                })
                 .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getDisplayName() + " ..." + "</i>"))
                 .onSuccess(this::setPreviewText)
                 .onFailure(exception -> {
@@ -313,6 +319,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     @Override
     public void invalidated(Observable observable) {
+        LOGGER.info("Invalidated!");
         update();
     }
 
