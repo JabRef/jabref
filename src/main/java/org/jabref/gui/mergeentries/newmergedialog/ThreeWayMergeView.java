@@ -74,14 +74,14 @@ public class ThreeWayMergeView extends VBox {
         toolbar.showDiffProperty().addListener(e -> updateDiff());
         toolbar.diffViewProperty().addListener(e -> updateDiff());
         toolbar.diffHighlightingMethodProperty().addListener(e -> updateDiff());
-        toolbar.showAllFieldsProperty().addListener(e -> updateDiff());
+        toolbar.hideEqualFieldsProperty().addListener(e -> updateDiff());
         this.updateDiff();
     }
 
     private void updateDiff() {
         if (toolbar.isShowDiffEnabled()) {
             for (FieldRowView row : fieldRows) {
-                if (!toolbar.isShowAllFields() &&
+                if (toolbar.hideEqualsField()&&
                     row.getLeftValueCell().getText().trim().equals(row.getRightValueCell().getText().trim())) {
                     row.hideRow();
                     continue;
@@ -94,11 +94,12 @@ public class ThreeWayMergeView extends VBox {
             }
         } else {
             for (FieldRowView row : fieldRows) {
-                if (!toolbar.isShowAllFields() &&
+                if (toolbar.hideEqualsField() &&
                     row.getLeftValueCell().getText().trim().equals(row.getRightValueCell().getText().trim())) {
                     row.hideRow();
                     continue;
                 }
+                row.showRow();
                 row.hideDiff();
             }
         }

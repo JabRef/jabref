@@ -43,7 +43,7 @@
                </toggleGroup>
             </RadioButton>
             <RadioButton fx:id="highlightCharactersRadioButtons" disable="true" mnemonicParsing="false" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
-            <CheckBox fx:id="showAllFieldsBox" text="%Show all fields"></CheckBox>
+            <CheckBox fx:id="hideEqualFieldsCheck" text="%Hide equal fields"></CheckBox>
          </items>
       </ToolBar>
    </children>

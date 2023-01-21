@@ -45,10 +45,10 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     private Button selectRightEntryValuesButton;
 
     @FXML
-    private CheckBox showAllFieldsBox;
+    private CheckBox hideEqualFieldsCheck;
 
     private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
-    private final BooleanProperty showAllFields = new SimpleBooleanProperty();
+    private final BooleanProperty hideEqualFields = new SimpleBooleanProperty();
     private EasyBinding<Boolean> showDiff;
 
     public ThreeWayMergeToolbar() {
@@ -102,7 +102,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         diffHighlightingMethodToggleGroup.selectToggle(highlightWordsRadioButton);
         plainTextOrDiffComboBox.valueProperty().set(PlainTextOrDiff.Diff);
-        showAllFields.bind(showAllFieldsBox.selectedProperty());
+        hideEqualFields.bind(hideEqualFieldsCheck.selectedProperty());
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {
@@ -125,12 +125,12 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         plainTextOrDiffComboBox.valueProperty().set(showDiff ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT);
     }
 
-    public BooleanProperty showAllFieldsProperty() {
-        return showAllFields;
+    public BooleanProperty hideEqualFieldsProperty() {
+        return hideEqualFields;
     }
 
-    public boolean isShowAllFields() {
-        return showAllFields.get();
+    public boolean hideEqualsField() {
+        return hideEqualFields.get();
     }
 
     /**
