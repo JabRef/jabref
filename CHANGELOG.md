@@ -25,7 +25,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
-
+- We fixed an issue where searching for a specific term with the DOAB fetcher lead to an exception [#9571](https://github.com/JabRef/jabref/issues/9571)
+- We fixed an issue where the "Import" -> "Library to import to" did not show the correct library name if two opened libraries had the same suffix [#9567](https://github.com/JabRef/jabref/issues/9567)
 
 
 

@@ -10,6 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -145,7 +146,8 @@ public class FileUtil {
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
                               .filter(part -> comparePath.toString().contains(part))
-                              .findFirst();
+                               .sorted(Comparator.comparingInt(String::length).reversed())
+                               .findFirst();
     }
 
     /**
