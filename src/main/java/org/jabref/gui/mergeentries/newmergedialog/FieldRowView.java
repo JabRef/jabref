@@ -155,7 +155,7 @@ public class FieldRowView {
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
-        showRow();
+        show();
         if (!rightValueCell.isVisible() || StringUtil.isNullOrEmpty(viewModel.getLeftFieldValue()) || StringUtil.isNullOrEmpty(viewModel.getRightFieldValue())) {
             return;
         }
@@ -174,13 +174,13 @@ public class FieldRowView {
         }
     }
 
-    public void hideRow() {
+    public void hide() {
         if (parent != null) {
             parent.getChildren().removeAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
         }
     }
 
-    public void showRow() {
+    public void show() {
         if (parent != null) {
             if (!parent.getChildren().contains(leftValueCell)) {
                 parent.getChildren().addAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);

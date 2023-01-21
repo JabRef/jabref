@@ -83,7 +83,7 @@ public class ThreeWayMergeView extends VBox {
             for (FieldRowView row : fieldRows) {
                 if (toolbar.hideEqualsField() &&
                     row.getLeftValueCell().getText().trim().equals(row.getRightValueCell().getText().trim())) {
-                    row.hideRow();
+                    row.hide();
                     continue;
                 }
                 if (row.getFieldNameCell().getText().equals("Groups") && (row.getLeftValueCell().getText().contains(keywordSeparator) || row.getRightValueCell().getText().contains(keywordSeparator))) {
@@ -96,10 +96,10 @@ public class ThreeWayMergeView extends VBox {
             for (FieldRowView row : fieldRows) {
                 if (toolbar.hideEqualsField() &&
                     row.getLeftValueCell().getText().trim().equals(row.getRightValueCell().getText().trim())) {
-                    row.hideRow();
+                    row.hide();
                     continue;
                 }
-                row.showRow();
+                row.show();
                 row.hideDiff();
             }
         }
