@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -203,17 +202,31 @@ class FileUtilTest {
 
     @Test
     void uniquePathSubstrings() {
-        String[] pathArr = {Path.of("C:/uniquefile.bib").toString(),
-                Path.of("C:/downloads/filename.bib").toString(), Path.of("C:/mypaper/bib/filename.bib").toString(),
-                Path.of("C:/external/mypaper/bib/filename.bib").toString(), ""};
-        String[] uniqArr = {Path.of("uniquefile.bib").toString(), Path.of("downloads/filename.bib").toString(),
-                Path.of("C:/mypaper/bib/filename.bib").toString(),
-                Path.of("external/mypaper/bib/filename.bib").toString(), ""};
-        List<String> paths = Arrays.asList(pathArr);
-        List<String> uniqPath = Arrays.asList(uniqArr);
+       List<String> paths = List.of("C:/uniquefile.bib",
+               "C:/downloads/filename.bib",
+               "C:/mypaper/bib/filename.bib",
+               "C:/external/mypaper/bib/filename.bib",
+               "");
+        List<String> uniqPath = List.of("uniquefile.bib",
+              "downloads/filename.bib",
+              "C:/mypaper/bib/filename.bib",
+              "external/mypaper/bib/filename.bib",
+              "");
 
         List<String> result = FileUtil.uniquePathSubstrings(paths);
         assertEquals(uniqPath, result);
+    }
+
+    @Test
+    void testUniquePathFragmentWithSameSuffix() {
+        List<String> dirs = List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliograsphy.bib");
+        assertEquals(Optional.of("bibliography.bib"), FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/bibliography.bib")));
+    }
+
+    @Test
+    void testUniquePathFragmentWithSameSuffixAndLongerName() {
+        List<String> dirs = List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliography.bib");
+        assertEquals(Optional.of("koppor-bibliography.bib"), FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/koppor-bibliography.bib")));
     }
 
     @Test
