@@ -32,89 +32,114 @@ import static org.mockito.Mockito.when;
 
 public class LuceneSearcherTest {
 
-    private LuceneSearcher search;
+    private LuceneSearcher searcher;
+    private PreferencesService preferencesService;
+    private BibDatabase bibDatabase;
+    private BibDatabaseContext bibDatabaseContext;
 
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
-        FilePreferences filePreferences = mock(FilePreferences.class);
-        when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
-        PreferencesService preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
-        // given
-        BibDatabase database = new BibDatabase();
-        BibDatabaseContext context = mock(BibDatabaseContext.class);
-        when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
-        when(context.getFulltextIndexPath()).thenReturn(indexDir);
-        when(context.getDatabase()).thenReturn(database);
-        when(context.getEntries()).thenReturn(database.getEntries());
-        BibEntry examplePdf = new BibEntry(StandardEntryType.Article);
-        examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "example.pdf", StandardFileType.PDF.getName())));
-        database.insertEntry(examplePdf);
+        preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
 
-        BibEntry metaDataEntry = new BibEntry(StandardEntryType.Article);
-        metaDataEntry.setFiles(Collections.singletonList(new LinkedFile("Metadata Entry", "metaData.pdf", StandardFileType.PDF.getName())));
-        metaDataEntry.setCitationKey("MetaData2017");
-        database.insertEntry(metaDataEntry);
+        bibDatabase = new BibDatabase();
+        bibDatabaseContext = mock(BibDatabaseContext.class);
+        when(bibDatabaseContext.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
+        when(bibDatabaseContext.getFulltextIndexPath()).thenReturn(indexDir);
+        when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
+        when(bibDatabaseContext.getEntries()).thenReturn(bibDatabase.getEntries());
+    }
 
-        BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis);
-        exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
-        exampleThesis.setCitationKey("ExampleThesis");
-        database.insertEntry(exampleThesis);
+    private void initIndexer() throws IOException {
+        LuceneIndexer indexer = LuceneIndexer.of(bibDatabaseContext, preferencesService);
+        searcher = LuceneSearcher.of(bibDatabaseContext);
 
-        LuceneIndexer indexer = LuceneIndexer.of(context, preferencesService);
-        search = LuceneSearcher.of(context);
-
-        indexer.createIndex();
-        for (BibEntry bibEntry : context.getEntries()) {
+        for (BibEntry bibEntry : bibDatabaseContext.getEntries()) {
             indexer.addBibFieldsToIndex(bibEntry);
             indexer.addLinkedFilesToIndex(bibEntry);
         }
     }
 
     @Test
-    public void searchForTest() {
-        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+    public void searchForTest() throws IOException {
+        insertPdfsForSearch();
+        initIndexer();
+
+        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(8, hits);
     }
 
     @Test
-    public void searchForUniversity() {
-        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("University", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+    public void searchForUniversity() throws IOException {
+        insertPdfsForSearch();
+        initIndexer();
+
+        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("University", EnumSet.noneOf(SearchRules.SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(1, hits);
     }
 
     @Test
-    public void searchForStopWord() {
-        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("and", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+    public void searchForStopWord() throws IOException {
+        insertPdfsForSearch();
+        initIndexer();
+
+        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("and", EnumSet.noneOf(SearchRules.SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(0, hits);
     }
 
     @Test
-    public void searchForSecond() {
-        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("second", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+    public void searchForSecond() throws IOException {
+        insertPdfsForSearch();
+        initIndexer();
+
+        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("second", EnumSet.noneOf(SearchRules.SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(4, hits);
     }
 
     @Test
-    public void searchForAnnotation() {
-        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("annotation", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+    public void searchForAnnotation() throws IOException {
+        insertPdfsForSearch();
+        initIndexer();
+
+        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("annotation", EnumSet.noneOf(SearchRules.SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(2, hits);
     }
 
     @Test
-    public void searchForEmptyString() {
-        HashMap<BibEntry, LuceneSearchResults> searchResults = search.search(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+    public void searchForEmptyString() throws IOException {
+        insertPdfsForSearch();
+        initIndexer();
+
+        HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)));
         int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(0, hits);
     }
 
     @Test
     public void searchWithNullString() {
-        assertThrows(NullPointerException.class, () -> search.search(null));
+        assertThrows(NullPointerException.class, () -> searcher.search(null));
+    }
+
+    private void insertPdfsForSearch() {
+        when(preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()).thenReturn(true);
+
+        BibEntry examplePdf = new BibEntry(StandardEntryType.Article);
+        examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "example.pdf", StandardFileType.PDF.getName())));
+        bibDatabase.insertEntry(examplePdf);
+
+        BibEntry metaDataEntry = new BibEntry(StandardEntryType.Article);
+        metaDataEntry.setFiles(Collections.singletonList(new LinkedFile("Metadata Entry", "metaData.pdf", StandardFileType.PDF.getName())));
+        metaDataEntry.setCitationKey("MetaData2017");
+        bibDatabase.insertEntry(metaDataEntry);
+
+        BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis);
+        exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+        exampleThesis.setCitationKey("ExampleThesis");
+        bibDatabase.insertEntry(exampleThesis);
     }
 }
