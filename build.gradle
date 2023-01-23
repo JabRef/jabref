@@ -42,7 +42,6 @@ version = project.findProperty('projVersion') ?: '100.0.0'
 java {
     sourceCompatibility = JavaVersion.VERSION_19
     targetCompatibility = JavaVersion.VERSION_19
-
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
     modularity.inferModulePath.set(false)
@@ -204,13 +203,13 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.153'
+    testImplementation 'io.github.classgraph:classgraph:4.8.154'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.9.1'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.9.2'
 
-    testImplementation 'org.mockito:mockito-core:4.11.0'
-    testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
+    testImplementation 'org.mockito:mockito-core:5.0.0'
+    testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.0.1'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.0.1'
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
