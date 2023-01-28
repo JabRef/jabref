@@ -22,7 +22,6 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
     private final PreviewWithSourceTab newPreviewWithSourcesTab = new PreviewWithSourceTab();
 
     public EntryChangeDetailsView(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
-
         // we need a copy here as we otherwise would set the same entry twice
         PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, stateManager, themeManager);
 
