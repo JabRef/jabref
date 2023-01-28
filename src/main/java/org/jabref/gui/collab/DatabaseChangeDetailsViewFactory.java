@@ -21,6 +21,7 @@ import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -33,24 +34,26 @@ public class DatabaseChangeDetailsViewFactory {
     private final ThemeManager themeManager;
     private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
+    private final PreviewViewer previewViewer;
 
-    public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
+    public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.themeManager = themeManager;
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
+        this.previewViewer = previewViewer;
     }
 
     public DatabaseChangeDetailsView create(DatabaseChange databaseChange) {
         // TODO: Use Pattern Matching for switch once it's out of preview
         if (databaseChange instanceof EntryChange entryChange) {
-            return new EntryChangeDetailsView(entryChange.getOldEntry(), entryChange.getNewEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
+            return new EntryChangeDetailsView(entryChange.getOldEntry(), entryChange.getNewEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager, previewViewer);
         } else if (databaseChange instanceof EntryAdd entryAdd) {
-            return new EntryWithPreviewAndSourceDetailsView(entryAdd.getAddedEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
+            return new EntryWithPreviewAndSourceDetailsView(entryAdd.getAddedEntry(), databaseContext, preferencesService, entryTypesManager, previewViewer);
         } else if (databaseChange instanceof EntryDelete entryDelete) {
-            return new EntryWithPreviewAndSourceDetailsView(entryDelete.getDeletedEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
+            return new EntryWithPreviewAndSourceDetailsView(entryDelete.getDeletedEntry(), databaseContext, preferencesService, entryTypesManager, previewViewer);
         } else if (databaseChange instanceof BibTexStringAdd stringAdd) {
             return new BibTexStringAddDetailsView(stringAdd);
         } else if (databaseChange instanceof BibTexStringDelete stringDelete) {

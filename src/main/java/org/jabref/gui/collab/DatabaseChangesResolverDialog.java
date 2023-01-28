@@ -16,6 +16,7 @@ import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.model.database.BibDatabaseContext;
@@ -36,6 +37,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
      * either. This cache is used to ensure that we only create the detail view instance once for each {@link DatabaseChange}.
      */
     private final Map<DatabaseChange, DatabaseChangeDetailsView> DETAILS_VIEW_CACHE = new HashMap<>();
+
 
     @FXML
     private TableView<DatabaseChange> changesTableView;
@@ -87,7 +89,8 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
+        PreviewViewer previewViewer = new PreviewViewer(database, dialogService, stateManager, themeManager);
+        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService, entryTypesManager, previewViewer);
 
         viewModel = new ExternalChangesResolverViewModel(changes, undoManager);
 

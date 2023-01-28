@@ -6,10 +6,7 @@ import java.io.StringWriter;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
@@ -20,6 +17,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.fxmisc.richtext.CodeArea;
@@ -30,10 +28,11 @@ public class PreviewWithSourceTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewWithSourceTab.class);
 
-    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
-        // TODO: Optimization: Each PreviewViewer instance creates a WebView on initialization. WebView instances are
-        //   very heavy on CPU and memory. Thus, we should consider sharing PreviewViewer between entry changes.
-        PreviewViewer previewViewer = new PreviewViewer(bibDatabaseContext, dialogService, stateManager, themeManager);
+    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
+        return getPreviewWithSourceTab(entry, bibDatabaseContext, preferencesService, entryTypesManager, previewViewer, "");
+    }
+
+    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer, String label) {
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setEntry(entry);
 
@@ -43,7 +42,14 @@ public class PreviewWithSourceTab {
         codeArea.setDisable(true);
 
         TabPane tabPanePreviewCode = new TabPane();
-        Tab previewTab = new Tab(Localization.lang("Entry preview"), previewViewer);
+        Tab previewTab = new Tab();
+        previewTab.setContent(previewViewer);
+
+        if (StringUtil.isNullOrEmpty(label)) {
+            previewTab.setText(Localization.lang("Entry preview"));
+        } else {
+            previewTab.setText(label);
+        }
 
         try {
             codeArea.appendText(getSourceString(entry, bibDatabaseContext.getMode(), preferencesService.getFieldWriterPreferences(), entryTypesManager));

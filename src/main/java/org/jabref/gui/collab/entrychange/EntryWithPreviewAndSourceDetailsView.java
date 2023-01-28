@@ -2,10 +2,8 @@ package org.jabref.gui.collab.entrychange;
 
 import javafx.scene.control.TabPane;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
-import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -15,8 +13,8 @@ public final class EntryWithPreviewAndSourceDetailsView extends DatabaseChangeDe
 
     private final PreviewWithSourceTab previewWithSourceTab = new PreviewWithSourceTab();
 
-    public EntryWithPreviewAndSourceDetailsView(BibEntry entry, BibDatabaseContext bibDatabaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
-        TabPane tabPanePreviewCode = previewWithSourceTab.getPreviewWithSourceTab(entry, bibDatabaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager);
+    public EntryWithPreviewAndSourceDetailsView(BibEntry entry, BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
+        TabPane tabPanePreviewCode = previewWithSourceTab.getPreviewWithSourceTab(entry, bibDatabaseContext, preferencesService, entryTypesManager, previewViewer);
         setLeftAnchor(tabPanePreviewCode, 8d);
         setTopAnchor(tabPanePreviewCode, 8d);
         setRightAnchor(tabPanePreviewCode, 8d);
