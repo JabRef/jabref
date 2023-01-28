@@ -72,6 +72,7 @@ import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.logic.layout.format.RemoveWhitespace;
 import org.jabref.logic.layout.format.Replace;
+import org.jabref.logic.layout.format.ReplaceWithEscapedDoubleQuotes;
 import org.jabref.logic.layout.format.RisAuthors;
 import org.jabref.logic.layout.format.RisKeywords;
 import org.jabref.logic.layout.format.RisMonth;
@@ -475,6 +476,7 @@ class LayoutEntry {
             case "Markdown" -> new MarkdownFormatter();
             case "CSLType" -> new CSLType();
             case "ShortMonth" -> new ShortMonthFormatter();
+            case "ReplaceWithEscapedDoubleQuotes" -> new ReplaceWithEscapedDoubleQuotes();
             default -> null;
         };
     }

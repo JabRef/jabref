@@ -67,6 +67,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - For portable versions, the `.deb` file now works on plain debian again. [#9472](https://github.com/JabRef/jabref/issues/9472)
 - We fixed an issue where the download of linked online files failed after an import of entries for certain urls. [#9518](https://github.com/JabRef/jabref/issues/9518)
 - We fixed an issue where an exception occured when manually downloading a file from an URL in the entry editor. [#9521](https://github.com/JabRef/jabref/issues/9521)
+- We fixed an issue with open office csv file formatting where commas in the abstract field where not escaped. [#9087][https://github.com/JabRef/jabref/issues/9087]
+- We fixed an issue with deleting groups where subgroups different from the selected group were deleted. [#9281][https://github.com/JabRef/jabref/issues/9281]
 
 ## [5.8] - 2022-12-18
 
