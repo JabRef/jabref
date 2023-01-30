@@ -18,7 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
-
+- We upgraded to Lucene 9.5 for the fulltext search. The search index will be rebuild. [#9584](https://github.com/JabRef/jabref/pull/9584)
 
 
 
