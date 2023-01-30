@@ -31,7 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 
 
-### Removed 
+### Removed
 
 - We removed the support of BibTeXML.[#9540](https://github.com/JabRef/jabref/issues/9540)
 
