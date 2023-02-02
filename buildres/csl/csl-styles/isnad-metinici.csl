@@ -21,7 +21,7 @@
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <!--
-	ISNAD AUTHOR-DATE v.1.0
+	ISNAD AUTHOR-DATE v.1.1
 
 	Document Type Mappings
 	ISNAD				CSL
@@ -51,8 +51,8 @@
 	Interview			interview
 	Interview			article-journal, article-magazine, article-newspaper, book (as collection-title with interviewer extra)
 	Legislation			legislation (with code number for official journal)
-	Legislation			legislation (without code number other legal sources) 
-	Standart			book
+	Legislation			legislation (without code number other legal sources)
+	Standard			standard (For backward compability book with issued, collection-number, authority)
 	Case				legal_case
 	Website				webpage
 	Databese			webpage
@@ -601,7 +601,14 @@
       <if type="article-journal article-magazine article-newspaper" match="any">
         <group delimiter=", ">
           <group>
-            <number suffix="/" variable="volume"/>
+            <choose>
+              <if match="all" variable="volume issue">
+                <number suffix="/" variable="volume"/>
+              </if>
+              <else>
+                <number variable="volume"/>
+              </else>
+            </choose>
             <number variable="issue"/>
           </group>
         </group>
@@ -736,7 +743,17 @@
               <if is-uncertain-date="issued">
                 <date variable="issued" form="numeric" date-parts="year" prefix="[" suffix="?]"/>
               </if>
-              <else-if type="book" variable="issued collection-number">
+              <else-if type="standard">
+                <choose>
+                  <if variable="collection-title" match="none">
+                    <group delimiter=", ">
+                      <date date-parts="year" form="numeric" variable="issued"/>
+                      <text variable="collection-number"/>
+                    </group>
+                  </if>
+                </choose>
+              </else-if>
+              <else-if type="book" variable="issued collection-number authority">
                 <choose>
                   <if variable="collection-title" match="none">
                     <group delimiter=", ">

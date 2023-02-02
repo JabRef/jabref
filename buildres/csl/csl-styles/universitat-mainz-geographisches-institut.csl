@@ -148,7 +148,7 @@
   <bibliography hanging-indent="true">
     <sort>
       <key macro="author"/>
-      <key variable="author" sort="ascending"/>
+      <key variable="issued" sort="descending"/>
     </sort>
     <layout suffix=".">
       <group delimiter=" ">

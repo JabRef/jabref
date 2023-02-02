@@ -8,7 +8,6 @@ import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.SendAsEMailAction;
 import org.jabref.gui.StateManager;
@@ -27,6 +26,7 @@ import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PreviewPreferences;
@@ -41,7 +41,8 @@ public class RightClickMenu {
                                      PreferencesService preferencesService,
                                      UndoManager undoManager,
                                      ClipBoardManager clipBoardManager,
-                                     TaskExecutor taskExecutor) {
+                                     TaskExecutor taskExecutor,
+                                     BibEntryTypesManager entryTypesManager) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
 
@@ -50,7 +51,7 @@ public class RightClickMenu {
                 createCopySubMenu(factory, dialogService, stateManager, preferencesService, clipBoardManager, taskExecutor),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(libraryTab.frame(), dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService.getBibEntryPreferences())),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager)),
 
                 new SeparatorMenuItem(),
@@ -76,8 +77,8 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                new ChangeEntryTypeMenu().getChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager()),
-                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(libraryTab, dialogService, stateManager))
+                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager(), keyBindingRepository, entryTypesManager).asSubMenu(),
+                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(libraryTab, dialogService, stateManager, taskExecutor, preferencesService))
         );
 
         return contextMenu;
@@ -114,7 +115,7 @@ public class RightClickMenu {
 
         copySpecialMenu.getItems().addAll(
                 new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, Globals.exportFactory, stateManager, clipBoardManager, taskExecutor, preferencesService)));
+                factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferencesService)));
 
         return copySpecialMenu;
     }

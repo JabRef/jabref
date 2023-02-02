@@ -6,6 +6,7 @@
     <link href="http://www.zotero.org/styles/economic-geology" rel="self"/>
     <link href="http://www.zotero.org/styles/american-journal-of-science" rel="template"/>
     <link href="http://www.editorialmanager.com/seg/default.aspx" rel="documentation"/>
+    <link href="https://www.segweb.org//pdf/publications/economic-geology/Instructions-to-Authors.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien, PhD</name>
       <email>obrienpat86@gmail.com</email>
@@ -14,7 +15,7 @@
     <category field="geology"/>
     <issn>0361-0128</issn>
     <eissn>1554-0774</eissn>
-    <updated>2018-02-19T15:05:37+00:00</updated>
+    <updated>2022-07-06T08:50:29+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -24,13 +25,13 @@
   </locale>
   <macro name="editor-translator">
     <names variable="editor translator" prefix="(" suffix=")" delimiter=", ">
-      <name and="symbol" initialize-with=". " delimiter=", "/>
+      <name and="symbol" initialize-with="."/>
       <label form="short" prefix=", " text-case="capitalize-first"/>
     </names>
   </macro>
   <macro name="author">
     <names variable="author">
-      <name and="text" delimiter-precedes-last="always" initialize-with=". " name-as-sort-order="all"/>
+      <name and="text" delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all"/>
       <label form="short" prefix=", "/>
       <substitute>
         <names variable="editor"/>
@@ -155,7 +156,7 @@
           <group prefix=", ">
             <text term="in"/>
             <names variable="editor translator" prefix=" " suffix="," delimiter=", ">
-              <name and="text" initialize-with=". " name-as-sort-order="all"/>
+              <name and="text" initialize-with="." name-as-sort-order="all"/>
               <label form="short" prefix=" "/>
             </names>
             <text variable="event" prefix=" " suffix=" &#8211;"/>
@@ -202,6 +203,10 @@
             <group delimiter=" ">
               <label variable="volume" form="short"/>
               <text variable="volume"/>
+            </group>
+            <group delimiter=" ">
+              <label variable="issue" form="short"/>
+              <text variable="issue"/>
             </group>
             <group delimiter=" ">
               <label plural="never" variable="page" form="short"/>

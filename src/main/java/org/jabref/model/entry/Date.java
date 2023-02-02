@@ -14,15 +14,26 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Date {
 
     private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
     private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Date.class);
+
     static {
         List<String> formatStrings = Arrays.asList(
-                "uuuu-MM-dd'T'HH:mm:ss[xxx][xx][X]",    // covers 2018-10-03T07:24:14+03:00
+                "uuuu-MM-dd'T'HH:mm[:ss][xxx][xx][X]",  // covers 2018-10-03T07:24:14+03:00
+                "uuuu-MM-dd'T'HH:m[:ss][xxx][xx][X]",   // covers 2018-10-03T17:2
+                "uuuu-MM-dd'T'H:mm[:ss][xxx][xx][X]",   // covers 2018-10-03T7:24
+                "uuuu-MM-dd'T'H:m[:ss][xxx][xx][X]",    // covers 2018-10-03T7:7
+                "uuuu-MM-dd'T'HH[:ss][xxx][xx][X]",     // covers 2018-10-03T07
+                "uuuu-MM-dd'T'H[:ss][xxx][xx][X]",      // covers 2018-10-03T7
                 "uuuu-M-d",                             // covers 2009-1-15
                 "uuuu-M",                               // covers 2009-11
+                "uuuu/M",                               // covers 2020/10
                 "d-M-uuuu",                             // covers 15-1-2012
                 "M-uuuu",                               // covers 1-2012
                 "M/uuuu",                               // covers 9/2015 and 09/2015
@@ -32,7 +43,9 @@ public class Date {
                 "d.M.uuuu",                             // covers 15.1.2015
                 "uuuu.M.d",                             // covers 2015.1.15
                 "uuuu",                                 // covers 2015
-                "MMM, uuuu");                           // covers Jan, 2020
+                "MMM, uuuu",                            // covers Jan, 2020
+                "uuuu.MM.d"                             // covers 2015.10.15
+                );
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
                                            .map(DateTimeFormatter::ofPattern)
@@ -93,20 +106,22 @@ public class Date {
                 TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0]);
                 TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1]);
                 return Optional.of(new Date(parsedDate, parsedEndDate));
-            } catch (DateTimeParseException ignored) {
+            } catch (DateTimeParseException e) {
+                LOGGER.debug("Invalid Date format", e);
                 return Optional.empty();
             }
         }
-
         try {
             TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
             return Optional.of(new Date(parsedDate));
-        } catch (DateTimeParseException ignored) {
+        } catch (DateTimeParseException e) {
+            LOGGER.debug("Invalid Date format", e);
             return Optional.empty();
         }
     }
 
-    public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue,
+    public static Optional<Date> parse(Optional<String> yearValue,
+                                       Optional<String> monthValue,
                                        Optional<String> dayValue) {
         Optional<Year> year = yearValue.flatMap(Date::convertToInt).map(Year::of);
         Optional<Month> month = monthValue.flatMap(Month::parse);
@@ -175,15 +190,28 @@ public class Date {
             return false;
         }
         Date date1 = (Date) o;
+
         return Objects.equals(getYear(), date1.getYear()) &&
                 Objects.equals(getMonth(), date1.getMonth()) &&
-                Objects.equals(getDay(), date1.getDay());
+                Objects.equals(getDay(), date1.getDay()) &&
+                Objects.equals(get(ChronoField.HOUR_OF_DAY), date1.get(ChronoField.HOUR_OF_DAY)) &&
+                Objects.equals(get(ChronoField.MINUTE_OF_HOUR), date1.get(ChronoField.MINUTE_OF_HOUR)) &&
+                Objects.equals(get(ChronoField.SECOND_OF_DAY), date1.get(ChronoField.SECOND_OF_DAY)) &&
+                Objects.equals(get(ChronoField.OFFSET_SECONDS), date1.get(ChronoField.OFFSET_SECONDS));
     }
 
     @Override
     public String toString() {
+        String formattedDate;
+        if (date.isSupported(ChronoField.OFFSET_SECONDS)) {
+            formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date);
+        } else if (date.isSupported(ChronoField.HOUR_OF_DAY)) {
+            formattedDate = DateTimeFormatter.ISO_DATE_TIME.format(date);
+        } else {
+            formattedDate = DateTimeFormatter.ISO_DATE.format(date);
+        }
         return "Date{" +
-                "date=" + date +
+                "date=" + formattedDate +
                 '}';
     }
 

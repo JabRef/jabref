@@ -28,7 +28,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.cleanup.NormalizeNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -79,9 +78,9 @@ public abstract class BibDatabaseWriter {
             }
         });
 
-        // Run a couple of standard cleanups
+        // Run standard cleanups
         List<FieldFormatterCleanup> preSaveCleanups =
-                Stream.of(new TrimWhitespaceFormatter(), new NormalizeNewlinesFormatter())
+                Stream.of(new TrimWhitespaceFormatter())
                       .map(formatter -> new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, formatter))
                       .collect(Collectors.toList());
         for (FieldFormatterCleanup formatter : preSaveCleanups) {

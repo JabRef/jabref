@@ -2,8 +2,7 @@ package org.jabref.gui.push;
 
 import java.util.List;
 
-import javafx.beans.property.ObjectProperty;
-
+import org.jabref.gui.actions.Action;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -18,7 +17,7 @@ public interface PushToApplication {
 
     String getTooltip();
 
-    JabRefIcon getIcon();
+    JabRefIcon getApplicationIcon();
 
     /**
      * The actual operation. This method will not be called on the event dispatch thread, so it should not do GUI
@@ -29,7 +28,7 @@ public interface PushToApplication {
     /**
      * Reporting etc., this method is called on the event dispatch thread after pushEntries() returns.
      */
-    void operationCompleted();
+    void onOperationCompleted();
 
     /**
      * Check whether this operation requires citation keys to be set for the entries. If true is returned an error message
@@ -39,5 +38,7 @@ public interface PushToApplication {
      */
     boolean requiresCitationKeys();
 
-    PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences);
+    Action getAction();
+
+    PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences pushToApplicationPreferences);
 }

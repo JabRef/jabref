@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -8,9 +9,11 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -18,6 +21,7 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
 
+import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -31,6 +35,8 @@ import org.jabref.model.util.OptionalUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class manages the GUI-state of JabRef, including:
@@ -46,6 +52,7 @@ import com.tobiasdiez.easybind.EasyBinding;
  */
 public class StateManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StateManager.class);
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
@@ -62,8 +69,10 @@ public class StateManager {
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
 
+    private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
+
     public StateManager() {
-        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
+        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
     }
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
@@ -124,6 +133,15 @@ public class StateManager {
         return activeDatabase.get();
     }
 
+    public void setActiveDatabase(BibDatabaseContext database) {
+        if (database == null) {
+            LOGGER.info("No open database detected");
+            activeDatabaseProperty().set(Optional.empty());
+        } else {
+            activeDatabaseProperty().set(Optional.of(database));
+        }
+    }
+
     public List<BibEntry> getEntriesInCurrentDatabase() {
         return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
                            .collect(Collectors.toList());
@@ -171,5 +189,27 @@ public class StateManager {
 
     public void setDialogWindowState(String className, DialogWindowState state) {
         dialogWindowStates.put(className, state);
+    }
+
+    public ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEditProperty() {
+        return lastAutomaticFieldEditorEdit;
+    }
+
+    public LastAutomaticFieldEditorEdit getLastAutomaticFieldEditorEdit() {
+        return lastAutomaticFieldEditorEditProperty().get();
+    }
+
+    public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
+        lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
+    }
+
+    public List<String> collectAllDatabasePaths() {
+        List<String> list = new ArrayList<>();
+        getOpenDatabases().stream()
+                          .map(BibDatabaseContext::getDatabasePath)
+                          .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                  path -> list.add(path.toAbsolutePath().toString()),
+                                  () -> list.add("")));
+        return list;
     }
 }

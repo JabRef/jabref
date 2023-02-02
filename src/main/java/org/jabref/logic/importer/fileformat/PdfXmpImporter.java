@@ -54,7 +54,7 @@ public class PdfXmpImporter extends Importer {
     public ParserResult importDatabase(Path filePath) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(XmpUtilReader.readXmp(filePath, xmpPreferences));
+            return new ParserResult(new XmpUtilReader().readXmp(filePath, xmpPreferences));
         } catch (IOException exception) {
             return ParserResult.fromError(exception);
         }

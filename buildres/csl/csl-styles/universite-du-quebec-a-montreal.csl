@@ -353,7 +353,7 @@
     <choose>
       <if match="any" variable="original-date">
         <choose>
-          <if type="musical_score book song" match="any">
+          <if type="musical_score book song chapter" match="any">
             <group prefix="(" suffix=")">
               <date date-parts="year" form="text" variable="issued"/>
               <text variable="year-suffix"/>
@@ -721,7 +721,7 @@
   </macro>
   <macro name="original-date">
     <choose>
-      <if type="song musical_score book" match="any">
+      <if type="song musical_score book chapter" match="any">
         <group prefix="(" suffix=")">
           <text value="Publication originale en "/>
           <date variable="original-date">

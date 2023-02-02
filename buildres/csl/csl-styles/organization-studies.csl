@@ -1173,7 +1173,11 @@
   <macro name="access">
     <choose>
       <if variable="DOI" match="any">
-        <text variable="DOI" prefix="https://doi.org/"/>
+        <choose>
+          <if match="none" variable="volume page">
+            <text variable="DOI" prefix="https://doi.org/"/>
+          </if>
+        </choose>
       </if>
       <else-if variable="URL">
         <group delimiter=" ">

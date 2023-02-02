@@ -33,8 +33,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final StateManager stateManager;
-    private final ThemeManager themeManager;
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
@@ -49,8 +47,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.stateManager = stateManager;
-        this.themeManager = themeManager;
 
         this.listeners = new ArrayList<>();
 
@@ -58,7 +54,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             try {
                 fileMonitor.addListenerForFile(path, this);
             } catch (IOException e) {
-                LOGGER.error("Error while trying to monitor " + path, e);
+                LOGGER.error("Error while trying to monitor {}", path, e);
             }
         });
 
@@ -67,7 +63,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 Localization.lang("The library has been modified by another program."),
                 List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
                         new Action(Localization.lang("Review changes"), event -> {
-                            dialogService.showCustomDialogAndWait(new ChangeDisplayDialog(database, changes));
+                            dialogService.showCustomDialogAndWait(new DatabaseChangesResolverDialog(changes, database, dialogService, stateManager, themeManager, preferencesService, Localization.lang("External Changes Resolver")));
                             notificationPane.hide();
                         })),
                 Duration.ZERO));
@@ -75,16 +71,18 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
     @Override
     public void fileUpdated() {
-        // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-        ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService, stateManager, themeManager);
-        BackgroundTask.wrap(scanner::scanForChanges)
-                      .onSuccess(changes -> {
-                          if (!changes.isEmpty()) {
-                              listeners.forEach(listener -> listener.databaseChanged(changes));
-                          }
-                      })
-                      .onFailure(e -> LOGGER.error("Error while watching for changes", e))
-                      .executeWith(taskExecutor);
+        synchronized (database) {
+            // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
+            ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService);
+            BackgroundTask.wrap(scanner::scanForChanges)
+                          .onSuccess(changes -> {
+                              if (!changes.isEmpty()) {
+                                  listeners.forEach(listener -> listener.databaseChanged(changes));
+                              }
+                          })
+                          .onFailure(e -> LOGGER.error("Error while watching for changes", e))
+                          .executeWith(taskExecutor);
+        }
     }
 
     public void addListener(DatabaseChangeListener listener) {

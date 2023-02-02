@@ -25,6 +25,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
  * and a StudyFetcher that manages the crawling over the selected E-Libraries.
  */
 public class Crawler {
+    public static final String FILENAME_STUDY_RESULT_BIB = "studyResult.bib";
+
     private final StudyRepository studyRepository;
     private final StudyFetcher studyFetcher;
 

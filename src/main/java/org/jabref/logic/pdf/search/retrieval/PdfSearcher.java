@@ -12,7 +12,6 @@ import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -36,7 +35,6 @@ public final class PdfSearcher {
 
     private PdfSearcher(Directory indexDirectory) {
         this.indexDirectory = indexDirectory;
-        Codec.forName("Lucene91");
     }
 
     public static PdfSearcher of(BibDatabaseContext databaseContext) throws IOException {

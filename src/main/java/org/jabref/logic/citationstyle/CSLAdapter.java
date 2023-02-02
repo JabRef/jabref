@@ -5,18 +5,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+import org.jabref.logic.integrity.PagesChecker;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import de.undercouch.citeproc.CSL;
@@ -73,14 +77,15 @@ public class CSLAdapter {
      * @throws IOException An error occurred in the underlying JavaScript framework
      */
     private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
-        if ((cslInstance == null) || !Objects.equals(newStyle, style)) {
+        final boolean newCslInstanceNeedsToBeCreated = (cslInstance == null) || !Objects.equals(newStyle, style);
+        if (newCslInstanceNeedsToBeCreated) {
             // lang and forceLang are set to the default values of other CSL constructors
             cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
                     new DefaultAbbreviationProvider(), newStyle, "en-US");
             style = newStyle;
         }
 
-        if (!Objects.equals(newFormat, format)) {
+        if (newCslInstanceNeedsToBeCreated || (!Objects.equals(newFormat, format))) {
             cslInstance.setOutputFormat(newFormat.getFormat());
             format = newFormat;
         }
@@ -95,11 +100,59 @@ public class CSLAdapter {
         private final List<BibEntry> data = new ArrayList<>();
         private BibDatabaseContext bibDatabaseContext;
         private BibEntryTypesManager entryTypesManager;
+        private PagesChecker pagesChecker;
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.
+         *
+         *<br>
+         *<table>
+         * <thead>
+         *<tr>
+         *<th style="text-align:left">BibTeX</th>
+         *<th style="text-align:left">BibLaTeX</th>
+         *<th style="text-align:left">EntryPreview/CSL</th>
+         *<th style="text-align:left">proposed logic, conditions and info</th>
+         *</tr>
+         *</thead>
+         *<tbody>
+         *<tr>
+         *<td style="text-align:left">volume</td>
+         *<td style="text-align:left">volume</td>
+         *<td style="text-align:left">volume</td>
+         *<td style="text-align:left"></td>
+         *</tr>
+         *<tr>
+         *<td style="text-align:left">number</td>
+         *<td style="text-align:left">issue</td>
+         *<td style="text-align:left">issue</td>
+         *<td style="text-align:left">For conversion to CSL or BibTeX: BibLaTeX <code>number</code> takes priority and supersedes BibLaTeX <code>issue</code></td>
+         *</tr>
+         *<tr>
+         *<td style="text-align:left">number</td>
+         *<td style="text-align:left">number</td>
+         *<td style="text-align:left">issue</td>
+         *<td style="text-align:left">same as above</td>
+         *</tr>
+         *<tr>
+         *<td style="text-align:left">pages</td>
+         *<td style="text-align:left">eid</td>
+         *<td style="text-align:left">number</td>
+         *<td style="text-align:left">Some journals put the article-number (= eid) into the pages field. If BibLaTeX <code>eid</code> exists, provide csl <code>number</code> to the style. If <code>pages</code> exists, provide csl <code>page</code>.  If <code>eid</code> WITHIN the <code>pages</code> field exists, detect the eid and provide csl <code>number</code>. If both <code>eid</code> and <code>pages</code> exists, ideally provide both csl <code>number</code> and csl <code>page</code>. Ideally the citationstyle should be able to flexibly choose the rendering.</td>
+         *</tr>
+         *<tr>
+         *<td style="text-align:left">pages</td>
+         *<td style="text-align:left">pages</td>
+         *<td style="text-align:left">page</td>
+         *<td style="text-align:left">same as above</td>
+         *</tr>
+         *</tbody>
+         *</table>
          */
-        private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+        private CSLItemData bibEntryToCSLItemData(BibEntry originalBibEntry, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
+            // We need to make a deep copy, because we modify the entry according to the logic presented at
+            // https://github.com/JabRef/jabref/issues/8372#issuecomment-1014941935
+            BibEntry bibEntry = (BibEntry) originalBibEntry.clone();
             String citeKey = bibEntry.getCitationKey().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 
@@ -108,8 +161,48 @@ public class CSLAdapter {
 
             Optional<BibEntryType> entryType = entryTypesManager.enrich(bibEntry.getType(), bibDatabaseContext.getMode());
 
-            Set<Field> fields = entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields());
+            if (bibEntry.getType().equals(StandardEntryType.Article)) {
+                // Patch bibEntry to contain the right BibTeX (not BibLaTeX) fields
+                // Note that we do not need to convert from "pages" to "page", because CiteProc already handles it
+                // See BibTeXConverter
+                if (bibDatabaseContext.isBiblatexMode()) {
+                    // Map "number" to CSL "issue", unless no number exists
+                    Optional<String> numberField = bibEntry.getField(StandardField.NUMBER);
+                    numberField.ifPresent(number -> {
+                            bibEntry.setField(StandardField.ISSUE, number);
+                            bibEntry.clearField(StandardField.NUMBER);
+                        }
+                    );
 
+                  bibEntry.getField(StandardField.EID).ifPresent(eid -> {
+                   if (!bibEntry.hasField(StandardField.NUMBER)) {
+                       bibEntry.setField(StandardField.NUMBER, eid);
+                       bibEntry.clearField(StandardField.EID);
+                        }
+                    });
+                } else {
+                    // BibTeX mode
+                    bibEntry.getField(StandardField.NUMBER).ifPresent(number -> {
+                        bibEntry.setField(StandardField.ISSUE, number);
+                        bibEntry.clearField(StandardField.NUMBER);
+                    });
+                    bibEntry.getField(StandardField.PAGES).ifPresent(pages -> {
+                        if (pages.toLowerCase(Locale.ROOT).startsWith("article ")) {
+                            pages = pages.substring("Article ".length());
+                            bibEntry.setField(StandardField.NUMBER, pages);
+                        }
+                    });
+                    bibEntry.getField(StandardField.EID).ifPresent(eid -> {
+                        if (!bibEntry.hasField(StandardField.PAGES)) {
+                            bibEntry.setField(StandardField.PAGES, eid);
+                            bibEntry.clearField(StandardField.EID);
+                        }
+                    });
+                }
+            }
+
+            Set<Field> fields = entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields());
+            fields.addAll(bibEntry.getFields());
             for (Field key : fields) {
                 bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())
                         .map(removeNewlinesFormatter::format)
@@ -130,13 +223,19 @@ public class CSLAdapter {
             this.data.addAll(data);
             this.bibDatabaseContext = bibDatabaseContext;
             this.entryTypesManager = entryTypesManager;
+
+            // Quick solution to always use BibLaTeX mode at the checker to allow pages ranges with single dash, too
+            // Example: pages = {1-2}
+            BibDatabaseContext ctx = new BibDatabaseContext();
+            ctx.setMode(BibDatabaseMode.BIBLATEX);
+            this.pagesChecker = new PagesChecker(ctx);
         }
 
         @Override
         public CSLItemData retrieveItem(String id) {
             return data.stream()
                        .filter(entry -> entry.getCitationKey().orElse("").equals(id))
-                       .map(entry -> JabRefItemDataProvider.bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
+                       .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
                        .findFirst().orElse(null);
         }
 

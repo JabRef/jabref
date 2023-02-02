@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="de-DE">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
+  <info>
+    <title>Journal für Medienlinguistik (Deutsch)</title>
+    <title-short>jfml (Deutsch)</title-short>
+    <id>http://www.zotero.org/styles/journal-fur-medienlinguistik</id>
+    <link href="http://www.zotero.org/styles/journal-fur-medienlinguistik" rel="self"/>
+    <link href="http://www.zotero.org/styles/technische-universitat-dresden-linguistik" rel="template"/>
+    <link xml:lang="de" href="https://jfml.org/libraryFiles/downloadPublic/5" rel="documentation"/>
+    <author>
+      <name>Simon Meier-Vieracker</name>
+      <uri>https://tu-dresden.de/gsw/slk/germanistik/al</uri>
+      <email>simon.meier-vieracker@tu-dresden.de</email>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="linguistics"/>
+    <issn>2569-6491</issn>
+    <summary>Stylesheet des Journals für Medienlinguistik (jfml)</summary>
+    <updated>2022-06-22T06:36:28+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="de-DE">
+    <terms>
+      <term name="et-al">et al.</term>
+      <term name="editor" form="short">Hg.</term>
+      <term name="online">Online unter</term>
+    </terms>
+  </locale>
+  <macro name="creator-year-long">
+    <choose>
+      <if match="none" variable="author editor">
+        <text value="o. A." suffix=" "/>
+      </if>
+    </choose>
+    <group delimiter=" ">
+      <names variable="author">
+        <name delimiter="/" name-as-sort-order="all"/>
+        <label form="short" prefix=" (" suffix=")"/>
+        <substitute>
+          <names variable="editor"/>
+        </substitute>
+      </names>
+      <date date-parts="year" form="text" variable="issued" prefix="(" suffix=")"/>
+    </group>
+  </macro>
+  <macro name="editor-container-title">
+    <group delimiter=": " suffix=" ">
+      <text term="in" text-case="capitalize-first"/>
+      <group delimiter=": " suffix=".">
+        <names variable="editor">
+          <name delimiter="/" name-as-sort-order="all"/>
+          <label form="short" prefix=" (" suffix=")"/>
+        </names>
+        <text macro="container-title"/>
+      </group>
+    </group>
+  </macro>
+  <macro name="publication-place-publisher">
+    <group delimiter=" ">
+      <group delimiter=": ">
+        <text variable="publisher-place" suffix=":"/>
+        <text variable="publisher"/>
+      </group>
+      <text macro="collection-title-number"/>
+    </group>
+  </macro>
+  <macro name="creator-year-short">
+    <group delimiter=" ">
+      <text macro="creator-short"/>
+      <date date-parts="year" form="text" variable="issued"/>
+    </group>
+  </macro>
+  <macro name="edition">
+    <choose>
+      <if match="any" is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <text term="edition"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="collection-title-number">
+    <group delimiter=" " prefix=" (" suffix=")">
+      <text variable="collection-title" suffix=","/>
+      <text variable="collection-number"/>
+    </group>
+  </macro>
+  <macro name="page-range">
+    <group>
+      <text variable="page"/>
+    </group>
+  </macro>
+  <macro name="online-url">
+    <group delimiter=" ">
+      <text variable="URL"/>
+    </group>
+  </macro>
+  <macro name="container-title-volume">
+    <group delimiter=" " suffix=",">
+      <text variable="container-title" font-style="italic"/>
+      <text variable="volume"/>
+      <text variable="issue" prefix="(" suffix=")"/>
+    </group>
+  </macro>
+  <macro name="creator-short">
+    <names variable="author">
+      <name form="short" delimiter="/"/>
+      <substitute>
+        <names variable="editor"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="book" match="any">
+        <text variable="title" font-style="italic"/>
+      </if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="container-title">
+    <choose>
+      <if type="chapter" match="any">
+        <text variable="container-title" font-style="italic"/>
+      </if>
+    </choose>
+  </macro>
+  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year-suffix">
+    <layout delimiter="; " prefix="(" suffix=")">
+      <group delimiter=", ">
+        <text macro="creator-year-short"/>
+        <group delimiter=" ">
+          <text term="page" form="symbol"/>
+          <text variable="locator"/>
+        </group>
+      </group>
+    </layout>
+  </citation>
+  <bibliography et-al-min="9" et-al-use-first="1" entry-spacing="0" hanging-indent="true">
+    <sort>
+      <key macro="creator-short"/>
+      <key macro="creator-year-short"/>
+    </sort>
+    <layout suffix=".">
+      <group delimiter=". ">
+        <group delimiter=" ">
+          <text macro="creator-year-long" suffix=":"/>
+          <text macro="title"/>
+        </group>
+        <choose>
+          <if type="book" match="any">
+            <group delimiter=". ">
+              <text macro="edition"/>
+              <text macro="publication-place-publisher"/>
+            </group>
+          </if>
+          <else-if type="article-journal article-magazine article-newspaper" match="any">
+            <group delimiter=" ">
+              <group delimiter=": ">
+                <text term="in" text-case="capitalize-first"/>
+                <text macro="container-title-volume"/>
+              </group>
+              <text macro="page-range" suffix="."/>
+              <text variable="DOI" prefix="DOI: "/>
+              <choose>
+                <if match="none" variable="DOI">
+                  <text variable="URL" prefix="URL: "/>
+                </if>
+              </choose>
+            </group>
+          </else-if>
+          <else-if type="chapter" match="any">
+            <group>
+              <text macro="editor-container-title"/>
+              <text macro="edition"/>
+              <text macro="publication-place-publisher"/>
+              <text macro="page-range" prefix=", "/>
+              <text variable="DOI" prefix=". DOI: "/>
+            </group>
+          </else-if>
+          <else-if type="dataset" match="any"/>
+          <else>
+            <group delimiter=". ">
+              <choose>
+                <if match="any" variable="container-title">
+                  <text macro="editor-container-title"/>
+                </if>
+              </choose>
+              <text macro="publication-place-publisher"/>
+              <text macro="page-range"/>
+              <text macro="collection-title-number"/>
+              <text macro="online-url"/>
+            </group>
+          </else>
+        </choose>
+      </group>
+    </layout>
+  </bibliography>
+</style>

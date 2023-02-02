@@ -40,6 +40,7 @@ public class MetaData {
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
     public static final String DATABASE_TYPE = "databaseType";
+    public static final String VERSION_DB_STRUCT = "VersionDBStructure";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
     public static final String FILE_DIRECTORY = "fileDirectory";
@@ -68,6 +69,8 @@ public class MetaData {
     private final ContentSelectors contentSelectors = new ContentSelectors();
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
+    private boolean encodingExplicitlySupplied;
+    private String VersionDBStructure;
 
     /**
      * Constructs an empty metadata.
@@ -208,6 +211,15 @@ public class MetaData {
         postChange();
     }
 
+    public Optional<String> getVersionDBStructure() {
+        return Optional.ofNullable(VersionDBStructure);
+    }
+
+    public void setVersionDBStructure(String version) {
+        VersionDBStructure = Objects.requireNonNull(version).trim();
+        postChange();
+    }
+
     public Optional<String> getUserFileDirectory(String user) {
         return Optional.ofNullable(userFileDirectory.get(user));
     }
@@ -291,6 +303,17 @@ public class MetaData {
         }
     }
 
+    public boolean getEncodingExplicitlySupplied() {
+        return encodingExplicitlySupplied;
+    }
+
+    /**
+     * Sets the indication whether the encoding was set using "% Encoding: ..." or whether it was detected "magically"
+     */
+    public void setEncodingExplicitlySupplied(boolean encodingExplicitlySupplied) {
+        this.encodingExplicitlySupplied = encodingExplicitlySupplied;
+    }
+
     /**
      * If disabled {@link MetaDataChangedEvent} will not be posted.
      */
@@ -349,6 +372,7 @@ public class MetaData {
         return (isProtected == metaData.isProtected)
                 && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
                 && Objects.equals(encoding, metaData.encoding)
+                && Objects.equals(encodingExplicitlySupplied, metaData.encodingExplicitlySupplied)
                 && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, metaData.userFileDirectory)
@@ -357,12 +381,18 @@ public class MetaData {
                 && Objects.equals(saveActions, metaData.saveActions)
                 && (mode == metaData.mode)
                 && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
-                && Objects.equals(contentSelectors, metaData.contentSelectors);
+                && Objects.equals(contentSelectors, metaData.contentSelectors)
+                && Objects.equals(VersionDBStructure, metaData.VersionDBStructure);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupsRoot.getValue(), encoding, saveOrderConfig, citeKeyPatterns, userFileDirectory,
-                defaultCiteKeyPattern, saveActions, mode, isProtected, defaultFileDirectory);
+        return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrderConfig, citeKeyPatterns, userFileDirectory,
+                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, defaultFileDirectory, contentSelectors, VersionDBStructure);
+    }
+
+    @Override
+    public String toString() {
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrderConfig + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + VersionDBStructure + "]";
     }
 }

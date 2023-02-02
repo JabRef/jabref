@@ -10,11 +10,11 @@ import javafx.scene.control.TableView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.PersistenceVisualStateTable;
 import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
@@ -28,8 +28,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                               PreferencesService preferencesService,
                               UndoManager undoManager,
                               DialogService dialogService,
-                              StateManager stateManager,
-                              ExternalFileTypes externalFileTypes) {
+                              StateManager stateManager) {
         super();
 
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
@@ -38,12 +37,11 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                                    database,
                                    preferencesService,
                                    preferencesService.getSearchDialogColumnPreferences(),
-                                   externalFileTypes,
                                    undoManager,
                                    dialogService,
                                    stateManager).createColumns();
 
-        if (!allCols.stream().anyMatch(col -> col instanceof LibraryColumn)) {
+        if (allCols.stream().noneMatch(col -> col instanceof LibraryColumn)) {
             allCols.add(0, new LibraryColumn());
         }
         this.getColumns().addAll(allCols);
@@ -68,7 +66,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new SearchResultsTablePersistenceVisualState(this, preferencesService);
+        new PersistenceVisualStateTable(this, preferencesService.getSearchDialogColumnPreferences());
 
         database.getDatabase().registerListener(this);
     }

@@ -11,27 +11,49 @@ import subprocess
 import sys
 from pathlib import Path
 
+def which(command):
+    if os.getenv("FLATPAK_ID"):
+        try:
+            return subprocess.check_output(["flatpak-spawn", "--host", "which", command]).decode().strip()
+        except subprocess.CalledProcessError:
+            pass
+    path = shutil.which(command)
+    if path != "":
+        return path
+    else:
+        return None
+
+
+JABREF_PATH = ""
+if os.getenv("FLATPAK_ID"):
+    try:
+        subprocess.check_output(["flatpak-spawn", "--host", "true"])
+    except subprocess.CalledProcessError:
+        logging.error("Failed to call JabRef: Flatpak browser missing permissions")
+        send_message({"message": "flatpakPermissionsError", "output": "Flatpak browser missing permissions"})
+        exit(-1)
+    JABREF_PATH = "flatpak-spawn --host "
+
 # Try a set of possible launchers to execute JabRef
 script_dir = Path(__file__).resolve().parent.parent
-relpath_path = script_dir / "bin/JabRef"
-lowercase_path = shutil.which("jabref")
-uppercase_path = shutil.which("JabRef")
+relpath_path = str(script_dir / "bin/JabRef")
+lowercase_path = which("jabref")
+uppercase_path = which("JabRef")
 
 # Relative path used in the portable install
-if relpath_path.exists():
-    JABREF_PATH = relpath_path
+if which(relpath_path) is not None:
+    JABREF_PATH += relpath_path
 # Lowercase launcher used in deb/rpm/snap packages
-elif lowercase_path is not None and os.path.exists(lowercase_path):
-    JABREF_PATH = Path(lowercase_path)
+elif lowercase_path is not None:
+    JABREF_PATH += lowercase_path
 # Uppercase launcher used in Arch AUR package
-elif uppercase_path is not None and os.path.exists(uppercase_path):
-    JABREF_PATH = Path(uppercase_path)
+elif uppercase_path is not None:
+    JABREF_PATH += uppercase_path
 # FLatpak support
-elif subprocess.run(["flatpak", "info", "org.jabref.jabref"], capture_output=True).returncode == 0:
-    JABREF_PATH = "flatpak run org.jabref.jabref"
+elif which("/var/lib/flatpak/exports/bin/org.jabref.jabref") is not None:
+    JABREF_PATH += "/var/lib/flatpak/exports/bin/org.jabref.jabref"
 else:
     logging.error("Could not determine JABREF_PATH")
-    send_message({"message": "error", "output": "Could not find JabRef. Please check that it is installed correctly."})
     sys.exit(-1)
 
 logging_dir = Path.home() / ".mozilla/native-messaging-hosts/"

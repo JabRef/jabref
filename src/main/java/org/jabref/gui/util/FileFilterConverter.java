@@ -28,11 +28,11 @@ public class FileFilterConverter {
 
     public static FileChooser.ExtensionFilter toExtensionFilter(FileType fileType) {
         String description = Localization.lang("%0 file", fileType.toString());
-        return new FileChooser.ExtensionFilter(description, fileType.getExtensionsWithDot());
+        return new FileChooser.ExtensionFilter(description, fileType.getExtensionsWithAsteriskAndDot());
     }
 
     public static FileChooser.ExtensionFilter toExtensionFilter(String description, FileType fileType) {
-        return new FileChooser.ExtensionFilter(description, fileType.getExtensionsWithDot());
+        return new FileChooser.ExtensionFilter(description, fileType.getExtensionsWithAsteriskAndDot());
     }
 
     public static Optional<Importer> getImporter(FileChooser.ExtensionFilter extensionFilter, Collection<Importer> importers) {
@@ -46,7 +46,7 @@ public class FileFilterConverter {
     public static FileChooser.ExtensionFilter forAllImporters(SortedSet<Importer> importers) {
         List<FileType> fileTypes = importers.stream().map(Importer::getFileType).collect(Collectors.toList());
         List<String> flatExtensions = fileTypes.stream()
-                                               .flatMap(type -> type.getExtensionsWithDot().stream())
+                                               .flatMap(type -> type.getExtensionsWithAsteriskAndDot().stream())
                                                .collect(Collectors.toList());
 
         return new FileChooser.ExtensionFilter(Localization.lang("Available import formats"), flatExtensions);

@@ -8,7 +8,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -62,9 +61,10 @@ public class AttachFileAction extends SimpleCommand {
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
-            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile,
+            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(
+                    newFile,
                     databaseContext.getFileDirectories(filePreferences),
-                    ExternalFileTypes.getInstance());
+                    filePreferences);
 
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 

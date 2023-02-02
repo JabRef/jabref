@@ -3,13 +3,12 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.PdfGrobidImporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -31,19 +30,18 @@ import static org.mockito.Mockito.when;
 public class GrobidServiceTest {
 
     private static GrobidService grobidService;
-    private static ImporterPreferences importerPreferences = new ImporterPreferences(
-            false,
-            true,
-            false,
-            "http://grobid.jabref.org:8070",
-            Collections.emptySet());
     private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
     public static void setup() {
-        grobidService = new GrobidService(importerPreferences);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
+        GrobidPreferences grobidPreferences = new GrobidPreferences(
+                true,
+                false,
+                "http://grobid.jabref.org:8070");
+        grobidService = new GrobidService(grobidPreferences);
     }
 
     @Test
@@ -84,12 +82,10 @@ public class GrobidServiceTest {
 
     @Test
     public void failsWhenGrobidDisabled() {
-        ImporterPreferences importSettingsWithGrobidDisabled = new ImporterPreferences(
+        GrobidPreferences importSettingsWithGrobidDisabled = new GrobidPreferences(
                 false,
                 false,
-                false,
-                "http://grobid.jabref.org:8070",
-                Collections.emptySet());
+                "http://grobid.jabref.org:8070");
         assertThrows(UnsupportedOperationException.class, () -> new GrobidService(importSettingsWithGrobidDisabled));
     }
 

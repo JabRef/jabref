@@ -82,7 +82,7 @@ tendo as inicias separadas por ponto.-->
             <name-part name="family" text-case="uppercase"/>
             <name-part name="given" text-case="uppercase"/>
           </name>
-          <label form="short" prefix=" (" suffix=".). " text-case="capitalize-first"/>
+          <label form="short" prefix=" (" suffix=".)" text-case="capitalize-first"/>
           <substitute>
             <names variable="editor"/>
             <names variable="collection-editor"/>
@@ -613,7 +613,7 @@ em caixa alta. Utiliza-se antes do nome da conferencia a expressao "In". Segundo
         <else>
           <text macro="author" suffix=". "/>
           <!--Autor-->
-          <text macro="title"/>
+          <text macro="title" suffix=". "/>
           <!--Titulo-->
           <text macro="container-contributors"/>
           <!--Nomes de editore-->

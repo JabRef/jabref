@@ -56,16 +56,11 @@ class FieldWriterTests {
     }
 
     @Test
-    void normalizeNewlineInAbstractField() throws Exception {
+    void noNormalizationOfNewlinesInAbstractField() throws Exception {
         String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
-
-        String expected = "{" + "lorem" + OS.NEWLINE + " ipsum lorem ipsum" + OS.NEWLINE
-                + "lorem ipsum "
-                + OS.NEWLINE + "lorem ipsum"
-                + OS.NEWLINE + "test" + "}";
-
         String result = writer.write(StandardField.ABSTRACT, text);
-
+        // The normalization is done at org.jabref.logic.exporter.BibWriter, so no need to normalize here
+        String expected = "{" + text + "}";
         assertEquals(expected, result);
     }
 
@@ -142,7 +137,7 @@ class FieldWriterTests {
     @Test
     void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
         String text = "#jan# - #feb#";
-        assertEquals("jan #{ - } # feb", writer.write(StandardField.MONTH, text));
+        assertEquals("jan # { - } # feb", writer.write(StandardField.MONTH, text));
     }
 
     @ParameterizedTest

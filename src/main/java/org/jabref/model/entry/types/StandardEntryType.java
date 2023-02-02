@@ -36,10 +36,7 @@ public enum StandardEntryType implements EntryType {
     Thesis("Thesis"),
     WWW("WWW"),
     Software("Software"),
-    Dataset("Dataset"),
-    SoftwareVersion("SoftwareVersion"),
-    SoftwareModule("SoftwareModule"),
-    CodeFragment("CodeFragment");
+    Dataset("Dataset");
 
     private final String displayName;
 

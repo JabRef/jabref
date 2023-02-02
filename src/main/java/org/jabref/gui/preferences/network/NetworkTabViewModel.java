@@ -2,9 +2,11 @@ package org.jabref.gui.preferences.network;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -19,7 +21,7 @@ import javafx.stage.FileChooser;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.gui.remote.JabRefMessageHandler;
+import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
@@ -69,9 +71,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final ProxyPreferences backupProxyPreferences;
     private final SSLPreferences sslPreferences;
 
-    private final List<String> restartWarning = new ArrayList<>();
-
     private final TrustStoreManager trustStoreManager;
+
+    private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
     public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -137,6 +139,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         this.trustStoreManager = new TrustStoreManager(Path.of(sslPreferences.getTruststorePath()));
     }
 
+    @Override
     public void setValues() {
         remoteServerProperty.setValue(remotePreferences.useRemoteServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
@@ -156,9 +159,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private void setSSLValues() {
         customCertificateListProperty.clear();
-
         trustStoreManager.getCustomCertificates().forEach(cert -> customCertificateListProperty.add(CustomCertificateViewModel.fromSSLCertificate(cert)));
         customCertificateListProperty.addListener((ListChangeListener<CustomCertificateViewModel>) c -> {
+            sslCertificatesChanged.set(true);
             while (c.next()) {
                 if (c.wasAdded()) {
                     CustomCertificateViewModel certificate = c.getAddedSubList().get(0);
@@ -172,9 +175,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         });
     }
 
+    @Override
     public void storeSettings() {
         storeRemoteSettings();
-
         storeProxySettings(new ProxyPreferences(
                 proxyUseProperty.getValue(),
                 proxyHostnameProperty.getValue().trim(),
@@ -200,7 +203,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort(), preferences);
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences), remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
             Globals.REMOTE_LISTENER.stop();
@@ -208,9 +211,12 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     private void storeProxySettings(ProxyPreferences newProxyPreferences) {
-        if (!newProxyPreferences.equals(proxyPreferences)) {
-            ProxyRegisterer.register(newProxyPreferences);
+        if (Objects.equals(newProxyPreferences, proxyPreferences)) {
+            // nothing changed; thus, nothing to store
+            return;
         }
+
+        ProxyRegisterer.register(newProxyPreferences);
 
         proxyPreferences.setUseProxy(newProxyPreferences.shouldUseProxy());
         proxyPreferences.setHostname(newProxyPreferences.getHostname());
@@ -252,6 +258,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         return proxyPasswordValidator.getValidationStatus();
     }
 
+    @Override
     public boolean validateSettings() {
         CompositeValidator validator = new CompositeValidator();
 
@@ -318,7 +325,11 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public List<String> getRestartWarnings() {
-        return restartWarning;
+        if (sslCertificatesChanged.get()) {
+            return List.of(Localization.lang("SSL configuration changed"));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public BooleanProperty remoteServerProperty() {

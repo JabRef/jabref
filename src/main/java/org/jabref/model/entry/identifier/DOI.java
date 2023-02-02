@@ -2,12 +2,16 @@ package org.jabref.model.entry.identifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -17,6 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
  */
+@AllowedToUseLogic("because we want to have this class 'smart' an be able to parse obscure DOIs, too. For this, we need the LatexToUnicodeformatter.")
 public class DOI implements Identifier {
 
     public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
@@ -93,8 +98,8 @@ public class DOI implements Identifier {
     // See https://stackoverflow.com/questions/3203190/regex-any-ascii-character for the regexp that includes ASCII characters only
     // Another reference for regexp for ASCII characters: https://howtodoinjava.com/java/regex/java-clean-ascii-text-non-printable-chars/
     private static final String CHARS_TO_REMOVE = "[\\s+" // remove white space characters, i.e, \t, \n, \x0B, \f, \r . + is a greedy quantifier
-                                                + "[^\\x00-\\x7F]" // strips off all non-ASCII characters
-                                                + "]";
+            + "[^\\x00-\\x7F]" // strips off all non-ASCII characters
+            + "]";
 
     // DOI
     private final String doi;
@@ -159,8 +164,15 @@ public class DOI implements Identifier {
      */
     public static Optional<DOI> parse(String doi) {
         try {
+            LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
             String cleanedDOI = doi;
+            cleanedDOI = URLDecoder.decode(cleanedDOI, StandardCharsets.UTF_8);
+            cleanedDOI = formatter.format(cleanedDOI);
             cleanedDOI = cleanedDOI.replaceAll(CHARS_TO_REMOVE, "");
+
+            if (cleanedDOI.startsWith("_") && cleanedDOI.endsWith("_")) {
+                cleanedDOI = cleanedDOI.substring(1, cleanedDOI.length() - 1);
+            }
 
             return Optional.of(new DOI(cleanedDOI));
         } catch (IllegalArgumentException | NullPointerException e) {

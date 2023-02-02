@@ -6,6 +6,7 @@
     <link href="http://www.zotero.org/styles/twentieth-century-music" rel="self"/>
     <link href="http://www.zotero.org/styles/university-of-new-england-australia-note" rel="template"/>
     <link href="https://www.cambridge.org/core/journals/twentieth-century-music/information/instructions-contributors" rel="documentation"/>
+    <link href="https://www.cambridge.org/core/services/aop-file-manager/file/626929e82cca172c593a1e27/TCM-IFC.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
     </author>
@@ -14,7 +15,7 @@
     <category field="history"/>
     <issn>1478-5722</issn>
     <eissn>1478-5730</eissn>
-    <updated>2018-01-16T09:37:56+00:00</updated>
+    <updated>2022-06-26T15:04:55+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -410,7 +411,11 @@
           <number variable="volume" form="numeric" suffix=":"/>
         </else-if>
       </choose>
-      <label variable="locator" form="short" suffix=" "/>
+      <choose>
+        <if match="none" locator="page">
+          <label variable="locator" form="short" suffix=" "/>
+        </if>
+      </choose>
       <text variable="locator"/>
     </group>
   </macro>

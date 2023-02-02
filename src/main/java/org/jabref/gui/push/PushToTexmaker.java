@@ -8,7 +8,7 @@ import org.jabref.preferences.PreferencesService;
 /**
  * Class for pushing entries into TexMaker.
  */
-public class PushToTexmaker extends AbstractPushToApplication implements PushToApplication {
+public class PushToTexmaker extends AbstractPushToApplication {
 
     public static final String NAME = "Texmaker";
 
@@ -22,7 +22,7 @@ public class PushToTexmaker extends AbstractPushToApplication implements PushToA
     }
 
     @Override
-    public JabRefIcon getIcon() {
+    public JabRefIcon getApplicationIcon() {
         return IconTheme.JabRefIcons.APPLICATION_TEXMAKER;
     }
 

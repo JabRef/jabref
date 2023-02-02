@@ -53,6 +53,6 @@ class GitHandlerTest {
 
     @Test
     void getCurrentlyCheckedOutBranch() throws IOException {
-        assertEquals("master", gitHandler.getCurrentlyCheckedOutBranch());
+        assertEquals("main", gitHandler.getCurrentlyCheckedOutBranch());
     }
 }

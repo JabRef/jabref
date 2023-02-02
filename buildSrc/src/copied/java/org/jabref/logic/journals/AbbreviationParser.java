@@ -9,10 +9,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -26,9 +24,10 @@ public class AbbreviationParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbbreviationParser.class);
 
-    private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
+    // Ensures ordering while preventing duplicates
+    private final LinkedHashSet<Abbreviation> abbreviations = new LinkedHashSet<>();
 
-    public void readJournalListFromResource(String resourceFileName) {
+    void readJournalListFromResource(String resourceFileName) {
         try (InputStream stream = JournalAbbreviationRepository.class.getResourceAsStream(resourceFileName);
              BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             readJournalList(reader);
@@ -65,12 +64,13 @@ public class AbbreviationParser {
                     return;
                 }
 
-                abbreviations.add(new Abbreviation(name, abbreviation, shortestUniqueAbbreviation));
+                Abbreviation abbreviationToAdd = new Abbreviation(name, abbreviation, shortestUniqueAbbreviation);
+                abbreviations.add(abbreviationToAdd);
             }
         }
     }
 
-    public List<Abbreviation> getAbbreviations() {
-        return new LinkedList<>(abbreviations);
+    public Collection<Abbreviation> getAbbreviations() {
+        return abbreviations;
     }
 }

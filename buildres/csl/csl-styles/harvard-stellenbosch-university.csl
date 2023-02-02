@@ -307,6 +307,16 @@
             </group>
             <text macro="publisher"/>
           </else-if>
+          <else-if type="article" match="any">
+            <group delimiter=". ">
+              <text macro="title"/>
+              <group delimiter=" ">
+                <text variable="genre"/>
+                <text variable="number"/>
+              </group>
+              <text macro="publisher"/>
+            </group>
+          </else-if>
         </choose>
         <text macro="access"/>
       </group>

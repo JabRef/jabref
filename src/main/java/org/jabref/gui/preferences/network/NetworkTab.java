@@ -110,7 +110,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE), remoteHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService), remoteHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {

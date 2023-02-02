@@ -15,12 +15,16 @@
     </contributor>
     <category citation-format="author-date"/>
     <summary>Style as per the May 2019 guidelines.</summary>
-    <updated>2021-11-10T10:39:01+00:00</updated>
+    <updated>2022-07-13T09:26:37+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
     <terms>
       <term name="edition" form="short">ed</term>
+      <term name="editor" form="short">
+        <single>ed.</single>
+        <multiple>eds</multiple>
+      </term>
     </terms>
   </locale>
   <locale xml:lang="sv">
@@ -34,15 +38,10 @@
     </terms>
   </locale>
   <macro name="container-contributors">
-    <choose>
-      <if type="chapter paper-conference" match="any">
-        <text term="in" text-case="capitalize-first" suffix=":"/>
-        <names variable="editor translator" delimiter=", " prefix=" ">
-          <name and="symbol" initialize-with="." name-as-sort-order="all"/>
-          <label form="short" prefix=" (" suffix=")"/>
-        </names>
-      </if>
-    </choose>
+    <names variable="editor translator" delimiter=", ">
+      <name and="symbol" initialize-with="." name-as-sort-order="all"/>
+      <label form="short" prefix=" (" suffix=")"/>
+    </names>
   </macro>
   <macro name="secondary-contributors">
     <choose>
@@ -93,8 +92,14 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="bill book graphic legal_case legislation motion_picture patent report song thesis webpage" match="any">
+      <if type="bill book graphic legal_case legislation motion_picture patent report song thesis webpage software" match="any">
         <text variable="title" font-style="italic"/>
+        <choose>
+          <if type="software" variable="version" match="any">
+            <text variable="version" prefix=" (" suffix=")"/>
+            <text variable="medium" prefix=" [" suffix="]"/>
+          </if>
+        </choose>
       </if>
       <else>
         <text variable="title"/>
@@ -244,20 +249,26 @@
           <text macro="publisher" prefix=". "/>
         </if>
         <else-if type="chapter entry-encyclopedia" match="any">
-          <text macro="issued" suffix=" "/>
-          <group suffix=".">
+          <group delimiter=". " suffix=".">
+            <text macro="issued"/>
             <text macro="title"/>
-            <text macro="type"/>
-          </group>
-          <text macro="container-contributors" prefix=" "/>
-          <text macro="secondary-contributors"/>
-          <text variable="container-title" font-style="italic" prefix=" " suffix="."/>
-          <group prefix=" (" suffix=")." delimiter="; ">
-            <text macro="collection-title"/>
-            <text variable="collection-number"/>
-          </group>
-          <text macro="edition" prefix=" "/>
-          <group delimiter=", " prefix=" ">
+            <group delimiter=": ">
+              <choose>
+                <if type="chapter paper-conference" match="any">
+                  <text term="in" text-case="capitalize-first"/>
+                </if>
+              </choose>
+              <group delimiter=" " suffix=".">
+                <text macro="container-contributors"/>
+                <text macro="secondary-contributors"/>
+                <text variable="container-title" font-style="italic" prefix=" " suffix="."/>
+              </group>
+            </group>
+            <group prefix=" (" suffix=")." delimiter="; ">
+              <text macro="collection-title"/>
+              <text variable="collection-number"/>
+            </group>
+            <text macro="edition" prefix=" "/>
             <text macro="publisher"/>
             <text variable="page"/>
           </group>
@@ -313,7 +324,7 @@
           <text macro="edition" prefix=" "/>
           <text macro="publisher" prefix=" " suffix="."/>
         </else-if>
-        <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+        <else-if type="bill book graphic legal_case legislation motion_picture report song software" match="any">
           <choose>
             <if variable="URL">
               <text macro="issued" suffix=" "/>
@@ -325,7 +336,6 @@
               <text macro="secondary-contributors"/>
               <text variable="container-title" font-style="italic" prefix=" "/>
               <text macro="locators"/>
-              <text variable="version" prefix=" Version: " suffix="."/>
               <text macro="publisher" prefix=" " suffix="."/>
             </if>
             <else>
@@ -338,7 +348,6 @@
               <text macro="secondary-contributors"/>
               <text variable="container-title" font-style="italic" prefix=" "/>
               <text macro="locators"/>
-              <text variable="version" prefix=" Version: " suffix="."/>
               <text macro="publisher" prefix=". " suffix="."/>
               <group prefix=" (" suffix=")" delimiter="; ">
                 <text macro="collection-title"/>

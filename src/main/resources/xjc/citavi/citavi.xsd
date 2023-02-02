@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="CitaviExchangeData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ProjectSettings">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AttachmentsFolderPath" />
+              <xs:element name="ColorScheme" type="xs:string" />
+              <xs:element name="CustomFields">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="CustomFieldSettings">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="CompareType" type="xs:string" />
+                          <xs:element name="DefaultValue" />
+                          <xs:element name="DropDownStyle" type="xs:string" />
+                          <xs:element name="PropertyName" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Description" type="xs:string" />
+              <xs:element name="IsUtc" type="xs:boolean" />
+              <xs:element name="LastChangeTime" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ProjectUserSettings">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="LastReferenceId" type="xs:string" />
+              <xs:element name="ShowCategoryClassification" type="xs:boolean" />
+              <xs:element name="SortOrder">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="SortProperty">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="ReferencePropertyId" type="xs:string" />
+                          <xs:element name="SortDirection" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="SortOrderImport">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="SortProperty">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="ReferencePropertyId" type="xs:string" />
+                          <xs:element name="SortDirection" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Categories">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Category" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="CreatedBy" minOccurs="0" />
+                    <xs:element type="xs:dateTime" name="CreatedOn" minOccurs="0" />
+                    <xs:element type="xs:string" name="ModifiedBy" minOccurs="0" />
+                    <xs:element type="xs:dateTime" name="ModifiedOn" minOccurs="0" />
+                    <xs:element type="xs:string" name="Name" />
+                  </xs:sequence>
+                  <xs:attribute type="xs:string" name="id" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="CategoryCatgories">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="OnetoN" maxOccurs="unbounded" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ImportGroups">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ImportGroup" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="CreatedBy" />
+                    <xs:element type="xs:dateTime" name="CreatedOn" />
+                    <xs:element type="xs:string" name="ModifiedBy" />
+                    <xs:element type="xs:dateTime" name="ModifiedOn" />
+                    <xs:element type="xs:byte" name="ImportGroupType" />
+                    <xs:element type="xs:string" name="Source" minOccurs="0" />
+                  </xs:sequence>
+                  <xs:attribute type="xs:string" name="id" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ImportGroupReferences">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="OnetoN" maxOccurs="unbounded" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Keywords">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Keyword">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CreatedBy" type="xs:string" />
+                    <xs:element name="CreatedOn" type="xs:dateTime" />
+                    <xs:element name="ModifiedBy" type="xs:string" />
+                    <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="Name" type="xs:string" />
+                    <xs:element name="Protected" type="xs:boolean" />
+                    <xs:element name="SortFullName" type="xs:string" />
+                    <xs:element name="UniqueFullName" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Publishers">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Publisher">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CreatedBy" type="xs:string" />
+                    <xs:element name="CreatedOn" type="xs:dateTime" />
+                    <xs:element name="ModifiedBy" type="xs:string" />
+                    <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="Name" type="xs:string" />
+                    <xs:element name="Notes" type="xs:string" />
+                    <xs:element name="Protected" type="xs:boolean" />
+                    <xs:element name="SortFullName" type="xs:string" />
+                    <xs:element name="UniqueFullName" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Persons">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Person">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CreatedBy" type="xs:string" />
+                    <xs:element name="CreatedOn" type="xs:dateTime" />
+                    <xs:element name="ModifiedBy" type="xs:string" />
+                    <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="FirstName" type="xs:string" />
+                    <xs:element name="LastName" type="xs:string" />
+                    <xs:element name="MiddleName" type="xs:string" />
+                    <xs:element name="Protected" type="xs:boolean" />
+                    <xs:element name="Sex" type="xs:unsignedByte" />
+                    <xs:element name="SortFullName" type="xs:string" />
+                    <xs:element name="UniqueFullName" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="References">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Reference">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CreatedBy" type="xs:string" />
+                    <xs:element name="CreatedOn" type="xs:dateTime" />
+                    <xs:element name="ModifiedBy" type="xs:string" />
+                    <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="Abstract" type="xs:string" />
+                    <xs:element name="AbstractComplexity" type="xs:unsignedByte" />
+                    <xs:element name="AbstractSourceTextFormat" type="xs:unsignedByte" />
+                    <xs:element name="CitationKeyUpdateType" type="xs:unsignedByte" />
+                    <xs:element name="CoverPath" type="xs:string" />
+                    <xs:element name="EvaluationComplexity" type="xs:unsignedByte" />
+                    <xs:element name="EvaluationSourceTextFormat" type="xs:unsignedByte" />
+                    <xs:element name="HasLabel1" type="xs:boolean" />
+                    <xs:element name="HasLabel2" type="xs:boolean" />
+                    <xs:element name="PageCount" type="xs:string" />
+                    <xs:element name="PageRange" type="xs:string" />
+                    <xs:element name="PageRangeNumber" type="xs:byte" />
+                    <xs:element name="Rating" type="xs:unsignedByte" />
+                    <xs:element name="ReferenceType" type="xs:string" />
+                    <xs:element name="ShortTitle" type="xs:string" />
+                    <xs:element name="ShortTitleUpdateType" type="xs:unsignedByte" />
+                    <xs:element name="StaticIDs" type="xs:string" />
+                    <xs:element name="TableOfContentsComplexity" type="xs:unsignedByte" />
+                    <xs:element name="TableOfContentsSourceTextFormat" type="xs:unsignedByte" />
+                    <xs:element name="Title" type="xs:string" />
+                    <xs:element name="Year" type="xs:string" />
+                    <xs:element name="Doi" type="xs:string" />
+                    <xs:element name="Isbn" type="xs:string" />
+                    <xs:element name="Volume" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceAuthors">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceEditors">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceGroups">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceKeywords">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferenceOrganizations">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReferencePublishers">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Locations">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Location">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CreatedBy" type="xs:string" />
+                    <xs:element name="CreatedOn" type="xs:dateTime" />
+                    <xs:element name="ModifiedBy" type="xs:string" />
+                    <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="Address" type="xs:string" />
+                    <xs:element name="LocationType" type="xs:unsignedByte" />
+                    <xs:element name="PreviewBehaviour" type="xs:unsignedByte" />
+                    <xs:element name="ReferenceID" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Annotations">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Annotation">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CreatedBy" type="xs:string" />
+                    <xs:element name="CreatedOn" type="xs:dateTime" />
+                    <xs:element name="ModifiedBy" type="xs:string" />
+                    <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="LocationID" type="xs:string" />
+                    <xs:element name="Quads" type="xs:string" />
+                    <xs:element name="Visible" type="xs:boolean" />
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="KnowledgeItems">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="KnowledgeItem">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CreatedBy" type="xs:string" />
+                    <xs:element name="CreatedOn" type="xs:dateTime" />
+                    <xs:element name="ModifiedBy" type="xs:string" />
+                    <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element minOccurs="0" name="CoreStatement" type="xs:string" />
+                    <xs:element name="CoreStatementUpdateType" type="xs:unsignedByte" />
+                    <xs:element name="KnowledgeItemType" type="xs:unsignedByte" />
+                    <xs:element minOccurs="0" name="PageRange" type="xs:string" />
+                    <xs:element name="PageRangeNumber" type="xs:int" />
+                    <xs:element minOccurs="0" name="PageRangeNumeralSystem" type="xs:unsignedByte" />
+                    <xs:element name="QuotationIndex" type="xs:unsignedByte" />
+                    <xs:element name="QuotationType" type="xs:unsignedByte" />
+                    <xs:element name="ReferenceID" type="xs:string" />
+                    <xs:element name="Relevance" type="xs:unsignedByte" />
+                    <xs:element name="SortFullName" type="xs:string" />
+                    <xs:element name="StaticIDs" type="xs:string" />
+                    <xs:element name="TextSourceTextFormat" type="xs:unsignedByte" />
+                    <xs:element minOccurs="0" name="Text" type="xs:string" />
+                    <xs:element type="xs:string" name="TextIsComplex" />
+                    <xs:element type="xs:string" name="TextFormatted" minOccurs="0" />
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="KnowledgeItemCategories">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="OnetoN" maxOccurs="unbounded" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="KnowledgeItemKeywords">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="OnetoN" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="EntityLinks">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="EntityLink">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="CreatedBy" type="xs:string" />
+                    <xs:element name="CreatedOn" type="xs:dateTime" />
+                    <xs:element name="ModifiedBy" type="xs:string" />
+                    <xs:element name="ModifiedOn" type="xs:dateTime" />
+                    <xs:element name="Indication" type="xs:string" />
+                    <xs:element name="RelationType" type="xs:unsignedByte" />
+                    <xs:element name="SourceID" type="xs:string" />
+                    <xs:element name="SourceType" type="xs:string" />
+                    <xs:element name="TargetID" type="xs:string" />
+                    <xs:element name="TargetType" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="Version" type="xs:string" use="required" />
+      <xs:attribute name="ConnectionIdentifier" type="xs:string" use="required" />
+      <xs:attribute name="Changeset" type="xs:unsignedByte" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

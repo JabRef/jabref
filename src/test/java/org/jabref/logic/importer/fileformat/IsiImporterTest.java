@@ -213,7 +213,7 @@ public class IsiImporterTest {
         assertEquals(Optional.of("Optical waveguides in Sn2P2S6 by low fluence MeV He+ ion implantation"),
                 second.getField(StandardField.TITLE));
 
-        assertEquals(Optional.of("Journal of Physics-condensed Matter"), first.getField(StandardField.JOURNAL));
+        assertEquals(Optional.of("Journal of Physics-Condensed Matter"), first.getField(StandardField.JOURNAL));
     }
 
     @Test

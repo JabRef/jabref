@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -49,8 +48,7 @@ class StudyDatabaseToFetcherConverterTest {
         timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         entryTypesManager = new BibEntryTypesManager();
         gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
@@ -58,7 +56,7 @@ class StudyDatabaseToFetcherConverterTest {
 
     @Test
     public void getActiveFetcherInstances() throws Exception {
-        Path studyDefinition = tempRepositoryDirectory.resolve("study.yml");
+        Path studyDefinition = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
         StudyRepository studyRepository = new StudyRepository(
@@ -83,7 +81,7 @@ class StudyDatabaseToFetcherConverterTest {
     }
 
     private void copyTestStudyDefinitionFileIntoDirectory(Path destination) throws Exception {
-        URL studyDefinition = this.getClass().getResource("study.yml");
+        URL studyDefinition = this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 }

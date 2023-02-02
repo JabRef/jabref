@@ -78,6 +78,8 @@ public enum StandardActions implements Action {
     REPLACE_ALL(Localization.lang("Find and replace"), KeyBinding.REPLACE_STRING),
     MANAGE_KEYWORDS(Localization.lang("Manage keywords")),
     MASS_SET_FIELDS(Localization.lang("Manage field names & content")),
+
+    AUTOMATIC_FIELD_EDITOR(Localization.lang("Automatic field editor")),
     TOGGLE_GROUPS(Localization.lang("Groups"), IconTheme.JabRefIcons.TOGGLE_GROUPS, KeyBinding.TOGGLE_GROUPS_INTERFACE),
     TOOGLE_OO(Localization.lang("OpenOffice/LibreOffice"), IconTheme.JabRefIcons.FILE_OPENOFFICE, KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION),
     TOGGLE_WEB_SEARCH(Localization.lang("Web search"), Localization.lang("Toggle web search interface"), IconTheme.JabRefIcons.WWW, KeyBinding.WEB_SEARCH),
@@ -85,8 +87,11 @@ public enum StandardActions implements Action {
     PARSE_LATEX(Localization.lang("Search for citations in LaTeX files..."), IconTheme.JabRefIcons.LATEX_CITATIONS),
     NEW_SUB_LIBRARY_FROM_AUX(Localization.lang("New sublibrary based on AUX file") + "...", Localization.lang("New BibTeX sublibrary") + Localization.lang("This feature generates a new library based on which entries are needed in an existing LaTeX document."), IconTheme.JabRefIcons.NEW),
     WRITE_METADATA_TO_PDF(Localization.lang("Write metadata to PDF files"), Localization.lang("Will write metadata to the PDFs linked from selected entries."), KeyBinding.WRITE_METADATA_TO_PDF),
+
     START_NEW_STUDY(Localization.lang("Start new systematic literature review")),
-    SEARCH_FOR_EXISTING_STUDY(Localization.lang("Perform search for existing systematic literature review")),
+    UPDATE_SEARCH_RESULTS_OF_STUDY(Localization.lang("Update study search results")),
+    EDIT_EXISTING_STUDY(Localization.lang("Manage study definition")),
+
     OPEN_DATABASE_FOLDER(Localization.lang("Reveal in file explorer")),
     OPEN_FOLDER(Localization.lang("Open folder"), Localization.lang("Open folder"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
     OPEN_FILE(Localization.lang("Open file"), Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
@@ -95,9 +100,9 @@ public enum StandardActions implements Action {
     COPY_DOI(Localization.lang("Copy DOI")),
     COPY_DOI_URL(Localization.lang("Copy DOI url")),
     ABBREVIATE(Localization.lang("Abbreviate journal names")),
-    ABBREVIATE_DEFAULT("DEFAULT", Localization.lang("Abbreviate journal names of the selected entries (DEFAULT abbreviation)"), KeyBinding.ABBREVIATE),
-    ABBREVIATE_MEDLINE("MEDLINE", Localization.lang("Abbreviate journal names of the selected entries (MEDLINE abbreviation)")),
-    ABBREVIATE_SHORTEST_UNIQUE("SHORTEST UNIQUE", Localization.lang("Abbreviate journal names of the selected entries (SHORTEST UNIQUE abbreviation)")),
+    ABBREVIATE_DEFAULT(Localization.lang("default"), Localization.lang("Abbreviate journal names of the selected entries (DEFAULT abbreviation)"), KeyBinding.ABBREVIATE),
+    ABBREVIATE_DOTLESS(Localization.lang("dotless"), Localization.lang("Abbreviate journal names of the selected entries (DOTLESS abbreviation)")),
+    ABBREVIATE_SHORTEST_UNIQUE(Localization.lang("shortest unique"), Localization.lang("Abbreviate journal names of the selected entries (SHORTEST UNIQUE abbreviation)")),
     UNABBREVIATE(Localization.lang("Unabbreviate journal names"), Localization.lang("Unabbreviate journal names of the selected entries"), KeyBinding.UNABBREVIATE),
 
     MANAGE_CUSTOM_EXPORTS(Localization.lang("Manage custom exports")),

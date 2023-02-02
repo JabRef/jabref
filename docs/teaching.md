@@ -1,5 +1,5 @@
 ---
-nav_order: 6
+nav_order: 3
 ---
 # JabRef and Software Engineering Training
 
@@ -15,27 +15,32 @@ By using JabRef as training object in exercises and labs, students can level-up 
 
 ## How to integrate JabRef in your class
 
-1. Get in touch with the JabRef team to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discord. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
-2. Choose tasks from one of the following boards. Write a comment on each issue so that it can be reserved for your course.
-   * Candidates for university projects: [https://github.com/JabRef/jabref/projects/9](https://github.com/JabRef/jabref/projects/9)
-     * This board categorizes in small, medium, and large features
-   * Feature Board: [https://github.com/JabRef/jabref/projects/7](https://github.com/JabRef/jabref/projects/7)
-     * This is a general feature board. Recommended, if the board above is empty or you did not find something suitable
-   * Bug Board: [https://github.com/JabRef/jabref/projects/5](https://github.com/JabRef/jabref/projects/5)
-     * This is an excellent board to find issues training the maintenance knowledge which is essential for industry work
-   * General "good first issues". The JabRef team tags issues as [good first issues](https://github.com/jabref/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to indicate open tasks offering a good start into the JabRef code. These issues are more a list of random bugs and features. For a more structured comparison of the opened tasks, we recommend the project boards listed above.
-   * Be aware that the difficulty of bugs and feature vary. A task should be chosen with care. The JabRef team can help here: The majority of the team has experiences in teaching
+1. Choose task from the board [Candidates for university projects](https://github.com/orgs/JabRef/projects/3/views/3).
+   There, new functionality is categorized in small, medium, and large effort.
+   Moreover, categorization on the main focus (UI, logic, or both),
+   implementation effort, testing effort, and "issue understanding effort".
+   The latter category is important, because some issues are "quick wins" and others need thorough thinking.   
+   In general, all issues of JabRef are free to take.
+   Be aware that the difficulty of bugs and feature vary.
+   For the brave, the [Bug Board](https://github.com/orgs/JabRef/projects/7) or the [Feature Board](https://github.com/JabRef/jabref/projects/6) provide other issue sources.
+   Especially for Master students, these are excellent boards to find issues that train maintenance knowledge (which is essential for industry work).
+   Finally, there is a [collection of good first issues](https://github.com/orgs/JabRef/projects/5), if you search for something to start guiding you though a focused aspect of JabRef's code.
+2. Get in touch with the JabRef team to reserve issues for your student group and possibly to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discord. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
 3. Schedule tasks with students
-4. Code reviews by JabRef maintainers
-5. Students address feedback and learn more about good coding practices by incoporating feedback
-6. Students update their pull request
-7. Pull request is merged
+4. Students implement code
+5. Students review other student's code (recommended: students of a previous year's project review current year's project code)
+6. Students address review feedback
+7. Students submit pull request
+8. Code reviews by JabRef maintainers
+9. Students address feedback and learn more about good coding practices by incoporating feedback
+10. Students update their pull request
+11. Pull request is merged
 
-For a near-to-perfect preparation and effect of the course, we ask you to get in touch with us **four weeks** in advance. Then, the JabRef team can a) learn about the starting skill level of the students, b) the aimed skill level at the end of the course, c) the amount of time the students are given to learn about and contribute to JabRef, d) check the [feature board](https://github.com/JabRef/jabref/projects/7) for appropriate tasks (and fill it as needed), e) recommend appropriate features.
+For a near-to-perfect preparation and effect of the course, we ask you to get in touch with us **four weeks** in advance. Then, the JabRef team can a) learn about the starting skill level of the students, b) the aimed skill level at the end of the course, c) the amount of time the students are given to learn about and contribute to JabRef, d) check the [Candidates for university projects](https://github.com/orgs/JabRef/projects/3/views/3) for appropriate tasks (and fill it as needed), e) recommend appropriate features.
 
-It is also possible to just direct students to our [Contribution Guide](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#contributing-guide). The learning effect may be lower as the time of the students has to be spent to a) learn about JabRef and b) select an appropriate issue.
+It is also possible to just direct students to our [Contribution Guide](https://devdocs.jabref.org/contributing.html#contribute-code). The learning effect may be lower as the time of the students has to be spent to a) learn about JabRef and b) select an appropriate issue.
 
-Since a huge fraction of software costs is spent on [software maintenance](https://en.wikipedia.org/wiki/Software\_maintenance), adding new features also educates in that aspect: perfective maintenance[1](teaching.md#LientzSwanson) is trained. When fixing bugs, corrective maintenance[2](teaching.md#LientzSwanson) is trained.
+Since a huge fraction of software costs is spent on [software maintenance](https://en.wikipedia.org/wiki/Software\_maintenance), adding new features also educates in that aspect: perfective maintenance[1](teaching.md#LientzSwanson) is trained. When fixing bugs, corrective maintenance [2](teaching.md#LientzSwanson) is trained.
 
 ## Process for contributions
 
@@ -70,6 +75,15 @@ Course: Open Source Software Development
 * Summary: In this course, students will be introduced to the processes and tools specific to Open Source Software development, and they will analyze existing projects to understand the architecture and processes of these projects. Besides, students will attempt to contribute source code to a large existing Open Source Software project.
 * Course offered in 2018 and 2019. Examples of merged pull requests: [4217](https://github.com/JabRef/jabref/pull/4217), [4255](https://github.com/JabRef/jabref/pull/4255), [4227](https://github.com/JabRef/jabref/pull/4227), [4260](https://github.com/JabRef/jabref/pull/4260), [5150](https://github.com/JabRef/jabref/pull/5150)
 
+#### King's College London
+
+Course: BSc Computer Science Individual Project
+
+* Summary: Students experience the procedure of finding and fixing small and medium issues in an open source project.
+* Successfully run in 2022/2023
+
+Do you have additions/suggestions for improvement?
+
 #### Northern Arizona University (NAU), USA
 
 Course [CS499 - Open Source Software Development](https://github.com/igorsteinmacher/CS499-OSS)
@@ -84,7 +98,7 @@ Course [CS499 - Open Source Software Development](https://github.com/igorsteinma
 Course [10915-01: Software Engineering](https://dmi.unibas.ch/de/studium/computer-science-informatik/lehrangebot-hs18/vorlesung-software-engineering/)
 
 * Lecture Materials: [https://github.com/unibas-marcelluethi/software-engineering](https://github.com/unibas-marcelluethi/software-engineering)
-* Successfully run Q3 2019.
+* Successfully run 2019 to 2022.
 * Excercise touching JabRef:
   * General idea: identify a feature missing in JabRef and develop the specification, system design, and implementation of the feature.
   * Introduction to JabRef's code: [Exercise 5](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week5/exercises/practical-exercises.md): Introduction into JabRef code.

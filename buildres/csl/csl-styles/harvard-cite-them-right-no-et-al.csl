@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
   <info>
-    <title>Cite Them Right 11th edition - Harvard (no "et al.")</title>
+    <title>Cite Them Right 12th edition - Harvard (no "et al.")</title>
     <id>http://www.zotero.org/styles/harvard-cite-them-right-no-et-al</id>
     <link href="http://www.zotero.org/styles/harvard-cite-them-right-no-et-al" rel="self"/>
     <link href="http://www.zotero.org/styles/harvard-cite-them-right" rel="template"/>
@@ -11,8 +11,8 @@
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <summary>Harvard according to Cite Them Right, 11th edition.</summary>
-    <updated>2021-09-02T07:43:59+00:00</updated>
+    <summary>Harvard according to Cite Them Right, 12th edition.</summary>
+    <updated>2022-06-28T11:12:19+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-GB">
@@ -29,12 +29,12 @@
     <choose>
       <if type="chapter paper-conference" match="any">
         <names variable="container-author" delimiter=", " suffix=", ">
-          <name and="text" initialize-with=". " delimiter=", " sort-separator=", " name-as-sort-order="all"/>
+          <name and="text" initialize-with=". "/>
         </names>
         <choose>
           <if variable="container-author" match="none">
             <names variable="editor translator" delimiter=", ">
-              <name and="text" initialize-with="." name-as-sort-order="all"/>
+              <name and="text" initialize-with="."/>
               <label form="short" prefix=" (" suffix=")"/>
             </names>
           </if>
@@ -98,7 +98,10 @@
   <macro name="access">
     <choose>
       <if variable="DOI">
-        <text variable="DOI" prefix="doi:"/>
+        <group delimiter=": ">
+          <text term="available at" text-case="capitalize-first"/>
+          <text variable="DOI" prefix="https://doi.org/"/>
+        </group>
       </if>
       <else-if variable="URL">
         <text term="available at" suffix=": " text-case="capitalize-first"/>

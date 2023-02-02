@@ -603,7 +603,7 @@
               </group>
             </if>
             <else>
-              <text variable="edition" text-case="capitalize-first" suffix="."/>
+              <text variable="edition"/>
             </else>
           </choose>
         </group>

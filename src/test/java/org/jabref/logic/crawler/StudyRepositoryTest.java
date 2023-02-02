@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +40,7 @@ import org.mockito.Answers;
 
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -82,13 +82,14 @@ class StudyRepositoryTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                "",
                 ',');
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.fieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
         when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
         getTestStudyRepository();
@@ -124,9 +125,9 @@ class StudyRepositoryTest {
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "Springer.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "Springer.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "Springer.bib")));
-        assertTrue(Files.notExists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "IEEEXplore.bib")));
-        assertTrue(Files.notExists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "IEEEXplore.bib")));
-        assertTrue(Files.notExists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "IEEEXplore.bib")));
+        assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "IEEEXplore.bib")));
+        assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "IEEEXplore.bib")));
+        assertFalse(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeSoftwareEngineering + " - Software Engineering", "IEEEXplore.bib")));
     }
 
     /**
@@ -166,20 +167,9 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void setsLastSearchDatePersistedCorrectly() throws Exception {
-        List<QueryResult> mockResults = getMockResults();
-
-        studyRepository.persist(mockResults);
-
-        assertEquals(LocalDate.now(), getTestStudyRepository().getStudy().getLastSearchDate());
-    }
-
-    @Test
     void studyResultsPersistedCorrectly() throws Exception {
         List<QueryResult> mockResults = getMockResults();
-
         studyRepository.persist(mockResults);
-
         assertEquals(new HashSet<>(getNonDuplicateBibEntryResult().getEntries()), new HashSet<>(getTestStudyRepository().getStudyResultEntries().getEntries()));
     }
 
@@ -201,8 +191,8 @@ class StudyRepositoryTest {
      * Copies the study definition file into the test repository
      */
     private void setUpTestStudyDefinitionFile() throws Exception {
-        Path destination = tempRepositoryDirectory.resolve("study.yml");
-        URL studyDefinition = this.getClass().getResource("study.yml");
+        Path destination = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+        URL studyDefinition = this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 
@@ -222,7 +212,7 @@ class StudyRepositoryTest {
 
     private BibDatabase getNonDuplicateBibEntryResult() {
         BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResults());
-        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.getKeywordSeparator());
+        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
         merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResults()));
         merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResults()));
         return mockResults;

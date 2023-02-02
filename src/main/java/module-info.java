@@ -54,7 +54,7 @@ open module org.jabref {
     requires jdk.xml.dom;
 
     // Annotations (@PostConstruct)
-    requires java.annotation;
+    requires jakarta.annotation;
 
     // Microsoft application insights
     requires applicationinsights.core;
@@ -85,7 +85,6 @@ open module org.jabref {
     requires org.mariadb.jdbc;
     uses org.mariadb.jdbc.credential.CredentialPlugin;
     requires org.apache.commons.lang3;
-    requires antlr.runtime;
     requires org.antlr.antlr4.runtime;
     requires org.fxmisc.flowless;
     requires org.apache.tika.core;
@@ -104,7 +103,7 @@ open module org.jabref {
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
-    uses org.apache.lucene.codecs.lucene91.Lucene91Codec;
+    uses org.apache.lucene.codecs.lucene94.Lucene94Codec;
 
     requires org.apache.lucene.queryparser;
     uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -115,6 +114,8 @@ open module org.jabref {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+    requires com.sun.jna;
+    requires com.sun.jna.platform;
 
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;

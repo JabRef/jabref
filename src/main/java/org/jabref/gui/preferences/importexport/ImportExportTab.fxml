@@ -16,6 +16,7 @@
 
     <Label styleClass="sectionHeader" text="%General"/>
     <CheckBox fx:id="generateNewKeyOnImport" text="%Generate a new key for imported entries (overwriting their default)"/>
+    <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
 
     <Label styleClass="sectionHeader" text="%Custom DOI URI"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">

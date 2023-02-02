@@ -28,7 +28,7 @@ import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.MedlineQueryTransformer;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -53,16 +53,6 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 
     private int numberOfResultsFound;
-
-    /**
-     * Replaces all commas in a given string with " AND "
-     *
-     * @param query input to remove commas
-     * @return input without commas
-     */
-    private static String replaceCommaWithAND(String query) {
-        return query.replaceAll(", ", " AND ").replaceAll(",", " AND ");
-    }
 
     /**
      * When using 'esearch.fcgi?db=&lt;database>&term=&lt;query>' we will get a list of IDs matching the query.
@@ -164,7 +154,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("sort", "relevance");
         uriBuilder.addParameter("retmax", String.valueOf(NUMBER_TO_FETCH));
-        uriBuilder.addParameter("term", replaceCommaWithAND(query));
+        uriBuilder.addParameter("term", query); // already lucene query
         return uriBuilder.build().toURL();
     }
 
@@ -200,7 +190,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     @Override
     public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         List<BibEntry> entryList;
-        DefaultQueryTransformer transformer = new DefaultQueryTransformer();
+        MedlineQueryTransformer transformer = new MedlineQueryTransformer();
         Optional<String> transformedQuery = transformer.transformLuceneQuery(luceneQuery);
 
         if (transformedQuery.isEmpty() || transformedQuery.get().isBlank()) {

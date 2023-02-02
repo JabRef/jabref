@@ -14,6 +14,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.BiblatexSoftwareField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -95,7 +96,7 @@ public class CffImporter extends Importer {
         StandardEntryType entryType = StandardEntryType.Software;
 
         // Map CFF fields to JabRef Fields
-        HashMap<String, StandardField> fieldMap = getFieldMappings();
+        HashMap<String, Field> fieldMap = getFieldMappings();
         for (Map.Entry<String, String> property : citation.values.entrySet()) {
             if (fieldMap.containsKey(property.getKey())) {
                 entryMap.put(fieldMap.get(property.getKey()), property.getValue());
@@ -120,7 +121,7 @@ public class CffImporter extends Importer {
         entryMap.put(StandardField.AUTHOR, authorStr);
 
         // Select DOI to keep
-        if (entryMap.get(StandardField.DOI) == null && citation.ids != null) {
+        if ((entryMap.get(StandardField.DOI) == null) && (citation.ids != null)) {
             List<CffIdentifier> doiIds = citation.ids.stream()
                             .filter(id -> id.type.equals("doi"))
                             .collect(Collectors.toList());
@@ -137,14 +138,14 @@ public class CffImporter extends Importer {
                                            .collect(Collectors.toList());
 
             if (swhIds.size() == 1) {
-                entryMap.put(StandardField.SWHID, swhIds.get(0));
+                entryMap.put(BiblatexSoftwareField.SWHID, swhIds.get(0));
             } else if (swhIds.size() > 1) {
                 List<String> relSwhIds = swhIds.stream()
                                                .filter(id -> id.split(":").length > 3) // quick filter for invalid swhids
                                                .filter(id -> id.split(":")[2].equals("rel"))
                                                .collect(Collectors.toList());
                 if (relSwhIds.size() == 1) {
-                    entryMap.put(StandardField.SWHID, relSwhIds.get(0));
+                    entryMap.put(BiblatexSoftwareField.SWHID, relSwhIds.get(0));
                 }
             }
         }
@@ -166,19 +167,19 @@ public class CffImporter extends Importer {
 
         try {
             citation = mapper.readValue(reader, CffFormat.class);
-            return citation != null && citation.values.get("title") != null;
+            return (citation != null) && (citation.values.get("title") != null);
         } catch (IOException e) {
             return false;
         }
     }
 
-    private HashMap<String, StandardField> getFieldMappings() {
-        HashMap<String, StandardField> fieldMappings = new HashMap<>();
+    private HashMap<String, Field> getFieldMappings() {
+        HashMap<String, Field> fieldMappings = new HashMap<>();
         fieldMappings.put("title", StandardField.TITLE);
         fieldMappings.put("version", StandardField.VERSION);
         fieldMappings.put("doi", StandardField.DOI);
-        fieldMappings.put("license", StandardField.LICENSE);
-        fieldMappings.put("repository", StandardField.REPOSITORY);
+        fieldMappings.put("license", BiblatexSoftwareField.LICENSE);
+        fieldMappings.put("repository", BiblatexSoftwareField.REPOSITORY);
         fieldMappings.put("url", StandardField.URL);
         fieldMappings.put("abstract", StandardField.ABSTRACT);
         fieldMappings.put("message", StandardField.COMMENT);

@@ -40,9 +40,22 @@
   </macro>
   <macro name="author-short">
     <choose>
-      <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-        <text macro="name-short-macro" font-variant="small-caps"/>
+      <if type="legal_case">
+        <choose>
+          <if variable="title-short">
+            <text macro="name-short-macro" font-style="italic"/>
+          </if>
+          <else>
+            <text macro="name-short-macro"/>
+          </else>
+        </choose>
       </if>
+      <else-if type="bill legislation" match="any">
+        <text macro="name-macro"/>
+      </else-if>
+      <else-if type="book graphic motion_picture report song" match="any">
+        <text macro="name-short-macro" font-variant="small-caps"/>
+      </else-if>
       <else>
         <text macro="name-short-macro"/>
       </else>
@@ -59,10 +72,10 @@
   </macro>
   <macro name="author">
     <choose>
-      <if type="legal_case">
+      <if type="bill legal_case legislation" match="any">
         <text macro="name-macro"/>
       </if>
-      <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+      <else-if type="book graphic motion_picture report song" match="any">
         <text macro="name-macro" font-variant="small-caps"/>
       </else-if>
       <else>
@@ -102,7 +115,7 @@
             <group delimiter=" ">
               <text variable="volume"/>
               <text macro="container"/>
-              <text variable="page"/>
+              <text variable="page-first"/>
             </group>
             <text variable="locator"/>
           </group>
@@ -117,7 +130,7 @@
           </group>
           <text macro="container"/>
           <group delimiter=", ">
-            <text variable="page"/>
+            <text variable="page-first"/>
             <text variable="locator"/>
           </group>
           <text macro="issuance" prefix="(" suffix=")"/>
@@ -133,7 +146,7 @@
           <text macro="issuance"/>
           <group delimiter=" ">
             <text value="at"/>
-            <text variable="page"/>
+            <text variable="page-first"/>
           </group>
         </group>
       </else-if>
@@ -143,13 +156,12 @@
           <text variable="volume"/>
           <text macro="container"/>
         </group>
-        <text variable="page"/>
+        <text variable="page-first"/>
         <text variable="locator" prefix=", "/>
         <text macro="issuance" prefix=" (" suffix=")"/>
       </else-if>
       <else-if type="book" match="any">
         <text variable="title" font-variant="small-caps"/>
-        <text variable="page" prefix=" "/>
         <text variable="locator" prefix=" "/>
         <text macro="issuance" prefix=" (" suffix=")"/>
       </else-if>
@@ -159,7 +171,7 @@
           <group delimiter=" ">
             <text variable="volume"/>
             <text macro="container"/>
-            <text variable="page"/>
+            <text variable="page-first"/>
             <text variable="locator"/>
             <text macro="issuance" prefix="(" suffix=")"/>
           </group>
@@ -175,11 +187,16 @@
             <if type="article-newspaper thesis" match="any">
               <group suffix=", ">
                 <date variable="issued">
-                  <date-part name="month"/>
+                  <date-part name="month" form="short"/>
                   <date-part name="day" prefix=" "/>
                 </date>
               </group>
             </if>
+            <else-if type="article-magazine">
+              <date variable="issued">
+                <date-part name="month" suffix=" " form="short"/>
+              </date>
+            </else-if>
           </choose>
           <date variable="issued">
             <date-part name="year"/>

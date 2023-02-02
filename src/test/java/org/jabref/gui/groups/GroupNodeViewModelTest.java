@@ -2,7 +2,6 @@ package org.jabref.gui.groups;
 
 import java.util.Arrays;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -48,8 +47,7 @@ class GroupNodeViewModelTest {
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 GroupViewMode.UNION,
                 true,
-                true,
-                new SimpleObjectProperty<>(',')
+                true
         ));
 
         viewModel = getViewModelForGroup(

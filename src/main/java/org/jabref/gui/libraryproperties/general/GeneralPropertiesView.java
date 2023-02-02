@@ -2,7 +2,6 @@ package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
 
-import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -11,7 +10,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
-import org.jabref.gui.libraryproperties.PropertiesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -19,8 +17,9 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
-public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralPropertiesViewModel> implements PropertiesTab {
+public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralPropertiesViewModel> {
     @FXML private ComboBox<Charset> encoding;
     @FXML private ComboBox<BibDatabaseMode> databaseMode;
     @FXML private TextField generalFileDirectory;

@@ -24,7 +24,7 @@ class StringUtilTest {
         Path path = Path.of("src", "main", "java", StringUtil.class.getName().replace('.', '/') + ".java");
         int lineCount = Files.readAllLines(path, StandardCharsets.UTF_8).size();
 
-        assertTrue(lineCount <= 761, "StringUtil increased in size to " + lineCount + ". "
+        assertTrue(lineCount <= 765, "StringUtil increased in size to " + lineCount + ". "
                 + "We try to keep this class as small as possible. "
                 + "Thus think twice if you add something to StringUtil.");
     }
@@ -385,5 +385,27 @@ class StringUtilTest {
     void testStripAccents() {
         assertEquals("aAoeee", StringUtil.stripAccents("åÄöéèë"));
         assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
+    }
+
+    static Stream<Arguments> testContainsWhitespace() {
+        return Stream.of(
+                Arguments.of(true, "file url"),
+                Arguments.of(true, "file\nurl"),
+                Arguments.of(true, "file\r\nurl"),
+                Arguments.of(true, "file\rurl"),
+                Arguments.of(true, "file\furl"),
+                Arguments.of(true, "file_url "),
+                Arguments.of(true, "file url\n"),
+                Arguments.of(true, " "),
+
+                Arguments.of(false, "file_url"),
+                Arguments.of(false, "PascalCase"),
+                Arguments.of(false, ""));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void testContainsWhitespace(Boolean expected, String input) {
+        assertEquals(expected, StringUtil.containsWhitespace(input));
     }
 }

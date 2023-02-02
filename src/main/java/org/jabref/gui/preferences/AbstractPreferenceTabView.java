@@ -2,14 +2,14 @@ package org.jabref.gui.preferences;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.preferences.PreferencesService;
+
+import jakarta.inject.Inject;
 
 public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel> extends VBox implements PreferencesTab {
 

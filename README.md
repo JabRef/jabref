@@ -71,7 +71,7 @@ An explanation of donation possibilities and usage of donations is available at 
 [![OpenHub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
 [![Deployment Status](https://github.com/JabRef/jabref/workflows/Deployment/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ADeployment)
 [![Test Status](https://github.com/JabRef/jabref/workflows/Tests/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ATests)
-[![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
+[![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=main)
 
 Want to be part of a free and open-source project that tens of thousands of scientists use every day?
 Check out the ways you can contribute, below:
@@ -84,11 +84,11 @@ Check out the ways you can contribute, below:
 
 We view pull requests as a collaborative process.
 Submit a pull request early to get feedback from the team on work in progress.
-We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve.
+We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve. Please also remember to discuss bigger changes early with the core developers to avoid a waste of time and work. Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
 
 If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
-To compile JabRef from source, you need a Java Development Kit 15 and `JAVA_HOME` pointing to this JDK.
+To compile JabRef from source, you need a Java Development Kit 19 and `JAVA_HOME` pointing to this JDK.
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
 and then generate the Eclipse `gradlew eclipse`.

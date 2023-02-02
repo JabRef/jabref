@@ -38,7 +38,7 @@ public class TexBibEntriesResolverTest {
     private BibEntry bibEntry;
 
     @BeforeEach
-    private void setUp() {
+    void setUp() {
         generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 

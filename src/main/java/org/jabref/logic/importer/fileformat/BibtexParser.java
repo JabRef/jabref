@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Can be used stand-alone.
  * <p>
- * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.preferences.GeneralPreferences, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
+ * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
  * <p>
  * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
  */
@@ -83,7 +83,7 @@ public class BibtexParser implements Parser {
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.getFieldContentFormatterPreferences());
+        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldContentFormatterPreferences());
         metaDataParser = new MetaDataParser(fileMonitor);
     }
 
@@ -228,7 +228,7 @@ public class BibtexParser implements Parser {
 
         // Instantiate meta data
         try {
-            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
+            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }
@@ -283,19 +283,18 @@ public class BibtexParser implements Parser {
 
             LOGGER.debug("Could not parse entry", ex);
             parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
-                    + "'. " + Localization.lang("Skipped entry."));
+                    + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry."));
         }
     }
 
     private void parseJabRefComment(Map<String, String> meta) {
-        StringBuilder buffer = null;
+        StringBuilder buffer;
         try {
             buffer = parseBracketedTextExactly();
         } catch (IOException e) {
-            /* if we get an IO Exception here, than we have an unbracketed comment,
-             * which means that we should just return and the comment will be picked up as arbitrary text
-             *  by the parser
-             */
+            // if we get an IO Exception here, then we have an unbracketed comment,
+            // which means that we should just return and the comment will be picked up as arbitrary text
+            // by the parser
             LOGGER.info("Found unbracketed comment");
             return;
         }
@@ -387,8 +386,8 @@ public class BibtexParser implements Parser {
         }
         // strip empty lines
         while ((runningIndex < indexOfAt) &&
-                (context.charAt(runningIndex) == '\r' ||
-                        context.charAt(runningIndex) == '\n')) {
+                ((context.charAt(runningIndex) == '\r') ||
+                        (context.charAt(runningIndex) == '\n'))) {
             runningIndex++;
         }
         return context.substring(runningIndex);
@@ -612,7 +611,7 @@ public class BibtexParser implements Parser {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
                 } else if (StandardField.KEYWORDS.equals(field)) {
                     // multiple keywords fields should be combined to one
-                    entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
+                    entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
             } else {
                 entry.setField(field, content);
@@ -634,7 +633,7 @@ public class BibtexParser implements Parser {
                 value.append(fieldContentFormatter.format(text, field));
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
-                // of brackets inside of a field, so we need to count the
+                // of brackets inside a field, so we need to count the
                 // brackets to know when the string is finished.
                 StringBuilder text = parseBracketedTextExactly();
                 value.append(fieldContentFormatter.format(text, field));

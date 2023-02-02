@@ -1,6 +1,5 @@
 package org.jabref.gui.search;
 
-import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -11,7 +10,6 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
@@ -22,13 +20,13 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     @FXML private SplitPane container;
     @FXML private ToggleButton keepOnTop;
 
-    private final ExternalFileTypes externalFileTypes;
     private final UndoManager undoManager;
 
     @Inject private PreferencesService preferencesService;
@@ -38,9 +36,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     private GlobalSearchResultDialogViewModel viewModel;
 
-    public GlobalSearchResultDialog(ExternalFileTypes externalFileTypes, UndoManager undoManager) {
+    public GlobalSearchResultDialog(UndoManager undoManager) {
         this.undoManager = undoManager;
-        this.externalFileTypes = externalFileTypes;
 
         setTitle(Localization.lang("Search results from open libraries"));
         ViewLoader.view(this)
@@ -57,7 +54,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
-        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, externalFileTypes);
+        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager);
 
         resultsTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
         resultsTable.getSelectionModel().selectFirst();

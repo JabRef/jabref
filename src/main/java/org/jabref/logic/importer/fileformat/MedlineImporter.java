@@ -425,7 +425,7 @@ public class MedlineImporter extends Importer implements Parser {
                 if ("pubmed".equals(id.getIdType())) {
                     fields.put(StandardField.PMID, id.getContent());
                 } else {
-                    fields.put(FieldFactory.parseField(id.getIdType()), id.getContent());
+                    fields.put(FieldFactory.parseField(StandardEntryType.Article, id.getIdType()), id.getContent());
                 }
             }
         }
@@ -499,7 +499,7 @@ public class MedlineImporter extends Importer implements Parser {
     private void addOtherId(Map<Field, String> fields, List<OtherID> otherID) {
         for (OtherID id : otherID) {
             if ((id.getSource() != null) && (id.getContent() != null)) {
-                fields.put(FieldFactory.parseField(id.getSource()), id.getContent());
+                fields.put(FieldFactory.parseField(StandardEntryType.Article, id.getSource()), id.getContent());
             }
         }
     }

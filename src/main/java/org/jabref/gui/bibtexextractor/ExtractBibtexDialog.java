@@ -1,6 +1,5 @@
 package org.jabref.gui.bibtexextractor;
 
-import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -13,12 +12,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 /**
  * GUI Dialog for the feature "Extract BibTeX from plain text".
@@ -35,6 +36,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private UndoManager undoManager;
     @Inject private PreferencesService preferencesService;
+    @Inject private ImportFormatReader importFormatReader;
 
     public ExtractBibtexDialog() {
         ViewLoader.view(this)
@@ -53,7 +55,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        this.viewModel = new BibtexExtractorViewModel(database, dialogService, preferencesService, fileUpdateMonitor, taskExecutor, undoManager, stateManager);
+        this.viewModel = new BibtexExtractorViewModel(database, dialogService, preferencesService, fileUpdateMonitor, taskExecutor, undoManager, stateManager, importFormatReader);
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
     }
 }

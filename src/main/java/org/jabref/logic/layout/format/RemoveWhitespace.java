@@ -3,7 +3,7 @@ package org.jabref.logic.layout.format;
 import org.jabref.logic.layout.LayoutFormatter;
 
 /**
- * Remove non printable character formatter.
+ * Remove non-printable character formatter.
  */
 public class RemoveWhitespace implements LayoutFormatter {
 

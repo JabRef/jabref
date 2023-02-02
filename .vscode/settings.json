@@ -1,0 +1,6 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.format.settings.url": "/config/VSCode Code Style.xml",
+    "java.checkstyle.configuration": "${workspaceFolder}/config/checkstyle/checkstyle_reviewdog.xml",
+    "java.checkstyle.version": "10.3.4",
+}

@@ -42,5 +42,4 @@
     </HBox>
 
     <CheckBox fx:id="alwaysReformatBib" text="%Always reformat BIB file on save and export"/>
-    <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
 </fx:root>

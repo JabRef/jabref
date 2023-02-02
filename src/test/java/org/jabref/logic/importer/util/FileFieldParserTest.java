@@ -37,7 +37,7 @@ class FileFieldParserTest {
         assertEquals(expected, FileFieldParser.convert(new ArrayList<>(input)));
     }
 
-    private static Stream<Arguments> stringsToParseTestData() throws Exception {
+    private static Stream<Arguments> stringsToParseTest() throws Exception {
         return Stream.of(
                 // null string
                 Arguments.of(
@@ -114,6 +114,18 @@ class FileFieldParserTest {
                         "desc:C\\:\\\\test.pdf:PDF"
                 ),
 
+                // handleNonEscapedFilePath
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("desc", Path.of("C:\\test.pdf"), "PDF")),
+                        "desc:C:\\test.pdf:PDF"
+                ),
+
+                // Source: https://github.com/JabRef/jabref/issues/8991#issuecomment-1214131042
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("Boyd2012.pdf", Path.of("C:\\Users\\Literature_database\\Boyd2012.pdf"), "PDF")),
+                        "Boyd2012.pdf:C\\:\\\\Users\\\\Literature_database\\\\Boyd2012.pdf:PDF"
+                ),
+
                 // subsetOfFieldsResultsInFileLink: description only
                 Arguments.of(
                         Collections.singletonList(new LinkedFile("", Path.of("file.pdf"), "")),
@@ -170,8 +182,8 @@ class FileFieldParserTest {
     }
 
     @ParameterizedTest
-    @MethodSource("stringsToParseTestData")
-    public void testParse(List<LinkedFile> expected, String input) {
+    @MethodSource
+    public void stringsToParseTest(List<LinkedFile> expected, String input) {
         assertEquals(expected, FileFieldParser.parse(input));
     }
 }

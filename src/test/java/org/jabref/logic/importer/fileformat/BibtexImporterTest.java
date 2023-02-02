@@ -12,10 +12,12 @@ import java.util.stream.Stream;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -161,11 +164,52 @@ public class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib"})
-    public void testParsingOfUtf8EncodedFileReadsUmlatCharacterCorrectly(String filename) throws Exception {
+    public void testParsingOfUtf8EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
                 List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
                 parserResult.getDatabase().getEntries());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
+    public void testParsingOfUtf16EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
+
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
+                parserResult.getDatabase().getEntries());
+
+        MetaData metaData = new MetaData();
+        metaData.setMode(BibDatabaseMode.BIBTEX);
+        metaData.setEncoding(StandardCharsets.UTF_16BE);
+        assertEquals(metaData, parserResult.getMetaData());
+    }
+
+    @Test
+    public void encodingSupplied() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-with-header.bib").toURI()));
+        assertTrue(parserResult.getMetaData().getEncodingExplicitlySupplied());
+    }
+
+    @Test
+    public void wrongEncodingSupplied() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-but-utf-8-declared--decoding-fails.bib").toURI()));
+
+        // The test file contains "Test{NBSP}I. Last" where the character "{NBSP}" is encoded using Windows-1252 instead of UTF-8
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Test�I. Last")),
+                parserResult.getDatabase().getEntries());
+    }
+
+    @Test
+    public void encodingNotSupplied() throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-without-header.bib").toURI()));
+        assertFalse(parserResult.getMetaData().getEncodingExplicitlySupplied());
     }
 }

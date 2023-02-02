@@ -81,7 +81,10 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
-            // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource. It might be that there is an UnknownHostException (eutils.ncbi.nlm.nih.gov cannot be resolved).
+            // check for the case where we already have a FetcherException from UrlDownload
+            if (e.getCause() instanceof FetcherException fe) {
+                throw fe;
+            }
             throw new FetcherException("A network error occurred", e);
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);

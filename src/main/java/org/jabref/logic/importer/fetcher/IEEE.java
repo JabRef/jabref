@@ -48,9 +48,9 @@ import org.slf4j.LoggerFactory;
  */
 public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
+    public static final String FETCHER_NAME = "IEEEXplore";
 
-    private static final String FETCHER_NAME = "IEEEXplore";
+    private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
 
     private static final String STAMP_BASE_STRING_DOCUMENT = "/stamp/stamp.jsp?tp=&arnumber=";
     private static final Pattern STAMP_PATTERN = Pattern.compile("(/stamp/stamp.jsp\\?t?p?=?&?arnumber=[0-9]+)");
@@ -214,7 +214,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonResponse(jsonEntry, importFormatPreferences.getKeywordSeparator());
+                    BibEntry entry = parseJsonResponse(jsonEntry, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                     boolean addEntry;
                     // In case entry has no year, add it
                     // In case an entry has a year, check if its in the year range

@@ -332,7 +332,7 @@ public class RepecNepImporter extends Importer {
                 String content = readMultipleLines(in);
                 String[] keywords = content.split("[,;]");
                 be.addKeywords(Arrays.asList(keywords),
-                        importFormatPreferences.getKeywordSeparator());
+                        importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
             } else if ("JEL".equals(keyword)) {
                 // parse JEL field
                 be.setField(new UnknownField("jel"), readMultipleLines(in));

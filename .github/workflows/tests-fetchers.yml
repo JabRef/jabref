@@ -11,10 +11,8 @@ on:
       - 'build.gradle'
   pull_request:
     paths:
-      - 'src/main/java/org/jabref/logic/**'
-      - 'src/test/java/org/jabref/logic/**'
-      - 'src/main/java/org/jabref/model/**'
-      - 'src/test/java/org/jabref/model/**'
+      - 'src/main/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/test/java/org/jabref/logic/importer/fetcher/**'
       - '.github/workflows/tests-fetchers.yml'
       - 'build.gradle'
   schedule:
@@ -26,10 +24,14 @@ env:
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
 
 concurrency:
   group: fetcher-tests-${{ github.head_ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   fetchertests:
@@ -41,7 +43,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run fetcher tests

@@ -26,7 +26,6 @@ import javafx.scene.layout.RowConstraints;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
@@ -53,7 +52,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final ThemeManager themeManager;
-    private final ExternalFileTypes externalFileTypes;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final StateManager stateManager;
@@ -71,7 +69,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                            PreferencesService preferences,
                            StateManager stateManager,
                            ThemeManager themeManager,
-                           ExternalFileTypes externalFileTypes,
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,
                            IndexingTaskManager indexingTaskManager) {
@@ -82,7 +79,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
         this.themeManager = themeManager;
-        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.stateManager = stateManager;
@@ -246,7 +242,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             scrollPane.setFitToHeight(true);
 
             SplitPane container = new SplitPane(scrollPane);
-            previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
+            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager);
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
                 if (show) {
                     container.getItems().remove(previewPanel);

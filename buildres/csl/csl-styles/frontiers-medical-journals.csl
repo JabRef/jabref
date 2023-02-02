@@ -3,7 +3,7 @@
   <info>
     <title>Frontiers medical journals</title>
     <id>http://www.zotero.org/styles/frontiers-medical-journals</id>
-    <!-- The 'Frontiers in...' series of medical (now called "Health" journals use different citation and bibliography styles 
+    <!-- The 'Frontiers in...' series of medical (now called "Health" journals use different citation and bibliography styles
          than the 'Frontiers in...' series of engineering and science (except Physics) journals. -->
     <link href="http://www.zotero.org/styles/frontiers-medical-journals" rel="self"/>
     <link href="http://www.zotero.org/styles/frontiers" rel="template"/>
@@ -141,7 +141,7 @@
             <date variable="issued" prefix=" (" suffix=")">
               <date-part name="year"/>
             </date>
-            <text variable="volume" font-weight="bold" suffix=":"/>
+            <text variable="volume" suffix=":"/>
           </group>
           <text variable="page" suffix="."/>
         </else>

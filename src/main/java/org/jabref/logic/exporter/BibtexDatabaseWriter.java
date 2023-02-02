@@ -110,7 +110,11 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
     @Override
     protected void writeProlog(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException {
-        if ((encoding == null) || (encoding == StandardCharsets.UTF_8)) {
+        // We write the encoding if
+        //   - it is provided (!= null)
+        //   - explicitly set in the .bib file OR not equal to UTF_8
+        // Otherwise, we do not write anything and return
+        if ((encoding == null) || (!bibDatabaseContext.getMetaData().getEncodingExplicitlySupplied() && (encoding == StandardCharsets.UTF_8))) {
             return;
         }
 

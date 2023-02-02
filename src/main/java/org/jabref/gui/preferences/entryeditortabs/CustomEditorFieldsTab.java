@@ -37,7 +37,7 @@ public class CustomEditorFieldsTab extends AbstractPreferenceTabView<CustomEdito
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS), generalFieldsHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService), generalFieldsHelp);
     }
 
     @FXML

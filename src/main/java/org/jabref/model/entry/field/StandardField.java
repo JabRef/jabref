@@ -1,7 +1,6 @@
 package org.jabref.model.entry.field;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
@@ -59,14 +58,11 @@ public enum StandardField implements Field {
     FOREWORD("foreword", FieldProperty.PERSON_NAMES),
     FOLDER("folder"),
     GENDER("gender", FieldProperty.GENDER),
-    HALID("hal_id"),
-    HALVERSION("hal_version"),
     HOLDER("holder", FieldProperty.PERSON_NAMES),
     HOWPUBLISHED("howpublished"),
     IDS("ids", FieldProperty.MULTIPLE_ENTRY_LINK),
     INSTITUTION("institution"),
     INTRODUCTION("introduction", FieldProperty.PERSON_NAMES),
-    INTRODUCEDIN("introducedin"),
     ISBN("isbn", "ISBN", FieldProperty.ISBN),
     ISRN("isrn", "ISRN"),
     ISSN("issn", "ISSN"),
@@ -81,7 +77,6 @@ public enum StandardField implements Field {
     LANGUAGE("language", FieldProperty.LANGUAGE),
     LABEL("label"),
     LIBRARY("library"),
-    LICENSE("license"),
     LOCATION("location"),
     MAINSUBTITLE("mainsubtitle", FieldProperty.BOOK_NAME),
     MAINTITLE("maintitle", FieldProperty.BOOK_NAME),
@@ -106,10 +101,7 @@ public enum StandardField implements Field {
     PUBSTATE("pubstate", FieldProperty.PUBLICATION_STATE),
     PRIMARYCLASS("primaryclass"),
     RELATED("related", FieldProperty.MULTIPLE_ENTRY_LINK),
-    RELATEDTYPE("relatedtype"),
-    RELATEDSTRING("relatedstring"),
     REPORTNO("reportno"),
-    REPOSITORY("repository"),
     REVIEW("review"),
     REVISION("revision"),
     SCHOOL("school"),
@@ -120,7 +112,6 @@ public enum StandardField implements Field {
     SORTKEY("sortkey"),
     SORTNAME("sortname", FieldProperty.PERSON_NAMES),
     SUBTITLE("subtitle"),
-    SWHID("swhid"),
     TITLE("title"),
     TITLEADDON("titleaddon"),
     TRANSLATOR("translator", FieldProperty.PERSON_NAMES),
@@ -182,7 +173,7 @@ public enum StandardField implements Field {
 
     @Override
     public Set<FieldProperty> getProperties() {
-        return Collections.unmodifiableSet(properties);
+        return properties;
     }
 
     @Override

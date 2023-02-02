@@ -13,7 +13,7 @@
     <category citation-format="author-date"/>
     <category field="biology"/>
     <category field="botany"/>
-    <updated>2021-07-27T13:34:10+00:00</updated>
+    <updated>2022-06-14T08:25:19+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="edition">
@@ -32,11 +32,13 @@
   <macro name="container">
     <choose>
       <if type="chapter paper-conference" match="any">
-        <text term="in" text-case="capitalize-first" font-style="italic" prefix=". " suffix=" "/>
-        <names variable="editor translator" delimiter=", " suffix=". ">
-          <name initialize-with="." delimiter=", " delimiter-precedes-last="never" and="symbol"/>
-          <label form="short" prefix=" (" suffix=")"/>
-        </names>
+        <group delimiter=": ">
+          <text term="in" text-case="capitalize-first" font-style="normal" prefix=". " suffix=" "/>
+          <names variable="editor translator" delimiter=", " suffix=". ">
+            <name initialize-with="." delimiter=", " delimiter-precedes-last="never" and="symbol"/>
+            <label form="short" prefix=" (" suffix=")"/>
+          </names>
+        </group>
         <group delimiter=", ">
           <text variable="container-title" text-case="title"/>
           <text variable="collection-title" text-case="title"/>
@@ -49,7 +51,7 @@
         </group>
       </else-if>
       <else>
-        <group prefix=". " delimiter=", ">
+        <group delimiter=", " prefix=". ">
           <text variable="container-title" form="short"/>
           <text variable="collection-title"/>
         </group>
@@ -86,14 +88,7 @@
     </names>
   </macro>
   <macro name="access">
-    <choose>
-      <if type="webpage">
-        <group>
-          <text value="URL" suffix=" "/>
-          <text variable="URL"/>
-        </group>
-      </if>
-    </choose>
+    <text variable="URL" prefix="&lt;" suffix="&gt;"/>
   </macro>
   <macro name="title">
     <choose>
@@ -106,10 +101,6 @@
           </group>
         </group>
       </if>
-      <else-if type="webpage">
-        <text variable="title"/>
-        <text value="WWW Document" prefix=" [" suffix="]"/>
-      </else-if>
       <else>
         <text variable="title"/>
       </else>
@@ -173,13 +164,13 @@
       </if>
       <else-if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
         <group delimiter=", " prefix=". ">
+          <text macro="edition"/>
+          <text macro="event"/>
+          <text macro="publisher"/>
           <group>
             <text variable="genre"/>
             <text variable="number" prefix=" No. "/>
           </group>
-          <text macro="edition"/>
-          <text macro="event"/>
-          <text macro="publisher"/>
         </group>
       </else-if>
       <else-if type="chapter paper-conference" match="any">
@@ -188,15 +179,21 @@
           <text macro="publisher"/>
         </group>
       </else-if>
+      <else-if type="webpage post post-weblog" match="any">
+        <group delimiter=". " prefix=". ">
+          <date form="text" date-parts="year-month-day" variable="issued"/>
+          <text macro="access"/>
+        </group>
+      </else-if>
     </choose>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" collapse="year">
     <sort>
-      <key macro="issued"/>
       <key macro="author"/>
+      <key macro="issued"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter=", ">
-      <group delimiter=" ">
+    <layout delimiter="; " prefix="(" suffix=")">
+      <group delimiter=", ">
         <text macro="author-short"/>
         <text macro="issued"/>
       </group>
@@ -217,7 +214,6 @@
         </group>
         <text macro="locators"/>
       </group>
-      <text macro="access" prefix=". "/>
     </layout>
   </bibliography>
 </style>

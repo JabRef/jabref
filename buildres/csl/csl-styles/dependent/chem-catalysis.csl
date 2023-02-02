@@ -5,12 +5,12 @@
     <title>Chem Catalysis</title>
     <id>http://www.zotero.org/styles/chem-catalysis</id>
     <link href="http://www.zotero.org/styles/chem-catalysis" rel="self"/>
-    <link href="http://www.zotero.org/styles/cell-numeric-superscript" rel="independent-parent"/>
+    <link href="http://www.zotero.org/styles/cell" rel="independent-parent"/>
     <link href="http://www.cell.com/chem-catalysis/authors" rel="documentation"/>
     <category citation-format="numeric"/>
     <category field="chemistry"/>
     <eissn>2667-1093</eissn>
-    <updated>2020-10-20T12:00:00+00:00</updated>
+    <updated>2017-10-20T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
 </style>

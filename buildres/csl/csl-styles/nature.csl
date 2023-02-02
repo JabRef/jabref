@@ -15,7 +15,7 @@
     <category field="generic-base"/>
     <issn>0028-0836</issn>
     <eissn>1476-4687</eissn>
-    <updated>2019-10-08T13:18:12+00:00</updated>
+    <updated>2022-07-01T16:03:34+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="title">
@@ -37,7 +37,7 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="volume"/>
+      <if variable="volume" type="article" match="any"/>
       <else-if variable="DOI">
         <text variable="DOI" prefix="doi:"/>
       </else-if>
@@ -55,6 +55,28 @@
           </group>
         </group>
       </if>
+      <else-if type="article">
+        <group delimiter=" ">
+          <choose>
+            <if variable="genre" match="any">
+              <text variable="genre" text-case="capitalize-first"/>
+            </if>
+            <else>
+              <text term="article" text-case="capitalize-first"/>
+            </else>
+          </choose>
+          <text term="at"/>
+          <choose>
+            <if variable="DOI" match="any">
+              <text variable="DOI" prefix="https://doi.org/"/>
+            </if>
+            <else>
+              <text variable="URL"/>
+            </else>
+          </choose>
+          <date date-parts="year" form="text" variable="issued" prefix="(" suffix=")"/>
+        </group>
+      </else-if>
       <else-if type="report webpage post post-weblog" match="any">
         <group delimiter=" ">
           <text variable="URL"/>

@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -25,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,15 +92,13 @@ public class CompositeSearchBasedFetcherTest {
      * @return A stream of Arguments wrapping set of fetchers.
      */
     static Stream<Arguments> performSearchParameters() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importFormatPreferences.getFieldContentFormatterPreferences())
-                .thenReturn(mock(FieldContentFormatterPreferences.class));
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
 
         List<SearchBasedFetcher> list = List.of(
-                new ArXiv(importFormatPreferences),
+                new ArXivFetcher(importFormatPreferences),
                 new INSPIREFetcher(importFormatPreferences),
                 new GvkFetcher(),
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
@@ -126,7 +124,7 @@ public class CompositeSearchBasedFetcherTest {
             // Only shift i at maximum to its MSB to the right
             for (int j = 0; Math.pow(2, j) <= i; j++) {
                 // Add fetcher j to the list if the j-th bit of i is 1
-                if ((i >> j) % 2 == 1) {
+                if (((i >> j) % 2) == 1) {
                     fetchers.add(list.get(j));
                 }
             }

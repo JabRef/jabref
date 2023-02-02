@@ -6,7 +6,7 @@
     <id>http://www.zotero.org/styles/technische-universitat-dresden-linguistik</id>
     <link href="http://www.zotero.org/styles/technische-universitat-dresden-linguistik" rel="self"/>
     <link href="http://www.zotero.org/styles/deutsche-sprache" rel="template"/>
-    <link xml:lang="de" href="https://tu-dresden.de/gsw/slk/germanistik/al/ressourcen/dateien/studium/200424_Stylesheet_ALI.pdf" rel="documentation"/>
+    <link href="https://tu-dresden.de/gsw/slk/germanistik/al/ressourcen/dateien/studium/200424_Stylesheet_ALI.pdf" rel="documentation"/>
     <author>
       <name>Simon Meier-Vieracker</name>
       <uri>https://tu-dresden.de/gsw/slk/germanistik/al</uri>
@@ -16,7 +16,7 @@
     <category field="linguistics"/>
     <category field="literature"/>
     <summary>Zitierstil entsprechend den Vorgaben der linguistischen Professuren am Institut für Germanistik der Technischen Universität Dresden. Der Stil orientiert sich an den Richtlinien von 'Deutsche Sprache: Zeitschrift für Theorie Praxis Dokumentation', hg. vom IDS Mannheim</summary>
-    <updated>2021-07-19T08:34:39+00:00</updated>
+    <updated>2022-06-23T08:36:06+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -51,14 +51,14 @@
           <name delimiter="/" name-as-sort-order="all"/>
           <label form="short" prefix=" (" suffix=")"/>
         </names>
-        <text variable="container-title"/>
+        <text macro="container-title"/>
       </group>
     </group>
   </macro>
   <macro name="publication-place-publisher">
     <group delimiter=": ">
       <text variable="publisher-place"/>
-      <text variable="publisher"/>
+      <text variable="publisher" quotes="false" font-variant="normal" font-weight="normal" vertical-align="baseline"/>
     </group>
   </macro>
   <macro name="creator-year-short">
@@ -81,7 +81,7 @@
     </choose>
   </macro>
   <macro name="collection-title-number">
-    <group delimiter=" " prefix="(= " suffix=")">
+    <group delimiter=" " prefix=" (= " suffix=")">
       <text variable="collection-title"/>
       <text variable="collection-number"/>
     </group>
@@ -113,6 +113,28 @@
       </substitute>
     </names>
   </macro>
+  <macro name="doi">
+    <text variable="DOI" prefix="https://doi.org/"/>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="book" match="any">
+        <text variable="title"/>
+        <text macro="collection-title-number" prefix=" "/>
+      </if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="container-title">
+    <choose>
+      <if type="chapter" match="any">
+        <text variable="container-title"/>
+        <text macro="collection-title-number"/>
+      </if>
+    </choose>
+  </macro>
   <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year-suffix">
     <layout delimiter="; " prefix="(" suffix=")">
       <group delimiter=", ">
@@ -133,12 +155,11 @@
       <group delimiter=". " suffix=".">
         <group delimiter=" ">
           <text macro="creator-year-long" suffix=":"/>
-          <text variable="title" strip-periods="false" font-variant="normal"/>
+          <text macro="title"/>
         </group>
         <choose>
           <if type="book" match="any">
             <group delimiter=". ">
-              <text macro="collection-title-number"/>
               <text macro="edition"/>
               <text macro="publication-place-publisher"/>
             </group>
@@ -150,17 +171,16 @@
                 <text macro="container-title-volume"/>
               </group>
               <text macro="page-range"/>
-              <text variable="DOI" strip-periods="false" prefix="doi:"/>
+              <text macro="doi" strip-periods="false"/>
             </group>
           </else-if>
           <else-if type="chapter" match="any">
             <group delimiter=". ">
               <text macro="editor-container-title"/>
-              <text macro="collection-title-number"/>
               <text macro="edition"/>
               <text macro="publication-place-publisher"/>
               <text macro="page-range"/>
-              <text variable="DOI" prefix="doi:"/>
+              <text macro="doi"/>
             </group>
           </else-if>
           <else-if type="dataset" match="any"/>

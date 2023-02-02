@@ -6,8 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import javafx.beans.property.ObjectProperty;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
@@ -15,16 +13,15 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.push.PushToApplicationConstants;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
+public class PushToLyx extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplicationConstants.LYX;
+    public static final String NAME = PushToApplications.LYX;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
@@ -38,25 +35,25 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public JabRefIcon getIcon() {
+    public JabRefIcon getApplicationIcon() {
         return IconTheme.JabRefIcons.APPLICATION_LYX;
     }
 
     @Override
-    public void operationCompleted() {
+    public void onOperationCompleted() {
         if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
-                    Localization.lang("verify that LyX is running and that the lyxpipe is valid")
-                            + ". [" + commandPath + "]");
+                    Localization.lang("Verify that LyX is running and that the lyxpipe is valid.")
+                            + "[" + commandPath + "]");
         } else if (couldNotCall) {
-            dialogService.showErrorDialogAndWait(Localization.lang("unable to write to") + " " + commandPath + ".in");
+            dialogService.showErrorDialogAndWait(Localization.lang("Unable to write to %0.", commandPath + ".in"));
         } else {
-            super.operationCompleted();
+            super.onOperationCompleted();
         }
     }
 
     @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
+    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToLyxSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 
@@ -66,7 +63,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getPushToApplicationCommandPaths().get(this.getDisplayName());
+        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;

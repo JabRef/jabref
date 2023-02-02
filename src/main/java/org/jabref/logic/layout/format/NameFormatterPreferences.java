@@ -11,8 +11,8 @@ public class NameFormatterPreferences {
     private final ObservableList<String> nameFormatterValue;
 
     public NameFormatterPreferences(List<String> nameFormatterKey, List<String> nameFormatterValue) {
-        this.nameFormatterKey = FXCollections.observableList(nameFormatterKey);
-        this.nameFormatterValue = FXCollections.observableList(nameFormatterValue);
+        this.nameFormatterKey = FXCollections.observableArrayList(nameFormatterKey);
+        this.nameFormatterValue = FXCollections.observableArrayList(nameFormatterValue);
     }
 
     public ObservableList<String> getNameFormatterKey() {

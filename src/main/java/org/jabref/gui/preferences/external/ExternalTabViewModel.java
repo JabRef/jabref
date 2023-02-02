@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.external;
 
+import java.util.HashMap;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -16,7 +18,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationSettings;
-import org.jabref.gui.push.PushToApplicationsManager;
+import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -48,19 +50,23 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final PushToApplicationsManager pushToApplicationsManager;
 
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().build();
 
-    private final ExternalApplicationsPreferences initialPreferences;
-    private final ObjectProperty<PushToApplicationPreferences> workingPushToApplicationPreferences;
+    private final ExternalApplicationsPreferences initialExternalApplicationPreferences;
+    private final PushToApplicationPreferences initialPushToApplicationPreferences;
+    private final PushToApplicationPreferences workingPushToApplicationPreferences;
 
-    public ExternalTabViewModel(DialogService dialogService, PreferencesService preferencesService, PushToApplicationsManager pushToApplicationsManager) {
+    public ExternalTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferences = preferencesService;
-        this.pushToApplicationsManager = pushToApplicationsManager;
-        this.initialPreferences = preferences.getExternalApplicationsPreferences();
-        this.workingPushToApplicationPreferences = new SimpleObjectProperty<>(preferencesService.getPushToApplicationPreferences());
+        this.initialExternalApplicationPreferences = preferences.getExternalApplicationsPreferences();
+        this.initialPushToApplicationPreferences = preferences.getPushToApplicationPreferences();
+        this.workingPushToApplicationPreferences = new PushToApplicationPreferences(
+                initialPushToApplicationPreferences.getActiveApplicationName(),
+                new HashMap<>(initialPushToApplicationPreferences.getCommandPaths()),
+                initialPushToApplicationPreferences.getEmacsArguments(),
+                initialPushToApplicationPreferences.getVimServer());
 
         terminalCommandValidator = new FunctionBasedValidator<>(
                 customTerminalCommandProperty,
@@ -80,36 +86,37 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        eMailReferenceSubjectProperty.setValue(initialPreferences.getEmailSubject());
-        autoOpenAttachedFoldersProperty.setValue(initialPreferences.shouldAutoOpenEmailAttachmentsFolder());
+        eMailReferenceSubjectProperty.setValue(initialExternalApplicationPreferences.getEmailSubject());
+        autoOpenAttachedFoldersProperty.setValue(initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
 
         pushToApplicationsListProperty.setValue(
-                FXCollections.observableArrayList(pushToApplicationsManager.getApplications()));
+                FXCollections.observableArrayList(PushToApplications.getAllApplications(dialogService, preferences)));
         selectedPushToApplicationProperty.setValue(
-                pushToApplicationsManager.getApplicationByName(initialPreferences.getPushToApplicationName())
-                                         .orElse(new PushToEmacs(dialogService, preferences)));
+                PushToApplications.getApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences)
+                                  .orElse(new PushToEmacs(dialogService, preferences)));
 
-        citeCommandProperty.setValue(initialPreferences.getCiteCommand());
-        useCustomTerminalProperty.setValue(initialPreferences.useCustomTerminal());
-        customTerminalCommandProperty.setValue(initialPreferences.getCustomTerminalCommand());
-        useCustomFileBrowserProperty.setValue(initialPreferences.useCustomFileBrowser());
-        customFileBrowserCommandProperty.setValue(initialPreferences.getCustomFileBrowserCommand());
+        citeCommandProperty.setValue(initialExternalApplicationPreferences.getCiteCommand());
+        useCustomTerminalProperty.setValue(initialExternalApplicationPreferences.useCustomTerminal());
+        customTerminalCommandProperty.setValue(initialExternalApplicationPreferences.getCustomTerminalCommand());
+        useCustomFileBrowserProperty.setValue(initialExternalApplicationPreferences.useCustomFileBrowser());
+        customFileBrowserCommandProperty.setValue(initialExternalApplicationPreferences.getCustomFileBrowserCommand());
     }
 
     public void storeSettings() {
-        preferences.storeExternalApplicationsPreferences(new ExternalApplicationsPreferences(
-                eMailReferenceSubjectProperty.getValue(),
-                autoOpenAttachedFoldersProperty.getValue(),
-                selectedPushToApplicationProperty.getValue().getDisplayName(),
-                citeCommandProperty.getValue(),
-                useCustomTerminalProperty.getValue(),
-                customTerminalCommandProperty.getValue(),
-                useCustomFileBrowserProperty.getValue(),
-                customFileBrowserCommandProperty.getValue()));
+        ExternalApplicationsPreferences externalPreferences = preferences.getExternalApplicationsPreferences();
+        externalPreferences.setEMailSubject(eMailReferenceSubjectProperty.getValue());
+        externalPreferences.setAutoOpenEmailAttachmentsFolder(autoOpenAttachedFoldersProperty.getValue());
+        externalPreferences.setCiteCommand(citeCommandProperty.getValue());
+        externalPreferences.setUseCustomTerminal(useCustomTerminalProperty.getValue());
+        externalPreferences.setCustomTerminalCommand(customTerminalCommandProperty.getValue());
+        externalPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());
+        externalPreferences.setCustomFileBrowserCommand(customFileBrowserCommandProperty.getValue());
 
-        preferences.storePushToApplicationPreferences(workingPushToApplicationPreferences.get());
-
-        pushToApplicationsManager.updateApplicationAction(selectedPushToApplicationProperty.getValue());
+        PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
+        pushPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());
+        pushPreferences.setCommandPaths(workingPushToApplicationPreferences.getCommandPaths());
+        pushPreferences.setEmacsArguments(workingPushToApplicationPreferences.getEmacsArguments());
+        pushPreferences.setVimServer(workingPushToApplicationPreferences.getVimServer());
     }
 
     public ValidationStatus terminalCommandValidationStatus() {

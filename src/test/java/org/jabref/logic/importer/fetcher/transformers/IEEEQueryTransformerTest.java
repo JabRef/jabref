@@ -39,7 +39,7 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
     }
 
     @Override
-    public void convertJournalField() throws Exception {
+    public void convertJournalFieldPrefix() throws Exception {
         IEEEQueryTransformer transformer = getTransformer();
 
         String queryString = "journal:Nature";

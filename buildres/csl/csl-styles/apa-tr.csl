@@ -223,7 +223,7 @@
       <else>
         <group delimiter=", ">
           <choose>
-            <if variable="event" match="none">
+            <if variable="event event-title" match="none">
               <text variable="genre"/>
             </if>
           </choose>
@@ -241,20 +241,34 @@
   </macro>
   <macro name="event">
     <choose>
-      <if variable="event">
+      <if variable="event event-title" match="any">
         <choose>
           <if variable="genre" match="none">
-            <text variable="event"/>
+            <text macro="event-title"/>
             <text term="presented at" prefix=", "/>
           </if>
           <else>
             <group delimiter=" ">
-              <text variable="event"/>
+              <text macro="event-title"/>
               <text variable="genre"/>
             </group>
           </else>
         </choose>
       </if>
+    </choose>
+  </macro>
+  <macro name="event-title">
+    <choose>
+      <!-- TODO: We expect "event-title" to be used,
+           but processors and applications may not be updated yet.
+           This macro ensures that either "event" or "event-title" can be accpeted.
+           Remove if procesor logic and application adoption can handle this. -->
+      <if variable="event-title">
+        <text variable="event-title"/>
+      </if>
+      <else>
+        <text variable="event"/>
+      </else>
     </choose>
   </macro>
   <macro name="issued">

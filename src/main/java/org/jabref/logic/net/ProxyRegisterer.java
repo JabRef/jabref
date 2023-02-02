@@ -21,10 +21,15 @@ public class ProxyRegisterer {
 
                 System.setProperty("https.proxyUser", proxyPrefs.getUsername());
                 System.setProperty("https.proxyPassword", proxyPrefs.getPassword());
+            } else {
+                System.clearProperty("http.proxyUser");
+                System.clearProperty("http.proxyPassword");
+
+                System.clearProperty("https.proxyUser");
+                System.clearProperty("https.proxyPassword");
             }
         } else {
-            // The following two lines signal that the system proxy settings
-            // should be used:
+            // The following two lines signal that the system proxy settings should be used:
             System.setProperty("java.net.useSystemProxies", "true");
             System.setProperty("proxySet", "true");
         }
