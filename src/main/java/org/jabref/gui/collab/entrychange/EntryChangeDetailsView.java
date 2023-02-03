@@ -1,8 +1,10 @@
 package org.jabref.gui.collab.entrychange;
 
 import javafx.geometry.Orientation;
+import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -22,11 +24,14 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
     private final PreviewWithSourceTab newPreviewWithSourcesTab = new PreviewWithSourceTab();
 
     public EntryChangeDetailsView(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
+        Label inJabRef = new Label(Localization.lang("In JabRef"));
+        Label onDisk = new Label(Localization.lang("On disk"));
+
         // we need a copy here as we otherwise would set the same entry twice
         PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, stateManager, themeManager);
 
-        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferencesService, entryTypesManager, previewClone, Localization.lang("Entry Preview - in JabRef"));
-        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferencesService, entryTypesManager, previewViewer, Localization.lang("Entry Preview - on disk"));
+        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferencesService, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
+        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferencesService, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));
 
         EasyBind.subscribe(oldEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -> {
             newEntryTabPane.getSelectionModel().select(selectedIndex.intValue());
@@ -38,13 +43,17 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
             }
         });
 
-        SplitPane split = new SplitPane(oldEntryTabPane, newEntryTabPane);
+        VBox containerOld = new VBox(inJabRef, oldEntryTabPane);
+        VBox containerNew = new VBox(onDisk, newEntryTabPane);
+
+        SplitPane split = new SplitPane(containerOld, containerNew);
         split.setOrientation(Orientation.HORIZONTAL);
 
         setLeftAnchor(split, 8d);
         setTopAnchor(split, 8d);
         setRightAnchor(split, 8d);
         setBottomAnchor(split, 8d);
+
         this.getChildren().add(split);
     }
 }
