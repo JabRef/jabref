@@ -12,44 +12,24 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.mods.AbstractDefinition;
-import org.jabref.logic.importer.fileformat.mods.DateDefinition;
-import org.jabref.logic.importer.fileformat.mods.DetailDefinition;
-import org.jabref.logic.importer.fileformat.mods.ExtentDefinition;
-import org.jabref.logic.importer.fileformat.mods.GenreDefinition;
-import org.jabref.logic.importer.fileformat.mods.HierarchicalGeographicDefinition;
-import org.jabref.logic.importer.fileformat.mods.IdentifierDefinition;
-import org.jabref.logic.importer.fileformat.mods.IssuanceDefinition;
-import org.jabref.logic.importer.fileformat.mods.LanguageDefinition;
-import org.jabref.logic.importer.fileformat.mods.LanguageTermDefinition;
-import org.jabref.logic.importer.fileformat.mods.LocationDefinition;
-import org.jabref.logic.importer.fileformat.mods.ModsCollectionDefinition;
-import org.jabref.logic.importer.fileformat.mods.ModsDefinition;
-import org.jabref.logic.importer.fileformat.mods.NameDefinition;
-import org.jabref.logic.importer.fileformat.mods.NamePartDefinition;
-import org.jabref.logic.importer.fileformat.mods.NoteDefinition;
-import org.jabref.logic.importer.fileformat.mods.OriginInfoDefinition;
-import org.jabref.logic.importer.fileformat.mods.PartDefinition;
-import org.jabref.logic.importer.fileformat.mods.PhysicalLocationDefinition;
-import org.jabref.logic.importer.fileformat.mods.PlaceDefinition;
-import org.jabref.logic.importer.fileformat.mods.PlaceTermDefinition;
-import org.jabref.logic.importer.fileformat.mods.RecordInfoDefinition;
-import org.jabref.logic.importer.fileformat.mods.RelatedItemDefinition;
-import org.jabref.logic.importer.fileformat.mods.StringPlusLanguage;
-import org.jabref.logic.importer.fileformat.mods.StringPlusLanguagePlusAuthority;
-import org.jabref.logic.importer.fileformat.mods.StringPlusLanguagePlusSupplied;
-import org.jabref.logic.importer.fileformat.mods.SubjectDefinition;
-import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
-import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
+import org.jabref.logic.importer.fileformat.mods.IdentifierDefn;
+import org.jabref.logic.importer.fileformat.mods.NameDefn;
+import org.jabref.logic.importer.fileformat.mods.RecordInfoDefn;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -59,10 +39,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import com.google.common.base.Joiner;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,8 +53,6 @@ public class ModsImporter extends Importer implements Parser {
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
 
     private final String keywordSeparator;
-
-    private JAXBContext context;
 
     public ModsImporter(ImportFormatPreferences importFormatPreferences) {
         keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
@@ -96,112 +70,457 @@ public class ModsImporter extends Importer implements Parser {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-            if (context == null) {
-                context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.mods");
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+
+            // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
+            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+
+            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
+
+            // event iterator
+            while (reader.hasNext()) {
+                int eventType = reader.next();
+
+                if (eventType == XMLEvent.START_ELEMENT) {
+                    if (reader.getName().getLocalPart().equals("mods")) {
+                        System.out.println("Starting mods");
+                        String id = reader.getAttributeValue(null, "ID");
+                        if (id != null) {
+                            System.out.println("ID: " + id);
+                        }
+                        parseMods(bibItems, reader);
+                    }
+                }
             }
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-
-            // The unmarshalled object is a jaxbElement.
-            JAXBElement<?> unmarshalledObject = (JAXBElement<?>) unmarshaller.unmarshal(input);
-
-            Optional<ModsCollectionDefinition> collection = getElement(unmarshalledObject.getValue(),
-                    ModsCollectionDefinition.class);
-            Optional<ModsDefinition> mods = getElement(unmarshalledObject.getValue(), ModsDefinition.class);
-
-            if (collection.isPresent()) {
-                List<ModsDefinition> modsDefinitions = collection.get().getMods();
-                parseModsCollection(bibItems, modsDefinitions);
-            } else if (mods.isPresent()) {
-                ModsDefinition modsDefinition = mods.get();
-                parseMods(bibItems, modsDefinition);
-            } else {
-                LOGGER.warn("Not expected root element found");
-            }
-        } catch (JAXBException e) {
+        } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
+
         return new ParserResult(bibItems);
     }
 
-    private void parseModsCollection(List<BibEntry> bibItems, List<ModsDefinition> mods) {
-        for (ModsDefinition modsDefinition : mods) {
-            parseMods(bibItems, modsDefinition);
-        }
-    }
-
-    private void parseMods(List<BibEntry> bibItems, ModsDefinition modsDefinition) {
+    private void parseMods(List<BibEntry> bibItems, XMLStreamReader reader) throws XMLStreamException {
         BibEntry entry = new BibEntry();
         Map<Field, String> fields = new HashMap<>();
-        if (modsDefinition.getID() != null) {
-            entry.setCitationKey(modsDefinition.getID());
-        }
-        if (modsDefinition.getModsGroup() != null) {
-            parseModsGroup(fields, modsDefinition.getModsGroup(), entry);
-        }
+
+        parseModsGroup(fields, reader, entry);
+
         entry.setField(fields);
         bibItems.add(entry);
     }
 
-    private void parseModsGroup(Map<Field, String> fields, List<Object> modsGroup, BibEntry entry) {
+    private void parseModsGroup(Map<Field, String> fields, XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
+        // These elements (subject, keywords and authors) can appear more than once,
+        // so they are collected in lists
+        List<String> notes = new ArrayList<>();
         List<String> keywords = new ArrayList<>();
         List<String> authors = new ArrayList<>();
-        List<String> notes = new ArrayList<>();
 
-        for (Object groupElement : modsGroup) {
-            // Get the element. Only one of the elements should be not an empty optional.
-            Optional<AbstractDefinition> abstractDefinition = getElement(groupElement, AbstractDefinition.class);
-            Optional<GenreDefinition> genreDefinition = getElement(groupElement, GenreDefinition.class);
-            Optional<LanguageDefinition> languageDefinition = getElement(groupElement, LanguageDefinition.class);
-            Optional<LocationDefinition> locationDefinition = getElement(groupElement, LocationDefinition.class);
-            Optional<NameDefinition> nameDefinition = getElement(groupElement, NameDefinition.class);
-            Optional<OriginInfoDefinition> originInfoDefinition = getElement(groupElement, OriginInfoDefinition.class);
-            Optional<RecordInfoDefinition> recordInfoDefinition = getElement(groupElement, RecordInfoDefinition.class);
-            Optional<NoteDefinition> noteDefinition = getElement(groupElement, NoteDefinition.class);
-            Optional<RelatedItemDefinition> relatedItemDefinition = getElement(groupElement,
-                    RelatedItemDefinition.class);
-            Optional<SubjectDefinition> subjectDefinition = getElement(groupElement, SubjectDefinition.class);
-            Optional<IdentifierDefinition> identifierDefinition = getElement(groupElement, IdentifierDefinition.class);
-            Optional<TitleInfoDefinition> titleInfoDefinition = getElement(groupElement, TitleInfoDefinition.class);
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+            if (eventType == XMLEvent.START_ELEMENT) {
+                // check which MODS group has started
+                switch (reader.getName().getLocalPart()) {
+                    case "abstract" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("Abstract: " + reader.getText());
+                            putIfValueNotNull(fields, StandardField.ABSTRACT, reader.getText());
+                        }
+                    }
+                    case "genre" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("Genre: " + reader.getText());
+                            System.out.println("Mapped Genre: " + EntryTypeFactory.parse(mapGenre(reader.getText())));
+                            entry.setType(EntryTypeFactory.parse(mapGenre(reader.getText())));
+                        }
+                    }
+                    case "language" -> {
+                        parseLanguage(reader, fields);
+                    }
+                    case "location" -> {
+                        parseLocationAndUrl(reader, fields);
+                    }
+                    case "identifier" -> {
+                        IdentifierDefn identifierDefinition = new IdentifierDefn();
+                        String type = reader.getAttributeValue(null, "type");
+                        System.out.println("Identifier type: " + type);
+                        identifierDefinition.setType(type);
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("Identifier value: " + reader.getText());
+                            identifierDefinition.setValue(reader.getText());
+                        }
+                        parseIdentifier(fields, identifierDefinition, entry);
+                    }
+                    case "note" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("Note: " + reader.getText());
+                            notes.add(reader.getText());
+                        }
+                    }
+                    case "recordInfo" -> {
+                        parseRecordInfo(reader, fields);
+                    }
+                    case "titleInfo" -> {
+                        parseTitle(reader, fields);
+                    }
+                    case "subject" -> {
+                        parseSubject(reader, fields, keywords);
+                    }
+                    case "originInfo" -> {
+                        parseOriginInfo(reader, fields);
+                    }
+                    case "name" -> {
+                        parseName(reader, fields, authors);
+                    }
+                    case "relatedItem" -> {
+                        parseRelatedItem(reader, fields);
+                    }
+                }
+            }
 
-            // Now parse the information if the element is present
-            abstractDefinition
-                    .ifPresent(abstractDef -> putIfValueNotNull(fields, StandardField.ABSTRACT, abstractDef.getValue()));
-
-            genreDefinition.ifPresent(genre -> entry.setType(EntryTypeFactory.parse(mapGenre(genre.getValue()))));
-
-            languageDefinition.ifPresent(
-                    languageDef -> languageDef.getLanguageTerm().stream().map(LanguageTermDefinition::getValue)
-                                              .forEach(language -> putIfValueNotNull(fields, StandardField.LANGUAGE, language)));
-
-            locationDefinition.ifPresent(location -> parseLocationAndUrl(fields, location));
-
-            nameDefinition.ifPresent(name -> handleAuthorsInNamePart(name, authors, fields));
-
-            originInfoDefinition.ifPresent(originInfo -> originInfo
-                    .getPlaceOrPublisherOrDateIssued()
-                    .forEach(element -> putPlaceOrPublisherOrDate(fields, element.getName().getLocalPart(),
-                            element.getValue())));
-
-            recordInfoDefinition.ifPresent(recordInfo -> parseRecordInfo(fields, recordInfo));
-
-            noteDefinition.ifPresent(note -> notes.add(note.getValue()));
-
-            relatedItemDefinition.ifPresent(relatedItem -> parseRelatedModsGroup(fields, relatedItem.getModsGroup()));
-
-            subjectDefinition
-                    .ifPresent(subject -> parseTopic(fields, subject.getTopicOrGeographicOrTemporal(), keywords));
-
-            identifierDefinition.ifPresent(identifier -> parseIdentifier(fields, identifier, entry));
-
-            titleInfoDefinition.ifPresent(titleInfo -> parseTitle(fields, titleInfo.getTitleOrSubTitleOrPartNumber()));
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("mods")) {
+                break;
+            }
         }
 
-        // The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
-        putIfListIsNotEmpty(fields, keywords, StandardField.KEYWORDS, this.keywordSeparator);
-        // same goes for authors and notes
-        putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, StandardField.NOTE, ", ");
+        putIfListIsNotEmpty(fields, keywords, StandardField.KEYWORDS, this.keywordSeparator);
+        putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
+    }
+
+    /**
+     * Parses information from the RelatedModsGroup. It has the same elements as ModsGroup.
+     * But information like volume, issue and the pages appear here instead of in the ModsGroup.
+     * Also, if there appears a title field, then this indicates that is the name of the journal
+     * which the article belongs to.
+     */
+    private void parseRelatedItem(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT) {
+                switch (reader.getName().getLocalPart()) {
+                    case "title" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("relatedItem.title: " + reader.getText());
+                            putIfValueNotNull(fields, StandardField.JOURNAL, reader.getText());
+                        }
+                    }
+                    case "detail" -> {
+                        handleDetail(reader, fields);
+                    }
+                    case "extent" -> {
+                        handleExtent(reader, fields);
+                    }
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("relatedItem")) {
+                break;
+            }
+        }
+    }
+
+    private void handleExtent(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        String total = "";
+        String startPage = "";
+        String endPage = "";
+
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT) {
+                switch (reader.getName().getLocalPart()) {
+                    case "total" -> {
+                        if (reader.next() == XMLEvent.CHARACTERS) {
+                            total = reader.getText();
+                        }
+                    }
+                    case "start" -> {
+                        if (reader.next() == XMLEvent.CHARACTERS) {
+                            startPage = reader.getText();
+                        }
+                    }
+                    case "end" -> {
+                        if (reader.next() == XMLEvent.CHARACTERS) {
+                            endPage = reader.getText();
+                        }
+                    }
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("extent")) {
+                break;
+            }
+        }
+
+        if (!total.isBlank()) {
+            putIfValueNotNull(fields, StandardField.PAGES, total);
+        } else if (!startPage.isBlank()) {
+            putIfValueNotNull(fields, StandardField.PAGES, startPage);
+            if (!endPage.isBlank()) {
+                // if end appears, then there has to be a start page appeared, so get it and put it together with
+                // the end page
+                fields.put(StandardField.PAGES, startPage + "-" + endPage);
+            }
+        }
+    }
+
+    private void handleDetail(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        String type = reader.getAttributeValue(null, "type");
+        Set<String> detailElementSet = Set.of("number", "caption", "title");
+
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT) {
+                if (detailElementSet.contains(reader.getName().getLocalPart())) {
+                    eventType = reader.next();
+                    if (eventType == XMLEvent.CHARACTERS) {
+                        System.out.println("relatedItem.detail.number/caption: " + reader.getText());
+                        putIfValueNotNull(fields, FieldFactory.parseField(type), reader.getText());
+                    }
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("detail")) {
+                break;
+            }
+        }
+    }
+
+    private void parseName(XMLStreamReader reader, Map<Field, String> fields, List<String> authors) throws XMLStreamException {
+        List<NameDefn> nameDefinitions = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT) {
+                if (reader.getName().getLocalPart().equals("affiliation")) {
+                    eventType = reader.next();
+                    if (eventType == XMLEvent.CHARACTERS) {
+                        System.out.println("name.affiliation: " + reader.getText());
+                        putIfValueNotNull(fields, new UnknownField("affiliation"), reader.getText());
+                    }
+                } else if (reader.getName().getLocalPart().equals("namePart")) {
+                    String type = reader.getAttributeValue(null, "type");
+                    eventType = reader.next();
+                    if (eventType == XMLEvent.CHARACTERS) {
+                        System.out.println("name.namePart " + reader.getText());
+                        nameDefinitions.add(new NameDefn(reader.getText(), type));
+                    }
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("name")) {
+                break;
+            }
+        }
+
+        handleAuthorsInNamePart(nameDefinitions, authors);
+    }
+
+    private void parseOriginInfo(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        List<String> places = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT) {
+                switch (reader.getName().getLocalPart()) {
+                    case "issuance" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("originInfo.Issuance: " + reader.getText());
+                            putIfValueNotNull(fields, new UnknownField("issuance"), reader.getText());
+                        }
+                    }
+                    case "placeTerm" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("originInfo.placeTerm: " + reader.getText());
+                            appendIfValueNotNullOrBlank(places, reader.getText());
+                        }
+                    }
+                    case "publisher" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("originInfo.publisher: " + reader.getText());
+                            putIfValueNotNull(fields, StandardField.PUBLISHER, reader.getText());
+                        }
+                    }
+                    case "edition" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("originInfo.edition: " + reader.getText());
+                            putIfValueNotNull(fields, StandardField.EDITION, reader.getText());
+                        }
+                    }
+                    case "dateIssued", "dateCreated", "dateCaptured", "dateModified" -> {
+                        String elementName = reader.getName().getLocalPart();
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("originInfo.date: " + reader.getText());
+                            putDate(fields, elementName, reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("originInfo")) {
+                break;
+            }
+        }
+
+        putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
+    }
+
+    private void parseSubject(XMLStreamReader reader, Map<Field, String> fields, List<String> keywords) throws XMLStreamException {
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT) {
+                switch (reader.getName().getLocalPart()) {
+                    case "topic" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("Subject Topic: " + reader.getText());
+                            keywords.add(reader.getText().trim());
+                        }
+                    }
+                    case "city" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("Subject City: " + reader.getText());
+                            putIfValueNotNull(fields, new UnknownField("city"), reader.getText());
+                        }
+                    }
+                    case "country" -> {
+                        eventType = reader.next();
+                        if (eventType == XMLEvent.CHARACTERS) {
+                            System.out.println("Subject Country: " + reader.getText());
+                            putIfValueNotNull(fields, new UnknownField("country"), reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("subject")) {
+                break;
+            }
+        }
+    }
+
+    private void parseRecordInfo(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        RecordInfoDefn recordInfoDefinition = new RecordInfoDefn();
+        List<String> recordContents = recordInfoDefinition.getRecordContentSourceOrRecordCreationDateOrRecordChangeDate();
+        List<String> languages = recordInfoDefinition.getLanguages();
+
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT) {
+                if (RecordInfoDefn.elementNameSet.contains(reader.getName().getLocalPart())) {
+                    eventType = reader.next();
+                    if (eventType == XMLEvent.CHARACTERS) {
+                        System.out.println("Record Content: " + reader.getText());
+                        recordContents.add(0, reader.getText());
+                    }
+                } else if (reader.getName().getLocalPart().equals("languageTerm")) {
+                    eventType = reader.next();
+                    if (eventType == XMLEvent.CHARACTERS) {
+                        System.out.println("Record Info Language: " + reader.getText());
+                        languages.add(reader.getText());
+                    }
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("recordInfo")) {
+                break;
+            }
+        }
+
+        for (String recordContent : recordContents) {
+            putIfValueNotNull(fields, new UnknownField("source"), recordContent);
+        }
+        putIfListIsNotEmpty(fields, languages, StandardField.LANGUAGE, ", ");
+    }
+
+    private void parseLanguage(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT &&
+                    reader.getName().getLocalPart().equals("languageTerm")) {
+                eventType = reader.next();
+                if (eventType == XMLEvent.CHARACTERS) {
+                    System.out.println("Language: " + reader.getText());
+                    putIfValueNotNull(fields, StandardField.LANGUAGE, reader.getText());
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("language")) {
+                break;
+            }
+        }
+    }
+
+    private void parseTitle(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT &&
+                    reader.getName().getLocalPart().equals("title")) {
+                eventType = reader.next();
+                if (eventType == XMLEvent.CHARACTERS) {
+                    System.out.println("Title: " + reader.getText());
+                    putIfValueNotNull(fields, StandardField.TITLE, reader.getText());
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("titleInfo")) {
+                break;
+            }
+        }
+    }
+
+    private void parseLocationAndUrl(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        List<String> locations = new ArrayList<>();
+        List<String> urls = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+
+            if (eventType == XMLEvent.START_ELEMENT) {
+                if (reader.getName().getLocalPart().equals("physicalLocation")) {
+                    eventType = reader.next();
+                    if (eventType == XMLEvent.CHARACTERS) {
+                        System.out.println("Physical Location: " + reader.getText());
+                        locations.add(reader.getText());
+                    }
+                } else if (reader.getName().getLocalPart().equals("url")) {
+                    eventType = reader.next();
+                    if (eventType == XMLEvent.CHARACTERS) {
+                        System.out.println("URL: " + reader.getText());
+                        urls.add(reader.getText());
+                    }
+                }
+            }
+
+            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("location")) {
+                break;
+            }
+        }
+
+        putIfListIsNotEmpty(fields, locations, StandardField.LOCATION, ", ");
+        putIfListIsNotEmpty(fields, urls, StandardField.URL, ", ");
     }
 
     private String mapGenre(String genre) {
@@ -214,20 +533,7 @@ public class ModsImporter extends Importer implements Parser {
         };
     }
 
-    private void parseTitle(Map<Field, String> fields, List<Object> titleOrSubTitleOrPartNumber) {
-        for (Object object : titleOrSubTitleOrPartNumber) {
-            if (object instanceof JAXBElement) {
-                @SuppressWarnings("unchecked")
-                JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
-                if ("title".equals(element.getName().getLocalPart())) {
-                    StringPlusLanguage title = element.getValue();
-                    fields.put(StandardField.TITLE, title.getValue());
-                }
-            }
-        }
-    }
-
-    private void parseIdentifier(Map<Field, String> fields, IdentifierDefinition identifier, BibEntry entry) {
+    private void parseIdentifier(Map<Field, String> fields, IdentifierDefn identifier, BibEntry entry) {
         String type = identifier.getType();
         if ("citekey".equals(type) && entry.getCitationKey().isEmpty()) {
             entry.setCitationKey(identifier.getValue());
@@ -237,188 +543,24 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void parseTopic(Map<Field, String> fields, List<JAXBElement<?>> topicOrGeographicOrTemporal,
-                            List<String> keywords) {
-        for (JAXBElement<?> jaxbElement : topicOrGeographicOrTemporal) {
-            Object value = jaxbElement.getValue();
-            String elementName = jaxbElement.getName().getLocalPart();
-            if (value instanceof HierarchicalGeographicDefinition) {
-                HierarchicalGeographicDefinition hierarchichalGeographic = (HierarchicalGeographicDefinition) value;
-                parseGeographicInformation(fields, hierarchichalGeographic);
-            } else if ((value instanceof StringPlusLanguagePlusAuthority) && "topic".equals(elementName)) {
-                StringPlusLanguagePlusAuthority topic = (StringPlusLanguagePlusAuthority) value;
-                keywords.add(topic.getValue().trim());
-            }
-        }
-    }
-
-    /**
-     * Returns an Optional which contains an instance of the given class, if the given element can be cast to this class.
-     * If the element cannot be cast to the given class, then an empty optional will be returned.
-     *
-     * @param groupElement The element that should be cast
-     * @param clazz        The class to which groupElement should be cast
-     * @return An Optional, that contains the groupElement as instance of clazz, if groupElement can be cast to clazz.
-     * An empty Optional, if groupElement cannot be cast to clazz
-     */
-    private <T> Optional<T> getElement(Object groupElement, Class<T> clazz) {
-        if (clazz.isAssignableFrom(groupElement.getClass())) {
-            return Optional.of(clazz.cast(groupElement));
-        }
-        return Optional.empty();
-    }
-
-    private void parseGeographicInformation(Map<Field, String> fields,
-                                            HierarchicalGeographicDefinition hierarchichalGeographic) {
-        List<JAXBElement<? extends StringPlusLanguage>> areaOrContinentOrCountry = hierarchichalGeographic
-                .getExtraTerrestrialAreaOrContinentOrCountry();
-        for (JAXBElement<? extends StringPlusLanguage> element : areaOrContinentOrCountry) {
-            String localName = element.getName().getLocalPart();
-            if ("city".equals(localName)) {
-                StringPlusLanguage city = element.getValue();
-                putIfValueNotNull(fields, new UnknownField("city"), city.getValue());
-            } else if ("country".equals(localName)) {
-                StringPlusLanguage country = element.getValue();
-                putIfValueNotNull(fields, new UnknownField("country"), country.getValue());
-            }
-        }
-    }
-
-    private void parseLocationAndUrl(Map<Field, String> fields, LocationDefinition locationDefinition) {
-        List<String> locations = locationDefinition.getPhysicalLocation().stream()
-                                                   .map(PhysicalLocationDefinition::getValue).collect(Collectors.toList());
-        putIfListIsNotEmpty(fields, locations, StandardField.LOCATION, ", ");
-
-        List<String> urls = locationDefinition.getUrl().stream().map(UrlDefinition::getValue)
-                                              .collect(Collectors.toList());
-        putIfListIsNotEmpty(fields, urls, StandardField.URL, ", ");
-    }
-
-    private void parseRecordInfo(Map<Field, String> fields, RecordInfoDefinition recordInfo) {
-        List<JAXBElement<?>> recordContent = recordInfo.getRecordContentSourceOrRecordCreationDateOrRecordChangeDate();
-        for (JAXBElement<?> jaxbElement : recordContent) {
-            Object value = jaxbElement.getValue();
-            if (value instanceof StringPlusLanguagePlusAuthority) {
-                StringPlusLanguagePlusAuthority source = (StringPlusLanguagePlusAuthority) value;
-                putIfValueNotNull(fields, new UnknownField("source"), source.getValue());
-            } else if (value instanceof LanguageDefinition) {
-                LanguageDefinition language = (LanguageDefinition) value;
-                List<LanguageTermDefinition> languageTerms = language.getLanguageTerm();
-                List<String> languages = languageTerms.stream().map(LanguageTermDefinition::getValue)
-                                                      .collect(Collectors.toList());
-                putIfListIsNotEmpty(fields, languages, StandardField.LANGUAGE, ", ");
-            }
-        }
-    }
-
-    /**
-     * Puts the Information from the RelatedModsGroup. It has the same elements like the ModsGroup.
-     * But Informations like volume, issue and the pages appear here instead of in the ModsGroup.
-     * Also if there appears a title field, then this indicates that is the name of journal which the article belongs to.
-     */
-    private void parseRelatedModsGroup(Map<Field, String> fields, List<Object> relatedModsGroup) {
-        for (Object groupElement : relatedModsGroup) {
-            if (groupElement instanceof PartDefinition) {
-                PartDefinition part = (PartDefinition) groupElement;
-                List<Object> detailOrExtentOrDate = part.getDetailOrExtentOrDate();
-                for (Object object : detailOrExtentOrDate) {
-                    if (object instanceof DetailDefinition) {
-                        DetailDefinition detail = (DetailDefinition) object;
-                        List<JAXBElement<StringPlusLanguage>> numberOrCaptionOrTitle = detail
-                                .getNumberOrCaptionOrTitle();
-
-                        // In the for loop should only be the value of the element that belongs to the detail not be null
-                        for (JAXBElement<StringPlusLanguage> jaxbElement : numberOrCaptionOrTitle) {
-                            StringPlusLanguage value = jaxbElement.getValue();
-                            // put details like volume, issue,...
-                            putIfValueNotNull(fields, FieldFactory.parseField(detail.getType()), value.getValue());
-                        }
-                    } else if (object instanceof ExtentDefinition) {
-                        ExtentDefinition extentDefinition = (ExtentDefinition) object;
-                        putPageInformation(extentDefinition, fields);
-                    }
-                }
-            } else if (groupElement instanceof TitleInfoDefinition) {
-                TitleInfoDefinition titleInfo = (TitleInfoDefinition) groupElement;
-                List<Object> titleOrSubTitleOrPartNumber = titleInfo.getTitleOrSubTitleOrPartNumber();
-                for (Object object : titleOrSubTitleOrPartNumber) {
-                    if (object instanceof JAXBElement) {
-                        @SuppressWarnings("unchecked")
-                        JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
-                        if ("title".equals(element.getName().getLocalPart())) {
-                            StringPlusLanguage journal = element.getValue();
-                            fields.put(StandardField.JOURNAL, journal.getValue());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void putPageInformation(ExtentDefinition extentDefinition, Map<Field, String> fields) {
-        if (extentDefinition.getTotal() != null) {
-            putIfValueNotNull(fields, StandardField.PAGES, String.valueOf(extentDefinition.getTotal()));
-        } else if (extentDefinition.getStart() != null) {
-            putIfValueNotNull(fields, StandardField.PAGES, extentDefinition.getStart().getValue());
-            if (extentDefinition.getEnd() != null) {
-                String endPage = extentDefinition.getEnd().getValue();
-                // if end appears, then there has to be a start page appeared, so get it and put it together with
-                // the end page
-                String startPage = fields.get(StandardField.PAGES);
-                fields.put(StandardField.PAGES, startPage + "-" + endPage);
-            }
-        }
-    }
-
-    private void putPlaceOrPublisherOrDate(Map<Field, String> fields, String elementName, Object object) {
-        Optional<IssuanceDefinition> issuanceDefinition = getElement(object, IssuanceDefinition.class);
-        Optional<PlaceDefinition> placeDefinition = getElement(object, PlaceDefinition.class);
-        Optional<DateDefinition> dateDefinition = getElement(object, DateDefinition.class);
-        Optional<StringPlusLanguagePlusSupplied> publisherOrEdition = getElement(object,
-                StringPlusLanguagePlusSupplied.class);
-
-        issuanceDefinition.ifPresent(issuance -> putIfValueNotNull(fields, new UnknownField("issuance"), issuance.value()));
-
-        List<String> places = new ArrayList<>();
-        placeDefinition
-                .ifPresent(place -> place.getPlaceTerm().stream().map(PlaceTermDefinition::getValue)
-                                         .filter(Objects::nonNull).forEach(places::add));
-        putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
-
-        dateDefinition.ifPresent(date -> putDate(fields, elementName, date));
-
-        publisherOrEdition.ifPresent(pubOrEd -> putPublisherOrEdition(fields, elementName, pubOrEd));
-    }
-
-    private void putPublisherOrEdition(Map<Field, String> fields, String elementName,
-                                       StringPlusLanguagePlusSupplied pubOrEd) {
-        if ("publisher".equals(elementName)) {
-            putIfValueNotNull(fields, StandardField.PUBLISHER, pubOrEd.getValue());
-        } else if ("edition".equals(elementName)) {
-            putIfValueNotNull(fields, StandardField.EDITION, pubOrEd.getValue());
-        }
-    }
-
-    private void putDate(Map<Field, String> fields, String elementName, DateDefinition date) {
-        if (date.getValue() != null) {
+    private void putDate(Map<Field, String> fields, String elementName, String date) {
+        if (date != null) {
             switch (elementName) {
-                case "dateIssued":
+                case "dateIssued" -> {
                     // The first 4 digits of dateIssued should be the year
-                    fields.put(StandardField.YEAR, date.getValue().replaceAll("[^0-9]*", "").replaceAll("\\(\\d?\\d?\\d?\\d?.*\\)", "\1"));
-                    break;
-                case "dateCreated":
+                    fields.put(StandardField.YEAR, date.replaceAll("[^0-9]*", "").replaceAll("\\(\\d?\\d?\\d?\\d?.*\\)", "\1"));
+                }
+                case "dateCreated" -> {
                     // If there was no year in date issued, then take the year from date created
-                    fields.computeIfAbsent(StandardField.YEAR, k -> date.getValue().substring(0, 4));
-                    fields.put(new UnknownField("created"), date.getValue());
-                    break;
-                case "dateCaptured":
-                    fields.put(new UnknownField("captured"), date.getValue());
-                    break;
-                case "dateModified":
-                    fields.put(new UnknownField("modified"), date.getValue());
-                    break;
-                default:
-                    break;
+                    fields.computeIfAbsent(StandardField.YEAR, k -> date.substring(0, 4));
+                    fields.put(new UnknownField("created"), date);
+                }
+                case "dateCaptured" -> {
+                    fields.put(new UnknownField("captured"), date);
+                }
+                case "dateModified" -> {
+                    fields.put(new UnknownField("modified"), date);
+                }
             }
         }
     }
@@ -429,40 +571,33 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void handleAuthorsInNamePart(NameDefinition name, List<String> authors, Map<Field, String> fields) {
-        List<JAXBElement<?>> namePartOrDisplayFormOrAffiliation = name.getNamePartOrDisplayFormOrAffiliation();
+    private void handleAuthorsInNamePart(List<NameDefn> nameDefinitions, List<String> authors) {
         List<String> foreName = new ArrayList<>();
         String familyName = "";
         String author = "";
-        for (JAXBElement<?> element : namePartOrDisplayFormOrAffiliation) {
-            Object value = element.getValue();
-            String elementName = element.getName().getLocalPart();
-            if (value instanceof NamePartDefinition) {
-                NamePartDefinition namePart = (NamePartDefinition) value;
-                String type = namePart.getAtType();
-                if ((type == null) && (namePart.getValue() != null)) {
-                    String namePartValue = namePart.getValue();
-                    namePartValue = namePartValue.replaceAll(",$", "");
-                    authors.add(namePartValue);
-                } else if ("family".equals(type) && (namePart.getValue() != null)) {
-                    // family should come first, so if family appears we can set the author then comes before
-                    // we have to check if forename and family name are not empty in case it's the first author
-                    if (!foreName.isEmpty() && !familyName.isEmpty()) {
-                        // now set and add the old author
-                        author = familyName + ", " + Joiner.on(" ").join(foreName);
-                        authors.add(author);
-                        // remove old forenames
-                        foreName.clear();
-                    } else if (foreName.isEmpty() && !familyName.isEmpty()) {
-                        authors.add(familyName);
-                    }
-                    familyName = namePart.getValue();
-                } else if ("given".equals(type) && (namePart.getValue() != null)) {
-                    foreName.add(namePart.getValue());
+
+        for (NameDefn nameDefinition : nameDefinitions) {
+            String type = nameDefinition.getType(); // date, family, given, termsOfAddress
+
+            if ((type == null) && (nameDefinition.getValue() != null)) {
+                String namePartValue = nameDefinition.getValue();
+                namePartValue = namePartValue.replaceAll(",$", "");
+                authors.add(namePartValue);
+            } else if ("family".equals(type) && (nameDefinition.getValue() != null)) {
+                // family should come first, so if family appears we can set the author then comes before
+                // we have to check if forename and family name are not empty in case it's the first author
+                if (!foreName.isEmpty() && !familyName.isEmpty()) {
+                    // now set and add the old author
+                    author = familyName + ", " + Joiner.on(" ").join(foreName);
+                    authors.add(author);
+                    // remove old forenames
+                    foreName.clear();
+                } else if (foreName.isEmpty() && !familyName.isEmpty()) {
+                    authors.add(familyName);
                 }
-            } else if ((value instanceof StringPlusLanguage) && "affiliation".equals(elementName)) {
-                StringPlusLanguage affiliation = (StringPlusLanguage) value;
-                putIfValueNotNull(fields, new UnknownField("affiliation"), affiliation.getValue());
+                familyName = nameDefinition.getValue();
+            } else if ("given".equals(type) && (nameDefinition.getValue() != null)) {
+                foreName.add(nameDefinition.getValue());
             }
         }
 
@@ -479,6 +614,12 @@ public class ModsImporter extends Importer implements Parser {
     private void putIfValueNotNull(Map<Field, String> fields, Field field, String value) {
         if (value != null) {
             fields.put(field, value);
+        }
+    }
+
+    private void appendIfValueNotNullOrBlank(List<String> list, String value) {
+        if (value != null && !value.isBlank()) {
+            list.add(value);
         }
     }
 
