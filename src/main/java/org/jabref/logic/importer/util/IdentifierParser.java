@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ARK;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
@@ -40,7 +41,15 @@ public class IdentifierParser {
     }
 
     private Optional<? extends Identifier> parseEprint(String eprint) {
-        Optional<String> eprintType = entry.getField(StandardField.EPRINTTYPE);
-        return ArXivIdentifier.parse(eprint);
+        Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
+        if (eprintTypeOpt.isPresent()) {
+            String eprintType = eprintTypeOpt.get();
+            if ("arxiv".equalsIgnoreCase(eprintType)) {
+                return ArXivIdentifier.parse(eprint);
+            } else if ("ark".equalsIgnoreCase(eprintType)) {
+                return ARK.parse(eprint);
+            }
+        }
+        return Optional.empty();
     }
 }

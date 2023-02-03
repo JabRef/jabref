@@ -14,7 +14,7 @@ import org.jabref.model.strings.StringUtil;
 /**
  * Identifier for the arXiv. See https://arxiv.org/help/arxiv_identifier
  */
-public class ArXivIdentifier implements Identifier {
+public class ArXivIdentifier extends EprintIdentifier {
 
     private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|pdf)/|arxiv|arXiv";
     private final String identifier;
@@ -98,11 +98,6 @@ public class ArXivIdentifier implements Identifier {
     @Override
     public int hashCode() {
         return Objects.hash(identifier, classification);
-    }
-
-    @Override
-    public Field getDefaultField() {
-        return StandardField.EPRINT;
     }
 
     @Override

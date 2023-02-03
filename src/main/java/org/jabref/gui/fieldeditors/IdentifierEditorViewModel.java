@@ -3,11 +3,11 @@ package org.jabref.gui.fieldeditors;
 import java.io.IOException;
 import java.util.Optional;
 
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.MapChangeListener;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGUI;
@@ -46,7 +46,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private final DialogService dialogService;
     private final Field field;
     private final PreferencesService preferences;
-    private final IdentifierParser identifierParser;
+    private IdentifierParser identifierParser;
 
     public IdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers, PreferencesService preferences) {
         super(field, suggestionProvider, fieldCheckers);
@@ -55,17 +55,35 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.field = field;
-        this.identifierParser = new IdentifierParser(entry);
-
-        identifier.bind(EasyBind.map(text, input -> identifierParser.parse(field, input)));
-
-        validIdentifierIsNotPresent.bind(EasyBind.map(identifier, Optional::isEmpty));
 
         idFetcherAvailable.setValue(WebFetchers.getIdFetcherForField(field).isPresent());
     }
 
     public boolean isIdFetcherAvailable() {
         return idFetcherAvailable.get();
+    }
+
+    @Override
+    public void bindToEntry(BibEntry entry) {
+        super.bindToEntry(entry);
+        // Unlike other identifiers (they only depend on their own field value), eprint  depends on eprinttype thus it
+        // needs to be reconstructed everytime the eprinttype field changes.
+        if (field == StandardField.EPRINT) {
+            entry.getFieldsObservable().addListener((MapChangeListener<Field, String>) change -> {
+                Field changedField = change.getKey();
+                if (StandardField.EPRINTTYPE.equals(changedField)) {
+                    this.identifierParser = new IdentifierParser(entry);
+                    identifier.bind(EasyBind.map(text, input -> identifierParser.parse(field, input)));
+                    validIdentifierIsNotPresent.bind(EasyBind.map(identifier, Optional::isEmpty));
+                }
+            });
+        }
+
+        this.identifierParser = new IdentifierParser(entry);
+
+        identifier.bind(EasyBind.map(text, input -> identifierParser.parse(field, input)));
+
+        validIdentifierIsNotPresent.bind(EasyBind.map(identifier, Optional::isEmpty));
     }
 
     public BooleanProperty idFetcherAvailableProperty() {
