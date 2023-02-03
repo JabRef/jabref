@@ -118,7 +118,7 @@ public class JabRefDesktop {
     }
 
     public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
-        IdentifierParser.parse(StandardField.DOI, link)
+            DOI.parse(link)
                         .map(identifier -> (DOI) identifier)
                         .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
                         .ifPresent(uri -> {

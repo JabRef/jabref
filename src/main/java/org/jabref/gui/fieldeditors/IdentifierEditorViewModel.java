@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import java.io.IOException;
 import java.util.Optional;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,6 +18,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -44,6 +46,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private final DialogService dialogService;
     private final Field field;
     private final PreferencesService preferences;
+    private final IdentifierParser identifierParser;
 
     public IdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers, PreferencesService preferences) {
         super(field, suggestionProvider, fieldCheckers);
@@ -52,14 +55,11 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.field = field;
+        this.identifierParser = new IdentifierParser(entry);
 
-        identifier.bind(
-                EasyBind.map(text, input -> IdentifierParser.parse(field, input))
-        );
+        identifier.bind(EasyBind.map(text, input -> identifierParser.parse(field, input)));
 
-        validIdentifierIsNotPresent.bind(
-                EasyBind.map(identifier, parsedIdentifier -> parsedIdentifier.isEmpty())
-        );
+        validIdentifierIsNotPresent.bind(EasyBind.map(identifier, Optional::isEmpty));
 
         idFetcherAvailable.setValue(WebFetchers.getIdFetcherForField(field).isPresent());
     }
@@ -114,31 +114,36 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void lookupIdentifier(BibEntry entry) {
-        WebFetchers.getIdFetcherForField(field).ifPresent(idFetcher -> {
-            BackgroundTask
-                    .wrap(() -> idFetcher.findIdentifier(entry))
-                    .onRunning(() -> identifierLookupInProgress.setValue(true))
-                    .onFinished(() -> identifierLookupInProgress.setValue(false))
-                    .onSuccess(identifier -> {
-                        if (identifier.isPresent()) {
-                            entry.setField(field, identifier.get().getNormalized());
-                        } else {
-                            dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
-                        }
-                    })
-                      .onFailure(exception -> {
-                          LOGGER.error("Error while fetching bibliographic information", exception);
-                          if (exception instanceof FetcherClientException) {
-                              dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("No data was found for the identifier"));
-                          } else if (exception instanceof FetcherServerException) {
-                              dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Server not available"));
-                          } else if (exception.getCause() != null) {
-                              dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
-                          } else {
-                              dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
-                          }
-                      })
-                      .executeWith(taskExecutor);
-        });
-    }
+        Optional<IdFetcher<? extends Identifier>> idFetcherOpt = WebFetchers.getIdFetcherForField(field);
+        if (idFetcherOpt.isEmpty()) {
+            return;
+        }
+
+        IdFetcher<? extends Identifier> idFetcher = idFetcherOpt.get();
+        BackgroundTask
+                .wrap(() -> idFetcher.findIdentifier(entry))
+                .onRunning(() -> identifierLookupInProgress.setValue(true))
+                .onFinished(() -> identifierLookupInProgress.setValue(false))
+                .onSuccess(identifier -> {
+                    if (identifier.isPresent()) {
+                        entry.setField(field, identifier.get().getNormalized());
+                    } else {
+                        dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
+                    }
+                })
+                  .onFailure(exception -> {
+                      LOGGER.error("Error while fetching bibliographic information", exception);
+                      if (exception instanceof FetcherClientException) {
+                          dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("No data was found for the identifier"));
+                      } else if (exception instanceof FetcherServerException) {
+                          dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Server not available"));
+                      } else if (exception.getCause() != null) {
+                          dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
+                      } else {
+                          dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", idFetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
+                      }
+                  })
+                  .executeWith(taskExecutor);
+        }
+
 }
