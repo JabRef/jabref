@@ -13,6 +13,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.fieldeditors.identifier.DoiIdentifierEditorViewModel;
+import org.jabref.gui.fieldeditors.identifier.EprintIdentifierEditorViewModel;
 import org.jabref.gui.fieldeditors.identifier.ISBNIdentifierEditorViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -42,6 +43,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
             this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         } else if (StandardField.ISBN.equals(field)) {
             this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+        } else if (StandardField.EPRINT.equals(field)) {
+            this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         }
 
         ViewLoader.view(this)

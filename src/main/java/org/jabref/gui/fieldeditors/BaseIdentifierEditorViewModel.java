@@ -34,7 +34,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     protected final BooleanProperty canLookupIdentifier = new SimpleBooleanProperty(true);
     protected final BooleanProperty canFetchBibliographyInformationById = new SimpleBooleanProperty();
     protected IdentifierParser identifierParser;
-    protected final ObjectProperty<Optional<T>> identifier = new SimpleObjectProperty<>();
+    protected final ObjectProperty<Optional<T>> identifier = new SimpleObjectProperty<>(Optional.empty());
     protected DialogService dialogService;
     protected TaskExecutor taskExecutor;
     protected PreferencesService preferences;
@@ -60,7 +60,6 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
 
     protected Optional<T> updateIdentifier(String input) {
         if (identifierParser == null) {
-            identifier.set(Optional.empty());
             return Optional.empty();
         }
 
