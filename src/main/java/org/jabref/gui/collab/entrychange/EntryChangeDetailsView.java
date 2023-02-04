@@ -25,7 +25,9 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
 
     public EntryChangeDetailsView(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
         Label inJabRef = new Label(Localization.lang("In JabRef"));
+        inJabRef.getStyleClass().add("lib-change-header");
         Label onDisk = new Label(Localization.lang("On disk"));
+        onDisk.getStyleClass().add("lib-change-header");
 
         // we need a copy here as we otherwise would set the same entry twice
         PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, stateManager, themeManager);

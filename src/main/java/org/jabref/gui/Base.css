@@ -676,6 +676,11 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-row-even-background;
 }
 
+.lib-change-header {
+	-fx-font-size: 130%;
+    -fx-padding: 0.2em 0em 0.2em 0.2em;
+}
+
 .table-view .groupColumnBackground {
     -fx-stroke: -jr-gray-2;
 }
