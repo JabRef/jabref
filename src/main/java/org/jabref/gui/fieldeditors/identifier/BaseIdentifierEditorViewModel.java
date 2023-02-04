@@ -117,7 +117,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         LOGGER.warn("Unable to fetch bibliography information using the '{}' identifier", field.getDisplayName());
     }
 
-    public void lookupByIdentifier(BibEntry bibEntry) {
+    public void lookupIdentifier(BibEntry bibEntry) {
         LOGGER.warn("Unable to lookup identifier for '{}'", field.getDisplayName());
     }
 

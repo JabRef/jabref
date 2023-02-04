@@ -27,7 +27,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     }
 
     @Override
-    public void lookupByIdentifier(BibEntry bibEntry) {
+    public void lookupIdentifier(BibEntry bibEntry) {
         CrossRef doiFetcher = new CrossRef();
 
         BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
