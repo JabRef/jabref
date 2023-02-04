@@ -163,5 +163,4 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                   })
                   .executeWith(taskExecutor);
         }
-
 }
