@@ -75,6 +75,7 @@ public class ThreeWayMergeView extends VBox {
         toolbar.diffViewProperty().addListener(e -> updateDiff());
         toolbar.diffHighlightingMethodProperty().addListener(e -> updateDiff());
         toolbar.hideEqualFieldsProperty().addListener(e -> showOrHideEqualFields());
+
         updateDiff();
         showOrHideEqualFields();
     }
