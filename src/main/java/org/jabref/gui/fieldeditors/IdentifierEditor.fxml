@@ -10,7 +10,7 @@
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.IdentifierEditor">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
-    <Button disable="${controller.viewModel.validIdentifierIsNotPresent}" onAction="#openExternalLink"
+    <Button disable="${controller.viewModel.isInvalidIdentifier}" onAction="#openExternalLink"
             styleClass="icon-button">
         <graphic>
             <JabRefIconView glyph="OPEN_LINK"/>
@@ -20,7 +20,8 @@
         </tooltip>
     </Button>
     <Button fx:id="lookupIdentifierButton" onAction="#lookupIdentifier" styleClass="icon-button"
-            visible="${controller.viewModel.idFetcherAvailable}" managed="${controller.viewModel.idFetcherAvailable}">
+            visible="${controller.viewModel.canLookupIdentifier}"
+            managed="${controller.viewModel.canLookupIdentifier}">
         <graphic>
             <StackPane>
                 <JabRefIconView glyph="LOOKUP_IDENTIFIER"
@@ -30,9 +31,11 @@
             </StackPane>
         </graphic>
     </Button>
-    <Button fx:id="fetchInformationByIdentifierButton" disable="${controller.viewModel.validIdentifierIsNotPresent}"
+    <Button fx:id="fetchInformationByIdentifierButton" disable="${controller.viewModel.isInvalidIdentifier}"
             onAction="#fetchInformationByIdentifier"
-            styleClass="icon-button">
+            styleClass="icon-button"
+            managed="${controller.viewModel.canFetchBibliographyInformationById}"
+            visible="${controller.viewModel.canFetchBibliographyInformationById}">
         <graphic>
             <JabRefIconView glyph="FETCH_BY_IDENTIFIER"/>
         </graphic>

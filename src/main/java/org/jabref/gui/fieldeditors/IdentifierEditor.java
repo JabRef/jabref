@@ -12,6 +12,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.gui.fieldeditors.identifier.DoiIdentifierEditorViewModel;
+import org.jabref.gui.fieldeditors.identifier.ISBNIdentifierEditorViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -24,7 +26,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
-    @FXML private IdentifierEditorViewModel viewModel;
+    @FXML private BaseIdentifierEditorViewModel<?> viewModel;
     @FXML private EditorTextArea textArea;
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
@@ -36,7 +38,11 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                             SuggestionProvider<?> suggestionProvider,
                             FieldCheckers fieldCheckers,
                             PreferencesService preferences) {
-        this.viewModel = new IdentifierEditorViewModel(field, suggestionProvider, taskExecutor, dialogService, fieldCheckers, preferences);
+        if (StandardField.DOI.equals(field)) {
+            this.viewModel = new DoiIdentifierEditorViewModel(field, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+        } else if (StandardField.ISBN.equals(field)) {
+            this.viewModel = new ISBNIdentifierEditorViewModel(field, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+        }
 
         ViewLoader.view(this)
                   .root(this)
@@ -58,7 +64,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
-    public IdentifierEditorViewModel getViewModel() {
+    public BaseIdentifierEditorViewModel<?> getViewModel() {
         return viewModel;
     }
 
@@ -75,12 +81,12 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void fetchInformationByIdentifier() {
-        entry.ifPresent(bibEntry -> viewModel.fetchInformationByIdentifier(bibEntry));
+        entry.ifPresent(bibEntry -> viewModel.fetchBibliographyInformation(bibEntry));
     }
 
     @FXML
     private void lookupIdentifier() {
-        entry.ifPresent(bibEntry -> viewModel.lookupIdentifier(bibEntry));
+        entry.ifPresent(bibEntry -> viewModel.lookupByIdentifier(bibEntry));
     }
 
     @FXML
