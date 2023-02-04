@@ -3,7 +3,6 @@ package org.jabref.gui.fieldeditors.identifier;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.fieldeditors.BaseIdentifierEditorViewModel;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;

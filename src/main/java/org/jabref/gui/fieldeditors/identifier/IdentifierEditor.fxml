@@ -8,7 +8,7 @@
 <?import org.jabref.gui.fieldeditors.EditorTextArea?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
-         fx:controller="org.jabref.gui.fieldeditors.IdentifierEditor">
+         fx:controller="org.jabref.gui.fieldeditors.identifier.IdentifierEditor">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <Button disable="${controller.viewModel.isInvalidIdentifier}" onAction="#openExternalLink"
             styleClass="icon-button">

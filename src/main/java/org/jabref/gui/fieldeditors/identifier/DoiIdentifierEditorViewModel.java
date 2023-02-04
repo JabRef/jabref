@@ -4,7 +4,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.fieldeditors.BaseIdentifierEditorViewModel;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;

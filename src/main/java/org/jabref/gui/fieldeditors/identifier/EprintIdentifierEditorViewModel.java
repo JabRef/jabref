@@ -4,7 +4,6 @@ import javafx.collections.MapChangeListener;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.fieldeditors.BaseIdentifierEditorViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;

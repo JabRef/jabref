@@ -1,4 +1,4 @@
-package org.jabref.gui.fieldeditors;
+package org.jabref.gui.fieldeditors.identifier;
 
 import java.util.Optional;
 
@@ -10,11 +10,11 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.fieldeditors.EditorTextArea;
+import org.jabref.gui.fieldeditors.EditorValidator;
+import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
-import org.jabref.gui.fieldeditors.identifier.DoiIdentifierEditorViewModel;
-import org.jabref.gui.fieldeditors.identifier.EprintIdentifierEditorViewModel;
-import org.jabref.gui.fieldeditors.identifier.ISBNIdentifierEditorViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;

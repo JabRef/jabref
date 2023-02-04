@@ -1,4 +1,4 @@
-package org.jabref.gui.fieldeditors;
+package org.jabref.gui.fieldeditors.identifier;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.fieldeditors.AbstractEditorViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
