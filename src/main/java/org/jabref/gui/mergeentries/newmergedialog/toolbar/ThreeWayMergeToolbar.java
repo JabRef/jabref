@@ -49,7 +49,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     private CheckBox onlyShowChangedFieldsCheck;
 
-    @Inject PreferencesService preferencesService;
+    @Inject
+    private PreferencesService preferencesService;
 
     private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
     private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();
