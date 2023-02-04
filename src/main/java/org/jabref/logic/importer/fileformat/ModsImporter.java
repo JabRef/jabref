@@ -78,21 +78,7 @@ public class ModsImporter extends Importer implements Parser {
 
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
 
-            // event iterator
-            while (reader.hasNext()) {
-                int eventType = reader.next();
-
-                if (eventType == XMLEvent.START_ELEMENT) {
-                    if (reader.getName().getLocalPart().equals("mods")) {
-                        System.out.println("Starting mods");
-                        String id = reader.getAttributeValue(null, "ID");
-                        if (id != null) {
-                            System.out.println("ID: " + id);
-                        }
-                        parseMods(bibItems, reader);
-                    }
-                }
-            }
+            parseModsCollection(bibItems, reader);
         } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
@@ -101,14 +87,24 @@ public class ModsImporter extends Importer implements Parser {
         return new ParserResult(bibItems);
     }
 
-    private void parseMods(List<BibEntry> bibItems, XMLStreamReader reader) throws XMLStreamException {
-        BibEntry entry = new BibEntry();
-        Map<Field, String> fields = new HashMap<>();
+    private void parseModsCollection(List<BibEntry> bibItems, XMLStreamReader reader) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader) && reader.getName().getLocalPart().equals("mods")) {
+                BibEntry entry = new BibEntry();
+                Map<Field, String> fields = new HashMap<>();
 
-        parseModsGroup(fields, reader, entry);
+                String id = reader.getAttributeValue(null, "ID");
+                if (id != null) {
+                    entry.setCitationKey(id);
+                }
 
-        entry.setField(fields);
-        bibItems.add(entry);
+                parseModsGroup(fields, reader, entry);
+
+                entry.setField(fields);
+                bibItems.add(entry);
+            }
+        }
     }
 
     private void parseModsGroup(Map<Field, String> fields, XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
@@ -119,22 +115,20 @@ public class ModsImporter extends Importer implements Parser {
         List<String> authors = new ArrayList<>();
 
         while (reader.hasNext()) {
-            int eventType = reader.next();
-            if (eventType == XMLEvent.START_ELEMENT) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
                 // check which MODS group has started
-                switch (reader.getName().getLocalPart()) {
+                switch (elementName) {
                     case "abstract" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("Abstract: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             putIfValueNotNull(fields, StandardField.ABSTRACT, reader.getText());
                         }
                     }
                     case "genre" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("Genre: " + reader.getText());
-                            System.out.println("Mapped Genre: " + EntryTypeFactory.parse(mapGenre(reader.getText())));
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             entry.setType(EntryTypeFactory.parse(mapGenre(reader.getText())));
                         }
                     }
@@ -147,19 +141,16 @@ public class ModsImporter extends Importer implements Parser {
                     case "identifier" -> {
                         IdentifierDefn identifierDefinition = new IdentifierDefn();
                         String type = reader.getAttributeValue(null, "type");
-                        System.out.println("Identifier type: " + type);
                         identifierDefinition.setType(type);
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("Identifier value: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             identifierDefinition.setValue(reader.getText());
                         }
                         parseIdentifier(fields, identifierDefinition, entry);
                     }
                     case "note" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("Note: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             notes.add(reader.getText());
                         }
                     }
@@ -184,7 +175,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("mods")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("mods")) {
                 break;
             }
         }
@@ -202,14 +193,12 @@ public class ModsImporter extends Importer implements Parser {
      */
     private void parseRelatedItem(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
         while (reader.hasNext()) {
-            int eventType = reader.next();
-
-            if (eventType == XMLEvent.START_ELEMENT) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
                 switch (reader.getName().getLocalPart()) {
                     case "title" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("relatedItem.title: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             putIfValueNotNull(fields, StandardField.JOURNAL, reader.getText());
                         }
                     }
@@ -222,7 +211,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("relatedItem")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("relatedItem")) {
                 break;
             }
         }
@@ -234,29 +223,31 @@ public class ModsImporter extends Importer implements Parser {
         String endPage = "";
 
         while (reader.hasNext()) {
-            int eventType = reader.next();
+            reader.next();
 
-            if (eventType == XMLEvent.START_ELEMENT) {
-                switch (reader.getName().getLocalPart()) {
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                reader.next();
+                switch (elementName) {
                     case "total" -> {
-                        if (reader.next() == XMLEvent.CHARACTERS) {
+                        if (isCharacterXMLEvent(reader)) {
                             total = reader.getText();
                         }
                     }
                     case "start" -> {
-                        if (reader.next() == XMLEvent.CHARACTERS) {
+                        if (isCharacterXMLEvent(reader)) {
                             startPage = reader.getText();
                         }
                     }
                     case "end" -> {
-                        if (reader.next() == XMLEvent.CHARACTERS) {
+                        if (isCharacterXMLEvent(reader)) {
                             endPage = reader.getText();
                         }
                     }
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("extent")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("extent")) {
                 break;
             }
         }
@@ -278,19 +269,18 @@ public class ModsImporter extends Importer implements Parser {
         Set<String> detailElementSet = Set.of("number", "caption", "title");
 
         while (reader.hasNext()) {
-            int eventType = reader.next();
+            reader.next();
 
-            if (eventType == XMLEvent.START_ELEMENT) {
+            if (isStartXMLEvent(reader)) {
                 if (detailElementSet.contains(reader.getName().getLocalPart())) {
-                    eventType = reader.next();
-                    if (eventType == XMLEvent.CHARACTERS) {
-                        System.out.println("relatedItem.detail.number/caption: " + reader.getText());
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
                         putIfValueNotNull(fields, FieldFactory.parseField(type), reader.getText());
                     }
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("detail")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("detail")) {
                 break;
             }
         }
@@ -300,26 +290,24 @@ public class ModsImporter extends Importer implements Parser {
         List<NameDefn> nameDefinitions = new ArrayList<>();
 
         while (reader.hasNext()) {
-            int eventType = reader.next();
+            reader.next();
 
-            if (eventType == XMLEvent.START_ELEMENT) {
+            if (isStartXMLEvent(reader)) {
                 if (reader.getName().getLocalPart().equals("affiliation")) {
-                    eventType = reader.next();
-                    if (eventType == XMLEvent.CHARACTERS) {
-                        System.out.println("name.affiliation: " + reader.getText());
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
                         putIfValueNotNull(fields, new UnknownField("affiliation"), reader.getText());
                     }
                 } else if (reader.getName().getLocalPart().equals("namePart")) {
                     String type = reader.getAttributeValue(null, "type");
-                    eventType = reader.next();
-                    if (eventType == XMLEvent.CHARACTERS) {
-                        System.out.println("name.namePart " + reader.getText());
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
                         nameDefinitions.add(new NameDefn(reader.getText(), type));
                     }
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("name")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("name")) {
                 break;
             }
         }
@@ -331,50 +319,45 @@ public class ModsImporter extends Importer implements Parser {
         List<String> places = new ArrayList<>();
 
         while (reader.hasNext()) {
-            int eventType = reader.next();
+            reader.next();
 
-            if (eventType == XMLEvent.START_ELEMENT) {
-                switch (reader.getName().getLocalPart()) {
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
                     case "issuance" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("originInfo.Issuance: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             putIfValueNotNull(fields, new UnknownField("issuance"), reader.getText());
                         }
                     }
                     case "placeTerm" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("originInfo.placeTerm: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             appendIfValueNotNullOrBlank(places, reader.getText());
                         }
                     }
                     case "publisher" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("originInfo.publisher: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             putIfValueNotNull(fields, StandardField.PUBLISHER, reader.getText());
                         }
                     }
                     case "edition" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("originInfo.edition: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             putIfValueNotNull(fields, StandardField.EDITION, reader.getText());
                         }
                     }
                     case "dateIssued", "dateCreated", "dateCaptured", "dateModified" -> {
-                        String elementName = reader.getName().getLocalPart();
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("originInfo.date: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             putDate(fields, elementName, reader.getText());
                         }
                     }
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("originInfo")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("originInfo")) {
                 break;
             }
         }
@@ -384,35 +367,32 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseSubject(XMLStreamReader reader, Map<Field, String> fields, List<String> keywords) throws XMLStreamException {
         while (reader.hasNext()) {
-            int eventType = reader.next();
+            reader.next();
 
-            if (eventType == XMLEvent.START_ELEMENT) {
+            if (isStartXMLEvent(reader)) {
                 switch (reader.getName().getLocalPart()) {
                     case "topic" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("Subject Topic: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             keywords.add(reader.getText().trim());
                         }
                     }
                     case "city" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("Subject City: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             putIfValueNotNull(fields, new UnknownField("city"), reader.getText());
                         }
                     }
                     case "country" -> {
-                        eventType = reader.next();
-                        if (eventType == XMLEvent.CHARACTERS) {
-                            System.out.println("Subject Country: " + reader.getText());
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
                             putIfValueNotNull(fields, new UnknownField("country"), reader.getText());
                         }
                     }
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("subject")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("subject")) {
                 break;
             }
         }
@@ -420,29 +400,27 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseRecordInfo(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
         RecordInfoDefn recordInfoDefinition = new RecordInfoDefn();
-        List<String> recordContents = recordInfoDefinition.getRecordContentSourceOrRecordCreationDateOrRecordChangeDate();
+        List<String> recordContents = recordInfoDefinition.getRecordContent();
         List<String> languages = recordInfoDefinition.getLanguages();
 
         while (reader.hasNext()) {
-            int eventType = reader.next();
+            reader.next();
 
-            if (eventType == XMLEvent.START_ELEMENT) {
+            if (isStartXMLEvent(reader)) {
                 if (RecordInfoDefn.elementNameSet.contains(reader.getName().getLocalPart())) {
-                    eventType = reader.next();
-                    if (eventType == XMLEvent.CHARACTERS) {
-                        System.out.println("Record Content: " + reader.getText());
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
                         recordContents.add(0, reader.getText());
                     }
                 } else if (reader.getName().getLocalPart().equals("languageTerm")) {
-                    eventType = reader.next();
-                    if (eventType == XMLEvent.CHARACTERS) {
-                        System.out.println("Record Info Language: " + reader.getText());
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
                         languages.add(reader.getText());
                     }
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("recordInfo")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("recordInfo")) {
                 break;
             }
         }
@@ -455,18 +433,16 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseLanguage(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
         while (reader.hasNext()) {
-            int eventType = reader.next();
+            reader.next();
 
-            if (eventType == XMLEvent.START_ELEMENT &&
-                    reader.getName().getLocalPart().equals("languageTerm")) {
-                eventType = reader.next();
-                if (eventType == XMLEvent.CHARACTERS) {
-                    System.out.println("Language: " + reader.getText());
+            if (isStartXMLEvent(reader) && reader.getName().getLocalPart().equals("languageTerm")) {
+                reader.next();
+                if (isCharacterXMLEvent(reader)) {
                     putIfValueNotNull(fields, StandardField.LANGUAGE, reader.getText());
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("language")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("language")) {
                 break;
             }
         }
@@ -474,18 +450,16 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseTitle(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
         while (reader.hasNext()) {
-            int eventType = reader.next();
+            reader.next();
 
-            if (eventType == XMLEvent.START_ELEMENT &&
-                    reader.getName().getLocalPart().equals("title")) {
-                eventType = reader.next();
-                if (eventType == XMLEvent.CHARACTERS) {
-                    System.out.println("Title: " + reader.getText());
+            if (isStartXMLEvent(reader) && reader.getName().getLocalPart().equals("title")) {
+                reader.next();
+                if (isCharacterXMLEvent(reader)) {
                     putIfValueNotNull(fields, StandardField.TITLE, reader.getText());
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("titleInfo")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("titleInfo")) {
                 break;
             }
         }
@@ -496,25 +470,23 @@ public class ModsImporter extends Importer implements Parser {
         List<String> urls = new ArrayList<>();
 
         while (reader.hasNext()) {
-            int eventType = reader.next();
+            reader.next();
 
-            if (eventType == XMLEvent.START_ELEMENT) {
+            if (isStartXMLEvent(reader)) {
                 if (reader.getName().getLocalPart().equals("physicalLocation")) {
-                    eventType = reader.next();
-                    if (eventType == XMLEvent.CHARACTERS) {
-                        System.out.println("Physical Location: " + reader.getText());
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
                         locations.add(reader.getText());
                     }
                 } else if (reader.getName().getLocalPart().equals("url")) {
-                    eventType = reader.next();
-                    if (eventType == XMLEvent.CHARACTERS) {
-                        System.out.println("URL: " + reader.getText());
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
                         urls.add(reader.getText());
                     }
                 }
             }
 
-            if (eventType == XMLEvent.END_ELEMENT && reader.getName().getLocalPart().equals("location")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("location")) {
                 break;
             }
         }
@@ -621,6 +593,18 @@ public class ModsImporter extends Importer implements Parser {
         if (value != null && !value.isBlank()) {
             list.add(value);
         }
+    }
+
+    private boolean isCharacterXMLEvent(XMLStreamReader reader) {
+        return reader.getEventType() == XMLEvent.CHARACTERS;
+    }
+
+    private boolean isStartXMLEvent(XMLStreamReader reader) {
+        return reader.getEventType() == XMLEvent.START_ELEMENT;
+    }
+
+    private boolean isEndXMLEvent(XMLStreamReader reader) {
+        return reader.getEventType() == XMLEvent.END_ELEMENT;
     }
 
     @Override

@@ -15,20 +15,20 @@ public class RecordInfoDefn {
             "recordInfoNote"
     );
 
-    private List<String> recordContentSourceOrRecordCreationDateOrRecordChangeDate;
+    private List<String> recordContent;
     private List<String> languages;
 
     public RecordInfoDefn() {
         languages = new ArrayList<>();
-        recordContentSourceOrRecordCreationDateOrRecordChangeDate = new ArrayList<>();
+        recordContent = new ArrayList<>();
     }
 
-    public List<String> getRecordContentSourceOrRecordCreationDateOrRecordChangeDate() {
-        return recordContentSourceOrRecordCreationDateOrRecordChangeDate;
+    public List<String> getRecordContent() {
+        return recordContent;
     }
 
-    public void setRecordContentSourceOrRecordCreationDateOrRecordChangeDate(List<String> recordContentSourceOrRecordCreationDateOrRecordChangeDate) {
-        this.recordContentSourceOrRecordCreationDateOrRecordChangeDate = recordContentSourceOrRecordCreationDateOrRecordChangeDate;
+    public void setRecordContent(List<String> recordContent) {
+        this.recordContent = recordContent;
     }
 
     public List<String> getLanguages() {
