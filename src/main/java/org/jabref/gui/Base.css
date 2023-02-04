@@ -677,7 +677,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .lib-change-header {
-	-fx-font-size: 130%;
+    -fx-font-size: 130%;
     -fx-padding: 0.2em 0em 0.2em 0.2em;
 }
 
