@@ -12,7 +12,6 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
@@ -23,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<DOI> {
     public static final Logger LOGGER = LoggerFactory.getLogger(DoiIdentifierEditorViewModel.class);
 
-    public DoiIdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
+    public DoiIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
         super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         configure(true, true);
     }

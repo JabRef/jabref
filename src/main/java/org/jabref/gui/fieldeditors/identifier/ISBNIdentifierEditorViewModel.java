@@ -8,13 +8,12 @@ import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.preferences.PreferencesService;
 
 public class ISBNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<ISBN> {
-    public ISBNIdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
+    public ISBNIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
         super(StandardField.ISBN, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         configure(true, false);
     }

@@ -39,9 +39,9 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                             FieldCheckers fieldCheckers,
                             PreferencesService preferences) {
         if (StandardField.DOI.equals(field)) {
-            this.viewModel = new DoiIdentifierEditorViewModel(field, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+            this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         } else if (StandardField.ISBN.equals(field)) {
-            this.viewModel = new ISBNIdentifierEditorViewModel(field, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+            this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         }
 
         ViewLoader.view(this)
