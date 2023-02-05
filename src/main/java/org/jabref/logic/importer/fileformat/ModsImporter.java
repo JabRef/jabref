@@ -27,9 +27,9 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.mods.IdentifierDefn;
-import org.jabref.logic.importer.fileformat.mods.NameDefn;
-import org.jabref.logic.importer.fileformat.mods.RecordInfoDefn;
+import org.jabref.logic.importer.fileformat.mods.Identifier;
+import org.jabref.logic.importer.fileformat.mods.Name;
+import org.jabref.logic.importer.fileformat.mods.RecordInfo;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -139,14 +139,11 @@ public class ModsImporter extends Importer implements Parser {
                         parseLocationAndUrl(reader, fields);
                     }
                     case "identifier" -> {
-                        IdentifierDefn identifierDefinition = new IdentifierDefn();
                         String type = reader.getAttributeValue(null, "type");
-                        identifierDefinition.setType(type);
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            identifierDefinition.setValue(reader.getText());
+                            parseIdentifier(fields, new Identifier(type, reader.getText()), entry);
                         }
-                        parseIdentifier(fields, identifierDefinition, entry);
                     }
                     case "note" -> {
                         reader.next();
@@ -287,7 +284,7 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     private void parseName(XMLStreamReader reader, Map<Field, String> fields, List<String> authors) throws XMLStreamException {
-        List<NameDefn> nameDefinitions = new ArrayList<>();
+        List<Name> names = new ArrayList<>();
 
         while (reader.hasNext()) {
             reader.next();
@@ -302,7 +299,7 @@ public class ModsImporter extends Importer implements Parser {
                     String type = reader.getAttributeValue(null, "type");
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
-                        nameDefinitions.add(new NameDefn(reader.getText(), type));
+                        names.add(new Name(reader.getText(), type));
                     }
                 }
             }
@@ -312,7 +309,7 @@ public class ModsImporter extends Importer implements Parser {
             }
         }
 
-        handleAuthorsInNamePart(nameDefinitions, authors);
+        handleAuthorsInNamePart(names, authors);
     }
 
     private void parseOriginInfo(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
@@ -399,15 +396,15 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     private void parseRecordInfo(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
-        RecordInfoDefn recordInfoDefinition = new RecordInfoDefn();
-        List<String> recordContents = recordInfoDefinition.getRecordContent();
-        List<String> languages = recordInfoDefinition.getLanguages();
+        RecordInfo recordInfoDefinition = new RecordInfo();
+        List<String> recordContents = recordInfoDefinition.recordContents();
+        List<String> languages = recordInfoDefinition.languages();
 
         while (reader.hasNext()) {
             reader.next();
 
             if (isStartXMLEvent(reader)) {
-                if (RecordInfoDefn.elementNameSet.contains(reader.getName().getLocalPart())) {
+                if (RecordInfo.elementNameSet.contains(reader.getName().getLocalPart())) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         recordContents.add(0, reader.getText());
@@ -505,13 +502,13 @@ public class ModsImporter extends Importer implements Parser {
         };
     }
 
-    private void parseIdentifier(Map<Field, String> fields, IdentifierDefn identifier, BibEntry entry) {
-        String type = identifier.getType();
+    private void parseIdentifier(Map<Field, String> fields, Identifier identifier, BibEntry entry) {
+        String type = identifier.type();
         if ("citekey".equals(type) && entry.getCitationKey().isEmpty()) {
-            entry.setCitationKey(identifier.getValue());
+            entry.setCitationKey(identifier.value());
         } else if (!"local".equals(type) && !"citekey".equals(type)) {
             // put all identifiers (doi, issn, isbn,...) except of local and citekey
-            putIfValueNotNull(fields, FieldFactory.parseField(identifier.getType()), identifier.getValue());
+            putIfValueNotNull(fields, FieldFactory.parseField(identifier.type()), identifier.value());
         }
     }
 
@@ -543,19 +540,19 @@ public class ModsImporter extends Importer implements Parser {
         }
     }
 
-    private void handleAuthorsInNamePart(List<NameDefn> nameDefinitions, List<String> authors) {
+    private void handleAuthorsInNamePart(List<Name> names, List<String> authors) {
         List<String> foreName = new ArrayList<>();
         String familyName = "";
         String author = "";
 
-        for (NameDefn nameDefinition : nameDefinitions) {
-            String type = nameDefinition.getType(); // date, family, given, termsOfAddress
+        for (Name name : names) {
+            String type = name.type(); // date, family, given, termsOfAddress
 
-            if ((type == null) && (nameDefinition.getValue() != null)) {
-                String namePartValue = nameDefinition.getValue();
+            if ((type == null) && (name.value() != null)) {
+                String namePartValue = name.value();
                 namePartValue = namePartValue.replaceAll(",$", "");
                 authors.add(namePartValue);
-            } else if ("family".equals(type) && (nameDefinition.getValue() != null)) {
+            } else if ("family".equals(type) && (name.value() != null)) {
                 // family should come first, so if family appears we can set the author then comes before
                 // we have to check if forename and family name are not empty in case it's the first author
                 if (!foreName.isEmpty() && !familyName.isEmpty()) {
@@ -567,9 +564,9 @@ public class ModsImporter extends Importer implements Parser {
                 } else if (foreName.isEmpty() && !familyName.isEmpty()) {
                     authors.add(familyName);
                 }
-                familyName = nameDefinition.getValue();
-            } else if ("given".equals(type) && (nameDefinition.getValue() != null)) {
-                foreName.add(nameDefinition.getValue());
+                familyName = name.value();
+            } else if ("given".equals(type) && (name.value() != null)) {
+                foreName.add(name.value());
             }
         }
 
