@@ -30,11 +30,12 @@ public class BvbFetcherTest {
     void testPerformTest() throws Exception {
         String searchquery = "effective java author:bloch";
         List<BibEntry> result = fetcher.performSearch(searchquery);
+        assertTrue(result.size() > 0);
 
-        System.out.println("Query:\n");
-        System.out.println(fetcher.getURLForQuery(new StandardSyntaxParser().parse(searchquery, NO_EXPLICIT_FIELD)));
-        System.out.println("Test result:\n");
-        result.forEach(entry -> System.out.println(entry.toString()));
+//        System.out.println("Query:\n");
+//        System.out.println(fetcher.getURLForQuery(new StandardSyntaxParser().parse(searchquery, NO_EXPLICIT_FIELD)));
+//        System.out.println("Test result:\n");
+//        result.forEach(entry -> System.out.println(entry.toString()));
     }
 
     @BeforeEach
