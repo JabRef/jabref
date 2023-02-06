@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.transformers.BVBQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.MarcXmlParser;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -34,7 +34,7 @@ public class BvbFetcher implements SearchBasedParserFetcher {
         uriBuilder.addParameter("version", "1.1");
         uriBuilder.addParameter("recordSchema", "marcxml");
         uriBuilder.addParameter("operation", "searchRetrieve");
-        uriBuilder.addParameter("query", new BVBQueryTransformer().transformLuceneQuery(query).orElse(""));
+        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformLuceneQuery(query).orElse("")); // new BVBQueryTransformer().transformLuceneQuery(query).orElse(""));
         uriBuilder.addParameter("maximumRecords", "10");
         return uriBuilder.build().toURL();
     }
