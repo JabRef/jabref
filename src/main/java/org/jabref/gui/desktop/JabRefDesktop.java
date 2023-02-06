@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -55,6 +56,7 @@ public class JabRefDesktop {
                                           PreferencesService preferencesService,
                                           String initialLink,
                                           Field initialField,
+                                          DialogService dialogService,
                                           BibEntry entry)
             throws IOException {
         String link = initialLink;
@@ -92,6 +94,15 @@ public class JabRefDesktop {
                     .map(Optional::get)
                     .map(URI::toASCIIString)
                     .orElse(link);
+
+            if (Objects.equals(link, initialLink)) {
+                Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
+                if (eprintTypeOpt.isEmpty()) {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please set the eprinttype field"));
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please verify that the eprint field has a valid '%0' id", eprintTypeOpt.get()));
+                }
+            }
             // should be opened in browser
             field = StandardField.URL;
         }
