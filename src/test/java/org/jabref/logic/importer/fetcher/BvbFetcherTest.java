@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -14,14 +13,13 @@ import org.jabref.testutils.category.FetcherTest;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // Disabled for experimental status.
-@Disabled
 @FetcherTest
 public class BvbFetcherTest {
 
@@ -31,8 +29,12 @@ public class BvbFetcherTest {
 
     @Test
     void testPerformTest() throws Exception {
-        List<BibEntry> result = fetcher.performSearch("effective java bloch");
+        String searchquery = "effective java author:bloch";
+        List<BibEntry> result = fetcher.performSearch(searchquery);
 
+        System.out.println("Query:\n");
+        System.out.println(fetcher.getURLForQuery(new StandardSyntaxParser().parse(searchquery, NO_EXPLICIT_FIELD)));
+        System.out.println("Test result:\n");
         result.forEach(entry -> System.out.println(entry.toString()));
     }
 
@@ -46,7 +48,7 @@ public class BvbFetcherTest {
                 .withField(StandardField.SUBTITLE, "best practices für die Java-Plattform")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
                 .withField(StandardField.TITLEADDON, "Joshua Bloch")
-                .withField(StandardField.EDITION, "3. Auflage")
+                .withField(StandardField.EDITION, "3. Auflage, Übersetzung der englischsprachigen 3. Originalausgabe 2018")
                 .withField(StandardField.FILE, "ParsedFileField{description='', link='http://search.ebscohost.com/login.aspx?direct=true&scope=site&db=nlebk&db=nlabk&AN=1906353', fileType='PDF'}")
                 .withField(StandardField.ISBN, "9783960886402")
                 .withField(StandardField.KEYWORDS, "Klassen, Interfaces, Generics, Enums, Annotationen, Lambdas, Streams, Module, parallel, Parallele Programmierung, Serialisierung, funktional, funktionale Programmierung, Java EE, Jakarta EE")
@@ -73,24 +75,25 @@ public class BvbFetcherTest {
     @Test
     public void simpleSearchQueryURLCorrect() throws Exception {
         String query = "java jdk";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
-        assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=java+and+jdk&maximumRecords=10", url.toString());
+        assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=java+jdk&maximumRecords=10", url.toString());
     }
 
     @Test
     public void complexSearchQueryURLCorrect() throws Exception {
-        String query = "tit:jdk";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        String query = "title:jdk";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
-        assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=marcxml.kon%3D%22java%22+and+marcxml.tit%3D%22jdk%22&maximumRecords=10", url.toString());
+        assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=jdk&maximumRecords=10", url.toString());
     }
 
     @Test
     public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch("title:\"effective java bloch\"");
+        List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
         assertTrue(searchResult.contains(bibEntryISBN9783960886402));
-        assertTrue(searchResult.contains(bibEntryISBN0321356683));
+        //assertTrue(searchResult.contains(bibEntryISBN0321356683));
+        assertEquals(bibEntryISBN0321356683, searchResult.get(4));
     }
 
     @Test
