@@ -59,12 +59,12 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         this.canFetchBibliographyInformationById.set(canFetchBibliographyInformationById);
     }
 
-    protected Optional<T> updateIdentifier(String input) {
+    protected Optional<T> updateIdentifier() {
         if (identifierParser == null) {
             return Optional.empty();
         }
 
-        identifier.set((Optional<T>) identifierParser.parse(field, input));
+        identifier.set((Optional<T>) identifierParser.parse(field));
         return identifier.get();
     }
 
@@ -136,7 +136,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
         identifierParser = new IdentifierParser(entry);
-        EasyBind.subscribe(textProperty(), this::updateIdentifier);
+        EasyBind.subscribe(textProperty(), ignored -> updateIdentifier());
         EasyBind.subscribe(identifier, newIdentifier -> isInvalidIdentifier.set(newIdentifier.isEmpty()));
     }
 }

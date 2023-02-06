@@ -22,19 +22,21 @@ public class IdentifierParser {
         this.entry = entry;
     }
 
-    public Optional<? extends Identifier> parse(Field field, String input) {
-        if (StringUtil.isBlank(input)) {
+    public Optional<? extends Identifier> parse(Field field) {
+        String fieldValue = entry.getField(field).orElse("");
+
+        if (StringUtil.isBlank(fieldValue)) {
             return Optional.empty();
         }
 
         if (StandardField.DOI.equals(field)) {
-            return DOI.parse(input);
+            return DOI.parse(fieldValue);
         } else if (StandardField.ISBN.equals(field)) {
-            return ISBN.parse(input);
+            return ISBN.parse(fieldValue);
         } else if (StandardField.EPRINT.equals(field)) {
-            return parseEprint(input);
+            return parseEprint(fieldValue);
         } else if (StandardField.MR_NUMBER.equals(field)) {
-            return MathSciNetId.parse(input);
+            return MathSciNetId.parse(fieldValue);
         }
 
         return Optional.empty();

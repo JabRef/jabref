@@ -86,7 +86,7 @@ public class JabRefDesktop {
             return;
         } else if (StandardField.EPRINT.equals(field)) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
-            link = identifierParser.parse(StandardField.EPRINT, link)
+            link = identifierParser.parse(StandardField.EPRINT)
                     .map(Identifier::getExternalURI)
                     .filter(Optional::isPresent)
                     .map(Optional::get)

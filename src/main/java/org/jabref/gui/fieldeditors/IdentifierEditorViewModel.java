@@ -73,7 +73,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                 Field changedField = change.getKey();
                 if (StandardField.EPRINTTYPE.equals(changedField)) {
                     this.identifierParser = new IdentifierParser(entry);
-                    identifier.bind(EasyBind.map(text, input -> identifierParser.parse(field, input)));
+                    identifier.bind(EasyBind.map(text, input -> identifierParser.parse(field)));
                     validIdentifierIsNotPresent.bind(EasyBind.map(identifier, Optional::isEmpty));
                 }
             });
@@ -81,7 +81,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
 
         this.identifierParser = new IdentifierParser(entry);
 
-        identifier.bind(EasyBind.map(text, input -> identifierParser.parse(field, input)));
+        identifier.bind(EasyBind.map(text, input -> identifierParser.parse(field)));
 
         validIdentifierIsNotPresent.bind(EasyBind.map(identifier, Optional::isEmpty));
     }

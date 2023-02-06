@@ -43,7 +43,7 @@ public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewMod
         weakEprintTypeFieldListener = new WeakMapChangeListener<>(change -> {
                     Field changedField = change.getKey();
                     if (StandardField.EPRINTTYPE.equals(changedField)) {
-                        updateIdentifier(text.get());
+                        updateIdentifier();
                     }
                 }
         );
