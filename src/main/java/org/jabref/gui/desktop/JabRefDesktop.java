@@ -19,13 +19,15 @@ import org.jabref.gui.desktop.os.OSX;
 import org.jabref.gui.desktop.os.Windows;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
 
@@ -52,7 +54,8 @@ public class JabRefDesktop {
     public static void openExternalViewer(BibDatabaseContext databaseContext,
                                           PreferencesService preferencesService,
                                           String initialLink,
-                                          Field initialField)
+                                          Field initialField,
+                                          BibEntry entry)
             throws IOException {
         String link = initialLink;
         Field field = initialField;
@@ -82,12 +85,13 @@ public class JabRefDesktop {
             openDoi(link);
             return;
         } else if (StandardField.EPRINT.equals(field)) {
-            link = ArXivIdentifier.parse(link)
-                                  .map(ArXivIdentifier::getExternalURI)
-                                  .filter(Optional::isPresent)
-                                  .map(Optional::get)
-                                  .map(URI::toASCIIString)
-                                  .orElse(link);
+            IdentifierParser identifierParser = new IdentifierParser(entry);
+            link = identifierParser.parse(StandardField.EPRINT, link)
+                    .map(Identifier::getExternalURI)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(URI::toASCIIString)
+                    .orElse(link);
             // should be opened in browser
             field = StandardField.URL;
         }
