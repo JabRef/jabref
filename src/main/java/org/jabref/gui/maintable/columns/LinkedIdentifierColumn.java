@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable.columns;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javafx.scene.Node;
@@ -10,6 +11,7 @@ import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.CellFactory;
@@ -33,7 +35,6 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
     private final CellFactory cellFactory;
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final StateManager stateManager;
 
     public LinkedIdentifierColumn(MainTableColumnModel model,
                                   CellFactory cellFactory,
@@ -46,7 +47,6 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
         this.cellFactory = cellFactory;
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.stateManager = stateManager;
 
         Node headerGraphic = IconTheme.JabRefIcons.WWW.getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Linked identifiers")));
@@ -96,7 +96,11 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
                     ControlHelper.truncateString(values.get(field), -1, "...", ControlHelper.EllipsisPosition.CENTER),
                     cellFactory.getTableIcon(field));
             menuItem.setOnAction(event -> {
-                new OpenUrlAction(dialogService, stateManager, preferences).execute();
+                try {
+                    JabRefDesktop.openExternalViewer(database, preferences, values.get(field), field, entry.getEntry());
+                } catch (IOException e) {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+                }
                 event.consume();
             });
             contextMenu.getItems().add(menuItem);
