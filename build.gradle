@@ -114,7 +114,7 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation 'org.apache.lucene:lucene-core:9.4.2'
+    implementation 'org.apache.lucene:lucene-core:9.5.0'
     implementation 'org.apache.lucene:lucene-queryparser:9.4.2'
     implementation 'org.apache.lucene:lucene-queries:9.4.2'
     implementation 'org.apache.lucene:lucene-analysis-common:9.4.2'
