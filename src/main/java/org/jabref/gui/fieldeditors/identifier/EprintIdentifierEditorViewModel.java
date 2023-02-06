@@ -1,6 +1,6 @@
 package org.jabref.gui.fieldeditors.identifier;
 
-import javafx.collections.MapChangeListener;
+import javafx.collections.WeakMapChangeListener;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -17,6 +17,11 @@ import org.jabref.preferences.PreferencesService;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<EprintIdentifier> {
+
+    // Since it's not obvious when to unregister the field listener, let's delegate this task to the garbage collector.
+    // https://en.wikipedia.org/wiki/Lapsed_listener_problem
+    private WeakMapChangeListener<Field, String> weakEprintTypeFieldListener;
+
     public EprintIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
         super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         configure(false, false);
@@ -35,14 +40,16 @@ public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewMod
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
+        weakEprintTypeFieldListener = new WeakMapChangeListener<>(change -> {
+                    Field changedField = change.getKey();
+                    if (StandardField.EPRINTTYPE.equals(changedField)) {
+                        updateIdentifier(text.get());
+                    }
+                }
+        );
         // Unlike other identifiers (they only depend on their own field value), eprint  depends on eprinttype thus
         // its identity changes whenever the eprinttype field changes .e.g. If eprinttype equals 'arxiv' then the eprint identity
         // will be of type ArXivIdentifier and if it equals 'ark' then it switches to type ARK.
-        entry.getFieldsObservable().addListener((MapChangeListener<Field, String>) change -> {
-            Field changedField = change.getKey();
-            if (StandardField.EPRINTTYPE.equals(changedField)) {
-                updateIdentifier(text.get());
-            }
-        });
+        entry.getFieldsObservable().addListener(weakEprintTypeFieldListener);
     }
 }
