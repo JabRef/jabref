@@ -22,7 +22,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -283,8 +282,6 @@ public class MarcXmlParser implements Parser {
 
         if (StringUtil.isNotBlank(name)) {
             bibEntry.setField(StandardField.SERIES, name);
-
-            bibEntry.setType(StandardEntryType.Article);
         }
 
         if (StringUtil.isNotBlank(volume)) {

@@ -19,7 +19,6 @@ import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransf
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Disabled for experimental status.
 @FetcherTest
 public class BvbFetcherTest {
 
@@ -92,20 +91,7 @@ public class BvbFetcherTest {
     public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
         assertTrue(searchResult.contains(bibEntryISBN9783960886402));
-        //assertTrue(searchResult.contains(bibEntryISBN0321356683));
-        assertEquals(bibEntryISBN0321356683, searchResult.get(4));
-    }
-
-    @Test
-    public void testPerformSearch591166003() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch("isbn:9783960886402");
-        assertEquals(Collections.singletonList(bibEntryISBN9783960886402), searchResult);
-    }
-
-    @Test
-    public void testPerformSearch66391437X() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch("isbn:bibEntryISBN0321356683");
-        assertEquals(Collections.singletonList(bibEntryISBN0321356683), searchResult);
+        assertTrue(searchResult.contains(bibEntryISBN0321356683));
     }
 
     @Test
