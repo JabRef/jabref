@@ -676,6 +676,11 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-row-even-background;
 }
 
+.lib-change-header {
+    -fx-font-size: 130%;
+    -fx-padding: 0.2em 0em 0.2em 0.2em;
+}
+
 .table-view .groupColumnBackground {
     -fx-stroke: -jr-gray-2;
 }
@@ -1308,6 +1313,11 @@ We want to have a look that matches our icons in the tool-bar */
 
 .code-area .text {
     -fx-fill: -fx-text-background-color;
+}
+
+#bibtexcodearea {
+    -fx-padding: 4 4 4 4;
+    -fx-background-color: -fx-control-inner-background;
 }
 
 .code-area .selection {

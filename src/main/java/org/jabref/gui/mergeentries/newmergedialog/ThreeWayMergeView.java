@@ -74,11 +74,26 @@ public class ThreeWayMergeView extends VBox {
         toolbar.showDiffProperty().addListener(e -> updateDiff());
         toolbar.diffViewProperty().addListener(e -> updateDiff());
         toolbar.diffHighlightingMethodProperty().addListener(e -> updateDiff());
-        this.updateDiff();
+        toolbar.hideEqualFieldsProperty().addListener(e -> showOrHideEqualFields());
+
+        updateDiff();
+        showOrHideEqualFields();
+    }
+
+    private void showOrHideEqualFields() {
+        for (FieldRowView row : fieldRows) {
+            if (toolbar.shouldHideEqualFields()) {
+                if (row.hasEqualLeftAndRightValues()) {
+                    row.hide();
+                }
+            } else {
+                row.show();
+            }
+        }
     }
 
     private void updateDiff() {
-        if (toolbar.isShowDiffEnabled()) {
+        if (toolbar.shouldShowDiffs()) {
             for (FieldRowView row : fieldRows) {
                 if (row.getFieldNameCell().getText().equals("Groups") && (row.getLeftValueCell().getText().contains(keywordSeparator) || row.getRightValueCell().getText().contains(keywordSeparator))) {
                     row.showDiff(new ShowDiffConfig(toolbar.getDiffView(), new GroupDiffMode(keywordSeparator)));
