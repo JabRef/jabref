@@ -32,6 +32,7 @@ import org.jabref.logic.importer.fileformat.mods.Name;
 import org.jabref.logic.importer.fileformat.mods.RecordInfo;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
@@ -516,8 +517,9 @@ public class ModsImporter extends Importer implements Parser {
         if (date != null) {
             switch (elementName) {
                 case "dateIssued" -> {
-                    // The first 4 digits of dateIssued should be the year
-                    fields.put(StandardField.YEAR, date.replaceAll("[^0-9]*", "").replaceAll("\\(\\d?\\d?\\d?\\d?.*\\)", "\1"));
+                    Date.parse(date)
+                            .flatMap(Date::getYear)
+                            .ifPresent(year -> fields.put(StandardField.YEAR, year.toString()));
                 }
                 case "dateCreated" -> {
                     // If there was no year in date issued, then take the year from date created
