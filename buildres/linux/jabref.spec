@@ -27,6 +27,8 @@ Requires: PACKAGE_DEFAULT_DEPENDENCIES PACKAGE_CUSTOM_DEPENDENCIES
 %description
 APPLICATION_DESCRIPTION
 
+%global __os_install_post %{nil}
+
 %prep
 
 %build
@@ -73,7 +75,7 @@ done
 # Remove the auto-install triggers of the browser addon for chrom/chromium
 rm -f /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
 rm -f /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
-UTILITY_SCRIPTS
+DESKTOP_SCRIPTS
 DESKTOP_COMMANDS_UNINSTALL
 
 %clean
