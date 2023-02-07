@@ -56,7 +56,7 @@ public class PreviewWithSourceTab {
         } catch (IOException e) {
             LOGGER.error("Error getting Bibtex: {}", entry);
         }
-        codeArea.setEditable(true);
+        codeArea.setEditable(false);
         Tab codeTab = new Tab(Localization.lang("%0 source", bibDatabaseContext.getMode().getFormattedName()), codeArea);
 
         tabPanePreviewCode.getTabs().addAll(previewTab, codeTab);
