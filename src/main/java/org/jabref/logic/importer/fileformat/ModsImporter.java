@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -517,9 +518,15 @@ public class ModsImporter extends Importer implements Parser {
         if (date != null) {
             switch (elementName) {
                 case "dateIssued" -> {
-                    Date.parse(date)
-                            .flatMap(Date::getYear)
+                    Optional<Date> optionalParsedDate = Date.parse(date);
+                    optionalParsedDate
+                            .ifPresent(parsedDate -> fields.put(StandardField.DATE, parsedDate.getNormalized()));
+
+                    optionalParsedDate.flatMap(Date::getYear)
                             .ifPresent(year -> fields.put(StandardField.YEAR, year.toString()));
+
+                    optionalParsedDate.flatMap(Date::getMonth)
+                            .ifPresent(month -> fields.put(StandardField.MONTH, month.getJabRefFormat()));
                 }
                 case "dateCreated" -> {
                     // If there was no year in date issued, then take the year from date created
