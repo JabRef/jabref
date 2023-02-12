@@ -2,13 +2,13 @@ package org.jabref.cli;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
 import javafx.collections.FXCollections;
 
 import org.jabref.cli.ArgumentProcessor.Mode;
-import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -16,9 +16,10 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.SearchPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,9 @@ class ArgumentProcessorTest {
         when(savePreferences.getSaveOrder()).thenReturn(SaveOrderConfig.getDefaultSaveOrder());
         when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
         when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
+        when(preferencesService.getSearchPreferences()).thenReturn(
+                new SearchPreferences(null, EnumSet.noneOf(SearchRules.SearchFlags.class), false)
+        );
 
         bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
     }
@@ -65,8 +69,6 @@ class ArgumentProcessorTest {
 
     @Test
     void testExportMatches(@TempDir Path tempDir) throws Exception {
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(importerPreferences, importFormatPreferences, new DummyFileUpdateMonitor());
-
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 
@@ -79,9 +81,9 @@ class ArgumentProcessorTest {
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
         String outputBibFile = outputBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("-n", "--debug", "--exportMatches", "Author=Einstein," + outputBibFile, "-i", originBibFile);
+        List<String> args = List.of("-n", "--debug", "--exportMatches", "Author=Einstein," + outputBibFile, originBibFile);
 
-        processor = new ArgumentProcessor(args.toArray(String[]::new), Mode.INITIAL_START, JabRefPreferences.getInstance());
+        processor = new ArgumentProcessor(args.toArray(String[]::new), Mode.INITIAL_START, preferencesService);
 
         assertTrue(Files.exists(outputBib));
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
