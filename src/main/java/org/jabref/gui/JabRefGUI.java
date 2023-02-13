@@ -68,6 +68,11 @@ public class JabRefGUI {
         mainFrame.init();
 
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+
+        // Set the min-width and min-height for the main window
+        mainStage.setMinHeight(330);
+        mainStage.setMinWidth(580);
+
         // Restore window location and/or maximised state
         if (guiPreferences.isWindowMaximised()) {
             mainStage.setMaximized(true);
