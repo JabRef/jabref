@@ -40,7 +40,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Execution(ExecutionMode.CONCURRENT)
 class JournalAbbreviationsViewModelTabTest {
 
     private final static TestAbbreviation ABBREVIATION_0 = new TestAbbreviation("Full0", "Abb0");
