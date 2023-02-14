@@ -27,6 +27,8 @@ Requires: PACKAGE_DEFAULT_DEPENDENCIES PACKAGE_CUSTOM_DEPENDENCIES
 %description
 APPLICATION_DESCRIPTION
 
+%global __os_install_post %{nil}
+
 %prep
 
 %build
@@ -71,9 +73,9 @@ for NATIVE_MESSAGING_JSON in "/usr/lib/mozilla/native-messaging-hosts/org.jabref
     fi
 done
 # Remove the auto-install triggers of the browser addon for chrom/chromium
-rm /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
-rm /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
-UTILITY_SCRIPTS
+rm -f /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
+rm -f /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json || true
+DESKTOP_SCRIPTS
 DESKTOP_COMMANDS_UNINSTALL
 
 %clean

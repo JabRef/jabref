@@ -33,6 +33,7 @@ public class GuiPreferences {
 
     private final StringProperty lastSelectedIdBasedFetcher;
     private final ObjectProperty<DiffMode> mergeDiffMode;
+    private final BooleanProperty mergeShowChangedFieldsOnly;
     private final DoubleProperty sidePaneWidth;
 
     public GuiPreferences(double positionX,
@@ -45,7 +46,8 @@ public class GuiPreferences {
                           FileHistory fileHistory,
                           String lastSelectedIdBasedFetcher,
                           DiffMode mergeDiffMode,
-                          double sidePaneWidth) {
+                          double sidePaneWidth,
+                          boolean mergeShowChangedFieldsOnly) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
         this.sizeX = new SimpleDoubleProperty(sizeX);
@@ -57,6 +59,7 @@ public class GuiPreferences {
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
+        this.mergeShowChangedFieldsOnly = new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
     }
 
     public double getPositionX() {
@@ -177,5 +180,17 @@ public class GuiPreferences {
 
     public void setSidePaneWidth(double sidePaneWidth) {
         this.sidePaneWidth.set(sidePaneWidth);
+    }
+
+    public BooleanProperty mergeShowChangedFieldOnlyProperty() {
+        return mergeShowChangedFieldsOnly;
+    }
+
+    public boolean isMergeShowChangedFieldsOnly() {
+        return mergeShowChangedFieldsOnly.getValue();
+    }
+
+    public void setIsMergedShowChangedFielsOnly(boolean showChangedFieldsOnly) {
+        mergeShowChangedFieldsOnly.setValue(showChangedFieldsOnly);
     }
 }

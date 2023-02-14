@@ -387,8 +387,8 @@ public class ArgumentProcessor {
             switch (data.length) {
                 case 3 -> formatName = data[2];
                 case 2 ->
-                        // default exporter: HTML table (with Abstract & BibTeX)
-                        formatName = "tablerefsabsbib";
+                        // default exporter: bib file
+                        formatName = "bib";
                 default -> {
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
                                                    .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
@@ -397,22 +397,29 @@ public class ArgumentProcessor {
                 }
             }
 
-            // export new database
-            ExporterFactory exporterFactory = ExporterFactory.create(
-                    preferencesService,
-                    Globals.entryTypesManager,
-                    Globals.journalAbbreviationRepository);
-            Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
-            if (exporter.isEmpty()) {
-                System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
+            if (formatName.equals("bib")) {
+                // output a bib file as default or if
+                // provided exportFormat is "bib"
+                saveDatabase(new BibDatabase(matches), data[1]);
+                LOGGER.debug("Finished export");
             } else {
-                // We have an TemplateExporter instance:
-                try {
-                    System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    exporter.get().export(databaseContext, Path.of(data[1]), matches, Collections.emptyList());
-                } catch (Exception ex) {
-                    System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
-                            + Throwables.getStackTraceAsString(ex));
+                // export new database
+                ExporterFactory exporterFactory = ExporterFactory.create(
+                        preferencesService,
+                        Globals.entryTypesManager,
+                        Globals.journalAbbreviationRepository);
+                Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
+                if (exporter.isEmpty()) {
+                    System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
+                } else {
+                    // We have an TemplateExporter instance:
+                    try {
+                        System.out.println(Localization.lang("Exporting") + ": " + data[1]);
+                        exporter.get().export(databaseContext, Path.of(data[1]), matches, Collections.emptyList());
+                    } catch (Exception ex) {
+                        System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
+                                + Throwables.getStackTraceAsString(ex));
+                    }
                 }
             }
         } else {
