@@ -338,7 +338,6 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
                     preferences.storeJournalAbbreviationPreferences(new JournalAbbreviationPreferences(
                             journalStringList,
-                            abbreviationsPreferences.getDefaultEncoding(),
                             useFJournal.getValue()
                     ));
 
