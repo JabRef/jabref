@@ -30,7 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the "Import" -> "Library to import to" did not show the correct library name if two opened libraries had the same suffix [#9567](https://github.com/JabRef/jabref/issues/9567)
 - We fixed an issue where the rpm-Version of JabRef could not be properly uninstalled and reinstalled [#9558](https://github.com/JabRef/jabref/issues/9558), [#9603](https://github.com/JabRef/jabref/issues/9603)
 - We fixed an issue where the command line export using `--exportMatches` flag does not create an output bib file [#9581](https://github.com/JabRef/jabref/issues/9581)
-
+- We fixed an issue where custom field in the custom entry types could not be set to mulitline [#9609](https://github.com/JabRef/jabref/issues/9609)
 
 
 
