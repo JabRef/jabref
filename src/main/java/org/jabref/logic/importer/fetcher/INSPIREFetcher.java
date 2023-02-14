@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,38 +17,17 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.jabref.model.util.OptionalUtil;
-
-
-
-
-
-
-
-
-
-
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jbibtex.BibTeXDatabase;
-import org.jbibtex.BibTeXEntry;
-import org.jbibtex.BibTeXParser;
-import org.jbibtex.Key;
 
 /**
  * Fetches data from the INSPIRE database.
@@ -105,21 +83,22 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
-
+    @Override
     public List<BibEntry> performSearch(BibEntry entry) {
         List<BibEntry> results = new ArrayList<>();
-
         String doi = entry.getField(StandardField.DOI).orElse(null);
+
         if (doi == null) {
             return results;
         }
 
-        String url = "https://inspirehep.net/api/doi" + doi;
+        String url = INSPIRE_EXTERNAL_HOST + doi;
 
         try {
+
             URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
+            URLDownload download = getUrlDownload(obj);
+            HttpURLConnection con = (HttpURLConnection) download.openConnection();
 
             int responseCode = con.getResponseCode();
             if (responseCode != 200) {
@@ -135,7 +114,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
             in.close();
 
             Parser bibtexParser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
-            return bibtexParser.parseEntries(doi);
+            return bibtexParser.parseEntries(String.valueOf(response));
         } catch (Exception e) {
             e.printStackTrace();
         }
