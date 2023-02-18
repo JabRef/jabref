@@ -770,8 +770,6 @@ public class LibraryTab extends Tab {
                 Globals.TASK_EXECUTOR,
                 dialogService,
                 preferencesService,
-                stateManager,
-                themeManager,
                 databaseNotificationPane));
     }
 

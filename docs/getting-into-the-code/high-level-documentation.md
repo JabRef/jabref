@@ -20,9 +20,7 @@ We use an event bus to publish events from the `model` to the other layers.
 This allows us to keep the architecture but still react upon changes within the core in the outer layers.
 Note that we are currently switching to JavaFX's observables, as this concepts seems as we aim for a stronger coupling to the data producers.
 
-You can view up-to-date diagrams for model, gui, and logic packages [at sourcespy](https://sourcespy.com/github/jabref/).
-
-## Package Structure [![SourceSpy Dashboard](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/jabref/)
+## Package Structure
 
 Permitted dependencies in our architecture are:
 
