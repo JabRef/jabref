@@ -31,7 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the rpm-Version of JabRef could not be properly uninstalled and reinstalled [#9558](https://github.com/JabRef/jabref/issues/9558), [#9603](https://github.com/JabRef/jabref/issues/9603)
 - We fixed an issue where the command line export using `--exportMatches` flag does not create an output bib file [#9581](https://github.com/JabRef/jabref/issues/9581)
 - We fixed an issue where custom field in the custom entry types could not be set to mulitline [#9609](https://github.com/JabRef/jabref/issues/9609)
-
+- We fixed an issue where the Office XML exporter did not resolve BibTeX-Strings when exporting entries [forum#3741](https://discourse.jabref.org/t/exporting-bibtex-constant-strings-to-ms-office-2007-xml/3741)
 
 
 ### Removed
