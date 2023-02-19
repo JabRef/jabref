@@ -30,7 +30,7 @@ public class ARK extends EprintIdentifier {
     @Override
     public String getNormalized() {
         String cleanARK = ark.strip();
-        return cleanARK.startsWith("ark:/") ? cleanARK.substring(5) : cleanARK;
+        return cleanARK.replaceFirst("^ark:/", "");
     }
 
     @Override
