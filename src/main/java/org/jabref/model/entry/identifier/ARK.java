@@ -12,7 +12,7 @@ import java.util.Optional;
  * <p>
  * ARK identifiers are typically prefixed with "ark:/". Even though the prefix does not help identify the resource, it appears
  * to be the standard because many websites that feature ARKs, such as archive.org, include it. For the convenience of our users
- * and to provide them with ability to copy/paste the ark as is, we decided to support arks with or without the prefix.
+ * and to provide them with ability to copy/paste the ark as is, we support arks with or without the prefix.
  * </p>
  */
 public class ARK extends EprintIdentifier {
@@ -23,6 +23,7 @@ public class ARK extends EprintIdentifier {
     }
 
     public static Optional<ARK> parse(String value) {
+        // TODO: Validate ARK
         return Optional.of(new ARK(value));
     }
 
