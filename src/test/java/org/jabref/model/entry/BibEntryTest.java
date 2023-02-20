@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.DIYcoverage.DIYCoverage;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.BibField;
@@ -23,7 +24,9 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.collect.Sets;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.Execution;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,11 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
+import org.jabref.DIYcoverage.DIYCoverage; /*ASSI3: Extra class for coverage*/
 
 @Execution(CONCURRENT)
 class BibEntryTest {
     private BibEntry entry = new BibEntry();
-
     @Test
     void testDefaultConstructor() {
         assertEquals(StandardEntryType.Misc, entry.getType());
@@ -808,5 +811,23 @@ class BibEntryTest {
 
         copyEntry.mergeWith(otherEntry, otherPrioritizedFields);
         assertEquals(expected.getFields(), copyEntry.getFields());
+    }
+
+    @Test
+    public void extractTestResults(){
+        System.out.println("Extracting results");
+        for (int k = 0; k < entry.taken.length; k++){ /*ASSI3: For branch coverage DIY*/
+            if(entry.taken[k]) {
+                DIYCoverage.takenTest[3][k] = true;
+            }
+        }
+
+    }
+    //@Test
+    @AfterAll
+    public static void printCoverage(){
+        System.out.println("Made it to printCoverage");
+        DIYCoverage.printAllTrue();
+        DIYCoverage.cleanArray(0);
     }
 }

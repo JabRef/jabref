@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 @AllowedToUseLogic("because it needs access to parser and writers")
 public class BibEntry implements Cloneable {
-
+    public static boolean[] taken = new boolean[1000]; /*ASSI3: Temporary array for branch coverage DIY */
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private final SharedBibEntryData sharedBibEntryData;
@@ -147,6 +147,7 @@ public class BibEntry implements Cloneable {
                 (targetField == StandardField.ENTRYSET) ||
                 (targetField == StandardField.RELATED) ||
                 (targetField == StandardField.SORTKEY)) {
+            taken[0] = true;
             return Optional.empty();
         }
 
@@ -157,10 +158,13 @@ public class BibEntry implements Cloneable {
                 ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.InBook)) ||
                 ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.BookInBook)) ||
                 ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.SuppBook))) {
+            taken[1] = true;
             if (targetField == StandardField.AUTHOR) {
+                taken[2] = true;
                 return Optional.of(StandardField.AUTHOR);
             }
             if (targetField == StandardField.BOOKAUTHOR) {
+                taken[3] = true;
                 return Optional.of(StandardField.AUTHOR);
             }
         }
@@ -176,13 +180,17 @@ public class BibEntry implements Cloneable {
                 ((sourceEntry == StandardEntryType.MvProceedings) && (targetEntry == StandardEntryType.InProceedings)) ||
                 ((sourceEntry == StandardEntryType.MvReference) && (targetEntry == StandardEntryType.Reference)) ||
                 ((sourceEntry == StandardEntryType.MvReference) && (targetEntry == StandardEntryType.InReference))) {
+            taken[4] = true;
             if (targetField == StandardField.MAINTITLE) {
+                taken[5] = true;
                 return Optional.of(StandardField.TITLE);
             }
             if (targetField == StandardField.MAINSUBTITLE) {
+                taken[6] = true;
                 return Optional.of(StandardField.SUBTITLE);
             }
             if (targetField == StandardField.MAINTITLEADDON) {
+                taken[7] = true;
                 return Optional.of(StandardField.TITLEADDON);
             }
 
@@ -190,11 +198,13 @@ public class BibEntry implements Cloneable {
             if ((targetField == StandardField.TITLE) ||
                     (targetField == StandardField.SUBTITLE) ||
                     (targetField == StandardField.TITLEADDON)) {
+                taken[8] = true;
                 return Optional.empty();
             }
 
             // for these fields, inheritance is not allowed for the specified entry types
             if (targetField == StandardField.SHORTTITLE) {
+                taken[9] = true;
                 return Optional.empty();
             }
         }
@@ -206,13 +216,18 @@ public class BibEntry implements Cloneable {
                 ((sourceEntry == StandardEntryType.Collection) && (targetEntry == StandardEntryType.SuppCollection)) ||
                 ((sourceEntry == StandardEntryType.Reference) && (targetEntry == StandardEntryType.InReference)) ||
                 ((sourceEntry == StandardEntryType.Proceedings) && (targetEntry == StandardEntryType.InProceedings))) {
+            taken[10] = true;
             if (targetField == StandardField.BOOKTITLE) {
+                taken[11] = true;
                 return Optional.of(StandardField.TITLE);
+
             }
             if (targetField == StandardField.BOOKSUBTITLE) {
+                taken[12] = true;
                 return Optional.of(StandardField.SUBTITLE);
             }
             if (targetField == StandardField.BOOKTITLEADDON) {
+                taken[13] = true;
                 return Optional.of(StandardField.TITLEADDON);
             }
 
@@ -220,32 +235,39 @@ public class BibEntry implements Cloneable {
             if ((targetField == StandardField.TITLE) ||
                     (targetField == StandardField.SUBTITLE) ||
                     (targetField == StandardField.TITLEADDON)) {
+                taken[14] = true;
                 return Optional.empty();
             }
 
             // for these fields, inheritance is not allowed for the specified entry types
             if ((targetField == StandardField.SHORTTITLE)) {
+                taken[15] = true;
                 return Optional.empty();
             }
         }
 
         if (((sourceEntry == IEEETranEntryType.Periodical) && (targetEntry == StandardEntryType.Article)) ||
                 ((sourceEntry == IEEETranEntryType.Periodical) && (targetEntry == StandardEntryType.SuppPeriodical))) {
+            taken[16] = true;
             if (targetField == StandardField.JOURNALTITLE) {
+                taken[17] = true;
                 return Optional.of(StandardField.TITLE);
             }
             if (targetField == StandardField.JOURNALSUBTITLE) {
+                taken[18] = true;
                 return Optional.of(StandardField.SUBTITLE);
             }
 
             // those fields are no more available for the same-name inheritance strategy
             if ((targetField == StandardField.TITLE) ||
                     (targetField == StandardField.SUBTITLE)) {
+                taken[19] = true;
                 return Optional.empty();
             }
 
             // for these fields, inheritance is not allowed for the specified entry types
             if ((targetField == StandardField.SHORTTITLE)) {
+                taken[20] = true;
                 return Optional.empty();
             }
         }
