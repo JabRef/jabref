@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.jabref.coverage.Coverage; /*ASSI3: Extra class for coverage*/
+import org.jabref.DIYcoverage.DIYCoverage; /*ASSI3: Extra class for coverage*/
 @FetcherTest
 public class GvkParserTest {
     private void doTest(String xmlName, int expectedSize, List<String> resourceNames) throws Exception {
@@ -34,7 +34,7 @@ public class GvkParserTest {
 
             for(int k = 0; k < parser.taken.length; k++){ /*ASSI3: For branch coverage DIY*/
                 if(parser.taken[k]) {
-                    Coverage.takenTest[0][k] = true;
+                    DIYCoverage.takenTest[0][k] = true;
                 }
             }
         }
@@ -73,8 +73,8 @@ public class GvkParserTest {
 
     @Test
     public void printCoverage(){
-        Coverage.printAllTrue();
-        Coverage.cleanArray(0);
+        DIYCoverage.printAllTrue();
+        DIYCoverage.cleanArray(0);
     }
 
 }
