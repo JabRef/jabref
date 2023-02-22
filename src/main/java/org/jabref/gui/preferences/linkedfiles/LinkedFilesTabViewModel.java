@@ -127,7 +127,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     @Override
     public boolean validateSettings() {
         ValidationStatus validationStatus = mainFileDirValidationStatus();
-        if (!validationStatus.isValid()) {
+        if (!validationStatus.isValid() && useMainFileDirectoryProperty().get()) {
             validationStatus.getHighestMessage().ifPresent(message ->
                     dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;
