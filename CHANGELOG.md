@@ -18,7 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
-
+- We refined the 'main directory not found' error message. [#9625](https://github.com/JabRef/jabref/pull/9625)
 
 
 
