@@ -199,7 +199,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     public boolean downloadFile(String urlText) {
         try {
             URL url = new URL(urlText);
-            addFromURL(url);
+            addFromURLAndDownload(url);
             return true;
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(
@@ -225,7 +225,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .onFinished(() -> fulltextLookupInProgress.setValue(false))
                 .onSuccess(url -> {
                     if (url.isPresent()) {
-                        addFromURL(url.get());
+                        addFromURLAndDownload(url.get());
                     } else {
                         dialogService.notify(Localization.lang("No full text document found"));
                     }
@@ -253,7 +253,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         }
     }
 
-    private void addFromURL(URL url) {
+    private void addFromURLAndDownload(URL url) {
         LinkedFileViewModel onlineFile = new LinkedFileViewModel(
                 new LinkedFile(url, ""),
                 entry,
