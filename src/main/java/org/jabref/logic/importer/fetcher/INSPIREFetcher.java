@@ -30,15 +30,12 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Fetches data from the INSPIRE database.
  */
 public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(INSPIREFetcher.class);
     private static final String INSPIRE_HOST = "https://inspirehep.net/api/literature/";
     private static final String INSPIRE_EXTERNAL_HOST = "https://inspirehep.net/api/doi/";
 
@@ -102,7 +99,6 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         try {
             URLDownload download = getUrlDownload(new URL(url));
             return getParser().parseEntries(download.asInputStream());
-
         } catch (IOException | ParseException e) {
             throw new FetcherException("Error occured during fetching", e);
         }
