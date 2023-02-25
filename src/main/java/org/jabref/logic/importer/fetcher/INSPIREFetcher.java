@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -11,7 +12,12 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.*;
+import org.jabref.logic.importer.EntryBasedFetcher;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultLuceneQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
@@ -24,16 +30,15 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fetches data from the INSPIRE database.
  */
 public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(INSPIREFetcher.class);
     private static final String INSPIRE_HOST = "https://inspirehep.net/api/literature/";
     private static final String INSPIRE_EXTERNAL_HOST = "https://inspirehep.net/api/doi/";
 
@@ -84,7 +89,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         List<BibEntry> results = new ArrayList<>();
         String doi = entry.getField(StandardField.DOI).orElse(null);
 
@@ -95,30 +100,11 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         String url = INSPIRE_EXTERNAL_HOST + doi;
 
         try {
+            URLDownload download = getUrlDownload(new URL(url));
+            return getParser().parseEntries(download.asInputStream());
 
-            URL obj = new URL(url);
-            URLDownload download = getUrlDownload(obj);
-            HttpURLConnection con = (HttpURLConnection) download.openConnection();
-
-            int responseCode = con.getResponseCode();
-            if (responseCode != 200) {
-                return results;
-            }
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            Parser bibtexParser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
-            return bibtexParser.parseEntries(String.valueOf(response));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | ParseException e) {
+            throw new FetcherException("Error occured during fetching", e);
         }
-
-        return results;
     }
 }
