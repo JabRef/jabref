@@ -88,13 +88,13 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         List<BibEntry> results = new ArrayList<>();
-        String doi = entry.getField(StandardField.DOI).orElse(null);
+        Optional<String> doi = entry.getField(StandardField.DOI);
 
-        if (doi == null) {
+        if (doi.isEmpty()) {
             return results;
         }
 
-        String url = INSPIRE_EXTERNAL_HOST + doi;
+        String url = INSPIRE_EXTERNAL_HOST + doi.get();
 
         try {
             URLDownload download = getUrlDownload(new URL(url));
