@@ -155,6 +155,7 @@ public class WebFetchers {
                                                                      FilePreferences filePreferences,
                                                                      BibDatabaseContext databaseContext) {
         SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+        set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new IsbnFetcher(importFormatPreferences)
