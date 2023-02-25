@@ -234,7 +234,11 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String RESOLVE_STRINGS_FOR_FIELDS = "resolveStringsForFields";
     public static final String DO_NOT_RESOLVE_STRINGS = "doNotResolveStrings";
+
+    // merge related
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
+    public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = "mergeShowOnlyChangedFields";
+
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
@@ -577,6 +581,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
+        defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
@@ -2489,7 +2494,8 @@ public class JabRefPreferences implements PreferencesService {
                 getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
                 DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
-                getDouble(SIDE_PANE_WIDTH));
+                getDouble(SIDE_PANE_WIDTH),
+                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS));
 
         EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(POS_Y, newValue.doubleValue()));
@@ -2514,6 +2520,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue.booleanValue()));
 
         return guiPreferences;
     }
