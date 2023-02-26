@@ -5,17 +5,23 @@ public enum GroupHierarchyType {
     /**
      * Group's contents are independent of its hierarchical position.
      */
-    INDEPENDENT,
+    INDEPENDENT("Independent"),
 
     /**
      * Group's content is the intersection of its own content with its supergroup's content.
      */
-    REFINING, // INTERSECTION
+    REFINING("Intersection"), // INTERSECTION
 
     /**
      * Group's content is the union of its own content with its subgroups' content.
      */
-    INCLUDING; // UNION
+    INCLUDING("Union"); // UNION
+
+    private final String displayName;
+
+    GroupHierarchyType(String displayName) {
+        this.displayName = displayName;
+    }
 
     /**
      * Returns the hierarchy type from its position in this enum.
@@ -28,5 +34,9 @@ public enum GroupHierarchyType {
         } else {
             return INDEPENDENT;
         }
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 }
