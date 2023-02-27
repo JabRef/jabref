@@ -97,7 +97,7 @@ public class AuthorListParser {
         Objects.requireNonNull(listOfNames);
 
         // Handle case names in order lastname, firstname and separated by ","
-        // E.g., Schneider, C., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
+        // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
         final boolean authorsContainAND = listOfNames.toUpperCase(Locale.ENGLISH).contains(" AND ");
         final boolean authorsContainOpeningBrace = listOfNames.contains("{");
         final boolean authorsContainSemicolon = listOfNames.contains(";");
