@@ -18,10 +18,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
--'Get full text' now also checks the file url.[#568](https://github.com/koppor/jabref/issues/568)
+- 'Get full text' now also checks the file url.[#568](https://github.com/koppor/jabref/issues/568)
 - We refined the 'main directory not found' error message. [#9625](https://github.com/JabRef/jabref/pull/9625)
-
-
 
 
 
