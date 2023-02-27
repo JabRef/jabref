@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest("in case our CI gets blocked")
 class LinkedFilesEditorViewModelTest {
-
     private LinkedFilesEditorViewModel viewModel;
     private final PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
     private final FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -37,7 +36,6 @@ class LinkedFilesEditorViewModelTest {
 
     @Test
     void urlFieldShouldDownloadFile(@TempDir Path tempDir) {
-
         when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(StandardExternalFileType.values()));
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
