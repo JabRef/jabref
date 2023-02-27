@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@FetcherTest("in case our CI gets blocked")
+@FetcherTest("Downloads a PDF file")
 class LinkedFilesEditorViewModelTest {
     private LinkedFilesEditorViewModel viewModel;
     private final PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
