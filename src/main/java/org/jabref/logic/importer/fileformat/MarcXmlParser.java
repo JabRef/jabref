@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.DateTimeException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -258,7 +259,14 @@ public class MarcXmlParser implements Parser {
             }
 
             if (StringUtil.isNotBlank(date)) {
-                bibEntry.setField(StandardField.DATE, Date.parse(StringUtil.stripBrackets(date)).map(Date::getNormalized).orElse(""));
+                String strippedDate = StringUtil.stripBrackets(date);
+                try {
+                    Date.parse(strippedDate).ifPresent(bibEntry::setDate);
+                } catch (DateTimeException exception) {
+                    // cannot read date value, just copy it in plain text
+                    LOGGER.info("Cannot parse date '{}'", strippedDate);
+                    bibEntry.setField(StandardField.DATE, StringUtil.stripBrackets(strippedDate));
+                }
             }
         }
     }
