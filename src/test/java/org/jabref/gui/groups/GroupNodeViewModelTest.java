@@ -47,7 +47,8 @@ class GroupNodeViewModelTest {
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 GroupViewMode.UNION,
                 true,
-                true
+                true,
+                GroupHierarchyType.INDEPENDENT
         ));
 
         viewModel = getViewModelForGroup(
