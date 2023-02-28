@@ -364,6 +364,8 @@ public class GroupDialogViewModel {
             }
 
             if (resultingGroup != null) {
+                preferencesService.getGroupsPreferences().setDefaultHierarchicalContext(groupHierarchySelectedProperty.getValue());
+
                 resultingGroup.setColor(colorProperty.getValue());
                 resultingGroup.setDescription(descriptionProperty.getValue());
                 resultingGroup.setIconName(iconProperty.getValue());
