@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.airhacks.afterburner.injection.Injector;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
@@ -17,6 +18,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
+import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -26,6 +28,7 @@ import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.JabRefPreferences;
 
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
@@ -61,6 +64,13 @@ public class JabRefGUI {
                 Globals.TASK_EXECUTOR,
                 preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
+
+        if (JabRefPreferences.getInstance().getProxyPreferences().shouldUseAuthentication()){
+            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+            PreferencesDialogView preferencesDialogView = new PreferencesDialogView(this.mainFrame);
+            preferencesDialogView.getPreferenceTabList().getSelectionModel().select(20);
+            dialogService.showCustomDialog(preferencesDialogView);
+        }
     }
 
     private void openWindow(Stage mainStage) {

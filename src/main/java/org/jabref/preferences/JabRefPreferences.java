@@ -1552,14 +1552,13 @@ public class JabRefPreferences implements PreferencesService {
                 get(PROXY_PORT),
                 getBoolean(PROXY_USE_AUTHENTICATION),
                 get(PROXY_USERNAME),
-                get(PROXY_PASSWORD));
+                (String) defaults.get(PROXY_PASSWORD));
 
         EasyBind.listen(proxyPreferences.useProxyProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE, newValue));
         EasyBind.listen(proxyPreferences.hostnameProperty(), (obs, oldValue, newValue) -> put(PROXY_HOSTNAME, newValue));
         EasyBind.listen(proxyPreferences.portProperty(), (obs, oldValue, newValue) -> put(PROXY_PORT, newValue));
         EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
         EasyBind.listen(proxyPreferences.usernameProperty(), (obs, oldValue, newValue) -> put(PROXY_USERNAME, newValue));
-        EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> put(PROXY_PASSWORD, newValue));
 
         return proxyPreferences;
     }
