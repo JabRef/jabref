@@ -37,7 +37,8 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher {
 
     private static final String INSPIRE_HOST = "https://inspirehep.net/api/literature/";
-    private static final String INSPIRE_EXTERNAL_HOST = "https://inspirehep.net/api/doi/";
+    private static final String INSPIRE_DOI_HOST = "https://inspirehep.net/api/doi/";
+    private static final String INSPIRE_ARXIV_HOST = "https://inspirehep.net/api/arxiv/";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -89,16 +90,23 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         List<BibEntry> results = new ArrayList<>();
         Optional<String> doi = entry.getField(StandardField.DOI);
+        Optional<String> archiveprefix = entry.getFieldOrAlias(StandardField.ARCHIVEPREFIX);
+        Optional<String> eprint = entry.getField(StandardField.EPRINT);
+        String url;
 
-        if (doi.isEmpty()) {
+        if (!doi.isEmpty()) {
+            url = INSPIRE_DOI_HOST + doi.get();
+        } else if (archiveprefix.get() == "arXiv" && !eprint.isEmpty()) {
+            url = INSPIRE_ARXIV_HOST + eprint.get();
+        } else {
             return results;
         }
 
-        String url = INSPIRE_EXTERNAL_HOST + doi.get();
-
         try {
             URLDownload download = getUrlDownload(new URL(url));
-            return getParser().parseEntries(download.asInputStream());
+            results = getParser().parseEntries(download.asInputStream());
+            results.forEach(this::doPostCleanup);
+            return results;
         } catch (IOException | ParseException e) {
             throw new FetcherException("Error occured during fetching", e);
         }
