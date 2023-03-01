@@ -2,7 +2,7 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" delimiter-precedes-et-al="never" demote-non-dropping-particle="sort-only">
   <!-- Polyglot; journal publishes in English, German, and occasionally in other languages -->
   <info>
-    <title>Offa - Berichte und Mitteilungen zur Urgeschichte, Frühgeschichte und Mittelalterarchäologie</title>
+    <title>Offa - Berichte und Mitteilungen zur Archäologie</title>
     <title-short>Offa</title-short>
     <id>http://www.zotero.org/styles/offa</id>
     <link href="http://www.zotero.org/styles/offa" rel="self"/>
@@ -360,10 +360,6 @@
     </choose>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-givenname="true" givenname-disambiguation-rule="all-names-with-initials" disambiguate-add-year-suffix="true">
-    <sort>
-      <key variable="issued"/>
-      <key macro="contributors-short-citation"/>
-    </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <group delimiter=" ">
