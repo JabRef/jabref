@@ -37,11 +37,11 @@ public class ProxyTest {
         //Globals.prefs = preferences;
         PreferencesMigrations.runMigrations(preferences);
         ProxyPreferences prox = preferences.getProxyPreferences();
-        if(prox.shouldUseAuthentication() && prox.shouldUseProxy()){
+        if(prox.shouldUseProxy()){
             assertNotEquals(prox.getHostname(),"");
             assertNotEquals(prox.getPort(),"");
         }
-        if(prox.shouldUseProxy()){
+        if(prox.shouldUseAuthentication()){
             assertNotEquals(prox.getUsername(),"");
             assertEquals(prox.getPassword(), "");
         }
