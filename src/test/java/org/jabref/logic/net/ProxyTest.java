@@ -11,48 +11,46 @@ import java.util.prefs.BackingStoreException;
 import static org.junit.jupiter.api.Assertions.*;
 public class ProxyTest {
     /**
-     * The method test if by storing a mock data of proxy information it get's stored as intented, where
-     * proxy host, port, username are stored and password aren't stored in
-     * the system register. It also ensures that the previous stored information isn't lost through extracting the
+     * The method test wheter storing a mock data of proxy information gets stored as intented, where
+     * proxy host, port, username should be stored in the system register and not password. The test also
+     * ensures that the previous stored information isn't lost through extracting the
      * information first and then restores it.
      */
     @Test
     public void testProxyPasswordNotStoredInRegister(){
-        //Get stored proxy preferences
+        //Get stored proxy preferences from registers
         final JabRefPreferences preferences = JabRefPreferences.getInstance();
-        //Globals.prefs = preferences;
         PreferencesMigrations.runMigrations(preferences);
         ProxyPreferences prox = preferences.getProxyPreferences();
-
+        //Save old registers
         String oldUseProxy = prox.shouldUseProxy().toString();
         String oldHostname = prox.getHostname();
         String oldPort = prox.getPort();
         String oldUseAuthentication = prox.shouldUseAuthentication().toString();
         String oldUsername = prox.getUsername();
         String oldPassword = prox.getPassword();
-
-        //Part 2 of test
+        //mock data
         String useProxy = "true";
         String hostname = "testName";
         String port = "8080";
         String useAuthentication = "true";
         String username = "testUserName";
         String password = "testPassword";
-
+        //String used for enabling usage of preference.put() for each proxy register
         String PROXY_USE = "useProxy";
         String PROXY_PORT = "proxyPort";
         String PROXY_HOSTNAME = "proxyHostname";
         String PROXY_USERNAME = "proxyUsername";
         String PROXY_PASSWORD = "proxyPassword";
         String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
-
+        //Writing to register with mock data
         preferences.put(PROXY_USE, useProxy);
         preferences.put(PROXY_HOSTNAME, hostname);
         preferences.put(PROXY_PORT, port);
         preferences.put(PROXY_USE_AUTHENTICATION, useAuthentication);
         preferences.put(PROXY_USERNAME, username);
         preferences.put(PROXY_PASSWORD, password);
-
+        //Actual test being conducted
         if(prox.shouldUseProxy()){
             assertEquals(prox.getHostname(),"testName");
             assertEquals(prox.getPort(),"8080");
@@ -62,7 +60,7 @@ public class ProxyTest {
             assertEquals(prox.getUsername(),"testUserName");
             assertNotEquals(prox.getPassword(), "testPassword");
         }
-
+        //Restores registers to previous state
         preferences.put(PROXY_USE, oldUseProxy);
         preferences.put(PROXY_HOSTNAME, oldHostname);
         preferences.put(PROXY_PORT, oldPort);
