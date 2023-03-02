@@ -68,7 +68,34 @@ public class ProxyTest {
         preferences.put(PROXY_USERNAME, oldUsername);
         preferences.put(PROXY_PASSWORD, oldPassword);
     }
+
     /**
-     * Add an additional test for testing that password get's stored somehow!
+     * The test checks if ProxyPreference class is still able to store password and use it from memory,
+     * even though it's no longer stored in register.
      */
+    @Test
+    public void testProxyPreferencesStorePassword() {
+        //mock data
+        Boolean useProxy = true;
+        String hostname = "testName";
+        String port = "8080";
+        Boolean useAuthentication = true;
+        String username = "testUserName";
+        String password = "testPassword";
+        //Creates proxy preference
+        ProxyPreferences proxyPref = new ProxyPreferences(
+                useProxy,
+                hostname,
+                port,
+                useAuthentication,
+                username,
+                password);
+        //Check if mock data is stored in object memory and can be extracted
+        assertEquals(proxyPref.shouldUseProxy(), true);
+        assertEquals(proxyPref.getHostname(), "testName");
+        assertEquals(proxyPref.getPort(), port);
+        assertEquals(proxyPref.shouldUseAuthentication(), true);
+        assertEquals(proxyPref.getUsername(), username);
+        assertEquals(proxyPref.getPassword(), password);
+    }
 }
