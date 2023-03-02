@@ -92,7 +92,7 @@ public class ProxyTest {
                 password);
         //Check if mock data is stored in object memory and can be extracted
         assertEquals(proxyPref.shouldUseProxy(), true);
-        assertEquals(proxyPref.getHostname(), "testName");
+        assertEquals(proxyPref.getHostname(), hostname);
         assertEquals(proxyPref.getPort(), port);
         assertEquals(proxyPref.shouldUseAuthentication(), true);
         assertEquals(proxyPref.getUsername(), username);
