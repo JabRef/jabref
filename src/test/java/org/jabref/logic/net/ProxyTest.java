@@ -20,33 +20,66 @@ public class ProxyTest {
      */
     @Test
     public void testProxyCredentialsMotStoredInRegisterHttp() throws IOException, BackingStoreException {
-        /*
-        Boolean useProxy = true;
-        String hostname = "testName";
-        String port = "8080";
-        Boolean useAuthentication = true;
-        String username = "testUserName";
-        String password = "testPassword";
-
-
-        ProxyPreferences proxyPref = new ProxyPreferences(useProxy, hostname,port,useAuthentication,username,password);
-        */
-
         //Get stored proxy preferences
         final JabRefPreferences preferences = JabRefPreferences.getInstance();
         //Globals.prefs = preferences;
         PreferencesMigrations.runMigrations(preferences);
         ProxyPreferences prox = preferences.getProxyPreferences();
+
+        String oldUseProxy = prox.shouldUseProxy().toString();
+        String oldHostname = prox.getHostname();
+        String oldPort = prox.getPort();
+        String oldUseAuthentication = prox.shouldUseAuthentication().toString();
+        String oldUsername = prox.getUsername();
+        String oldPassword = prox.getPassword();
+
         if(prox.shouldUseProxy()){
             assertNotEquals(prox.getHostname(),"");
             assertNotEquals(prox.getPort(),"");
+            System.out.println();
         }
         if(prox.shouldUseAuthentication()){
             assertNotEquals(prox.getUsername(),"");
             assertEquals(prox.getPassword(), "");
         }
-        //Run the test 2 times if test don't work to hopefully flush everything from older version and then connect again
-        //preferences.clear();
+        //Part 2 of test
+        String useProxy = "true";
+        String hostname = "testName";
+        String port = "8080";
+        String useAuthentication = "true";
+        String username = "testUserName";
+        String password = "testPassword";
+
+        String PROXY_USE = "useProxy";
+        String PROXY_PORT = "proxyPort";
+        String PROXY_HOSTNAME = "proxyHostname";
+        String PROXY_USERNAME = "proxyUsername";
+        String PROXY_PASSWORD = "proxyPassword";
+        String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
+
+        preferences.put(PROXY_USE, useProxy);
+        preferences.put(PROXY_HOSTNAME, hostname);
+        preferences.put(PROXY_PORT, port);
+        preferences.put(PROXY_USE_AUTHENTICATION, useAuthentication);
+        preferences.put(PROXY_USERNAME, username);
+        preferences.put(PROXY_PASSWORD, password);
+
+        if(prox.shouldUseProxy()){
+            assertEquals(prox.getHostname(),"testName");
+            assertEquals(prox.getPort(),"8080");
+            System.out.println();
+        }
+        if(prox.shouldUseAuthentication()){
+            assertEquals(prox.getUsername(),"testUserName");
+            assertNotEquals(prox.getPassword(), "testPassword");
+        }
+
+        preferences.put(PROXY_USE, oldUseProxy);
+        preferences.put(PROXY_HOSTNAME, oldHostname);
+        preferences.put(PROXY_PORT, oldPort);
+        preferences.put(PROXY_USE_AUTHENTICATION, oldUseAuthentication);
+        preferences.put(PROXY_USERNAME, oldUsername);
+        preferences.put(PROXY_PASSWORD, oldPassword);
     }
     /**
 
