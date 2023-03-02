@@ -46,7 +46,7 @@ public class ProxyTest {
             assertEquals(prox.getPassword(), "");
         }
         //Run the test 2 times if test don't work to hopefully flush everything from older version and then connect again
-        preferences.clear();
+        //preferences.clear();
     }
     /**
 
