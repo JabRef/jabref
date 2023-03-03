@@ -38,6 +38,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -195,47 +196,64 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return result;
     }
 
+    public boolean downloadFile(String urlText) {
+        try {
+            URL url = new URL(urlText);
+            addFromURLAndDownload(url);
+            return true;
+        } catch (MalformedURLException exception) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Invalid URL"),
+                    exception);
+            return false;
+        }
+    }
+
     public void fetchFulltext() {
         FulltextFetchers fetcher = new FulltextFetchers(
                 preferences.getImportFormatPreferences(),
                 preferences.getImporterPreferences());
-        BackgroundTask
+        Optional<String> urlField = entry.getField(StandardField.URL);
+        Boolean download_success = false;
+        if (urlField.isPresent()) {
+            download_success = downloadFile(urlField.get());
+        }
+        if (!urlField.isPresent() || !download_success) {
+            BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))
                 .onFinished(() -> fulltextLookupInProgress.setValue(false))
                 .onSuccess(url -> {
                     if (url.isPresent()) {
-                        addFromURL(url.get());
+                        addFromURLAndDownload(url.get());
                     } else {
                         dialogService.notify(Localization.lang("No full text document found"));
                     }
                 })
                 .executeWith(taskExecutor);
+        }
     }
 
     public void addFromURL() {
         String clipText = ClipBoardManager.getContents();
         Optional<String> urlText;
+        String urlField = entry.getField(StandardField.URL).orElse("");
         if (clipText.startsWith("http://") || clipText.startsWith("https://") || clipText.startsWith("ftp://")) {
             urlText = dialogService.showInputDialogWithDefaultAndWait(
                     Localization.lang("Download file"), Localization.lang("Enter URL to download"), clipText);
+        } else if (urlField.startsWith("http://") || urlField.startsWith("https://") || urlField.startsWith("ftp://")) {
+            urlText = dialogService.showInputDialogWithDefaultAndWait(
+                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), urlField);
         } else {
             urlText = dialogService.showInputDialogAndWait(
                     Localization.lang("Download file"), Localization.lang("Enter URL to download"));
         }
         if (urlText.isPresent()) {
-            try {
-                URL url = new URL(urlText.get());
-                addFromURL(url);
-            } catch (MalformedURLException exception) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Invalid URL"),
-                        exception);
-            }
+            downloadFile(urlText.get());
         }
     }
 
-    private void addFromURL(URL url) {
+    private void addFromURLAndDownload(URL url) {
         LinkedFileViewModel onlineFile = new LinkedFileViewModel(
                 new LinkedFile(url, ""),
                 entry,
