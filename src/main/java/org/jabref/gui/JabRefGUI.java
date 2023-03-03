@@ -18,17 +18,16 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
-import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.JabRefPreferences;
 
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
@@ -65,11 +64,13 @@ public class JabRefGUI {
                 preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
 
-        if (JabRefPreferences.getInstance().getProxyPreferences().shouldUseAuthentication()){
+        if (preferencesService.getProxyPreferences().shouldUseAuthentication()){
             DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            PreferencesDialogView preferencesDialogView = new PreferencesDialogView(this.mainFrame);
-            preferencesDialogView.getPreferenceTabList().getSelectionModel().select(20);
-            dialogService.showCustomDialog(preferencesDialogView);
+            dialogService.showPasswordDialogAndWait("Proxy configuration", "Proxy requires password","Password")
+                .ifPresent(newPassword -> {
+                    preferencesService.getProxyPreferences().setPassword(newPassword);
+                    ProxyRegisterer.register(preferencesService.getProxyPreferences());
+                });
         }
     }
 
