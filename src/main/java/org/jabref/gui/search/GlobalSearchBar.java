@@ -138,6 +138,10 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
+        searchField.setContextMenu(SearchFieldRightClickMenu.create(
+                keyBindingRepository,
+                stateManager));
+
         ClipBoardManager.addX11Support(searchField);
 
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
