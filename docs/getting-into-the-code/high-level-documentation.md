@@ -8,13 +8,19 @@ This page describes relevant information about the code structure of JabRef prec
 
 We have been successfully transitioning from a spaghetti to a more structured architecture with the `model` in the center, and the `logic` as an intermediate layer towards the `gui` which is the outer shell. There are additional utility packages for `preferences` and the `cli`. The dependencies are only directed towards the center. We have JUnit tests to detect violations of the most crucial dependencies (between `logic`, `model`, and `gui`), and the build will fail automatically in these cases.
 
-The `model` represents the most important data structures (`BibDatases`, `BibEntries`, `Events`, and related aspects) and has only a little bit of logic attached. The `logic` is responsible for reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use. Only the `gui` knows the user and his preferences and can interact with him to help him solve tasks. For each layer, we form packages according to their responsibility, i.e., vertical structuring. The `model` should have no dependencies to other classes of JabRef and the `logic` should only depend on `model` classes. The `cli` package bundles classes that are responsible for JabRef's command line interface. The `preferences` represents all information customizable by a user for her personal needs.
+The `model` represents the most important data structures (`BibDatases`, `BibEntries`, `Events`, and related aspects) and has only a little bit of logic attached.
+The `logic` is responsible for reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use.
+Only the `gui` knows the user and their preferences and can interact with them to help them solving tasks.
+For each layer, we form packages according to their responsibility, i.e., vertical structuring.
+The `model` should have no dependencies to other classes of JabRef and the `logic` should only depend on `model` classes.
+The `cli` package bundles classes that are responsible for JabRef's command line interface.
+The `preferences` package represents all information customizable by a user for her personal needs.
 
-We use an event bus to publish events from the `model` to the other layers. This allows us to keep the architecture but still react upon changes within the core in the outer layers.
+We use an event bus to publish events from the `model` to the other layers.
+This allows us to keep the architecture but still react upon changes within the core in the outer layers.
+Note that we are currently switching to JavaFX's observables, as this concepts seems as we aim for a stronger coupling to the data producers.
 
-You can view up-to-date diagrams for model, gui, and logic packages [at sourcespy](https://sourcespy.com/github/jabref/).
-
-## Package Structure [![SourceSpy Dashboard](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/jabref/)
+## Package Structure
 
 Permitted dependencies in our architecture are:
 

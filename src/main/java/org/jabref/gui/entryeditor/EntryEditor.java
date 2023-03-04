@@ -29,6 +29,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
+import org.jabref.gui.cleanup.CleanupSingleAction;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
@@ -228,6 +229,12 @@ public class EntryEditor extends BorderPane {
     }
 
     @FXML
+    void generateCleanupButton() {
+        CleanupSingleAction action = new CleanupSingleAction(getEntry(), preferencesService, dialogService, stateManager, undoManager);
+        action.execute();
+    }
+
+    @FXML
     private void navigateToPreviousEntry() {
         libraryTab.selectPreviousEntry();
     }
@@ -395,7 +402,7 @@ public class EntryEditor extends BorderPane {
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        new FetchAndMergeEntry(libraryTab, taskExecutor).fetchAndMerge(entry, fetcher);
+        new FetchAndMergeEntry(libraryTab, taskExecutor, preferencesService, dialogService).fetchAndMerge(entry, fetcher);
     }
 
     public void setFocusToField(Field field) {

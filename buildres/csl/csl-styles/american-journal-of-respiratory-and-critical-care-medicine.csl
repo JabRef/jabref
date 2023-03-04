@@ -2,6 +2,7 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
     <title>American Journal of Respiratory and Critical Care Medicine</title>
+    <title-short>AJRCCM</title-short>
     <id>http://www.zotero.org/styles/american-journal-of-respiratory-and-critical-care-medicine</id>
     <link href="http://www.zotero.org/styles/american-journal-of-respiratory-and-critical-care-medicine" rel="self"/>
     <link href="http://www.zotero.org/styles/nature" rel="template"/>
@@ -14,11 +15,14 @@
     <contributor>
       <name>Sebastian Karcher</name>
     </contributor>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>1073-449X</issn>
     <eissn>1535-4970</eissn>
-    <updated>2014-06-03T22:14:43+00:00</updated>
+    <updated>2022-12-19T14:23:40+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="title">
@@ -119,7 +123,7 @@
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography et-al-min="30" et-al-use-first="29" second-field-align="flush" entry-spacing="0" line-spacing="2">
+  <bibliography et-al-min="7" et-al-use-first="6" second-field-align="flush" entry-spacing="0" line-spacing="2">
     <layout>
       <text variable="citation-number" suffix="."/>
       <group delimiter=". " suffix=". ">

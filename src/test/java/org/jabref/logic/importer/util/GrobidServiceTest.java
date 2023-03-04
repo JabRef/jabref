@@ -30,17 +30,18 @@ import static org.mockito.Mockito.when;
 public class GrobidServiceTest {
 
     private static GrobidService grobidService;
-    private static GrobidPreferences grobidPreferences = new GrobidPreferences(
-            true,
-            false,
-            "http://grobid.jabref.org:8070");
     private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
     public static void setup() {
-        grobidService = new GrobidService(grobidPreferences);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
+        GrobidPreferences grobidPreferences = new GrobidPreferences(
+                true,
+                false,
+                "http://grobid.jabref.org:8070");
+        grobidService = new GrobidService(grobidPreferences);
     }
 
     @Test

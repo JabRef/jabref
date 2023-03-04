@@ -153,9 +153,9 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
     private void preventTextSelectionViaMouseEvents() {
         label.addEventFilter(MouseEvent.ANY, e -> {
-            if (e.getEventType() == MouseEvent.MOUSE_DRAGGED ||
-                    e.getEventType() == MouseEvent.DRAG_DETECTED ||
-                    e.getEventType() == MouseEvent.MOUSE_ENTERED) {
+            if ((e.getEventType() == MouseEvent.MOUSE_DRAGGED) ||
+                    (e.getEventType() == MouseEvent.DRAG_DETECTED) ||
+                    (e.getEventType() == MouseEvent.MOUSE_ENTERED)) {
                 e.consume();
             } else if (e.getEventType() == MouseEvent.MOUSE_PRESSED) {
                 if (e.getClickCount() > 1) {

@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.study.Study;
@@ -17,7 +16,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class ManageStudyDefinitionViewModelTest {
     private ImportFormatPreferences importFormatPreferences;
@@ -29,8 +27,6 @@ class ManageStudyDefinitionViewModelTest {
         // code taken from org.jabref.logic.importer.WebFetchersTest.setUp
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class);
-        FieldContentFormatterPreferences fieldContentFormatterPreferences = mock(FieldContentFormatterPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
         dialogService = mock(DialogService.class);
     }
 
@@ -41,7 +37,6 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyDatabaseItem("ACM Portal", true),
                 new StudyDatabaseItem("ArXiv", false),
                 new StudyDatabaseItem("Biodiversity Heritage", false),
-                new StudyDatabaseItem("CiteSeerX", false),
                 new StudyDatabaseItem("Collection of Computer Science Bibliographies", false),
                 new StudyDatabaseItem("Crossref", false),
                 new StudyDatabaseItem("DBLP", true),
@@ -81,7 +76,6 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyDatabaseItem("ACM Portal", true),
                 new StudyDatabaseItem("ArXiv", false),
                 new StudyDatabaseItem("Biodiversity Heritage", false),
-                new StudyDatabaseItem("CiteSeerX", false),
                 new StudyDatabaseItem("Collection of Computer Science Bibliographies", false),
                 new StudyDatabaseItem("Crossref", false),
                 new StudyDatabaseItem("DBLP", false),

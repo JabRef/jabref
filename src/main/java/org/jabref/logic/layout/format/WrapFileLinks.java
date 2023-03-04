@@ -71,7 +71,7 @@ import org.jabref.model.util.FileHelper;
  * <p/>
  * would give the following output:
  * 1. An early &quot;draft&quot; (/home/john/draft.txt)
- *
+ * <p/>
  * Additional pairs of replacements can be added.
  */
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
@@ -96,12 +96,14 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     }
 
     private final Map<String, String> replacements = new HashMap<>();
-    private final FileLinkPreferences prefs;
+    private final List<Path> fileDirectories;
+    private final String mainFileDirectory;
     private String fileType;
     private List<FormatEntry> format;
 
-    public WrapFileLinks(FileLinkPreferences fileLinkPreferences) {
-        this.prefs = fileLinkPreferences;
+    public WrapFileLinks(List<Path> fileDirectories, String mainFileDirectory) {
+        this.fileDirectories = fileDirectories;
+        this.mainFileDirectory = mainFileDirectory;
     }
 
     /**
@@ -194,14 +196,10 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             break;
                         case FILE_PATH:
                             List<Path> dirs;
-                            // We need to resolve the file directory from the database's metadata,
-                            // but that is not available from a formatter. Therefore, as an
-                            // ugly hack, the export routine has set a global variable before
-                            // starting the export, which contains the database's file directory:
-                            if ((prefs.getFileDirForDatabase() == null) || prefs.getFileDirForDatabase().isEmpty()) {
-                                dirs = Collections.singletonList(Path.of(prefs.getMainFileDirectory()));
+                            if (fileDirectories.isEmpty()) {
+                                dirs = Collections.singletonList(Path.of(mainFileDirectory));
                             } else {
-                                dirs = prefs.getFileDirForDatabase();
+                                dirs = fileDirectories;
                             }
 
                             String pathString = flEntry.findIn(dirs)

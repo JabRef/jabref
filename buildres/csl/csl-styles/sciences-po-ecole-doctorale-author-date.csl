@@ -67,11 +67,16 @@
   </macro>
   <macro name="archive">
     <choose>
-      <if variable="archive archive_location" match="any">
-        <group delimiter=". ">
-          <text variable="archive_location" text-case="capitalize-first"/>
-          <text variable="archive"/>
-          <text variable="archive-place"/>
+      <if type="manuscript" match="any">
+        <group delimiter="">
+          <text variable="publisher-place" suffix=".&#160;"/>
+          <text variable="archive" suffix=",&#160;"/>
+          <text variable="archive_location"/>
+          <choose>
+            <if variable="call-number" match="any">
+              <text variable="call-number" prefix="&#160;/&#160;"/>
+            </if>
+          </choose>
         </group>
       </if>
     </choose>
@@ -136,7 +141,7 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="article bill book broadcast graphic legal_case legislation map manuscript motion_picture patent personal_communication report song webpage" match="any">
+      <if type="article bill book broadcast graphic legal_case legislation map motion_picture patent personal_communication report song webpage" match="any">
         <text variable="title" font-style="italic"/>
       </if>
       <else-if type="article-journal article-newspaper article-magazine" match="any">
@@ -158,9 +163,9 @@
         </group>
       </else-if>
       <else-if type="manuscript" match="any">
-        <group delimiter=",">
-          <text variable="title" quotes="true"/>
-          <text variable="genre" prefix=" "/>
+        <group delimiter=". ">
+          <text variable="title" font-style="italic"/>
+          <text variable="genre"/>
         </group>
       </else-if>
       <else-if type="chapter entry-dictionary entry-encyclopedia" match="any">
@@ -177,7 +182,7 @@
   </macro>
   <macro name="pub-place">
     <choose>
-      <if type="bill book chapter entry-dictionary entry-encyclopedia thesis legal_case manuscript map paper-conference song" match="any">
+      <if type="bill book chapter entry-dictionary entry-encyclopedia thesis legal_case map paper-conference song" match="any">
         <choose>
           <if variable="publisher-place" match="any">
             <text variable="publisher-place"/>
@@ -191,7 +196,7 @@
   </macro>
   <macro name="publisher">
     <choose>
-      <if type="bill book chapter entry-dictionary entry-encyclopedia thesis legal_case manuscript map paper-conference report song" match="any">
+      <if type="bill book chapter entry-dictionary entry-encyclopedia thesis legal_case map paper-conference report song" match="any">
         <choose>
           <if variable="publisher" match="any">
             <text variable="publisher"/>
@@ -214,7 +219,7 @@
   </macro>
   <macro name="yearpage">
     <choose>
-      <if type="article bill book graphic legal_case map motion_picture paper-conference manuscript report song thesis " match="any">
+      <if type="article bill book graphic legal_case map motion_picture paper-conference report song thesis " match="any">
         <group delimiter=". ">
           <date variable="issued">
             <date-part name="year"/>
@@ -274,6 +279,26 @@
               <label variable="page" form="short"/>
               <text variable="page"/>
             </else>
+          </choose>
+        </group>
+      </else-if>
+      <else-if type="manuscript" match="any">
+        <group delimiter=". ">
+          <date variable="issued">
+            <date-part name="day" suffix=" "/>
+            <date-part name="month" suffix=" "/>
+            <date-part name="year" suffix=""/>
+          </date>
+          <choose>
+            <if variable="locator" match="any">
+              <group delimiter="&#8239;">
+                <label variable="locator" form="short"/>
+                <text variable="locator"/>
+              </group>
+            </if>
+            <else-if variable="locator" match="none">
+              <text variable="number-of-pages" suffix="&#160;p"/>
+            </else-if>
           </choose>
         </group>
       </else-if>

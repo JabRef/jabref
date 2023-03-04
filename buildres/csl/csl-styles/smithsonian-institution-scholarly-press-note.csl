@@ -7,13 +7,14 @@
     <link href="http://www.zotero.org/styles/smithsonian-institution-scholarly-press-note" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-fullnote-bibliography" rel="template"/>
     <link href="https://scholarlypress.si.edu/resources/guidelinesforms/" rel="documentation"/>
+    <link href="https://public-media.secure.si.edu/filer/b6/b9/b6b92307-28a1-49fe-ae1a-3021f848746e/sisp_guide_to_notes-biblio_feb2020.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
       <email>obrienpat86@gmail.com</email>
     </author>
     <category citation-format="note"/>
     <category field="generic-base"/>
-    <updated>2018-04-24T15:30:08+00:00</updated>
+    <updated>2022-11-07T14:19:26+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -103,7 +104,7 @@
                 <else>
                   <names variable="editor translator" delimiter=", ">
                     <label form="verb-short" text-case="lowercase" suffix=" "/>
-                    <name and="text" delimiter=", "/>
+                    <name and="text" initialize-with=". "/>
                   </names>
                 </else>
               </choose>
@@ -232,7 +233,7 @@
         <text variable="title" font-style="italic" prefix="review of "/>
       </else-if>
       <else>
-        <text variable="title" text-case="title" quotes="true"/>
+        <text variable="title" text-case="title"/>
       </else>
     </choose>
   </macro>
@@ -265,7 +266,7 @@
         <text variable="title"/>
       </else-if>
       <else>
-        <text variable="title" text-case="title" quotes="true"/>
+        <text variable="title" text-case="title" quotes="false"/>
       </else>
     </choose>
   </macro>

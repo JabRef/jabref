@@ -385,7 +385,7 @@ public class StudyRepository {
      * @param crawlResults The results that shall be persisted.
      */
     private void persistResults(List<QueryResult> crawlResults) throws IOException, SaveException {
-        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.getKeywordSeparator());
+        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
         BibDatabase newStudyResultEntries = new BibDatabase();
 
         for (QueryResult result : crawlResults) {

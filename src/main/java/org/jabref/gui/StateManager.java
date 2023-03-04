@@ -207,6 +207,15 @@ public class StateManager {
         lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
     }
 
+    public List<String> collectAllDatabasePaths() {
+        List<String> list = new ArrayList<>();
+        getOpenDatabases().stream()
+                          .map(BibDatabaseContext::getDatabasePath)
+                          .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                  path -> list.add(path.toAbsolutePath().toString()),
+                                  () -> list.add("")));
+        return list;
+        
     public void addSearchHistory(String search) {
         searchHistory.add(search);
     }
