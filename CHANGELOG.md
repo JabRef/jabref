@@ -11,7 +11,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
-<<<<<<< HEAD
 - In case a backup is found, the filename of the backup is shown.
 - On startup, JabRef notifies the user if there were parsing errors during opening.
 - We integrated a new three-way merge UI for merging entries in the Entries Merger Dialog, the Duplicate Resolver Dialog, the Entry Importer Dialog, and the External Changes Resolver Dialog. [#8945](https://github.com/JabRef/jabref/pull/8945)
@@ -27,8 +26,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a field showing the BibTeX/biblatex source for added and deleted entries in the "External Changes Resolver" dialog. [#9509](https://github.com/JabRef/jabref/issues/9509)
 
 
-
->>>>>>> 34847978a913d7b1b01318375c63d9141ceb75ea
 
 ### Changed
 
