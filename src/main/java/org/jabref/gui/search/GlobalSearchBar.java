@@ -14,6 +14,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -106,7 +108,6 @@ public class GlobalSearchBar extends HBox {
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
-    private KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
@@ -126,6 +127,7 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
+        KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
@@ -142,6 +144,14 @@ public class GlobalSearchBar extends HBox {
                 keyBindingRepository,
                 stateManager,
                 searchField));
+
+        ObservableSet<String> search = stateManager.getWholeSearchHistory();
+        search.addListener((SetChangeListener.Change<? extends String> change) -> {
+            searchField.setContextMenu(SearchFieldRightClickMenu.create(
+                    keyBindingRepository,
+                    stateManager,
+                    searchField));
+        });
 
         ClipBoardManager.addX11Support(searchField);
 
