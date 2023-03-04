@@ -6,7 +6,8 @@
     <id>http://www.zotero.org/styles/journal-of-the-american-college-of-cardiology</id>
     <link href="http://www.zotero.org/styles/journal-of-the-american-college-of-cardiology" rel="self"/>
     <link href="http://www.zotero.org/styles/american-medical-association" rel="template"/>
-    <link href="http://content.onlinejacc.org/misc/ifora.dtl" rel="documentation"/>
+    <link href="https://www.jacc.org/journal/jacc" rel="documentation"/>
+    <link href="https://www.jacc.org/pb-assets/documents/author-instructions-jacc-1613751106523.pdf" rel="documentation"/>
     <author>
       <name>Julian Onions</name>
       <email>julian.onions@gmail.com</email>
@@ -19,9 +20,14 @@
     <issn>0735-1097</issn>
     <eissn>1558-3597</eissn>
     <summary>Journal of the American College of Cardiology</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2022-12-09T09:35:42+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="online">published online</term>
+    </terms>
+  </locale>
   <macro name="editor">
     <names variable="editor">
       <name name-as-sort-order="all" sort-separator=" " initialize-with="" delimiter=", " delimiter-precedes-last="always"/>
@@ -45,24 +51,34 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL">
-        <text value="Available at:" suffix=" "/>
-        <text variable="URL" suffix="."/>
-        <group prefix=" ">
-          <text term="accessed" text-case="capitalize-first" suffix=" "/>
-          <date variable="accessed">
-            <date-part name="month" suffix=" "/>
-            <date-part name="day" suffix=", "/>
-            <date-part name="year"/>
-          </date>
+      <if type="webpage post post-weblog" match="any">
+        <group delimiter=". ">
+          <group delimiter=" ">
+            <text term="accessed" text-case="capitalize-first"/>
+            <date form="text" variable="accessed"/>
+          </group>
+          <text variable="URL"/>
         </group>
       </if>
+      <else-if type="article-journal" match="any">
+        <choose>
+          <if match="none" variable="page volume">
+            <group delimiter=". ">
+              <group>
+                <text term="online" text-case="capitalize-first"/>
+                <date form="text" variable="issued"/>
+              </group>
+              <text variable="DOI" prefix="https://doi.org/"/>
+            </group>
+          </if>
+        </choose>
+      </else-if>
     </choose>
   </macro>
   <macro name="title">
     <choose>
       <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-        <text variable="title"/>
+        <text variable="title" font-style="italic"/>
       </if>
       <else>
         <text variable="title"/>
@@ -92,11 +108,11 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter=", ">
+    <layout delimiter=", " vertical-align="sup">
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography hanging-indent="false" et-al-min="7" et-al-use-first="3">
+  <bibliography et-al-min="7" et-al-use-first="3" line-spacing="2">
     <layout>
       <text variable="citation-number" suffix=". "/>
       <text macro="author"/>
@@ -108,7 +124,7 @@
             <text macro="editor" prefix=" (" suffix=")"/>
           </group>
           <text prefix=" " macro="publisher"/>
-          <group suffix="." prefix="; ">
+          <group prefix=", " suffix=".">
             <date variable="issued">
               <date-part name="year"/>
             </date>
@@ -120,7 +136,7 @@
           <group prefix=" ">
             <text term="in" text-case="capitalize-first" suffix=": "/>
             <text macro="editor"/>
-            <text variable="container-title" prefix=" " suffix="."/>
+            <text variable="container-title" font-style="italic" prefix=" " suffix="."/>
             <text variable="volume" prefix="Vol " suffix="."/>
             <text macro="edition" prefix=" "/>
             <text variable="collection-title" prefix=" " suffix="."/>
@@ -136,21 +152,21 @@
           </group>
         </else-if>
         <else>
-          <group suffix=".">
-            <text macro="title" prefix=" "/>
-            <text macro="editor" prefix=" "/>
-          </group>
-          <group prefix=" " suffix=".">
-            <text variable="container-title" form="short"/>
-            <group delimiter=";" prefix=" ">
-              <date variable="issued">
-                <date-part name="year"/>
-              </date>
-              <group>
+          <group delimiter=". ">
+            <group>
+              <text macro="title" prefix=" "/>
+              <text macro="editor" prefix=" "/>
+            </group>
+            <text variable="container-title" form="short" strip-periods="true" font-style="italic"/>
+            <group delimiter=":" prefix=" " suffix=".">
+              <group delimiter=";" prefix=" ">
+                <date variable="issued">
+                  <date-part name="year"/>
+                </date>
                 <text variable="volume"/>
               </group>
+              <text variable="page"/>
             </group>
-            <text variable="page" prefix=":"/>
           </group>
         </else>
       </choose>

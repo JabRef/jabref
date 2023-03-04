@@ -89,6 +89,7 @@ class CitationKeyGeneratorTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
+                "",
                 ',');
 
         return new CitationKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
@@ -1121,6 +1122,7 @@ class CitationKeyGeneratorTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
+                "",
                 ',');
 
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");

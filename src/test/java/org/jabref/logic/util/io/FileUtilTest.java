@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -204,17 +202,31 @@ class FileUtilTest {
 
     @Test
     void uniquePathSubstrings() {
-        String[] pathArr = {Path.of("C:/uniquefile.bib").toString(),
-                Path.of("C:/downloads/filename.bib").toString(), Path.of("C:/mypaper/bib/filename.bib").toString(),
-                Path.of("C:/external/mypaper/bib/filename.bib").toString(), ""};
-        String[] uniqArr = {Path.of("uniquefile.bib").toString(), Path.of("downloads/filename.bib").toString(),
-                Path.of("C:/mypaper/bib/filename.bib").toString(),
-                Path.of("external/mypaper/bib/filename.bib").toString(), ""};
-        List<String> paths = Arrays.asList(pathArr);
-        List<String> uniqPath = Arrays.asList(uniqArr);
+       List<String> paths = List.of("C:/uniquefile.bib",
+               "C:/downloads/filename.bib",
+               "C:/mypaper/bib/filename.bib",
+               "C:/external/mypaper/bib/filename.bib",
+               "");
+        List<String> uniqPath = List.of("uniquefile.bib",
+              "downloads/filename.bib",
+              "C:/mypaper/bib/filename.bib",
+              "external/mypaper/bib/filename.bib",
+              "");
 
         List<String> result = FileUtil.uniquePathSubstrings(paths);
         assertEquals(uniqPath, result);
+    }
+
+    @Test
+    void testUniquePathFragmentWithSameSuffix() {
+        List<String> dirs = List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliograsphy.bib");
+        assertEquals(Optional.of("bibliography.bib"), FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/bibliography.bib")));
+    }
+
+    @Test
+    void testUniquePathFragmentWithSameSuffixAndLongerName() {
+        List<String> dirs = List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliography.bib");
+        assertEquals(Optional.of("koppor-bibliography.bib"), FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/koppor-bibliography.bib")));
     }
 
     @Test
@@ -275,57 +287,6 @@ class FileUtilTest {
         Files.createFile(temp);
         FileUtil.copyFile(existingTestFile, temp, false);
         assertNotEquals(Files.readAllLines(existingTestFile, StandardCharsets.UTF_8), Files.readAllLines(temp, StandardCharsets.UTF_8));
-    }
-
-    @Test
-    void testRenameFileWithFromFileIsNullAndToFileIsNull() {
-        assertThrows(NullPointerException.class, () -> FileUtil.renameFile(null, null));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndToFileIsNull() {
-        assertThrows(NullPointerException.class, () -> FileUtil.renameFile(existingTestFile, null));
-    }
-
-    @Test
-    void testRenameFileWithFromFileIsNullAndToFileExist() {
-        assertThrows(NullPointerException.class, () -> FileUtil.renameFile(null, existingTestFile));
-    }
-
-    @Test
-    void testRenameFileWithFromFileNotExistAndToFileNotExist() {
-        assertFalse(FileUtil.renameFile(nonExistingTestPath, nonExistingTestPath));
-    }
-
-    @Test
-    void testRenameFileWithFromFileNotExistAndToFileExist() {
-        assertFalse(FileUtil.renameFile(nonExistingTestPath, existingTestFile));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndToFileNotExist() {
-        assertTrue(FileUtil.renameFile(existingTestFile, nonExistingTestPath));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndToFileExist() {
-        assertTrue(FileUtil.renameFile(existingTestFile, existingTestFile));
-    }
-
-    @Test
-    void testRenameFileWithFromFileExistAndOtherToFileExist() {
-        assertFalse(FileUtil.renameFile(existingTestFile, otherExistingTestFile));
-    }
-
-    @Test
-    void testRenameFileSuccessful(@TempDir Path otherTemporaryFolder) {
-        // Be careful. This "otherTemporaryFolder" is the same as the "temporaryFolder"
-        // in the @BeforeEach method.
-        Path temp = Path.of(otherTemporaryFolder.resolve("123").toString());
-
-        LOGGER.debug("Temp dir {}", temp);
-        FileUtil.renameFile(existingTestFile, temp);
-        assertFalse(Files.exists(existingTestFile));
     }
 
     @Test

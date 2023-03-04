@@ -214,7 +214,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonResponse(jsonEntry, importFormatPreferences.getKeywordSeparator());
+                    BibEntry entry = parseJsonResponse(jsonEntry, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                     boolean addEntry;
                     // In case entry has no year, add it
                     // In case an entry has a year, check if its in the year range

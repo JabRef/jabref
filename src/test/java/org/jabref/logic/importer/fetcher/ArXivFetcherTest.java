@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,10 +54,10 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
     @BeforeAll
     static void setUp() {
-        importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         // Used during DOI fetch process
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+        when(importFormatPreferences.fieldContentFormatterPreferences()).thenReturn(
                 new FieldContentFormatterPreferences(
                         Arrays.stream("pdf;ps;url;doi;file;isbn;issn".split(";"))
                               .map(fieldName -> StandardField.fromName(fieldName).isPresent() ? StandardField.fromName(fieldName).get() : new UnknownField(fieldName))
@@ -104,6 +105,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.DOI, "10.48550/ARXIV.1811.10364");
 
         // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
+        // FixMe: Test this BibEntry
         completePaper = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
                 .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")

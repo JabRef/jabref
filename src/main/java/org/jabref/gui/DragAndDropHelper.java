@@ -23,4 +23,16 @@ public class DragAndDropHelper {
             return dragboard.getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());
         }
     }
+
+    public static boolean hasGroups(Dragboard dragboard) {
+        return !getGroups(dragboard).isEmpty();
+    }
+
+    public static List<String> getGroups(Dragboard dragboard) {
+        if (!dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
+            return Collections.emptyList();
+        } else {
+            return (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
+        }
+    }
 }

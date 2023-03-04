@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
+import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selection;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
@@ -23,8 +24,6 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selection;
-
 /**
  * A controller class to control left, right and merged field values
  */
@@ -41,6 +40,8 @@ public class FieldRowView {
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
+    private GridPane parent;
+
     public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
@@ -48,6 +49,14 @@ public class FieldRowView {
         leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex);
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
+
+        // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
+        // This won't be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
+        leftValueCell.parentProperty().addListener(e -> {
+            if (leftValueCell.getParent() instanceof GridPane grid) {
+                parent = grid;
+            }
+        });
 
         if (FieldMergerFactory.canMerge(field)) {
             ToggleMergeUnmergeButton toggleMergeUnmergeButton = new ToggleMergeUnmergeButton(field);
@@ -164,6 +173,20 @@ public class FieldRowView {
         }
     }
 
+    public void hide() {
+        if (parent != null) {
+            parent.getChildren().removeAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
+        }
+    }
+
+    public void show() {
+        if (parent != null) {
+            if (!parent.getChildren().contains(leftValueCell)) {
+                parent.getChildren().addAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
+            }
+        }
+    }
+
     public void hideDiff() {
         if (!rightValueCell.isVisible()) {
             return;
@@ -178,5 +201,14 @@ public class FieldRowView {
         int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
         getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
         getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());
+    }
+
+    public boolean hasEqualLeftAndRightValues() {
+        return viewModel.hasEqualLeftAndRightValues();
+    }
+
+    @Override
+    public String toString() {
+        return "FieldRowView [shouldShowDiffs=" + shouldShowDiffs.get() + ", fieldNameCell=" + fieldNameCell + ", leftValueCell=" + leftValueCell + ", rightValueCell=" + rightValueCell + ", mergedValueCell=" + mergedValueCell + "]";
     }
 }

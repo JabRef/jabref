@@ -117,8 +117,8 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                     }
                 }
                 case "dc.type" -> entry.setType(StandardEntryType.Book);
-                case "dc.date.issued" -> entry.setField(StandardField.YEAR, String.valueOf(
-                        dataObject.getInt("value")));
+                case "dc.date.issued" -> entry.setField(StandardField.DATE, String.valueOf(
+                        dataObject.getString("value")));
                 case "oapen.identifier.doi" -> entry.setField(StandardField.DOI,
                         dataObject.getString("value"));
                 case "dc.title" -> entry.setField(StandardField.TITLE,

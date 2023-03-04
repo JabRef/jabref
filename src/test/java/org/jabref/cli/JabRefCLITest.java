@@ -1,6 +1,7 @@
 package org.jabref.cli;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -128,5 +129,18 @@ class JabRefCLITest {
         JabRefCLI cli = new JabRefCLI(new String[]{"-importBibtex", bibtex});
 
         assertEquals(bibtex, cli.getBibtexImport());
+    }
+
+    @Test
+    void wrapStringList() {
+        List<String> given = List.of("html", "simplehtml", "docbook5", "docbook4", "din1505", "bibordf", "tablerefs", "listrefs",
+                "tablerefsabsbib", "harvard", "iso690rtf", "iso690txt", "endnote", "oocsv", "ris", "misq", "yaml", "bibtexml", "oocalc", "ods",
+                "MSBib", "mods", "xmp", "pdf", "bib");
+        String expected = """
+                Available export formats: html, simplehtml, docbook5, docbook4, din1505, bibordf, tablerefs,
+                listrefs, tablerefsabsbib, harvard, iso690rtf, iso690txt, endnote, oocsv, ris, misq, yaml, bibtexml,
+                oocalc, ods, MSBib, mods, xmp, pdf, bib""";
+
+        assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given, 26));
     }
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="en-US">
   <info>
-    <title>Cambridge University Press (author-date)</title>
+    <title>Cambridge University Press, CambridgeB (author-date)</title>
     <id>http://www.zotero.org/styles/cambridge-university-press-author-date</id>
     <link href="http://www.zotero.org/styles/cambridge-university-press-author-date" rel="self"/>
     <link href="http://www.zotero.org/styles/apa-no-doi-no-issue" rel="template"/>
-    <link href="http://www.zotero.org/styles/ios-press-books" rel="documentation"/>
+    <link href="https://www.cambridge.org/core/services/aop-file-manager/file/610be5e3a1acae0932de3cca/Cambridge-Reference-Styles.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien, PhD</name>
       <email>obrienpat86@gmail.com</email>
@@ -220,7 +220,7 @@
                 <text variable="publisher"/>
               </group>
               <group>
-                <label variable="page" form="short" suffix=" "/>
+                <label variable="page" form="short" prefix=", " suffix=" "/>
                 <text variable="page"/>
               </group>
             </if>

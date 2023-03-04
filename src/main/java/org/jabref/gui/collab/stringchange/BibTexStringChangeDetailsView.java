@@ -3,10 +3,10 @@ package org.jabref.gui.collab.stringchange;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.collab.ExternalChangeDetailsView;
+import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.l10n.Localization;
 
-public final class BibTexStringChangeDetailsView extends ExternalChangeDetailsView {
+public final class BibTexStringChangeDetailsView extends DatabaseChangeDetailsView {
 
     public BibTexStringChangeDetailsView(BibTexStringChange stringChange) {
         VBox container = new VBox();
