@@ -140,7 +140,8 @@ public class GlobalSearchBar extends HBox {
 
         searchField.setContextMenu(SearchFieldRightClickMenu.create(
                 keyBindingRepository,
-                stateManager));
+                stateManager,
+                currentResults));
 
         ClipBoardManager.addX11Support(searchField);
 
@@ -198,6 +199,7 @@ public class GlobalSearchBar extends HBox {
                 },
                 query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
 
+        this.stateManager.addSearchHistory(searchField.textProperty().get());
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
     }

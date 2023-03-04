@@ -1,8 +1,11 @@
 package org.jabref.gui;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
@@ -69,6 +72,8 @@ public class StateManager {
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
 
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
+
+    private final Set<String> searchHistory = new LinkedHashSet<>();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
@@ -200,5 +205,31 @@ public class StateManager {
 
     public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
         lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
+    }
+
+    public void addSearchHistory(String search) {
+        searchHistory.add(search);
+    }
+
+    public Set<String> getWholeSearchHistory() {
+        return searchHistory;
+    }
+
+    public List<String> getLastSearchHistory(int size) {
+        List<String> lastSearches = new ArrayList<>();
+        Object[] searchArray = searchHistory.toArray();
+        int numSearches = searchHistory.size();
+        int startIndex = 0;
+        if (size < numSearches) {
+            startIndex = Math.max(0, numSearches - size);
+        }
+        for (int i = startIndex; i < numSearches; i++) {
+            lastSearches.add((String) searchArray[i]);
+        }
+        return lastSearches;
+    }
+
+    public void clearSearchHistory() {
+        searchHistory.clear();
     }
 }
