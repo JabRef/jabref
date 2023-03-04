@@ -106,6 +106,7 @@ public class GlobalSearchBar extends HBox {
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
+    private KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
@@ -125,7 +126,6 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
-        KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
@@ -141,7 +141,7 @@ public class GlobalSearchBar extends HBox {
         searchField.setContextMenu(SearchFieldRightClickMenu.create(
                 keyBindingRepository,
                 stateManager,
-                currentResults));
+                searchField));
 
         ClipBoardManager.addX11Support(searchField);
 
@@ -199,7 +199,6 @@ public class GlobalSearchBar extends HBox {
                 },
                 query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
 
-        this.stateManager.addSearchHistory(searchField.textProperty().get());
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
     }
@@ -298,6 +297,7 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
+        this.stateManager.addSearchHistory(searchField.textProperty().get());
         stateManager.setSearchQuery(searchQuery);
     }
 

@@ -1,7 +1,6 @@
 package org.jabref.gui.search;
 
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -13,10 +12,12 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
+import org.controlsfx.control.textfield.CustomTextField;
+
 public class SearchFieldRightClickMenu {
     public static ContextMenu create(KeyBindingRepository keyBindingRepository,
                                      StateManager stateManager,
-                                     Label currentResults) {
+                                     CustomTextField searchField) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
 
@@ -31,7 +32,7 @@ public class SearchFieldRightClickMenu {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(StandardActions.SELECT_ALL, null, stateManager)),
-                createSearchFromHistorySubMenu(factory, stateManager, currentResults)
+                createSearchFromHistorySubMenu(factory, stateManager, searchField)
         );
 
         return contextMenu;
@@ -39,7 +40,7 @@ public class SearchFieldRightClickMenu {
 
     private static Menu createSearchFromHistorySubMenu(ActionFactory factory,
                                                        StateManager stateManager,
-                                                       Label currentResults) {
+                                                       CustomTextField searchField) {
         Menu searchFromHistorySubMenu = factory.createMenu(() -> "Search from history...");
 
         int num = stateManager.getLastSearchHistory(10).size();
@@ -52,7 +53,7 @@ public class SearchFieldRightClickMenu {
                 MenuItem item = factory.createMenuItem(() -> stateManager.getLastSearchHistory(10).get(finalI), new SimpleCommand() {
                     @Override
                     public void execute() {
-                        currentResults.setText(stateManager.getLastSearchHistory(10).get(finalI));
+                        searchField.setText(stateManager.getLastSearchHistory(10).get(finalI));
                     }
                 });
                 searchFromHistorySubMenu.getItems().addAll(item);
