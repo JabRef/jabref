@@ -14,6 +14,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -136,6 +138,19 @@ public class GlobalSearchBar extends HBox {
                     event.consume();
                 }
             }
+        });
+
+        searchField.setContextMenu(SearchFieldRightClickMenu.create(
+                keyBindingRepository,
+                stateManager,
+                searchField));
+
+        ObservableSet<String> search = stateManager.getWholeSearchHistory();
+        search.addListener((SetChangeListener.Change<? extends String> change) -> {
+            searchField.setContextMenu(SearchFieldRightClickMenu.create(
+                    keyBindingRepository,
+                    stateManager,
+                    searchField));
         });
 
         ClipBoardManager.addX11Support(searchField);
@@ -292,6 +307,7 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
+        this.stateManager.addSearchHistory(searchField.textProperty().get());
         stateManager.setSearchQuery(searchQuery);
     }
 

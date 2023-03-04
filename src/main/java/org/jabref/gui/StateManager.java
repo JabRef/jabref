@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.collections.ObservableSet;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
@@ -70,6 +72,8 @@ public class StateManager {
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
 
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
+
+    private final ObservableSet<String> searchHistory = FXCollections.observableSet(new LinkedHashSet<>());
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
@@ -211,5 +215,30 @@ public class StateManager {
                                   path -> list.add(path.toAbsolutePath().toString()),
                                   () -> list.add("")));
         return list;
+        
+    public void addSearchHistory(String search) {
+        searchHistory.add(search);
+    }
+
+    public ObservableSet<String> getWholeSearchHistory() {
+        return searchHistory;
+    }
+
+    public List<String> getLastSearchHistory(int size) {
+        List<String> lastSearches = new ArrayList<>();
+        Object[] searchArray = searchHistory.toArray();
+        int numSearches = searchHistory.size();
+        int startIndex = 0;
+        if (size < numSearches) {
+            startIndex = Math.max(0, numSearches - size);
+        }
+        for (int i = startIndex; i < numSearches; i++) {
+            lastSearches.add((String) searchArray[i]);
+        }
+        return lastSearches;
+    }
+
+    public void clearSearchHistory() {
+        searchHistory.clear();
     }
 }
