@@ -28,8 +28,8 @@ public class AttachFileFromURLAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     public AttachFileFromURLAction(LibraryTab libraryTab,
-                            DialogService dialogService,
-                            StateManager stateManager,
+                                   DialogService dialogService,
+                                   StateManager stateManager,
                                    TaskExecutor taskExecutor, PreferencesService preferencesService) {
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
