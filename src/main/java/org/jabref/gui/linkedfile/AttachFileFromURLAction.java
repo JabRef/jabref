@@ -21,7 +21,6 @@ import org.jabref.preferences.PreferencesService;
 
 public class AttachFileFromURLAction extends SimpleCommand {
 
-    private final LibraryTab libraryTab;
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -31,7 +30,6 @@ public class AttachFileFromURLAction extends SimpleCommand {
                                    DialogService dialogService,
                                    StateManager stateManager,
                                    TaskExecutor taskExecutor, PreferencesService preferencesService) {
-        this.libraryTab = libraryTab;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -60,16 +58,12 @@ public class AttachFileFromURLAction extends SimpleCommand {
         Optional<String> urlText;
         String urlField = entry.getField(StandardField.URL).orElse("");
         if (clipText.startsWith("http://") || clipText.startsWith("https://") || clipText.startsWith("ftp://")) {
-            urlText = dialogService.showInputDialogWithDefaultAndWait(
-                                                                      Localization.lang("Download file"), Localization.lang("Enter URL to download"), clipText);
+            urlText = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Download file"), Localization.lang("Enter URL to download"), clipText);
         } else if (urlField.startsWith("http://") || urlField.startsWith("https://") || urlField.startsWith("ftp://")) {
-            urlText = dialogService.showInputDialogWithDefaultAndWait(
-                                                                      Localization.lang("Download file"), Localization.lang("Enter URL to download"), urlField);
+            urlText = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Download file"), Localization.lang("Enter URL to download"), urlField);
         } else {
-            urlText = dialogService.showInputDialogAndWait(
-                                                           Localization.lang("Download file"), Localization.lang("Enter URL to download"));
+            urlText = dialogService.showInputDialogAndWait(Localization.lang("Download file"), Localization.lang("Enter URL to download"));
         }
-
         if (!urlText.isPresent()) {
             return;
         }
@@ -77,20 +71,16 @@ public class AttachFileFromURLAction extends SimpleCommand {
         try {
             URL url = new URL(String.valueOf(urlText.get()));
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
-                                                                     new LinkedFile(url, ""),
-                                                                     entry,
-                                                                     databaseContext,
-                                                                     taskExecutor,
-                                                                     dialogService,
-                                                                     preferencesService);
-
+                             new LinkedFile(url, ""),
+                             entry,
+                             databaseContext,
+                             taskExecutor,
+                             dialogService,
+                             preferencesService);
             onlineFile.download();
 
         } catch (MalformedURLException exception) {
-            dialogService.showErrorDialogAndWait(
-                                                 Localization.lang("Invalid URL"),
-                                                 exception);
-            return;
+            dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
         }
     }
 }
