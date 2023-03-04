@@ -215,7 +215,8 @@ public class StateManager {
                                   path -> list.add(path.toAbsolutePath().toString()),
                                   () -> list.add("")));
         return list;
-        
+    }
+
     public void addSearchHistory(String search) {
         searchHistory.add(search);
     }
