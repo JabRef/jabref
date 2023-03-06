@@ -13,7 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We added a field showing the BibTeX/biblatex source for added and deleted entries in the "External Changes Resolver" dialog. [#9509](https://github.com/JabRef/jabref/issues/9509)
 - We added a full text fetcher for IACR eprints.
-- Add "Attach file from URL" to right-click context menu which downloads file from URL and stores it with reference library.
+- We added "Attach file from URL" to right-click context menu to download and store a file with the reference library.
 
 
 
