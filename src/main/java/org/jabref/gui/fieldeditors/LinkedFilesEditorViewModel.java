@@ -23,6 +23,7 @@ import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -213,11 +214,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences.getImportFormatPreferences(),
                 preferences.getImporterPreferences());
         Optional<String> urlField = entry.getField(StandardField.URL);
-        Boolean download_success = false;
+        boolean download_success = false;
         if (urlField.isPresent()) {
             download_success = downloadFile(urlField.get());
         }
-        if (!urlField.isPresent() || !download_success) {
+        if (urlField.isEmpty() || !download_success) {
             BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))
@@ -234,8 +235,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void addFromURL() {
-       LinkedFilesEditorViewModelUtil util = new LinkedFilesEditorViewModelUtil(dialogService, entry);
-       util.getUrlForDownloadFromClipBoardOrEntry().ifPresent(this::downloadFile);
+        AttachFileFromURLAction.getUrlForDownloadFromClipBoardOrEntry(dialogService, entry)
+                               .ifPresent(this::downloadFile);
     }
 
     private void addFromURLAndDownload(URL url) {
