@@ -196,6 +196,7 @@ public class WebFetchers {
         fetchers.add(new ArXivFetcher(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
         fetchers.add(new ApsFetcher());
+        fetchers.add(new IacrEprintFetcher(importFormatPreferences));
 
         // Meta search
         // fetchers.add(new JstorFetcher(importFormatPreferences));
