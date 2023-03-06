@@ -20,7 +20,6 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +61,6 @@ class JournalAbbreviationsViewModelTabTest {
     private JournalAbbreviationsTabViewModel viewModel;
     private Path emptyTestFile;
     private Path tempFolder;
-    private PreferencesService preferencesService;
     private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
     private DialogService dialogService;
 
@@ -179,14 +177,12 @@ class JournalAbbreviationsViewModelTabTest {
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws Exception {
         JournalAbbreviationPreferences abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
-        preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getJournalAbbreviationPreferences()).thenReturn(abbreviationPreferences);
 
         dialogService = mock(DialogService.class);
         this.tempFolder = tempFolder;
 
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, repository);
+        viewModel = new JournalAbbreviationsTabViewModel(abbreviationPreferences, dialogService, taskExecutor, repository);
 
         emptyTestFile = createTestFile(new CsvFileNameAndContent("emptyTestFile.csv", ""));
     }
@@ -513,13 +509,6 @@ class JournalAbbreviationsViewModelTabTest {
 
         actual = Files.readAllLines(testFile3, StandardCharsets.UTF_8);
         assertEquals(testData.finalContentsOfFile3, actual);
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideTestFiles")
-    void testSaveExternalFilesListToPreferences(TestData testData) throws IOException {
-        addFourTestFileToViewModelAndPreferences(testData);
-        verify(preferencesService).storeJournalAbbreviationPreferences(any());
     }
 
     /**
