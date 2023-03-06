@@ -25,7 +25,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
     private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
     private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/";
     private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
-    private static final String FULLTEXT_URL_PREFIX = "https://eprint.iacr.org/archive/";
+    private static final String FULLTEXT_URL_PREFIX = "https://eprint.iacr.org/";
     private static final String VERSION_URL_PREFIX = "https://eprint.iacr.org/archive/versions/";
 
     private final ImportFormatPreferences prefs;
@@ -142,7 +142,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
             String fulltextLinkAsInHtml = getRequiredValueBetween(startOfFulltextLink, ".pdf", descriptiveHtml);
             // There is an additional "\n           href=\"/archive/" we have to remove - and for some reason,
             // getRequiredValueBetween refuses to match across the line break.
-            fulltextLinkAsInHtml = fulltextLinkAsInHtml.replaceFirst(".*href=\"/archive/", "").trim();
+            fulltextLinkAsInHtml = fulltextLinkAsInHtml.replaceFirst(".*href=\"/", "").trim();
             String fulltextLink = FULLTEXT_URL_PREFIX + fulltextLinkAsInHtml + ".pdf";
             return Optional.of(new URL(fulltextLink));
         }
