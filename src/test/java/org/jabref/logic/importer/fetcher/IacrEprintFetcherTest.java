@@ -200,7 +200,6 @@ public class IacrEprintFetcherTest {
         return ids.stream();
     }
 
-
     @Test
     public void getFulltextWithVersion() throws FetcherException, IOException {
         Optional<URL> pdfUrl = fetcher.findFullText(abram2017);
