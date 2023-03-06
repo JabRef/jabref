@@ -1545,6 +1545,7 @@ public class JabRefPreferences implements PreferencesService {
         if (Objects.nonNull(proxyPreferences)) {
             return proxyPreferences;
         }
+
         proxyPreferences = new ProxyPreferences(
                 getBoolean(PROXY_USE),
                 get(PROXY_HOSTNAME),
