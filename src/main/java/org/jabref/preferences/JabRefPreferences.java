@@ -453,6 +453,7 @@ public class JabRefPreferences implements PreferencesService {
     private MainTablePreferences mainTablePreferences;
     private ColumnPreferences mainTableColumnPreferences;
     private ColumnPreferences searchDialogColumnPreferences;
+    private JournalAbbreviationPreferences journalAbbreviationPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1116,12 +1117,20 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), StandardCharsets.UTF_8, getBoolean(USE_AMS_FJOURNAL));
-    }
+        if (Objects.nonNull(journalAbbreviationPreferences)) {
+            return journalAbbreviationPreferences;
+        }
 
-    @Override
-    public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
-        putStringList(EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
+        journalAbbreviationPreferences = new JournalAbbreviationPreferences(
+                getStringList(EXTERNAL_JOURNAL_LISTS),
+                getBoolean(USE_AMS_FJOURNAL));
+
+        journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) change ->
+                putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
+        EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
+                (obs, oldValue, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
+
+        return journalAbbreviationPreferences;
     }
 
     @Override
@@ -2525,7 +2534,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue.booleanValue()));
+        EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
 
         return guiPreferences;
     }
