@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.airhacks.afterburner.injection.Injector;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
@@ -20,6 +21,7 @@ import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
@@ -61,6 +63,15 @@ public class JabRefGUI {
                 Globals.TASK_EXECUTOR,
                 preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
+
+        if (preferencesService.getProxyPreferences().shouldUseProxy() && preferencesService.getProxyPreferences().shouldUseAuthentication()){
+            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+            dialogService.showPasswordDialogAndWait("Proxy configuration", "Proxy requires password","Password")
+                .ifPresent(newPassword -> {
+                    preferencesService.getProxyPreferences().setPassword(newPassword);
+                    ProxyRegisterer.register(preferencesService.getProxyPreferences());
+                });
+        }
     }
 
     private void openWindow(Stage mainStage) {
