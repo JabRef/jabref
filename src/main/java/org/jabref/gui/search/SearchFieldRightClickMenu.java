@@ -11,6 +11,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.logic.l10n.Localization;
 
 import org.controlsfx.control.textfield.CustomTextField;
 
@@ -41,11 +42,11 @@ public class SearchFieldRightClickMenu {
     private static Menu createSearchFromHistorySubMenu(ActionFactory factory,
                                                        StateManager stateManager,
                                                        CustomTextField searchField) {
-        Menu searchFromHistorySubMenu = factory.createMenu(() -> "Search from history...");
+        Menu searchFromHistorySubMenu = factory.createMenu(() -> Localization.lang("Search from history..."));
 
         int num = stateManager.getLastSearchHistory(10).size();
         if (num == 0) {
-            MenuItem item = new MenuItem("your search history is empty");
+            MenuItem item = new MenuItem(Localization.lang("your search history is empty"));
             searchFromHistorySubMenu.getItems().addAll(item);
         } else {
             for (int i = 0; i < num; i++) {
