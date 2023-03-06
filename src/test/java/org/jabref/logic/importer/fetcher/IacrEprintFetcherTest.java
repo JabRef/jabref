@@ -203,15 +203,13 @@ public class IacrEprintFetcherTest {
     @Test
     public void getFulltextWithVersion() throws FetcherException, IOException {
         Optional<URL> pdfUrl = fetcher.findFullText(abram2017);
-        assertTrue(pdfUrl.isPresent());
-        assertEquals("https://eprint.iacr.org/archive/2017/1118/1511505927.pdf", pdfUrl.get().toString());
+        assertEquals(Optional.of("https://eprint.iacr.org/archive/2017/1118/1511505927.pdf"), pdfUrl.map(URL::toString));
     }
 
     @Test
     public void getFulltextWithoutVersion() throws FetcherException, IOException {
         Optional<URL> pdfUrl = fetcher.findFullText(abram2017noVersion);
-        assertTrue(pdfUrl.isPresent());
-        assertEquals("https://eprint.iacr.org/2017/1118.pdf", pdfUrl.get().toString());
+        assertEquals(Optional.of("https://eprint.iacr.org/2017/1118.pdf"), pdfUrl.map(URL::toString));
     }
 
     @Test
@@ -219,11 +217,11 @@ public class IacrEprintFetcherTest {
         BibEntry abram2017WithoutUrl = abram2017;
         abram2017WithoutUrl.clearField(StandardField.URL);
         Optional<URL> pdfUrl = fetcher.findFullText(abram2017WithoutUrl);
-        assertTrue(pdfUrl.isEmpty());
+        assertEquals(Optional.empty(), pdfUrl);
     }
 
     @Test
-    public void getFulltextWithNonIACRUrl() throws FetcherException, IOException {
+    public void getFulltextWithNonIACRUrl() throws IOException {
         BibEntry abram2017WithNonIACRUrl = abram2017;
         abram2017WithNonIACRUrl.setField(StandardField.URL, "https://example.com");
         assertThrows(FetcherException.class, () -> fetcher.findFullText(abram2017WithNonIACRUrl));
