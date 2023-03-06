@@ -27,7 +27,7 @@ jobs:
           echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
       - name: Delete folder on builds.jabref.org
         if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: appleboy/ssh-action@v0.1.7
+        uses: appleboy/ssh-action@v0.1.8
         with:
           script: rm -rf /var/www/builds.jabref.org/www/${{ steps.extract_branch.outputs.branch }} || true
           host: build-upload.jabref.org
