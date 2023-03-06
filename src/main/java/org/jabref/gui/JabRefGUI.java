@@ -64,7 +64,7 @@ public class JabRefGUI {
                 preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
 
-        if (preferencesService.getProxyPreferences().shouldUseAuthentication()){
+        if (preferencesService.getProxyPreferences().shouldUseProxy() && preferencesService.getProxyPreferences().shouldUseAuthentication()){
             DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
             dialogService.showPasswordDialogAndWait("Proxy configuration", "Proxy requires password","Password")
                 .ifPresent(newPassword -> {
