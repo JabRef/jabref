@@ -71,7 +71,7 @@ public class StateManager {
 
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
 
-    private final ObservableList<String> searchHistory = FXCollections.observableList(new ArrayList<>());
+    private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
@@ -225,17 +225,11 @@ public class StateManager {
     }
 
     public List<String> getLastSearchHistory(int size) {
-        List<String> lastSearches = new ArrayList<>();
-        Object[] searchArray = searchHistory.toArray();
-        int numSearches = searchHistory.size();
-        int startIndex = 0;
-        if (size < numSearches) {
-            startIndex = Math.max(0, numSearches - size);
+        int sizeSearches = searchHistory.size();
+        if (size < sizeSearches) {
+            return searchHistory.subList(sizeSearches - size, sizeSearches);
         }
-        for (int i = startIndex; i < numSearches; i++) {
-            lastSearches.add((String) searchArray[i]);
-        }
-        return lastSearches;
+        return searchHistory;
     }
 
     public void clearSearchHistory() {
