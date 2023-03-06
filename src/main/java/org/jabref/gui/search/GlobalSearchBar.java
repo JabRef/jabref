@@ -14,8 +14,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -145,8 +145,8 @@ public class GlobalSearchBar extends HBox {
                 stateManager,
                 searchField));
 
-        ObservableSet<String> search = stateManager.getWholeSearchHistory();
-        search.addListener((SetChangeListener.Change<? extends String> change) -> {
+        ObservableList<String> search = stateManager.getWholeSearchHistory();
+        search.addListener((ListChangeListener.Change<? extends String> change) -> {
             searchField.setContextMenu(SearchFieldRightClickMenu.create(
                     keyBindingRepository,
                     stateManager,

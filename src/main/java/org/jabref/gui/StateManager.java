@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,7 +17,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import javafx.collections.ObservableSet;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
@@ -73,7 +71,7 @@ public class StateManager {
 
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
 
-    private final ObservableSet<String> searchHistory = FXCollections.observableSet(new LinkedHashSet<>());
+    private final ObservableList<String> searchHistory = FXCollections.observableList(new ArrayList<>());
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
@@ -218,10 +216,11 @@ public class StateManager {
     }
 
     public void addSearchHistory(String search) {
+        searchHistory.remove(search);
         searchHistory.add(search);
     }
 
-    public ObservableSet<String> getWholeSearchHistory() {
+    public ObservableList<String> getWholeSearchHistory() {
         return searchHistory;
     }
 
