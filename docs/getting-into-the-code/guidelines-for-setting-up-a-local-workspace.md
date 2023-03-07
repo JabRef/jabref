@@ -63,7 +63,7 @@ In the case of IntelliJ, this will be downloaded inside the IDE (if you follow t
 In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 19 (e.g., `javac 19`).
 If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 Please head to <https://adoptium.net/de/temurin/releases> to download JDK 19.
-Note that JDK 19 does not work.
+
 
 ## Get the code
 
