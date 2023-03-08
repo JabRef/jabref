@@ -27,6 +27,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.logic.search.SearchHistory;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -71,8 +72,17 @@ public class StateManager {
 
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
 
+    private final ObjectProperty<SearchHistory> searchHistory = new SimpleObjectProperty<>();
+
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
+    }
+
+    public SearchHistory getSearchHistory() {
+        if (this.searchHistory.isNull().get()) {
+            this.searchHistory.set(new SearchHistory());
+        }
+        return this.searchHistory.get();
     }
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {

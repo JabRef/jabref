@@ -106,6 +106,10 @@ public class GlobalSearchBar extends HBox {
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
+    private HistoryDialogView historyDialogView;
+
+    private final Button openSearchHistoryButton;
+    private final BooleanProperty searchHistoryActive = new SimpleBooleanProperty(false);
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
@@ -145,6 +149,7 @@ public class GlobalSearchBar extends HBox {
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
         openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
         keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
+        openSearchHistoryButton = IconTheme.JabRefIcons.SEARCH_HISTORY.asButton();
 
         initSearchModifierButtons();
 
@@ -180,7 +185,7 @@ public class GlobalSearchBar extends HBox {
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
         Platform.runLater(() -> visualizer.initVisualization(regexValidator.getValidationStatus(), searchField));
 
-        this.getChildren().addAll(searchField, openGlobalSearchButton, currentResults);
+        this.getChildren().addAll(searchField, openGlobalSearchButton, openSearchHistoryButton, currentResults);
         this.setSpacing(4.0);
         this.setAlignment(Pos.CENTER_LEFT);
 
@@ -246,6 +251,16 @@ public class GlobalSearchBar extends HBox {
             dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);
         });
+
+        openSearchHistoryButton.disableProperty().bindBidirectional(searchHistoryActive);
+        openSearchHistoryButton.setTooltip(new Tooltip(Localization.lang("See, modify and reuse your search history")));
+        initSearchModifierButton(openSearchHistoryButton);
+        openSearchHistoryButton.setOnAction(evt -> {
+            searchHistoryActive.setValue(true);
+            historyDialogView = new HistoryDialogView(stateManager, searchField);
+            dialogService.showCustomDialogAndWait(historyDialogView);
+            searchHistoryActive.setValue(false);
+        });
     }
 
     private void initSearchModifierButton(ButtonBase searchButton) {
@@ -292,13 +307,16 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
+
+        stateManager.getSearchHistory().addSearch(searchQuery.getQuery());
         stateManager.setSearchQuery(searchQuery);
     }
 
     private boolean validRegex() {
         try {
             Pattern.compile(searchField.getText());
-        } catch (PatternSyntaxException e) {
+        } catch (
+                PatternSyntaxException e) {
             LOGGER.debug(e.getMessage());
             return false;
         }
@@ -335,7 +353,9 @@ public class GlobalSearchBar extends HBox {
             Field privatePopup = AutoCompletionBinding.class.getDeclaredField("autoCompletionPopup");
             privatePopup.setAccessible(true);
             return (AutoCompletePopup<T>) privatePopup.get(autoCompletionBinding);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (
+                IllegalAccessException |
+                NoSuchFieldException e) {
             LOGGER.error("Could not get access to auto completion popup", e);
             return new AutoCompletePopup<>();
         }
