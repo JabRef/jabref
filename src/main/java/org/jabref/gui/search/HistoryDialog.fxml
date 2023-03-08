@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<DialogPane prefWidth="530.0" prefHeight="510.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.search.HistoryDialogView">
+    <content>
+        <VBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
+            <TableView
+                    fx:id="searchHistoryTable"
+                    HBox.hgrow="ALWAYS"
+                    editable="true">
+                <columns>
+                    <TableColumn
+                            fx:id="searchHistoryStringColumn"
+                            text="%Search String"
+                            reorderable="false"
+                    />
+                    <TableColumn
+                            fx:id="searchHistoryDateColumn"
+                            text="Date"
+                            maxWidth="150.0"
+                            prefWidth="150.0"
+                            minWidth="150.0"
+                            resizable="false"
+                            reorderable="false"
+                    />
+                    <TableColumn
+                            fx:id="searchHistoryRemoveColumn"
+                            text=""
+                            maxWidth="30.0"
+                            prefWidth="30.0"
+                            minWidth="30.0"
+                            reorderable="false"
+                            resizable="false"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView
+                            fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
+        </VBox>
+    </content>
+    <header>
+    </header>
+    <ButtonType fx:constant="CLOSE"/>
+</DialogPane>
