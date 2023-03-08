@@ -110,6 +110,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
@@ -378,6 +379,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // GroupViewMode
     private static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
+    private static final String DEFAULT_HIERARCHICAL_CONTEXT = "defaultHierarchicalContext";
 
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
@@ -451,6 +453,7 @@ public class JabRefPreferences implements PreferencesService {
     private MainTablePreferences mainTablePreferences;
     private ColumnPreferences mainTableColumnPreferences;
     private ColumnPreferences searchDialogColumnPreferences;
+    private JournalAbbreviationPreferences journalAbbreviationPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -598,6 +601,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_UNION_VIEW_MODE, GroupViewMode.INTERSECTION.name());
+        defaults.put(DEFAULT_HIERARCHICAL_CONTEXT, GroupHierarchyType.INDEPENDENT.name());
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
@@ -1113,12 +1117,20 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), StandardCharsets.UTF_8, getBoolean(USE_AMS_FJOURNAL));
-    }
+        if (Objects.nonNull(journalAbbreviationPreferences)) {
+            return journalAbbreviationPreferences;
+        }
 
-    @Override
-    public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
-        putStringList(EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
+        journalAbbreviationPreferences = new JournalAbbreviationPreferences(
+                getStringList(EXTERNAL_JOURNAL_LISTS),
+                getBoolean(USE_AMS_FJOURNAL));
+
+        journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) change ->
+                putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
+        EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
+                (obs, oldValue, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
+
+        return journalAbbreviationPreferences;
     }
 
     @Override
@@ -1367,12 +1379,14 @@ public class JabRefPreferences implements PreferencesService {
         groupsPreferences = new GroupsPreferences(
                 GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE)),
                 getBoolean(AUTO_ASSIGN_GROUP),
-                getBoolean(DISPLAY_GROUP_COUNT)
+                getBoolean(DISPLAY_GROUP_COUNT),
+                GroupHierarchyType.valueOf(get(DEFAULT_HIERARCHICAL_CONTEXT))
         );
 
         EasyBind.listen(groupsPreferences.groupViewModeProperty(), (obs, oldValue, newValue) -> put(GROUP_INTERSECT_UNION_VIEW_MODE, newValue.name()));
         EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
         EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (obs, oldValue, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
+        EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
 
         return groupsPreferences;
     }
@@ -2520,7 +2534,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue.booleanValue()));
+        EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
 
         return guiPreferences;
     }

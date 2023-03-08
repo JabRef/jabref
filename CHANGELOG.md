@@ -12,14 +12,18 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added a field showing the BibTeX/biblatex source for added and deleted entries in the "External Changes Resolver" dialog. [#9509](https://github.com/JabRef/jabref/issues/9509)
+- We added a full text fetcher for IACR eprints. [#9651](https://github.com/JabRef/jabref/pull/9651)
+- We added "Attach file from URL" to right-click context menu to download and store a file with the reference library. [#9646](https://github.com/JabRef/jabref/issues/9646)
+- We enabled updating an existing entry with data from InspireHEP. [#9351](https://github.com/JabRef/jabref/issues/9351)
 
 
 
 
 ### Changed
 
+- 'Get full text' now also checks the file url. [#568](https://github.com/koppor/jabref/issues/568)
 - We refined the 'main directory not found' error message. [#9625](https://github.com/JabRef/jabref/pull/9625)
-
+- We modified the `Add Group` dialog to use the most recently selected group hierarchical context [#9141](https://github.com/JabRef/jabref/issues/9141)
 
 
 

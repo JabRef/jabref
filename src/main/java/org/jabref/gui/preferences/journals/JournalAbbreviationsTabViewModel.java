@@ -25,7 +25,6 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +50,6 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
 
-    private final PreferencesService preferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
@@ -59,15 +57,14 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private boolean shouldWriteLists;
 
-    public JournalAbbreviationsTabViewModel(PreferencesService preferences,
+    public JournalAbbreviationsTabViewModel(JournalAbbreviationPreferences abbreviationsPreferences,
                                             DialogService dialogService,
                                             TaskExecutor taskExecutor,
                                             JournalAbbreviationRepository journalAbbreviationRepository) {
-        this.preferences = Objects.requireNonNull(preferences);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
-        this.abbreviationsPreferences = preferences.getJournalAbbreviationPreferences();
+        this.abbreviationsPreferences = abbreviationsPreferences;
 
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldValue, newValue) -> {
@@ -336,11 +333,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                                                                  .map(path -> path.getAbsolutePath().get().toAbsolutePath().toString())
                                                                  .collect(Collectors.toList());
 
-                    preferences.storeJournalAbbreviationPreferences(new JournalAbbreviationPreferences(
-                            journalStringList,
-                            abbreviationsPreferences.getDefaultEncoding(),
-                            useFJournal.getValue()
-                    ));
+                    abbreviationsPreferences.setExternalJournalLists(journalStringList);
+                    abbreviationsPreferences.setUseFJournalField(useFJournal.get());
 
                     if (shouldWriteLists) {
                         saveJournalAbbreviationFiles();
@@ -348,7 +342,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     }
                 })
                 .onSuccess((success) -> Globals.journalAbbreviationRepository =
-                        JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()))
+                        JournalAbbreviationLoader.loadRepository(abbreviationsPreferences))
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
                 .executeWith(taskExecutor);
     }
