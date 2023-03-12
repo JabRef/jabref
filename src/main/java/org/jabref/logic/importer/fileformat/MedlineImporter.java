@@ -15,9 +15,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -61,9 +63,7 @@ import org.jabref.logic.importer.fileformat.medline.PubDate;
 import org.jabref.logic.importer.fileformat.medline.PublicationType;
 import org.jabref.logic.importer.fileformat.medline.Publisher;
 import org.jabref.logic.importer.fileformat.medline.PubmedArticle;
-import org.jabref.logic.importer.fileformat.medline.PubmedArticleSet;
 import org.jabref.logic.importer.fileformat.medline.PubmedBookArticle;
-import org.jabref.logic.importer.fileformat.medline.PubmedBookArticleSet;
 import org.jabref.logic.importer.fileformat.medline.PubmedBookData;
 import org.jabref.logic.importer.fileformat.medline.QualifierName;
 import org.jabref.logic.importer.fileformat.medline.Section;
@@ -71,6 +71,7 @@ import org.jabref.logic.importer.fileformat.medline.Sections;
 import org.jabref.logic.importer.fileformat.medline.Text;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -140,44 +141,179 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
+    public ParserResult importDatabase(BufferedReader input) throws IOException {
+        Objects.requireNonNull(input);
 
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-            Object unmarshalledObject = unmarshallRoot(reader);
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
-            // check whether we have an article set, an article, a book article or a book article set
-            if (unmarshalledObject instanceof PubmedArticleSet) {
-                PubmedArticleSet articleSet = (PubmedArticleSet) unmarshalledObject;
-                for (Object article : articleSet.getPubmedArticleOrPubmedBookArticle()) {
-                    if (article instanceof PubmedArticle) {
-                        PubmedArticle currentArticle = (PubmedArticle) article;
-                        parseArticle(currentArticle, bibItems);
+            // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
+            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+
+            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
+
+            while (reader.hasNext()) {
+                reader.next();
+                if (isStartXMLEvent(reader)) {
+                    String elementName = reader.getName().getLocalPart();
+                    switch (elementName) {
+                        case "PubmedArticle" -> {
+                            // Case 3: PubmedArticle
+                            parseArticleNew(reader, bibItems);
+                        }
                     }
-                    if (article instanceof PubmedBookArticle) {
-                        PubmedBookArticle currentArticle = (PubmedBookArticle) article;
-                        parseBookArticle(currentArticle, bibItems);
-                    }
-                }
-            } else if (unmarshalledObject instanceof PubmedArticle) {
-                PubmedArticle article = (PubmedArticle) unmarshalledObject;
-                parseArticle(article, bibItems);
-            } else if (unmarshalledObject instanceof PubmedBookArticle) {
-                PubmedBookArticle currentArticle = (PubmedBookArticle) unmarshalledObject;
-                parseBookArticle(currentArticle, bibItems);
-            } else {
-                PubmedBookArticleSet bookArticleSet = (PubmedBookArticleSet) unmarshalledObject;
-                for (PubmedBookArticle bookArticle : bookArticleSet.getPubmedBookArticle()) {
-                    parseBookArticle(bookArticle, bibItems);
+
+                    // Case 1: PubmedArticleSet
+
+                    // Case 2: PubmedBookArticleSet
+
+                    // Case 4: PubmedBookArticle
                 }
             }
-        } catch (JAXBException | XMLStreamException e) {
+
+//            Object unmarshalledObject = unmarshallRoot(reader);
+//
+//            // check whether we have an article set, an article, a book article or a book article set
+//            if (unmarshalledObject instanceof PubmedArticleSet) {
+//                PubmedArticleSet articleSet = (PubmedArticleSet) unmarshalledObject;
+//                for (Object article : articleSet.getPubmedArticleOrPubmedBookArticle()) {
+//                    if (article instanceof PubmedArticle) {
+//                        PubmedArticle currentArticle = (PubmedArticle) article;
+//                        parseArticle(currentArticle, bibItems);
+//                    }
+//                    if (article instanceof PubmedBookArticle) {
+//                        PubmedBookArticle currentArticle = (PubmedBookArticle) article;
+//                        parseBookArticle(currentArticle, bibItems);
+//                    }
+//                }
+//            } else if (unmarshalledObject instanceof PubmedArticle) {
+//                PubmedArticle article = (PubmedArticle) unmarshalledObject;
+//                parseArticle(article, bibItems);
+//            } else if (unmarshalledObject instanceof PubmedBookArticle) {
+//                PubmedBookArticle currentArticle = (PubmedBookArticle) unmarshalledObject;
+//                parseBookArticle(currentArticle, bibItems);
+//            } else {
+//                PubmedBookArticleSet bookArticleSet = (PubmedBookArticleSet) unmarshalledObject;
+//                for (PubmedBookArticle bookArticle : bookArticleSet.getPubmedBookArticle()) {
+//                    parseBookArticle(bookArticle, bibItems);
+//                }
+//            }
+        } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
+
         return new ParserResult(bibItems);
+    }
+
+    private void parseArticleNew(XMLStreamReader reader, List<BibEntry> bibItems) throws XMLStreamException {
+        Map<Field, String> fields = new HashMap<>();
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "MedlineCitation" -> {
+                        parseMedlineCitation(reader, fields);
+                    }
+                    case "PubmedData" -> {
+                        //
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("PubmedArticle")) {
+                break;
+            }
+        }
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(fields);
+
+        bibItems.add(entry);
+    }
+
+    private void parseMedlineCitation(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        String status = reader.getAttributeValue(null, "Status");
+        String owner = reader.getAttributeValue(null, "Owner");
+        fields.put(new UnknownField("status"), status);
+        fields.put(StandardField.OWNER, owner);
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "DateCreated", "DateCompleted" -> {
+                        parseDate(reader, elementName, fields);
+                    }
+                    case "Article" -> {
+                        String pubmodel = reader.getAttributeValue(null, "PubModel");
+                        fields.put(new UnknownField("pubmodel"), pubmodel);
+                    }
+                    case "PMID" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            fields.put(StandardField.PMID, reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("MedlineCitation")) {
+                break;
+            }
+        }
+    }
+
+    private void parseDate(XMLStreamReader reader, String parentElement, Map<Field, String> fields) throws XMLStreamException {
+        Optional<String> year = Optional.empty();
+        Optional<String> month = Optional.empty();
+        Optional<String> day = Optional.empty();
+
+        // mapping from date XML element to field name
+        Map<String, String> dateFieldMap = Map.of(
+                "DateCreated", "created",
+                "DateCompleted", "completed"
+        );
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "Year" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            year = Optional.of(reader.getText());
+                        }
+                    }
+                    case "Month" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            month = Optional.of(reader.getText());
+                        }
+                    }
+                    case "Day" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            day = Optional.of(reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(parentElement)) {
+                break;
+            }
+        }
+
+        Optional<Date> date = Date.parse(year, month, day);
+        date.ifPresent(dateValue ->
+                fields.put(new UnknownField(dateFieldMap.get(parentElement)), dateValue.getNormalized()));
     }
 
     private Object unmarshallRoot(BufferedReader reader) throws JAXBException, XMLStreamException {
@@ -698,6 +834,18 @@ public class MedlineImporter extends Importer implements Parser {
             endPage = startPage.substring(0, lengthOfStartPage - lengthOfEndPage) + endPage;
         }
         return startPage + "--" + endPage;
+    }
+
+    private boolean isCharacterXMLEvent(XMLStreamReader reader) {
+        return reader.getEventType() == XMLEvent.CHARACTERS;
+    }
+
+    private boolean isStartXMLEvent(XMLStreamReader reader) {
+        return reader.getEventType() == XMLEvent.START_ELEMENT;
+    }
+
+    private boolean isEndXMLEvent(XMLStreamReader reader) {
+        return reader.getEventType() == XMLEvent.END_ELEMENT;
     }
 
     @Override
