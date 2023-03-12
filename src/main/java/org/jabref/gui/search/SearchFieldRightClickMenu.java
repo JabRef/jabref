@@ -59,6 +59,13 @@ public class SearchFieldRightClickMenu {
                 });
                 searchFromHistorySubMenu.getItems().addAll(item);
             }
+            MenuItem clear = factory.createMenuItem(() -> Localization.lang("Clear history"), new SimpleCommand() {
+                @Override
+                public void execute() {
+                    stateManager.clearSearchHistory();
+                }
+            });
+            searchFromHistorySubMenu.getItems().addAll(new SeparatorMenuItem(), clear);
         }
         return searchFromHistorySubMenu;
     }

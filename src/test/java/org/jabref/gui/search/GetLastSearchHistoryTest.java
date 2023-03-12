@@ -46,4 +46,19 @@ public class GetLastSearchHistoryTest {
 
         Assertions.assertEquals(expected, lastSearchHistory);
     }
+
+    @Test
+    void testclearSearchHistory() {
+        StateManager stateManager = new StateManager();
+        stateManager.addSearchHistory("test1");
+        stateManager.addSearchHistory("test2");
+        stateManager.addSearchHistory("test3");
+        List<String> lastSearchHistory = stateManager.getWholeSearchHistory();
+        List<String> expected = List.of("test1", "test2", "test3");
+        Assertions.assertEquals(expected, lastSearchHistory);
+        stateManager.clearSearchHistory();
+        lastSearchHistory = stateManager.getWholeSearchHistory();
+        expected = List.of();
+        Assertions.assertEquals(expected, lastSearchHistory);
+    }
 }
