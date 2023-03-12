@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -23,10 +24,11 @@ import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
 
@@ -53,7 +55,9 @@ public class JabRefDesktop {
     public static void openExternalViewer(BibDatabaseContext databaseContext,
                                           PreferencesService preferencesService,
                                           String initialLink,
-                                          Field initialField)
+                                          Field initialField,
+                                          DialogService dialogService,
+                                          BibEntry entry)
             throws IOException {
         String link = initialLink;
         Field field = initialField;
@@ -83,12 +87,20 @@ public class JabRefDesktop {
             openDoi(link);
             return;
         } else if (StandardField.EPRINT.equals(field)) {
-            link = ArXivIdentifier.parse(link)
-                                  .map(ArXivIdentifier::getExternalURI)
-                                  .filter(Optional::isPresent)
-                                  .map(Optional::get)
-                                  .map(URI::toASCIIString)
-                                  .orElse(link);
+            IdentifierParser identifierParser = new IdentifierParser(entry);
+            link = identifierParser.parse(StandardField.EPRINT)
+                    .flatMap(Identifier::getExternalURI)
+                    .map(URI::toASCIIString)
+                    .orElse(link);
+
+            if (Objects.equals(link, initialLink)) {
+                Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
+                if (eprintTypeOpt.isEmpty()) {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please set the eprinttype field"));
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please verify that the eprint field has a valid '%0' id", eprintTypeOpt.get()));
+                }
+            }
             // should be opened in browser
             field = StandardField.URL;
         }
@@ -118,7 +130,7 @@ public class JabRefDesktop {
     }
 
     public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
-        IdentifierParser.parse(StandardField.DOI, link)
+            DOI.parse(link)
                         .map(identifier -> (DOI) identifier)
                         .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
                         .ifPresent(uri -> {
