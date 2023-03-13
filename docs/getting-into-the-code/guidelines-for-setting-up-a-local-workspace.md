@@ -306,7 +306,7 @@ Now you can use IntelliJ IDEA's internal build system by using **Build > Build P
 To run an example test from IntelliJ, we let IntelliJ create a launch configuration:
 
 Locate the class `BibEntryTest`:
-Press </kbd>Ctrl</kbd>+<kbd>N</kbd>.
+Press <kbd>Ctrl</kbd>+<kbd>N</kbd>.
 Then, the "Search for classes dialog" pops up.
 Enter `bibenrytest`.
 Now, `BibEntryTest` should appear first:
