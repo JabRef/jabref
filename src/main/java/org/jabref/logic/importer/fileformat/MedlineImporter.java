@@ -47,22 +47,17 @@ import org.jabref.logic.importer.fileformat.medline.Investigator;
 import org.jabref.logic.importer.fileformat.medline.InvestigatorList;
 import org.jabref.logic.importer.fileformat.medline.Journal;
 import org.jabref.logic.importer.fileformat.medline.JournalIssue;
-import org.jabref.logic.importer.fileformat.medline.Keyword;
-import org.jabref.logic.importer.fileformat.medline.KeywordList;
 import org.jabref.logic.importer.fileformat.medline.MedlineCitation;
 import org.jabref.logic.importer.fileformat.medline.MedlineJournalInfo;
-import org.jabref.logic.importer.fileformat.medline.MeshHeading;
-import org.jabref.logic.importer.fileformat.medline.MeshHeadingList;
-import org.jabref.logic.importer.fileformat.medline.OtherID;
+import org.jabref.logic.importer.fileformat.medline.MeshHeadingRec;
+import org.jabref.logic.importer.fileformat.medline.OtherIDRec;
 import org.jabref.logic.importer.fileformat.medline.Pagination;
-import org.jabref.logic.importer.fileformat.medline.PersonalNameSubject;
-import org.jabref.logic.importer.fileformat.medline.PersonalNameSubjectList;
+import org.jabref.logic.importer.fileformat.medline.PersonalNameSubjectRec;
 import org.jabref.logic.importer.fileformat.medline.PublicationType;
 import org.jabref.logic.importer.fileformat.medline.Publisher;
 import org.jabref.logic.importer.fileformat.medline.PubmedArticle;
 import org.jabref.logic.importer.fileformat.medline.PubmedBookArticle;
 import org.jabref.logic.importer.fileformat.medline.PubmedBookData;
-import org.jabref.logic.importer.fileformat.medline.QualifierName;
 import org.jabref.logic.importer.fileformat.medline.Section;
 import org.jabref.logic.importer.fileformat.medline.Sections;
 import org.jabref.logic.util.StandardFileType;
@@ -156,15 +151,14 @@ public class MedlineImporter extends Importer implements Parser {
                     switch (elementName) {
                         case "PubmedArticle" -> {
                             // Case 3: PubmedArticle
-                            parseArticleNew(reader, bibItems);
+                            parseArticleNew(reader, bibItems, elementName);
                         }
+                        // Case 1: PubmedArticleSet
+
+                        // Case 2: PubmedBookArticleSet
+
+                        // Case 4: PubmedBookArticle
                     }
-
-                    // Case 1: PubmedArticleSet
-
-                    // Case 2: PubmedBookArticleSet
-
-                    // Case 4: PubmedBookArticle
                 }
             }
 
@@ -203,7 +197,7 @@ public class MedlineImporter extends Importer implements Parser {
         return new ParserResult(bibItems);
     }
 
-    private void parseArticleNew(XMLStreamReader reader, List<BibEntry> bibItems) throws XMLStreamException {
+    private void parseArticleNew(XMLStreamReader reader, List<BibEntry> bibItems, String parentElement) throws XMLStreamException {
         Map<Field, String> fields = new HashMap<>();
 
         while (reader.hasNext()) {
@@ -212,7 +206,7 @@ public class MedlineImporter extends Importer implements Parser {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
                     case "MedlineCitation" -> {
-                        parseMedlineCitation(reader, fields);
+                        parseMedlineCitation(reader, fields, elementName);
                     }
                     case "PubmedData" -> {
                         //
@@ -220,7 +214,7 @@ public class MedlineImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("PubmedArticle")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(parentElement)) {
                 break;
             }
         }
@@ -231,7 +225,15 @@ public class MedlineImporter extends Importer implements Parser {
         bibItems.add(entry);
     }
 
-    private void parseMedlineCitation(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseMedlineCitation(XMLStreamReader reader, Map<Field, String> fields, String parentElement) throws XMLStreamException {
+        // multiple occurrences of the following fields can be present
+        List<String> citationSubsets = new ArrayList<>();
+        List<MeshHeadingRec> meshHeadingList = new ArrayList<>();
+        List<PersonalNameSubjectRec> personalNameSubjectList = new ArrayList<>();
+        List<OtherIDRec> otherIDList = new ArrayList<>();
+        List<String> keywordList = new ArrayList<>();
+        List<String> spaceFlightMissionList = new ArrayList<>();
+
         String status = reader.getAttributeValue(null, "Status");
         String owner = reader.getAttributeValue(null, "Owner");
         fields.put(new UnknownField("status"), status);
@@ -254,10 +256,221 @@ public class MedlineImporter extends Importer implements Parser {
                             fields.put(StandardField.PMID, reader.getText());
                         }
                     }
+                    case "MedlineJournalInfo" -> {
+                        parseMedlineJournalInfo(reader, fields, elementName);
+                    }
+                    case "ChemicalList" -> {
+                        parseChemicalList(reader, fields, elementName);
+                    }
+                    case "CitationSubset" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            citationSubsets.add(reader.getText());
+                        }
+                    }
+                    case "GeneSymbol" -> {
+                        parseGeneSymbolList(reader, fields, elementName);
+                    }
+                    case "MeshHeading" -> {
+                        parseMeshHeading(reader, meshHeadingList, elementName);
+                    }
+                    case "NumberofReferences" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, new UnknownField("references"), reader.getText());
+                        }
+                    }
+                    case "PersonalNameSubject" -> {
+                        parsePersonalNameSubject(reader, personalNameSubjectList, elementName);
+                    }
+                    case "OtherID" -> {
+                        String otherIdSource = reader.getAttributeValue(null, "Source");
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            String content = reader.getText();
+                            otherIDList.add(new OtherIDRec(otherIdSource, content));
+                        }
+                    }
+                    case "Keyword" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            keywordList.add(reader.getText());
+                        }
+                    }
+                    case "SpaceFlightMission" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            spaceFlightMissionList.add(reader.getText());
+                        }
+                    }
+                    case "InvestigatorList" -> {
+                        // TODO
+                    }
+                    case "GeneralNote" -> {
+                        // TODO
+                    }
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("MedlineCitation")) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(parentElement)) {
+                break;
+            }
+        }
+
+        // populate multiple occurrence fields
+        fields.put(new UnknownField("citation-subset"), join(citationSubsets, ", "));
+        addMeshHeading(fields, meshHeadingList);
+        addPersonalNames(fields, personalNameSubjectList);
+        addOtherId(fields, otherIDList);
+        addKeywords(fields, keywordList);
+        fields.put(new UnknownField("space-flight-mission"), join(spaceFlightMissionList, ", "));
+    }
+
+    private void parsePersonalNameSubject(XMLStreamReader reader, List<PersonalNameSubjectRec> personalNameSubjectList, String startElement)
+            throws XMLStreamException {
+        String lastName = "";
+        String foreName = "";
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "LastName" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            lastName = reader.getText();
+                        }
+                    }
+                    case "ForeName" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            foreName = reader.getText();
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
+        }
+
+        personalNameSubjectList.add(new PersonalNameSubjectRec(lastName, foreName));
+    }
+
+    private void parseMeshHeading(XMLStreamReader reader, List<MeshHeadingRec> meshHeadingList, String startElement) throws XMLStreamException {
+        String descriptorName = "";
+        List<String> qualifierNames = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "DescriptorName" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            descriptorName = reader.getText();
+                        }
+                    }
+                    case "QualifierName" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            qualifierNames.add(reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
+        }
+
+        meshHeadingList.add(new MeshHeadingRec(descriptorName, qualifierNames));
+    }
+
+    private void parseGeneSymbolList(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
+        List<String> geneSymbols = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                if (elementName.equals("GeneSymbol")) {
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
+                        geneSymbols.add(reader.getText());
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
+        }
+
+        fields.put(new UnknownField("gene-symbols"), join(geneSymbols, ", "));
+    }
+
+    private void parseChemicalList(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
+        List<String> chemicalNames = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                if (elementName.equals("NameOfSubstance")) {
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
+                        chemicalNames.add(reader.getText());
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
+        }
+
+        fields.put(new UnknownField("chemicals"), join(chemicalNames, ", "));
+    }
+
+    private void parseMedlineJournalInfo(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "Country" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, new UnknownField("country"), reader.getText());
+                        }
+                    }
+                    case "MedlineTA" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, new UnknownField("journal-abbreviation"), reader.getText());
+                        }
+                    }
+                    case "NlmUniqueID" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, new UnknownField("nlm-id"), reader.getText());
+                        }
+                    }
+                    case "ISSNLinking" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, new UnknownField("issn-linking"), reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
                 break;
             }
         }
@@ -452,7 +665,7 @@ public class MedlineImporter extends Importer implements Parser {
                 fields.put(new UnknownField("sections"), join(result, "; "));
             }
             if (bookDocument.getKeywordList() != null) {
-                addKeyWords(fields, bookDocument.getKeywordList());
+//                addKeywords(fields, bookDocument.getKeywordList());
             }
             if (bookDocument.getContributionDate() != null) {
                 addContributionDate(fields, bookDocument.getContributionDate());
@@ -610,17 +823,17 @@ public class MedlineImporter extends Importer implements Parser {
                 addGeneSymbols(fields, medlineCitation.getGeneSymbolList());
             }
             if (medlineCitation.getMeshHeadingList() != null) {
-                addMeashHeading(fields, medlineCitation.getMeshHeadingList());
+                // addMeshHeading(fields, medlineCitation.getMeshHeadingList());
             }
             putIfValueNotNull(fields, new UnknownField("references"), medlineCitation.getNumberOfReferences());
             if (medlineCitation.getPersonalNameSubjectList() != null) {
-                addPersonalNames(fields, medlineCitation.getPersonalNameSubjectList());
+//                addPersonalNames(fields, medlineCitation.getPersonalNameSubjectList());
             }
             if (medlineCitation.getOtherID() != null) {
-                addOtherId(fields, medlineCitation.getOtherID());
+//                addOtherId(fields, medlineCitation.getOtherID());
             }
             if (medlineCitation.getKeywordList() != null) {
-                addKeyWords(fields, medlineCitation.getKeywordList());
+//                addKeywords(fields, medlineCitation.getKeywordList());
             }
             if (medlineCitation.getSpaceFlightMission() != null) {
                 fields.put(new UnknownField("space-flight-mission"), join(medlineCitation.getSpaceFlightMission(), ", "));
@@ -691,69 +904,63 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void addKeyWords(Map<Field, String> fields, List<KeywordList> allKeywordLists) {
-        List<String> keywordStrings = new ArrayList<>();
-        // add keywords to the list
-        for (KeywordList keywordList : allKeywordLists) {
-            for (Keyword keyword : keywordList.getKeyword()) {
-                for (Serializable content : keyword.getContent()) {
-                    if (content instanceof String) {
-                        keywordStrings.add((String) content);
-                    }
-                }
-            }
-        }
-        // Check whether MeshHeadingList exist or not
+    private void addKeywords(Map<Field, String> fields, List<String> keywordList) {
+        // Check whether MeshHeadingList exists or not
         if (fields.get(StandardField.KEYWORDS) == null) {
-            fields.put(StandardField.KEYWORDS, join(keywordStrings, KEYWORD_SEPARATOR));
+            fields.put(StandardField.KEYWORDS, join(keywordList, KEYWORD_SEPARATOR));
         } else {
-            if (keywordStrings.size() > 0) {
+            if (!keywordList.isEmpty()) {
                 // if it exists, combine the MeshHeading with the keywords
-                String result = join(keywordStrings, "; ");
+                String result = join(keywordList, "; ");
                 result = fields.get(StandardField.KEYWORDS) + KEYWORD_SEPARATOR + result;
                 fields.put(StandardField.KEYWORDS, result);
             }
         }
     }
 
-    private void addOtherId(Map<Field, String> fields, List<OtherID> otherID) {
-        for (OtherID id : otherID) {
-            if ((id.getSource() != null) && (id.getContent() != null)) {
-                fields.put(FieldFactory.parseField(StandardEntryType.Article, id.getSource()), id.getContent());
+    private void addOtherId(Map<Field, String> fields, List<OtherIDRec> otherIDList) {
+        for (OtherIDRec id : otherIDList) {
+            if (!id.source().isBlank() && !id.content().isBlank()) {
+                fields.put(FieldFactory.parseField(StandardEntryType.Article, id.source()), id.content());
             }
         }
     }
 
-    private void addPersonalNames(Map<Field, String> fields, PersonalNameSubjectList personalNameSubjectList) {
+    private void addPersonalNames(Map<Field, String> fields, List<PersonalNameSubjectRec> personalNameSubjectList) {
         if (fields.get(StandardField.AUTHOR) == null) {
             // if no authors appear, then add the personal names as authors
             List<String> personalNames = new ArrayList<>();
-            if (personalNameSubjectList.getPersonalNameSubject() != null) {
-                List<PersonalNameSubject> personalNameSubject = personalNameSubjectList.getPersonalNameSubject();
-                for (PersonalNameSubject personalName : personalNameSubject) {
-                    String name = personalName.getLastName();
-                    if (personalName.getForeName() != null) {
-                        name += ", " + personalName.getForeName();
+
+            if (!personalNameSubjectList.isEmpty()) {
+                for (PersonalNameSubjectRec personalNameSubject : personalNameSubjectList) {
+                    StringBuilder result = new StringBuilder(personalNameSubject.lastName());
+                    if (!personalNameSubject.foreName().isBlank()) {
+                        result.append(", ").append(personalNameSubject.foreName());
                     }
-                    personalNames.add(name);
+                    personalNames.add(result.toString());
                 }
+
                 fields.put(StandardField.AUTHOR, join(personalNames, " and "));
             }
         }
     }
 
-    private void addMeashHeading(Map<Field, String> fields, MeshHeadingList meshHeadingList) {
-        ArrayList<String> keywords = new ArrayList<>();
-        for (MeshHeading keyword : meshHeadingList.getMeshHeading()) {
-            StringBuilder result = new StringBuilder(keyword.getDescriptorName().getContent());
-            if (keyword.getQualifierName() != null) {
-                for (QualifierName qualifier : keyword.getQualifierName()) {
-                    result.append(", ").append(qualifier.getContent());
+    private void addMeshHeading(Map<Field, String> fields, List<MeshHeadingRec> meshHeadingList) {
+        List<String> keywords = new ArrayList<>();
+
+        if (!meshHeadingList.isEmpty()) {
+            for (MeshHeadingRec meshHeading : meshHeadingList) {
+                StringBuilder result = new StringBuilder(meshHeading.descriptorName());
+                if (meshHeading.qualifierNames() != null) {
+                    for (String qualifierName : meshHeading.qualifierNames()) {
+                        result.append(", ").append(qualifierName);
+                    }
                 }
+                keywords.add(result.toString());
             }
-            keywords.add(result.toString());
+
+            fields.put(StandardField.KEYWORDS, join(keywords, KEYWORD_SEPARATOR));
         }
-        fields.put(StandardField.KEYWORDS, join(keywords, KEYWORD_SEPARATOR));
     }
 
     private void addGeneSymbols(Map<Field, String> fields, GeneSymbolList geneSymbolList) {
