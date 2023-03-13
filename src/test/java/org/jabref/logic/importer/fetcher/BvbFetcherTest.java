@@ -77,7 +77,7 @@ public class BvbFetcherTest {
         String query = "java jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
-        assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=java+jdk&maximumRecords=10", url.toString());
+        assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=java+jdk&maximumRecords=30", url.toString());
     }
 
     @Test
@@ -85,7 +85,7 @@ public class BvbFetcherTest {
         String query = "title:jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
-        assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=jdk&maximumRecords=10", url.toString());
+        assertEquals("http://bvbr.bib-bvb.de:5661/bvb01sru?version=1.1&recordSchema=marcxml&operation=searchRetrieve&query=jdk&maximumRecords=30", url.toString());
     }
 
     @Test
