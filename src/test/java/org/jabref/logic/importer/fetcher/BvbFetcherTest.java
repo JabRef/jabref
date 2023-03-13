@@ -8,6 +8,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
@@ -18,6 +19,7 @@ import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransf
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@FetcherTest
 public class BvbFetcherTest {
 
     BvbFetcher fetcher = new BvbFetcher();
