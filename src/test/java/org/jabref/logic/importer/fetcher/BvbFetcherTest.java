@@ -8,7 +8,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
@@ -19,11 +18,10 @@ import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransf
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@FetcherTest
 public class BvbFetcherTest {
 
     BvbFetcher fetcher = new BvbFetcher();
-    BibEntry bibEntryISBN0321356683;
+    BibEntry bibEntryISBN0134685997;
     BibEntry bibEntryISBN9783960886402;
 
     @Test
@@ -44,7 +42,7 @@ public class BvbFetcherTest {
 
         bibEntryISBN9783960886402 = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.TITLE, "Effective Java")
-                .withField(StandardField.DATE, "2018")
+                .withField(StandardField.YEAR, "2018")
                 .withField(StandardField.SUBTITLE, "best practices für die Java-Plattform")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
                 .withField(StandardField.TITLEADDON, "Joshua Bloch")
@@ -55,15 +53,14 @@ public class BvbFetcherTest {
                 .withField(StandardField.LOCATION, "Heidelberg")
                 .withField(StandardField.PUBLISHER, "{dpunkt.verlag} and {Dpunkt. Verlag (Heidelberg)}");
 
-        bibEntryISBN0321356683 = new BibEntry(StandardEntryType.Misc)
+        bibEntryISBN0134685997 = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.TITLE, "Effective Java")
-                .withField(StandardField.DATE, "2011")
+                .withField(StandardField.YEAR, "2018")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
-                .withField(StandardField.SERIES, "\u0098The\u009C Java series")
                 .withField(StandardField.TITLEADDON, "Joshua Bloch")
-                .withField(StandardField.EDITION, "2. ed., [Nachdr.]")
-                .withField(StandardField.ISBN, "0321356683")
-                .withField(StandardField.LOCATION, "Upper Saddle River, NJ [u.a.]")
+                .withField(StandardField.EDITION, "Third edition")
+                .withField(StandardField.ISBN, "0134685997")
+                .withField(StandardField.LOCATION, "Boston")
                 .withField(StandardField.PUBLISHER, "{Addison-Wesley}");
     }
 
@@ -91,8 +88,8 @@ public class BvbFetcherTest {
     @Test
     public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
-        assertTrue(searchResult.contains(bibEntryISBN9783960886402));
-        assertTrue(searchResult.contains(bibEntryISBN0321356683));
+        assertEquals(bibEntryISBN9783960886402, searchResult.get(0));
+        assertEquals(bibEntryISBN0134685997, searchResult.get(1));
     }
 
     @Test
