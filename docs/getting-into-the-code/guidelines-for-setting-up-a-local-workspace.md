@@ -96,20 +96,13 @@ To prevent this, execute the following steps:
 
 ```cmd
 git clone --depth=10 https://github.com/JabRef/jabref.git
+cd jabref
 git remote rename origin upstream
 git remote add origin https://github.com/YOUR_USERNAME/jabref.git
 ```
 
 The `--depth--10` is used to limit the download to \~20 MB instead of downloading the complete history (\~800 MB).
 If you want to dig in our commit history, feel free to download everything.
-
-Go to the newly created JabRef folder: `cd jabref`.
-
-Add JabRef's upstream code base as upstream:
-
-```
-git remote add upstream https://github.com/JabRef/jabref.git
-```
 
 Now, you have two remote repositories, where `origin` is yours and `upstream` is the one of the JabRef organization.
 
