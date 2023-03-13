@@ -71,7 +71,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
                 .withField(StandardField.MONTH, "#sep#")
                 .withField(StandardField.NUMBER, "1")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
-                .withField(StandardField.DOI, "10.12942/lrr-2012-1010.48550/arXiv.1112.3960")
+                .withField(StandardField.DOI, "10.12942/lrr-2012-10")
                 .withField(StandardField.PRIMARYCLASS, "astro-ph.CO")
                 .withField(StandardField.EID, "10")
                 .withField(StandardField.EPRINT, "1112.3960")

@@ -11,15 +11,20 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
-
+- We added a field showing the BibTeX/biblatex source for added and deleted entries in the "External Changes Resolver" dialog. [#9509](https://github.com/JabRef/jabref/issues/9509)
+- We added a full text fetcher for IACR eprints. [#9651](https://github.com/JabRef/jabref/pull/9651)
+- We added "Attach file from URL" to right-click context menu to download and store a file with the reference library. [#9646](https://github.com/JabRef/jabref/issues/9646)
+- We enabled updating an existing entry with data from InspireHEP. [#9351](https://github.com/JabRef/jabref/issues/9351)
+- We added a fetcher for the Bibliotheksverbund Bayern (experimental). [#9641](https://github.com/JabRef/jabref/pull/9641)
 
 
 
 
 ### Changed
 
-
-
+- 'Get full text' now also checks the file url. [#568](https://github.com/koppor/jabref/issues/568)
+- We refined the 'main directory not found' error message. [#9625](https://github.com/JabRef/jabref/pull/9625)
+- We modified the `Add Group` dialog to use the most recently selected group hierarchical context [#9141](https://github.com/JabRef/jabref/issues/9141)
 
 
 
@@ -28,9 +33,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the browser import would add ' characters before the BibTeX entry on Linux [#9588](https://github.com/JabRef/jabref/issues/9588)
 - We fixed an issue where searching for a specific term with the DOAB fetcher lead to an exception [#9571](https://github.com/JabRef/jabref/issues/9571)
 - We fixed an issue where the "Import" -> "Library to import to" did not show the correct library name if two opened libraries had the same suffix [#9567](https://github.com/JabRef/jabref/issues/9567)
-- We added a fetcher for the Bibliotheksverbund Bayern (experimental). [#9641](https://github.com/JabRef/jabref/pull/9641) 
-
-
+- We fixed an issue where the rpm-Version of JabRef could not be properly uninstalled and reinstalled [#9558](https://github.com/JabRef/jabref/issues/9558), [#9603](https://github.com/JabRef/jabref/issues/9603)
+- We fixed an issue where the command line export using `--exportMatches` flag does not create an output bib file [#9581](https://github.com/JabRef/jabref/issues/9581)
+- We fixed an issue where custom field in the custom entry types could not be set to mulitline [#9609](https://github.com/JabRef/jabref/issues/9609)
+- We fixed an issue where the Office XML exporter did not resolve BibTeX-Strings when exporting entries [forum#3741](https://discourse.jabref.org/t/exporting-bibtex-constant-strings-to-ms-office-2007-xml/3741)
 
 
 ### Removed
@@ -49,6 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a dropdown menu to let users change the library they want to import into during import. [#6177](https://github.com/JabRef/jabref/issues/6177)
 - We added the possibility to add/remove a preview style from the selected list using a double click. [#9490](https://github.com/JabRef/jabref/issues/9490)
 - We added the option to define fields as "multine" directly in the custom entry types dialog. [#6448](https://github.com/JabRef/jabref/issues/6448)
+- We changed the minWidth and the minHeight of the main window, so it won't have a width and/or a height with the value 0. [#9606](https://github.com/JabRef/jabref/issues/9606)
 
 ### Changed
 

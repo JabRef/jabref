@@ -157,6 +157,7 @@ public class WebFetchers {
                                                                      FilePreferences filePreferences,
                                                                      BibDatabaseContext databaseContext) {
         SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+        set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new IsbnFetcher(importFormatPreferences)
@@ -197,6 +198,7 @@ public class WebFetchers {
         fetchers.add(new ArXivFetcher(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
         fetchers.add(new ApsFetcher());
+        fetchers.add(new IacrEprintFetcher(importFormatPreferences));
 
         // Meta search
         // fetchers.add(new JstorFetcher(importFormatPreferences));

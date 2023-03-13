@@ -30,7 +30,7 @@ public final class EntryChangeResolver extends DatabaseChangeResolver {
     @Override
     public Optional<DatabaseChange> askUserToResolveChange() {
         MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), bibEntryPreferences);
-        mergeEntriesDialog.setLeftHeaderText(Localization.lang("On JabRef"));
+        mergeEntriesDialog.setLeftHeaderText(Localization.lang("In JabRef"));
         mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
         mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, BasicDiffMethod.WORDS));
 

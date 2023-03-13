@@ -14,7 +14,7 @@
     <category field="chemistry"/>
     <issn>1756-1108</issn>
     <eissn>1109-4028</eissn>
-    <updated>2019-09-18T22:12:15+00:00</updated>
+    <updated>2023-02-07T08:52:03+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -73,6 +73,13 @@
       <else>
         <text variable="edition" suffix="."/>
       </else>
+    </choose>
+  </macro>
+  <macro name="access">
+    <choose>
+      <if match="any" variable="DOI">
+        <text variable="DOI" prefix="DOI: "/>
+      </if>
     </choose>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year">
@@ -137,6 +144,7 @@
           </group>
         </else>
       </choose>
+      <text macro="access" prefix=", "/>
     </layout>
   </bibliography>
 </style>
