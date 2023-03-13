@@ -26,12 +26,10 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.medline.Abstract;
-import org.jabref.logic.importer.fileformat.medline.AbstractText;
 import org.jabref.logic.importer.fileformat.medline.AffiliationInfo;
 import org.jabref.logic.importer.fileformat.medline.ArticleId;
 import org.jabref.logic.importer.fileformat.medline.ArticleIdList;
 import org.jabref.logic.importer.fileformat.medline.ArticleTitle;
-import org.jabref.logic.importer.fileformat.medline.Author;
 import org.jabref.logic.importer.fileformat.medline.AuthorList;
 import org.jabref.logic.importer.fileformat.medline.Book;
 import org.jabref.logic.importer.fileformat.medline.BookDocument;
@@ -59,7 +57,6 @@ import org.jabref.logic.importer.fileformat.medline.OtherID;
 import org.jabref.logic.importer.fileformat.medline.Pagination;
 import org.jabref.logic.importer.fileformat.medline.PersonalNameSubject;
 import org.jabref.logic.importer.fileformat.medline.PersonalNameSubjectList;
-import org.jabref.logic.importer.fileformat.medline.PubDate;
 import org.jabref.logic.importer.fileformat.medline.PublicationType;
 import org.jabref.logic.importer.fileformat.medline.Publisher;
 import org.jabref.logic.importer.fileformat.medline.PubmedArticle;
@@ -68,7 +65,6 @@ import org.jabref.logic.importer.fileformat.medline.PubmedBookData;
 import org.jabref.logic.importer.fileformat.medline.QualifierName;
 import org.jabref.logic.importer.fileformat.medline.Section;
 import org.jabref.logic.importer.fileformat.medline.Sections;
-import org.jabref.logic.importer.fileformat.medline.Text;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -82,7 +78,6 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
 import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
@@ -251,8 +246,7 @@ public class MedlineImporter extends Importer implements Parser {
                         parseDate(reader, elementName, fields);
                     }
                     case "Article" -> {
-                        String pubmodel = reader.getAttributeValue(null, "PubModel");
-                        fields.put(new UnknownField("pubmodel"), pubmodel);
+                        parseArticleInformation(reader, fields);
                     }
                     case "PMID" -> {
                         reader.next();
@@ -264,6 +258,96 @@ public class MedlineImporter extends Importer implements Parser {
             }
 
             if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("MedlineCitation")) {
+                break;
+            }
+        }
+    }
+
+    private void parseArticleInformation(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        String pubmodel = reader.getAttributeValue(null, "PubModel");
+        fields.put(new UnknownField("pubmodel"), pubmodel);
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "Journal" -> {
+                        parseJournal(reader, fields);
+                    }
+                    case "ArticleTitle" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            fields.put(StandardField.TITLE, StringUtil.stripBrackets(reader.getText()));
+                        }
+                    }
+                    case "Pagination" -> {
+                        addPagination(reader, fields);
+                    }
+                    case "ELocationID" -> {
+                        String eidType = reader.getAttributeValue(null, "EIdType");
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            if (eidType.equals("doi")) {
+                                fields.put(StandardField.DOI, reader.getText());
+                            }
+                            if (eidType.equals("pii")) {
+                                fields.put(new UnknownField("pii"), reader.getText());
+                            }
+                        }
+                    }
+                    case "Abstract" -> {
+                        addAbstract(reader, fields);
+                    }
+                    case "AuthorList" -> {
+                        handleAuthorList(reader, fields);
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Article")) {
+                break;
+            }
+        }
+    }
+
+    private void parseJournal(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "Title" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, StandardField.JOURNAL, reader.getText());
+                        }
+                    }
+                    case "ISSN" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, StandardField.ISSN, reader.getText());
+                        }
+                    }
+                    case "Volume" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, StandardField.VOLUME, reader.getText());
+                        }
+                    }
+                    case "Issue" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, StandardField.ISSUE, reader.getText());
+                        }
+                    }
+                    case "PubDate" -> {
+                        addPubDate(reader, fields);
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Journal")) {
                 break;
             }
         }
@@ -349,11 +433,11 @@ public class MedlineImporter extends Importer implements Parser {
             }
             if (bookDocument.getAbstract() != null) {
                 Abstract abs = bookDocument.getAbstract();
-                addAbstract(fields, abs);
+                // addAbstract(fields, abs);
             }
             if (bookDocument.getPagination() != null) {
                 Pagination pagination = bookDocument.getPagination();
-                addPagination(fields, pagination);
+                // addPagination(fields, pagination);
             }
             if (bookDocument.getSections() != null) {
                 ArrayList<String> result = new ArrayList<>();
@@ -419,14 +503,14 @@ public class MedlineImporter extends Importer implements Parser {
             putStringFromSerializableList(fields, StandardField.TITLE, title.getContent());
         }
         if (book.getPubDate() != null) {
-            addPubDate(fields, book.getPubDate());
+            // addPubDate(fields, book.getPubDate());
         }
         if (book.getAuthorList() != null) {
             List<AuthorList> authorLists = book.getAuthorList();
             // authorLists size should be one
             if (authorLists.size() == 1) {
                 for (AuthorList authorList : authorLists) {
-                    handleAuthors(fields, authorList);
+                    // handleAuthorList(fields, authorList);
                 }
             } else {
                 LOGGER.info(String.format("Size of authorlist was %s", authorLists.size()));
@@ -440,7 +524,7 @@ public class MedlineImporter extends Importer implements Parser {
 
         if (book.getELocationID() != null) {
             for (ELocationID id : book.getELocationID()) {
-                addElocationID(fields, id);
+//                addElocationID(fields, id);
             }
         }
         if (book.getIsbn() != null) {
@@ -702,79 +786,133 @@ public class MedlineImporter extends Importer implements Parser {
                 putIfValueNotNull(fields, StandardField.VOLUME, journalIssue.getVolume());
                 putIfValueNotNull(fields, StandardField.ISSUE, journalIssue.getIssue());
 
-                addPubDate(fields, journalIssue.getPubDate());
+                // addPubDate(fields, journalIssue.getPubDate());
             } else if (object instanceof ArticleTitle) {
                 ArticleTitle articleTitle = (ArticleTitle) object;
                 fields.put(StandardField.TITLE, StringUtil.stripBrackets(articleTitle.getContent().toString()));
             } else if (object instanceof Pagination) {
                 Pagination pagination = (Pagination) object;
-                addPagination(fields, pagination);
+                // addPagination(fields, pagination);
             } else if (object instanceof ELocationID) {
                 ELocationID eLocationID = (ELocationID) object;
-                addElocationID(fields, eLocationID);
+//                addElocationID(fields, eLocationID);
             } else if (object instanceof Abstract) {
                 Abstract abs = (Abstract) object;
-                addAbstract(fields, abs);
+                // addAbstract(fields, abs);
             } else if (object instanceof AuthorList) {
                 AuthorList authors = (AuthorList) object;
-                handleAuthors(fields, authors);
+//                handleAuthorList(fields, authors);
             }
         }
     }
 
-    private void addElocationID(Map<Field, String> fields, ELocationID eLocationID) {
-        if (eLocationID.getEIdType().equals("doi")) {
-            fields.put(StandardField.DOI, eLocationID.getContent());
-        }
-        if (eLocationID.getEIdType().equals("pii")) {
-            fields.put(new UnknownField("pii"), eLocationID.getContent());
-        }
-    }
-
-    private void addPubDate(Map<Field, String> fields, PubDate pubDate) {
-        if (pubDate.getYear() == null) {
-            // if year of the pubdate is null, the medlineDate shouldn't be null
-            fields.put(StandardField.YEAR, extractYear(pubDate.getMedlineDate()));
-        } else {
-            fields.put(StandardField.YEAR, pubDate.getYear());
-            if (pubDate.getMonth() != null) {
-                Optional<Month> month = Month.parse(pubDate.getMonth());
-                if (month.isPresent()) {
-                    fields.put(StandardField.MONTH, month.get().getJabRefFormat());
+    private void addPubDate(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "MedlineDate" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            fields.put(StandardField.YEAR, extractYear(reader.getText()));
+                        }
+                    }
+                    case "Year" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            fields.put(StandardField.YEAR, reader.getText());
+                        }
+                    }
+                    case "Month" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            Optional<Month> month = Month.parse(reader.getText());
+                            month.ifPresent(monthValue -> fields.put(StandardField.MONTH, monthValue.getJabRefFormat()));
+                        }
+                    }
+                    case "Season" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            fields.put(new UnknownField("season"), reader.getText());
+                        }
+                    }
                 }
-            } else if (pubDate.getSeason() != null) {
-                fields.put(new UnknownField("season"), pubDate.getSeason());
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("PubDate")) {
+                break;
             }
         }
     }
 
-    private void addAbstract(Map<Field, String> fields, Abstract abs) {
-        putIfValueNotNull(fields, new UnknownField("copyright"), abs.getCopyrightInformation());
+    private void addAbstract(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
         List<String> abstractText = new ArrayList<>();
-        for (AbstractText text : abs.getAbstractText()) {
-            for (Serializable textContent : text.getContent()) {
-                if (textContent instanceof String) {
-                    abstractText.add((String) textContent);
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "CopyrightInformation" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, new UnknownField("copyright"), reader.getText());
+                        }
+                    }
+                    case "AbstractText" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            abstractText.add(reader.getText());
+                        }
+                    }
                 }
             }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Abstract")) {
+                break;
+            }
         }
+
         fields.put(StandardField.ABSTRACT, join(abstractText, " "));
     }
 
-    private void addPagination(Map<Field, String> fields, Pagination pagination) {
+    private void addPagination(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
         String startPage = "";
         String endPage = "";
-        for (JAXBElement<String> element : pagination.getContent()) {
-            if ("MedlinePgn".equals(element.getName().getLocalPart())) {
-                putIfValueNotNull(fields, StandardField.PAGES, fixPageRange(element.getValue()));
-            } else if ("StartPage".equals(element.getName().getLocalPart())) {
-                // it could happen, that the article has only a start page
-                startPage = element.getValue() + endPage;
-                putIfValueNotNull(fields, StandardField.PAGES, startPage);
-            } else if ("EndPage".equals(element.getName().getLocalPart())) {
-                endPage = element.getValue();
-                // but it should not happen, that a endpage appears without startpage
-                fields.put(StandardField.PAGES, fixPageRange(startPage + "-" + endPage));
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "MedlinePgn" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, StandardField.PAGES, fixPageRange(reader.getText()));
+                        }
+                    }
+                    case "StartPage" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            // it could happen, that the article has only a start page
+                            startPage = reader.getText() + endPage;
+                            putIfValueNotNull(fields, StandardField.PAGES, startPage);
+                        }
+                    }
+                    case "EndPage" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            endPage = reader.getText();
+                            // but it should not happen, that a endpage appears without startpage
+                            fields.put(StandardField.PAGES, fixPageRange(startPage + "-" + endPage));
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Pagination")) {
+                break;
             }
         }
     }
@@ -784,25 +922,69 @@ public class MedlineImporter extends Importer implements Parser {
         return medlineDate.substring(0, 4);
     }
 
-    private void handleAuthors(Map<Field, String> fields, AuthorList authors) {
+    private void handleAuthorList(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
         List<String> authorNames = new ArrayList<>();
-        for (Author author : authors.getAuthor()) {
-            if (author.getCollectiveName() != null) {
-                Text collectiveNames = author.getCollectiveName();
-                for (Serializable content : collectiveNames.getContent()) {
-                    if (content instanceof String) {
-                        authorNames.add((String) content);
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "Author" -> {
+                        parseAuthor(reader, authorNames);
                     }
                 }
-            } else {
-                String authorName = author.getLastName();
-                if (author.getForeName() != null) {
-                    authorName += ", " + author.getForeName();
-                }
-                authorNames.add(authorName);
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("AuthorList")) {
+                break;
             }
         }
+
         fields.put(StandardField.AUTHOR, join(authorNames, " and "));
+    }
+
+    private void parseAuthor(XMLStreamReader reader, List<String> authorNames) throws XMLStreamException {
+        String authorName = "";
+        List<String> collectiveNames = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "CollectiveName" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            collectiveNames.add(reader.getText());
+                        }
+                    }
+                    case "LastName" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            authorName = reader.getText();
+                        }
+                    }
+                    case "ForeName" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            authorName += ", " + reader.getText();
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Author")) {
+                break;
+            }
+        }
+
+        if (collectiveNames.size() > 0) {
+            authorNames.addAll(collectiveNames);
+        }
+        if (!authorName.isBlank()) {
+            authorNames.add(authorName);
+        }
     }
 
     private void addDateRevised(Map<Field, String> fields, DateRevised dateRevised) {
