@@ -90,10 +90,14 @@ cd git-reposiroties
 
 **Note that putting the repo jabref directly under `C:\` or any other drive letter under windows causes compile errors**
 
-Run the respective `git clone` command:
+Initial cloning might be very slow (`27.00 KiB/s`).
+
+To prevent this, execute the following steps:
 
 ```cmd
-git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git
+git clone --depth=10 https://github.com/JabRef/jabref.git
+git remote rename origin upstream
+git remote add origin https://github.com/YOUR_USERNAME/jabref.git
 ```
 
 The `--depth--10` is used to limit the download to \~20 MB instead of downloading the complete history (\~800 MB).
