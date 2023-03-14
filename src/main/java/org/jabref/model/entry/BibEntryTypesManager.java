@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,11 +19,20 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 
 public class BibEntryTypesManager {
+    private final InternalEntryTypes BIBTEX = new InternalEntryTypes(
+            Stream.concat(BibtexEntryTypeDefinitions.ALL.stream(), IEEETranEntryTypeDefinitions.ALL.stream())
+                  .collect(Collectors.toList()));
 
-    private final InternalEntryTypes BIBTEX = new InternalEntryTypes(Stream.concat(BibtexEntryTypeDefinitions.ALL.stream(), IEEETranEntryTypeDefinitions.ALL.stream()).collect(Collectors.toList()));
-    private final InternalEntryTypes BIBLATEX = new InternalEntryTypes(Stream.concat(BiblatexEntryTypeDefinitions.ALL.stream(), Stream.concat(BiblatexSoftwareEntryTypeDefinitions.ALL.stream(), BiblatexAPAEntryTypeDefinitions.ALL.stream())).collect(Collectors.toList()));
+    private final InternalEntryTypes BIBLATEX = new InternalEntryTypes(
+            Stream.concat(BiblatexEntryTypeDefinitions.ALL.stream(),
+                          Stream.concat(BiblatexSoftwareEntryTypeDefinitions.ALL.stream(), BiblatexAPAEntryTypeDefinitions.ALL.stream()))
+                  .collect(Collectors.toList()));
 
     public BibEntryTypesManager() {
+    }
+
+    private InternalEntryTypes getEntryTypes(BibDatabaseMode mode) {
+        return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX : BIBTEX;
     }
 
     /**
@@ -33,19 +43,7 @@ public class BibEntryTypesManager {
      * @return the list of all found custom types
      */
     public List<BibEntryType> getAllCustomTypes(BibDatabaseMode mode) {
-        Collection<BibEntryType> customizedTypes = getAllTypes(mode);
-        if (mode == BibDatabaseMode.BIBTEX) {
-            return customizedTypes.stream()
-                                  .filter(entryType -> BibtexEntryTypeDefinitions.ALL.stream().noneMatch(bibtexType -> bibtexType.getType().equals(entryType.getType())))
-                                  .filter(entryType -> IEEETranEntryTypeDefinitions.ALL.stream().noneMatch(ieeeType -> ieeeType.getType().equals(entryType.getType())))
-                                  .collect(Collectors.toList());
-        } else {
-            return customizedTypes.stream()
-                                  .filter(entryType -> BiblatexEntryTypeDefinitions.ALL.stream().noneMatch(biblatexType -> biblatexType.getType().equals(entryType.getType())))
-                                  .filter(entryType -> BiblatexSoftwareEntryTypeDefinitions.ALL.stream().noneMatch(biblatexSoftware -> biblatexSoftware.getType().equals(entryType.getType())))
-                                  .filter(entryType -> BiblatexAPAEntryTypeDefinitions.ALL.stream().noneMatch(biblatexAPA -> biblatexAPA.getType().equals(entryType.getType())))
-                                  .collect(Collectors.toList());
-        }
+        return getEntryTypes(mode).getAllCustomTypes();
     }
 
     /**
@@ -103,36 +101,44 @@ public class BibEntryTypesManager {
         }
     }
 
-    private InternalEntryTypes getEntryTypes(BibDatabaseMode mode) {
-        return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX : BIBTEX;
-    }
-
     /**
      * This class is used to specify entry types for either BIBTEX and BIBLATEX.
      */
-    static class InternalEntryTypes {
+    private static class InternalEntryTypes {
         private final SortedSet<BibEntryType> customOrModifiedType = new TreeSet<>();
         private final SortedSet<BibEntryType> standardTypes;
 
-        public InternalEntryTypes(List<BibEntryType> standardTypes) {
+        private InternalEntryTypes(List<BibEntryType> standardTypes) {
             this.standardTypes = new TreeSet<>(standardTypes);
+        }
+
+        private List<BibEntryType> getAllCustomTypes() {
+            Collection<BibEntryType> customizedTypes = getAllTypes();
+            return customizedTypes.stream()
+                                  .filter(bibEntryType -> standardTypes.stream()
+                                                                       .noneMatch(item -> item.getType().equals(bibEntryType.getType())))
+                                  .toList();
         }
 
         /**
          * This method returns the BibtexEntryType for the name of a type,
          * or an empty optional if it does not exist.
          */
-        public Optional<BibEntryType> enrich(EntryType type) {
+        private Optional<BibEntryType> enrich(EntryType type) {
             Optional<BibEntryType> enrichedType = customOrModifiedType.stream()
-                                                                      .filter(customizedType -> customizedType.getType().equals(type))
+                                                                      .filter(typeEquals(type))
                                                                       .findFirst();
             if (enrichedType.isPresent()) {
                 return enrichedType;
             } else {
                 return standardTypes.stream()
-                                    .filter(customizedType -> customizedType.getType().equals(type))
+                                    .filter(typeEquals(type))
                                     .findFirst();
             }
+        }
+
+        private Predicate<BibEntryType> typeEquals(EntryType toCompare) {
+            return item -> item.getType().equals(toCompare);
         }
 
         private void addCustomOrModifiedType(BibEntryType type) {
@@ -148,13 +154,13 @@ public class BibEntryTypesManager {
             customOrModifiedType.clear();
         }
 
-        public SortedSet<BibEntryType> getAllTypes() {
+        private SortedSet<BibEntryType> getAllTypes() {
             SortedSet<BibEntryType> allTypes = new TreeSet<>(customOrModifiedType);
             allTypes.addAll(standardTypes);
             return allTypes;
         }
 
-        public boolean isCustomOrModifiedType(BibEntryType entryType) {
+        private boolean isCustomOrModifiedType(BibEntryType entryType) {
             return customOrModifiedType.stream()
                                        .anyMatch(customizedType -> customizedType.equals(entryType));
         }
