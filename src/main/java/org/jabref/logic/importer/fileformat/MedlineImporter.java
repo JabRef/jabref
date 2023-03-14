@@ -26,9 +26,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.medline.Abstract;
-import org.jabref.logic.importer.fileformat.medline.AffiliationInfo;
-import org.jabref.logic.importer.fileformat.medline.ArticleId;
-import org.jabref.logic.importer.fileformat.medline.ArticleIdList;
+import org.jabref.logic.importer.fileformat.medline.ArticleIDRec;
 import org.jabref.logic.importer.fileformat.medline.ArticleTitle;
 import org.jabref.logic.importer.fileformat.medline.AuthorList;
 import org.jabref.logic.importer.fileformat.medline.Book;
@@ -36,26 +34,16 @@ import org.jabref.logic.importer.fileformat.medline.BookDocument;
 import org.jabref.logic.importer.fileformat.medline.BookTitle;
 import org.jabref.logic.importer.fileformat.medline.Chemical;
 import org.jabref.logic.importer.fileformat.medline.ContributionDate;
-import org.jabref.logic.importer.fileformat.medline.DateCompleted;
-import org.jabref.logic.importer.fileformat.medline.DateCreated;
 import org.jabref.logic.importer.fileformat.medline.DateRevised;
 import org.jabref.logic.importer.fileformat.medline.ELocationID;
 import org.jabref.logic.importer.fileformat.medline.GeneSymbolList;
-import org.jabref.logic.importer.fileformat.medline.GeneralNote;
-import org.jabref.logic.importer.fileformat.medline.ISSN;
-import org.jabref.logic.importer.fileformat.medline.Investigator;
-import org.jabref.logic.importer.fileformat.medline.InvestigatorList;
-import org.jabref.logic.importer.fileformat.medline.Journal;
-import org.jabref.logic.importer.fileformat.medline.JournalIssue;
-import org.jabref.logic.importer.fileformat.medline.MedlineCitation;
-import org.jabref.logic.importer.fileformat.medline.MedlineJournalInfo;
+import org.jabref.logic.importer.fileformat.medline.InvestigatorRec;
 import org.jabref.logic.importer.fileformat.medline.MeshHeadingRec;
 import org.jabref.logic.importer.fileformat.medline.OtherIDRec;
 import org.jabref.logic.importer.fileformat.medline.Pagination;
 import org.jabref.logic.importer.fileformat.medline.PersonalNameSubjectRec;
 import org.jabref.logic.importer.fileformat.medline.PublicationType;
 import org.jabref.logic.importer.fileformat.medline.Publisher;
-import org.jabref.logic.importer.fileformat.medline.PubmedArticle;
 import org.jabref.logic.importer.fileformat.medline.PubmedBookArticle;
 import org.jabref.logic.importer.fileformat.medline.PubmedBookData;
 import org.jabref.logic.importer.fileformat.medline.Section;
@@ -72,9 +60,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +74,6 @@ public class MedlineImporter extends Importer implements Parser {
     private static final String KEYWORD_SEPARATOR = "; ";
 
     private static final Locale ENGLISH = Locale.ENGLISH;
-    private Unmarshaller unmarshaller;
 
     private static String join(List<String> list, String string) {
         return Joiner.on(string).join(list);
@@ -151,7 +135,7 @@ public class MedlineImporter extends Importer implements Parser {
                     switch (elementName) {
                         case "PubmedArticle" -> {
                             // Case 3: PubmedArticle
-                            parseArticleNew(reader, bibItems, elementName);
+                            parseArticle(reader, bibItems, elementName);
                         }
                         // Case 1: PubmedArticleSet
 
@@ -197,7 +181,7 @@ public class MedlineImporter extends Importer implements Parser {
         return new ParserResult(bibItems);
     }
 
-    private void parseArticleNew(XMLStreamReader reader, List<BibEntry> bibItems, String parentElement) throws XMLStreamException {
+    private void parseArticle(XMLStreamReader reader, List<BibEntry> bibItems, String startElement) throws XMLStreamException {
         Map<Field, String> fields = new HashMap<>();
 
         while (reader.hasNext()) {
@@ -209,12 +193,12 @@ public class MedlineImporter extends Importer implements Parser {
                         parseMedlineCitation(reader, fields, elementName);
                     }
                     case "PubmedData" -> {
-                        //
+                        parsePubmedData(reader, fields, elementName);
                     }
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(parentElement)) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
                 break;
             }
         }
@@ -225,7 +209,45 @@ public class MedlineImporter extends Importer implements Parser {
         bibItems.add(entry);
     }
 
-    private void parseMedlineCitation(XMLStreamReader reader, Map<Field, String> fields, String parentElement) throws XMLStreamException {
+    private void parsePubmedData(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
+        String publicationStatus = "";
+        List<ArticleIDRec> articleIDList = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "PublicationStatus" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            publicationStatus = reader.getText();
+                        }
+                    }
+                    case "ArticleId" -> {
+                        String idType = reader.getAttributeValue(null, "IdType");
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            articleIDList.add(new ArticleIDRec(idType, reader.getText()));
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
+        }
+
+        if (fields.get(new UnknownField("revised")) != null) {
+            putIfValueNotNull(fields, StandardField.PUBSTATE, publicationStatus);
+            if (!articleIDList.isEmpty()) {
+                addArticleIdList(fields, articleIDList);
+            }
+        }
+    }
+
+    private void parseMedlineCitation(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
         // multiple occurrences of the following fields can be present
         List<String> citationSubsets = new ArrayList<>();
         List<MeshHeadingRec> meshHeadingList = new ArrayList<>();
@@ -233,6 +255,8 @@ public class MedlineImporter extends Importer implements Parser {
         List<OtherIDRec> otherIDList = new ArrayList<>();
         List<String> keywordList = new ArrayList<>();
         List<String> spaceFlightMissionList = new ArrayList<>();
+        List<InvestigatorRec> investigatorList = new ArrayList<>();
+        List<String> generalNoteList = new ArrayList<>();
 
         String status = reader.getAttributeValue(null, "Status");
         String owner = reader.getAttributeValue(null, "Owner");
@@ -244,8 +268,8 @@ public class MedlineImporter extends Importer implements Parser {
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
-                    case "DateCreated", "DateCompleted" -> {
-                        parseDate(reader, elementName, fields);
+                    case "DateCreated", "DateCompleted", "DateRevised" -> {
+                        parseDate(reader, fields, elementName);
                     }
                     case "Article" -> {
                         parseArticleInformation(reader, fields);
@@ -303,16 +327,19 @@ public class MedlineImporter extends Importer implements Parser {
                             spaceFlightMissionList.add(reader.getText());
                         }
                     }
-                    case "InvestigatorList" -> {
-                        // TODO
+                    case "Investigator" -> {
+                        parseInvestigator(reader, investigatorList, elementName);
                     }
                     case "GeneralNote" -> {
-                        // TODO
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            generalNoteList.add(reader.getText());
+                        }
                     }
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(parentElement)) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
                 break;
             }
         }
@@ -324,6 +351,48 @@ public class MedlineImporter extends Importer implements Parser {
         addOtherId(fields, otherIDList);
         addKeywords(fields, keywordList);
         fields.put(new UnknownField("space-flight-mission"), join(spaceFlightMissionList, ", "));
+        addInvestigators(fields, investigatorList);
+        addNotes(fields, generalNoteList);
+    }
+
+    private void parseInvestigator(XMLStreamReader reader, List<InvestigatorRec> investigatorList, String startElement)
+            throws XMLStreamException {
+        String lastName = "";
+        String foreName = "";
+        List<String> affiliationList = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "LastName" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            lastName = reader.getText();
+                        }
+                    }
+                    case "ForeName" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            foreName = reader.getText();
+                        }
+                    }
+                    case "Affiliation" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            affiliationList.add(reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
+        }
+
+        investigatorList.add(new InvestigatorRec(lastName, foreName, affiliationList));
     }
 
     private void parsePersonalNameSubject(XMLStreamReader reader, List<PersonalNameSubjectRec> personalNameSubjectList, String startElement)
@@ -566,7 +635,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void parseDate(XMLStreamReader reader, String parentElement, Map<Field, String> fields) throws XMLStreamException {
+    private void parseDate(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
         Optional<String> year = Optional.empty();
         Optional<String> month = Optional.empty();
         Optional<String> day = Optional.empty();
@@ -574,7 +643,8 @@ public class MedlineImporter extends Importer implements Parser {
         // mapping from date XML element to field name
         Map<String, String> dateFieldMap = Map.of(
                 "DateCreated", "created",
-                "DateCompleted", "completed"
+                "DateCompleted", "completed",
+                "DateRevised", "revised"
         );
 
         while (reader.hasNext()) {
@@ -603,36 +673,14 @@ public class MedlineImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(parentElement)) {
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
                 break;
             }
         }
 
         Optional<Date> date = Date.parse(year, month, day);
         date.ifPresent(dateValue ->
-                fields.put(new UnknownField(dateFieldMap.get(parentElement)), dateValue.getNormalized()));
-    }
-
-    private Object unmarshallRoot(BufferedReader reader) throws JAXBException, XMLStreamException {
-        initUmarshaller();
-
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
-
-        // go to the root element
-        while (!xmlStreamReader.isStartElement()) {
-            xmlStreamReader.next();
-        }
-
-        return unmarshaller.unmarshal(xmlStreamReader);
-    }
-
-    private void initUmarshaller() throws JAXBException {
-        if (unmarshaller == null) {
-            // Lazy init because this is expensive
-            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.medline");
-            unmarshaller = context.createUnmarshaller();
-        }
+                fields.put(new UnknownField(dateFieldMap.get(startElement)), dateValue.getNormalized()));
     }
 
     private void parseBookArticle(PubmedBookArticle currentArticle, List<BibEntry> bibItems) {
@@ -770,136 +818,53 @@ public class MedlineImporter extends Importer implements Parser {
         return String.format("%s-%s-%s", year, month, day);
     }
 
-    private void parseArticle(PubmedArticle article, List<BibEntry> bibItems) {
-        Map<Field, String> fields = new HashMap<>();
-
-        if (article.getPubmedData() != null) {
-            if (article.getMedlineCitation().getDateRevised() != null) {
-                DateRevised dateRevised = article.getMedlineCitation().getDateRevised();
-                addDateRevised(fields, dateRevised);
-                putIfValueNotNull(fields, StandardField.PUBSTATE, article.getPubmedData().getPublicationStatus());
-                if (article.getPubmedData().getArticleIdList() != null) {
-                    ArticleIdList articleIdList = article.getPubmedData().getArticleIdList();
-                    addArticleIdList(fields, articleIdList);
-                }
-            }
-        }
-        if (article.getMedlineCitation() != null) {
-            MedlineCitation medlineCitation = article.getMedlineCitation();
-
-            fields.put(new UnknownField("status"), medlineCitation.getStatus());
-            DateCreated dateCreated = medlineCitation.getDateCreated();
-            if (medlineCitation.getDateCreated() != null) {
-                fields.put(new UnknownField("created"),
-                        convertToDateFormat(dateCreated.getYear(), dateCreated.getMonth(), dateCreated.getDay()));
-            }
-            fields.put(new UnknownField("pubmodel"), medlineCitation.getArticle().getPubModel());
-
-            if (medlineCitation.getDateCompleted() != null) {
-                DateCompleted dateCompleted = medlineCitation.getDateCompleted();
-                fields.put(new UnknownField("completed"),
-                        convertToDateFormat(dateCompleted.getYear(), dateCompleted.getMonth(), dateCompleted.getDay()));
-            }
-
-            fields.put(StandardField.PMID, medlineCitation.getPMID().getContent());
-            fields.put(StandardField.OWNER, medlineCitation.getOwner());
-
-            addArticleInformation(fields, medlineCitation.getArticle().getContent());
-
-            MedlineJournalInfo medlineJournalInfo = medlineCitation.getMedlineJournalInfo();
-            putIfValueNotNull(fields, new UnknownField("country"), medlineJournalInfo.getCountry());
-            putIfValueNotNull(fields, new UnknownField("journal-abbreviation"), medlineJournalInfo.getMedlineTA());
-            putIfValueNotNull(fields, new UnknownField("nlm-id"), medlineJournalInfo.getNlmUniqueID());
-            putIfValueNotNull(fields, new UnknownField("issn-linking"), medlineJournalInfo.getISSNLinking());
-            if (medlineCitation.getChemicalList() != null) {
-                if (medlineCitation.getChemicalList().getChemical() != null) {
-                    addChemicals(fields, medlineCitation.getChemicalList().getChemical());
-                }
-            }
-            if (medlineCitation.getCitationSubset() != null) {
-                fields.put(new UnknownField("citation-subset"), join(medlineCitation.getCitationSubset(), ", "));
-            }
-            if (medlineCitation.getGeneSymbolList() != null) {
-                addGeneSymbols(fields, medlineCitation.getGeneSymbolList());
-            }
-            if (medlineCitation.getMeshHeadingList() != null) {
-                // addMeshHeading(fields, medlineCitation.getMeshHeadingList());
-            }
-            putIfValueNotNull(fields, new UnknownField("references"), medlineCitation.getNumberOfReferences());
-            if (medlineCitation.getPersonalNameSubjectList() != null) {
-//                addPersonalNames(fields, medlineCitation.getPersonalNameSubjectList());
-            }
-            if (medlineCitation.getOtherID() != null) {
-//                addOtherId(fields, medlineCitation.getOtherID());
-            }
-            if (medlineCitation.getKeywordList() != null) {
-//                addKeywords(fields, medlineCitation.getKeywordList());
-            }
-            if (medlineCitation.getSpaceFlightMission() != null) {
-                fields.put(new UnknownField("space-flight-mission"), join(medlineCitation.getSpaceFlightMission(), ", "));
-            }
-            if (medlineCitation.getInvestigatorList() != null) {
-                addInvestigators(fields, medlineCitation.getInvestigatorList());
-            }
-            if (medlineCitation.getGeneralNote() != null) {
-                addNotes(fields, medlineCitation.getGeneralNote());
-            }
-        }
-
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(fields);
-
-        bibItems.add(entry);
-    }
-
-    private void addArticleIdList(Map<Field, String> fields, ArticleIdList articleIdList) {
-        for (ArticleId id : articleIdList.getArticleId()) {
-            if (id.getIdType() != null) {
-                if ("pubmed".equals(id.getIdType())) {
-                    fields.put(StandardField.PMID, id.getContent());
+    private void addArticleIdList(Map<Field, String> fields, List<ArticleIDRec> articleIdList) {
+        for (ArticleIDRec id : articleIdList) {
+            if (!id.idType().isBlank()) {
+                if ("pubmed".equals(id.idType())) {
+                    fields.put(StandardField.PMID, id.content());
                 } else {
-                    fields.put(FieldFactory.parseField(StandardEntryType.Article, id.getIdType()), id.getContent());
+                    fields.put(FieldFactory.parseField(StandardEntryType.Article, id.idType()), id.content());
                 }
             }
         }
     }
 
-    private void addNotes(Map<Field, String> fields, List<GeneralNote> generalNote) {
+    private void addNotes(Map<Field, String> fields, List<String> generalNoteList) {
         List<String> notes = new ArrayList<>();
-        for (GeneralNote note : generalNote) {
-            if (note != null) {
-                notes.add(note.getContent());
+
+        for (String note : generalNoteList) {
+            if (!note.isBlank()) {
+                notes.add(note);
             }
         }
+
         fields.put(StandardField.NOTE, join(notes, ", "));
     }
 
-    private void addInvestigators(Map<Field, String> fields, InvestigatorList investigatorList) {
+    private void addInvestigators(Map<Field, String> fields, List<InvestigatorRec> investigatorList) {
         List<String> investigatorNames = new ArrayList<>();
         List<String> affiliationInfos = new ArrayList<>();
-        String name;
+
         // add the investigators like the authors
-        if (investigatorList.getInvestigator() != null) {
-            List<Investigator> investigators = investigatorList.getInvestigator();
-            for (Investigator investigator : investigators) {
-                name = investigator.getLastName();
-                if (investigator.getForeName() != null) {
-                    name += ", " + investigator.getForeName();
+        if (!investigatorList.isEmpty()) {
+            for (InvestigatorRec investigator : investigatorList) {
+                StringBuilder result = new StringBuilder(investigator.lastName());
+                if (!investigator.foreName().isBlank()) {
+                    result.append(", ").append(investigator.foreName());
                 }
-                investigatorNames.add(name);
+                investigatorNames.add(result.toString());
 
                 // now add the affiliation info
-                if (investigator.getAffiliationInfo() != null) {
-                    for (AffiliationInfo info : investigator.getAffiliationInfo()) {
-                        for (Serializable affiliation : info.getAffiliation().getContent()) {
-                            if (affiliation instanceof String) {
-                                affiliationInfos.add((String) affiliation);
-                            }
-                        }
-                    }
-                    fields.put(new UnknownField("affiliation"), join(affiliationInfos, ", "));
+                if (!investigator.affiliationList().isEmpty()) {
+                    affiliationInfos.addAll(investigator.affiliationList());
                 }
             }
+
+            if (!affiliationInfos.isEmpty()) {
+                fields.put(new UnknownField("affiliation"), join(affiliationInfos, ", "));
+            }
+
             fields.put(new UnknownField("investigator"), join(investigatorNames, " and "));
         }
     }
@@ -976,41 +941,6 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
         fields.put(new UnknownField("chemicals"), join(chemicalNames, ", "));
-    }
-
-    private void addArticleInformation(Map<Field, String> fields, List<Object> content) {
-        for (Object object : content) {
-            if (object instanceof Journal) {
-                Journal journal = (Journal) object;
-                putIfValueNotNull(fields, StandardField.JOURNAL, journal.getTitle());
-
-                ISSN issn = journal.getISSN();
-                if (issn != null) {
-                    putIfValueNotNull(fields, StandardField.ISSN, issn.getContent());
-                }
-
-                JournalIssue journalIssue = journal.getJournalIssue();
-                putIfValueNotNull(fields, StandardField.VOLUME, journalIssue.getVolume());
-                putIfValueNotNull(fields, StandardField.ISSUE, journalIssue.getIssue());
-
-                // addPubDate(fields, journalIssue.getPubDate());
-            } else if (object instanceof ArticleTitle) {
-                ArticleTitle articleTitle = (ArticleTitle) object;
-                fields.put(StandardField.TITLE, StringUtil.stripBrackets(articleTitle.getContent().toString()));
-            } else if (object instanceof Pagination) {
-                Pagination pagination = (Pagination) object;
-                // addPagination(fields, pagination);
-            } else if (object instanceof ELocationID) {
-                ELocationID eLocationID = (ELocationID) object;
-//                addElocationID(fields, eLocationID);
-            } else if (object instanceof Abstract) {
-                Abstract abs = (Abstract) object;
-                // addAbstract(fields, abs);
-            } else if (object instanceof AuthorList) {
-                AuthorList authors = (AuthorList) object;
-//                handleAuthorList(fields, authors);
-            }
-        }
     }
 
     private void addPubDate(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
