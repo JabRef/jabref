@@ -7,6 +7,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.Map;
 
 import org.jabref.gui.Globals;
@@ -147,10 +148,8 @@ public class Launcher {
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 Globals.getFileUpdateMonitor());
-        Globals.entryTypesManager.addCustomOrModifiedTypes(
-                preferences.getBibEntryTypes(BibDatabaseMode.BIBTEX),
-                preferences.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
-
+        EnumSet.allOf(BibDatabaseMode.class).forEach(mode ->
+                Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.getBibEntryTypes(mode), mode));
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
     }

@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.field.BibField;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
@@ -20,66 +18,11 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 
 public class BibEntryTypesManager {
-    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
+
     private final InternalEntryTypes BIBTEX = new InternalEntryTypes(Stream.concat(BibtexEntryTypeDefinitions.ALL.stream(), IEEETranEntryTypeDefinitions.ALL.stream()).collect(Collectors.toList()));
     private final InternalEntryTypes BIBLATEX = new InternalEntryTypes(Stream.concat(BiblatexEntryTypeDefinitions.ALL.stream(), Stream.concat(BiblatexSoftwareEntryTypeDefinitions.ALL.stream(), BiblatexAPAEntryTypeDefinitions.ALL.stream())).collect(Collectors.toList()));
 
     public BibEntryTypesManager() {
-    }
-
-    public static Optional<BibEntryType> parse(String comment) {
-        String rest = comment.substring(ENTRYTYPE_FLAG.length());
-        int indexEndOfName = rest.indexOf(':');
-        if (indexEndOfName < 0) {
-            return Optional.empty();
-        }
-        String fieldsDescription = rest.substring(indexEndOfName + 2);
-
-        int indexEndOfRequiredFields = fieldsDescription.indexOf(']');
-        int indexEndOfOptionalFields = fieldsDescription.indexOf(']', indexEndOfRequiredFields + 1);
-        if ((indexEndOfRequiredFields < 4) || (indexEndOfOptionalFields < (indexEndOfRequiredFields + 6))) {
-            return Optional.empty();
-        }
-        EntryType type = EntryTypeFactory.parse(rest.substring(0, indexEndOfName));
-        String reqFields = fieldsDescription.substring(4, indexEndOfRequiredFields);
-        String optFields = fieldsDescription.substring(indexEndOfRequiredFields + 6, indexEndOfOptionalFields);
-
-        BibEntryTypeBuilder entryTypeBuilder = new BibEntryTypeBuilder()
-                .withType(type)
-                .withImportantFields(FieldFactory.parseFieldList(optFields))
-                .withRequiredFields(FieldFactory.parseOrFieldsList(reqFields));
-        return Optional.of(entryTypeBuilder.build());
-    }
-
-    public static String serialize(BibEntryType entryType) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(ENTRYTYPE_FLAG);
-        builder.append(entryType.getType().getName());
-        builder.append(": req[");
-        builder.append(FieldFactory.serializeOrFieldsList(entryType.getRequiredFields()));
-        builder.append("] opt[");
-        builder.append(FieldFactory.serializeFieldsList(
-                entryType.getOptionalFields()
-                         .stream()
-                         .map(BibField::getField)
-                         .collect(Collectors.toList())));
-        builder.append("]");
-        return builder.toString();
-    }
-
-    /**
-     * Returns true if the type is a custom type, or if it is a standard type which has customized fields
-     */
-    public boolean isCustomOrModifiedType(BibEntryType type, BibDatabaseMode mode) {
-        return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.isCustomOrModifiedType(type) : BIBTEX.isCustomOrModifiedType(type);
-    }
-
-    /**
-     * Sets the given custom entry types for BibTeX and biblatex mode
-     */
-    public void addCustomOrModifiedTypes(List<BibEntryType> customizedBibtexEntryTypes, List<BibEntryType> customizedBiblatexEntryTypes) {
-        customizedBibtexEntryTypes.forEach(type -> addCustomOrModifiedType(type, BibDatabaseMode.BIBTEX));
-        customizedBiblatexEntryTypes.forEach(type -> addCustomOrModifiedType(type, BibDatabaseMode.BIBLATEX));
     }
 
     /**
@@ -105,32 +48,35 @@ public class BibEntryTypesManager {
         }
     }
 
+    /**
+     * Returns true if the type is a custom type, or if it is a standard type which has customized fields
+     */
+    public boolean isCustomOrModifiedType(BibEntryType type, BibDatabaseMode mode) {
+        return getEntryTypes(mode).isCustomOrModifiedType(type);
+    }
+
+    /**
+     * Sets the given custom entry types for BibTeX and biblatex mode
+     */
+    public void addCustomOrModifiedTypes(List<BibEntryType> customizedEntryTypes, BibDatabaseMode mode) {
+        InternalEntryTypes entryTypes = getEntryTypes(mode);
+        customizedEntryTypes.forEach(entryTypes::addCustomOrModifiedType);
+    }
+
     public void addCustomOrModifiedType(BibEntryType entryType, BibDatabaseMode mode) {
-        if (BibDatabaseMode.BIBLATEX == mode) {
-            BIBLATEX.addCustomOrModifiedType(entryType);
-        } else if (BibDatabaseMode.BIBTEX == mode) {
-            BIBTEX.addCustomOrModifiedType(entryType);
-        }
+        getEntryTypes(mode).addCustomOrModifiedType(entryType);
     }
 
     public void removeCustomOrModifiedEntryType(BibEntryType entryType, BibDatabaseMode mode) {
-        if (BibDatabaseMode.BIBLATEX == mode) {
-            BIBLATEX.removeCustomOrModifiedEntryType(entryType);
-        } else if (BibDatabaseMode.BIBTEX == mode) {
-            BIBTEX.removeCustomOrModifiedEntryType(entryType);
-        }
+        getEntryTypes(mode).removeCustomOrModifiedEntryType(entryType);
     }
 
     public void clearAllCustomEntryTypes(BibDatabaseMode mode) {
-        if (BibDatabaseMode.BIBLATEX == mode) {
-            BIBLATEX.clearAllCustomEntryTypes();
-        } else if (BibDatabaseMode.BIBTEX == mode) {
-            BIBTEX.clearAllCustomEntryTypes();
-        }
+        getEntryTypes(mode).clearAllCustomEntryTypes();
     }
 
-    public Collection<BibEntryType> getAllTypes(BibDatabaseMode type) {
-        return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getAllTypes() : BIBTEX.getAllTypes();
+    public Collection<BibEntryType> getAllTypes(BibDatabaseMode mode) {
+        return getEntryTypes(mode).getAllTypes();
     }
 
     public boolean isCustomType(EntryType type, BibDatabaseMode mode) {
@@ -143,7 +89,7 @@ public class BibEntryTypesManager {
      * @param mode the mode of the BibDatabase, may be null
      */
     public Optional<BibEntryType> enrich(EntryType type, BibDatabaseMode mode) {
-        return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.enrich(type) : BIBTEX.enrich(type);
+        return getEntryTypes(mode).enrich(type);
     }
 
     public boolean isDifferentCustomOrModifiedType(BibEntryType type, BibDatabaseMode mode) {
@@ -155,6 +101,10 @@ public class BibEntryTypesManager {
             // different customization
             return !EntryTypeFactory.isEqualNameAndFieldBased(type, currentlyStoredType.get());
         }
+    }
+
+    private InternalEntryTypes getEntryTypes(BibDatabaseMode mode) {
+        return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX : BIBTEX;
     }
 
     /**

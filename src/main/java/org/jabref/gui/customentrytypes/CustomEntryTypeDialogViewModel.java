@@ -3,6 +3,7 @@ package org.jabref.gui.customentrytypes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -194,8 +195,8 @@ public class CustomEntryTypeDialogViewModel {
     public void resetAllCustomEntryTypes() {
         entryTypesManager.clearAllCustomEntryTypes(mode);
         preferencesService.clearBibEntryTypes(mode);
-        entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
-                                                   preferencesService.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
+        EnumSet.allOf(BibDatabaseMode.class).forEach(
+                mode -> entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(mode), mode));
     }
 
     public void apply() {
@@ -221,7 +222,7 @@ public class CustomEntryTypeDialogViewModel {
         preferencesService.getImportExportPreferences().setNonWrappableFields(multilineFields.stream().map(Field::getDisplayName).collect(Collectors.joining(";")));
         preferencesService.storeCustomEntryTypes(entryTypesManager);
         // Reload types from preferences to make sure any modifications are present when reopening the dialog
-        entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
-                                                   preferencesService.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
+        EnumSet.allOf(BibDatabaseMode.class).forEach(
+                mode -> entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(mode), mode));
     }
 }
