@@ -1170,7 +1170,7 @@ public class JabRefPreferences implements PreferencesService {
             Arrays.stream(prefsNode.keys())
                   .map(key -> prefsNode.get(key, null))
                   .filter(Objects::nonNull)
-                  .forEach(typeString -> MetaDataParser.parseCustomEntryTypes(typeString).ifPresent(storedEntryTypes::add));
+                  .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(storedEntryTypes::add));
         } catch (BackingStoreException e) {
             LOGGER.info("Parsing customized entry types failed.", e);
         }
@@ -1196,14 +1196,8 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeCustomEntryTypes(BibEntryTypesManager entryTypesManager) {
-        storeBibEntryTypes(BibDatabaseMode.BIBTEX, entryTypesManager);
-        storeBibEntryTypes(BibDatabaseMode.BIBLATEX, entryTypesManager);
-    }
-
-    private void storeBibEntryTypes(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager entryTypesManager) {
-        Collection<BibEntryType> customBiblatexBibTexTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
-
-        storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
+        storeBibEntryTypes(entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX), BibDatabaseMode.BIBTEX);
+        storeBibEntryTypes(entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), BibDatabaseMode.BIBLATEX);
     }
 
     private void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {

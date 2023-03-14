@@ -164,7 +164,7 @@ class BibEntryTypesManagerTest {
 
         entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(overwrittenStandardType);
-        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryTypes(serialized);
+        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
 
         assertEquals(Optional.of(overwrittenStandardType), type);
     }
@@ -182,7 +182,7 @@ class BibEntryTypesManagerTest {
 
         entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(overwrittenStandardType);
-        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryTypes(serialized);
+        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
 
         assertEquals(overwrittenStandardType.getOptionalFields(), type.get().getOptionalFields());
     }

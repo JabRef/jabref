@@ -320,7 +320,7 @@ public class BibtexParser implements Parser {
                           .equals(MetaData.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
-            Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryTypes(comment);
+            Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(comment);
             if (typ.isPresent()) {
                 entryTypes.add(typ.get());
             } else {

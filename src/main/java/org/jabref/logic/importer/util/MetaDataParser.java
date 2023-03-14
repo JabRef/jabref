@@ -38,7 +38,7 @@ public class MetaDataParser {
         MetaDataParser.fileMonitor = fileMonitor;
     }
 
-    public static Optional<BibEntryType> parseCustomEntryTypes(String comment) {
+    public static Optional<BibEntryType> parseCustomEntryType(String comment) {
         String rest = comment.substring(MetaData.ENTRYTYPE_FLAG.length());
         int indexEndOfName = rest.indexOf(':');
         if (indexEndOfName < 0) {

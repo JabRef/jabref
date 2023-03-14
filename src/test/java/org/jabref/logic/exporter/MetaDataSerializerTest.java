@@ -13,7 +13,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.util.OS;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
@@ -26,8 +25,6 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,7 +47,7 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    public void serializeNewMetadataReturnsEmptyMap() throws Exception {
+    public void serializeNewMetadataReturnsEmptyMap() {
         assertEquals(Collections.emptyMap(), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 
@@ -81,24 +78,22 @@ public class MetaDataSerializerTest {
         assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 
-    @ParameterizedTest
-    @EnumSource(BibDatabaseMode.class)
-    void testParsingEmptyOrFieldsReturnsEmpyCollections(BibDatabaseMode mode) {
+    @Test
+    void testParsingEmptyOrFieldsReturnsEmptyCollections() {
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
-        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryTypes(serialized);
+        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
         assertEquals(Collections.emptySet(), type.get().getRequiredFields());
     }
 
-    @ParameterizedTest
-    @EnumSource(BibDatabaseMode.class)
-    void testParsingEmptyOptionalFieldsFieldsReturnsEmpyCollections(BibDatabaseMode mode) {
+    @Test
+    void testParsingEmptyOptionalFieldsFieldsReturnsEmptyCollections() {
         newCustomType = new BibEntryType(
                 CUSTOM_TYPE,
                 Collections.emptySet(),
                 Collections.singleton(new OrFields(StandardField.AUTHOR)));
 
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
-        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryTypes(serialized);
+        Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
         assertEquals(Collections.emptySet(), type.get().getOptionalFields());
     }
 }
