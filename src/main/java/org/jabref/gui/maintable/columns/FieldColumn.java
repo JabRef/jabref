@@ -11,7 +11,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.UnknownField;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.MoreCollectors;
 
 /**
  * A column that displays the text-value of the field
@@ -33,9 +33,9 @@ public class FieldColumn extends MainTableColumn<String> {
 
         if (fields.size() == 1) {
             // comparator can't parse more than one value
-            Field field = Iterables.getOnlyElement(fields);
+            Field field = fields.stream().collect(MoreCollectors.onlyElement());
 
-            if (field instanceof UnknownField || field.isNumeric()) {
+            if ((field instanceof UnknownField) || field.isNumeric()) {
                 this.setComparator(new NumericFieldComparator());
             }
         }

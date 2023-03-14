@@ -8,9 +8,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -33,24 +31,18 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final StateManager stateManager;
-    private final ThemeManager themeManager;
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
                                  DialogService dialogService,
                                  PreferencesService preferencesService,
-                                 StateManager stateManager,
-                                 ThemeManager themeManager,
                                  LibraryTab.DatabaseNotification notificationPane) {
         this.database = database;
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.stateManager = stateManager;
-        this.themeManager = themeManager;
 
         this.listeners = new ArrayList<>();
 
@@ -67,7 +59,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 Localization.lang("The library has been modified by another program."),
                 List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
                         new Action(Localization.lang("Review changes"), event -> {
-                            dialogService.showCustomDialogAndWait(new ExternalChangesResolverDialog(changes, database, dialogService, stateManager, themeManager, preferencesService));
+                            dialogService.showCustomDialogAndWait(new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver")));
                             notificationPane.hide();
                         })),
                 Duration.ZERO));
@@ -77,7 +69,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     public void fileUpdated() {
         synchronized (database) {
             // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-            ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService, stateManager, themeManager);
+            ChangeScanner scanner = new ChangeScanner(database, dialogService, preferencesService);
             BackgroundTask.wrap(scanner::scanForChanges)
                           .onSuccess(changes -> {
                               if (!changes.isEmpty()) {

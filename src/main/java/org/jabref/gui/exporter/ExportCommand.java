@@ -24,12 +24,8 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -71,18 +67,15 @@ public class ExportCommand extends SimpleCommand {
 
     @Override
     public void execute() {
-        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
-        SavePreferences savePreferences = preferences.getSavePreferencesForExport();
-        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
-
         // Get list of exporters and sort before adding to file dialog
-        List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
-                                                        .sorted(Comparator.comparing(Exporter::getName))
-                                                        .collect(Collectors.toList());
+        ExporterFactory exporterFactory = ExporterFactory.create(
+                preferences,
+                Globals.entryTypesManager,
+                Globals.journalAbbreviationRepository);
+        List<Exporter> exporters = exporterFactory.getExporters().stream()
+                                                  .sorted(Comparator.comparing(Exporter::getName))
+                                                  .collect(Collectors.toList());
 
-        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences,
-                xmpPreferences, preferences.getGeneralPreferences().getDefaultBibDatabaseMode(), Globals.entryTypesManager);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
                 .withDefaultExtension(preferences.getImportExportPreferences().getLastExportExtension())
@@ -111,10 +104,7 @@ public class ExportCommand extends SimpleCommand {
                                   .orElse(Collections.emptyList());
         }
 
-        // Set the global variable for this database's file directory before exporting,
-        // so formatters can resolve linked files correctly.
-        // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = stateManager.getActiveDatabase()
+        List<Path> fileDirForDatabase = stateManager.getActiveDatabase()
                                                        .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
                                                        .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
@@ -129,7 +119,8 @@ public class ExportCommand extends SimpleCommand {
                 .wrap(() -> {
                     format.export(stateManager.getActiveDatabase().get(),
                             file,
-                            finEntries);
+                            finEntries,
+                            fileDirForDatabase);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {

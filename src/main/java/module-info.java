@@ -77,7 +77,7 @@ open module org.jabref {
     requires unirest.java;
     requires org.apache.httpcomponents.httpclient;
     requires org.jsoup;
-    requires commons.csv;
+    requires org.apache.commons.csv;
     requires io.github.javadiffutils;
     requires java.string.similarity;
     requires ojdbc10;

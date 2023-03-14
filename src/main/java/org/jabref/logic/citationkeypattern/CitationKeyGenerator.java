@@ -1,7 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,29 +45,6 @@ public class CitationKeyGenerator extends BracketedPattern {
         this.database = Objects.requireNonNull(database);
         this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
         this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
-    }
-
-    @Deprecated
-    static String generateKey(BibEntry entry, String pattern) {
-        return generateKey(entry, pattern, new BibDatabase());
-    }
-
-    @Deprecated
-    static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
-        GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
-        keyPattern.setDefaultValue("[" + pattern + "]");
-        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "",
-                "",
-                DEFAULT_UNWANTED_CHARACTERS,
-                keyPattern,
-                ',');
-
-        return new CitationKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
     }
 
     /**

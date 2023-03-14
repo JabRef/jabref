@@ -1,21 +1,36 @@
 package org.jabref.logic.journals;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Abbreviation implements Comparable<Abbreviation> {
+public class Abbreviation implements Comparable<Abbreviation>, Serializable {
 
-    private final String name;
+    private static final long serialVersionUID = 1;
+
+    private transient String name;
     private final String abbreviation;
-    private final String shortestUniqueAbbreviation;
+    private transient String dotlessAbbreviation;
+
+    // Is the empty string if not available
+    private String shortestUniqueAbbreviation;
 
     public Abbreviation(String name, String abbreviation) {
         this(name, abbreviation, "");
     }
 
     public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
-        this.name = name;
-        this.abbreviation = abbreviation;
-        this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim();
+        this(name,
+                abbreviation,
+                // "L. N." becomes "L  N ", we need to remove the double spaces inbetween
+                abbreviation.replace(".", " ").replace("  ", " ").trim(),
+                shortestUniqueAbbreviation.trim());
+    }
+
+    private Abbreviation(String name, String abbreviation, String dotlessAbbreviation, String shortestUniqueAbbreviation) {
+        this.name = name.intern();
+        this.abbreviation = abbreviation.intern();
+        this.dotlessAbbreviation = dotlessAbbreviation.intern();
+        this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim().intern();
     }
 
     public String getName() {
@@ -27,62 +42,72 @@ public class Abbreviation implements Comparable<Abbreviation> {
     }
 
     public String getShortestUniqueAbbreviation() {
-        String result = shortestUniqueAbbreviation;
-        if (result.isEmpty()) {
-            return getAbbreviation();
+        if (shortestUniqueAbbreviation.isEmpty()) {
+            shortestUniqueAbbreviation = getAbbreviation();
         }
-        return result;
+        return shortestUniqueAbbreviation;
     }
 
-    public String getMedlineAbbreviation() {
-        return getAbbreviation().replace(".", " ").replace("  ", " ").trim();
+    public boolean isDefaultShortestUniqueAbbreviation() {
+        return (shortestUniqueAbbreviation.isEmpty()) || this.shortestUniqueAbbreviation.equals(this.abbreviation);
+    }
+
+    public String getDotlessAbbreviation() {
+        return this.dotlessAbbreviation;
     }
 
     @Override
     public int compareTo(Abbreviation toCompare) {
-        return getName().compareTo(toCompare.getName());
+        int nameComparison = getName().compareTo(toCompare.getName());
+        if (nameComparison != 0) {
+            return nameComparison;
+        }
+
+        int abbreviationComparison = getAbbreviation().compareTo(toCompare.getAbbreviation());
+        if (abbreviationComparison != 0) {
+            return abbreviationComparison;
+        }
+
+        return getShortestUniqueAbbreviation().compareTo(toCompare.getShortestUniqueAbbreviation());
     }
 
     public String getNext(String current) {
         String currentTrimmed = current.trim();
 
-        if (getMedlineAbbreviation().equals(currentTrimmed)) {
+        if (getDotlessAbbreviation().equals(currentTrimmed)) {
             return getShortestUniqueAbbreviation().equals(getAbbreviation()) ? getName() : getShortestUniqueAbbreviation();
         } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) && !getShortestUniqueAbbreviation().equals(getAbbreviation())) {
             return getName();
         } else if (getName().equals(currentTrimmed)) {
             return getAbbreviation();
         } else {
-            return getMedlineAbbreviation();
+            return getDotlessAbbreviation();
         }
     }
 
     @Override
     public String toString() {
-        return String.format("Abbreviation{name=%s, abbreviation=%s, medlineAbbreviation=%s, shortestUniqueAbbreviation=%s}",
+        return String.format("Abbreviation{name=%s, abbreviation=%s, dotlessAbbreviation=%s, shortestUniqueAbbreviation=%s}",
                 this.name,
                 this.abbreviation,
-                this.getMedlineAbbreviation(),
+                this.dotlessAbbreviation,
                 this.shortestUniqueAbbreviation);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        Abbreviation that = (Abbreviation) obj;
-
-        return Objects.equals(getName(), that.getName());
+        Abbreviation that = (Abbreviation) o;
+        return getName().equals(that.getName()) && getAbbreviation().equals(that.getAbbreviation()) && getShortestUniqueAbbreviation().equals(that.getShortestUniqueAbbreviation());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName());
+        return Objects.hash(getName(), getAbbreviation(), getShortestUniqueAbbreviation());
     }
 }

@@ -1,7 +1,6 @@
 package org.jabref.model.entry.field;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
@@ -174,7 +173,7 @@ public enum StandardField implements Field {
 
     @Override
     public Set<FieldProperty> getProperties() {
-        return Collections.unmodifiableSet(properties);
+        return properties;
     }
 
     @Override

@@ -47,7 +47,6 @@ import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
-import com.google.common.collect.ImmutableMap;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
@@ -93,9 +92,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      */
     private static final Set<Field> CHOSEN_MANUAL_DOI_FIELDS = Set.of(StandardField.DOI, StandardField.PUBLISHER, InternalField.KEY_FIELD);
 
-    private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = ImmutableMap.of(
+    private static final Map<String, String> ARXIV_KEYWORDS_WITH_COMMA_REPLACEMENTS = Collections.unmodifiableMap(Map.of(
             "Computational Engineering, Finance, and Science", "Computational Engineering / Finance / Science",
-            "Distributed, Parallel, and Cluster Computing", "Distributed / Parallel / Cluster Computing");
+            "Distributed, Parallel, and Cluster Computing", "Distributed / Parallel / Cluster Computing"));
 
     private final ArXiv arXiv;
     private final DoiFetcher doiFetcher;
@@ -149,7 +148,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 allKeywords = Optional.of(allKeywords.get().replaceAll(entry.getKey(), entry.getValue()));
             }
 
-            String filteredKeywords = KeywordList.merge(allKeywords.get(), "", importFormatPreferences.getKeywordSeparator()).toString();
+            String filteredKeywords = KeywordList.merge(
+                    allKeywords.get(),
+                    "",
+                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).toString();
             bibEntry.setField(StandardField.KEYWORDS, filteredKeywords);
         }
     }
@@ -597,9 +599,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
             ArXivQueryTransformer transformer = new ArXivQueryTransformer();
             String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
-            List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
-                                                                                        .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
-                                                                                        .collect(Collectors.toList());
+            List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber)
+                    .stream()
+                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                    .collect(Collectors.toList());
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
         }
 
@@ -607,8 +610,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             return searchResult.stream()
                                .filter(entry -> entry.getField(StandardField.DATE).isPresent())
                                // Filter the date field for year only
-                               .filter(entry -> transformer.getEndYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= transformer.getEndYear().get())
-                               .filter(entry -> transformer.getStartYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= transformer.getStartYear().get())
+                               .filter(entry -> transformer.getEndYear().isEmpty() || (Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= transformer.getEndYear().get()))
+                               .filter(entry -> transformer.getStartYear().isEmpty() || (Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= transformer.getStartYear().get()))
                                .collect(Collectors.toList());
         }
 
@@ -625,7 +628,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         @Override
         public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
             return searchForEntryById(identifier)
-                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
+                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
         }
 
         @Override

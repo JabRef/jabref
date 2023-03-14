@@ -1,26 +1,28 @@
 package org.jabref.gui.mergeentries.newmergedialog.toolbar;
 
-import java.util.Arrays;
-
 import javafx.beans.binding.BooleanExpression;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
+import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
-
-import static org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.DiffMethod;
+import jakarta.inject.Inject;
 
 public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
@@ -44,7 +46,14 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     private Button selectRightEntryValuesButton;
 
-    private final ObjectProperty<DiffHighlighter.DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
+    @FXML
+    private CheckBox onlyShowChangedFieldsCheck;
+
+    @Inject
+    private PreferencesService preferencesService;
+
+    private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
+    private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();
     private EasyBinding<Boolean> showDiff;
 
     public ThreeWayMergeToolbar() {
@@ -56,9 +65,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
     public void initialize() {
         showDiff = EasyBind.map(plainTextOrDiffComboBox.valueProperty(), plainTextOrDiff -> plainTextOrDiff == PlainTextOrDiff.Diff);
-
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
-        plainTextOrDiffComboBox.getSelectionModel().select(PlainTextOrDiff.PLAIN_TEXT);
+        plainTextOrDiffComboBox.getSelectionModel().select(PlainTextOrDiff.Diff);
         plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(PlainTextOrDiff plainTextOrDiff) {
@@ -91,13 +99,17 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable -> {
             if (diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightCharactersRadioButtons)) {
-                diffHighlightingMethod.set(DiffMethod.CHARS);
+                diffHighlightingMethod.set(BasicDiffMethod.CHARS);
             } else {
-                diffHighlightingMethod.set(DiffMethod.WORDS);
+                diffHighlightingMethod.set(BasicDiffMethod.WORDS);
             }
         }));
 
         diffHighlightingMethodToggleGroup.selectToggle(highlightWordsRadioButton);
+        plainTextOrDiffComboBox.valueProperty().set(PlainTextOrDiff.Diff);
+
+        onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty());
+        onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {
@@ -120,6 +132,14 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         plainTextOrDiffComboBox.valueProperty().set(showDiff ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT);
     }
 
+    public BooleanProperty hideEqualFieldsProperty() {
+        return onlyShowChangedFields;
+    }
+
+    public boolean shouldHideEqualFields() {
+        return onlyShowChangedFields.get();
+    }
+
     /**
      * Convenience method used to disable diff related views when diff is not selected.
      *
@@ -132,7 +152,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         return showDiffProperty().map(showDiff -> !showDiff);
     }
 
-    public Boolean isShowDiffEnabled() {
+    public Boolean shouldShowDiffs() {
         return showDiffProperty().get();
     }
 
@@ -170,10 +190,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }
 
         public static PlainTextOrDiff fromString(String str) {
-            return Arrays.stream(values())
-                    .filter(plainTextOrDiff -> plainTextOrDiff.getValue().equals(str))
-                    .findAny()
-                    .orElseThrow(IllegalArgumentException::new);
+            return Enum.valueOf(PlainTextOrDiff.class, str);
         }
     }
 
@@ -191,10 +208,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }
 
         public static DiffView fromString(String str) {
-            return Arrays.stream(values())
-                    .filter(diffView -> diffView.getValue().equals(str))
-                    .findAny()
-                    .orElseThrow(IllegalArgumentException::new);
+            return Enum.valueOf(DiffView.class, str);
         }
     }
 }

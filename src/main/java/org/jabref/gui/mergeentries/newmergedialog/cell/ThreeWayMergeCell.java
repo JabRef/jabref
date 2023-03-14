@@ -40,4 +40,9 @@ public abstract class ThreeWayMergeCell extends HBox {
     public void setText(String text) {
         viewModel.setText(text);
     }
+
+    @Override
+    public String toString() {
+        return "ThreeWayMergeCell [getText()=" + getText() + "]";
+    }
 }

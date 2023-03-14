@@ -5,22 +5,24 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.model.groups.GroupHierarchyType;
+
 public class GroupsPreferences {
 
     private final ObjectProperty<GroupViewMode> groupViewMode;
     private final BooleanProperty shouldAutoAssignGroup;
     private final BooleanProperty shouldDisplayGroupCount;
-    private final ObjectProperty<Character> keywordSeparator;
+    private final ObjectProperty<GroupHierarchyType> defaultHierarchicalContext;
 
     public GroupsPreferences(GroupViewMode groupViewMode,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
-                             ObjectProperty<Character> keywordSeparator) {
+                             GroupHierarchyType defaultHierarchicalContext) {
 
         this.groupViewMode = new SimpleObjectProperty<>(groupViewMode);
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
-        this.keywordSeparator = keywordSeparator;
+        this.defaultHierarchicalContext = new SimpleObjectProperty<>(defaultHierarchicalContext);
     }
 
     public GroupViewMode getGroupViewMode() {
@@ -59,15 +61,15 @@ public class GroupsPreferences {
         this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
     }
 
-    public Character getKeywordSeparator() {
-        return keywordSeparator.getValue();
+    public GroupHierarchyType getDefaultHierarchicalContext() {
+        return defaultHierarchicalContext.get();
     }
 
-    public ObjectProperty<Character> keywordSeparatorProperty() {
-        return keywordSeparator;
+    public ObjectProperty<GroupHierarchyType> defaultHierarchicalContextProperty() {
+        return defaultHierarchicalContext;
     }
 
-    public void setKeywordSeparator(Character keywordSeparator) {
-        this.keywordSeparator.set(keywordSeparator);
+    public void setDefaultHierarchicalContext(GroupHierarchyType defaultHierarchicalContext) {
+        this.defaultHierarchicalContext.set(defaultHierarchicalContext);
     }
 }

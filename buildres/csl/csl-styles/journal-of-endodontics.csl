@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" page-range-format="minimal" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" initialize-with="" page-range-format="minimal" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
     <title>Journal of Endodontics</title>
     <title-short>JOEN</title-short>
@@ -11,18 +11,21 @@
       <name>Ramanathan</name>
       <email>Ra.Ganapathi@elsevier.com</email>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>0099-2399</issn>
     <eissn>1878-3554</eissn>
     <summary>A style for some Elsevier journals, resembles Vancouver style</summary>
-    <updated>2014-10-31T11:44:17+00:00</updated>
+    <updated>2023-02-12T10:43:40+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="access">
     <choose>
       <if variable="DOI">
-        <text variable="DOI" prefix="Doi: "/>
+        <text variable="DOI" prefix="https://doi.org/"/>
       </if>
       <else-if type="webpage post-weblog" match="any">
         <choose>
@@ -38,8 +41,8 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name form="long" initialize="false" delimiter=", " delimiter-precedes-last="always" name-as-sort-order="all" sort-separator=" "/>
-      <label form="long" prefix=", "/>
+      <name delimiter-precedes-last="always" name-as-sort-order="all" sort-separator=" "/>
+      <label form="short" prefix=", "/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -49,7 +52,7 @@
   <macro name="editor">
     <names variable="editor">
       <name initialize="true" delimiter=", " delimiter-precedes-last="always" name-as-sort-order="all" sort-separator=" " form="long"/>
-      <label form="long" prefix=", " plural="contextual" suffix="."/>
+      <label form="short" prefix=", "/>
     </names>
   </macro>
   <macro name="year-date">
@@ -68,7 +71,6 @@
     <choose>
       <if type="article-journal article-magazine" match="any">
         <text variable="volume" form="long"/>
-        <text variable="issue" prefix="(" suffix=")"/>
       </if>
     </choose>
   </macro>
@@ -117,13 +119,13 @@
     <sort>
       <key variable="citation-number" sort="ascending"/>
     </sort>
-    <layout delimiter="," prefix="(" suffix=")">
+    <layout vertical-align="sup" delimiter=",">
       <text variable="citation-number" vertical-align="baseline"/>
     </layout>
   </citation>
-  <bibliography entry-spacing="0" second-field-align="flush" et-al-min="7" et-al-use-first="3">
+  <bibliography et-al-min="7" et-al-use-first="3" second-field-align="flush" entry-spacing="0">
     <layout suffix=".">
-      <text variable="citation-number"/>
+      <text variable="citation-number" suffix="."/>
       <text macro="author" suffix=". "/>
       <choose>
         <if type="bill book graphic legal_case legislation motion_picture report song" match="any">

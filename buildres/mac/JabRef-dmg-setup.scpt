@@ -21,17 +21,23 @@ tell application "Finder"
 	make new alias file at POSIX file "DEPLOY_VOLUME_PATH" to POSIX file "DEPLOY_INSTALL_LOCATION" with properties {name:"DEPLOY_INSTALL_LOCATION"}
 	
 	set allTheFiles to the name of every item of theWindow
+	set xpos to 120
 	repeat with theFile in allTheFiles
 		set theFilePath to POSIX path of theFile
+		set appFilePath to POSIX path of "/DEPLOY_TARGET"
 		if theFilePath is "DEPLOY_INSTALL_LOCATION" then
-			-- Position install location
-			set position of item theFile of theWindow to {430, 170}
+		-- Position install location
+		set position of item theFile of theWindow to {430, 170}
+		else if theFilePath ends with appFilePath then
+		-- Position application or runtime
+		set position of item theFile of theWindow to {140, 170}
 		else
-			-- Position application or runtime
-			set position of item theFile of theWindow to {140, 170}
+		-- Position all other items in a second row.
+		set position of item theFile of theWindow to {xpos, 290}
+		set xpos to xpos + 150
 		end if
 	end repeat
-	
+
 	update theDisk without registering applications
 	delay 5
 	close (get window of theDisk)

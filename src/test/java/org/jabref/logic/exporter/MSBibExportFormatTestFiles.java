@@ -66,10 +66,10 @@ public class MSBibExportFormatTestFiles {
         Path expectedFile = resourceDir.resolve(xmlFileName);
         Path importFile = resourceDir.resolve(filename);
 
-        List<BibEntry> entries = testImporter.importDatabase(importFile)
-                                             .getDatabase()
-                                             .getEntries();
+        BibDatabaseContext contextFromImport = testImporter.importDatabase(importFile).getDatabaseContext();
+        List<BibEntry> entries = contextFromImport.getEntries();
 
+        contextFromImport.getDatabase().getStringValues().forEach(this.databaseContext.getDatabase()::addString);
         exporter.export(databaseContext, exportedFile, entries);
 
         String expected = String.join("\n", Files.readAllLines(expectedFile));
