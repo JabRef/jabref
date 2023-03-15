@@ -147,18 +147,10 @@
         </else-if>
       </choose>
       <choose>
-        <if variable="issued" match="none">
-          <group delimiter=" ">
-            <text term="accessed" text-case="capitalize-first"/>
-            <date variable="accessed" form="text"/>
-          </group>
-        </if>
-      </choose>
-      <choose>
         <if type="legal_case" match="none">
           <choose>
             <if variable="DOI">
-              <text variable="DOI" prefix="DOI:"/>
+              <text variable="DOI" prefix="DOI: https://doi.org/"/>
             </if>
             <else-if match="all" variable="URL">
               <text term="available at" text-case="sentence" suffix=" "/>
