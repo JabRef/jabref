@@ -1125,11 +1125,11 @@
   <macro name="container-periodical">
     <group delimiter=". ">
       <group delimiter=", ">
-        <text variable="container-title" font-style="italic" text-case="title"/>
+        <text variable="container-title" font-style="italic" form="short"/>
         <choose>
           <if variable="volume">
             <group>
-              <text variable="volume" font-style="italic"/>
+              <text variable="volume"/>
               <text variable="issue" prefix="(" suffix=")"/>
             </group>
           </if>
