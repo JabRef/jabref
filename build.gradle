@@ -424,7 +424,7 @@ test {
     }
 
     moduleOptions {
-        // TODO: Remove this as soon as archunit is modularized
+        // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
     }
 
