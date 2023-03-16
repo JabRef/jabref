@@ -87,7 +87,7 @@ public class ClipBoardManager {
         return result;
     }
 
-    public Optional<String> getBibTeXEntriesFromClipbaord() {
+    public Optional<String> getBibTeXEntriesFromClipboard() {
         return Optional.ofNullable(clipboard.getContent(DragAndDropDataFormats.ENTRIES)).map(String.class::cast);
     }
 
