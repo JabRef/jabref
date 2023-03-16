@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fileformat.medline;
 
-public record PersonalNameSubjectRec(
+public record PersonalNameSubject(
         String lastName,
         String foreName
 ) {

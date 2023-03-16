@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fileformat.medline;
 
-public record OtherIDRec(
+public record OtherID(
         String source,
         String content
 ) {

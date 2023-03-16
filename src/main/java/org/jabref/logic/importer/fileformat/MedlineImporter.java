@@ -24,11 +24,11 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.medline.ArticleIDRec;
-import org.jabref.logic.importer.fileformat.medline.InvestigatorRec;
-import org.jabref.logic.importer.fileformat.medline.MeshHeadingRec;
-import org.jabref.logic.importer.fileformat.medline.OtherIDRec;
-import org.jabref.logic.importer.fileformat.medline.PersonalNameSubjectRec;
+import org.jabref.logic.importer.fileformat.medline.ArticleID;
+import org.jabref.logic.importer.fileformat.medline.Investigator;
+import org.jabref.logic.importer.fileformat.medline.MeshHeading;
+import org.jabref.logic.importer.fileformat.medline.OtherID;
+import org.jabref.logic.importer.fileformat.medline.PersonalNameSubject;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -106,6 +106,8 @@ public class MedlineImporter extends Importer implements Parser {
 
             // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
             xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            // required for reading Unicode characters such as &#xf6;
+            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
 
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
 
@@ -297,12 +299,7 @@ public class MedlineImporter extends Importer implements Parser {
                         String eidType = reader.getAttributeValue(null, "EIdType");
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            if (eidType.equals("doi")) {
-                                fields.put(StandardField.DOI, reader.getText());
-                            }
-                            if (eidType.equals("pii")) {
-                                fields.put(new UnknownField("pii"), reader.getText());
-                            }
+                            handleElocationID(fields, reader, eidType);
                         }
                     }
                     case "Isbn" -> {
@@ -321,6 +318,15 @@ public class MedlineImporter extends Importer implements Parser {
 
         if (!isbnList.isEmpty()) {
             fields.put(StandardField.ISBN, join(isbnList, ", "));
+        }
+    }
+
+    private void handleElocationID(Map<Field, String> fields, XMLStreamReader reader, String eidType) {
+        if (eidType.equals("doi")) {
+            fields.put(StandardField.DOI, reader.getText());
+        }
+        if (eidType.equals("pii")) {
+            fields.put(new UnknownField("pii"), reader.getText());
         }
     }
 
@@ -387,7 +393,7 @@ public class MedlineImporter extends Importer implements Parser {
     private void parsePubmedData(XMLStreamReader reader, Map<Field, String> fields, String startElement)
             throws XMLStreamException {
         String publicationStatus = "";
-        List<ArticleIDRec> articleIDList = new ArrayList<>();
+        List<ArticleID> articleIDList = new ArrayList<>();
 
         while (reader.hasNext()) {
             reader.next();
@@ -404,7 +410,7 @@ public class MedlineImporter extends Importer implements Parser {
                         String idType = reader.getAttributeValue(null, "IdType");
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            articleIDList.add(new ArticleIDRec(idType, reader.getText()));
+                            articleIDList.add(new ArticleID(idType, reader.getText()));
                         }
                     }
                 }
@@ -427,12 +433,12 @@ public class MedlineImporter extends Importer implements Parser {
             throws XMLStreamException {
         // multiple occurrences of the following fields can be present
         List<String> citationSubsets = new ArrayList<>();
-        List<MeshHeadingRec> meshHeadingList = new ArrayList<>();
-        List<PersonalNameSubjectRec> personalNameSubjectList = new ArrayList<>();
-        List<OtherIDRec> otherIDList = new ArrayList<>();
+        List<MeshHeading> meshHeadingList = new ArrayList<>();
+        List<PersonalNameSubject> personalNameSubjectList = new ArrayList<>();
+        List<OtherID> otherIDList = new ArrayList<>();
         List<String> keywordList = new ArrayList<>();
         List<String> spaceFlightMissionList = new ArrayList<>();
-        List<InvestigatorRec> investigatorList = new ArrayList<>();
+        List<Investigator> investigatorList = new ArrayList<>();
         List<String> generalNoteList = new ArrayList<>();
 
         String status = reader.getAttributeValue(null, "Status");
@@ -481,7 +487,7 @@ public class MedlineImporter extends Importer implements Parser {
                     case "MeshHeading" -> {
                         parseMeshHeading(reader, meshHeadingList, elementName);
                     }
-                    case "NumberofReferences" -> {
+                    case "NumberOfReferences" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
                             putIfValueNotNull(fields, new UnknownField("references"), reader.getText());
@@ -495,7 +501,7 @@ public class MedlineImporter extends Importer implements Parser {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
                             String content = reader.getText();
-                            otherIDList.add(new OtherIDRec(otherIdSource, content));
+                            otherIDList.add(new OtherID(otherIdSource, content));
                         }
                     }
                     case "Keyword" -> {
@@ -542,7 +548,7 @@ public class MedlineImporter extends Importer implements Parser {
         addNotes(fields, generalNoteList);
     }
 
-    private void parseInvestigator(XMLStreamReader reader, List<InvestigatorRec> investigatorList, String startElement)
+    private void parseInvestigator(XMLStreamReader reader, List<Investigator> investigatorList, String startElement)
             throws XMLStreamException {
         String lastName = "";
         String foreName = "";
@@ -579,10 +585,10 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        investigatorList.add(new InvestigatorRec(lastName, foreName, affiliationList));
+        investigatorList.add(new Investigator(lastName, foreName, affiliationList));
     }
 
-    private void parsePersonalNameSubject(XMLStreamReader reader, List<PersonalNameSubjectRec> personalNameSubjectList, String startElement)
+    private void parsePersonalNameSubject(XMLStreamReader reader, List<PersonalNameSubject> personalNameSubjectList, String startElement)
             throws XMLStreamException {
         String lastName = "";
         String foreName = "";
@@ -612,10 +618,10 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        personalNameSubjectList.add(new PersonalNameSubjectRec(lastName, foreName));
+        personalNameSubjectList.add(new PersonalNameSubject(lastName, foreName));
     }
 
-    private void parseMeshHeading(XMLStreamReader reader, List<MeshHeadingRec> meshHeadingList, String startElement)
+    private void parseMeshHeading(XMLStreamReader reader, List<MeshHeading> meshHeadingList, String startElement)
             throws XMLStreamException {
         String descriptorName = "";
         List<String> qualifierNames = new ArrayList<>();
@@ -645,7 +651,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        meshHeadingList.add(new MeshHeadingRec(descriptorName, qualifierNames));
+        meshHeadingList.add(new MeshHeading(descriptorName, qualifierNames));
     }
 
     private void parseGeneSymbolList(XMLStreamReader reader, Map<Field, String> fields, String startElement)
@@ -761,14 +767,10 @@ public class MedlineImporter extends Importer implements Parser {
                     }
                     case "ELocationID" -> {
                         String eidType = reader.getAttributeValue(null, "EIdType");
+                        String validYN = reader.getAttributeValue(null, "ValidYN");
                         reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            if (eidType.equals("doi")) {
-                                fields.put(StandardField.DOI, reader.getText());
-                            }
-                            if (eidType.equals("pii")) {
-                                fields.put(new UnknownField("pii"), reader.getText());
-                            }
+                        if (isCharacterXMLEvent(reader) && "Y".equals(validYN)) {
+                            handleElocationID(fields, reader, eidType);
                         }
                     }
                     case "Abstract" -> {
@@ -879,17 +881,13 @@ public class MedlineImporter extends Importer implements Parser {
                 fields.put(new UnknownField(dateFieldMap.get(startElement)), dateValue.getNormalized()));
     }
 
-    private String convertToDateFormat(String year, String month, String day) {
-        return String.format("%s-%s-%s", year, month, day);
-    }
-
-    private void addArticleIdList(Map<Field, String> fields, List<ArticleIDRec> articleIdList) {
-        for (ArticleIDRec id : articleIdList) {
+    private void addArticleIdList(Map<Field, String> fields, List<ArticleID> articleIdList) {
+        for (ArticleID id : articleIdList) {
             if (!id.idType().isBlank()) {
                 if ("pubmed".equals(id.idType())) {
                     fields.computeIfAbsent(StandardField.PMID, k -> id.content());
                 } else {
-                    fields.put(FieldFactory.parseField(StandardEntryType.Article, id.idType()), id.content());
+                    fields.computeIfAbsent(FieldFactory.parseField(StandardEntryType.Article, id.idType()), k -> id.content());
                 }
             }
         }
@@ -909,13 +907,13 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void addInvestigators(Map<Field, String> fields, List<InvestigatorRec> investigatorList) {
+    private void addInvestigators(Map<Field, String> fields, List<Investigator> investigatorList) {
         List<String> investigatorNames = new ArrayList<>();
         List<String> affiliationInfos = new ArrayList<>();
 
         // add the investigators like the authors
         if (!investigatorList.isEmpty()) {
-            for (InvestigatorRec investigator : investigatorList) {
+            for (Investigator investigator : investigatorList) {
                 StringBuilder result = new StringBuilder(investigator.lastName());
                 if (!investigator.foreName().isBlank()) {
                     result.append(", ").append(investigator.foreName());
@@ -950,21 +948,21 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void addOtherId(Map<Field, String> fields, List<OtherIDRec> otherIDList) {
-        for (OtherIDRec id : otherIDList) {
+    private void addOtherId(Map<Field, String> fields, List<OtherID> otherIDList) {
+        for (OtherID id : otherIDList) {
             if (!id.source().isBlank() && !id.content().isBlank()) {
                 fields.put(FieldFactory.parseField(StandardEntryType.Article, id.source()), id.content());
             }
         }
     }
 
-    private void addPersonalNames(Map<Field, String> fields, List<PersonalNameSubjectRec> personalNameSubjectList) {
+    private void addPersonalNames(Map<Field, String> fields, List<PersonalNameSubject> personalNameSubjectList) {
         if (fields.get(StandardField.AUTHOR) == null) {
             // if no authors appear, then add the personal names as authors
             List<String> personalNames = new ArrayList<>();
 
             if (!personalNameSubjectList.isEmpty()) {
-                for (PersonalNameSubjectRec personalNameSubject : personalNameSubjectList) {
+                for (PersonalNameSubject personalNameSubject : personalNameSubjectList) {
                     StringBuilder result = new StringBuilder(personalNameSubject.lastName());
                     if (!personalNameSubject.foreName().isBlank()) {
                         result.append(", ").append(personalNameSubject.foreName());
@@ -977,11 +975,11 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void addMeshHeading(Map<Field, String> fields, List<MeshHeadingRec> meshHeadingList) {
+    private void addMeshHeading(Map<Field, String> fields, List<MeshHeading> meshHeadingList) {
         List<String> keywords = new ArrayList<>();
 
         if (!meshHeadingList.isEmpty()) {
-            for (MeshHeadingRec meshHeading : meshHeadingList) {
+            for (MeshHeading meshHeading : meshHeadingList) {
                 StringBuilder result = new StringBuilder(meshHeading.descriptorName());
                 if (meshHeading.qualifierNames() != null) {
                     for (String qualifierName : meshHeading.qualifierNames()) {
@@ -1136,7 +1134,7 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void parseAuthor(XMLStreamReader reader, List<String> authorNames) throws XMLStreamException {
-        String authorName = "";
+        StringBuilder authorName = new StringBuilder();
         List<String> collectiveNames = new ArrayList<>();
 
         while (reader.hasNext()) {
@@ -1153,13 +1151,13 @@ public class MedlineImporter extends Importer implements Parser {
                     case "LastName" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            authorName = reader.getText();
+                            authorName = new StringBuilder(reader.getText());
                         }
                     }
                     case "ForeName" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            authorName += ", " + reader.getText();
+                            authorName.append(", ").append(reader.getText());
                         }
                     }
                 }
@@ -1173,8 +1171,8 @@ public class MedlineImporter extends Importer implements Parser {
         if (collectiveNames.size() > 0) {
             authorNames.addAll(collectiveNames);
         }
-        if (!authorName.isBlank()) {
-            authorNames.add(authorName);
+        if (!authorName.toString().isBlank()) {
+            authorNames.add(authorName.toString());
         }
     }
 
