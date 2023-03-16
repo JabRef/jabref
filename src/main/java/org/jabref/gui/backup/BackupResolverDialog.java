@@ -32,7 +32,7 @@ public class BackupResolverDialog extends FXDialog {
         getDialogPane().setMinHeight(180);
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
 
-        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP);
+        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP);
         String backupFilename = backupPathOpt.map(Path::getFileName).map(Path::toString).orElse(Localization.lang("File not found"));
         String content = new StringBuilder()
                 .append(Localization.lang("A backup file for '%0' was found at [%1]",
