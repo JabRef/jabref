@@ -23,7 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Changed
 
 - 'Get full text' now also checks the file url. [#568](https://github.com/koppor/jabref/issues/568)
-- JabRef writes a new backup file only if there is a change. Before, JabRef created a backup upon start.
+- JabRef writes a new backup file only if there is a change. Before, JabRef created a backup upon start. [#9679](https://github.com/JabRef/jabref/pull/9679)
 - We refined the 'main directory not found' error message. [#9625](https://github.com/JabRef/jabref/pull/9625)
 - We modified the `Add Group` dialog to use the most recently selected group hierarchical context [#9141](https://github.com/JabRef/jabref/issues/9141)
 
