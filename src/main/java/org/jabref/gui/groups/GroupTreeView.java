@@ -40,7 +40,11 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -408,96 +412,37 @@ public class GroupTreeView extends BorderPane {
             return null;
         }
 
-        ContextMenu menu = new ContextMenu();
+        ContextMenu contextMenu = new ContextMenu();
 
-        Menu removeGroupWithSubgroups = new Menu(Localization.lang("Remove group"));
+        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
-        MenuItem removeGroupNoSubgroups = new MenuItem(Localization.lang("Remove group"));
-        removeGroupNoSubgroups.setOnAction(event -> viewModel.removeGroupNoSubgroups(group));
+        MenuItem removeGroup;
+        if (viewModel.hasSubgroups(group) && viewModel.canAddGroupsIn(group)) {
+            removeGroup = new Menu(Localization.lang("Remove group"), null,
+                    factory.createMenuItem(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS, group)),
+                    factory.createMenuItem(StandardActions.GROUP_REMOVE_WITH_SUBGROUPS, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_WITH_SUBGROUPS, group))
+            );
+        } else {
+            removeGroup = factory.createMenuItem(StandardActions.GROUP_REMOVE, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE, group));
+        }
 
-        MenuItem editGroup = new MenuItem(Localization.lang("Edit group"));
-        editGroup.setOnAction(event -> {
-            menu.hide();
-            viewModel.editGroup(group);
-            groupTree.refresh();
-        });
+        contextMenu.getItems().forEach(item -> item.setGraphic(null));
+        contextMenu.getStyleClass().add("context-menu");
 
-        MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Keep subgroups"));
-        removeGroupKeepSubgroups.setOnAction(event -> viewModel.removeGroupKeepSubgroups(group));
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
+                removeGroup,
+                factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),
+                factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
+        );
 
-        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
-        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
-
-        MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
-        addSubgroup.setOnAction(event -> {
-            menu.hide();
-            viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
-        });
-
-        MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
-        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
-
-        MenuItem sortSubgroups = new MenuItem(Localization.lang("Sort subgroups A-Z"));
-        sortSubgroups.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group.getGroupNode()));
-
-        MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
-        addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
-
-        MenuItem removeEntries = new MenuItem(Localization.lang("Remove selected entries from this group"));
-        removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
-
-        menu.setOnShown(event -> {
-            menu.getItems().clear();
-            if (viewModel.isEditable(group)) {
-                menu.getItems().add(editGroup);
-                if ((group.getChildren().size() > 0) && viewModel.canAddGroupsIn(group)) {
-                    menu.getItems().add(removeGroupWithSubgroups);
-                    menu.getItems().add(new SeparatorMenuItem());
-                    menu.getItems().add(addSubgroup);
-                    menu.getItems().add(removeSubgroups);
-                    menu.getItems().add(sortSubgroups);
-                } else {
-                    menu.getItems().add(removeGroupNoSubgroups);
-                    if (viewModel.canAddGroupsIn(group)) {
-                        menu.getItems().add(new SeparatorMenuItem());
-                        menu.getItems().add(addSubgroup);
-                    }
-                }
-            }
-            if (group.isRoot()) {
-                menu.getItems().add(addSubgroup);
-                menu.getItems().add(removeSubgroups);
-                menu.getItems().add(sortSubgroups);
-            }
-
-            if (viewModel.canAddEntriesIn(group)) {
-                menu.getItems().add(new SeparatorMenuItem());
-                menu.getItems().add(addEntries);
-                menu.getItems().add(removeEntries);
-            }
-        });
-
-        menu.getItems().add(new Menu());
-        removeGroupWithSubgroups.getItems().add(removeGroupKeepSubgroups);
-        removeGroupWithSubgroups.getItems().add(removeGroupAndSubgroups);
-
-        // TODO: Disable some actions under certain conditions
-        // if (group.canBeEdited()) {
-        // editGroupPopupAction.setEnabled(false);
-        // addGroupPopupAction.setEnabled(false);
-        // removeGroupAndSubgroupsPopupAction.setEnabled(false);
-        // removeGroupKeepSubgroupsPopupAction.setEnabled(false);
-        // } else {
-        // editGroupPopupAction.setEnabled(true);
-        // addGroupPopupAction.setEnabled(true);
-        // addGroupPopupAction.setNode(node);
-        // removeGroupAndSubgroupsPopupAction.setEnabled(true);
-        // removeGroupKeepSubgroupsPopupAction.setEnabled(true);
-        // }
-        // sortSubmenu.setEnabled(!node.isLeaf());
-        // removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
-
-        return menu;
+        return contextMenu;
     }
 
     private void addNewGroup() {
@@ -538,6 +483,61 @@ public class GroupTreeView extends BorderPane {
             } else {
                 // leave the expansion state of the tree item as it is
                 this.draggedItem.setExpanded(this.draggedItem.isExpanded());
+            }
+        }
+    }
+
+    private class ContextAction extends SimpleCommand {
+
+        private final StandardActions command;
+        private final GroupNodeViewModel group;
+
+        public ContextAction(StandardActions command, GroupNodeViewModel group) {
+            this.command = command;
+            this.group = group;
+
+            this.executable.bind(BindingsHelper.constantOf(
+                    switch (command) {
+                        case GROUP_EDIT ->
+                                viewModel.isEditable(group);
+                        case GROUP_REMOVE ->
+                                viewModel.isEditable(group) && viewModel.canAddGroupsIn(group);
+                        case GROUP_SUBGROUP_ADD ->
+                                viewModel.isEditable(group) && viewModel.canAddGroupsIn(group)
+                                        || group.isRoot();
+                        case GROUP_SUBGROUP_REMOVE, GROUP_SUBGROUP_SORT ->
+                                viewModel.isEditable(group) && viewModel.hasSubgroups(group) && viewModel.canAddGroupsIn(group)
+                                        || group.isRoot();
+                        case GROUP_ENTRIES_ADD, GROUP_ENTRIES_REMOVE ->
+                                viewModel.canAddEntriesIn(group);
+                        default ->
+                                true;
+                    }));
+        }
+
+        @Override
+        public void execute() {
+            switch (command) {
+                case GROUP_REMOVE ->
+                        viewModel.removeGroupNoSubgroups(group);
+                case GROUP_REMOVE_KEEP_SUBGROUPS ->
+                        viewModel.removeGroupKeepSubgroups(group);
+                case GROUP_REMOVE_WITH_SUBGROUPS ->
+                        viewModel.removeGroupAndSubgroups(group);
+                case GROUP_EDIT -> {
+                    viewModel.editGroup(group);
+                    groupTree.refresh();
+                }
+                case GROUP_SUBGROUP_ADD ->
+                        viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
+                case GROUP_SUBGROUP_REMOVE ->
+                        viewModel.removeSubgroups(group);
+                case GROUP_SUBGROUP_SORT ->
+                        viewModel.sortAlphabeticallyRecursive(group.getGroupNode());
+                case GROUP_ENTRIES_ADD ->
+                        viewModel.addSelectedEntries(group);
+                case GROUP_ENTRIES_REMOVE ->
+                        viewModel.removeSelectedEntries(group);
             }
         }
     }
