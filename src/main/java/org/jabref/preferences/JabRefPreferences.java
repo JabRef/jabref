@@ -782,13 +782,6 @@ public class JabRefPreferences implements PreferencesService {
         return result;
     }
 
-    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
-        return switch (mode) {
-            case BIBTEX -> PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES);
-            case BIBLATEX -> PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
-        };
-    }
-
     private static Optional<String> getNextUnit(Reader data) throws IOException {
         // character last read
         // -1 if end of stream
@@ -1214,6 +1207,12 @@ public class JabRefPreferences implements PreferencesService {
         } catch (BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
         }
+    }
+
+    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
+        return mode == BibDatabaseMode.BIBTEX
+                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
+                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
 
     @Override
