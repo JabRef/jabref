@@ -23,6 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Changed
 
 - 'Get full text' now also checks the file url. [#568](https://github.com/koppor/jabref/issues/568)
+- `log.txt` now contains an entry if a BibTeX entry could not be parsed.
 - We refined the 'main directory not found' error message. [#9625](https://github.com/JabRef/jabref/pull/9625)
 - We modified the `Add Group` dialog to use the most recently selected group hierarchical context [#9141](https://github.com/JabRef/jabref/issues/9141)
 
@@ -37,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the command line export using `--exportMatches` flag does not create an output bib file [#9581](https://github.com/JabRef/jabref/issues/9581)
 - We fixed an issue where custom field in the custom entry types could not be set to mulitline [#9609](https://github.com/JabRef/jabref/issues/9609)
 - We fixed an issue where the Office XML exporter did not resolve BibTeX-Strings when exporting entries [forum#3741](https://discourse.jabref.org/t/exporting-bibtex-constant-strings-to-ms-office-2007-xml/3741)
+- JabRef is now more relaxed when parsing field content: In case a field content ended with `\`, the combination `\}` was treated as plain `}`. [#9668](https://github.com/JabRef/jabref/issues/9668)
 
 
 ### Removed

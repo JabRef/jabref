@@ -243,6 +243,25 @@ class BibEntryWriterTest {
     }
 
     @Test
+    void roundTripKeepsFilePathEndingWithBackslash() throws IOException {
+        String bibtexEntry = """
+                @Article{,
+                  file = {dir\\},
+                }
+                """.replaceAll("\n", OS.NEWLINE);
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
     void roundTripWithPrependingNewlines() throws IOException {
         // @formatter:off
         String bibtexEntry = "\r\n@Article{test," + OS.NEWLINE +

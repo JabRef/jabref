@@ -6,11 +6,13 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
@@ -44,26 +46,14 @@ class ImportHandlerTest {
 
         List<BibEntry> bibEntries = importHandler.handleBibTeXData("""
                 @InProceedings{Wen2013,
-                  author           = {Tao Wen},
-                  booktitle        = {45. Kraftwerkstechnisches Kolloquium},
                   library          = {Tagungen\\2013\\KWTK45\\},
-                  title            = {Zünd- Und Abbrandverhalten Von Staubförmigen Brennstoffen},
-                  year             = {2013},
-                  comment          = {978-3-944310-04-06},
-                  creationdate     = {2023-03-13T13:09:59},
-                  file             = {:Tagungen/2013/KWTK45/Wen2013 - Zünd Und Abbrandverhalten Von Staubförmigen Brennstoffen.pdf:PDF},
-                  keywords         = {zündverzug, kohle, braunkohle, lausitz, zündofen, experiment, verzögerung, partikeldurchmesser, zündhyperbel, holzhackschnitzel, torf, staub, steinkohle, getreidestaub, brennstofffeuchte, biomasse, fossile, flüchtige, volatile, FIELD-Rohr, drop-tube, model, vergleich, berechnung,},
-                  modificationdate = {2023-03-13T13:17:17},
-                  owner            = {JOJ},
-                  url              = {https://fis.tu-dresden.de/portal/de/publications/zund-und-abbrandverhalten-von-staubfoermigen-brennstoffen(2f9dd517-794a-4cf5-9897-bc9eb6f125c6).html},
                 }
                 """);
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.AUTHOR, "Tao Wen");
+                .withCitationKey("Wen2013")
+                .withField(StandardField.LIBRARY, "Tagungen\\2013\\KWTK45\\");
 
-        assertEquals(List.of(expected), bibEntries);
-        // when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
-        // when(stateManager.getActiveDatabase()).thenReturn(Optional.of(current));
+        assertEquals(List.of(expected), bibEntries.stream().toList());
     }
 }
