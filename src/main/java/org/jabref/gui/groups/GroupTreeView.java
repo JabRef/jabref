@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
@@ -27,6 +28,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
@@ -45,6 +47,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
+import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
@@ -245,111 +248,111 @@ public class GroupTreeView extends BorderPane {
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
         PseudoClass subElementPseudoClass = PseudoClass.getPseudoClass("sub");
 
-        groupTree.setRowFactory(treeTable -> {
-            TreeTableRow<GroupNodeViewModel> row = new TreeTableRow<>();
-            row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
-                boolean isRoot = newTreeItem == treeTable.getRoot();
-                row.pseudoClassStateChanged(rootPseudoClass, isRoot);
-
-                boolean isFirstLevel = (newTreeItem != null) && (newTreeItem.getParent() == treeTable.getRoot());
-                row.pseudoClassStateChanged(subElementPseudoClass, !isRoot && !isFirstLevel);
-            });
-            // Remove disclosure node since we display custom version in separate column
-            // Simply setting to null is not enough since it would be replaced by the default node on every change
-            row.setDisclosureNode(null);
-            row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -> row.setDisclosureNode(null));
-
-            // Add context menu (only for non-null items)
-            row.contextMenuProperty().bind(
-                    EasyBind.wrapNullable(row.itemProperty())
-                            .mapOpt(this::createContextMenuForGroup)
-                            .orElseOpt((ContextMenu) null));
-            row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-                if (event.getTarget() instanceof StackPane pane) {
-                    if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
-                        event.consume();
-                    }
-                }
-            });
-
-            // Drag and drop support
-            row.setOnDragDetected(event -> {
-                List<String> groupsToMove = new ArrayList<>();
-                for (TreeItem<GroupNodeViewModel> selectedItem : treeTable.getSelectionModel().getSelectedItems()) {
-                    if ((selectedItem != null) && (selectedItem.getValue() != null)) {
-                        groupsToMove.add(selectedItem.getValue().getPath());
-                    }
-                }
-
-                if (groupsToMove.size() > 0) {
-                    localDragboard.clearAll();
-                }
-
-                // Put the group nodes as content
-                Dragboard dragboard = treeTable.startDragAndDrop(TransferMode.MOVE);
-                // Display the group when dragging
-                dragboard.setDragView(row.snapshot(null, null));
-                ClipboardContent content = new ClipboardContent();
-                content.put(DragAndDropDataFormats.GROUP, groupsToMove);
-                dragboard.setContent(content);
-                event.consume();
-            });
-            row.setOnDragOver(event -> {
-                Dragboard dragboard = event.getDragboard();
-                if ((event.getGestureSource() != row) && (row.getItem() != null) && row.getItem().acceptableDrop(dragboard)) {
-                    event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
-
-                    // expand node and all children on drag over
-                    dragExpansionHandler.expandGroup(row.getTreeItem());
-
-                    if (localDragboard.hasBibEntries()) {
-                        ControlHelper.setDroppingPseudoClasses(row);
-                    } else {
-                        ControlHelper.setDroppingPseudoClasses(row, event);
-                    }
-                }
-                event.consume();
-            });
-            row.setOnDragExited(event -> ControlHelper.removeDroppingPseudoClasses(row));
-
-            row.setOnDragDropped(event -> {
-                Dragboard dragboard = event.getDragboard();
-                boolean success = false;
-
-                if (dragboard.hasContent(DragAndDropDataFormats.GROUP) && viewModel.canAddGroupsIn(row.getItem())) {
-                    List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
-                    List<GroupNodeViewModel> changedGroups = new LinkedList<>();
-                    for (String pathToSource : pathToSources) {
-                        Optional<GroupNodeViewModel> source = viewModel
-                                .rootGroupProperty().get()
-                                .getChildByPath(pathToSource);
-                        if (source.isPresent() && viewModel.canBeDragged(source.get())) {
-                            source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
-                            changedGroups.add(source.get());
-                            success = true;
-                        }
-                    }
-                    groupTree.getSelectionModel().clearSelection();
-                    changedGroups.forEach(value -> selectNode(value, true));
-                    if (success) {
-                        viewModel.writeGroupChangesToMetaData();
-                    }
-                }
-
-                if (localDragboard.hasBibEntries()) {
-                    List<BibEntry> entries = localDragboard.getBibEntries();
-                    row.getItem().addEntriesToGroup(entries);
-                    success = true;
-                }
-                event.setDropCompleted(success);
-                event.consume();
-            });
-
-            return row;
-        });
+        new ViewModelTreeTableRowFactory<GroupNodeViewModel>()
+                .withContextMenu(this::createContextMenuForGroup)
+                .withOnMousePressedEvent(this::ignoreOnTreeDisclosure)
+                .withCustomInitializer(row -> {
+                    // Remove disclosure node since we display custom version in separate column
+                    // Simply setting to null is not enough since it would be replaced by the default node on every change
+                    row.setDisclosureNode(null);
+                    row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -> row.setDisclosureNode(null));
+                })
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragExited(this::handleOnDragExited)
+                .setOnDragOver(this::handleOnDragOver)
+                .withPseudoClass(rootPseudoClass, row -> Bindings.createBooleanBinding(
+                        () -> (row != null) && (row.getItem() == groupTree.getRoot().getValue()), row.treeItemProperty()))
+                .withPseudoClass(subElementPseudoClass, row -> Bindings.createBooleanBinding(
+                        () -> (row != null) && (groupTree.getTreeItemLevel(row.getTreeItem()) > 1), row.treeItemProperty()))
+                .install(groupTree);
 
         // Filter text field
         setupClearButtonField(searchField);
+    }
+
+    private void ignoreOnTreeDisclosure(GroupNodeViewModel row, MouseEvent event) {
+        if (event.getTarget() instanceof StackPane pane) {
+            if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
+                event.consume();
+            }
+        }
+    }
+
+    private void handleOnDragExited(TreeTableRow<GroupNodeViewModel> row, GroupNodeViewModel fieldViewModel, DragEvent dragEvent) {
+        ControlHelper.removeDroppingPseudoClasses(row);
+    }
+
+    private void handleOnDragDetected(TreeTableRow<GroupNodeViewModel> row, GroupNodeViewModel groupViewModel, MouseEvent event) {
+        List<String> groupsToMove = new ArrayList<>();
+        for (TreeItem<GroupNodeViewModel> selectedItem : row.getTreeTableView().getSelectionModel().getSelectedItems()) {
+            if ((selectedItem != null) && (selectedItem.getValue() != null)) {
+                groupsToMove.add(selectedItem.getValue().getPath());
+            }
+        }
+
+        if (groupsToMove.size() > 0) {
+            localDragboard.clearAll();
+        }
+
+        // Put the group nodes as content
+        Dragboard dragboard = row.startDragAndDrop(TransferMode.MOVE);
+        // Display the group when dragging
+        dragboard.setDragView(row.snapshot(null, null));
+        ClipboardContent content = new ClipboardContent();
+        content.put(DragAndDropDataFormats.GROUP, groupsToMove);
+        dragboard.setContent(content);
+        event.consume();
+    }
+
+    private void handleOnDragDropped(TreeTableRow<GroupNodeViewModel> row, GroupNodeViewModel originalItem, DragEvent event) {
+        Dragboard dragboard = event.getDragboard();
+        boolean success = false;
+
+        if (dragboard.hasContent(DragAndDropDataFormats.GROUP) && viewModel.canAddGroupsIn(row.getItem())) {
+            List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
+            List<GroupNodeViewModel> changedGroups = new LinkedList<>();
+            for (String pathToSource : pathToSources) {
+                Optional<GroupNodeViewModel> source = viewModel
+                        .rootGroupProperty().get()
+                        .getChildByPath(pathToSource);
+                if (source.isPresent() && viewModel.canBeDragged(source.get())) {
+                    source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
+                    changedGroups.add(source.get());
+                    success = true;
+                }
+            }
+            groupTree.getSelectionModel().clearSelection();
+            changedGroups.forEach(value -> selectNode(value, true));
+            if (success) {
+                viewModel.writeGroupChangesToMetaData();
+            }
+        }
+
+        if (localDragboard.hasBibEntries()) {
+            List<BibEntry> entries = localDragboard.getBibEntries();
+            row.getItem().addEntriesToGroup(entries);
+            success = true;
+        }
+        event.setDropCompleted(success);
+        event.consume();
+    }
+
+    private void handleOnDragOver(TreeTableRow<GroupNodeViewModel> row, GroupNodeViewModel originalItem, DragEvent event) {
+        Dragboard dragboard = event.getDragboard();
+        if ((event.getGestureSource() != row) && (row.getItem() != null) && row.getItem().acceptableDrop(dragboard)) {
+            event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
+
+            // expand node and all children on drag over
+            dragExpansionHandler.expandGroup(row.getTreeItem());
+
+            if (localDragboard.hasBibEntries()) {
+                ControlHelper.setDroppingPseudoClasses(row);
+            } else {
+                ControlHelper.setDroppingPseudoClasses(row, event);
+            }
+        }
+        event.consume();
     }
 
     private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
@@ -401,6 +404,10 @@ public class GroupTreeView extends BorderPane {
     }
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
+        if (group == null) {
+            return null;
+        }
+
         ContextMenu menu = new ContextMenu();
 
         Menu removeGroupWithSubgroups = new Menu(Localization.lang("Remove group"));
