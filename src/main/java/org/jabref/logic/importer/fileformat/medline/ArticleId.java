@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fileformat.medline;
 
-public record ArticleID(
+public record ArticleId(
         String idType,
         String content
 ) {

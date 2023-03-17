@@ -24,10 +24,10 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.medline.ArticleID;
+import org.jabref.logic.importer.fileformat.medline.ArticleId;
 import org.jabref.logic.importer.fileformat.medline.Investigator;
 import org.jabref.logic.importer.fileformat.medline.MeshHeading;
-import org.jabref.logic.importer.fileformat.medline.OtherID;
+import org.jabref.logic.importer.fileformat.medline.OtherId;
 import org.jabref.logic.importer.fileformat.medline.PersonalNameSubject;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
@@ -299,7 +299,7 @@ public class MedlineImporter extends Importer implements Parser {
                         String eidType = reader.getAttributeValue(null, "EIdType");
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            handleElocationID(fields, reader, eidType);
+                            handleElocationId(fields, reader, eidType);
                         }
                     }
                     case "Isbn" -> {
@@ -321,7 +321,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void handleElocationID(Map<Field, String> fields, XMLStreamReader reader, String eidType) {
+    private void handleElocationId(Map<Field, String> fields, XMLStreamReader reader, String eidType) {
         if (eidType.equals("doi")) {
             fields.put(StandardField.DOI, reader.getText());
         }
@@ -393,7 +393,7 @@ public class MedlineImporter extends Importer implements Parser {
     private void parsePubmedData(XMLStreamReader reader, Map<Field, String> fields, String startElement)
             throws XMLStreamException {
         String publicationStatus = "";
-        List<ArticleID> articleIDList = new ArrayList<>();
+        List<ArticleId> articleIdList = new ArrayList<>();
 
         while (reader.hasNext()) {
             reader.next();
@@ -410,7 +410,7 @@ public class MedlineImporter extends Importer implements Parser {
                         String idType = reader.getAttributeValue(null, "IdType");
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            articleIDList.add(new ArticleID(idType, reader.getText()));
+                            articleIdList.add(new ArticleId(idType, reader.getText()));
                         }
                     }
                 }
@@ -423,8 +423,8 @@ public class MedlineImporter extends Importer implements Parser {
 
         if (fields.get(new UnknownField("revised")) != null) {
             putIfValueNotNull(fields, StandardField.PUBSTATE, publicationStatus);
-            if (!articleIDList.isEmpty()) {
-                addArticleIdList(fields, articleIDList);
+            if (!articleIdList.isEmpty()) {
+                addArticleIdList(fields, articleIdList);
             }
         }
     }
@@ -435,7 +435,7 @@ public class MedlineImporter extends Importer implements Parser {
         List<String> citationSubsets = new ArrayList<>();
         List<MeshHeading> meshHeadingList = new ArrayList<>();
         List<PersonalNameSubject> personalNameSubjectList = new ArrayList<>();
-        List<OtherID> otherIDList = new ArrayList<>();
+        List<OtherId> otherIdList = new ArrayList<>();
         List<String> keywordList = new ArrayList<>();
         List<String> spaceFlightMissionList = new ArrayList<>();
         List<Investigator> investigatorList = new ArrayList<>();
@@ -501,7 +501,7 @@ public class MedlineImporter extends Importer implements Parser {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
                             String content = reader.getText();
-                            otherIDList.add(new OtherID(otherIdSource, content));
+                            otherIdList.add(new OtherId(otherIdSource, content));
                         }
                     }
                     case "Keyword" -> {
@@ -539,7 +539,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
         addMeshHeading(fields, meshHeadingList);
         addPersonalNames(fields, personalNameSubjectList);
-        addOtherId(fields, otherIDList);
+        addOtherId(fields, otherIdList);
         addKeywords(fields, keywordList);
         if (!spaceFlightMissionList.isEmpty()) {
             fields.put(new UnknownField("space-flight-mission"), join(spaceFlightMissionList, ", "));
@@ -770,7 +770,7 @@ public class MedlineImporter extends Importer implements Parser {
                         String validYN = reader.getAttributeValue(null, "ValidYN");
                         reader.next();
                         if (isCharacterXMLEvent(reader) && "Y".equals(validYN)) {
-                            handleElocationID(fields, reader, eidType);
+                            handleElocationId(fields, reader, eidType);
                         }
                     }
                     case "Abstract" -> {
@@ -881,8 +881,8 @@ public class MedlineImporter extends Importer implements Parser {
                 fields.put(new UnknownField(dateFieldMap.get(startElement)), dateValue.getNormalized()));
     }
 
-    private void addArticleIdList(Map<Field, String> fields, List<ArticleID> articleIdList) {
-        for (ArticleID id : articleIdList) {
+    private void addArticleIdList(Map<Field, String> fields, List<ArticleId> articleIdList) {
+        for (ArticleId id : articleIdList) {
             if (!id.idType().isBlank()) {
                 if ("pubmed".equals(id.idType())) {
                     fields.computeIfAbsent(StandardField.PMID, k -> id.content());
@@ -948,8 +948,8 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    private void addOtherId(Map<Field, String> fields, List<OtherID> otherIDList) {
-        for (OtherID id : otherIDList) {
+    private void addOtherId(Map<Field, String> fields, List<OtherId> otherIdList) {
+        for (OtherId id : otherIdList) {
             if (!id.source().isBlank() && !id.content().isBlank()) {
                 fields.put(FieldFactory.parseField(StandardEntryType.Article, id.source()), id.content());
             }
