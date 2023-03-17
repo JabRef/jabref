@@ -70,6 +70,7 @@ public class BackupUIManager {
 
             return DefaultTaskExecutor.runInJavaFXThread(() -> {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
+                LOGGER.debug("changes: {}", changes);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
                         originalDatabase, "Review Backup"

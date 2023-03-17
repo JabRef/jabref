@@ -11,6 +11,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
 
+import com.google.common.base.MoreObjects;
+
 public final class GroupChange extends DatabaseChange {
     private final GroupDiff groupDiff;
 
@@ -52,5 +54,12 @@ public final class GroupChange extends DatabaseChange {
 
     public GroupDiff getGroupDiff() {
         return groupDiff;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("groupDiff", groupDiff)
+                          .toString();
     }
 }

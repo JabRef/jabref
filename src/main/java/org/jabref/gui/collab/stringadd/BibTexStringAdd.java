@@ -9,6 +9,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
 
+import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,5 +36,12 @@ public final class BibTexStringAdd extends DatabaseChange {
 
     public BibtexString getAddedString() {
         return addedString;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("addedString", addedString)
+                          .toString();
     }
 }

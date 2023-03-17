@@ -8,6 +8,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
 
+import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,5 +45,13 @@ public final class BibTexStringRename extends DatabaseChange {
 
     public BibtexString getNewString() {
         return newString;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("oldString", oldString)
+                          .add("newString", newString)
+                          .toString();
     }
 }

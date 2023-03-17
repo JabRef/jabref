@@ -8,6 +8,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import com.google.common.base.MoreObjects;
+
 public final class EntryDelete extends DatabaseChange {
     private final BibEntry deletedEntry;
 
@@ -27,5 +29,12 @@ public final class EntryDelete extends DatabaseChange {
 
     public BibEntry getDeletedEntry() {
         return deletedEntry;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("deletedEntry", deletedEntry)
+                          .toString();
     }
 }

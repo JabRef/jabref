@@ -7,6 +7,8 @@ import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
+import com.google.common.base.MoreObjects;
+
 public final class MetadataChange extends DatabaseChange {
     private final MetaDataDiff metaDataDiff;
 
@@ -28,5 +30,12 @@ public final class MetadataChange extends DatabaseChange {
 
     public MetaDataDiff getMetaDataDiff() {
         return metaDataDiff;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("metaDataDiff", metaDataDiff)
+                          .toString();
     }
 }

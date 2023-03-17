@@ -8,6 +8,7 @@ import org.jabref.logic.bibtex.comparator.PreambleDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
+import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,5 +32,12 @@ public final class PreambleChange extends DatabaseChange {
 
     public PreambleDiff getPreambleDiff() {
         return preambleDiff;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("preambleDiff", preambleDiff)
+                          .toString();
     }
 }

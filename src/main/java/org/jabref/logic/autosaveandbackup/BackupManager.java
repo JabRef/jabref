@@ -139,20 +139,26 @@ public class BackupManager {
      * In the case of an exception <code>true</code> is returned to ensure that the user checks the output.
      */
     public static boolean backupFileDiffers(Path originalPath) {
+        LOGGER.debug("originalPath path: {}", originalPath);
         Path discardedFile = determineDiscardedFile(originalPath);
         if (Files.exists(discardedFile)) {
+            LOGGER.debug("discardedFile {} exists", discardedFile);
             try {
                 Files.delete(discardedFile);
             } catch (IOException e) {
                 LOGGER.error("Could not remove discarded file {}", discardedFile, e);
+                LOGGER.debug("backupFileDiffers for {}: true", originalPath);
                 return true;
             }
+            LOGGER.debug("backupFileDiffers for {}: false", originalPath);
             return false;
         }
-        return getLatestBackupPath(originalPath).map(latestBackupPath -> {
+        LOGGER.debug("discardedFile {} does not exist", discardedFile);
+        Boolean result = getLatestBackupPath(originalPath).map(latestBackupPath -> {
+            LOGGER.debug("Latest backup path: {}", latestBackupPath);
             FileTime latestBackupFileLastModifiedTime;
             try {
-                 latestBackupFileLastModifiedTime = Files.getLastModifiedTime(latestBackupPath);
+                latestBackupFileLastModifiedTime = Files.getLastModifiedTime(latestBackupPath);
             } catch (IOException e) {
                 LOGGER.debug("Could not get timestamp of backup file {}", latestBackupPath, e);
                 // If we cannot get the timestamp, we do show any warning
@@ -179,6 +185,8 @@ public class BackupManager {
                 return true;
             }
         }).orElse(false);
+        LOGGER.debug("backupFileDiffers for {}: {}", originalPath, result);
+        return result;
     }
 
     /**

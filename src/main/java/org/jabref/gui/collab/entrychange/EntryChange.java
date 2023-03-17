@@ -11,6 +11,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import com.google.common.base.MoreObjects;
+
 public final class EntryChange extends DatabaseChange {
     private final BibEntry oldEntry;
     private final BibEntry newEntry;
@@ -45,5 +47,13 @@ public final class EntryChange extends DatabaseChange {
         changeEntryEdit.end();
 
         undoEdit.addEdit(changeEntryEdit);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("oldEntry", oldEntry)
+                          .add("newEntry", newEntry)
+                          .toString();
     }
 }
