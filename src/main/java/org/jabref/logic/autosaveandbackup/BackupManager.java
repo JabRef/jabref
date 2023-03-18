@@ -87,7 +87,7 @@ public class BackupManager {
      * Determines the most recent existing backup file name
      */
     static Optional<Path> getLatestBackupPath(Path originalPath) {
-        return BackupFileUtil.getPathOfLatestExisingBackupFile(originalPath, BackupFileType.BACKUP);
+        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP);
     }
 
     /**
