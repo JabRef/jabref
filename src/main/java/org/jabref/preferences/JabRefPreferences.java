@@ -530,7 +530,10 @@ public class JabRefPreferences implements PreferencesService {
 
         // SSL
         defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance()
-                                                            .getUserDataDir(OS.APP_DIR_APP_NAME, "ssl", OS.APP_DIR_APP_AUTHOR))
+                                                            .getUserDataDir(
+                                                                    OS.APP_DIR_APP_NAME,
+                                                                    "ssl",
+                                                                    OS.APP_DIR_APP_AUTHOR))
                                           .resolve("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
