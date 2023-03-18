@@ -248,13 +248,17 @@ public class BibDatabaseContext {
 
     public Path getFulltextIndexPath() {
         Path appData = getFulltextIndexBasePath();
+        Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData);
-            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
+            return indexPath;
         }
 
-        return appData.resolve("unsaved");
+        indexPath = appData.resolve("unsaved");
+        LOGGER.debug("Using index for unsaved database: {}", indexPath);
+        return indexPath;
     }
 
     @Override

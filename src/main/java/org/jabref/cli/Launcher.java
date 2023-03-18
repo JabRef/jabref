@@ -108,7 +108,7 @@ public class Launcher {
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
                 "writerFile", "shared file",
-                "writerFile.level", "info",
+                "writerFile.level", "debug",
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
 
