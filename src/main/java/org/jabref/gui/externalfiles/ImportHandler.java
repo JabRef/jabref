@@ -258,7 +258,7 @@ public class ImportHandler {
     }
 
     public List<BibEntry> handleBibTeXData(String entries) {
-        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), fileUpdateMonitor);
         try {
             return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
         } catch (ParseException ex) {
