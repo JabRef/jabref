@@ -241,6 +241,7 @@ public class MedlineImporter extends Importer implements Parser {
     private void parseBookInformation(XMLStreamReader reader, Map<Field, String> fields, String startElement)
             throws XMLStreamException {
         List<String> isbnList = new ArrayList<>();
+        List<String> titleList = new ArrayList<>();
 
         while (reader.hasNext()) {
             reader.next();
@@ -260,10 +261,7 @@ public class MedlineImporter extends Importer implements Parser {
                         }
                     }
                     case "BookTitle" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, StandardField.TITLE, reader.getText());
-                        }
+                        handleTextElement(reader, titleList, elementName);
                     }
                     case "PubDate" -> {
                         addPubDate(reader, fields, elementName);
@@ -318,6 +316,10 @@ public class MedlineImporter extends Importer implements Parser {
 
         if (!isbnList.isEmpty()) {
             fields.put(StandardField.ISBN, join(isbnList, ", "));
+        }
+
+        if (!titleList.isEmpty()) {
+            putIfValueNotNull(fields, StandardField.TITLE, join(titleList, " "));
         }
     }
 
@@ -745,6 +747,7 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void parseArticleInformation(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        List<String> titleList = new ArrayList<>();
         String pubmodel = reader.getAttributeValue(null, "PubModel");
         fields.put(new UnknownField("pubmodel"), pubmodel);
 
@@ -757,10 +760,7 @@ public class MedlineImporter extends Importer implements Parser {
                         parseJournal(reader, fields);
                     }
                     case "ArticleTitle" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            fields.put(StandardField.TITLE, StringUtil.stripBrackets(reader.getText()));
-                        }
+                        handleTextElement(reader, titleList, elementName);
                     }
                     case "Pagination" -> {
                         addPagination(reader, fields, elementName);
@@ -785,6 +785,10 @@ public class MedlineImporter extends Importer implements Parser {
             if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Article")) {
                 break;
             }
+        }
+
+        if (!titleList.isEmpty()) {
+            fields.put(StandardField.TITLE, StringUtil.stripBrackets(join(titleList, " ")));
         }
     }
 
@@ -1035,7 +1039,7 @@ public class MedlineImporter extends Importer implements Parser {
 
     private void addAbstract(XMLStreamReader reader, Map<Field, String> fields, String startElement)
             throws XMLStreamException {
-        List<String> abstractText = new ArrayList<>();
+        List<String> abstractTextList = new ArrayList<>();
 
         while (reader.hasNext()) {
             reader.next();
@@ -1049,10 +1053,7 @@ public class MedlineImporter extends Importer implements Parser {
                         }
                     }
                     case "AbstractText" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            abstractText.add(reader.getText());
-                        }
+                        handleTextElement(reader, abstractTextList, elementName);
                     }
                 }
             }
@@ -1062,7 +1063,42 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        fields.put(StandardField.ABSTRACT, join(abstractText, " "));
+        if (!abstractTextList.isEmpty()) {
+            fields.put(StandardField.ABSTRACT, join(abstractTextList, " "));
+        }
+    }
+
+    /**
+     * Handles text entities that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+     * We ignore the tags and return only the characters present in the enclosing parent element.
+     *
+     */
+    private void handleTextElement(XMLStreamReader reader, List<String> textList, String startElement)
+            throws XMLStreamException {
+        StringBuilder result = new StringBuilder();
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "sup", "sub" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            result.append("(").append(reader.getText()).append(")");
+                        }
+                    }
+                }
+            } else if (isCharacterXMLEvent(reader)) {
+                result.append(reader.getText().trim()).append(" ");
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
+        }
+
+        textList.add(result.toString().trim());
     }
 
     private void addPagination(XMLStreamReader reader, Map<Field, String> fields, String startElement)
