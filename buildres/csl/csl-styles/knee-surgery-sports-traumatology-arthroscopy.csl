@@ -6,7 +6,8 @@
     <id>http://www.zotero.org/styles/knee-surgery-sports-traumatology-arthroscopy</id>
     <link href="http://www.zotero.org/styles/knee-surgery-sports-traumatology-arthroscopy" rel="self"/>
     <link href="http://www.zotero.org/styles/springer-basic-brackets" rel="template"/>
-    <link href="http://www.kssta.org/index.php?id=42" rel="documentation"/>
+    <link href="https://www.kssta.org/kssta-reference-style-examples/" rel="documentation"/>
+    <link href="https://www.kssta.org/authors-homepage/references/" rel="documentation"/>
     <author>
       <name>Sebastian Kopf</name>
     </author>
@@ -15,7 +16,7 @@
     <issn>0942-2056</issn>
     <eissn>1433-7347</eissn>
     <summary>Official journal of the European Society of Sports Traumatology, Knee Surgery and Arthroscopy (ESSKA).</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2023-03-06T09:58:42+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -64,23 +65,39 @@
     </names>
   </macro>
   <macro name="publisher">
-    <group delimiter=", " prefix=" ">
-      <text variable="genre"/>
-      <text variable="publisher"/>
-      <text variable="publisher-place"/>
-    </group>
+    <choose>
+      <if type="book chapter paper-conference thesis" match="any">
+        <group delimiter=", " prefix=" ">
+          <text variable="genre"/>
+          <text variable="publisher"/>
+          <text variable="publisher-place"/>
+        </group>
+      </if>
+    </choose>
   </macro>
   <macro name="locators">
     <choose>
       <if type="article-journal">
-        <group prefix=" " delimiter=":">
-          <text variable="volume"/>
-          <text variable="page"/>
-        </group>
+        <choose>
+          <if match="all" variable="page volume">
+            <group prefix=" " delimiter=":">
+              <group>
+                <text variable="volume"/>
+                <text variable="issue" prefix="(" suffix=")"/>
+              </group>
+              <text variable="page"/>
+            </group>
+          </if>
+          <else>
+            <text variable="DOI" prefix="DOI: "/>
+          </else>
+        </choose>
       </if>
       <else-if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="any">
-        <label variable="page" form="short" prefix=", " suffix=" " strip-periods="true"/>
-        <text variable="page"/>
+        <group delimiter=" " prefix=", ">
+          <label strip-periods="true" variable="page" form="short"/>
+          <text variable="page"/>
+        </group>
       </else-if>
     </choose>
   </macro>
