@@ -500,7 +500,7 @@ public class BibtexParser implements Parser {
         return character;
     }
 
-    private char[] peek2() throws IOException {
+    private char[] peekTwoCharacters() throws IOException {
         char character1 = (char) read();
         char character2 = (char) read();
         unread(character2);
@@ -918,8 +918,11 @@ public class BibtexParser implements Parser {
                     // It could be that a user has a backslash at the end of the entry, but intended to put a file path
                     // We want to be relaxed at that case
                     // First described at https://github.com/JabRef/jabref/issues/9668
-                    char[] peek2 = peek2();
-                    if ((peek2[0] == ',') && ((peek2[1] == OS.NEWLINE.charAt(0)) || (peek2[1] == '\n'))) {
+                    char[] nextTwoCharacters = peekTwoCharacters();
+                    // Check for "\},\n" - Example context: `  path = {c:\temp\},\n`
+                    // On Windows, it could be "\},\r\n", thus we rely in OS.NEWLINE.charAt(0) (which returns '\r' or '\n').
+                    //   In all cases, we should check for '\n' as the file could be encoded with Linux line endings on Windows.
+                    if ((nextTwoCharacters[0] == ',') && ((nextTwoCharacters[1] == OS.NEWLINE.charAt(0)) || (nextTwoCharacters[1] == '\n'))) {
                         // We hit '\}\r` or `\}\n`
                         // Heuristics: Unwanted escaping of }
                         //
