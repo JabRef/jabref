@@ -220,7 +220,7 @@ public class XmpUtilWriter {
      * Existing fields values are overridden if the bibtex entry has the
      * corresponding value set.
      * <p>
-     * The method to write DublineCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
+     * The method to write DublinCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
      *
      * @param document The pdf document to write to.
      * @param entry    The Bibtex entry that is written into the PDF properties. *
@@ -280,7 +280,7 @@ public class XmpUtilWriter {
      * The method will overwrite existing BibTeX-XMP-data, but keep other
      * existing metadata.
      *
-     * The code for using PDFBox is also used at {@link EmbeddedBibFilePdfExporter#embedBibTex(java.lang.String, java.nio.file.Path)}.
+     * The code for using PDFBox is also used at {@link EmbeddedBibFilePdfExporter#embedBibTex(String, Path)}.
      *
      * @param path          The file to write the entries to.
      * @param bibtexEntries The entries to write to the file. *

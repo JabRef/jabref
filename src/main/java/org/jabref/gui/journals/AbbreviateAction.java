@@ -87,7 +87,7 @@ public class AbbreviateAction extends SimpleCommand {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 Globals.journalAbbreviationRepository,
                 abbreviationType,
-                journalAbbreviationPreferences.useAMSFJournalFieldForAbbrevAndUnabbrev());
+                journalAbbreviationPreferences.shouldUseFJournalField());
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
 

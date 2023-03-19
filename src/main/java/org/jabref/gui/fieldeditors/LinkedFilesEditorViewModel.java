@@ -16,7 +16,6 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
@@ -24,6 +23,7 @@ import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -214,11 +214,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences.getImportFormatPreferences(),
                 preferences.getImporterPreferences());
         Optional<String> urlField = entry.getField(StandardField.URL);
-        Boolean download_success = false;
+        boolean download_success = false;
         if (urlField.isPresent()) {
             download_success = downloadFile(urlField.get());
         }
-        if (!urlField.isPresent() || !download_success) {
+        if (urlField.isEmpty() || !download_success) {
             BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))
@@ -235,22 +235,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void addFromURL() {
-        String clipText = ClipBoardManager.getContents();
-        Optional<String> urlText;
-        String urlField = entry.getField(StandardField.URL).orElse("");
-        if (clipText.startsWith("http://") || clipText.startsWith("https://") || clipText.startsWith("ftp://")) {
-            urlText = dialogService.showInputDialogWithDefaultAndWait(
-                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), clipText);
-        } else if (urlField.startsWith("http://") || urlField.startsWith("https://") || urlField.startsWith("ftp://")) {
-            urlText = dialogService.showInputDialogWithDefaultAndWait(
-                    Localization.lang("Download file"), Localization.lang("Enter URL to download"), urlField);
-        } else {
-            urlText = dialogService.showInputDialogAndWait(
-                    Localization.lang("Download file"), Localization.lang("Enter URL to download"));
-        }
-        if (urlText.isPresent()) {
-            downloadFile(urlText.get());
-        }
+        AttachFileFromURLAction.getUrlForDownloadFromClipBoardOrEntry(dialogService, entry)
+                               .ifPresent(this::downloadFile);
     }
 
     private void addFromURLAndDownload(URL url) {

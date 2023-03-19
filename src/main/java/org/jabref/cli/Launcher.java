@@ -22,6 +22,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -90,10 +91,12 @@ public class Launcher {
      * the log configuration programmatically anymore.
      */
     private static void addLogToDisk() {
-        Path directory = Path.of(AppDirsFactory.getInstance().getUserLogDir(
-                "jabref",
-                new BuildInfo().version.toString(),
-                "org.jabref"));
+        Path directory = Path.of(AppDirsFactory.getInstance()
+                                               .getUserDataDir(
+                OS.APP_DIR_APP_NAME,
+                "logs",
+                OS.APP_DIR_APP_AUTHOR))
+                .resolve(new BuildInfo().version.toString());
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -105,7 +108,7 @@ public class Launcher {
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
                 "writerFile", "shared file",
-                "writerFile.level", "info",
+                "writerFile.level", "debug",
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
 
