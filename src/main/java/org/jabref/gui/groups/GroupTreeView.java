@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
@@ -217,6 +219,18 @@ public class GroupTreeView extends BorderPane {
                                 }
                             });
                     text.getStyleClass().setAll("text");
+                    text.textProperty().bind(Bindings.createStringBinding(() -> {
+                        int hits = group.getHits().get();
+                        if (hits >= 1000000) {
+                            double millions = hits / 1000000.0;
+                            return new DecimalFormat("#,##0.#").format(millions) + "m";
+                        } else if (hits >= 1000) {
+                            double thousands = hits / 1000.0;
+                            return new DecimalFormat("#,##0.#").format(thousands) + "k";
+                        } else {
+                            return Integer.toString(hits);
+                        }
+                    }, group.getHits()));
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
                     return node;
