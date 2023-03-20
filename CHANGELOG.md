@@ -29,7 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Backups of libraries are not stored per JabRef version, but collected together.
 - We modified the `Add Group` dialog to use the most recently selected group hierarchical context [#9141](https://github.com/JabRef/jabref/issues/9141)
 - We improved the Medline importer to correctly import ISO dates for `revised`. [#9536](https://github.com/JabRef/jabref/issues/9536)
-- To avoid cluttering of the directory, We always delete the `.sav` file upon successful write.
+- To avoid cluttering of the directory, We always delete the `.sav` file upon successful write. [#9675](https://github.com/JabRef/jabref/pull/9675)
 
 
 
