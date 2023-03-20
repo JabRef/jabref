@@ -132,7 +132,7 @@ public class FileUtil {
         List<String> uniquePathParts = uniquePathSubstrings(paths);
         return uniquePathParts.stream()
                               .filter(part -> comparePath.toString().contains(part)
-                                      && !part.equals(fileName) && part.contains(File.separator))
+                                              && !part.equals(fileName) && part.contains(File.separator))
                               .findFirst()
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
@@ -145,9 +145,9 @@ public class FileUtil {
      */
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
-                              .filter(part -> comparePath.toString().contains(part))
-                               .sorted(Comparator.comparingInt(String::length).reversed())
-                               .findFirst();
+                                          .filter(part -> comparePath.toString().contains(part))
+                                          .sorted(Comparator.comparingInt(String::length).reversed())
+                                          .findFirst();
     }
 
     /**
@@ -212,7 +212,7 @@ public class FileUtil {
         try {
             // Preserve Hard Links with OpenOption defaults included for clarity
             Files.write(pathToDestinationFile, Files.readAllBytes(pathToSourceFile),
-                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+                        StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
             return true;
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
@@ -311,9 +311,9 @@ public class FileUtil {
     public static Optional<Path> find(String filename, Path rootDirectory) {
         try (Stream<Path> pathStream = Files.walk(rootDirectory)) {
             return pathStream
-                    .filter(Files::isRegularFile)
-                    .filter(f -> f.getFileName().toString().equals(filename))
-                    .findFirst();
+                             .filter(Files::isRegularFile)
+                             .filter(f -> f.getFileName().toString().equals(filename))
+                             .findFirst();
         } catch (UncheckedIOException | IOException ex) {
             LOGGER.error("Error trying to locate the file " + filename + " inside the directory " + rootDirectory);
         }
