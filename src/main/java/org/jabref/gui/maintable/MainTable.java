@@ -322,9 +322,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void paste() {
         List<BibEntry> entriesToAdd;
-            entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipbaord()
+            entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipboard()
             .map(importHandler::handleBibTeXData)
-            .orElseGet(this::handleNonBibteXStringData);
+            .orElseGet(this::handleNonBibTeXStringData);
 
         for (BibEntry entry : entriesToAdd) {
             importHandler.importEntryWithDuplicateCheck(database, entry);
@@ -334,7 +334,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
-    private List<BibEntry> handleNonBibteXStringData() {
+    private List<BibEntry> handleNonBibTeXStringData() {
         String data = ClipBoardManager.getContents();
         List<BibEntry> entries = new ArrayList<>();
         try {
