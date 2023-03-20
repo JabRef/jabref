@@ -111,7 +111,6 @@ public class URLDownload {
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = {new X509TrustManager() {
-
             @Override
             public void checkClientTrusted(X509Certificate[] chain, String authType) {
             }

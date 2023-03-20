@@ -74,8 +74,6 @@ public class FileHelper {
         return Optional.empty();
     }
 
-
-
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns an empty optional if the file does not
      * exist.<br/>
