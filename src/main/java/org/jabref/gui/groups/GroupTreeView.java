@@ -116,9 +116,9 @@ public class GroupTreeView extends BorderPane {
         mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
         numberColumn.getStyleClass().add("numberColumn");
-        numberColumn.setMinWidth(40d);
-        numberColumn.setMaxWidth(40d);
-        numberColumn.setPrefWidth(40d);
+        numberColumn.setMinWidth(60d);
+        numberColumn.setMaxWidth(60d);
+        numberColumn.setPrefWidth(60d);
         numberColumn.setResizable(false);
         expansionNodeColumn = new TreeTableColumn<>();
         expansionNodeColumn.getStyleClass().add("expansionNodeColumn");
@@ -133,7 +133,7 @@ public class GroupTreeView extends BorderPane {
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
         this.setCenter(groupTree);
 
-        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(60d).subtract(15));
+        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
 
         addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setId("addNewGroup");
@@ -231,6 +231,23 @@ public class GroupTreeView extends BorderPane {
                             return Integer.toString(hits);
                         }
                     }, group.getHits()));
+
+                    text.styleProperty().bind(Bindings.createStringBinding(() -> {
+                        double reducedFontSize;
+                        double font_size = preferencesService.getAppearancePreferences().getMainFontSize();
+                        // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
+                        if (font_size > 26.0) {
+                            reducedFontSize = 0.25;
+                        } else if (font_size > 22.0) {
+                            reducedFontSize = 0.35;
+                        } else if (font_size > 18.0) {
+                            reducedFontSize = 0.55;
+                        } else {
+                            reducedFontSize = 0.75;
+                        }
+                        return String.format("-fx-font-size: %fem;", reducedFontSize);
+                    }, preferencesService.getAppearancePreferences().mainFontSizeProperty()));
+
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
                     return node;
