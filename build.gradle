@@ -143,7 +143,7 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.4.0.202211300538-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.14.2'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.1'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.7'
 
@@ -178,8 +178,8 @@ dependencies {
     implementation 'com.konghq:unirest-java:3.14.2'
 
     implementation 'org.slf4j:slf4j-api:2.0.6'
-    implementation "org.tinylog:tinylog-api:2.5.0"
-    implementation "org.tinylog:slf4j-tinylog:2.6.0"
+    implementation "org.tinylog:tinylog-api:2.6.1"
+    implementation "org.tinylog:slf4j-tinylog:2.6.1"
     implementation "org.tinylog:tinylog-impl:2.6.0"
 
     implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
@@ -203,7 +203,7 @@ dependencies {
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.154'
+    testImplementation 'io.github.classgraph:classgraph:4.8.157'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.9.2'
 
@@ -216,7 +216,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.7.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.8.1'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
@@ -259,8 +259,6 @@ processResources {
 
 task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateSearchGrammarSource",
-                                "generateMedlineSource",
-                                "generateBibtexmlSource",
                                 "generateEndnoteSource",
                                 "generateModsSource",
                                 "generateCitaviSource"]) {
@@ -288,24 +286,6 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
-}
-
-task generateMedlineSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the medline importer."
-
-    schemaFile = "src/main/resources/xjc/medline/medline.xsd"
-    outputDirectory = "src-gen/main/java"
-    javaPackage = "org.jabref.logic.importer.fileformat.medline"
-}
-
-task generateBibtexmlSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the bibtexml importer."
-
-    schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
-    outputDirectory = "src-gen/main/java/"
-    javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
 }
 
 task generateEndnoteSource(type: XjcTask) {
@@ -424,7 +404,7 @@ test {
     }
 
     moduleOptions {
-        // TODO: Remove this as soon as archunit is modularized
+        // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
     }
 

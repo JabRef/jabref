@@ -63,7 +63,7 @@ In the case of IntelliJ, this will be downloaded inside the IDE (if you follow t
 In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 19 (e.g., `javac 19`).
 If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 Please head to <https://adoptium.net/de/temurin/releases> to download JDK 19.
-Note that JDK 19 does not work.
+
 
 ## Get the code
 
@@ -90,22 +90,19 @@ cd git-reposiroties
 
 **Note that putting the repo jabref directly under `C:\` or any other drive letter under windows causes compile errors**
 
-Run the respective `git clone` command:
+Initial cloning might be very slow (`27.00 KiB/s`).
+
+To prevent this, execute the following steps:
 
 ```cmd
-git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git
+git clone --depth=10 https://github.com/JabRef/jabref.git
+cd jabref
+git remote rename origin upstream
+git remote add origin https://github.com/YOUR_USERNAME/jabref.git
 ```
 
 The `--depth--10` is used to limit the download to \~20 MB instead of downloading the complete history (\~800 MB).
 If you want to dig in our commit history, feel free to download everything.
-
-Go to the newly created JabRef folder: `cd jabref`.
-
-Add JabRef's upstream code base as upstream:
-
-```
-git remote add upstream https://github.com/JabRef/jabref.git
-```
 
 Now, you have two remote repositories, where `origin` is yours and `upstream` is the one of the JabRef organization.
 
@@ -309,7 +306,7 @@ Now you can use IntelliJ IDEA's internal build system by using **Build > Build P
 To run an example test from IntelliJ, we let IntelliJ create a launch configuration:
 
 Locate the class `BibEntryTest`:
-Press </kbd>Ctrl</kbd>+<kbd>N</kbd>.
+Press <kbd>Ctrl</kbd>+<kbd>N</kbd>.
 Then, the "Search for classes dialog" pops up.
 Enter `bibenrytest`.
 Now, `BibEntryTest` should appear first:

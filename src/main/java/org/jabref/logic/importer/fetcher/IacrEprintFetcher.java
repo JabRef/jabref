@@ -1,11 +1,14 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -17,7 +20,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-public class IacrEprintFetcher implements IdBasedFetcher {
+public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
 
     public static final String NAME = "IACR eprints";
 
@@ -26,6 +29,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private static final Predicate<String> IDENTIFIER_PREDICATE = Pattern.compile("\\d{4}/\\d{3,5}").asPredicate();
     private static final String CITATION_URL_PREFIX = "https://eprint.iacr.org/";
     private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
+    private static final String FULLTEXT_URL_PREFIX = "https://eprint.iacr.org/";
     private static final String VERSION_URL_PREFIX = "https://eprint.iacr.org/archive/versions/";
 
     private final ImportFormatPreferences prefs;
@@ -129,5 +133,28 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @Override
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+        Objects.requireNonNull(entry);
+
+        Optional<String> urlField = entry.getField(StandardField.URL);
+        if (urlField.isPresent()) {
+            String descriptiveHtml = getHtml(urlField.get());
+            String startOfFulltextLink = "<a class=\"btn btn-sm btn-outline-dark\"";
+            String fulltextLinkAsInHtml = getRequiredValueBetween(startOfFulltextLink, ".pdf", descriptiveHtml);
+            // There is an additional "\n           href=\"/archive/" we have to remove - and for some reason,
+            // getRequiredValueBetween refuses to match across the line break.
+            fulltextLinkAsInHtml = fulltextLinkAsInHtml.replaceFirst(".*href=\"/", "").trim();
+            String fulltextLink = FULLTEXT_URL_PREFIX + fulltextLinkAsInHtml + ".pdf";
+            return Optional.of(new URL(fulltextLink));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.PREPRINT;
     }
 }

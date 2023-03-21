@@ -36,6 +36,7 @@ class ManageStudyDefinitionViewModelTest {
         assertEquals(List.of(
                 new StudyDatabaseItem("ACM Portal", true),
                 new StudyDatabaseItem("ArXiv", false),
+                new StudyDatabaseItem("Bibliotheksverbund Bayern (Experimental)", false),
                 new StudyDatabaseItem("Biodiversity Heritage", false),
                 new StudyDatabaseItem("Collection of Computer Science Bibliographies", false),
                 new StudyDatabaseItem("Crossref", false),
@@ -75,6 +76,7 @@ class ManageStudyDefinitionViewModelTest {
         assertEquals(List.of(
                 new StudyDatabaseItem("ACM Portal", true),
                 new StudyDatabaseItem("ArXiv", false),
+                new StudyDatabaseItem("Bibliotheksverbund Bayern (Experimental)", false),
                 new StudyDatabaseItem("Biodiversity Heritage", false),
                 new StudyDatabaseItem("Collection of Computer Science Bibliographies", false),
                 new StudyDatabaseItem("Crossref", false),
