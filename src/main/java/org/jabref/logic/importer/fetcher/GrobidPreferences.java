@@ -8,13 +8,16 @@ import javafx.beans.property.StringProperty;
 public class GrobidPreferences {
     private final BooleanProperty grobidEnabled;
     private final BooleanProperty grobidOptOut;
+    private final BooleanProperty grobidDemanded;
     private final StringProperty grobidURL;
 
     public GrobidPreferences(boolean grobidEnabled,
                              boolean grobidOptOut,
+                             boolean grobidDemanded,
                              String grobidURL) {
         this.grobidEnabled = new SimpleBooleanProperty(grobidEnabled);
         this.grobidOptOut = new SimpleBooleanProperty(grobidOptOut);
+        this.grobidDemanded = new SimpleBooleanProperty(grobidDemanded);
         this.grobidURL = new SimpleStringProperty(grobidURL);
     }
 
@@ -41,6 +44,20 @@ public class GrobidPreferences {
     public void setGrobidOptOut(boolean grobidOptOut) {
         this.grobidOptOut.set(grobidOptOut);
     }
+
+
+    public boolean isGrobidDemanded() {
+        return grobidDemanded.get();
+    }
+
+    public BooleanProperty grobidDemandedProperty() {
+        return grobidDemanded;
+    }
+
+    public void setGrobidDemanded(boolean grobidDemanded) {
+        this.grobidDemanded.set(grobidDemanded);
+    }
+
 
     public String getGrobidURL() {
         return grobidURL.get();

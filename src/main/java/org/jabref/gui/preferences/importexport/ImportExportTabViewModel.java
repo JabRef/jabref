@@ -53,11 +53,16 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty exportInOriginalProperty = new SimpleBooleanProperty();
     private final BooleanProperty exportInTableOrderProperty = new SimpleBooleanProperty();
     private final BooleanProperty exportInSpecifiedOrderProperty = new SimpleBooleanProperty();
+    //private final BooleanProperty gorbidEnabledProperty = new SimpleBooleanProperty();
+
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
-
+//remove
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
+    private final BooleanProperty grobidDisabledProperty = new SimpleBooleanProperty();
+    private final BooleanProperty grobidDemandedProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
+    //remove
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
 
@@ -104,7 +109,14 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
                                                       .map(SortCriterionViewModel::new)
                                                       .toList());
 
+//remove
+
+
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
+        grobidDisabledProperty.setValue(grobidPreferences.isGrobidOptOut());
+        grobidDemandedProperty.setValue(grobidPreferences.isGrobidDemanded());
+
+
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
         apiKeys.setValue(FXCollections.observableArrayList(preferencesService.getImporterPreferences().getApiKeys()));
@@ -114,7 +126,9 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
-        grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
+        grobidPreferences.setGrobidDemanded(grobidDisabledProperty.getValue());
+        grobidPreferences.setGrobidOptOut(grobidDemandedProperty.getValue());
+
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
 
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
@@ -171,6 +185,10 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     public BooleanProperty grobidEnabledProperty() {
         return grobidEnabledProperty;
     }
+    public BooleanProperty grobidDisabledProperty() {
+        return grobidDisabledProperty;
+    }
+    public BooleanProperty grobidDemandedProperty() { return grobidDemandedProperty; }
 
     public StringProperty grobidURLProperty() {
         return grobidURLProperty;

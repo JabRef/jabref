@@ -7,6 +7,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.commonfxcontrols.RemoteServicesConfigPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -23,13 +24,12 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     @FXML private TextField useCustomDOIName;
 
     @FXML private SaveOrderConfigPanel exportOrderPanel;
-
+    @FXML private RemoteServicesConfigPanel RemoteServicesConfigPanel;
     @FXML private ComboBox<FetcherApiKey> apiKeySelector;
     @FXML private TextField customApiKey;
     @FXML private CheckBox useCustomApiKey;
     @FXML private Button testCustomApiKey;
 
-    @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
     @FXML private CheckBox warnAboutDuplicatesOnImport;
@@ -62,9 +62,13 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
         exportOrderPanel.setCriteriaLimit(3);
 
-        grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
+        RemoteServicesConfigPanel.gorbidDemandedProperty().bindBidirectional(viewModel.grobidDemandedProperty());
+        RemoteServicesConfigPanel.gorbidDisabledProperty().bindBidirectional(viewModel.grobidDisabledProperty());
+        RemoteServicesConfigPanel.gorbidEnabledProperty().bindBidirectional(viewModel.grobidEnabledProperty());
+
+
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
-        grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
+        grobidURL.disableProperty().bind(viewModel.grobidEnabledProperty());
 
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
 

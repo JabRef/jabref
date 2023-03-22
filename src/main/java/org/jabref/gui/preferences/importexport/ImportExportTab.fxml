@@ -31,7 +31,7 @@
     <SaveOrderConfigPanel fx:id="exportOrderPanel"/>
 
     <Label styleClass="sectionHeader" text="%Remote services"/>
-    <RemoteServicesConfigPanel fx:id="RemoteServicesPanel"/>
+    <RemoteServicesConfigPanel fx:id="RemoteServicesConfigPanel"/>
 
     <Label styleClass="sectionHeader" text="%Remote services"/>
     <CheckBox fx:id="grobidEnabled" text="%Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."/>

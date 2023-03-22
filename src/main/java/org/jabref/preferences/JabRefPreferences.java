@@ -268,6 +268,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
     public static final String GROBID_OPT_OUT = "grobidOptOut";
+
+    public static final String GROBID_DEMANDED = "grobidDemanded";
     public static final String GROBID_URL = "grobidURL";
 
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
@@ -494,6 +496,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
         defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
+        defaults.put(GROBID_DEMANDED, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
 
         defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
@@ -2850,10 +2853,12 @@ public class JabRefPreferences implements PreferencesService {
         grobidPreferences = new GrobidPreferences(
                 getBoolean(GROBID_ENABLED),
                 getBoolean(GROBID_OPT_OUT),
+                getBoolean(GROBID_DEMANDED),
                 get(GROBID_URL));
 
         EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
         EasyBind.listen(grobidPreferences.grobidOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_OPT_OUT, newValue));
+        EasyBind.listen(grobidPreferences.grobidDemandedProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_DEMANDED, newValue));
         EasyBind.listen(grobidPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
 
         return grobidPreferences;
