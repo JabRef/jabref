@@ -145,8 +145,9 @@ public class Launcher {
 
     private static void applyPreferences(PreferencesService preferences) {
         // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationRepository = JournalAbbreviationLoader
-                .loadRepository(preferences.getJournalAbbreviationPreferences());
+        JournalAbbreviationLoader journalAbbreviationLoader = new JournalAbbreviationLoader();
+            Globals.journalAbbreviationRepository = journalAbbreviationLoader
+                    .loadRepository(preferences.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(

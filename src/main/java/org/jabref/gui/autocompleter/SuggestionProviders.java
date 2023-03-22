@@ -2,7 +2,7 @@ package org.jabref.gui.autocompleter;
 
 import java.util.Set;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
@@ -12,10 +12,10 @@ public class SuggestionProviders {
 
     private final boolean isEmpty;
     private BibDatabase database;
-    private JournalAbbreviationRepository abbreviationRepository;
+    private AbbreviationRepository abbreviationRepository;
     private AutoCompletePreferences autoCompletePreferences;
 
-    public SuggestionProviders(BibDatabase database, JournalAbbreviationRepository abbreviationRepository, AutoCompletePreferences autoCompletePreferences) {
+    public SuggestionProviders(BibDatabase database, AbbreviationRepository abbreviationRepository, AutoCompletePreferences autoCompletePreferences) {
         this.database = database;
         this.abbreviationRepository = abbreviationRepository;
         this.autoCompletePreferences = autoCompletePreferences;

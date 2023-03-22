@@ -3,7 +3,7 @@ package org.jabref.gui.autocompleter;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -26,7 +26,7 @@ class SuggestionProvidersTest {
     @BeforeEach
     public void initializeSuggestionProviders() {
         BibDatabase database = new BibDatabase();
-        JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
+        AbbreviationRepository abbreviationRepository = mock(AbbreviationRepository.class);
         Set<Field> completeFields = Set.of(StandardField.AUTHOR, StandardField.XREF, StandardField.XDATA, StandardField.JOURNAL, StandardField.PUBLISHER, SpecialField.PRINTED);
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(
                 true,

@@ -4,16 +4,16 @@ import javax.swing.undo.CompoundEdit;
 
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 public class UndoableUnabbreviator {
 
-    private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final AbbreviationRepository journalAbbreviationRepository;
 
-    public UndoableUnabbreviator(JournalAbbreviationRepository journalAbbreviationRepository) {
+    public UndoableUnabbreviator(AbbreviationRepository journalAbbreviationRepository) {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 

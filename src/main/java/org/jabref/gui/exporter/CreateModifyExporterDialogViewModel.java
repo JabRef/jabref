@@ -10,7 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -37,10 +37,10 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private final StringProperty layoutFile = new SimpleStringProperty("");
     private final StringProperty extension = new SimpleStringProperty("");
 
-    private final JournalAbbreviationRepository repository;
+    private final AbbreviationRepository repository;
 
     public CreateModifyExporterDialogViewModel(ExporterViewModel exporter, DialogService dialogService, PreferencesService preferences,
-                                               JournalAbbreviationRepository repository) {
+                                               AbbreviationRepository repository) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.repository = repository;

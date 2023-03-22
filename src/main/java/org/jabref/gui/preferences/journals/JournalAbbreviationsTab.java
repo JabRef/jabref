@@ -27,7 +27,7 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -59,7 +59,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML private CustomTextField searchBox;
 
     @Inject private TaskExecutor taskExecutor;
-    @Inject private JournalAbbreviationRepository abbreviationRepository;
+    @Inject private AbbreviationRepository abbreviationRepository;
 
     private Timeline invalidateSearch;
 

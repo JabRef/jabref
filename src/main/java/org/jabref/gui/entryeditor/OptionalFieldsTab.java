@@ -7,7 +7,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,7 +25,7 @@ public class OptionalFieldsTab extends OptionalFieldsTabBase {
                              IndexingTaskManager indexingTaskManager,
                              BibEntryTypesManager entryTypesManager,
                              TaskExecutor taskExecutor,
-                             JournalAbbreviationRepository journalAbbreviationRepository) {
+                             AbbreviationRepository journalAbbreviationRepository) {
         super(
                 Localization.lang("Optional fields"),
                 true,

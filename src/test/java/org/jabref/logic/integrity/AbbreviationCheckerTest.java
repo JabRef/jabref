@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class AbbreviationCheckerTest {
 
-    private JournalAbbreviationRepository abbreviationRepository;
+    private AbbreviationRepository abbreviationRepository;
     private AbbreviationChecker checker;
 
     @BeforeEach

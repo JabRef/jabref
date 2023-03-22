@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AbbreviationsTest {
 
-    private JournalAbbreviationRepository repository;
+    private AbbreviationRepository repository;
 
     @BeforeEach
     void setUp() {

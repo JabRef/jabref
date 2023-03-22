@@ -11,7 +11,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -32,7 +32,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                                 ThemeManager themeManager,
                                 IndexingTaskManager indexingTaskManager,
                                 TaskExecutor taskExecutor,
-                                JournalAbbreviationRepository journalAbbreviationRepository) {
+                                AbbreviationRepository journalAbbreviationRepository) {
         super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
 
         this.fields = new LinkedHashSet<>(fields);

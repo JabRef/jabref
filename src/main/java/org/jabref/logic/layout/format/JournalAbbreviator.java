@@ -2,7 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.util.Objects;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatter;
 
 /**
@@ -15,9 +15,9 @@ import org.jabref.logic.layout.LayoutFormatter;
  */
 public class JournalAbbreviator implements LayoutFormatter {
 
-    private final JournalAbbreviationRepository repository;
+    private final AbbreviationRepository repository;
 
-    public JournalAbbreviator(JournalAbbreviationRepository repository) {
+    public JournalAbbreviator(AbbreviationRepository repository) {
         this.repository = Objects.requireNonNull(repository);
     }
 

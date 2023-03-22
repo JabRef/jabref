@@ -12,7 +12,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -36,7 +36,7 @@ public class FieldEditors {
     public static FieldEditorFX getForField(final Field field,
                                             final TaskExecutor taskExecutor,
                                             final DialogService dialogService,
-                                            final JournalAbbreviationRepository journalAbbreviationRepository,
+                                            final AbbreviationRepository journalAbbreviationRepository,
                                             final PreferencesService preferences,
                                             final BibDatabaseContext databaseContext,
                                             final EntryType entryType,

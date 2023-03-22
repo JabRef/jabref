@@ -22,7 +22,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.PreferencesService;
@@ -55,13 +55,13 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final TaskExecutor taskExecutor;
 
     private final JournalAbbreviationPreferences abbreviationsPreferences;
-    private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final AbbreviationRepository journalAbbreviationRepository;
     private boolean shouldWriteLists;
 
     public JournalAbbreviationsTabViewModel(PreferencesService preferences,
                                             DialogService dialogService,
                                             TaskExecutor taskExecutor,
-                                            JournalAbbreviationRepository journalAbbreviationRepository) {
+                                            AbbreviationRepository journalAbbreviationRepository) {
         this.preferences = Objects.requireNonNull(preferences);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);

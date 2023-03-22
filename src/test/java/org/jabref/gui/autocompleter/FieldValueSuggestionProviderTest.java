@@ -8,7 +8,7 @@ import java.util.Set;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -66,7 +66,7 @@ class FieldValueSuggestionProviderTest {
     @Test
     void completeOnIgnoredFieldReturnsNothing() {
         AutoCompletePreferences autoCompletePreferences = mock(AutoCompletePreferences.class);
-        JournalAbbreviationRepository journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
+        AbbreviationRepository journalAbbreviationRepository = mock(AbbreviationRepository.class);
         when(autoCompletePreferences.getCompleteFields()).thenReturn(FXCollections.observableSet(Set.of(StandardField.AUTHOR)));
         SuggestionProviders suggestionProviders = new SuggestionProviders(database, journalAbbreviationRepository, autoCompletePreferences);
 

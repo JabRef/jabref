@@ -4,14 +4,14 @@ import java.util.Optional;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
 public class JournalEditorViewModel extends AbstractEditorViewModel {
-    private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final AbbreviationRepository journalAbbreviationRepository;
 
-    public JournalEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, JournalAbbreviationRepository journalAbbreviationRepository, FieldCheckers fieldCheckers) {
+    public JournalEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, AbbreviationRepository journalAbbreviationRepository, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
 
         this.journalAbbreviationRepository = journalAbbreviationRepository;

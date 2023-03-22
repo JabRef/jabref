@@ -47,7 +47,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -107,7 +107,7 @@ public class EntryEditor extends BorderPane {
     @Inject private CountingUndoManager undoManager;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject private AbbreviationRepository journalAbbreviationRepository;
 
     private final List<EntryEditorTab> entryEditorTabs = new LinkedList<>();
 

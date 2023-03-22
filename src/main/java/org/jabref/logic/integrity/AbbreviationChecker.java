@@ -2,15 +2,15 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
 public class AbbreviationChecker implements ValueChecker {
 
-    private final JournalAbbreviationRepository abbreviationRepository;
+    private final AbbreviationRepository abbreviationRepository;
 
-    public AbbreviationChecker(JournalAbbreviationRepository abbreviationRepository) {
+    public AbbreviationChecker(AbbreviationRepository abbreviationRepository) {
         this.abbreviationRepository = abbreviationRepository;
     }
 

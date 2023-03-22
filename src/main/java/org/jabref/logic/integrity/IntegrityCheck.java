@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -21,7 +21,7 @@ public class IntegrityCheck {
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
                           FilePreferences filePreferences,
                           CitationKeyPatternPreferences citationKeyPatternPreferences,
-                          JournalAbbreviationRepository journalAbbreviationRepository,
+                          AbbreviationRepository journalAbbreviationRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
 

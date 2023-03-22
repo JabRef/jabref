@@ -25,7 +25,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
@@ -75,7 +75,7 @@ public interface PreferencesService {
 
     void importPreferences(Path file) throws JabRefException;
 
-    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
+    LayoutFormatterPreferences getLayoutFormatterPreferences(AbbreviationRepository repository);
 
     ImportFormatPreferences getImportFormatPreferences();
 
@@ -216,7 +216,7 @@ public interface PreferencesService {
 
     ImportExportPreferences getImportExportPreferences();
 
-    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
+    List<TemplateExporter> getCustomExportFormats(AbbreviationRepository repository);
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
 

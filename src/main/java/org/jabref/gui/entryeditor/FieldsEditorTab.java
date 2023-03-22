@@ -32,7 +32,7 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -53,7 +53,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final PreferencesService preferences;
     private final ThemeManager themeManager;
     private final TaskExecutor taskExecutor;
-    private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final AbbreviationRepository journalAbbreviationRepository;
     private final StateManager stateManager;
     private final IndexingTaskManager indexingTaskManager;
     private PreviewPanel previewPanel;
@@ -70,7 +70,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                            StateManager stateManager,
                            ThemeManager themeManager,
                            TaskExecutor taskExecutor,
-                           JournalAbbreviationRepository journalAbbreviationRepository,
+                           AbbreviationRepository journalAbbreviationRepository,
                            IndexingTaskManager indexingTaskManager) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);

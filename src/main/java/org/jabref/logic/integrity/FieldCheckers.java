@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -20,11 +20,11 @@ public class FieldCheckers {
     private final Multimap<Field, ValueChecker> fieldChecker;
 
     public FieldCheckers(BibDatabaseContext databaseContext, FilePreferences filePreferences,
-                         JournalAbbreviationRepository abbreviationRepository, boolean allowIntegerEdition) {
+                         AbbreviationRepository abbreviationRepository, boolean allowIntegerEdition) {
         fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, allowIntegerEdition);
     }
 
-    private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean allowIntegerEdition) {
+    private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, AbbreviationRepository abbreviationRepository, boolean allowIntegerEdition) {
         ArrayListMultimap<Field, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (Field field : FieldFactory.getBookNameFields()) {

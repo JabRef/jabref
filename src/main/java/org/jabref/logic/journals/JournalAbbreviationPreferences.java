@@ -1,27 +1,26 @@
 package org.jabref.logic.journals;
 
-import java.nio.charset.Charset;
 import java.util.List;
 
-public class JournalAbbreviationPreferences {
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
-    private final Charset defaultEncoding;
-    private List<String> externalJournalLists;
-
-    public JournalAbbreviationPreferences(List<String> externalJournalLists, Charset defaultEncoding) {
-        this.externalJournalLists = externalJournalLists;
-        this.defaultEncoding = defaultEncoding;
+public class JournalAbbreviationPreferences extends AbbreviationPreferences {
+    private final BooleanProperty useFJournalField;
+    public JournalAbbreviationPreferences(List<String> externalLists, boolean useFJournalField) {
+        super(externalLists);
+        this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
     }
 
-    public List<String> getExternalJournalLists() {
-        return externalJournalLists;
+    public boolean shouldUseFJournalField() {
+        return useFJournalField.get();
     }
 
-    public void setExternalJournalLists(List<String> externalJournalLists) {
-        this.externalJournalLists = externalJournalLists;
+    public BooleanProperty useFJournalFieldProperty() {
+        return useFJournalField;
     }
 
-    public Charset getDefaultEncoding() {
-        return defaultEncoding;
+    public void setUseFJournalField(boolean useFJournalField) {
+        this.useFJournalField.set(useFJournalField);
     }
 }

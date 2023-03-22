@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 
@@ -13,11 +13,11 @@ public class LayoutFormatterPreferences {
     private final NameFormatterPreferences nameFormatterPreferences;
     private final FileLinkPreferences fileLinkPreferences;
     private final Map<String, String> customExportNameFormatters = new HashMap<>();
-    private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final AbbreviationRepository journalAbbreviationRepository;
 
     public LayoutFormatterPreferences(NameFormatterPreferences nameFormatterPreferences,
                                       FileLinkPreferences fileLinkPreferences,
-                                      JournalAbbreviationRepository journalAbbreviationRepository) {
+                                      AbbreviationRepository journalAbbreviationRepository) {
         this.nameFormatterPreferences = nameFormatterPreferences;
         this.fileLinkPreferences = fileLinkPreferences;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
@@ -31,7 +31,7 @@ public class LayoutFormatterPreferences {
         return fileLinkPreferences;
     }
 
-    public JournalAbbreviationRepository getJournalAbbreviationRepository() {
+    public AbbreviationRepository getJournalAbbreviationRepository() {
         return journalAbbreviationRepository;
     }
 

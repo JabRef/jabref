@@ -18,7 +18,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +45,7 @@ class JournalAbbreviationsViewModelTabTest {
     private Path emptyTestFile;
     private Path tempFolder;
     private PreferencesService preferencesService;
-    private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
+    private final AbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
     private DialogService dialogService;
 
     public static Stream<Arguments> provideTestFiles() {

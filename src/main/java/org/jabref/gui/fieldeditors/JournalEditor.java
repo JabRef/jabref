@@ -8,7 +8,7 @@ import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
@@ -21,7 +21,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextField textField;
 
     public JournalEditor(Field field,
-                         JournalAbbreviationRepository journalAbbreviationRepository,
+                         AbbreviationRepository journalAbbreviationRepository,
                          PreferencesService preferences,
                          SuggestionProvider<?> suggestionProvider,
                          FieldCheckers fieldCheckers) {

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -18,7 +18,7 @@ public class JournalInAbbreviationListCheckerTest {
 
     private JournalInAbbreviationListChecker checker;
     private JournalInAbbreviationListChecker checkerb;
-    private JournalAbbreviationRepository abbreviationRepository;
+    private AbbreviationRepository abbreviationRepository;
     private BibEntry entry;
 
     @BeforeEach

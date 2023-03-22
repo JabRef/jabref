@@ -8,7 +8,7 @@ import javafx.scene.control.TableView;
 import org.jabref.gui.exporter.ExporterViewModel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -22,7 +22,7 @@ public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterT
     @FXML private TableColumn<ExporterViewModel, String> layoutColumn;
     @FXML private TableColumn<ExporterViewModel, String> extensionColumn;
 
-    @Inject private JournalAbbreviationRepository repository;
+    @Inject private AbbreviationRepository repository;
 
     public CustomExporterTab() {
         ViewLoader.view(this)

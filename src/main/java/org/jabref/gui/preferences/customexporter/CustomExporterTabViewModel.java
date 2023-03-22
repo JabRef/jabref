@@ -13,7 +13,7 @@ import org.jabref.gui.exporter.CreateModifyExporterDialogView;
 import org.jabref.gui.exporter.ExporterViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.AbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 
 public class CustomExporterTabViewModel implements PreferenceTabViewModel {
@@ -23,9 +23,9 @@ public class CustomExporterTabViewModel implements PreferenceTabViewModel {
 
     private final PreferencesService preferences;
     private final DialogService dialogService;
-    private final JournalAbbreviationRepository repository;
+    private final AbbreviationRepository repository;
 
-    public CustomExporterTabViewModel(PreferencesService preferences, DialogService dialogService, JournalAbbreviationRepository repository) {
+    public CustomExporterTabViewModel(PreferencesService preferences, DialogService dialogService, AbbreviationRepository repository) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.repository = repository;

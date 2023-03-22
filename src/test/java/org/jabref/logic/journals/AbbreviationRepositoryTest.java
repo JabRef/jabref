@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class JournalAbbreviationRepositoryTest {
+class AbbreviationRepositoryTest {
 
-    private JournalAbbreviationRepository repository;
+    private AbbreviationRepository repository;
 
     @BeforeEach
     void setUp() {
