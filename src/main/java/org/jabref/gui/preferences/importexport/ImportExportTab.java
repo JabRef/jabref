@@ -68,7 +68,7 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
 
 
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
-        grobidURL.disableProperty().bind(viewModel.grobidEnabledProperty());
+        grobidURL.disableProperty().bind(viewModel.grobidEnabledProperty().not());
 
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
 

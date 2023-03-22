@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <fx:root prefWidth="650.0" spacing="10.0" type="VBox"
@@ -13,9 +10,9 @@
     </fx:define>
 
     <RadioButton fx:id="gorbidEnabled" text="%Always enable Gorbid"
-                 toggleGroup="RemoteServicesToggleGroup"/>
+                 toggleGroup="$RemoteServicesToggleGroup"/>
     <RadioButton fx:id="gorbidDisabled" text="%Always disable Gorbid"
-                 toggleGroup="RemoteServicesToggleGroup"/>
+                 toggleGroup="$RemoteServicesToggleGroup"/>
     <RadioButton fx:id="gorbidDemanded" text="%Always Ask"
-                 toggleGroup="RemoteServicesToggleGroup"/>
+                 toggleGroup="$RemoteServicesToggleGroup"/>
 </fx:root>

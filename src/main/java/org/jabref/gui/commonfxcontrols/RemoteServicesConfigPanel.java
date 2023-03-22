@@ -2,12 +2,13 @@ package org.jabref.gui.commonfxcontrols;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import javafx.beans.property.BooleanProperty;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
 
-public class RemoteServicesConfigPanel extends VBox {
+
+public class
+RemoteServicesConfigPanel extends VBox {
     @FXML private RadioButton gorbidEnabled;
     @FXML private RadioButton gorbidDisabled;
     @FXML private RadioButton gorbidDemanded;
@@ -18,6 +19,8 @@ public class RemoteServicesConfigPanel extends VBox {
                 .root(this)
                 .load();
     }
+
+    @FXML
     private void initialize() {
         viewModel = new RemoteServicesConfigPanelViewModel();
         gorbidEnabled.selectedProperty().bindBidirectional(viewModel.gorbidEnabledProperty());
