@@ -42,7 +42,7 @@ version = project.findProperty('projVersion') ?: '100.0.0'
 java {
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(19))
+            languageVersion.set(JavaLanguageVersion.of(20))
         }
     }
 
