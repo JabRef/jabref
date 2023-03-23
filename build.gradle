@@ -27,6 +27,9 @@ plugins {
     id 'project-report'
 
     id 'idea'
+    
+    // enable downloading of JDKs
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.4.0'
 }
 
 // Enable following for debugging
