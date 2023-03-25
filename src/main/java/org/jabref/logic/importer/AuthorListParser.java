@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
+import org.jabref.model.strings.StringUtil;
 
 public class AuthorListParser {
 
@@ -95,6 +96,9 @@ public class AuthorListParser {
      */
     public AuthorList parse(String listOfNames) {
         Objects.requireNonNull(listOfNames);
+
+        // Handle the statement "and others" at the end, removing it
+        listOfNames = StringUtil.removeStringAtTheEnd(listOfNames.trim(), " and others");
 
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.

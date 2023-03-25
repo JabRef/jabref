@@ -1150,4 +1150,11 @@ class CitationKeyGeneratorTest {
         entry.setField(StandardField.YEAR, "2021");
         assertEquals("Brekel2021", generateKey(entry, "[auth][year]"));
     }
+
+    @Test
+    void generateKeyCorrectKeyWithAndOthersAtTheEnd() {
+        BibEntry entry = createABibEntryAuthor("Alexander Artemenko and others");
+        entry.setField(StandardField.YEAR, "2019");
+        assertEquals("Artemenko2019", generateKey(entry, "[auth][year]"));
+    }
 }
