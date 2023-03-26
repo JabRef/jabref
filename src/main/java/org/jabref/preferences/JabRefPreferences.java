@@ -2548,6 +2548,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(guiPreferences.mergePlainTextOrDiffProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF, newValue.name()));
+        EasyBind.listen(guiPreferences.mergeDiffViewProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_VIEW, newValue.name()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
 

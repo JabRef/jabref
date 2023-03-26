@@ -179,9 +179,6 @@ public class ThreeWayMergeView extends VBox {
         fieldRows.forEach(FieldRowView::selectRightValue);
     }
 
-    public void showDiff(ShowDiffConfig diffConfig) {
-    }
-
     public BibEntry getLeftEntry() {
         return viewModel.getLeftEntry();
     }
