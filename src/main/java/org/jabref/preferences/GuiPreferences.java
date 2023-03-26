@@ -203,7 +203,7 @@ public class GuiPreferences {
         return mergeDiffView;
     }
 
-    public void setMergeDiffMode(DiffView mergeDiffView) {
+    public void setMergeDiffView(DiffView mergeDiffView) {
         this.mergeDiffView.set(mergeDiffView);
     }
 

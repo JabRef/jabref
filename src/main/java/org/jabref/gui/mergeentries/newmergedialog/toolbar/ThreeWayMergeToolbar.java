@@ -87,6 +87,9 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         diffViewComboBox.disableProperty().bind(notShowDiffProperty());
         diffViewComboBox.getItems().addAll(DiffView.values());
         diffViewComboBox.getSelectionModel().select(preferencesService.getGuiPreferences().getMergeDiffView());
+        diffViewComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            preferencesService.getGuiPreferences().setMergeDiffView(newValue);
+        });
         diffViewComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(DiffView diffView) {
@@ -98,6 +101,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
                 return DiffView.fromString(string);
             }
         });
+
+        setDiffView(preferencesService.getGuiPreferences().getMergeDiffView());
 
         highlightWordsRadioButton.disableProperty().bind(notShowDiffProperty());
         highlightCharactersRadioButtons.disableProperty().bind(notShowDiffProperty());

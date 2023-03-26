@@ -180,9 +180,6 @@ public class ThreeWayMergeView extends VBox {
     }
 
     public void showDiff(ShowDiffConfig diffConfig) {
-        toolbar.setDiffView(diffConfig.diffView());
-        toolbar.setDiffHighlightingMethod(diffConfig.diffHighlightingMethod());
-        toolbar.setShowDiff(true);
     }
 
     public BibEntry getLeftEntry() {
