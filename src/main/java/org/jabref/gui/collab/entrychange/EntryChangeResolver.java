@@ -13,23 +13,25 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.BibEntryPreferences;
+import org.jabref.preferences.GuiPreferences;
 
 public final class EntryChangeResolver extends DatabaseChangeResolver {
     private final EntryChange entryChange;
     private final BibDatabaseContext databaseContext;
 
     private final BibEntryPreferences bibEntryPreferences;
-
-    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, BibEntryPreferences bibEntryPreferences) {
+    private final GuiPreferences guiPreferences;
+    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, BibEntryPreferences bibEntryPreferences, GuiPreferences guiPreferences) {
         super(dialogService);
         this.entryChange = entryChange;
         this.databaseContext = databaseContext;
         this.bibEntryPreferences = bibEntryPreferences;
+        this.guiPreferences = guiPreferences;
     }
 
     @Override
     public Optional<DatabaseChange> askUserToResolveChange() {
-        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), bibEntryPreferences);
+        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), bibEntryPreferences, guiPreferences);
         mergeEntriesDialog.setLeftHeaderText(Localization.lang("In JabRef"));
         mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
         mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, BasicDiffMethod.WORDS));

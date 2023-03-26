@@ -18,6 +18,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.preferences.BibEntryPreferences;
+import org.jabref.preferences.GuiPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
@@ -40,7 +42,7 @@ public class ThreeWayMergeView extends VBox {
     private final FieldMergerFactory fieldMergerFactory;
     private final String keywordSeparator;
 
-    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, BibEntryPreferences bibEntryPreferences) {
+    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, BibEntryPreferences bibEntryPreferences, GuiPreferences guiPreferences) {
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
         viewModel = new ThreeWayMergeViewModel((BibEntry) leftEntry.clone(), (BibEntry) rightEntry.clone(), leftHeader, rightHeader);
         this.fieldMergerFactory = new FieldMergerFactory(bibEntryPreferences);
@@ -49,7 +51,8 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane = new GridPane();
         scrollPane = new ScrollPane();
         headerView = new ThreeWayMergeHeaderView(leftHeader, rightHeader);
-        toolbar = new ThreeWayMergeToolbar();
+
+        toolbar = new ThreeWayMergeToolbar(guiPreferences);
 
         initializeColumnConstraints();
         initializeMergeGridPane();
@@ -63,8 +66,8 @@ public class ThreeWayMergeView extends VBox {
         getChildren().addAll(toolbar, headerView, scrollPane);
     }
 
-    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, BibEntryPreferences bibEntryPreferences) {
-        this(leftEntry, rightEntry, LEFT_DEFAULT_HEADER, RIGHT_DEFAULT_HEADER, bibEntryPreferences);
+    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, BibEntryPreferences bibEntryPreferences, GuiPreferences guiPreferences) {
+        this(leftEntry, rightEntry, LEFT_DEFAULT_HEADER, RIGHT_DEFAULT_HEADER, bibEntryPreferences, guiPreferences);
     }
 
     private void initializeToolbar() {

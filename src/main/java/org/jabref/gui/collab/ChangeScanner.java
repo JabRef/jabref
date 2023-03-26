@@ -28,7 +28,7 @@ public class ChangeScanner {
                          PreferencesService preferencesService) {
         this.database = database;
         this.preferencesService = preferencesService;
-        this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database, preferencesService.getBibEntryPreferences());
+        this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database, preferencesService.getBibEntryPreferences(), preferencesService.getGuiPreferences());
     }
 
     public List<DatabaseChange> scanForChanges() {

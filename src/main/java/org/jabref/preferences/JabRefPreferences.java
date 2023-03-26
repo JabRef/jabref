@@ -55,6 +55,7 @@ import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.gui.mergeentries.DiffMode;
+import org.jabref.gui.mergeentries.PlainTextOrDiff;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
@@ -238,6 +239,8 @@ public class JabRefPreferences implements PreferencesService {
 
     // merge related
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
+    public static final String MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF = "mergeEntriesPlainTextOrDiff";
+
     public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = "mergeShowOnlyChangedFields";
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
@@ -584,6 +587,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
+        defaults.put(MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF, PlainTextOrDiff.Diff.name());
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
@@ -2508,6 +2512,7 @@ public class JabRefPreferences implements PreferencesService {
                 getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
                 DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
+                PlainTextOrDiff.parse(get(MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF)),
                 getDouble(SIDE_PANE_WIDTH),
                 getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS));
 
@@ -2533,6 +2538,7 @@ public class JabRefPreferences implements PreferencesService {
         guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
+        EasyBind.listen(guiPreferences.mergePlainTextOrDiffProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF, newValue.name()));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
 

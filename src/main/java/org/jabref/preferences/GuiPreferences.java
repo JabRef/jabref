@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.mergeentries.DiffMode;
+import org.jabref.gui.mergeentries.PlainTextOrDiff;
 import org.jabref.logic.util.io.FileHistory;
 
 public class GuiPreferences {
@@ -33,6 +34,8 @@ public class GuiPreferences {
 
     private final StringProperty lastSelectedIdBasedFetcher;
     private final ObjectProperty<DiffMode> mergeDiffMode;
+    private final ObjectProperty<PlainTextOrDiff> mergePlainTextOrDiff;
+
     private final BooleanProperty mergeShowChangedFieldsOnly;
     private final DoubleProperty sidePaneWidth;
 
@@ -46,6 +49,7 @@ public class GuiPreferences {
                           FileHistory fileHistory,
                           String lastSelectedIdBasedFetcher,
                           DiffMode mergeDiffMode,
+                          PlainTextOrDiff mergePlainTextOrDiff,
                           double sidePaneWidth,
                           boolean mergeShowChangedFieldsOnly) {
         this.positionX = new SimpleDoubleProperty(positionX);
@@ -57,6 +61,7 @@ public class GuiPreferences {
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
+        this.mergePlainTextOrDiff = new SimpleObjectProperty<>(mergePlainTextOrDiff);
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
         this.mergeShowChangedFieldsOnly = new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
@@ -168,6 +173,18 @@ public class GuiPreferences {
 
     public void setMergeDiffMode(DiffMode mergeDiffMode) {
         this.mergeDiffMode.set(mergeDiffMode);
+    }
+
+    public PlainTextOrDiff getMergePlainTextOrDiff() {
+        return mergePlainTextOrDiff.get();
+    }
+
+    public ObjectProperty<PlainTextOrDiff> mergePlainTextOrDiffProperty() {
+        return mergePlainTextOrDiff;
+    }
+
+    public void setMergePlainTextOrDiff(PlainTextOrDiff mergePlainTextOrDiff) {
+        this.mergePlainTextOrDiff.set(mergePlainTextOrDiff);
     }
 
     public double getSidePaneWidth() {

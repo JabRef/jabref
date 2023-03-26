@@ -14,9 +14,11 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.mergeentries.PlainTextOrDiff;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -55,8 +57,9 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
     private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();
     private EasyBinding<Boolean> showDiff;
-
-    public ThreeWayMergeToolbar() {
+    private GuiPreferences guiPreferences;
+    public ThreeWayMergeToolbar(GuiPreferences guiPreferences) {
+        this.guiPreferences = guiPreferences;
         ViewLoader.view(this)
                 .root(this)
                 .load();
@@ -67,6 +70,11 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         showDiff = EasyBind.map(plainTextOrDiffComboBox.valueProperty(), plainTextOrDiff -> plainTextOrDiff == PlainTextOrDiff.Diff);
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
         plainTextOrDiffComboBox.getSelectionModel().select(PlainTextOrDiff.Diff);
+
+        plainTextOrDiffComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            System.out.println(newValue);
+        });
+
         plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(PlainTextOrDiff plainTextOrDiff) {
@@ -174,24 +182,6 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
     public void setOnSelectRightEntryValuesButtonClicked(Runnable onClick) {
         selectRightEntryValuesButton.setOnMouseClicked(e -> onClick.run());
-    }
-
-    public enum PlainTextOrDiff {
-        PLAIN_TEXT(Localization.lang("Plain Text")), Diff(Localization.lang("Show Diff"));
-
-        private final String value;
-
-        PlainTextOrDiff(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public static PlainTextOrDiff fromString(String str) {
-            return Enum.valueOf(PlainTextOrDiff.class, str);
-        }
     }
 
     public enum DiffView {
