@@ -9,15 +9,14 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.BibEntryPreferences;
-import org.jabref.preferences.GuiPreferences;
 
 public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
     private final ThreeWayMergeView threeWayMergeView;
     private final BibEntry one;
     private final BibEntry two;
 
-    public MergeEntriesDialog(BibEntry one, BibEntry two, BibEntryPreferences bibEntryPreferences, GuiPreferences guiPreferences) {
-        threeWayMergeView = new ThreeWayMergeView(one, two, bibEntryPreferences, guiPreferences);
+    public MergeEntriesDialog(BibEntry one, BibEntry two, BibEntryPreferences bibEntryPreferences) {
+        threeWayMergeView = new ThreeWayMergeView(one, two, bibEntryPreferences);
         this.one = one;
         this.two = two;
 

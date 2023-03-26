@@ -20,18 +20,17 @@ public final class EntryChangeResolver extends DatabaseChangeResolver {
     private final BibDatabaseContext databaseContext;
 
     private final BibEntryPreferences bibEntryPreferences;
-    private final GuiPreferences guiPreferences;
-    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, BibEntryPreferences bibEntryPreferences, GuiPreferences guiPreferences) {
+
+    public EntryChangeResolver(EntryChange entryChange, DialogService dialogService, BibDatabaseContext databaseContext, BibEntryPreferences bibEntryPreferences) {
         super(dialogService);
         this.entryChange = entryChange;
         this.databaseContext = databaseContext;
         this.bibEntryPreferences = bibEntryPreferences;
-        this.guiPreferences = guiPreferences;
     }
 
     @Override
     public Optional<DatabaseChange> askUserToResolveChange() {
-        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), bibEntryPreferences, guiPreferences);
+        MergeEntriesDialog mergeEntriesDialog = new MergeEntriesDialog(entryChange.getOldEntry(), entryChange.getNewEntry(), bibEntryPreferences);
         mergeEntriesDialog.setLeftHeaderText(Localization.lang("In JabRef"));
         mergeEntriesDialog.setRightHeaderText(Localization.lang("On disk"));
         mergeEntriesDialog.configureDiff(new ShowDiffConfig(ThreeWayMergeToolbar.DiffView.SPLIT, BasicDiffMethod.WORDS));

@@ -77,21 +77,21 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
-                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService.getBibEntryPreferences(), preferencesService.getGuiPreferences());
+                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService.getBibEntryPreferences());
             }
             case DUPLICATE_SEARCH_WITH_EXACT -> {
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 removeExactVisible = true;
-                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService.getBibEntryPreferences(), preferencesService.getGuiPreferences());
+                threeWayMerge = new ThreeWayMergeView(one, two, preferencesService.getBibEntryPreferences());
             }
             case IMPORT_CHECK -> {
                 first = new ButtonType(Localization.lang("Keep old entry"), ButtonData.LEFT);
                 second = new ButtonType(Localization.lang("Keep from import"), ButtonData.LEFT);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.LEFT);
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"), preferencesService.getBibEntryPreferences(), preferencesService.getGuiPreferences());
+                        Localization.lang("From import"), preferencesService.getBibEntryPreferences());
             }
             default -> throw new IllegalStateException("Switch expression should be exhaustive");
         }

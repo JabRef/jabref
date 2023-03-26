@@ -18,7 +18,6 @@ import org.jabref.gui.mergeentries.PlainTextOrDiff;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -57,9 +56,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
     private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();
     private EasyBinding<Boolean> showDiff;
-    private GuiPreferences guiPreferences;
-    public ThreeWayMergeToolbar(GuiPreferences guiPreferences) {
-        this.guiPreferences = guiPreferences;
+
+    public ThreeWayMergeToolbar() {
         ViewLoader.view(this)
                 .root(this)
                 .load();
@@ -69,10 +67,10 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     public void initialize() {
         showDiff = EasyBind.map(plainTextOrDiffComboBox.valueProperty(), plainTextOrDiff -> plainTextOrDiff == PlainTextOrDiff.Diff);
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
-        plainTextOrDiffComboBox.getSelectionModel().select(PlainTextOrDiff.Diff);
+        plainTextOrDiffComboBox.getSelectionModel().select(preferencesService.getGuiPreferences().getMergePlainTextOrDiff());
 
         plainTextOrDiffComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
-            System.out.println(newValue);
+            preferencesService.getGuiPreferences().setMergePlainTextOrDiff(newValue);
         });
 
         plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
@@ -114,7 +112,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }));
 
         diffHighlightingMethodToggleGroup.selectToggle(highlightWordsRadioButton);
-        plainTextOrDiffComboBox.valueProperty().set(PlainTextOrDiff.Diff);
+        plainTextOrDiffComboBox.valueProperty().set(preferencesService.getGuiPreferences().getMergePlainTextOrDiff());
 
         onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty());
         onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
