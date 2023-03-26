@@ -15,7 +15,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.mergeentries.DiffMode;
-import org.jabref.gui.mergeentries.PlainTextOrDiff;
+import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar.DiffView;
+import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar.PlainTextOrDiff;
 import org.jabref.logic.util.io.FileHistory;
 
 public class GuiPreferences {
@@ -35,6 +36,8 @@ public class GuiPreferences {
     private final StringProperty lastSelectedIdBasedFetcher;
     private final ObjectProperty<DiffMode> mergeDiffMode;
     private final ObjectProperty<PlainTextOrDiff> mergePlainTextOrDiff;
+    private final ObjectProperty<DiffView> mergeDiffView;
+    private final BooleanProperty mergeHighlightsWords;
 
     private final BooleanProperty mergeShowChangedFieldsOnly;
     private final DoubleProperty sidePaneWidth;
@@ -50,6 +53,8 @@ public class GuiPreferences {
                           String lastSelectedIdBasedFetcher,
                           DiffMode mergeDiffMode,
                           PlainTextOrDiff mergePlainTextOrDiff,
+                          DiffView mergeDiffView,
+                          boolean mergeHighlightsWords,
                           double sidePaneWidth,
                           boolean mergeShowChangedFieldsOnly) {
         this.positionX = new SimpleDoubleProperty(positionX);
@@ -62,6 +67,9 @@ public class GuiPreferences {
         this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
         this.mergePlainTextOrDiff = new SimpleObjectProperty<>(mergePlainTextOrDiff);
+        this.mergeDiffView = new SimpleObjectProperty<>(mergeDiffView);
+        this.mergeHighlightsWords = new SimpleBooleanProperty(mergeHighlightsWords);
+
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
         this.mergeShowChangedFieldsOnly = new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
@@ -185,6 +193,30 @@ public class GuiPreferences {
 
     public void setMergePlainTextOrDiff(PlainTextOrDiff mergePlainTextOrDiff) {
         this.mergePlainTextOrDiff.set(mergePlainTextOrDiff);
+    }
+
+    public DiffView getMergeDiffView() {
+        return mergeDiffView.get();
+    }
+
+    public ObjectProperty<DiffView> mergeDiffViewProperty() {
+        return mergeDiffView;
+    }
+
+    public void setMergeDiffMode(DiffView mergeDiffView) {
+        this.mergeDiffView.set(mergeDiffView);
+    }
+
+    public boolean getMergeHighlightWords() {
+        return mergeHighlightsWords.get();
+    }
+
+    public BooleanProperty mergeHighlightWordsProperty() {
+        return mergeHighlightsWords;
+    }
+
+    public void setMergeHighlightWords(boolean mergeHighlightsWords) {
+        this.mergeHighlightsWords.set(mergeHighlightsWords);
     }
 
     public double getSidePaneWidth() {

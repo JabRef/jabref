@@ -13,7 +13,6 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.BibEntryPreferences;
-import org.jabref.preferences.GuiPreferences;
 
 public final class EntryChangeResolver extends DatabaseChangeResolver {
     private final EntryChange entryChange;

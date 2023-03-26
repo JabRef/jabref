@@ -14,7 +14,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.mergeentries.PlainTextOrDiff;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
@@ -87,7 +86,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         diffViewComboBox.disableProperty().bind(notShowDiffProperty());
         diffViewComboBox.getItems().addAll(DiffView.values());
-        diffViewComboBox.getSelectionModel().select(DiffView.UNIFIED);
+        diffViewComboBox.getSelectionModel().select(preferencesService.getGuiPreferences().getMergeDiffView());
         diffViewComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(DiffView diffView) {
@@ -111,7 +110,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
             }
         }));
 
-        diffHighlightingMethodToggleGroup.selectToggle(highlightWordsRadioButton);
+        diffHighlightingMethodToggleGroup.selectToggle(preferencesService.getGuiPreferences().getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
         plainTextOrDiffComboBox.valueProperty().set(preferencesService.getGuiPreferences().getMergePlainTextOrDiff());
 
         onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty());
@@ -182,6 +181,32 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         selectRightEntryValuesButton.setOnMouseClicked(e -> onClick.run());
     }
 
+    public enum PlainTextOrDiff {
+        PLAIN_TEXT(Localization.lang("Plain Text")), Diff(Localization.lang("Show Diff"));
+
+        private final String value;
+
+        PlainTextOrDiff(String value) {
+            this.value = value;
+        }
+
+        public static PlainTextOrDiff parse(String name) {
+            try {
+                return PlainTextOrDiff.valueOf(name);
+            } catch (IllegalArgumentException e) {
+                return Diff; // default
+            }
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public static PlainTextOrDiff fromString(String str) {
+            return Enum.valueOf(PlainTextOrDiff.class, str);
+        }
+    }
+
     public enum DiffView {
         UNIFIED(Localization.lang("Unified View")),
         SPLIT(Localization.lang("Split View"));
@@ -189,6 +214,14 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         DiffView(String value) {
             this.value = value;
+        }
+
+        public static DiffView parse(String name) {
+            try {
+                return DiffView.valueOf(name);
+            } catch (IllegalArgumentException e) {
+                return UNIFIED; // default
+            }
         }
 
         public String getValue() {
