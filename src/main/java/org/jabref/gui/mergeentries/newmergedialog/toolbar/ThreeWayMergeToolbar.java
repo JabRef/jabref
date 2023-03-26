@@ -110,11 +110,14 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable -> {
             if (diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightCharactersRadioButtons)) {
                 diffHighlightingMethod.set(BasicDiffMethod.CHARS);
+                preferencesService.getGuiPreferences().setMergeHighlightWords(false);
             } else {
                 diffHighlightingMethod.set(BasicDiffMethod.WORDS);
+                preferencesService.getGuiPreferences().setMergeHighlightWords(true);
             }
         }));
 
+        System.out.println(preferencesService.getGuiPreferences().getMergeHighlightWords());
         diffHighlightingMethodToggleGroup.selectToggle(preferencesService.getGuiPreferences().getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
         plainTextOrDiffComboBox.valueProperty().set(preferencesService.getGuiPreferences().getMergePlainTextOrDiff());
         diffViewComboBox.valueProperty().set(preferencesService.getGuiPreferences().getMergeDiffView());

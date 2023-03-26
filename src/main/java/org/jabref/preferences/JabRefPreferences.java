@@ -594,7 +594,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
         defaults.put(MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF, PlainTextOrDiff.Diff.name());
         defaults.put(MERGE_ENTRIES_DIFF_VIEW, DiffView.UNIFIED.name());
-        defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.FALSE);
+        defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
@@ -2549,6 +2549,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
         EasyBind.listen(guiPreferences.mergePlainTextOrDiffProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF, newValue.name()));
         EasyBind.listen(guiPreferences.mergeDiffViewProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_VIEW, newValue.name()));
+        EasyBind.listen(guiPreferences.mergeHighlightWordsProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
 
