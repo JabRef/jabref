@@ -243,7 +243,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF = "mergeEntriesPlainTextOrDiff";
     public static final String MERGE_ENTRIES_DIFF_VIEW = "mergeEntriesDiffView";
     public static final String MERGE_ENTRIES_HIGHLIGHT_WORDS = "mergeEntriesHighlightWords";
-    public static final String MERGE_ENTRIES_HIGHLIGHT_ONLY_SHOW_CHANGED_FIELDS = "mergeEntriesOnlyShowChangedFields";
 
 
     public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = "mergeShowOnlyChangedFields";

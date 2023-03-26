@@ -102,8 +102,6 @@ public class ThreeWayMergeToolbar extends AnchorPane {
             }
         });
 
-        setDiffView(preferencesService.getGuiPreferences().getMergeDiffView());
-
         highlightWordsRadioButton.disableProperty().bind(notShowDiffProperty());
         highlightCharactersRadioButtons.disableProperty().bind(notShowDiffProperty());
 
@@ -117,7 +115,6 @@ public class ThreeWayMergeToolbar extends AnchorPane {
             }
         }));
 
-        System.out.println(preferencesService.getGuiPreferences().getMergeHighlightWords());
         diffHighlightingMethodToggleGroup.selectToggle(preferencesService.getGuiPreferences().getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
         plainTextOrDiffComboBox.valueProperty().set(preferencesService.getGuiPreferences().getMergePlainTextOrDiff());
         diffViewComboBox.valueProperty().set(preferencesService.getGuiPreferences().getMergeDiffView());
@@ -132,10 +129,6 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
     public DiffView getDiffView() {
         return diffViewProperty().get();
-    }
-
-    public void setDiffView(DiffView diffView) {
-        diffViewProperty().set(diffView);
     }
 
     public EasyBinding<Boolean> showDiffProperty() {
