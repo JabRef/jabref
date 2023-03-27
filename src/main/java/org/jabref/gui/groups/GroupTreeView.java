@@ -564,5 +564,4 @@ public class GroupTreeView extends BorderPane {
             }
         }
     }
-
 }
