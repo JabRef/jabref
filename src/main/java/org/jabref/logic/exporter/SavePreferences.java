@@ -49,7 +49,7 @@ public class SavePreferences {
 
         this(saveInOriginalOrder,
                 saveOrder,
-                true,
+                false,
                 saveType,
                 takeMetadataSaveOrderInAccount,
                 reformatFile,
