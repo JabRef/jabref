@@ -55,8 +55,6 @@ public interface PreferencesService {
 
     KeyBindingRepository getKeyBindingRepository();
 
-    void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences);
-
     FilePreferences getFilePreferences();
 
     FieldWriterPreferences getFieldWriterPreferences();
