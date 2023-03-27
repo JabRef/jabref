@@ -220,7 +220,6 @@ public class GroupTreeView extends BorderPane {
                             });
                     text.getStyleClass().setAll("text");
 
-
                     text.styleProperty().bind(Bindings.createStringBinding(() -> {
                         double reducedFontSize;
                         double font_size = preferencesService.getAppearancePreferences().getMainFontSize();
