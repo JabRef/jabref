@@ -215,22 +215,10 @@ public class GroupTreeView extends BorderPane {
                                 }
 
                                 if (newValue) {
-                                    text.textProperty().bind(group.getHits().asString());
+                                    text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                                 }
                             });
                     text.getStyleClass().setAll("text");
-                    text.textProperty().bind(Bindings.createStringBinding(() -> {
-                        int hits = group.getHits().get();
-                        if (hits >= 1000000) {
-                            double millions = hits / 1000000.0;
-                            return new DecimalFormat("#,##0.#").format(millions) + "m";
-                        } else if (hits >= 1000) {
-                            double thousands = hits / 1000.0;
-                            return new DecimalFormat("#,##0.#").format(thousands) + "k";
-                        } else {
-                            return Integer.toString(hits);
-                        }
-                    }, group.getHits()));
 
                     text.styleProperty().bind(Bindings.createStringBinding(() -> {
                         double reducedFontSize;
@@ -526,6 +514,17 @@ public class GroupTreeView extends BorderPane {
 
     private void addNewGroup() {
         viewModel.addNewGroupToRoot();
+    }
+
+    private String getFormattedNumber(int hits) {
+        if (hits >= 1000000) {
+            double millions = hits / 1000000.0;
+            return new DecimalFormat("#,##0.#").format(millions) + "m";
+        } else if (hits >= 1000) {
+            double thousands = hits / 1000.0;
+            return new DecimalFormat("#,##0.#").format(thousands) + "k";
+        }
+        return Integer.toString(hits);
     }
 
     /**
