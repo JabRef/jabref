@@ -49,7 +49,6 @@ public class ThreeWayMergeView extends VBox {
         mergeGridPane = new GridPane();
         scrollPane = new ScrollPane();
         headerView = new ThreeWayMergeHeaderView(leftHeader, rightHeader);
-
         toolbar = new ThreeWayMergeToolbar();
 
         initializeColumnConstraints();
@@ -177,6 +176,12 @@ public class ThreeWayMergeView extends VBox {
 
     public void selectRightEntryValues() {
         fieldRows.forEach(FieldRowView::selectRightValue);
+    }
+
+    public void showDiff(ShowDiffConfig diffConfig) {
+        toolbar.setDiffView(diffConfig.diffView());
+        toolbar.setDiffHighlightingMethod(diffConfig.diffHighlightingMethod());
+        toolbar.setShowDiff(true);
     }
 
     public BibEntry getLeftEntry() {

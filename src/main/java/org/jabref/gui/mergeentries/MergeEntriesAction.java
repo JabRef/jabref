@@ -23,6 +23,7 @@ public class MergeEntriesAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.bibEntryPreferences = bibEntryPreferences;
+
         this.executable.bind(ActionHelper.needsEntriesSelected(NUMBER_OF_ENTRIES_NEEDED, stateManager));
     }
 

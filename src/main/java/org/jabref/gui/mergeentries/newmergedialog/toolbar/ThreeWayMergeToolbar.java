@@ -68,7 +68,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
         plainTextOrDiffComboBox.getSelectionModel().select(preferencesService.getGuiPreferences().getMergePlainTextOrDiff());
 
-        plainTextOrDiffComboBox.setConverter(new StringConverter<> () {
+        plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(PlainTextOrDiff plainTextOrDiff) {
                 return plainTextOrDiff.getValue();
@@ -121,6 +121,10 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
     public DiffView getDiffView() {
         return diffViewProperty().get();
+    }
+
+    public void setDiffView(DiffView diffView) {
+        diffViewProperty().set(diffView);
     }
 
     public EasyBinding<Boolean> showDiffProperty() {

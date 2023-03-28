@@ -37,8 +37,7 @@ public class GuiPreferences {
     private final ObjectProperty<DiffMode> mergeDiffMode;
     private final ObjectProperty<PlainTextOrDiff> mergePlainTextOrDiff;
     private final ObjectProperty<DiffView> mergeDiffView;
-    private final BooleanProperty mergeHighlightsWords;
-
+    private final BooleanProperty mergeHighlightWords;
     private final BooleanProperty mergeShowChangedFieldsOnly;
     private final DoubleProperty sidePaneWidth;
 
@@ -68,7 +67,7 @@ public class GuiPreferences {
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
         this.mergePlainTextOrDiff = new SimpleObjectProperty<>(mergePlainTextOrDiff);
         this.mergeDiffView = new SimpleObjectProperty<>(mergeDiffView);
-        this.mergeHighlightsWords = new SimpleBooleanProperty(mergeHighlightsWords);
+        this.mergeHighlightWords = new SimpleBooleanProperty(mergeHighlightsWords);
 
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
@@ -208,15 +207,15 @@ public class GuiPreferences {
     }
 
     public boolean getMergeHighlightWords() {
-        return mergeHighlightsWords.get();
+        return mergeHighlightWords.get();
     }
 
     public BooleanProperty mergeHighlightWordsProperty() {
-        return mergeHighlightsWords;
+        return mergeHighlightWords;
     }
 
     public void setMergeHighlightWords(boolean mergeHighlightsWords) {
-        this.mergeHighlightsWords.set(mergeHighlightsWords);
+        this.mergeHighlightWords.set(mergeHighlightsWords);
     }
 
     public double getSidePaneWidth() {
