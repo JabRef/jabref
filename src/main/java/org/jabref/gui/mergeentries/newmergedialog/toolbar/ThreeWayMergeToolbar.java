@@ -68,11 +68,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
         plainTextOrDiffComboBox.getSelectionModel().select(preferencesService.getGuiPreferences().getMergePlainTextOrDiff());
 
-        plainTextOrDiffComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
-            preferencesService.getGuiPreferences().setMergePlainTextOrDiff(newValue);
-        });
-
-        plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
+        plainTextOrDiffComboBox.setConverter(new StringConverter<> () {
             @Override
             public String toString(PlainTextOrDiff plainTextOrDiff) {
                 return plainTextOrDiff.getValue();
@@ -87,9 +83,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         diffViewComboBox.disableProperty().bind(notShowDiffProperty());
         diffViewComboBox.getItems().addAll(DiffView.values());
         diffViewComboBox.getSelectionModel().select(preferencesService.getGuiPreferences().getMergeDiffView());
-        diffViewComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
-            preferencesService.getGuiPreferences().setMergeDiffView(newValue);
-        });
+
         diffViewComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(DiffView diffView) {
@@ -108,10 +102,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable -> {
             if (diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightCharactersRadioButtons)) {
                 diffHighlightingMethod.set(BasicDiffMethod.CHARS);
-                preferencesService.getGuiPreferences().setMergeHighlightWords(false);
             } else {
                 diffHighlightingMethod.set(BasicDiffMethod.WORDS);
-                preferencesService.getGuiPreferences().setMergeHighlightWords(true);
             }
         }));
 
@@ -181,6 +173,14 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
     public void setOnSelectRightEntryValuesButtonClicked(Runnable onClick) {
         selectRightEntryValuesButton.setOnMouseClicked(e -> onClick.run());
+    }
+
+    public void saveGuiPreferences() {
+        preferencesService.getGuiPreferences().setMergePlainTextOrDiff(plainTextOrDiffComboBox.getValue());
+        preferencesService.getGuiPreferences().setMergeDiffView(diffViewComboBox.getValue());
+
+        boolean highlightWordsRadioButtonValue = diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightWordsRadioButton);
+        preferencesService.getGuiPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);
     }
 
     public enum PlainTextOrDiff {
