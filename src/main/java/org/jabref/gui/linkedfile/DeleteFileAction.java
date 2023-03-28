@@ -120,7 +120,7 @@ public class DeleteFileAction extends SimpleCommand {
         Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
 
         if (file.isEmpty()) {
-            LOGGER.warn("Could not find file " + linkedFile.getLink());
+            LOGGER.warn("Could not find file {}", linkedFile.getLink());
         }
 
         if (file.isPresent()) {
@@ -129,8 +129,10 @@ public class DeleteFileAction extends SimpleCommand {
             } catch (
                     IOException ex) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Cannot delete file"), Localization.lang("File permission error"));
-                LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                LOGGER.warn("File permission error while deleting: {}", linkedFile, ex);
             }
+        } else {
+            dialogService.notify(Localization.lang("Error accessing file '%0'.", linkedFile.getLink()));
         }
     }
 }
