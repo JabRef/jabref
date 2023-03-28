@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -551,16 +550,11 @@ public class StringUtil {
      * @return list      {@link java.util.List} of <tt>String</tt>
      */
     public static List<String> tokenizeToList(String buf, String delimstr) {
-        List<String> list = new ArrayList<>();
         String buffer = buf + '\n';
 
-        StringTokenizer st = new StringTokenizer(buffer, delimstr);
+        String delimPatternString = Pattern.quote(delimstr).replaceAll("%", "|");
 
-        while (st.hasMoreTokens()) {
-            list.add(st.nextToken());
-        }
-
-        return list;
+        return Arrays.asList(buffer.split(delimPatternString));
     }
 
     public static String limitStringLength(String s, int maxLength) {

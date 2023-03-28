@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,9 +53,7 @@ public class KeywordList implements Iterable<Keyword> {
 
         KeywordList keywordList = new KeywordList();
 
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
-        while (tok.hasMoreTokens()) {
-            String chain = tok.nextToken();
+        for (String chain : keywordString.split(Pattern.quote(delimiter.toString()))) {
             Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
             keywordList.add(chainRoot);
         }
