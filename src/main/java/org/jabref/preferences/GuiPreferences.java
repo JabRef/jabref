@@ -53,7 +53,7 @@ public class GuiPreferences {
                           DiffMode mergeDiffMode,
                           PlainTextOrDiff mergePlainTextOrDiff,
                           DiffView mergeDiffView,
-                          boolean mergeHighlightsWords,
+                          boolean mergeHighlightWords,
                           double sidePaneWidth,
                           boolean mergeShowChangedFieldsOnly) {
         this.positionX = new SimpleDoubleProperty(positionX);
@@ -67,7 +67,7 @@ public class GuiPreferences {
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
         this.mergePlainTextOrDiff = new SimpleObjectProperty<>(mergePlainTextOrDiff);
         this.mergeDiffView = new SimpleObjectProperty<>(mergeDiffView);
-        this.mergeHighlightWords = new SimpleBooleanProperty(mergeHighlightsWords);
+        this.mergeHighlightWords = new SimpleBooleanProperty(mergeHighlightWords);
 
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
