@@ -25,7 +25,6 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -34,6 +33,7 @@ import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
+import org.jabref.model.util.FileNameCleaner;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GeneralPreferences;
 
@@ -354,7 +354,7 @@ public class StudyRepository {
      * Input: '"test driven"' as a query entry with id 12348765
      * Output: '12348765 - test driven'
      *
-     * Note that this method might be similar to {@link org.jabref.model.util.FileUtil#getValidFileName(String)} or {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName(String)}
+     * Note that this method might be similar to {@link org.jabref.model.util.FileUtil#getValidFileName(String)} or {@link org.jabref.model.util.FileNameCleaner#cleanFileName(String)}
      *
      * @param query that is trimmed and combined with its query id
      * @return a unique folder name for any query.

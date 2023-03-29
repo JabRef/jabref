@@ -1,4 +1,4 @@
-package org.jabref.logic.util.io;
+package org.jabref.model.util;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,13 +11,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.FileUtil;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -357,9 +359,84 @@ class FileUtilTest {
 
     @Test
     void testFindInListOfPath() {
+        // due to the added workaround for old JabRef behavior as both path starts with the same name they are considered equal
         List<Path> paths = List.of(existingTestFile, otherExistingTestFile, rootDir);
-        List<Path> resultPaths = List.of(existingTestFile, existingTestFile);
+        List<Path> resultPaths = List.of(existingTestFile);
         List<Path> result = FileUtil.findListOfFiles("existingTestFile.txt", paths);
         assertEquals(resultPaths, result);
+    }
+
+    @Test
+    public void extractFileExtension() {
+        final String filePath = FileUtil.class.getResource("pdffile.pdf").getPath();
+        assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
+    }
+
+    @Test
+    public void fileExtensionFromUrl() {
+        final String filePath = "https://link.springer.com/content/pdf/10.1007%2Fs40955-018-0121-9.pdf";
+        assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
+    }
+
+    @Test
+    public void testFileNameEmpty() {
+        Path path = Path.of("/");
+        assertEquals(Optional.of(path), FileUtil.find("", path));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"*", "?", ">", "\""})
+    public void testFileNameIllegal(String fileName) {
+        Path path = Path.of("/");
+        assertEquals(Optional.empty(), FileUtil.find(fileName, path));
+    }
+
+    @Test
+    public void testFindsFileInDirectory(@TempDir Path temp) throws Exception {
+        Path firstFilePath = temp.resolve("files");
+        Files.createDirectories(firstFilePath);
+        Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
+
+        assertEquals(Optional.of(firstFile), FileUtil.find("test.pdf", temp.resolve("files")));
+    }
+
+    @Test
+    public void testFindsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
+        Path firstFilePath = temp.resolve("files");
+        Files.createDirectories(firstFilePath);
+        Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
+
+        assertEquals(Optional.of(firstFile), FileUtil.find("files/test.pdf", temp.resolve("files")));
+    }
+
+    @Test
+    public void testDoesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
+        Path firstFilesPath = temp.resolve("files");
+        Path secondFilesPath = firstFilesPath.resolve("files");
+        Files.createDirectories(secondFilesPath);
+        Path testFile = secondFilesPath.resolve("test.pdf");
+        Files.createFile(testFile);
+        assertEquals(Optional.of(testFile.toAbsolutePath()), FileUtil.find("files/test.pdf", firstFilesPath));
+    }
+
+    public void testCTemp() {
+        String fileName = "c:\\temp.pdf";
+        if (OS.WINDOWS) {
+            assertFalse(FileUtil.detectBadFileName(fileName));
+        } else {
+            assertTrue(FileUtil.detectBadFileName(fileName));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/mnt/tmp/test.pdf"})
+    public void legalPaths(String fileName) {
+        assertFalse(FileUtil.detectBadFileName(fileName));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"te{}mp.pdf"})
+    public void illegalPaths(String fileName) {
+        assertTrue(FileUtil.detectBadFileName(fileName));
     }
 }

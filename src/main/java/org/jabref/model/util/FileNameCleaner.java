@@ -1,6 +1,4 @@
-package org.jabref.logic.util.io;
-
-import org.jabref.model.util.FileUtil;
+package org.jabref.model.util;
 
 /**
  * This class is based on http://stackoverflow.com/a/5626340/873282

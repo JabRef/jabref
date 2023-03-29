@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
-import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -62,7 +61,6 @@ public class FileUtil {
             123, 124, 125
     };
     // @formatter:on
-
 
     private FileUtil() {
     }
@@ -326,7 +324,7 @@ public class FileUtil {
      * @param rootDirectory the rootDirectory that will be searched
      * @return the path to the first file that matches the defined conditions
      */
-    public static Optional<Path> find(String filename, Path rootDirectory) {
+    public static Optional<Path> findSingleOld(String filename, Path rootDirectory) {
         try (Stream<Path> pathStream = Files.walk(rootDirectory)) {
             return pathStream
                              .filter(Files::isRegularFile)
@@ -337,6 +335,7 @@ public class FileUtil {
         }
         return Optional.empty();
     }
+
 
     public static Optional<Path> find(final BibDatabaseContext databaseContext, String fileName, FilePreferences filePreferences) {
         Objects.requireNonNull(fileName, "fileName");
@@ -364,6 +363,48 @@ public class FileUtil {
         return directories.stream()
                           .flatMap(directory -> find(fileName, directory).stream())
                           .findFirst();
+    }
+
+    /**
+     * Converts a relative filename to an absolute one, if necessary.
+     *
+     * @param fileName the filename (e.g., a .pdf file), may contain path separators
+     * @param directory the directory which should be search starting point
+     *
+     * @returns an empty optional if the file does not exist, otherwise, the absolute path
+     */
+    public static Optional<Path> find(String fileName, Path directory) {
+        Objects.requireNonNull(fileName);
+        Objects.requireNonNull(directory);
+
+        if (detectBadFileName(fileName)) {
+            LOGGER.error("Invalid characters in path for file {} ", fileName);
+            return Optional.empty();
+        }
+
+        // Explicitly check for an empty string, as File.exists returns true on that empty path, because it maps to the default jar location.
+        // If we then call toAbsoluteDir, it would always return the jar-location folder. This is not what we want here.
+        if (fileName.isEmpty()) {
+            return Optional.of(directory);
+        }
+
+        Path resolvedFile = directory.resolve(fileName);
+        if (Files.exists(resolvedFile)) {
+            return Optional.of(resolvedFile);
+        }
+
+        // get the furthest path element from root and check if our filename starts with the same name
+        // workaround for old JabRef behavior
+        String furthestDirFromRoot = directory.getFileName().toString();
+        if (fileName.startsWith(furthestDirFromRoot)) {
+            resolvedFile = directory.resolveSibling(fileName);
+        }
+
+        if (Files.exists(resolvedFile)) {
+            return Optional.of(resolvedFile);
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -420,7 +461,7 @@ public class FileUtil {
     /**
      * Detect illegal characters in given filename.
      *
-     * See also {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName}
+     * See also {@link org.jabref.model.util.FileNameCleaner#cleanFileName}
      *
      * @param fileName the fileName to detect
      * @return Boolean whether there is an illegal name.
