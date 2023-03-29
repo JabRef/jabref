@@ -12,8 +12,6 @@ import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.FileUtil;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -356,7 +354,7 @@ class FileUtilTest {
 
     @Test
     void testFindinPath() {
-        Optional<Path> resultPath1 = FileUtil.find("existingTestFile.txt", rootDir);
+        Optional<Path> resultPath1 = FileUtil.findSingleOld("existingTestFile.txt", rootDir);
         assertEquals(resultPath1.get().toString(), existingTestFile.toString());
     }
 
@@ -371,7 +369,7 @@ class FileUtilTest {
 
     @Test
     public void extractFileExtension() {
-        final String filePath = FileUtil.class.getResource("pdffile.pdf").getPath();
+        final String filePath = FileUtilTest.class.getResource("pdffile.pdf").getPath();
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
