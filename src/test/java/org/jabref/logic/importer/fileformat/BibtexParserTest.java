@@ -608,6 +608,32 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseRecognizesFinalSlashAsSlash() throws Exception {
+        ParserResult result = parser
+                .parse(new StringReader("""
+        @misc{,
+          test = {wired\\},
+        }
+        """));
+
+        assertEquals(
+                List.of(new BibEntry()
+                .withField(new UnknownField("test"), "wired\\")),
+                result.getDatabase().getEntries()
+        );
+    }
+
+    /**
+     * JabRef's heuristics is not able to parse this special case.
+     */
+    @Test
+    void parseFailsWithFinalSlashAsSlashWhenSingleLine() throws Exception {
+        ParserResult parserResult = parser.parse(new StringReader("@misc{, test = {wired\\}}"));
+        // In case JabRef was more relaxed, `assertFalse` would be provided here.
+        assertTrue(parserResult.hasWarnings());
+    }
+
+    @Test
     void parseRecognizesDateFieldWithConcatenation() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,date = {1-4~} # nov}"));

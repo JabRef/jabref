@@ -1,5 +1,6 @@
 package org.jabref.gui.edit;
 
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.web.WebView;
 
@@ -22,6 +23,7 @@ public class EditAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
     private final JabRefFrame frame;
+    private TextField text;
     private final StandardActions action;
     private final StateManager stateManager;
 
@@ -52,8 +54,12 @@ public class EditAction extends SimpleCommand {
                 // DELETE_ENTRY in text field should do forward delete
                 switch (action) {
                     case COPY -> textInput.copy();
+                    case UNDO -> textInput.undo();
+                    case REDO -> textInput.redo();
                     case CUT -> textInput.cut();
                     case PASTE -> textInput.paste();
+                    case DELETE -> textInput.clear();
+                    case SELECT_ALL -> textInput.selectAll();
                     case DELETE_ENTRY -> textInput.deleteNextChar();
                     default -> throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
                 }
