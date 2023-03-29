@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.types.EntryType;
@@ -33,12 +32,19 @@ public abstract class AbstractCitationKeyPattern {
         // A holder for fields of the entry to be used for the key
         List<String> fieldList = new ArrayList<>();
 
-        // Before we do anything, we add the parameter to the ArrayLIst
+        // Before we do anything, we add the parameter to the ArrayList
         fieldList.add(bibtexKeyPattern);
 
-        StringTokenizer tok = new StringTokenizer(bibtexKeyPattern, "[]", true);
-        while (tok.hasMoreTokens()) {
-            fieldList.add(tok.nextToken());
+        // regex to split around a character
+        String WITH_DELIMITER = "((?<=%1$s)|(?=%1$s))";
+
+        // Split around [ or ]
+        String[] bibtexKeyPatteStrings = bibtexKeyPattern.split(
+            String.format(WITH_DELIMITER, "\\[") + "|" + 
+            String.format(WITH_DELIMITER, "\\]")
+        );
+        for (String tokenString : bibtexKeyPatteStrings) {
+            fieldList.add(tokenString);
         }
         return fieldList;
     }

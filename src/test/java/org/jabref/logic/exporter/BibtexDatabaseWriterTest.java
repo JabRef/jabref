@@ -727,6 +727,49 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
+    void AbstractCitationKeyPatternParse() throws Exception {
+        AbstractCitationKeyPattern pattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
+        
+        pattern.setDefaultValue("[field1]spacer1[field2]spacer2[field3]");
+        List<String> expectedPattern = List.of(
+            "[field1]spacer1[field2]spacer2[field3]",
+            "[",
+            "field1",
+            "]",
+            "spacer1",
+            "[",
+            "field2",
+            "]",
+            "spacer2",
+            "[",
+            "field3",
+            "]"
+        );
+        assertEquals(expectedPattern, pattern.getDefaultValue());
+    }
+
+    @Test
+    void AbstractCitationKeyPatternParseEmptySpacer() throws Exception {
+        AbstractCitationKeyPattern pattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
+        
+        pattern.setDefaultValue("[field1][field2]spacer2[field3]");
+        List<String> expectedPattern = List.of(
+            "[field1][field2]spacer2[field3]",
+            "[",
+            "field1",
+            "]",
+            "[",
+            "field2",
+            "]",
+            "spacer2",
+            "[",
+            "field3",
+            "]"
+        );
+        assertEquals(expectedPattern, pattern.getDefaultValue());
+    }
+
+    @Test
     void writeBiblatexMode() throws Exception {
         metaData.setMode(BibDatabaseMode.BIBLATEX);
 
