@@ -51,8 +51,8 @@
             <mods:place>
                 <mods:placeTerm type="text">India</mods:placeTerm>
             </mods:place>
-            <mods:dateCaptured keyDate="yes">2000-11-11</mods:dateCaptured>
             <mods:dateCreated keyDate="yes">2000-11-10</mods:dateCreated>
+            <mods:dateCaptured keyDate="yes">2000-11-11</mods:dateCaptured>
             <mods:edition>2</mods:edition>
             <mods:issuance>monographic</mods:issuance>
             <mods:dateModified keyDate="yes">2000-12-10</mods:dateModified>

@@ -373,9 +373,9 @@ class ModsExporter extends Exporter {
             addDate("dateIssued", value, originInfo);
         } else if (field.equals(new UnknownField("created"))) {
             addDate("dateCreated", value, originInfo);
-        } else if (field.equals(new UnknownField("modified"))) {
+        } else if (field.equals(StandardField.MODIFICATIONDATE)) {
             addDate("dateModified", value, originInfo);
-        } else if (field.equals(new UnknownField("captured"))) {
+        } else if (field.equals(StandardField.CREATIONDATE)) {
             addDate("dateCaptured", value, originInfo);
         } else if (StandardField.PUBLISHER.equals(field)) {
             StringPlusLanguagePlusSupplied publisher = new StringPlusLanguagePlusSupplied();

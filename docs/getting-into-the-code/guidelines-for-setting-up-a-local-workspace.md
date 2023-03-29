@@ -85,7 +85,7 @@ In the following, we will use `c:\git-repositories` as base folder:
 ```cmd
 cd \
 mkdir git-repositories
-cd git-reposiroties
+cd git-repositories
 ```
 
 **Note that putting the repo jabref directly under `C:\` or any other drive letter under windows causes compile errors**
