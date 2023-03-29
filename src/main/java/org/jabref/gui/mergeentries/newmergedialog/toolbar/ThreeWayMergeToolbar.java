@@ -20,6 +20,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.google.common.base.Enums;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import jakarta.inject.Inject;
@@ -197,11 +198,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }
 
         public static PlainTextOrDiff parse(String name) {
-            try {
-                return PlainTextOrDiff.valueOf(name);
-            } catch (IllegalArgumentException e) {
-                return Diff; // default
-            }
+            return Enums.getIfPresent(PlainTextOrDiff.class, name).or(Diff);
         }
 
         public String getValue() {
@@ -223,11 +220,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }
 
         public static DiffView parse(String name) {
-            try {
-                return DiffView.valueOf(name);
-            } catch (IllegalArgumentException e) {
-                return UNIFIED; // default
-            }
+            return Enums.getIfPresent(DiffView.class, name).or(UNIFIED);
         }
 
         public String getValue() {
