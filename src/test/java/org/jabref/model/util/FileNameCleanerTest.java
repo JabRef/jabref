@@ -1,7 +1,5 @@
 package org.jabref.model.util;
 
-import org.jabref.model.util.FileNameCleaner;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

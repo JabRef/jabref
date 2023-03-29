@@ -336,7 +336,6 @@ public class FileUtil {
         return Optional.empty();
     }
 
-
     public static Optional<Path> find(final BibDatabaseContext databaseContext, String fileName, FilePreferences filePreferences) {
         Objects.requireNonNull(fileName, "fileName");
         return find(fileName, databaseContext.getFileDirectories(filePreferences));
