@@ -13,9 +13,9 @@ import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.util.FileUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,12 +128,12 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private Path relativize(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        return FileHelper.relativize(path, fileDirectories);
+        return FileUtil.relativize(path, fileDirectories);
     }
 
     private Path expandPath(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        return FileHelper.find(path.toString(), fileDirectories).orElse(path);
+        return FileUtil.find(path.toString(), fileDirectories).orElse(path);
     }
 
     private List<Path> getFileDirectoriesAsPaths() {

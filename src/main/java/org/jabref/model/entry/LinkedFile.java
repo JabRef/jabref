@@ -18,7 +18,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.util.FileHelper;
+import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.FilePreferences;
 
 /**
@@ -192,7 +192,7 @@ public class LinkedFile implements Serializable {
                     return Optional.empty();
                 }
             } else {
-                return FileHelper.find(link.get(), directories);
+                return FileUtil.find(link.get(), directories);
             }
         } catch (InvalidPathException ex) {
             return Optional.empty();

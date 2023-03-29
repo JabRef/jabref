@@ -9,11 +9,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.util.FileHelper;
+import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
@@ -124,7 +123,7 @@ public class LinkedFileHandler {
     public String getSuggestedFileName() {
         String oldFileName = fileEntry.getLink();
 
-        String extension = FileHelper.getFileExtension(oldFileName).orElse(fileEntry.getFileType());
+        String extension = FileUtil.getFileExtension(oldFileName).orElse(fileEntry.getFileType());
         return getSuggestedFileName(extension);
     }
 

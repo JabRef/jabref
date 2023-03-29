@@ -18,9 +18,9 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;

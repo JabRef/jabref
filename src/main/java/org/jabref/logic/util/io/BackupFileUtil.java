@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.OS;
+import org.jabref.model.util.FileUtil;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;

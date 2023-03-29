@@ -18,12 +18,11 @@ import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.FileHelper;
+import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
@@ -127,7 +126,7 @@ public class AutoSetFileLinksUtil {
                                              });
 
             if (!fileAlreadyLinked) {
-                Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
+                Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
                                                             .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
                                                             .orElse(Optional.of(new UnknownExternalFileType("")));
 

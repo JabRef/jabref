@@ -1,10 +1,11 @@
-package org.jabref.logic.util.io;
+package org.jabref.model.util;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -22,11 +23,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
+import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.FileHelper;
-import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,23 @@ public class FileUtil {
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
+
+    /**
+     * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
+     */
+    // @formatter:off
+    private static final int[] ILLEGAL_CHARS = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            30, 31, 34,
+            42,
+            58, // ":"
+            60, 62, 63,
+            123, 124, 125
+    };
+    // @formatter:on
+
 
     private FileUtil() {
     }
@@ -320,6 +338,34 @@ public class FileUtil {
         return Optional.empty();
     }
 
+    public static Optional<Path> find(final BibDatabaseContext databaseContext, String fileName, FilePreferences filePreferences) {
+        Objects.requireNonNull(fileName, "fileName");
+        return find(fileName, databaseContext.getFileDirectories(filePreferences));
+    }
+
+    /**
+     * Converts a relative filename to an absolute one, if necessary. Returns
+     * an empty optional if the file does not exist.
+     * <p>
+     * Will look in each of the given directories starting from the beginning and
+     * returning the first found file to match if any.
+     */
+    public static Optional<Path> find(String fileName, List<Path> directories) {
+        if (directories.isEmpty()) {
+            // Fallback, if no directories to resolve are passed
+            Path path = Path.of(fileName);
+            if (path.isAbsolute()) {
+                return Optional.of(path);
+            } else {
+                return Optional.empty();
+            }
+        }
+
+        return directories.stream()
+                          .flatMap(directory -> find(fileName, directory).stream())
+                          .findFirst();
+    }
+
     /**
      * Finds a file inside a list of directory structures. Will also look for the file inside nested directories.
      *
@@ -327,7 +373,7 @@ public class FileUtil {
      * @param directories the directories that will be searched
      * @return a list including all found paths to files that match the defined conditions
      */
-    public static List<Path> find(String filename, List<Path> directories) {
+    public static List<Path> findListOfFiles(String filename, List<Path> directories) {
         List<Path> files = new ArrayList<>();
         for (Path dir : directories) {
             FileUtil.find(filename, dir).ifPresent(files::add);
@@ -369,5 +415,37 @@ public class FileUtil {
      */
     public static Path getInitialDirectory(BibDatabaseContext databaseContext, Path workingDirectory) {
         return databaseContext.getDatabasePath().map(Path::getParent).orElse(workingDirectory);
+    }
+
+    /**
+     * Detect illegal characters in given filename.
+     *
+     * See also {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName}
+     *
+     * @param fileName the fileName to detect
+     * @return Boolean whether there is an illegal name.
+     */
+    public static boolean detectBadFileName(String fileName) {
+        // fileName could be a path, we want to check the fileName only (and don't care about the path)
+        // Reason: Handling of "c:\temp.pdf" is difficult, because ":" is an illegal character in the file name,
+        //         but a perfectly legal one in the path at this position
+        try {
+            fileName = Path.of(fileName).getFileName().toString();
+        } catch (InvalidPathException e) {
+            // in case the internal method cannot parse the path, it is surely illegal
+            return true;
+        }
+
+        for (int i = 0; i < fileName.length(); i++) {
+            char c = fileName.charAt(i);
+            if (!isCharLegal(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isCharLegal(char c) {
+        return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
     }
 }

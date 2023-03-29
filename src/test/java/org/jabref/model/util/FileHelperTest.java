@@ -22,26 +22,26 @@ class FileHelperTest {
     @Test
     public void extractFileExtension() {
         final String filePath = FileHelperTest.class.getResource("pdffile.pdf").getPath();
-        assertEquals(Optional.of("pdf"), FileHelper.getFileExtension(filePath));
+        assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
     @Test
     public void fileExtensionFromUrl() {
         final String filePath = "https://link.springer.com/content/pdf/10.1007%2Fs40955-018-0121-9.pdf";
-        assertEquals(Optional.of("pdf"), FileHelper.getFileExtension(filePath));
+        assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
     @Test
     public void testFileNameEmpty() {
         Path path = Path.of("/");
-        assertEquals(Optional.of(path), FileHelper.find("", path));
+        assertEquals(Optional.of(path), FileUtil.find("", path));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"*", "?", ">", "\""})
     public void testFileNameIllegal(String fileName) {
         Path path = Path.of("/");
-        assertEquals(Optional.empty(), FileHelper.find(fileName, path));
+        assertEquals(Optional.empty(), FileUtil.find(fileName, path));
     }
 
     @Test
@@ -50,7 +50,7 @@ class FileHelperTest {
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
 
-        assertEquals(Optional.of(firstFile), FileHelper.find("test.pdf", temp.resolve("files")));
+        assertEquals(Optional.of(firstFile), FileUtil.find("test.pdf", temp.resolve("files")));
     }
 
     @Test
@@ -59,7 +59,7 @@ class FileHelperTest {
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
 
-        assertEquals(Optional.of(firstFile), FileHelper.find("files/test.pdf", temp.resolve("files")));
+        assertEquals(Optional.of(firstFile), FileUtil.find("files/test.pdf", temp.resolve("files")));
     }
 
     @Test
@@ -69,27 +69,27 @@ class FileHelperTest {
         Files.createDirectories(secondFilesPath);
         Path testFile = secondFilesPath.resolve("test.pdf");
         Files.createFile(testFile);
-        assertEquals(Optional.of(testFile.toAbsolutePath()), FileHelper.find("files/test.pdf", firstFilesPath));
+        assertEquals(Optional.of(testFile.toAbsolutePath()), FileUtil.find("files/test.pdf", firstFilesPath));
     }
 
     public void testCTemp() {
         String fileName = "c:\\temp.pdf";
         if (OS.WINDOWS) {
-            assertFalse(FileHelper.detectBadFileName(fileName));
+            assertFalse(FileUtil.detectBadFileName(fileName));
         } else {
-            assertTrue(FileHelper.detectBadFileName(fileName));
+            assertTrue(FileUtil.detectBadFileName(fileName));
         }
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"/mnt/tmp/test.pdf"})
     public void legalPaths(String fileName) {
-        assertFalse(FileHelper.detectBadFileName(fileName));
+        assertFalse(FileUtil.detectBadFileName(fileName));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"te{}mp.pdf"})
     public void illegalPaths(String fileName) {
-        assertTrue(FileHelper.detectBadFileName(fileName));
+        assertTrue(FileUtil.detectBadFileName(fileName));
     }
 }

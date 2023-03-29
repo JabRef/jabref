@@ -28,13 +28,13 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.FilePreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;

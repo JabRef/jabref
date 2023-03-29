@@ -17,7 +17,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.util.FileHelper;
+import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -72,7 +72,7 @@ public class ActionHelper {
                     return true;
                 }
 
-                Optional<Path> filename = FileHelper.find(
+                Optional<Path> filename = FileUtil.find(
                         stateManager.getActiveDatabase().get(),
                         files.get(0).getLink(),
                         preferencesService.getFilePreferences());

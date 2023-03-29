@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.FilePreferences;
 
 public class RelativePathsCleanup implements CleanupJob {

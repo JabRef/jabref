@@ -52,7 +52,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileHelper;
+import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -338,7 +338,7 @@ public class ArgumentProcessor {
         for (String fileName : pdfs) {
             Path filePath = Path.of(fileName);
             if (!filePath.isAbsolute()) {
-                filePath = FileHelper.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileHelper.find(fileName, List.of(Path.of("").toAbsolutePath())).orElse(filePath));
+                filePath = FileUtil.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileUtil.find(fileName, List.of(Path.of("").toAbsolutePath())).orElse(filePath));
             }
             if (Files.exists(filePath)) {
                 try {
