@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.scene.paint.Color;
 
+import org.jabref.logic.util.FileUtil;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
@@ -19,7 +20,6 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileUtil;
 
 public class GroupSerializer {
     private static String serializeAllEntriesGroup() {

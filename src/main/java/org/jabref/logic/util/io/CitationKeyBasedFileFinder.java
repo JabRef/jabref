@@ -18,10 +18,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileNameCleaner;
-import org.jabref.model.util.FileUtil;
 
 class CitationKeyBasedFileFinder implements FileFinder {
 

@@ -21,9 +21,9 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.FilePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;

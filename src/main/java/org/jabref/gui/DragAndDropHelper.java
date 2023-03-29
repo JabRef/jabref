@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import javafx.scene.input.Dragboard;
 
-import org.jabref.model.util.FileUtil;
+import org.jabref.logic.util.FileUtil;
 
 public class DragAndDropHelper {
 

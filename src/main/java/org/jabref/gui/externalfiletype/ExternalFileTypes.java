@@ -11,9 +11,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.FilePreferences;
 
 // Do not make this class final, as it otherwise can't be mocked for tests

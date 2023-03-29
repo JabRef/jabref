@@ -16,8 +16,8 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileUtil;
 
 public class FileFilterConverter {
 

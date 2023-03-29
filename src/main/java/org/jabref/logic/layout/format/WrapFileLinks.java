@@ -9,8 +9,8 @@ import java.util.Map;
 
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.util.FileUtil;
 
 /**
  * This formatter iterates over all file links, or all file links of a specified

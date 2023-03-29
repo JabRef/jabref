@@ -51,6 +51,7 @@ import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -66,7 +67,6 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;

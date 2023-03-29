@@ -13,11 +13,11 @@ import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;

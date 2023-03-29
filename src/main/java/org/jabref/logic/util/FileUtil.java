@@ -1,4 +1,4 @@
-package org.jabref.model.util;
+package org.jabref.logic.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +23,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
+import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
@@ -460,7 +462,7 @@ public class FileUtil {
     /**
      * Detect illegal characters in given filename.
      *
-     * See also {@link org.jabref.model.util.FileNameCleaner#cleanFileName}
+     * See also {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName}
      *
      * @param fileName the fileName to detect
      * @return Boolean whether there is an illegal name.

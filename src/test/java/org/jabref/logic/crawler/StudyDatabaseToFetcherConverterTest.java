@@ -13,10 +13,10 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.GeneralPreferences;
 
 import org.junit.jupiter.api.Assertions;

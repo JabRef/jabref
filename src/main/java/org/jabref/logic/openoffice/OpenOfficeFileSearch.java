@@ -13,8 +13,8 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.util.FileUtil;
 import org.jabref.logic.util.OS;
-import org.jabref.model.util.FileUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

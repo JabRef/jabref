@@ -14,7 +14,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.jabref.logic.util.BackupFileType;
-import org.jabref.model.util.FileUtil;
+import org.jabref.logic.util.FileUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

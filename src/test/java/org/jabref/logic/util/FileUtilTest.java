@@ -1,4 +1,4 @@
-package org.jabref.model.util;
+package org.jabref.logic.util;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -10,7 +10,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -30,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
+@AllowedToUseLogic("uses OS from logic package")
 class FileUtilTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtilTest.class);
 

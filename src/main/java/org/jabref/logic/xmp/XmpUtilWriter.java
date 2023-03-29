@@ -16,12 +16,12 @@ import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.schema.DublinCoreSchemaCustom;
-import org.jabref.model.util.FileUtil;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;

@@ -25,9 +25,9 @@ import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.FileUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.action.Action;

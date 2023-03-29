@@ -1,4 +1,6 @@
-package org.jabref.model.util;
+package org.jabref.logic.util;
+
+import org.jabref.logic.util.io.FileNameCleaner;
 
 import org.junit.jupiter.api.Test;
 
