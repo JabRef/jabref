@@ -37,7 +37,7 @@ public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
         this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, replaceEntries);
         this.setResultConverter(buttonType -> {
             if (buttonType.equals(replaceEntries)) {
-                threeWayMergeView.getThreeWayToolbar().saveGuiPreferences();
+                threeWayMergeView.saveToolbarGuiPreferences();
                 return new EntriesMergeResult(one, two, threeWayMergeView.getLeftEntry(), threeWayMergeView.getRightEntry(), threeWayMergeView.getMergedEntry());
             } else {
                 return null;

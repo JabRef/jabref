@@ -192,7 +192,7 @@ public class ThreeWayMergeView extends VBox {
         return viewModel.getRightEntry();
     }
 
-    public ThreeWayMergeToolbar getThreeWayToolbar() {
-        return toolbar;
+    public void saveToolbarGuiPreferences() {
+        toolbar.saveGuiPreferences();
     }
 }
