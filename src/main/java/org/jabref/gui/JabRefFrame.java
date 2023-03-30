@@ -40,7 +40,6 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -851,7 +850,6 @@ public class JabRefFrame extends BorderPane {
                         event.consume();
                     }
                 });
-
 
         // @formatter:off
         library.getItems().addAll(
