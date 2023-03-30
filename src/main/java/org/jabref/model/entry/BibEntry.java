@@ -45,6 +45,7 @@ import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -304,26 +305,6 @@ public class BibEntry implements Cloneable {
         return ((database == null) || result.isEmpty()) ?
                 result :
                 Optional.of(database.resolveForStrings(result.get()));
-    }
-
-    public OptionalBinding<String> genericGetResolvedFieldOrAliasBinding(Field field, BibDatabase database) {
-        OptionalBinding<String> result = getFieldBinding(field);
-        // If this field is not set, and the entry has a crossref, try to look up the
-        // field in the referred entry, following the biblatex rules
-        if (result.isEmpty().get() && (database != null)) {
-            Optional<BibEntry> referred = database.getReferencedEntry(this);
-            if (referred.isPresent()) {
-                EntryType sourceEntry = referred.get().type.get();
-                EntryType targetEntry = type.get();
-                Optional<Field> sourceField = getSourceField(field, targetEntry, sourceEntry);
-
-                if (sourceField.isPresent()) {
-                    result = EasyBind.valueAt(referred.get().getFieldsObservable(), field);
-                }
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -992,6 +973,29 @@ public class BibEntry implements Cloneable {
         }
 
         return FileFieldParser.parse(oldValue.get());
+    }
+
+    /**
+     * Gets a bound list of linked files.
+     *
+     * @param database maybenull
+     *                 The database of the bibtex entry.
+     * @return the list of linked files, is never null but can be empty.
+     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}
+     */
+    public EasyBinding<List<LinkedFile>> getFiles(BibDatabase database) {
+        OptionalBinding<String> result = getFieldBinding(StandardField.FILE);
+
+        // If there are no files on this entry we will fetch them from the referred entry.
+        if (result.isEmpty().get() && database != null) {
+            Optional<BibEntry> referred = database.getReferencedEntry(this);
+
+            if (referred.isPresent()) {
+                result = EasyBind.valueAt(referred.get().getFieldsObservable(), StandardField.FILE);
+            }
+        }
+
+        return result.mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
     }
 
     public void setDate(Date date) {
