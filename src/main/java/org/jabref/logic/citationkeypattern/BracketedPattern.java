@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.StringJoiner;
-import java.util.StringTokenizer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -216,21 +215,30 @@ public class BracketedPattern {
      * @return The expanded pattern. Not null.
      */
     public static String expandBrackets(String pattern, Function<String, String> bracketContentHandler) {
+        // regex to split around a character
+        String WITH_DELIMITER = "((?<=%1$s)|(?=%1$s))";
+        // for character either of the following characters:  [ ] " \\
+        String delimWithReturn = (
+            String.format(WITH_DELIMITER, "\\[") + "|" + 
+            String.format(WITH_DELIMITER, "\\]") + "|" + 
+            String.format(WITH_DELIMITER, "\\\"") + "|" + 
+            String.format(WITH_DELIMITER, "\\\\")
+        );
         Objects.requireNonNull(pattern);
         StringBuilder expandedPattern = new StringBuilder();
-        StringTokenizer parsedPattern = new StringTokenizer(pattern, "\\[]\"", true);
+        Scanner patternScanner = new Scanner(pattern).useDelimiter(delimWithReturn);
 
-        while (parsedPattern.hasMoreTokens()) {
-            String token = parsedPattern.nextToken();
+        while (patternScanner.hasNext()) {
+            String token = patternScanner.next();
             switch (token) {
-                case "\"" -> appendQuote(expandedPattern, parsedPattern);
+                case "\"" -> appendQuote(expandedPattern, patternScanner);
                 case "[" -> {
-                    String fieldMarker = contentBetweenBrackets(parsedPattern, pattern);
+                    String fieldMarker = contentBetweenBrackets(patternScanner, pattern);
                     expandedPattern.append(bracketContentHandler.apply(fieldMarker));
                 }
                 case "\\" -> {
-                    if (parsedPattern.hasMoreTokens()) {
-                        expandedPattern.append(parsedPattern.nextToken());
+                    if (patternScanner.hasNext()) {
+                        expandedPattern.append(patternScanner.next());
                     } else {
                         LOGGER.warn("Found a \"\\\" that is not part of an escape sequence");
                     }
@@ -239,6 +247,7 @@ public class BracketedPattern {
             }
         }
 
+        patternScanner.close();
         return expandedPattern.toString();
     }
 
@@ -246,22 +255,22 @@ public class BracketedPattern {
      * Returns the content enclosed between brackets, including enclosed quotes, and excluding the paired enclosing brackets.
      * There may be brackets in it.
      * Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
-     * is encountered, and has been consumed, by the {@code StringTokenizer}.
+     * is encountered, and has been consumed, by the {@code Scanner}.
      *
      * @param pattern   pattern used by {@code expandBrackets}, used for logging
-     * @param tokenizer the tokenizer producing the tokens
+     * @param scanner   the scanner producing the tokens
      * @return the content enclosed by brackets
      */
-    private static String contentBetweenBrackets(StringTokenizer tokenizer, final String pattern) {
+    private static String contentBetweenBrackets(Scanner scanner, final String pattern) {
         StringBuilder bracketContent = new StringBuilder();
         boolean foundClosingBracket = false;
         int subBrackets = 0;
         // make sure to read until the paired ']'
-        while (tokenizer.hasMoreTokens() && !foundClosingBracket) {
-            String token = tokenizer.nextToken();
+        while (scanner.hasNext() && !foundClosingBracket) {
+            String token = scanner.next();
             // If the beginning of a quote is found, append the content
             switch (token) {
-                case "\"" -> appendQuote(bracketContent, tokenizer);
+                case "\"" -> appendQuote(bracketContent, scanner);
                 case "]" -> {
                     if (subBrackets == 0) {
                         foundClosingBracket = true;
@@ -289,16 +298,16 @@ public class BracketedPattern {
     /**
      * Appends the content between, and including, two \" to the provided <code>StringBuilder</code>. Intended to be
      * used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a \" is
-     * encountered by the StringTokenizer.
+     * encountered by the Scanner.
      *
      * @param stringBuilder the <code>StringBuilder</code> to which tokens will be appended
-     * @param tokenizer     the tokenizer producing the tokens
+     * @param scanner       the scanner producing the tokens
      */
-    private static void appendQuote(StringBuilder stringBuilder, StringTokenizer tokenizer) {
+    private static void appendQuote(StringBuilder stringBuilder, Scanner scanner) {
         stringBuilder.append("\"");  // We know that the previous token was \"
         String token = "";
-        while (tokenizer.hasMoreTokens() && !"\"".equals(token)) {
-            token = tokenizer.nextToken();
+        while (scanner.hasNext() && !"\"".equals(token)) {
+            token = scanner.next();
             stringBuilder.append(token);
         }
     }
