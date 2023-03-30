@@ -44,7 +44,17 @@ public class Date {
                 "uuuu.M.d",                             // covers 2015.1.15
                 "uuuu",                                 // covers 2015
                 "MMM, uuuu",                            // covers Jan, 2020
-                "uuuu.MM.d"                             // covers 2015.10.15
+                "uuuu.MM.d",                            // covers 2015.10.15
+                "y-",                                   // covers 2015-
+                "-y",                                   // covers -2015
+                "y-M/y-M",                              // covers 2015-01/2015-02
+                "MMMM y/MMMM y",                        // covers January 2015/February 2015
+                "d MMMM y/d MMMM y",                    // covers 20 January 2015/20 February 2015
+                "y G",                                  // covers 1 BC
+                "y G / y G",                            // covers 30 BC / 5 AD
+                "yyyy G / yyyy G",                      // covers 0030 BC / 0005 AD
+                "yyyy-MM G / yyyy-MM G",                // covers 0030-01 BC / 0005-02 AD
+                "y?"                                    // covers 2023?
                 );
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
