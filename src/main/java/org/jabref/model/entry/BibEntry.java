@@ -306,6 +306,26 @@ public class BibEntry implements Cloneable {
                 Optional.of(database.resolveForStrings(result.get()));
     }
 
+    public OptionalBinding<String> genericGetResolvedFieldOrAliasBinding(Field field, BibDatabase database) {
+        OptionalBinding<String> result = getFieldBinding(field);
+        // If this field is not set, and the entry has a crossref, try to look up the
+        // field in the referred entry, following the biblatex rules
+        if (result.isEmpty().get() && (database != null)) {
+            Optional<BibEntry> referred = database.getReferencedEntry(this);
+            if (referred.isPresent()) {
+                EntryType sourceEntry = referred.get().type.get();
+                EntryType targetEntry = type.get();
+                Optional<Field> sourceField = getSourceField(field, targetEntry, sourceEntry);
+
+                if (sourceField.isPresent()) {
+                    result = EasyBind.valueAt(referred.get().getFieldsObservable(), field);
+                }
+            }
+        }
+
+        return result;
+    }
+
     /**
      * Returns this entry's ID.
      */

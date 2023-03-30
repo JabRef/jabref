@@ -49,7 +49,7 @@ public class BibEntryTableViewModel {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
 
-        this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
+        this.linkedFiles = entry.genericGetResolvedFieldOrAliasBinding(StandardField.FILE, bibDatabaseContext.getDatabase()).mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
@@ -79,10 +79,10 @@ public class BibEntryTableViewModel {
         return new UiThreadBinding<>(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
                 (a, b) ->
                         database.getMetaData().getGroups().map(groupTreeNode ->
-                                groupTreeNode.getMatchingGroups(entry).stream()
-                                             .map(GroupTreeNode::getGroup)
-                                             .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
-                                             .collect(Collectors.toList()))
+                                        groupTreeNode.getMatchingGroups(entry).stream()
+                                                     .map(GroupTreeNode::getGroup)
+                                                     .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
+                                                     .collect(Collectors.toList()))
                                 .orElse(Collections.emptyList())));
     }
 
