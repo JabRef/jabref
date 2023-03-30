@@ -18,6 +18,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -39,6 +40,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -842,6 +844,14 @@ public class JabRefFrame extends BorderPane {
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, this, dialogService, prefs, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, this, dialogService, prefs, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, this, dialogService, prefs, undoManager, stateManager));
+                edit.addEventHandler(ActionEvent.ACTION, event -> {
+                    // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
+                    // If the mainscreen is not focused, the actions captured by menu are consumed.
+                    if (OS.OS_X && !mainStage.focusedProperty().get()) {
+                        event.consume();
+                    }
+                });
+
 
         // @formatter:off
         library.getItems().addAll(
