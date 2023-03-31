@@ -43,8 +43,31 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     private final JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
 
+    private PreferencesTab tabToBeFound;
+
     public PreferencesDialogView(JabRefFrame frame) {
         this.frame = frame;
+        this.setTitle(Localization.lang("JabRef preferences"));
+
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
+
+        ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
+
+        // Stop the default button from firing when the user hits enter within the search box
+        searchBox.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                event.consume();
+            }
+        });
+
+        themeManager.updateFontStyle(getDialogPane().getScene());
+    }
+
+    public PreferencesDialogView(JabRefFrame frame, PreferencesTab tabToBeFound) {
+        this.frame = frame;
+        this.tabToBeFound = tabToBeFound;
         this.setTitle(Localization.lang("JabRef preferences"));
 
         ViewLoader.view(this)
@@ -100,12 +123,26 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             }
         });
 
-        preferenceTabList.getSelectionModel().selectFirst();
+        if (this.tabToBeFound != null) {
+            preferenceTabList.getSelectionModel().select(findPreferencesTab(this.tabToBeFound));
+        } else {
+            preferenceTabList.getSelectionModel().selectFirst();
+        }
         new ViewModelListCellFactory<PreferencesTab>()
                 .withText(PreferencesTab::getTabName)
                 .install(preferenceTabList);
 
         viewModel.setValues();
+    }
+
+    PreferencesTab findPreferencesTab(PreferencesTab tabToBeFound) {
+        for (int i = 0; i < viewModel.getPreferenceTabs().size(); i++) {
+            boolean isTabFound = viewModel.getPreferenceTabs().get(i).getTabName().equals(tabToBeFound.getTabName());
+            if (isTabFound) {
+                return viewModel.getPreferenceTabs().get(i);
+            }
+        }
+        return null;
     }
 
     @FXML

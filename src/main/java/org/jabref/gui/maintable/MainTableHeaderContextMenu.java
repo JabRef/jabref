@@ -5,12 +5,17 @@ import java.util.List;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.layout.StackPane;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.preferences.ShowPreferencesAction;
+import org.jabref.gui.preferences.table.TableTab;
 
 public class MainTableHeaderContextMenu extends ContextMenu {
 
@@ -75,6 +80,11 @@ public class MainTableHeaderContextMenu extends ContextMenu {
             RightClickMenuItem itemToAdd = createMenuItem(tableColumn, false);
             this.getItems().add(itemToAdd);
         }
+
+        this.getItems().add(separator);
+
+        RightClickMenuMoreItem itemToAdd = new RightClickMenuMoreItem("More");
+        this.getItems().add(itemToAdd);
     }
 
     /**
@@ -222,6 +232,22 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         public boolean isVisibleInTable() {
             return visibleInTable;
+        }
+    }
+
+    /**
+     * RightClickMenuMoreItem: A special menu item that opens the Preferences > Entry table window
+     *
+     */
+    private class RightClickMenuMoreItem extends MenuItem {
+
+        RightClickMenuMoreItem(String displayName) {
+            super(displayName);
+
+            // Set action to open the Preferences > Entry table window
+            this.setOnAction(event -> {
+                new ShowPreferencesAction(JabRefGUI.getMainFrame(), Globals.TASK_EXECUTOR, new TableTab()).execute();
+            });
         }
     }
 }
