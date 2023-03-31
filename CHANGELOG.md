@@ -50,7 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the password is saved locally if user wants to use proxy with authentication [#8055](https://github.com/JabRef/jabref/issues/8055)
 - JabRef is now more relaxed when parsing field content: In case a field content ended with `\`, the combination `\}` was treated as plain `}`. [#9668](https://github.com/JabRef/jabref/issues/9668)
 - We resolved an issue that cut off the number of group entries when it exceedet four digits. [#8797](https://github.com/JabRef/jabref/issues/8797)
-
+- We fixed an issue where the Global Search UI preview is still white in dark theme. [#9362](https://github.com/JabRef/jabref/issues/9362)
 
 ### Removed
 
