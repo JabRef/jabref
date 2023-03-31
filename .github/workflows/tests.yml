@@ -61,7 +61,7 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
-        run: xvfb-run --auto-servernum ./gradlew clean && ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
+        run: ./gradlew clean && xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
         env:
           CI: "true"
       - name: Format failed test results
@@ -127,7 +127,7 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
-        run: xvfb-run --auto-servernum ./gradlew clean && ./gradlew guiTest
+        run: ./gradlew clean && xvfb-run --auto-servernum ./gradlew guiTest
         env:
           CI: "true"
   codecoverage:
