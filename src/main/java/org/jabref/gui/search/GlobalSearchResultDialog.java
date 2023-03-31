@@ -7,6 +7,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -75,6 +76,15 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             keepOnTop.setGraphic(value
                     ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
                     : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
+        });
+
+        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
+            getDialogPane().setPrefHeight(viewModel.searchWindowHeight());
+            getDialogPane().setPrefWidth(viewModel.searchWindowWidth());
+        });
+
+        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
+            viewModel.updateWindowSize((int) getHeight(), (int) getWidth());
         });
     }
 }
