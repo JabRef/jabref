@@ -15,8 +15,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.mergeentries.DiffMode;
-import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar.DiffView;
-import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar.PlainTextOrDiff;
 import org.jabref.logic.util.io.FileHistory;
 
 public class GuiPreferences {

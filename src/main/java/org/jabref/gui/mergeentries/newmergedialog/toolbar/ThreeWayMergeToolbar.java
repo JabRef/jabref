@@ -24,7 +24,6 @@ import com.google.common.base.Enums;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import jakarta.inject.Inject;
-import org.apache.commons.lang3.builder.Diff;
 
 public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML

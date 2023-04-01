@@ -55,8 +55,6 @@ import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.gui.mergeentries.DiffMode;
-import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar.DiffView;
-import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar.PlainTextOrDiff;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
