@@ -17,6 +17,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -67,8 +68,6 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     public void initialize() {
         showDiff = EasyBind.map(plainTextOrDiffComboBox.valueProperty(), plainTextOrDiff -> plainTextOrDiff == PlainTextOrDiff.Diff);
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
-        PlainTextOrDiff plainTextOrDiffPreference = preferencesService.getGuiPreferences().getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;
-        plainTextOrDiffComboBox.getSelectionModel().select(plainTextOrDiffPreference);
 
         plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
             @Override
@@ -84,8 +83,6 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         diffViewComboBox.disableProperty().bind(notShowDiffProperty());
         diffViewComboBox.getItems().addAll(DiffView.values());
-        DiffView diffViewPreference = preferencesService.getGuiPreferences().getMergeShouldShowUnifiedDiff() ? DiffView.UNIFIED : DiffView.SPLIT;
-        diffViewComboBox.getSelectionModel().select(diffViewPreference);
 
         diffViewComboBox.setConverter(new StringConverter<>() {
             @Override
@@ -110,12 +107,22 @@ public class ThreeWayMergeToolbar extends AnchorPane {
             }
         }));
 
-        diffHighlightingMethodToggleGroup.selectToggle(preferencesService.getGuiPreferences().getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
-        plainTextOrDiffComboBox.valueProperty().set(plainTextOrDiffPreference);
-        diffViewComboBox.valueProperty().set(diffViewPreference);
-
         onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty());
         onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
+
+        loadStoredPreferences();
+    }
+
+    private void loadStoredPreferences() {
+        GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+
+        PlainTextOrDiff plainTextOrDiffPreference = guiPreferences.getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;
+        plainTextOrDiffComboBox.getSelectionModel().select(plainTextOrDiffPreference);
+
+        DiffView diffViewPreference = guiPreferences.getMergeShouldShowUnifiedDiff() ? DiffView.UNIFIED : DiffView.SPLIT;
+        diffViewComboBox.getSelectionModel().select(diffViewPreference);
+
+        diffHighlightingMethodToggleGroup.selectToggle(guiPreferences.getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {
