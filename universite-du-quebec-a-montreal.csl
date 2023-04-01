@@ -408,6 +408,12 @@
               <text variable="year-suffix"/>
             </group>
           </if>
+          <else>
+            <group delimiter="-" prefix="(" suffix=")">
+              <date date-parts="year" form="text" variable="issued"/>
+              <text variable="year-suffix"/>
+            </group>
+          </else>
         </choose>
       </else-if>
       <else-if variable="issued">
@@ -511,10 +517,20 @@
         <text variable="year-suffix"/>
       </if>
       <else-if match="any" variable="status">
-        <group delimiter="-">
-          <text variable="status"/>
-          <text variable="year-suffix"/>
-        </group>
+        <choose>
+          <if match="none" variable="issued">
+            <group delimiter="-">
+              <text variable="status"/>
+              <text variable="year-suffix"/>
+            </group>
+          </if>
+          <else>
+            <group>
+              <date date-parts="year" form="text" variable="issued"/>
+              <text variable="year-suffix"/>
+            </group>
+          </else>
+        </choose>
       </else-if>
       <else-if variable="issued">
         <choose>
