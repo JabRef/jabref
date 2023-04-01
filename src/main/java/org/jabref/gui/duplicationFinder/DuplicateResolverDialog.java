@@ -149,7 +149,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         getDialogPane().setContent(borderPane);
     }
 
-    private void saveThreeWayMergeToolbarPreferences(){
+    private void saveThreeWayMergeToolbarPreferences() {
         threeWayMerge.saveToolbarGuiPreferences();
     }
 
