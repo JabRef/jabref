@@ -244,7 +244,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void update() {
         if (entry.isEmpty() || (layout == null)) {
-            // Nothing to do
+            // Make sure that the preview panel is not completely white, especially with dark theme on
+            setPreviewText("");
             return;
         }
 
