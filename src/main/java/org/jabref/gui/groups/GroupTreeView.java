@@ -70,12 +70,16 @@ public class GroupTreeView extends BorderPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeView.class);
 
+    private static final PseudoClass PSEUDOCLASS_ANYSELECTED = PseudoClass.getPseudoClass("any-selected");
+    private static final PseudoClass PSEUDOCLASS_ALLSELECTED = PseudoClass.getPseudoClass("all-selected");
+    private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
+    private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
+
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
     private CustomTextField searchField;
-    private Button addNewGroup;
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -88,10 +92,7 @@ public class GroupTreeView extends BorderPane {
     private DragExpansionHandler dragExpansionHandler;
 
     /**
-     * The groups panel
-     *
-     * Note: This panel is deliberately not created in FXML, since parsing of this took about 500 msecs. In an attempt
-     * to speed up the startup time of JabRef, this has been rewritten to plain java.
+     * Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
      */
     public GroupTreeView(TaskExecutor taskExecutor,
                          StateManager stateManager,
@@ -141,7 +142,7 @@ public class GroupTreeView extends BorderPane {
 
         mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
 
-        addNewGroup = new Button(Localization.lang("Add group"));
+        Button addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setId("addNewGroup");
         addNewGroup.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(addNewGroup, Priority.ALWAYS);
@@ -200,79 +201,28 @@ public class GroupTreeView extends BorderPane {
                 .install(mainColumn);
 
         // Number of hits (only if user wants to see them)
-        PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
-        PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
-                .withGraphic(group -> {
-                    final StackPane node = new StackPane();
-                    node.getStyleClass().setAll("hits");
-                    if (!group.isRoot()) {
-                        BindingsHelper.includePseudoClassWhen(node, anySelected,
-                                group.anySelectedEntriesMatchedProperty());
-                        BindingsHelper.includePseudoClassWhen(node, allSelected,
-                                group.allSelectedEntriesMatchedProperty());
-                    }
-                    Text text = new Text();
-                    EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
-                            (newValue) -> {
-                                if (text.textProperty().isBound()) {
-                                    text.textProperty().unbind();
-                                    text.setText("");
-                                }
-
-                                if (newValue) {
-                                    text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
-                                }
-                            });
-                    text.getStyleClass().setAll("text");
-
-                    text.styleProperty().bind(Bindings.createStringBinding(() -> {
-                        double reducedFontSize;
-                        double font_size = preferencesService.getAppearancePreferences().getMainFontSize();
-                        // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
-                        if (font_size > 26.0) {
-                            reducedFontSize = 0.25;
-                        } else if (font_size > 22.0) {
-                            reducedFontSize = 0.35;
-                        } else if (font_size > 18.0) {
-                            reducedFontSize = 0.55;
-                        } else {
-                            reducedFontSize = 0.75;
-                        }
-                        return String.format("-fx-font-size: %fem;", reducedFontSize);
-                    }, preferencesService.getAppearancePreferences().mainFontSizeProperty()));
-
-                    node.getChildren().add(text);
-                    node.setMaxWidth(Control.USE_PREF_SIZE);
-                    return node;
-                })
+                .withGraphic(this::createNumberCell)
                 .install(numberColumn);
 
         // Arrow indicating expanded status
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
-                .withGraphic(viewModel -> {
-                    final StackPane disclosureNode = new StackPane();
-                    disclosureNode.visibleProperty().bind(viewModel.hasChildrenProperty());
-                    disclosureNode.getStyleClass().setAll("tree-disclosure-node");
-
-                    final StackPane disclosureNodeArrow = new StackPane();
-                    disclosureNodeArrow.getStyleClass().setAll("arrow");
-                    disclosureNode.getChildren().add(disclosureNodeArrow);
-                    return disclosureNode;
-                })
+                .withGraphic(this::getArrowCell)
                 .withOnMouseClickedEvent(group -> event -> {
                     group.toggleExpansion();
                     event.consume();
                 })
                 .install(expansionNodeColumn);
 
-        // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
-        PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
-        PseudoClass subElementPseudoClass = PseudoClass.getPseudoClass("sub");
-
         new ViewModelTreeTableRowFactory<GroupNodeViewModel>()
                 .withContextMenu(this::createContextMenuForGroup)
-                .withOnMousePressedEvent(this::ignoreOnTreeDisclosure)
+                .withOnMousePressedEvent((row, event) -> {
+                    if (event.getTarget() instanceof StackPane pane) {
+                        if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
+                            event.consume();
+                        }
+                    }
+                })
                 .withCustomInitializer(row -> {
                     // Remove disclosure node since we display custom version in separate column
                     // Simply setting to null is not enough since it would be replaced by the default node on every change
@@ -283,9 +233,9 @@ public class GroupTreeView extends BorderPane {
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragExited(this::handleOnDragExited)
                 .setOnDragOver(this::handleOnDragOver)
-                .withPseudoClass(rootPseudoClass, row -> Bindings.createBooleanBinding(
+                .withPseudoClass(PSEUDOCLASS_ROOTELEMENT, row -> Bindings.createBooleanBinding(
                         () -> (row != null) && (row.getItem() == groupTree.getRoot().getValue()), row.treeItemProperty()))
-                .withPseudoClass(subElementPseudoClass, row -> Bindings.createBooleanBinding(
+                .withPseudoClass(PSEUDOCLASS_SUBELEMENT, row -> Bindings.createBooleanBinding(
                         () -> (row != null) && (groupTree.getTreeItemLevel(row.getTreeItem()) > 1), row.treeItemProperty()))
                 .install(groupTree);
 
@@ -293,12 +243,59 @@ public class GroupTreeView extends BorderPane {
         setupClearButtonField(searchField);
     }
 
-    private void ignoreOnTreeDisclosure(GroupNodeViewModel row, MouseEvent event) {
-        if (event.getTarget() instanceof StackPane pane) {
-            if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
-                event.consume();
-            }
+    private StackPane getArrowCell(GroupNodeViewModel viewModel) {
+        final StackPane disclosureNode = new StackPane();
+        disclosureNode.visibleProperty().bind(viewModel.hasChildrenProperty());
+        disclosureNode.getStyleClass().setAll("tree-disclosure-node");
+
+        final StackPane disclosureNodeArrow = new StackPane();
+        disclosureNodeArrow.getStyleClass().setAll("arrow");
+        disclosureNode.getChildren().add(disclosureNodeArrow);
+        return disclosureNode;
+    }
+
+    private StackPane createNumberCell(GroupNodeViewModel group) {
+        final StackPane node = new StackPane();
+        node.getStyleClass().setAll("hits");
+        if (!group.isRoot()) {
+            BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ANYSELECTED,
+                    group.anySelectedEntriesMatchedProperty());
+            BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ALLSELECTED,
+                    group.allSelectedEntriesMatchedProperty());
         }
+        Text text = new Text();
+        EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
+                (newValue) -> {
+                    if (text.textProperty().isBound()) {
+                        text.textProperty().unbind();
+                        text.setText("");
+                    }
+
+                    if (newValue) {
+                        text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
+                    }
+                });
+        text.getStyleClass().setAll("text");
+
+        text.styleProperty().bind(Bindings.createStringBinding(() -> {
+            double reducedFontSize;
+            double font_size = preferencesService.getAppearancePreferences().getMainFontSize();
+            // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
+            if (font_size > 26.0) {
+                reducedFontSize = 0.25;
+            } else if (font_size > 22.0) {
+                reducedFontSize = 0.35;
+            } else if (font_size > 18.0) {
+                reducedFontSize = 0.55;
+            } else {
+                reducedFontSize = 0.75;
+            }
+            return String.format("-fx-font-size: %fem;", reducedFontSize);
+        }, preferencesService.getAppearancePreferences().mainFontSizeProperty()));
+
+        node.getChildren().add(text);
+        node.setMaxWidth(Control.USE_PREF_SIZE);
+        return node;
     }
 
     private void handleOnDragExited(TreeTableRow<GroupNodeViewModel> row, GroupNodeViewModel fieldViewModel, DragEvent dragEvent) {
@@ -431,21 +428,19 @@ public class GroupTreeView extends BorderPane {
         }
 
         ContextMenu contextMenu = new ContextMenu();
-
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
         MenuItem removeGroup;
         if (viewModel.hasSubgroups(group) && viewModel.canAddGroupsIn(group)) {
             removeGroup = new Menu(Localization.lang("Remove group"), null,
-                    factory.createMenuItem(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS, group)),
-                    factory.createMenuItem(StandardActions.GROUP_REMOVE_WITH_SUBGROUPS, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_WITH_SUBGROUPS, group))
+                    factory.createMenuItem(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS,
+                            new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS, group)),
+                    factory.createMenuItem(StandardActions.GROUP_REMOVE_WITH_SUBGROUPS,
+                            new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_WITH_SUBGROUPS, group))
             );
         } else {
             removeGroup = factory.createMenuItem(StandardActions.GROUP_REMOVE, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE, group));
         }
-
-        contextMenu.getItems().forEach(item -> item.setGraphic(null));
-        contextMenu.getStyleClass().add("context-menu");
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
@@ -460,6 +455,8 @@ public class GroupTreeView extends BorderPane {
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
         );
 
+        contextMenu.getItems().forEach(item -> item.setGraphic(null));
+        contextMenu.getStyleClass().add("context-menu");
         return contextMenu;
     }
 
