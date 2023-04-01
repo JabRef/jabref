@@ -117,7 +117,7 @@ public class BibEntryWriter {
             List<Field> optionalFields = type.get()
                                              .getOptionalFields()
                                              .stream()
-                                             .map(BibField::getField)
+                                             .map(BibField::field)
                                              .sorted(Comparator.comparing(Field::getName))
                                              .collect(Collectors.toList());
 
