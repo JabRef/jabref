@@ -1,7 +1,10 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -17,10 +20,12 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.preferences.PreferencesService;
 
@@ -62,14 +67,23 @@ public class CommentsTab extends FieldsEditorTab {
     }
 
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
-        Set<Field> fieldsToShow = new HashSet<>();
-        fieldsToShow.add(new UserSpecificCommentField(name));
-        Set<Field> allFields = entry.getFields();
-        for (Field field : allFields) {
-            if (field.getProperties().contains(FieldProperty.COMMENT)) {
-                fieldsToShow.add(field);
-            }
+        BibDatabaseMode mode = databaseContext.getMode();
+        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
+
+        if (entryType.isPresent()) {
+            UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(name);
+            Set<Field> otherFields = new LinkedHashSet<>();
+            otherFields.add(defaultCommentField);
+
+            // Add other comment fields from the entry
+            otherFields.addAll(entry.getFields().stream()
+                                    .filter(field -> field.equals(StandardField.COMMENT) || field instanceof UserSpecificCommentField)
+                                    .collect(Collectors.toSet()));
+
+            return otherFields;
+        } else {
+            // Entry type unknown -> treat all fields as required
+            return Collections.emptySet();
         }
-        return fieldsToShow;
     }
 }
