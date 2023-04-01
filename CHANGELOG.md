@@ -96,7 +96,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where an exception occured when manually downloading a file from an URL in the entry editor. [#9521](https://github.com/JabRef/jabref/issues/9521)
 - We fixed an issue with open office csv file formatting where commas in the abstract field where not escaped. [#9087][https://github.com/JabRef/jabref/issues/9087]
 - We fixed an issue with deleting groups where subgroups different from the selected group were deleted. [#9281][https://github.com/JabRef/jabref/issues/9281]
-- We fixed an issue where the pin button on the Global Search dialog was located on the wrong location. [#9362](https://github.com/JabRef/jabref/issues/9362)
+- We fixed an issue where the pin button on the Global Search dialog was located at the bottom and not at the top. [#9362](https://github.com/JabRef/jabref/issues/9362)
 
 ## [5.8] - 2022-12-18
 
