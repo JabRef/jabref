@@ -29,6 +29,7 @@ import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.preferences.PreferencesService;
 
 public class OtherFieldsTab extends FieldsEditorTab {
@@ -75,7 +76,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
             Set<Field> allKnownFields = entryType.get().getAllFields();
 //            Set<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(LinkedHashSet::new));
             Set<Field> otherFields = entry.getFields().stream()
-                                          .filter(field -> !allKnownFields.contains(field) && !field.getProperties().contains(FieldProperty.COMMENT))
+                                          .filter(field -> !allKnownFields.contains(field) && !field.getName().toLowerCase().contains("comment"))
                                           .collect(Collectors.toCollection(LinkedHashSet::new));
             otherFields.removeAll(entryType.get().getDeprecatedFields(mode));
             otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet()));
