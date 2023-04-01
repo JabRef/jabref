@@ -10,7 +10,7 @@ public class UserSpecificCommentField implements Field {
     private final Set<FieldProperty> properties;
 
     public UserSpecificCommentField(String username) {
-        this.name = "comment" + username;
+        this.name = "comment-" + username;
         this.properties = EnumSet.of(FieldProperty.COMMENT);
     }
 
