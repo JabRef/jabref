@@ -400,7 +400,7 @@
       </date>
     </group>
   </macro>
-  <citation et-al-min="20" et-al-use-first="1" disambiguate-add-names="true">
+  <citation et-al-min="20" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-year-suffix="true">
     <layout delimiter="; " suffix=".">
       <choose>
         <if position="subsequent">
@@ -424,10 +424,18 @@
             </if>
             <else>
               <text macro="contributors-short"/>
-              <text prefix=" " macro="issued-year"/>
+              <choose>
+                <if type="article-newspaper" match="any">
+                  <text prefix=" " macro="title-short" font-style="italic"/>
+                  <text prefix=" " macro="issued"/>
+                </if>
+                <else>
+                  <text prefix=" " macro="issued-year"/>
+                </else>
+              </choose>
+              <text macro="citation-locator"/>
             </else>
           </choose>
-          <text macro="citation-locator"/>
         </if>
         <else>
           <choose>

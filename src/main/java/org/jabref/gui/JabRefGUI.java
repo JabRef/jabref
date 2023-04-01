@@ -20,6 +20,7 @@ import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
@@ -27,6 +28,7 @@ import org.jabref.logic.util.WebViewStore;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +63,15 @@ public class JabRefGUI {
                 Globals.TASK_EXECUTOR,
                 preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
+
+        if (preferencesService.getProxyPreferences().shouldUseProxy() && preferencesService.getProxyPreferences().shouldUseAuthentication()) {
+            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+            dialogService.showPasswordDialogAndWait(Localization.lang("Proxy configuration"), Localization.lang("Proxy requires password"), Localization.lang("Password"))
+                .ifPresent(newPassword -> {
+                    preferencesService.getProxyPreferences().setPassword(newPassword);
+                    ProxyRegisterer.register(preferencesService.getProxyPreferences());
+                });
+        }
     }
 
     private void openWindow(Stage mainStage) {

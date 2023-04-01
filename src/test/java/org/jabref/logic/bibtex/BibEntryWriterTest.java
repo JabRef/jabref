@@ -184,7 +184,6 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripTest() throws IOException {
-        // @formatter:off
         String bibtexEntry = """
                 @Article{test,
                   Author                   = {Foo Bar},
@@ -193,7 +192,63 @@ class BibEntryWriterTest {
                   Number                   = {1}
                 }
                 """.replaceAll("\n", OS.NEWLINE);
-        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
+    void roundTripKeepsFilePathWithBackslashes() throws IOException {
+        String bibtexEntry = """
+                @Article{,
+                  file = {Tagungen\\2013\\KWTK45},
+                }
+                """.replaceAll("\n", OS.NEWLINE);
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
+    void roundTripKeepsEscapedCharacters() throws IOException {
+        String bibtexEntry = """
+                @Article{,
+                  demofield = {Tagungen\\2013\\KWTK45},
+                }
+                """.replaceAll("\n", OS.NEWLINE);
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
+    void roundTripKeepsFilePathEndingWithBackslash() throws IOException {
+        String bibtexEntry = """
+                @Article{,
+                  file = {dir\\},
+                }
+                """.replaceAll("\n", OS.NEWLINE);
 
         // read in bibtex string
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
