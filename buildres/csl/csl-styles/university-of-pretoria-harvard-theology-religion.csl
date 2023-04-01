@@ -13,7 +13,7 @@
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2022-06-22T00:06:00+00:00</updated>
+    <updated>2023-03-30T00:13:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-GB">
@@ -249,23 +249,25 @@
               </if>
               <else-if type="article-journal article-magazine" match="any">
                 <text prefix="‘" suffix="’" macro="title"/>
-                <text variable="container-title" font-style="italic"/>
-                <group delimiter=", ">
-                  <choose>
-                    <if variable="volume issue" match="any">
-                      <group>
-                        <text variable="volume"/>
-                        <text variable="issue" prefix="(" suffix=")"/>
-                      </group>
-                    </if>
-                    <else>
-                      <date variable="issued" prefix="(" suffix=")">
-                        <date-part name="month" form="long"/>
-                        <date-part name="day" prefix=", "/>
-                      </date>
-                    </else>
-                  </choose>
-                  <text variable="page"/>
+                <group delimiter=" ">
+                  <text variable="container-title" font-style="italic"/>
+                  <group delimiter=", ">
+                    <choose>
+                      <if variable="volume issue" match="any">
+                        <group>
+                          <text variable="volume"/>
+                          <text variable="issue" prefix="(" suffix=")"/>
+                        </group>
+                      </if>
+                      <else>
+                        <date variable="issued" prefix="(" suffix=")">
+                          <date-part name="month" form="long"/>
+                          <date-part name="day" prefix=", "/>
+                        </date>
+                      </else>
+                    </choose>
+                    <text variable="page"/>
+                  </group>
                 </group>
               </else-if>
               <else-if type="article-newspaper" match="any">
@@ -312,6 +314,44 @@
                   <text variable="number"/>
                 </group>
                 <text macro="publisher"/>
+              </else-if>
+              <else-if type="speech interview" match="any">
+                <text macro="title"/>
+                <group delimiter=" ">
+                  <text variable="genre" text-case="capitalize-first"/>
+                  <text variable="number"/>
+                </group>
+                <group delimiter=" ">
+                  <choose>
+                    <if variable="event-title" match="any">
+                      <text variable="event-title"/>
+                    </if>
+                    <else>
+                      <text variable="container-title"/>
+                    </else>
+                  </choose>
+                </group>
+                <group delimiter=" ">
+                  <choose>
+                    <if variable="publisher" match="any">
+                      <text macro="publisher"/>
+                    </if>
+                    <else-if variable="medium" match="any">
+                      <text variable="medium"/>
+                    </else-if>
+                    <else>
+                      <text variable="event-place"/>
+                    </else>
+                  </choose>
+                  <group delimiter=": ">
+                    <date variable="issued">
+                      <date-part name="day" prefix="on " suffix=" "/>
+                      <date-part name="month" form="long" suffix=" "/>
+                      <date-part name="year" form="long"/>
+                    </date>
+                    <text variable="page"/>
+                  </group>
+                </group>
               </else-if>
             </choose>
             <text macro="access"/>
