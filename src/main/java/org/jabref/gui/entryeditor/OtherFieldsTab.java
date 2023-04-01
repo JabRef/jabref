@@ -28,6 +28,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.preferences.PreferencesService;
 
 public class OtherFieldsTab extends FieldsEditorTab {
@@ -72,8 +73,10 @@ public class OtherFieldsTab extends FieldsEditorTab {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             Set<Field> allKnownFields = entryType.get().getAllFields();
-            Set<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(LinkedHashSet::new));
-
+//            Set<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<Field> otherFields = entry.getFields().stream()
+                                          .filter(field -> !allKnownFields.contains(field) && !(field instanceof UserSpecificCommentField))
+                                          .collect(Collectors.toCollection(LinkedHashSet::new));
             otherFields.removeAll(entryType.get().getDeprecatedFields(mode));
             otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet()));
             otherFields.remove(InternalField.KEY_FIELD);
