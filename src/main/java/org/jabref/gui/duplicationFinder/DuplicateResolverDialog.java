@@ -123,20 +123,18 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             // Updates the window state on button press
             stateManager.setDialogWindowState(getClass().getSimpleName(), new DialogWindowState(this.getX(), this.getY(), this.getDialogPane().getHeight(), this.getDialogPane().getWidth()));
 
+            if (!button.equals(cancel)) {
+                threeWayMerge.saveToolbarGuiPreferences();
+            }
             if (button.equals(first)) {
-                saveThreeWayMergeToolbarPreferences();
                 return DuplicateResolverResult.KEEP_LEFT;
             } else if (button.equals(second)) {
-                saveThreeWayMergeToolbarPreferences();
                 return DuplicateResolverResult.KEEP_RIGHT;
             } else if (button.equals(both)) {
-                saveThreeWayMergeToolbarPreferences();
                 return DuplicateResolverResult.KEEP_BOTH;
             } else if (button.equals(merge)) {
-                saveThreeWayMergeToolbarPreferences();
                 return DuplicateResolverResult.KEEP_MERGE;
             } else if (button.equals(removeExact)) {
-                saveThreeWayMergeToolbarPreferences();
                 return DuplicateResolverResult.AUTOREMOVE_EXACT;
             }
             return null;
@@ -147,10 +145,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         borderPane.setRight(helpButton);
 
         getDialogPane().setContent(borderPane);
-    }
-
-    private void saveThreeWayMergeToolbarPreferences() {
-        threeWayMerge.saveToolbarGuiPreferences();
     }
 
     public BibEntry getMergedEntry() {
