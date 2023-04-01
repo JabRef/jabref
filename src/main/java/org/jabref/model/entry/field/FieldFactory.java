@@ -156,6 +156,7 @@ public class FieldFactory {
         fields.addAll(EnumSet.allOf(InternalField.class));
         fields.addAll(EnumSet.allOf(SpecialField.class));
         fields.addAll(EnumSet.allOf(StandardField.class));
+        fields.add(new UserSpecificCommentField("username"));
         return fields;
     }
 
