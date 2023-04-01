@@ -4,7 +4,7 @@
     <title>The Accounting Review</title>
     <id>http://www.zotero.org/styles/the-accounting-review</id>
     <link href="http://www.zotero.org/styles/the-accounting-review" rel="self"/>
-    <link href="http://aaahq.org/pubs/EdPolicies/REV_EdPolicy.pdf" rel="documentation"/>
+    <link href="https://aaahq.org/portals/0/documents/publications/00_MANUSCRIPT_PREPARATION_AND_STYLE_11.29.22.pdf" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
     </author>
@@ -12,11 +12,14 @@
       <name>Julian Onions</name>
       <email>julian.onions@gmail.com</email>
     </contributor>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <issn>0001-4826</issn>
     <eissn>1558-7967</eissn>
-    <updated>2012-10-25T21:15:26+00:00</updated>
+    <updated>2023-03-16T09:10:03+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -392,7 +395,7 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true">
+  <citation et-al-min="6" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true">
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <group delimiter=" ">
@@ -403,7 +406,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" et-al-min="11" et-al-use-first="7" subsequent-author-substitute="&#8212;&#8212;&#8212;" entry-spacing="0">
+  <bibliography et-al-min="11" et-al-use-first="7" entry-spacing="0" hanging-indent="true">
     <sort>
       <key macro="contributors"/>
       <key variable="issued"/>
