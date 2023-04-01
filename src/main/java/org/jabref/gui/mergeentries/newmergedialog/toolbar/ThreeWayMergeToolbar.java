@@ -110,10 +110,10 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty());
         onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
 
-        loadStoredPreferences();
+        loadSavedConfiguration();
     }
 
-    private void loadStoredPreferences() {
+    private void loadSavedConfiguration() {
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
 
         PlainTextOrDiff plainTextOrDiffPreference = guiPreferences.getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;
@@ -123,6 +123,14 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         diffViewComboBox.getSelectionModel().select(diffViewPreference);
 
         diffHighlightingMethodToggleGroup.selectToggle(guiPreferences.getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
+    }
+
+    public void saveToolbarConfiguration() {
+        preferencesService.getGuiPreferences().setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);
+        preferencesService.getGuiPreferences().setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);
+
+        boolean highlightWordsRadioButtonValue = diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightWordsRadioButton);
+        preferencesService.getGuiPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {
@@ -187,14 +195,6 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
     public void setOnSelectRightEntryValuesButtonClicked(Runnable onClick) {
         selectRightEntryValuesButton.setOnMouseClicked(e -> onClick.run());
-    }
-
-    public void saveGuiPreferences() {
-        preferencesService.getGuiPreferences().setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);
-        preferencesService.getGuiPreferences().setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);
-
-        boolean highlightWordsRadioButtonValue = diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightWordsRadioButton);
-        preferencesService.getGuiPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);
     }
 
     public enum PlainTextOrDiff {

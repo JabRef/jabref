@@ -36,8 +36,8 @@ public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
         ButtonType replaceEntries = new ButtonType(Localization.lang("Merge entries"), ButtonBar.ButtonData.OK_DONE);
         this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, replaceEntries);
         this.setResultConverter(buttonType -> {
+            threeWayMergeView.saveConfiguration();
             if (buttonType.equals(replaceEntries)) {
-                threeWayMergeView.saveToolbarGuiPreferences();
                 return new EntriesMergeResult(one, two, threeWayMergeView.getLeftEntry(), threeWayMergeView.getRightEntry(), threeWayMergeView.getMergedEntry());
             } else {
                 return null;

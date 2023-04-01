@@ -122,10 +122,8 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         this.setResultConverter(button -> {
             // Updates the window state on button press
             stateManager.setDialogWindowState(getClass().getSimpleName(), new DialogWindowState(this.getX(), this.getY(), this.getDialogPane().getHeight(), this.getDialogPane().getWidth()));
+            threeWayMerge.saveConfiguration();
 
-            if (!button.equals(cancel)) {
-                threeWayMerge.saveToolbarGuiPreferences();
-            }
             if (button.equals(first)) {
                 return DuplicateResolverResult.KEEP_LEFT;
             } else if (button.equals(second)) {
