@@ -35,8 +35,8 @@ public class GuiPreferences {
 
     private final StringProperty lastSelectedIdBasedFetcher;
     private final ObjectProperty<DiffMode> mergeDiffMode;
-    private final ObjectProperty<PlainTextOrDiff> mergePlainTextOrDiff;
-    private final ObjectProperty<DiffView> mergeDiffView;
+    private final BooleanProperty mergeShouldShowDiff;
+    private final BooleanProperty mergeShouldShowUnifiedDiff;
     private final BooleanProperty mergeHighlightWords;
     private final BooleanProperty mergeShowChangedFieldsOnly;
     private final DoubleProperty sidePaneWidth;
@@ -51,8 +51,8 @@ public class GuiPreferences {
                           FileHistory fileHistory,
                           String lastSelectedIdBasedFetcher,
                           DiffMode mergeDiffMode,
-                          PlainTextOrDiff mergePlainTextOrDiff,
-                          DiffView mergeDiffView,
+                          boolean mergeShouldShowDiff,
+                          boolean mergeShouldShowUnifiedDiff,
                           boolean mergeHighlightWords,
                           double sidePaneWidth,
                           boolean mergeShowChangedFieldsOnly) {
@@ -65,8 +65,8 @@ public class GuiPreferences {
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
-        this.mergePlainTextOrDiff = new SimpleObjectProperty<>(mergePlainTextOrDiff);
-        this.mergeDiffView = new SimpleObjectProperty<>(mergeDiffView);
+        this.mergeShouldShowDiff = new SimpleBooleanProperty(mergeShouldShowDiff);
+        this.mergeShouldShowUnifiedDiff = new SimpleBooleanProperty(mergeShouldShowUnifiedDiff);
         this.mergeHighlightWords = new SimpleBooleanProperty(mergeHighlightWords);
 
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
@@ -182,28 +182,28 @@ public class GuiPreferences {
         this.mergeDiffMode.set(mergeDiffMode);
     }
 
-    public PlainTextOrDiff getMergePlainTextOrDiff() {
-        return mergePlainTextOrDiff.get();
+    public boolean getMergeShouldShowDiff() {
+        return mergeShouldShowDiff.get();
     }
 
-    public ObjectProperty<PlainTextOrDiff> mergePlainTextOrDiffProperty() {
-        return mergePlainTextOrDiff;
+    public BooleanProperty mergeShouldShowDiffProperty() {
+        return mergeShouldShowDiff;
     }
 
-    public void setMergePlainTextOrDiff(PlainTextOrDiff mergePlainTextOrDiff) {
-        this.mergePlainTextOrDiff.set(mergePlainTextOrDiff);
+    public void setMergeShouldShowDiff(boolean mergeShouldShowDiff) {
+        this.mergeShouldShowDiff.set(mergeShouldShowDiff);
     }
 
-    public DiffView getMergeDiffView() {
-        return mergeDiffView.get();
+    public boolean getMergeShouldShowUnifiedDiff() {
+        return mergeShouldShowUnifiedDiff.get();
     }
 
-    public ObjectProperty<DiffView> mergeDiffViewProperty() {
-        return mergeDiffView;
+    public BooleanProperty mergeShouldShowUnifiedDiffProperty() {
+        return mergeShouldShowUnifiedDiff;
     }
 
-    public void setMergeDiffView(DiffView mergeDiffView) {
-        this.mergeDiffView.set(mergeDiffView);
+    public void setMergeShouldShowUnifiedDiff(boolean mergeShouldShowUnifiedDiff) {
+        this.mergeShouldShowUnifiedDiff.set(mergeShouldShowUnifiedDiff);
     }
 
     public boolean getMergeHighlightWords() {

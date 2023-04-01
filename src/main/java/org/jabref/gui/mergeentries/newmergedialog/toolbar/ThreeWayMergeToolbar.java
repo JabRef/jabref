@@ -24,6 +24,7 @@ import com.google.common.base.Enums;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.builder.Diff;
 
 public class ThreeWayMergeToolbar extends AnchorPane {
     @FXML
@@ -67,7 +68,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     public void initialize() {
         showDiff = EasyBind.map(plainTextOrDiffComboBox.valueProperty(), plainTextOrDiff -> plainTextOrDiff == PlainTextOrDiff.Diff);
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
-        plainTextOrDiffComboBox.getSelectionModel().select(preferencesService.getGuiPreferences().getMergePlainTextOrDiff());
+        PlainTextOrDiff plainTextOrDiffPreference = preferencesService.getGuiPreferences().getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;
+        plainTextOrDiffComboBox.getSelectionModel().select(plainTextOrDiffPreference);
 
         plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
             @Override
@@ -83,7 +85,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         diffViewComboBox.disableProperty().bind(notShowDiffProperty());
         diffViewComboBox.getItems().addAll(DiffView.values());
-        diffViewComboBox.getSelectionModel().select(preferencesService.getGuiPreferences().getMergeDiffView());
+        DiffView diffViewPreference = preferencesService.getGuiPreferences().getMergeShouldShowUnifiedDiff() ? DiffView.UNIFIED : DiffView.SPLIT;
+        diffViewComboBox.getSelectionModel().select(diffViewPreference);
 
         diffViewComboBox.setConverter(new StringConverter<>() {
             @Override
@@ -109,8 +112,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         }));
 
         diffHighlightingMethodToggleGroup.selectToggle(preferencesService.getGuiPreferences().getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
-        plainTextOrDiffComboBox.valueProperty().set(preferencesService.getGuiPreferences().getMergePlainTextOrDiff());
-        diffViewComboBox.valueProperty().set(preferencesService.getGuiPreferences().getMergeDiffView());
+        plainTextOrDiffComboBox.valueProperty().set(plainTextOrDiffPreference);
+        diffViewComboBox.valueProperty().set(diffViewPreference);
 
         onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty());
         onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
@@ -181,8 +184,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     }
 
     public void saveGuiPreferences() {
-        preferencesService.getGuiPreferences().setMergePlainTextOrDiff(plainTextOrDiffComboBox.getValue());
-        preferencesService.getGuiPreferences().setMergeDiffView(diffViewComboBox.getValue());
+        preferencesService.getGuiPreferences().setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);
+        preferencesService.getGuiPreferences().setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);
 
         boolean highlightWordsRadioButtonValue = diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightWordsRadioButton);
         preferencesService.getGuiPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);

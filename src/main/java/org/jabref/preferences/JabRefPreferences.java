@@ -240,8 +240,8 @@ public class JabRefPreferences implements PreferencesService {
 
     // merge related
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
-    public static final String MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF = "mergeEntriesPlainTextOrDiff";
-    public static final String MERGE_ENTRIES_DIFF_VIEW = "mergeEntriesDiffView";
+    public static final String MERGE_ENTRIES_SHOULD_SHOW_DIFF = "mergeEntriesShouldShowDiff";
+    public static final String MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF = "mergeEntriesShouldShowUnifiedDiff";
     public static final String MERGE_ENTRIES_HIGHLIGHT_WORDS = "mergeEntriesHighlightWords";
 
 
@@ -594,8 +594,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
-        defaults.put(MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF, PlainTextOrDiff.Diff.name());
-        defaults.put(MERGE_ENTRIES_DIFF_VIEW, DiffView.UNIFIED.name());
+        defaults.put(MERGE_ENTRIES_SHOULD_SHOW_DIFF, Boolean.TRUE);
+        defaults.put(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, Boolean.TRUE);
         defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
 
@@ -2520,8 +2520,8 @@ public class JabRefPreferences implements PreferencesService {
                 getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
                 DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
-                PlainTextOrDiff.parse(get(MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF)),
-                DiffView.parse(get(MERGE_ENTRIES_DIFF_VIEW)),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF),
                 getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS),
                 getDouble(SIDE_PANE_WIDTH),
                 getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS));
@@ -2548,8 +2548,8 @@ public class JabRefPreferences implements PreferencesService {
         guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
-        EasyBind.listen(guiPreferences.mergePlainTextOrDiffProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_PLAIN_TEXT_OR_DIFF, newValue.name()));
-        EasyBind.listen(guiPreferences.mergeDiffViewProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_VIEW, newValue.name()));
+        EasyBind.listen(guiPreferences.mergeShouldShowDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, newValue));
+        EasyBind.listen(guiPreferences.mergeShouldShowUnifiedDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, newValue));
         EasyBind.listen(guiPreferences.mergeHighlightWordsProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
