@@ -84,8 +84,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         });
 
         getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
-            preferencesService.getSearchPreferences().setSearchWindowHeight((int) getHeight());
-            preferencesService.getSearchPreferences().setSearchWindowWidth((int) getWidth());
+            preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
+            preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
         });
     }
 }

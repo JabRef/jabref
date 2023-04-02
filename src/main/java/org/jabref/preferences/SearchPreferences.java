@@ -3,10 +3,10 @@ package org.jabref.preferences;
 import java.util.EnumSet;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
@@ -20,10 +20,10 @@ public class SearchPreferences {
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
 
-    private final IntegerProperty searchWindowHeight = new SimpleIntegerProperty();
-    private final IntegerProperty searchWindowWidth = new SimpleIntegerProperty();
+    private final DoubleProperty searchWindowHeight = new SimpleDoubleProperty();
+    private final DoubleProperty searchWindowWidth = new SimpleDoubleProperty();
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop, int searchWindowHeight, int searchWindowWidth) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth) {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
 
@@ -112,27 +112,27 @@ public class SearchPreferences {
         this.keepWindowOnTop.set(keepWindowOnTop);
     }
 
-    public int getSearchWindowHeight() {
+    public double getSearchWindowHeight() {
         return this.searchWindowHeight.get();
     }
 
-    public int getSearchWindowWidth() {
+    public double getSearchWindowWidth() {
         return this.searchWindowWidth.get();
     }
 
-    public IntegerProperty getSearchWindowHeightProperty() {
+    public DoubleProperty getSearchWindowHeightProperty() {
         return this.searchWindowHeight;
     }
 
-    public IntegerProperty getSearchWindowWidthProperty() {
+    public DoubleProperty getSearchWindowWidthProperty() {
         return this.searchWindowWidth;
     }
 
-    public void setSearchWindowHeight(int height) {
+    public void setSearchWindowHeight(double height) {
         this.searchWindowHeight.set(height);
     }
 
-    public void setSearchWindowWidth(int width) {
+    public void setSearchWindowWidth(double width) {
         this.searchWindowWidth.set(width);
     }
 }
