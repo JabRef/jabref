@@ -326,7 +326,7 @@ public class FileUtil {
      * @param rootDirectory the rootDirectory that will be searched
      * @return the path to the first file that matches the defined conditions
      */
-    public static Optional<Path> findSingleOld(String filename, Path rootDirectory) {
+    public static Optional<Path> findSingleFileRecursively(String filename, Path rootDirectory) {
         try (Stream<Path> pathStream = Files.walk(rootDirectory)) {
             return pathStream
                              .filter(Files::isRegularFile)

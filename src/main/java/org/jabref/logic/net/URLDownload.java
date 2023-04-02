@@ -206,9 +206,9 @@ public class URLDownload {
 
         // Set a custom Apache Client Builder to be able to allow circular redirects, otherwise downloads from springer might not work
         Unirest.config().httpClient(new ApacheClient.Builder()
-                                                              .withRequestConfig((c, r) -> RequestConfig.custom()
-                                                                                                        .setCircularRedirectsAllowed(true)
-                                                                                                        .build()));
+                                    .withRequestConfig((c, r) -> RequestConfig.custom()
+                                                       .setCircularRedirectsAllowed(true)
+                                                       .build()));
 
         Unirest.config().setDefaultHeader("User-Agent", USER_AGENT);
 

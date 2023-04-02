@@ -131,7 +131,6 @@ public class JabRefDesktop {
 
     public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
             DOI.parse(link)
-                        .map(identifier -> identifier)
                         .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
                         .ifPresent(uri -> {
                             try {

@@ -354,7 +354,7 @@ class FileUtilTest {
 
     @Test
     void testFindinPath() {
-        Optional<Path> resultPath1 = FileUtil.findSingleOld("existingTestFile.txt", rootDir);
+        Optional<Path> resultPath1 = FileUtil.findSingleFileRecursively("existingTestFile.txt", rootDir);
         assertEquals(resultPath1.get().toString(), existingTestFile.toString());
     }
 
