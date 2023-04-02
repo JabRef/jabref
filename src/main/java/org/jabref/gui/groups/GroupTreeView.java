@@ -179,7 +179,7 @@ public class GroupTreeView extends BorderPane {
                         this::updateSelection
                 ));
 
-        // We try to to prevent publishing changes in the search field directly to the search task that takes some time
+        // We try to prevent publishing changes in the search field directly to the search task that takes some time
         // for larger group structures.
         final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
             LOGGER.debug("Run group search " + searchField.getText());
@@ -475,7 +475,7 @@ public class GroupTreeView extends BorderPane {
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
         MenuItem removeGroup;
-        if (viewModel.hasSubgroups(group) && viewModel.canAddGroupsIn(group)) {
+        if (viewModel.hasSubgroups(group) && viewModel.canAddGroupsIn(group) && !group.isRoot()) {
             removeGroup = new Menu(Localization.lang("Remove group"), null,
                     factory.createMenuItem(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS,
                             new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS, group)),
@@ -568,7 +568,7 @@ public class GroupTreeView extends BorderPane {
                     switch (command) {
                         case GROUP_EDIT ->
                                 viewModel.isEditable(group);
-                        case GROUP_REMOVE ->
+                        case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
                                 viewModel.isEditable(group) && viewModel.canAddGroupsIn(group);
                         case GROUP_SUBGROUP_ADD ->
                                 viewModel.isEditable(group) && viewModel.canAddGroupsIn(group)
