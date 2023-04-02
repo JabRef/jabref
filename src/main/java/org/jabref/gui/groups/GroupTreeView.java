@@ -519,12 +519,10 @@ public class GroupTreeView extends BorderPane {
         return Integer.toString(hits);
     }
 
-    /**
-     * Workaround taken from https://github.com/controlsfx/controlsfx/issues/330
-     */
+    // ToDo: reflective access, should be removed
+    //  Workaround taken from https://github.com/controlsfx/controlsfx/issues/330
     private void setupClearButtonField(CustomTextField customTextField) {
         try {
-            // TODO: reflective access, should be removed
             Method m = TextFields.class.getDeclaredMethod("setupClearButtonField", TextField.class, ObjectProperty.class);
             m.setAccessible(true);
             m.invoke(null, customTextField, customTextField.rightProperty());
