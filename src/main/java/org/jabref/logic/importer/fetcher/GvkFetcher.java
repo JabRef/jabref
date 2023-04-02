@@ -12,7 +12,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.GVKQueryTransformer;
-import org.jabref.logic.importer.fileformat.GvkParser;
+import org.jabref.logic.importer.fileformat.PicaXmlParser;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -51,6 +51,6 @@ public class GvkFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new GvkParser();
+        return new PicaXmlParser();
     }
 }

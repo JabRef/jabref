@@ -25,7 +25,7 @@
     <issn>2364-3676</issn>
     <eissn>2197-649X</eissn>
     <summary>Author-date style meeting citation specifications provided by JNA. Based on the DAI style.</summary>
-    <updated>2020-10-11T23:58:34+00:00</updated>
+    <updated>2023-03-20T23:58:34+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -229,35 +229,33 @@
     </date>
   </macro>
   <macro name="place-date">
-    <choose>
-      <if type="book thesis chapter paper-conference" match="any">
-        <choose>
-          <if match="none" variable="edition">
-            <text value=" "/>
-          </if>
-        </choose>
-        <group delimiter=" " prefix=" (" suffix=")">
-          <choose>
-            <if type="thesis" match="any">
-              <text variable="genre" suffix=" "/>
-              <text variable="publisher"/>
-            </if>
-            <else>
-              <choose>
-                <if match="any" variable="original-date original-publisher-place">
-                  <text variable="original-publisher-place"/>
-                  <date date-parts="year" form="text" variable="original-date" prefix=" "/>
-                  <text value="; "/>
-                </if>
-              </choose>
-              <text variable="publisher-place"/>
-            </else>
-          </choose>
-          <text macro="date"/>
-          <text macro="edition"/>
-        </group>
-      </if>
-    </choose>
+    <group delimiter="" prefix=" ">
+      <choose>
+        <if type="book thesis chapter paper-conference" match="any">
+          <text macro="edition" prefix=" "/>
+          <group delimiter=" " prefix="(" suffix=")">
+            <choose>
+              <if type="thesis" match="any">
+                <text variable="genre" suffix=" "/>
+                <text variable="publisher"/>
+              </if>
+              <else>
+                <choose>
+                  <if match="any" variable="original-date original-publisher-place">
+                    <text variable="original-publisher-place"/>
+                    <date date-parts="year" form="text" variable="original-date" prefix=" "/>
+                    <text value="; "/>
+                  </if>
+                </choose>
+                <text variable="publisher-place"/>
+              </else>
+            </choose>
+            <text macro="date"/>
+            <text macro="edition"/>
+          </group>
+        </if>
+      </choose>
+    </group>
   </macro>
   <macro name="journal-date">
     <choose>
@@ -274,7 +272,6 @@
   </macro>
   <macro name="collection-title">
     <text variable="container-title" prefix=" "/>
-    <text variable="volume" prefix=" "/>
   </macro>
   <macro name="event">
     <text term="presented at" suffix=" "/>
@@ -301,6 +298,7 @@
       <if match="any" variable="collection-title">
         <text variable="collection-title" prefix=". "/>
         <text variable="collection-number" prefix=" "/>
+        <text variable="volume" prefix=" "/>
       </if>
     </choose>
     <choose>

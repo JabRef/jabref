@@ -78,7 +78,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                                           .filter(field -> !allKnownFields.contains(field) && !field.getName().toLowerCase().contains("comment"))
                                           .collect(Collectors.toCollection(LinkedHashSet::new));
             otherFields.removeAll(entryType.get().getDeprecatedFields(mode));
-            otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet()));
+            otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::field).collect(Collectors.toSet()));
             otherFields.remove(InternalField.KEY_FIELD);
             otherFields.removeAll(customTabFieldNames);
             return otherFields;

@@ -58,6 +58,11 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         resultsTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
         resultsTable.getSelectionModel().selectFirst();
+
+        if (resultsTable.getSelectionModel().getSelectedItem() != null) {
+            previewViewer.setEntry(resultsTable.getSelectionModel().getSelectedItem().getEntry());
+        }
+
         resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
