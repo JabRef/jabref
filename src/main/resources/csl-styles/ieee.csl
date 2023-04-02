@@ -183,7 +183,6 @@
                 <text term="in"/>
                 <text variable="container-title" font-style="italic"/>
               </group>
-              <text variable="event-place"/>
             </group>
           </if>
           <!-- Unpublished Conference Paper -->
@@ -295,6 +294,19 @@
       </choose>
     </group>
   </macro>
+  <!-- Series -->
+  <macro name="collection">
+    <choose>
+      <if variable="collection-title" match="any">
+        <text term="in" suffix=" "/>
+        <group delimiter=", " suffix=". ">
+          <text variable="collection-title"/>
+          <text variable="collection-number" prefix="no. "/>
+          <text variable="volume" prefix="vol. "/>
+        </group>
+      </if>
+    </choose>
+  </macro>
   <!-- Citation -->
   <citation collapse="citation-number">
     <sort>
@@ -337,13 +349,35 @@
           <text macro="access"/>
         </if>
         <else-if type="paper-conference speech" match="any">
-          <group delimiter=", " suffix=".">
+          <group delimiter=", " suffix=", ">
             <text macro="title"/>
             <text macro="event"/>
+            <text macro="editor"/>
+          </group>
+          <text macro="collection"/>
+          <group delimiter=", " suffix=".">
+            <text macro="publisher"/>
             <text macro="issued"/>
-            <text macro="locators"/>
             <text macro="page"/>
             <text macro="status"/>
+          </group>
+          <text macro="access"/>
+        </else-if>
+        <else-if type="chapter">
+          <group delimiter=", " suffix=", ">
+            <text macro="title"/>
+            <group delimiter=" ">
+              <text term="in" suffix=" "/>
+              <text variable="container-title" font-style="italic"/>
+            </group>
+          </group>
+          <text macro="editor" suffix=", "/>
+          <text macro="edition"/>
+          <text macro="collection"/>
+          <group delimiter=", " suffix=".">
+            <text macro="publisher"/>
+            <text macro="issued"/>
+            <text macro="page"/>
           </group>
           <text macro="access"/>
         </else-if>
@@ -399,6 +433,7 @@
             <text macro="title"/>
             <text macro="locators"/>
           </group>
+          <text macro="collection"/>
           <group delimiter=", " suffix=".">
             <text macro="publisher"/>
             <text macro="issued"/>
@@ -417,29 +452,13 @@
           </group>
           <text macro="access"/>
         </else-if>
-        <else-if type="chapter paper-conference" match="any">
-          <group delimiter=", " suffix=", ">
-            <text macro="title"/>
-            <group delimiter=" ">
-              <text term="in"/>
-              <text variable="container-title" font-style="italic"/>
-            </group>
-            <text macro="locators"/>
-          </group>
-          <text macro="editor" suffix=" "/>
-          <group delimiter=", " suffix=".">
-            <text macro="publisher"/>
-            <text macro="issued"/>
-            <text macro="page"/>
-          </group>
-          <text macro="access"/>
-        </else-if>
         <else>
           <group delimiter=", " suffix=". ">
             <text macro="title"/>
             <text variable="container-title" font-style="italic"/>
             <text macro="locators"/>
           </group>
+          <text macro="collection"/>
           <group delimiter=", " suffix=".">
             <text macro="publisher"/>
             <text macro="page"/>

@@ -35,7 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - `log.txt` does not contain entries for non-found files during PDF indexing. [#9678](https://github.com/JabRef/jabref/pull/9678)
 - We improved the Medline importer to correctly import ISO dates for `revised`. [#9536](https://github.com/JabRef/jabref/issues/9536)
 - To avoid cluttering of the directory, We always delete the `.sav` file upon successful write. [#9675](https://github.com/JabRef/jabref/pull/9675)
-
+- We improved the unlinking/deletion of multiple linked files of an entry using the <kbd>Delete</kbd> key [#9473](https://github.com/JabRef/jabref/issues/9473)
 
 
 ### Fixed
@@ -47,9 +47,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the command line export using `--exportMatches` flag does not create an output bib file [#9581](https://github.com/JabRef/jabref/issues/9581)
 - We fixed an issue where custom field in the custom entry types could not be set to mulitline [#9609](https://github.com/JabRef/jabref/issues/9609)
 - We fixed an issue where the Office XML exporter did not resolve BibTeX-Strings when exporting entries [forum#3741](https://discourse.jabref.org/t/exporting-bibtex-constant-strings-to-ms-office-2007-xml/3741)
+- We fixed an issue where the Merge Entries Toolbar configuration was not saved after hitting 'Merge Entries' button [#9091](https://github.com/JabRef/jabref/issues/9091)
 - We fixed an issue where the password is saved locally if user wants to use proxy with authentication [#8055](https://github.com/JabRef/jabref/issues/8055)
 - JabRef is now more relaxed when parsing field content: In case a field content ended with `\`, the combination `\}` was treated as plain `}`. [#9668](https://github.com/JabRef/jabref/issues/9668)
 - We resolved an issue that cut off the number of group entries when it exceedet four digits. [#8797](https://github.com/JabRef/jabref/issues/8797)
+- We fixed an issue where the Global Search UI preview is still white in dark theme. [#9362](https://github.com/JabRef/jabref/issues/9362)
+- We fixed the double paste issue when <kbd>Cmd</kbd> + <kbd>v</kbd> is pressed on 'New entry from plaintext' dialog. [#9367](https://github.com/JabRef/jabref/issues/9367)
 
 
 ### Removed
