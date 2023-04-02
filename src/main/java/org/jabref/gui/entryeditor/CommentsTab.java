@@ -75,15 +75,9 @@ public class CommentsTab extends FieldsEditorTab {
             Set<Field> comments = new LinkedHashSet<>();
             comments.add(defaultCommentField);
 
-            // Add other comment fields from the entry
             comments.addAll(entry.getFields().stream()
                                  .filter(field -> field.equals(StandardField.COMMENT) || field instanceof UserSpecificCommentField || field.getName().toLowerCase().contains("comment"))
                                  .collect(Collectors.toSet()));
-
-            // Filter out all fields that have the string "comment" in their name
-//            comments = comments.stream()
-//                               .filter(field -> field.getName().toLowerCase().contains("comment"))
-//                               .collect(Collectors.toSet());
 
             return comments;
         } else {

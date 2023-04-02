@@ -74,7 +74,6 @@ public class OtherFieldsTab extends FieldsEditorTab {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             Set<Field> allKnownFields = entryType.get().getAllFields();
-//            Set<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(LinkedHashSet::new));
             Set<Field> otherFields = entry.getFields().stream()
                                           .filter(field -> !allKnownFields.contains(field) && !field.getName().toLowerCase().contains("comment"))
                                           .collect(Collectors.toCollection(LinkedHashSet::new));
