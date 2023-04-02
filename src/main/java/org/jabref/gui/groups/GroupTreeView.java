@@ -15,11 +15,14 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
+import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
@@ -75,6 +78,8 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
+    private static final double SCROLL_SPEED = 50;
+
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
@@ -90,6 +95,9 @@ public class GroupTreeView extends BorderPane {
     private CustomLocalDragboard localDragboard;
 
     private DragExpansionHandler dragExpansionHandler;
+
+    private Timer scrollTimer;
+    private double scrollVelocity = 0;
 
     /**
      * Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
@@ -238,6 +246,8 @@ public class GroupTreeView extends BorderPane {
                 .withPseudoClass(PSEUDOCLASS_SUBELEMENT, row -> Bindings.createBooleanBinding(
                         () -> (row != null) && (groupTree.getTreeItemLevel(row.getTreeItem()) > 1), row.treeItemProperty()))
                 .install(groupTree);
+
+        setupDragScrolling();
 
         // Filter text field
         setupClearButtonField(searchField);
@@ -420,6 +430,40 @@ public class GroupTreeView extends BorderPane {
         }
 
         return node;
+    }
+
+    // see http://programmingtipsandtraps.blogspot.com/2015/10/drag-and-drop-in-treetableview-with.html
+    private void setupDragScrolling() {
+        scrollTimer = FxTimer.createPeriodic(Duration.ofMillis(20), () ->
+                getVerticalScrollbar().ifPresent(scrollBar -> {
+                    double newValue = scrollBar.getValue() + scrollVelocity;
+                    newValue = Math.min(newValue, 1d);
+                    newValue = Math.max(newValue, 0d);
+                    scrollBar.setValue(newValue);
+                }));
+
+        groupTree.setOnScroll((event) -> scrollTimer.stop());
+        groupTree.setOnDragDone((event) -> scrollTimer.stop());
+        groupTree.setOnDragEntered((event) -> scrollTimer.stop());
+        groupTree.setOnDragDropped((event) -> scrollTimer.stop());
+        groupTree.setOnDragExited((event) -> {
+            if (event.getY() > 0) {
+                scrollVelocity = 1.0 / SCROLL_SPEED;
+            } else {
+                scrollVelocity = -1.0 / SCROLL_SPEED;
+            }
+            scrollTimer.restart();
+        });
+    }
+
+    private Optional<ScrollBar> getVerticalScrollbar() {
+        for (Node node : groupTree.lookupAll(".scroll-bar")) {
+            if (node instanceof ScrollBar scrollbar
+                    && scrollbar.getOrientation().equals(Orientation.VERTICAL)) {
+                return Optional.of(scrollbar);
+            }
+        }
+        return Optional.empty();
     }
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
