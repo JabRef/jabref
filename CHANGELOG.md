@@ -35,7 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - `log.txt` does not contain entries for non-found files during PDF indexing. [#9678](https://github.com/JabRef/jabref/pull/9678)
 - We improved the Medline importer to correctly import ISO dates for `revised`. [#9536](https://github.com/JabRef/jabref/issues/9536)
 - To avoid cluttering of the directory, We always delete the `.sav` file upon successful write. [#9675](https://github.com/JabRef/jabref/pull/9675)
-
+- We improved the unlinking/deletion of multiple linked files of an entry using the <kbd>Delete</kbd> key [#9473](https://github.com/JabRef/jabref/issues/9473)
 
 
 ### Fixed
