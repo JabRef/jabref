@@ -81,9 +81,9 @@ public class CommentsTab extends FieldsEditorTab {
                                  .collect(Collectors.toSet()));
 
             // Filter out all fields that have the string "comment" in their name
-            comments = comments.stream()
-                               .filter(field -> field.getName().toLowerCase().contains("comment"))
-                               .collect(Collectors.toSet());
+//            comments = comments.stream()
+//                               .filter(field -> field.getName().toLowerCase().contains("comment"))
+//                               .collect(Collectors.toSet());
 
             return comments;
         } else {
