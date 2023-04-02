@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
@@ -41,6 +40,7 @@ import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.GrobidOptInDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -218,10 +218,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case DELETE_ENTRY:
-                        List<LinkedFileViewModel> toBeDeleted = List.copyOf(listView.getSelectionModel().getSelectedItems());
-                        for (LinkedFileViewModel selectedItem : toBeDeleted) {
-                            viewModel.deleteFile(selectedItem);
-                        }
+                        new DeleteFileAction(dialogService, preferencesService, databaseContext,
+                                viewModel, listView).execute();
                         event.consume();
                         break;
                     default:

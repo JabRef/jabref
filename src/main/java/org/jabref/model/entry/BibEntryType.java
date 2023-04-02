@@ -38,7 +38,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
      */
     public Set<BibField> getOptionalFields() {
         return getAllBibFields().stream()
-                             .filter(field -> !isRequired(field.getField()))
+                             .filter(field -> !isRequired(field.field()))
                              .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
@@ -66,20 +66,20 @@ public class BibEntryType implements Comparable<BibEntryType> {
     }
 
     public Set<Field> getAllFields() {
-        return fields.stream().map(BibField::getField).collect(Collectors.toCollection(LinkedHashSet::new));
+        return fields.stream().map(BibField::field).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Set<Field> getPrimaryOptionalFields() {
         return getOptionalFields().stream()
-                                  .filter(field -> field.getPriority() == FieldPriority.IMPORTANT)
-                                  .map(BibField::getField)
+                                  .filter(field -> field.priority() == FieldPriority.IMPORTANT)
+                                  .map(BibField::field)
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Set<Field> getSecondaryOptionalFields() {
         return getOptionalFields().stream()
-                                  .filter(field -> field.getPriority() == FieldPriority.DETAIL)
-                                  .map(BibField::getField)
+                                  .filter(field -> field.priority() == FieldPriority.DETAIL)
+                                  .map(BibField::field)
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
@@ -112,9 +112,9 @@ public class BibEntryType implements Comparable<BibEntryType> {
     private Set<Field> getOptionalFieldsAndAliases() {
         Set<Field> optionalFieldsAndAliases = new LinkedHashSet<>(getOptionalFields().size());
         for (BibField field : getOptionalFields()) {
-            optionalFieldsAndAliases.add(field.getField());
-            if (EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.containsKey(field.getField())) {
-                optionalFieldsAndAliases.add(field.getField());
+            optionalFieldsAndAliases.add(field.field());
+            if (EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX.containsKey(field.field())) {
+                optionalFieldsAndAliases.add(field.field());
             }
         }
         return optionalFieldsAndAliases;

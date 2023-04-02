@@ -123,7 +123,7 @@ public class DuplicateCheck {
         if (optionalFields.isEmpty()) {
             return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
-        final double[] opt = DuplicateCheck.compareFieldSet(optionalFields.stream().map(BibField::getField).collect(Collectors.toSet()), one, two);
+        final double[] opt = DuplicateCheck.compareFieldSet(optionalFields.stream().map(BibField::field).collect(Collectors.toSet()), one, two);
         final double numerator = (DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1]);
         final double denominator = (req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1];
         final double totValue = numerator / denominator;
