@@ -1,7 +1,7 @@
 package org.jabref.logic.cleanup;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,11 +34,7 @@ public class DoiCleanup implements CleanupJob {
             String doiFieldValue = entry.getField(StandardField.DOI).orElse(null);
 
             String decodeDoiFieldValue = "";
-            try {
-                decodeDoiFieldValue = URLDecoder.decode(doiFieldValue, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                decodeDoiFieldValue = doiFieldValue;
-            }
+            decodeDoiFieldValue = URLDecoder.decode(doiFieldValue, StandardCharsets.UTF_8);
             doiFieldValue = decodeDoiFieldValue;
 
             Optional<DOI> doi = DOI.parse(doiFieldValue);

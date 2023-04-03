@@ -61,7 +61,7 @@ public class BibEntryTypesManager {
         builder.append(FieldFactory.serializeFieldsList(
                 entryType.getOptionalFields()
                          .stream()
-                         .map(BibField::getField)
+                         .map(BibField::field)
                          .collect(Collectors.toList())));
         builder.append("]");
         return builder.toString();
@@ -170,7 +170,7 @@ public class BibEntryTypesManager {
 
         /**
          * This method returns the BibtexEntryType for the name of a type,
-         * or null if it does not exist.
+         * or an empty optional if it does not exist.
          */
         public Optional<BibEntryType> enrich(EntryType type) {
             Optional<BibEntryType> enrichedType = customOrModifiedType.stream()

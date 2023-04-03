@@ -157,11 +157,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         loading.set(true);
 
         try {
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame);
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame, preferencesService);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 
-            if (!folder.getValue().isEmpty()) {
+            if (!folder.getValue().isEmpty() && autosave.get()) {
                 try {
                     new SaveDatabaseAction(libraryTab, preferencesService, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
@@ -253,7 +253,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         }
 
         rememberPassword.set(sharedDatabaseRememberPassword);
-        
+
         sharedDatabaseFolder.ifPresent(folder::set);
         autosave.set(sharedDatabaseAutosave);
     }

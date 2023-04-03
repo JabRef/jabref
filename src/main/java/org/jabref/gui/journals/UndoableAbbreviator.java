@@ -7,16 +7,20 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 public class UndoableAbbreviator {
 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final AbbreviationType abbreviationType;
+    private final boolean useFJournalField;
 
-    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType) {
+    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType, boolean useFJournalField) {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.abbreviationType = abbreviationType;
+        this.useFJournalField = useFJournalField;
     }
 
     /**
@@ -43,10 +47,17 @@ public class UndoableAbbreviator {
             return false; // Unknown, cannot abbreviate anything.
         }
 
-        String newText = getAbbreviatedName(journalAbbreviationRepository.get(text).get());
+        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get();
+        String newText = getAbbreviatedName(abbreviation);
 
         if (newText.equals(origText)) {
             return false;
+        }
+
+        // Store full name into fjournal but only if it exists
+        if (useFJournalField && (StandardField.JOURNAL.equals(fieldName) || StandardField.JOURNALTITLE.equals(fieldName))) {
+            entry.setField(AMSField.FJOURNAL, abbreviation.getName());
+            ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, abbreviation.getName()));
         }
 
         entry.setField(fieldName, newText);
@@ -58,8 +69,8 @@ public class UndoableAbbreviator {
         switch (abbreviationType) {
             case DEFAULT:
                 return text.getAbbreviation();
-            case MEDLINE:
-                return text.getMedlineAbbreviation();
+            case DOTLESS:
+                return text.getDotlessAbbreviation();
             case SHORTEST_UNIQUE:
                 return text.getShortestUniqueAbbreviation();
             default:

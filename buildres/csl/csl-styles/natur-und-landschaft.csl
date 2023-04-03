@@ -13,7 +13,7 @@
     <category citation-format="author-date"/>
     <category field="science"/>
     <issn>0028-0615</issn>
-    <updated>2017-02-22T17:40:00+00:00</updated>
+    <updated>2023-02-08T11:46:10+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -170,13 +170,17 @@
             <text macro="publisher"/>
           </group>
         </else-if>
-        <else-if type="webpage post-weblog" match="any">
-          <text macro="title" prefix=" "/>
-          <text variable="container-title" font-style="normal"/>
-          <text variable="URL" prefix=" "/>
-          <group delimiter=" " prefix="(" suffix=")">
-            <text term="accessed"/>
-            <date form="numeric" variable="accessed"/>
+        <else-if type="webpage post-weblog post" match="any">
+          <group delimiter=". ">
+            <text macro="title" prefix=" "/>
+            <text variable="container-title" font-style="normal"/>
+            <group delimiter=" ">
+              <text variable="URL" prefix=" "/>
+              <group delimiter=" " prefix="(" suffix=")">
+                <text term="accessed"/>
+                <date form="numeric" variable="accessed"/>
+              </group>
+            </group>
           </group>
         </else-if>
         <else>
@@ -202,7 +206,7 @@
         </else>
       </choose>
       <choose>
-        <if type="webpage post-weblog" match="none">
+        <if type="webpage post-weblog post" match="none">
           <choose>
             <if variable="URL">
               <text variable="URL" prefix="((" suffix="))"/>

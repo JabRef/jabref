@@ -1,6 +1,5 @@
 ---
 parent: Code Howtos
-nav_order: 5
 ---
 # Fetchers
 

@@ -28,6 +28,7 @@ import org.jabref.logic.importer.fileformat.endnote.Contributors;
 import org.jabref.logic.importer.fileformat.endnote.Dates;
 import org.jabref.logic.importer.fileformat.endnote.ElectronicResourceNum;
 import org.jabref.logic.importer.fileformat.endnote.Isbn;
+import org.jabref.logic.importer.fileformat.endnote.Keyword;
 import org.jabref.logic.importer.fileformat.endnote.Keywords;
 import org.jabref.logic.importer.fileformat.endnote.Label;
 import org.jabref.logic.importer.fileformat.endnote.Notes;
@@ -212,7 +213,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.NOTE, value.trim()));
         getUrl(endNoteRecord)
                 .ifPresent(value -> entry.setField(StandardField.URL, value));
-        entry.putKeywords(getKeywords(endNoteRecord), preferences.getKeywordSeparator());
+        entry.putKeywords(getKeywords(endNoteRecord), preferences.bibEntryPreferences().getKeywordSeparator());
         Optional.ofNullable(endNoteRecord.getAbstract())
                 .map(Abstract::getStyle)
                 .map(Style::getContent)
@@ -307,9 +308,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         if (keywords != null) {
             return keywords.getKeyword()
                            .stream()
-                           .map(keyword -> keyword.getStyle())
+                           .map(Keyword::getStyle)
                            .filter(Objects::nonNull)
-                           .map(style -> style.getContent())
+                           .map(Style::getContent)
                            .collect(Collectors.toList());
         } else {
             return Collections.emptyList();

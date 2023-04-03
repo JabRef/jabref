@@ -7,7 +7,6 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SavePreferences;
@@ -19,6 +18,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.GeneralPreferences;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.eclipse.jgit.api.Git;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,9 @@ import static org.mockito.Mockito.when;
 
 /**
  * Integration test of the components used for SLR support
+ * Marked as FetcherTest as it calls fetcher
  */
+@FetcherTest
 class CrawlerTest {
     @TempDir
     Path tempRepositoryDirectory;
@@ -91,6 +93,7 @@ class CrawlerTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                "",
                 ',');
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -100,8 +103,8 @@ class CrawlerTest {
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
         entryTypesManager = new BibEntryTypesManager();
     }
 

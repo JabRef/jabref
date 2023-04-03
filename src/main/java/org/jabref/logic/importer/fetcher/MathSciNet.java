@@ -27,6 +27,7 @@ import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -114,7 +115,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new MoveFieldCleanup(new UnknownField("fjournal"), StandardField.JOURNAL).cleanup(entry);
+        new MoveFieldCleanup(AMSField.FJOURNAL, StandardField.JOURNAL).cleanup(entry);
         new MoveFieldCleanup(new UnknownField("mrclass"), StandardField.KEYWORDS).cleanup(entry);
         new FieldFormatterCleanup(new UnknownField("mrreviewer"), new ClearFormatter()).cleanup(entry);
         new DoiCleanup().cleanup(entry);

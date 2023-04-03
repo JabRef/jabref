@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,6 +35,8 @@ import org.jabref.model.util.OptionalUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class manages the GUI-state of JabRef, including:
@@ -49,6 +52,7 @@ import com.tobiasdiez.easybind.EasyBinding;
  */
 public class StateManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StateManager.class);
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
@@ -66,6 +70,8 @@ public class StateManager {
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
 
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
+
+    private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
@@ -129,6 +135,15 @@ public class StateManager {
         return activeDatabase.get();
     }
 
+    public void setActiveDatabase(BibDatabaseContext database) {
+        if (database == null) {
+            LOGGER.info("No open database detected");
+            activeDatabaseProperty().set(Optional.empty());
+        } else {
+            activeDatabaseProperty().set(Optional.of(database));
+        }
+    }
+
     public List<BibEntry> getEntriesInCurrentDatabase() {
         return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
                            .collect(Collectors.toList());
@@ -188,5 +203,36 @@ public class StateManager {
 
     public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
         lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
+    }
+
+    public List<String> collectAllDatabasePaths() {
+        List<String> list = new ArrayList<>();
+        getOpenDatabases().stream()
+                          .map(BibDatabaseContext::getDatabasePath)
+                          .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                  path -> list.add(path.toAbsolutePath().toString()),
+                                  () -> list.add("")));
+        return list;
+    }
+
+    public void addSearchHistory(String search) {
+        searchHistory.remove(search);
+        searchHistory.add(search);
+    }
+
+    public ObservableList<String> getWholeSearchHistory() {
+        return searchHistory;
+    }
+
+    public List<String> getLastSearchHistory(int size) {
+        int sizeSearches = searchHistory.size();
+        if (size < sizeSearches) {
+            return searchHistory.subList(sizeSearches - size, sizeSearches);
+        }
+        return searchHistory;
+    }
+
+    public void clearSearchHistory() {
+        searchHistory.clear();
     }
 }

@@ -23,6 +23,7 @@ import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -37,7 +38,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.util.FileHelper;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -88,7 +89,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
      * TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
      */
     public static LinkedFile fromFile(Path file, List<Path> fileDirectories, FilePreferences filePreferences) {
-        String fileExtension = FileHelper.getFileExtension(file).orElse("");
+        String fileExtension = FileUtil.getFileExtension(file).orElse("");
         ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, filePreferences)
                                                               .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
@@ -195,40 +196,50 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return result;
     }
 
+    public boolean downloadFile(String urlText) {
+        try {
+            URL url = new URL(urlText);
+            addFromURLAndDownload(url);
+            return true;
+        } catch (MalformedURLException exception) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Invalid URL"),
+                    exception);
+            return false;
+        }
+    }
+
     public void fetchFulltext() {
         FulltextFetchers fetcher = new FulltextFetchers(
                 preferences.getImportFormatPreferences(),
                 preferences.getImporterPreferences());
-        BackgroundTask
+        Optional<String> urlField = entry.getField(StandardField.URL);
+        boolean download_success = false;
+        if (urlField.isPresent()) {
+            download_success = downloadFile(urlField.get());
+        }
+        if (urlField.isEmpty() || !download_success) {
+            BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))
                 .onFinished(() -> fulltextLookupInProgress.setValue(false))
                 .onSuccess(url -> {
                     if (url.isPresent()) {
-                        addFromURL(url.get());
+                        addFromURLAndDownload(url.get());
                     } else {
                         dialogService.notify(Localization.lang("No full text document found"));
                     }
                 })
                 .executeWith(taskExecutor);
-    }
-
-    public void addFromURL() {
-        Optional<String> urlText = dialogService.showInputDialogAndWait(
-                Localization.lang("Download file"), Localization.lang("Enter URL to download"));
-        if (urlText.isPresent()) {
-            try {
-                URL url = new URL(urlText.get());
-                addFromURL(url);
-            } catch (MalformedURLException exception) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Invalid URL"),
-                        exception);
-            }
         }
     }
 
-    private void addFromURL(URL url) {
+    public void addFromURL() {
+        AttachFileFromURLAction.getUrlForDownloadFromClipBoardOrEntry(dialogService, entry)
+                               .ifPresent(this::downloadFile);
+    }
+
+    private void addFromURLAndDownload(URL url) {
         LinkedFileViewModel onlineFile = new LinkedFileViewModel(
                 new LinkedFile(url, ""),
                 entry,

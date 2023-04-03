@@ -385,15 +385,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
         Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
 
         if (file.isEmpty()) {
-            LOGGER.warn("Could not find file " + linkedFile.getLink());
+            LOGGER.warn("Could not find file {}", linkedFile.getLink());
             return true;
         }
 
         ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"), ButtonData.YES);
         ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
         Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
-                Localization.lang("Delete '%0'", file.get().toString()),
-                Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                Localization.lang("Delete '%0'", file.get().getFileName().toString()),
+                Localization.lang("Delete '%0' permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk.", file.get().toString()),
                 removeFromEntry, deleteFromEntry, ButtonType.CANCEL);
 
         if (buttonType.isPresent()) {
@@ -407,7 +407,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return true;
                 } catch (IOException ex) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Cannot delete file"), Localization.lang("File permission error"));
-                    LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                    LOGGER.warn("File permission error while deleting: {}", linkedFile, ex);
                 }
             }
         }
@@ -490,13 +490,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
-                                urlDownload.getSource().toString()))) {
+                                          urlDownload.getSource().toString()))) {
                     return true;
                 } else {
                     dialogService.notify(Localization.lang("Download operation canceled."));
+                    return false;
                 }
+            } else {
+                LOGGER.error("Error while checking if the file can be downloaded", ex);
+                dialogService.notify(Localization.lang("Error downloading"));
+                return false;
             }
-            return false;
         }
         return true;
     }
@@ -508,8 +512,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
                     ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
-                    String suggestedTypeName = externalFileType.getName();
-                    linkedFile.setFileType(suggestedTypeName);
+
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
                     String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileDirectoryPattern());
                     suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);

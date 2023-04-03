@@ -158,6 +158,8 @@ public class BibDatabaseContext {
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
         // 3. BIB file directory or Main file directory
+        // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
+        // (in the metadata of the bib file)
         if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
@@ -169,7 +171,7 @@ public class BibDatabaseContext {
             });
         } else {
             // Main file directory
-            preferences.getFileDirectory().ifPresent(fileDirs::add);
+            preferences.getMainFileDirectory().ifPresent(fileDirs::add);
         }
 
         return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
@@ -181,7 +183,9 @@ public class BibDatabaseContext {
      * @return the path - or an empty optional, if none of the directories exists
      */
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
-        return getFileDirectories(preferences).stream().filter(Files::exists).findFirst();
+        return getFileDirectories(preferences).stream()
+                                              .filter(Files::exists)
+                                              .findFirst();
     }
 
     private Path getFileDirectoryPath(String directoryName) {
@@ -244,13 +248,17 @@ public class BibDatabaseContext {
 
     public Path getFulltextIndexPath() {
         Path appData = getFulltextIndexBasePath();
+        Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData);
-            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
+            return indexPath;
         }
 
-        return appData.resolve("unsaved");
+        indexPath = appData.resolve("unsaved");
+        LOGGER.debug("Using index for unsaved database: {}", indexPath);
+        return indexPath;
     }
 
     @Override

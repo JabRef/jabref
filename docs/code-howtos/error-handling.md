@@ -1,6 +1,5 @@
 ---
 parent: Code Howtos
-nav_order: 3
 ---
 # Error Handling in JabRef
 

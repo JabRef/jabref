@@ -211,7 +211,7 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("results");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                    BibEntry entry = parseBibJSONtoBibtex(bibJsonEntry, preferences.getKeywordSeparator());
+                    BibEntry entry = parseBibJSONtoBibtex(bibJsonEntry, preferences.bibEntryPreferences().getKeywordSeparator());
                     entries.add(entry);
                 }
             }

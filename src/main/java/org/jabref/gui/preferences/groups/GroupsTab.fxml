@@ -3,9 +3,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
@@ -22,9 +20,4 @@
                  toggleGroup="$groupViewMode"/>
     <CheckBox fx:id="autoAssignGroup" text="%Automatically assign new entry to selected groups"/>
     <CheckBox fx:id="displayGroupCount" text="%Display count of items in group"/>
-
-    <HBox spacing="4" alignment="CENTER_LEFT">
-        <Label text="%Keyword separator"/>
-        <TextField fx:id="keywordSeparator" minWidth="30.0" maxWidth="30.0"/>
-    </HBox>
 </fx:root>

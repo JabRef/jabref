@@ -40,6 +40,18 @@ class SpecialFieldsToSeparateFieldsTest {
     }
 
     @Test
+    public void noKeywordToMigrateButDuplicateKeywords() {
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
+                                       .withField(StandardField.KEYWORDS, "asdf, asdf, asdf");
+        BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
+                                          .withField(StandardField.KEYWORDS, "asdf, asdf, asdf");
+
+        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
+
+        assertEquals(expected, entry);
+    }
+
+    @Test
     public void migrateMultipleSpecialFields() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
                                        .withField(StandardField.KEYWORDS, "printed, prio1");

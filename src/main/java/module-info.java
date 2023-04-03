@@ -77,7 +77,7 @@ open module org.jabref {
     requires unirest.java;
     requires org.apache.httpcomponents.httpclient;
     requires org.jsoup;
-    requires commons.csv;
+    requires org.apache.commons.csv;
     requires io.github.javadiffutils;
     requires java.string.similarity;
     requires ojdbc10;
@@ -94,8 +94,6 @@ open module org.jabref {
     requires com.ibm.icu;
 
     requires flexmark;
-    requires flexmark.ext.gfm.strikethrough;
-    requires flexmark.ext.gfm.tasklist;
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;
@@ -114,6 +112,8 @@ open module org.jabref {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires net.harawata.appdirs;
+    requires com.sun.jna;
+    requires com.sun.jna.platform;
 
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;

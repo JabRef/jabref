@@ -189,7 +189,6 @@ class IntegrityCheckTest {
     }
 
     private CitationKeyPatternPreferences createCitationKeyPatternPreferences() {
-        final GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
         return new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -198,7 +197,8 @@ class IntegrityCheckTest {
                 "",
                 "",
                 CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
-                keyPattern,
+                GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                "",
                 ',');
     }
 

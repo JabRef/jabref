@@ -14,7 +14,6 @@ public interface NativeDesktop {
      *
      * @param filePath    The filename.
      * @param application Link to the app that opens the file.
-     * @throws IOException
      */
     void openFileWithApplication(String filePath, String application) throws IOException;
 
@@ -30,6 +29,13 @@ public interface NativeDesktop {
      * @return the path to the applications folder.
      */
     Path getApplicationDirectory();
+
+    /**
+     * Get the user's default file chooser directory
+     *
+     * @return The path to the directory
+     */
+     Path getDefaultFileChooserDirectory();
 
     /**
      * Returns the path to the system's user directory.

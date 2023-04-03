@@ -85,6 +85,9 @@ interface SearchBasedFetcherCapabilityTest {
 
     /**
      * Test whether the library API supports journal based search.
+     *
+     * WARNING: the error while merging information from user-assigned DOI (more specifically, "10.1016/j.geomphys.2012.09.009")
+     * is related to a failed read by the Bibtex Parser (title is formatted in a weird way)
      */
     @Test
     default void supportsJournalSearch() throws Exception {

@@ -1,8 +1,8 @@
 name: Refresh Journal Lists
 
 on:
+  # Allow to run manually
   workflow_dispatch:
-    # Allow to run manually
 
 permissions:
   contents: read
@@ -15,16 +15,13 @@ jobs:
     name: Refresh Journal List Files
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
-          ref: main
-          persist-credentials: false
-          fetch-depth: 0
+          persist-credentials: true
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Update journal lists
@@ -37,24 +34,37 @@ jobs:
           cd abbrv.jabref.org/journals
 
           # remove all lists without dot in them
-          # we use abbrevatiation lists containing dots in them only (to be consistent)
+          # we use abbreviation lists containing dots in them only (to be consistent)
           rm journal_abbreviations_entrez.csv
           rm journal_abbreviations_medicus.csv
-          rm journal_abbreviations_webofscience-dots.csv
+          rm journal_abbreviations_webofscience-dotless.csv
+
+          # we currently do not have good support for BibTeX strings
+          rm journal_abbreviations_ieee_strings.csv
 
           # prepare building
           mkdir -p $GITHUB_WORKSPACE/build/journals
           cp * $GITHUB_WORKSPACE/build/journals/
 
           # ensure that the .java classes are the most recent ones
+          mkdir -p $GITHUB_WORKSPACE/buildSrc/src/copied/java/org/jabref/logic/journals
           cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/copied/java/org/jabref/logic/journals
 
           # create .mv file
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
       - uses: peter-evans/create-pull-request@v4
+        if: github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update-journallist
           title: "[Bot] Update Journal abbrev list"
           commit-message: Update journal abbrev list
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        if: github.ref != 'refs/heads/main'
+        with:
+          message: 'Update journal abbrev list'
+          committer_email: actions@github.com
+          fetch: false
+          push: true

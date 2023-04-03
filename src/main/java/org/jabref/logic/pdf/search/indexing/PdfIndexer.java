@@ -188,7 +188,7 @@ public class PdfIndexer {
         }
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
-            LOGGER.warn("Could not find {}", linkedFile.getLink());
+            LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
         }
         try {

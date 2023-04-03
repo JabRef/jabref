@@ -2,36 +2,39 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
     <title>Biochemical Society Transactions</title>
-    <title-short>Biochem Soc Trans</title-short>
+    <title-short>BST</title-short>
     <id>http://www.zotero.org/styles/biochemical-society-transactions</id>
     <link href="http://www.zotero.org/styles/biochemical-society-transactions" rel="self"/>
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
-    <link href="http://www.biochemsoctrans.org/" rel="documentation"/>
+    <link href="https://portlandpress.com/biochemsoctrans/pages/instructions_to_authors" rel="documentation"/>
     <author>
       <name>Mélanie Tremblay</name>
       <email>melanie.tremblay@hepato-neuro.ca</email>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>0300-5127</issn>
     <eissn>1470-8752</eissn>
     <summary>Biochem Soc Trans style.</summary>
-    <updated>2013-10-18T00:04:27+00:00</updated>
+    <updated>2022-12-19T12:40:30+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <!--  modified from vancouver  -->
   <macro name="author">
-    <names variable="author" suffix=". ">
-      <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
+    <names variable="author">
+      <name and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
       <label form="long" prefix=", "/>
       <substitute>
         <names variable="editor"/>
+        <text macro="title"/>
       </substitute>
     </names>
   </macro>
   <macro name="editor">
-    <names variable="editor" suffix=". ">
-      <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
+    <names variable="editor">
+      <name and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
       <label form="long" prefix=", "/>
     </names>
   </macro>
@@ -46,10 +49,14 @@
     </group>
   </macro>
   <macro name="access">
-    <group>
-      <text value="Available from: "/>
-      <text variable="URL"/>
-    </group>
+    <choose>
+      <if match="any" variable="DOI">
+        <text variable="DOI" prefix="https://doi.org/"/>
+      </if>
+      <else>
+        <text variable="URL"/>
+      </else>
+    </choose>
   </macro>
   <macro name="accessed-date">
     <choose>
@@ -68,14 +75,7 @@
   <macro name="journal-title">
     <choose>
       <if type="article-journal article-magazine" match="any">
-        <group suffix=". ">
-          <text variable="container-title" form="short"/>
-          <choose>
-            <if variable="URL">
-              <text term="internet" prefix=" [" suffix="]" text-case="capitalize-first"/>
-            </if>
-          </choose>
-        </group>
+        <text variable="container-title" form="short" font-style="italic"/>
       </if>
       <else>
         <text variable="container-title" suffix=". " form="short"/>
@@ -83,18 +83,7 @@
     </choose>
   </macro>
   <macro name="title">
-    <group delimiter=" ">
-      <text variable="title"/>
-      <choose>
-        <if type="article-journal article-magazine" match="none">
-          <choose>
-            <if variable="URL">
-              <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
-            </if>
-          </choose>
-        </if>
-      </choose>
-    </group>
+    <text variable="title"/>
   </macro>
   <macro name="edition">
     <choose>
@@ -113,43 +102,49 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout vertical-align="sup" prefix="[" suffix="]" delimiter=",">
+    <layout vertical-align="baseline" delimiter="," prefix="[" suffix="]">
       <text variable="citation-number"/>
     </layout>
   </citation>
   <bibliography et-al-min="7" et-al-use-first="6" second-field-align="flush">
     <layout>
-      <text variable="citation-number" prefix="[" suffix="]"/>
-      <text macro="author"/>
-      <date variable="issued">
-        <date-part name="year" prefix="(" suffix=") "/>
-      </date>
-      <text macro="title" suffix=". "/>
-      <choose>
-        <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-          <group prefix=" " delimiter=" ">
-            <text macro="edition"/>
-            <text macro="publisher"/>
-          </group>
-        </if>
-        <else-if type="chapter paper-conference" match="any">
-          <group prefix=" " suffix=". ">
-            <text term="in" suffix=": " text-case="capitalize-first"/>
-            <text macro="editor"/>
-            <text variable="container-title"/>
-          </group>
-          <text macro="publisher" prefix=" "/>
-          <text variable="page" prefix=" p. " suffix="."/>
-        </else-if>
-        <else>
-          <text macro="journal-title"/>
-          <group suffix=". ">
-            <text variable="volume" font-weight="bold"/>
-            <text variable="page" prefix=", "/>
-          </group>
-        </else>
-      </choose>
-      <text macro="access"/>
+      <text variable="citation-number"/>
+      <group delimiter=". ">
+        <group delimiter=" ">
+          <text macro="author"/>
+          <date variable="issued">
+            <date-part name="year" prefix="(" suffix=")"/>
+          </date>
+          <text macro="title"/>
+        </group>
+        <choose>
+          <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+            <group prefix=" " delimiter=" ">
+              <text macro="edition"/>
+              <text macro="publisher"/>
+            </group>
+          </if>
+          <else-if type="chapter paper-conference" match="any">
+            <group prefix=" " suffix=". ">
+              <text term="in" suffix=": " text-case="capitalize-first"/>
+              <text macro="editor"/>
+              <text variable="container-title"/>
+            </group>
+            <text macro="publisher" prefix=" "/>
+            <text variable="page" prefix=" p. " suffix="."/>
+          </else-if>
+          <else>
+            <group delimiter=" ">
+              <text macro="journal-title"/>
+              <group delimiter=", ">
+                <text variable="volume" font-weight="bold"/>
+                <text variable="page"/>
+              </group>
+            </group>
+          </else>
+        </choose>
+      </group>
+      <text macro="access" prefix=" "/>
     </layout>
   </bibliography>
 </style>

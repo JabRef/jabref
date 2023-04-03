@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +38,7 @@ public class IacrEprintFetcherTest {
 
     private IacrEprintFetcher fetcher;
     private BibEntry abram2017;
+    private BibEntry abram2017noVersion;
     private BibEntry beierle2016;
     private BibEntry delgado2017;
 
@@ -53,6 +56,17 @@ public class IacrEprintFetcherTest {
                 .withField(StandardField.TITLE, "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus")
                 .withField(StandardField.URL, "https://eprint.iacr.org/2017/1118/20171124:064527")
                 .withField(StandardField.VERSION, "20171124:064527")
+                .withField(StandardField.YEAR, "2017");
+
+        abram2017noVersion = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("cryptoeprint:2017/1118")
+                .withField(StandardField.ABSTRACT, "dummy")
+                .withField(StandardField.AUTHOR, "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman")
+                .withField(StandardField.DATE, "2017-11-24")
+                .withField(StandardField.HOWPUBLISHED, "Cryptology ePrint Archive, Paper 2017/1118")
+                .withField(StandardField.NOTE, "\\url{https://eprint.iacr.org/2017/1118}")
+                .withField(StandardField.TITLE, "Solida: A Blockchain Protocol Based on Reconfigurable Byzantine Consensus")
+                .withField(StandardField.URL, "https://eprint.iacr.org/2017/1118")
                 .withField(StandardField.YEAR, "2017");
 
         beierle2016 = new BibEntry(StandardEntryType.Misc)
@@ -184,5 +198,32 @@ public class IacrEprintFetcherTest {
         ids.addAll(getIdsFor(1999, 24));
         ids.removeAll(withdrawnIds);
         return ids.stream();
+    }
+
+    @Test
+    public void getFulltextWithVersion() throws FetcherException, IOException {
+        Optional<URL> pdfUrl = fetcher.findFullText(abram2017);
+        assertEquals(Optional.of("https://eprint.iacr.org/archive/2017/1118/1511505927.pdf"), pdfUrl.map(URL::toString));
+    }
+
+    @Test
+    public void getFulltextWithoutVersion() throws FetcherException, IOException {
+        Optional<URL> pdfUrl = fetcher.findFullText(abram2017noVersion);
+        assertEquals(Optional.of("https://eprint.iacr.org/2017/1118.pdf"), pdfUrl.map(URL::toString));
+    }
+
+    @Test
+    public void getFulltextWithoutUrl() throws FetcherException, IOException {
+        BibEntry abram2017WithoutUrl = abram2017;
+        abram2017WithoutUrl.clearField(StandardField.URL);
+        Optional<URL> pdfUrl = fetcher.findFullText(abram2017WithoutUrl);
+        assertEquals(Optional.empty(), pdfUrl);
+    }
+
+    @Test
+    public void getFulltextWithNonIACRUrl() throws IOException {
+        BibEntry abram2017WithNonIACRUrl = abram2017;
+        abram2017WithNonIACRUrl.setField(StandardField.URL, "https://example.com");
+        assertThrows(FetcherException.class, () -> fetcher.findFullText(abram2017WithNonIACRUrl));
     }
 }

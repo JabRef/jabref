@@ -110,7 +110,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 new MainTableColumnFactory(
                         database,
                         preferencesService,
-                        preferencesService.getColumnPreferences(),
+                        preferencesService.getMainTableColumnPreferences(),
                         libraryTab.getUndoManager(),
                         dialogService,
                         stateManager).createColumns());
@@ -130,7 +130,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         stateManager,
                         preferencesService,
                         undoManager,
-                        Globals.getClipboardManager(),
+                        clipBoardManager,
                         Globals.TASK_EXECUTOR,
                         Globals.entryTypesManager))
                 .setOnDragDetected(this::handleOnDragDetected)
@@ -176,7 +176,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new PersistenceVisualStateTable(this, preferencesService);
+        new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences());
 
         setupKeyBindings(keyBindingRepository);
 
@@ -188,6 +188,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         });
 
         database.getDatabase().registerListener(this);
+
+        MainTableColumnFactory rightClickMenuFactory = new MainTableColumnFactory(
+                database,
+                preferencesService,
+                preferencesService.getMainTableColumnPreferences(),
+                libraryTab.getUndoManager(),
+                dialogService,
+                stateManager);
+        // Enable the header right-click menu.
+        new MainTableHeaderContextMenu(this, rightClickMenuFactory).show(true);
     }
 
     /**
@@ -241,7 +251,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (!selectedEntries.isEmpty()) {
             try {
-                Globals.getClipboardManager().setContent(selectedEntries);
+                clipBoardManager.setContent(selectedEntries);
                 dialogService.notify(libraryTab.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
             } catch (IOException e) {
                 LOGGER.error("Error while copying selected entries to clipboard", e);
@@ -311,10 +321,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void paste() {
-        List<BibEntry> entriesToAdd = new ArrayList<>();
-            entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipbaord()
+        List<BibEntry> entriesToAdd;
+            entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipboard()
             .map(importHandler::handleBibTeXData)
-            .orElseGet(this::handleNonBibteXStringData);
+            .orElseGet(this::handleNonBibTeXStringData);
 
         for (BibEntry entry : entriesToAdd) {
             importHandler.importEntryWithDuplicateCheck(database, entry);
@@ -324,8 +334,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
-    private List<BibEntry> handleNonBibteXStringData() {
-        String data = this.clipBoardManager.getContents();
+    private List<BibEntry> handleNonBibTeXStringData() {
+        String data = ClipBoardManager.getContents();
         List<BibEntry> entries = new ArrayList<>();
         try {
             entries = this.importHandler.handleStringData(data);

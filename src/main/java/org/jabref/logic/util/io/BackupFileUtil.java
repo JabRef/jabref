@@ -10,7 +10,6 @@ import java.util.HexFormat;
 import java.util.Optional;
 
 import org.jabref.logic.util.BackupFileType;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 
 import net.harawata.appdirs.AppDirsFactory;
@@ -25,11 +24,11 @@ public class BackupFileUtil {
     }
 
     public static Path getAppDataBackupDir() {
-        Path directory = Path.of(AppDirsFactory.getInstance().getUserDataDir(
-                                     OS.APP_DIR_APP_NAME,
-                                     new BuildInfo().version.toString(),
-                                     OS.APP_DIR_APP_AUTHOR))
-                             .resolve("backups");
+        Path directory = Path.of(AppDirsFactory.getInstance()
+                                               .getUserDataDir(
+                                                       OS.APP_DIR_APP_NAME,
+                                                       "backups",
+                                                       OS.APP_DIR_APP_AUTHOR));
         return directory;
     }
 
@@ -69,8 +68,10 @@ public class BackupFileUtil {
 
     /**
      * Finds the latest backup (.sav). If it does not exist, an empty optional is returned
+     *
+     * @param targetFile the full path of the file to backup
      */
-    public static Optional<Path> getPathOfLatestExisingBackupFile(Path targetFile, BackupFileType fileType) {
+    public static Optional<Path> getPathOfLatestExistingBackupFile(Path targetFile, BackupFileType fileType) {
         // The code is similar to "getPathForNewBackupFileAndCreateDirectory"
 
         String extension = "." + fileType.getExtensions().get(0);

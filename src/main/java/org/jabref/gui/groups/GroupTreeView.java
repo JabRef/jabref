@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
@@ -28,7 +30,6 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -115,9 +116,9 @@ public class GroupTreeView extends BorderPane {
         mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
         numberColumn.getStyleClass().add("numberColumn");
-        numberColumn.setMinWidth(40d);
-        numberColumn.setMaxWidth(40d);
-        numberColumn.setPrefWidth(40d);
+        numberColumn.setMinWidth(60d);
+        numberColumn.setMaxWidth(60d);
+        numberColumn.setPrefWidth(60d);
         numberColumn.setResizable(false);
         expansionNodeColumn = new TreeTableColumn<>();
         expansionNodeColumn.getStyleClass().add("expansionNodeColumn");
@@ -132,7 +133,7 @@ public class GroupTreeView extends BorderPane {
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
         this.setCenter(groupTree);
 
-        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(60d).subtract(15));
+        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
 
         addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setId("addNewGroup");
@@ -214,10 +215,27 @@ public class GroupTreeView extends BorderPane {
                                 }
 
                                 if (newValue) {
-                                    text.textProperty().bind(group.getHits().asString());
+                                    text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                                 }
                             });
                     text.getStyleClass().setAll("text");
+
+                    text.styleProperty().bind(Bindings.createStringBinding(() -> {
+                        double reducedFontSize;
+                        double font_size = preferencesService.getAppearancePreferences().getMainFontSize();
+                        // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
+                        if (font_size > 26.0) {
+                            reducedFontSize = 0.25;
+                        } else if (font_size > 22.0) {
+                            reducedFontSize = 0.35;
+                        } else if (font_size > 18.0) {
+                            reducedFontSize = 0.55;
+                        } else {
+                            reducedFontSize = 0.75;
+                        }
+                        return String.format("-fx-font-size: %fem;", reducedFontSize);
+                    }, preferencesService.getAppearancePreferences().mainFontSizeProperty()));
+
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
                     return node;
@@ -266,10 +284,7 @@ public class GroupTreeView extends BorderPane {
                             .mapOpt(this::createContextMenuForGroup)
                             .orElseOpt((ContextMenu) null));
             row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    // Prevent right-click to select group
-                    event.consume();
-                } else if (event.getTarget() instanceof StackPane pane) {
+                if (event.getTarget() instanceof StackPane pane) {
                     if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
                         event.consume();
                     }
@@ -320,14 +335,14 @@ public class GroupTreeView extends BorderPane {
                 Dragboard dragboard = event.getDragboard();
                 boolean success = false;
 
-                if (dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
+                if (dragboard.hasContent(DragAndDropDataFormats.GROUP) && viewModel.canAddGroupsIn(row.getItem())) {
                     List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
                     List<GroupNodeViewModel> changedGroups = new LinkedList<>();
                     for (String pathToSource : pathToSources) {
                         Optional<GroupNodeViewModel> source = viewModel
                                 .rootGroupProperty().get()
                                 .getChildByPath(pathToSource);
-                        if (source.isPresent()) {
+                        if (source.isPresent() && viewModel.canBeDragged(source.get())) {
                             source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
                             changedGroups.add(source.get());
                             success = true;
@@ -335,6 +350,9 @@ public class GroupTreeView extends BorderPane {
                     }
                     groupTree.getSelectionModel().clearSelection();
                     changedGroups.forEach(value -> selectNode(value, true));
+                    if (success) {
+                        viewModel.writeGroupChangesToMetaData();
+                    }
                 }
 
                 if (localDragboard.hasBibEntries()) {
@@ -403,7 +421,11 @@ public class GroupTreeView extends BorderPane {
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
         ContextMenu menu = new ContextMenu();
-        Menu removeGroup = new Menu(Localization.lang("Remove group"));
+
+        Menu removeGroupWithSubgroups = new Menu(Localization.lang("Remove group"));
+
+        MenuItem removeGroupNoSubgroups = new MenuItem(Localization.lang("Remove group"));
+        removeGroupNoSubgroups.setOnAction(event -> viewModel.removeGroupNoSubgroups(group));
 
         MenuItem editGroup = new MenuItem(Localization.lang("Edit group"));
         editGroup.setOnAction(event -> {
@@ -425,12 +447,10 @@ public class GroupTreeView extends BorderPane {
         });
 
         MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
-        removeSubgroups.setOnAction(event -> {
-            viewModel.removeSubgroups(group);
-        });
+        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
 
-        MenuItem sortSubgroups = new MenuItem(Localization.lang("Sort subgroups"));
-        sortSubgroups.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
+        MenuItem sortSubgroups = new MenuItem(Localization.lang("Sort subgroups A-Z"));
+        sortSubgroups.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group.getGroupNode()));
 
         MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
         addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
@@ -438,17 +458,40 @@ public class GroupTreeView extends BorderPane {
         MenuItem removeEntries = new MenuItem(Localization.lang("Remove selected entries from this group"));
         removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
 
-        menu.getItems().add(editGroup);
-        removeGroup.getItems().add(removeGroupKeepSubgroups);
-        removeGroup.getItems().add(removeGroupAndSubgroups);
-        menu.getItems().add(removeGroup);
-        menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().add(addSubgroup);
-        menu.getItems().add(removeSubgroups);
-        menu.getItems().add(sortSubgroups);
-        menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().add(addEntries);
-        menu.getItems().add(removeEntries);
+        menu.setOnShown(event -> {
+            menu.getItems().clear();
+            if (viewModel.isEditable(group)) {
+                menu.getItems().add(editGroup);
+                if ((group.getChildren().size() > 0) && viewModel.canAddGroupsIn(group)) {
+                    menu.getItems().add(removeGroupWithSubgroups);
+                    menu.getItems().add(new SeparatorMenuItem());
+                    menu.getItems().add(addSubgroup);
+                    menu.getItems().add(removeSubgroups);
+                    menu.getItems().add(sortSubgroups);
+                } else {
+                    menu.getItems().add(removeGroupNoSubgroups);
+                    if (viewModel.canAddGroupsIn(group)) {
+                        menu.getItems().add(new SeparatorMenuItem());
+                        menu.getItems().add(addSubgroup);
+                    }
+                }
+            }
+            if (group.isRoot()) {
+                menu.getItems().add(addSubgroup);
+                menu.getItems().add(removeSubgroups);
+                menu.getItems().add(sortSubgroups);
+            }
+
+            if (viewModel.canAddEntriesIn(group)) {
+                menu.getItems().add(new SeparatorMenuItem());
+                menu.getItems().add(addEntries);
+                menu.getItems().add(removeEntries);
+            }
+        });
+
+        menu.getItems().add(new Menu());
+        removeGroupWithSubgroups.getItems().add(removeGroupKeepSubgroups);
+        removeGroupWithSubgroups.getItems().add(removeGroupAndSubgroups);
 
         // TODO: Disable some actions under certain conditions
         // if (group.canBeEdited()) {
@@ -471,6 +514,17 @@ public class GroupTreeView extends BorderPane {
 
     private void addNewGroup() {
         viewModel.addNewGroupToRoot();
+    }
+
+    private String getFormattedNumber(int hits) {
+        if (hits >= 1000000) {
+            double millions = hits / 1000000.0;
+            return new DecimalFormat("#,##0.#").format(millions) + "m";
+        } else if (hits >= 1000) {
+            double thousands = hits / 1000.0;
+            return new DecimalFormat("#,##0.#").format(thousands) + "k";
+        }
+        return Integer.toString(hits);
     }
 
     /**

@@ -14,7 +14,7 @@
     <category field="social_science"/>
     <issn>1867-0911</issn>
     <eissn>1867-0938</eissn>
-    <updated>2022-01-12T15:57:21+00:00</updated>
+    <updated>2023-03-08T11:51:34+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -32,15 +32,11 @@
       <if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
         <group delimiter=", ">
           <names variable="container-author" delimiter=", ">
-            <name and="symbol" name-as-sort-order="first">
-              <name-part name="family" font-variant="small-caps"/>
-            </name>
+            <name name-as-sort-order="first"/>
             <label form="short" prefix=" (" text-case="title" suffix=")"/>
           </names>
           <names variable="editor translator" delimiter=", ">
-            <name and="symbol" name-as-sort-order="first">
-              <name-part name="family" font-variant="small-caps"/>
-            </name>
+            <name name-as-sort-order="first"/>
             <label form="short" prefix=" (" text-case="title" suffix=")"/>
           </names>
         </group>
@@ -65,9 +61,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name delimiter="; " and="symbol" delimiter-precedes-last="never" initialize="true" name-as-sort-order="first">
-        <name-part name="family" font-variant="small-caps"/>
-      </name>
+      <name delimiter="; " delimiter-precedes-last="never" name-as-sort-order="first"/>
       <label form="short" prefix=" (" suffix=")" text-case="capitalize-first"/>
       <substitute>
         <names variable="editor"/>
@@ -86,9 +80,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author" font-variant="normal">
-      <name form="short" and="symbol" delimiter-precedes-last="never" initialize-with=". ">
-        <name-part name="family" font-variant="small-caps"/>
-      </name>
+      <name form="short" and="symbol" delimiter-precedes-last="never" initialize-with=". "/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -596,7 +588,7 @@
     <layout suffix=".">
       <group delimiter=". ">
         <group delimiter=": ">
-          <group delimiter=", ">
+          <group font-weight="bold" delimiter=", ">
             <text macro="author"/>
             <text macro="issued"/>
           </group>

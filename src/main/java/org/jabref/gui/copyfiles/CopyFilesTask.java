@@ -34,7 +34,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferencesService;
     private final Path exportPath;
-    private final String localizedSucessMessage = Localization.lang("Copied file successfully");
+    private final String localizedSuccessMessage = Localization.lang("Copied file successfully");
     private final String localizedErrorMessage = Localization.lang("Could not copy file") + ": " + Localization.lang("File exists");
     private final long totalFilesCount;
     private final List<BibEntry> entries;
@@ -96,10 +96,10 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                             }
                         }
                         if (success) {
-                            updateMessage(localizedSucessMessage);
+                            updateMessage(localizedSuccessMessage);
                             numberSuccessful++;
-                            writeLogMessage(newFile, bw, localizedSucessMessage);
-                            addResultToList(newFile, success, localizedSucessMessage);
+                            writeLogMessage(newFile, bw, localizedSuccessMessage);
+                            addResultToList(newFile, success, localizedSuccessMessage);
                         } else {
                             updateMessage(localizedErrorMessage);
                             writeLogMessage(newFile, bw, localizedErrorMessage);
@@ -110,12 +110,12 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
             }
             updateMessage(Localization.lang("Finished copying"));
 
-            String sucessMessage = Localization.lang("Copied %0 files of %1 sucessfully to %2",
+            String successMessage = Localization.lang("Copied %0 files of %1 successfully to %2",
                     Integer.toString(numberSuccessful),
                     Integer.toString(totalFilesCounter),
                     newPath.map(Path::getParent).map(Path::toString).orElse(""));
-            updateMessage(sucessMessage);
-            bw.write(sucessMessage);
+            updateMessage(successMessage);
+            bw.write(successMessage);
             return results;
         }
     }

@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Can be used stand-alone.
  * <p>
- * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.preferences.GeneralPreferences, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
+ * Main using method: {@link org.jabref.logic.importer.OpenDatabase#loadDatabase(java.nio.file.Path, org.jabref.logic.importer.ImportFormatPreferences, org.jabref.model.util.FileUpdateMonitor)}
  * <p>
  * Opposite class: {@link org.jabref.logic.exporter.BibDatabaseWriter}
  */
@@ -83,7 +83,7 @@ public class BibtexParser implements Parser {
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.getFieldContentFormatterPreferences());
+        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldContentFormatterPreferences());
         metaDataParser = new MetaDataParser(fileMonitor);
     }
 
@@ -228,7 +228,7 @@ public class BibtexParser implements Parser {
 
         // Instantiate meta data
         try {
-            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
+            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }
@@ -278,10 +278,10 @@ public class BibtexParser implements Parser {
 
             database.insertEntry(entry);
         } catch (IOException ex) {
-            // Trying to make the parser more robust.
+            // This makes the parser more robust:
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
 
-            LOGGER.debug("Could not parse entry", ex);
+            LOGGER.warn("Could not parse entry", ex);
             parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry."));
         }
@@ -290,7 +290,7 @@ public class BibtexParser implements Parser {
     private void parseJabRefComment(Map<String, String> meta) {
         StringBuilder buffer;
         try {
-            buffer = parseBracketedTextExactly();
+            buffer = parseBracketedFieldContent();
         } catch (IOException e) {
             // if we get an IO Exception here, then we have an unbracketed comment,
             // which means that we should just return and the comment will be picked up as arbitrary text
@@ -500,6 +500,16 @@ public class BibtexParser implements Parser {
         return character;
     }
 
+    private char[] peekTwoCharacters() throws IOException {
+        char character1 = (char) read();
+        char character2 = (char) read();
+        unread(character2);
+        unread(character1);
+        return new char[] {
+                character1, character2
+        };
+    }
+
     private int read() throws IOException {
         int character = pushbackReader.read();
 
@@ -611,7 +621,7 @@ public class BibtexParser implements Parser {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
                 } else if (StandardField.KEYWORDS.equals(field)) {
                     // multiple keywords fields should be combined to one
-                    entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
+                    entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
             } else {
                 entry.setField(field, content);
@@ -635,7 +645,7 @@ public class BibtexParser implements Parser {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside a field, so we need to count the
                 // brackets to know when the string is finished.
-                StringBuilder text = parseBracketedTextExactly();
+                StringBuilder text = parseBracketedFieldContent();
                 value.append(fieldContentFormatter.format(text, field));
             } else if (Character.isDigit((char) character)) { // value is a number
                 String number = parseTextToken();
@@ -668,7 +678,6 @@ public class BibtexParser implements Parser {
             int character = read();
             if (character == -1) {
                 eof = true;
-
                 return token.toString();
             }
 
@@ -886,7 +895,11 @@ public class BibtexParser implements Parser {
         }
     }
 
-    private StringBuilder parseBracketedTextExactly() throws IOException {
+    /**
+     * This is called if a field in the form of <code>field = {content}</code> is parsed.
+     * The global variable <code>character</code> contains <code>{</code>.
+     */
+    private StringBuilder parseBracketedFieldContent() throws IOException {
         StringBuilder value = new StringBuilder();
 
         consume('{');
@@ -898,7 +911,35 @@ public class BibtexParser implements Parser {
         while (true) {
             character = (char) read();
 
-            boolean isClosingBracket = (character == '}') && (lastCharacter != '\\');
+            boolean isClosingBracket = false;
+            if (character == '}') {
+                if (lastCharacter == '\\') {
+                    // We hit `\}`
+                    // It could be that a user has a backslash at the end of the entry, but intended to put a file path
+                    // We want to be relaxed at that case
+                    // First described at https://github.com/JabRef/jabref/issues/9668
+                    char[] nextTwoCharacters = peekTwoCharacters();
+                    // Check for "\},\n" - Example context: `  path = {c:\temp\},\n`
+                    // On Windows, it could be "\},\r\n", thus we rely in OS.NEWLINE.charAt(0) (which returns '\r' or '\n').
+                    //   In all cases, we should check for '\n' as the file could be encoded with Linux line endings on Windows.
+                    if ((nextTwoCharacters[0] == ',') && ((nextTwoCharacters[1] == OS.NEWLINE.charAt(0)) || (nextTwoCharacters[1] == '\n'))) {
+                        // We hit '\}\r` or `\}\n`
+                        // Heuristics: Unwanted escaping of }
+                        //
+                        // Two consequences:
+                        //
+                        // 1. Keep `\` as read
+                        //   This is already done
+                        //
+                        // 2. Treat `}` as closing bracket
+                        isClosingBracket = true;
+                    } else {
+                        isClosingBracket = false;
+                    }
+                } else {
+                    isClosingBracket = true;
+                }
+            }
 
             if (isClosingBracket && (brackets == 0)) {
                 return value;

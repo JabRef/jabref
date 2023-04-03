@@ -1,27 +1,41 @@
 package org.jabref.logic.journals;
 
-import java.nio.charset.Charset;
 import java.util.List;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class JournalAbbreviationPreferences {
 
-    private final Charset defaultEncoding;
-    private List<String> externalJournalLists;
+    private final ObservableList<String> externalJournalLists;
+    private final BooleanProperty useFJournalField;
 
-    public JournalAbbreviationPreferences(List<String> externalJournalLists, Charset defaultEncoding) {
-        this.externalJournalLists = externalJournalLists;
-        this.defaultEncoding = defaultEncoding;
+    public JournalAbbreviationPreferences(List<String> externalJournalLists,
+                                          boolean useFJournalField) {
+        this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
+        this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
     }
 
-    public List<String> getExternalJournalLists() {
+    public ObservableList<String> getExternalJournalLists() {
         return externalJournalLists;
     }
 
-    public void setExternalJournalLists(List<String> externalJournalLists) {
-        this.externalJournalLists = externalJournalLists;
+    public void setExternalJournalLists(List<String> list) {
+        externalJournalLists.clear();
+        externalJournalLists.addAll(list);
     }
 
-    public Charset getDefaultEncoding() {
-        return defaultEncoding;
+    public boolean shouldUseFJournalField() {
+        return useFJournalField.get();
+    }
+
+    public BooleanProperty useFJournalFieldProperty() {
+        return useFJournalField;
+    }
+
+    public void setUseFJournalField(boolean useFJournalField) {
+        this.useFJournalField.set(useFJournalField);
     }
 }
