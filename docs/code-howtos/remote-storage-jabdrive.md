@@ -52,7 +52,10 @@ In order to support synchronization, additional metadata is kept for each item:
 ### Global time clock
 
 The idea is that the server tracks a global (logical) monotone increasing "time clock" tracking the existing revisions.
-This is called "generation ID" in `Revision`.
+Each entry has its own revision, increased "locally".
+The "global revision id" keeps track of the global synchronization state.
+One can view it as aggregation on the synchronization state of all entries.
+Similar to the revision concept of Subversion.
 
 ### Tombstones
 
@@ -110,7 +113,7 @@ This is more an implementation detail than a conceptual difference.
 
 The pulled data from the server needs to be merged with the local view of the data.
 The data is merged on a per-entry basis.
-Based on the "generation ID" ()`Revision` of server and client, following cases can occur:
+Based on the "generation ID" (`Revision`) of server and client, following cases can occur:
 
 1. The server's `Revision` is higher than the client's `Revision`: Two cases need to be distinguished:
    1. The client's entry is dirty. That means, the user has edited the entry in the meantime.
@@ -159,7 +162,7 @@ For this reason, a new cycle is started.
 ## Scenarios
 
 Having discussed the general algorithm, we discuss scenarios which can happen during usage.
-In the following, `T` denotes the "generation Id".
+In the following, `T` denotes the "global generation Id".
 
 We focus on JabRef as client and a "user" using JabRef.
 
@@ -217,17 +220,17 @@ This is not quite optimal since the last pull response contains the full data of
 
 The identifier needs to be unique at the very least across the library and should stay constant in time.
 Both features cannot be ensured for BibTeX keys.
-Note this is simlar to the `shared_id` in the case of the SQL synchronization.
+Note this is similar to the `shared_id` in the case of the SQL synchronization.
 
 ### Why do we need revisions? Are `updatedAt` timeflags not enough?
 
 The revision functions as "generation Id" known from [Lamport clocks](https://en.wikipedia.org/wiki/Lamport_timestamp) and common in synchronization.
-For instance, the [Optimistic Offline Lock](https://martinfowler.com/eaaCatalog/optimisticOfflineLock.html) also uses these kind of clocks.
+For instance, the [Optimistic Offline Lock](https://martinfowler.com/eaaCatalog/optimisticOfflineLock.html) also uses these kinds of clocks.
 
 A "generation Id" is essentially a clock local to the entry that ticks whenever the entry is synced with the server.
 As for us there is only one server, strictly speaking, it would suffice to use the global server time for this.
 Moreover, for the sync algorithm, the client would only need to store the revision/server time during the pull-merge-push cycle (to make sure that during this time the entry is not modified again on the server).
-Nevertheless, the generation ID is only a tiny data blob and it gives a bit of additional security/consistency during the merge operation, so we keep it around all the time.
+Nevertheless, the generation Id is only a tiny data blob, and it gives a bit of additional security/consistency during the merge operation, so we keep it around all the time.
 
 ### Why do we need an entry hash?
 
