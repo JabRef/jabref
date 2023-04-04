@@ -52,6 +52,8 @@ This version is used as version in the sense of an [Optimistic Offline Lock](htt
 It assumes that the chance of conflict is low.
 Implementation details are found at <https://www.baeldung.com/cs/offline-concurrency-control>.
 
+The `shared_id` and `version` are handled in [`org.jabref.model.entry.SharedBibEntryData`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/model/entry/SharedBibEntryData.java).
+
 ## Synchronization
 
 PostgreSQL supports to register listeners on the database on changes.
