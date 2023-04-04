@@ -385,7 +385,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
 
         if (file.isEmpty()) {
-            LOGGER.warn("Could not find file " + linkedFile.getLink());
+            LOGGER.warn("Could not find file {}", linkedFile.getLink());
             return true;
         }
 
@@ -407,7 +407,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return true;
                 } catch (IOException ex) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Cannot delete file"), Localization.lang("File permission error"));
-                    LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                    LOGGER.warn("File permission error while deleting: {}", linkedFile, ex);
                 }
             }
         }

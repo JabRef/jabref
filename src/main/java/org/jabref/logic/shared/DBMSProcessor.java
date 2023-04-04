@@ -56,23 +56,22 @@ public abstract class DBMSProcessor {
      * @throws SQLException
      */
     public boolean checkBaseIntegrity() throws SQLException {
-        boolean value;
-        value = false;
+        boolean databasePassesIntegrityCheck = false;
         DBMSType type = this.connectionProperties.getType();
         Map<String, String> metadata = getSharedMetaData();
         if (type == DBMSType.POSTGRESQL || type == DBMSType.MYSQL) {
             try {
                 Integer VERSION_DB_STRUCT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
                 if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
-                    value = true;
+                    databasePassesIntegrityCheck = true;
                 }
             } catch (Exception e) {
-                value = false;
+                databasePassesIntegrityCheck = false;
             }
         } else {
-            value = checkTableAvailability("ENTRY", "FIELD", "METADATA");
+            databasePassesIntegrityCheck = checkTableAvailability("ENTRY", "FIELD", "METADATA");
         }
-        return value;
+        return databasePassesIntegrityCheck;
     }
 
     /**
