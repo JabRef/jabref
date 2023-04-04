@@ -93,8 +93,6 @@ open module org.jabref {
     requires com.ibm.icu;
 
     requires flexmark;
-    requires flexmark.ext.gfm.strikethrough;
-    requires flexmark.ext.gfm.tasklist;
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;
