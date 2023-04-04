@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
-import org.jabref.logic.util.FileUtil;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.LinkedFile;
 
 /**

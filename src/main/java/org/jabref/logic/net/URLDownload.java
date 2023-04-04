@@ -42,7 +42,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
-import org.jabref.logic.util.FileUtil;
+import org.jabref.logic.util.io.FileUtil;
 
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;

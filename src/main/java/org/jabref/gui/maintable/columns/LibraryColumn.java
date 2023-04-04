@@ -5,7 +5,7 @@ import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableColumnModel.Type;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileUtil;
+import org.jabref.logic.util.io.FileUtil;
 
 public class LibraryColumn extends MainTableColumn<String> {
 

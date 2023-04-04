@@ -1,7 +1,5 @@
 package org.jabref.logic.util.io;
 
-import org.jabref.logic.util.FileUtil;
-
 /**
  * This class is based on http://stackoverflow.com/a/5626340/873282
  * extended with LEFT CURLY BRACE and RIGHT CURLY BRACE

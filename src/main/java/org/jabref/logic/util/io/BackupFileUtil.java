@@ -10,7 +10,6 @@ import java.util.HexFormat;
 import java.util.Optional;
 
 import org.jabref.logic.util.BackupFileType;
-import org.jabref.logic.util.FileUtil;
 import org.jabref.logic.util.OS;
 
 import net.harawata.appdirs.AppDirsFactory;

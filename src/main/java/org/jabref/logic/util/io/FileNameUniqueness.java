@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileUtil;
 
 public class FileNameUniqueness {
     private static final Pattern DUPLICATE_MARK_PATTERN = Pattern.compile("(.*) \\(\\d+\\)");

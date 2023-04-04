@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.jabref.logic.util.FileType;
-import org.jabref.logic.util.FileUtil;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseModeDetection;
 
 import com.ibm.icu.text.CharsetDetector;
