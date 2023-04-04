@@ -204,8 +204,10 @@
     <group delimiter=", ">
       <text variable="volume" prefix="vol. "/>
       <text variable="issue" prefix="no. "/>
-      <text variable="page" prefix="pp. "/>
     </group>
+  </macro>
+  <macro name="volume">
+    <text variable="volume" prefix="vol. "/>
   </macro>
   <macro name="publisher">
     <choose>
@@ -232,7 +234,7 @@
     <choose>
       <if variable="URL">
         <group prefix=" [" suffix="]">
-          <text term="accessed" text-case="capitalize-first"/>
+          <text term="accessed"/>
           <date variable="accessed">
             <date-part name="day" prefix=" "/>
             <date-part name="month" prefix=" "/>
@@ -335,7 +337,8 @@
             <text macro="publisher-place" suffix=": "/>
             <text macro="publisher" suffix=". "/>
             <text macro="accessed" suffix=". "/>
-            <text macro="collection" suffix=". "/>
+            <text macro="collection" suffix=", "/>
+            <text macro="volume" suffix=". "/>
             <text macro="isbn" suffix=". "/>
             <text macro="url" suffix=". "/>
           </group>
@@ -346,7 +349,8 @@
             <text macro="year-date" suffix=". "/>
             <text macro="title" suffix=", "/>
             <text macro="edition" suffix=". "/>
-            <text macro="issue" suffix=". "/>
+            <text macro="issue" suffix=", "/>
+            <text macro="page" suffix=". "/>
             <text macro="accessed" suffix=". "/>
             <text macro="issn" suffix=". "/>
             <text macro="doi" suffix=". "/>
@@ -375,9 +379,10 @@
             <text macro="edition" suffix=". "/>
             <text macro="publisher-place" suffix=": "/>
             <text macro="publisher" suffix=". "/>
-            <text macro="collection" suffix=", "/>
             <text macro="page" suffix=". "/>
             <text macro="accessed" suffix=". "/>
+            <text macro="collection" suffix=", "/>
+            <text macro="volume" suffix=". "/>
             <text macro="isbn" suffix=". "/>
             <text macro="url" suffix=". "/>
           </group>
@@ -390,9 +395,10 @@
             <text macro="edition" suffix=". "/>
             <text macro="publisher-place" suffix=": "/>
             <text macro="publisher" suffix=", "/>
-            <text macro="collection" suffix=", "/>
             <text macro="page" suffix=". "/>
             <text macro="accessed" suffix=". "/>
+            <text macro="collection" suffix=", "/>
+            <text macro="volume" suffix=". "/>
             <text macro="isbn" suffix=". "/>
             <text macro="url" suffix=". "/>
           </group>
@@ -419,6 +425,8 @@
             <text macro="publisher" suffix=", "/>
             <text macro="page" suffix=". "/>
             <text macro="accessed" suffix=". "/>
+            <text macro="collection" suffix=", "/>
+            <text macro="volume" suffix=". "/>
             <text macro="isbn" suffix=". "/>
             <text macro="doi" suffix=". "/>
             <text macro="url" suffix=". "/>
