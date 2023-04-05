@@ -1,5 +1,7 @@
 package org.jabref.logic.exporter;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -47,10 +49,20 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 
+
+// Delete these after finishing refactoring
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
+
+// relevant StAX imports
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
 
 /**
  * TemplateExporter for exporting in MODS XML format.
@@ -136,31 +148,44 @@ class ModsExporter extends Exporter {
                 mods.getModsGroup().add(originInfo);
 
                 addRelatedAndOriginInfoToModsGroup(relatedItem, partDefinition, mods);
-                modsCollection.getMods().add(mods);
+                modsCollection.getMods().add(mods); // still add to mods
             }
 
+            // no more need for this
             JAXBElement<ModsCollectionDefinition> jaxbElement = new JAXBElement<>(
                     new QName(MODS_NAMESPACE_URI, "modsCollection"), ModsCollectionDefinition.class, modsCollection);
 
-            createMarshallerAndWriteToFile(file, jaxbElement);
-        } catch (JAXBException ex) {
+            // pass modsCollection directly into
+            createStaxWriterAndWriteToFile(file, modsCollection);
+        } catch (
+                XMLStreamException |
+                FileNotFoundException ex) {
             throw new SaveException(ex);
         }
     }
 
-    private void createMarshallerAndWriteToFile(Path file, JAXBElement<ModsCollectionDefinition> jaxbElement)
-            throws JAXBException {
+    private void createStaxWriterAndWriteToFile(Path file, ModsCollectionDefinition modsCollection)
+            throws XMLStreamException, FileNotFoundException {
 
-        if (context == null) {
-            context = JAXBContext.newInstance(ModsCollectionDefinition.class);
+        XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
+        FileOutputStream fOutputStream = new FileOutputStream(file.toFile());
+
+        XMLStreamWriter writer = outputFactory.createXMLStreamWriter(fOutputStream);
+
+        writer.writeStartDocument("utf-8", "1.0");
+        writer.writeStartElement(MODS_NAMESPACE_URI, "modsCollection");
+
+        // write contents of mod elements
+        for (ModsDefinition modsDefinition : modsCollection.getMods()) {
+            // will create separate function to write this
+            // writeModsDefinition(writer, modsDefinition);
         }
-        Marshaller marshaller = context.createMarshaller();
-        // format the output
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, MODS_SCHEMA_LOCATION);
 
-        // Write to File
-        marshaller.marshal(jaxbElement, file.toFile());
+        writer.writeEndElement();
+        writer.writeEndDocument();
+
+        writer.flush();
+        writer.close();
     }
 
     private void addRelatedAndOriginInfoToModsGroup(RelatedItemDefinition relatedItem, PartDefinition partDefinition,
