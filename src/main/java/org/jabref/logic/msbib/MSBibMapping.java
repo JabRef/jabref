@@ -11,6 +11,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 /**
@@ -24,7 +25,7 @@ public class MSBibMapping {
 
     private static final HashBiMap<Field, String> BIBLATEX_TO_MS_BIB = HashBiMap.create();
 
-    private static final HashBiMap<String, Integer> LANG_TO_LCID = HashBiMap.create();
+    private static final BiMap<String, Integer> LANG_TO_LCID = HashBiMap.create();
 
     static {
         LANG_TO_LCID.put("basque", 1609);
@@ -34,7 +35,7 @@ public class MSBibMapping {
         LANG_TO_LCID.put("czech", 1029);
         LANG_TO_LCID.put("danish", 1030);
         LANG_TO_LCID.put("dutch", 1043);
-        LANG_TO_LCID.put("english", 1033); // american english
+        LANG_TO_LCID.put("english", 0); // american english
         LANG_TO_LCID.put("finnish", 1035);
         LANG_TO_LCID.put("french", 1036);
         LANG_TO_LCID.put("german", 1031);
@@ -169,7 +170,6 @@ public class MSBibMapping {
      * @return Returns 0 for English
      */
     public static int getLCID(String language) {
-        // TODO: add language to LCID mapping
         return LANG_TO_LCID.get(language);
 
     }
@@ -181,7 +181,6 @@ public class MSBibMapping {
      * @return Returns english
      */
     public static String getLanguage(int LCID) {
-        // TODO: add language to LCID mapping
         return LANG_TO_LCID.inverse().get(LCID);
     }
 
