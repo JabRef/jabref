@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -76,13 +78,30 @@ public class CommentsTab extends FieldsEditorTab {
             comments.add(defaultCommentField);
 
             comments.addAll(entry.getFields().stream()
-                                 .filter(field -> field.equals(StandardField.COMMENT) || field instanceof UserSpecificCommentField || field.getName().toLowerCase().contains("comment"))
+                                 .filter(field -> field.equals(StandardField.COMMENT) ||
+                                         field instanceof UserSpecificCommentField ||
+                                         field.getName().toLowerCase().contains("comment"))
                                  .collect(Collectors.toSet()));
 
             return comments;
         } else {
             // Entry type unknown -> treat all fields as required
             return Collections.emptySet();
+        }
+    }
+
+    @Override
+    protected void setupPanel(BibEntry entry, boolean compressed) {
+        super.setupPanel(entry, compressed);
+
+        // Implement the logic to disable editing for fields other than StandardField.COMMENT
+        for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
+            Field field = fieldEditorEntry.getKey();
+            FieldEditorFX editor = fieldEditorEntry.getValue();
+
+            if (field instanceof UserSpecificCommentField && !field.getName().contains(name)) {
+                editor.getNode().setDisable(true);
+            }
         }
     }
 }
