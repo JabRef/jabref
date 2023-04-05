@@ -55,6 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the issue where the size of the global search window was not retained after closing. [#9362](https://github.com/JabRef/jabref/issues/9362)
 - We fixed an issue where the Global Search UI preview is still white in dark theme. [#9362](https://github.com/JabRef/jabref/issues/9362)
 - We fixed the double paste issue when <kbd>Cmd</kbd> + <kbd>v</kbd> is pressed on 'New entry from plaintext' dialog. [#9367](https://github.com/JabRef/jabref/issues/9367)
+- We fixed the log text color in the event log console when using dark mode. [#9732](https://github.com/JabRef/jabref/issues/9732)
 
 
 ### Removed
