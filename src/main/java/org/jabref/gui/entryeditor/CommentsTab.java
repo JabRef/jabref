@@ -94,12 +94,17 @@ public class CommentsTab extends FieldsEditorTab {
     protected void setupPanel(BibEntry entry, boolean compressed) {
         super.setupPanel(entry, compressed);
 
-        // Implement the logic to disable editing for fields other than StandardField.COMMENT
         for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
             Field field = fieldEditorEntry.getKey();
             FieldEditorFX editor = fieldEditorEntry.getValue();
 
-            if (field instanceof UserSpecificCommentField && !field.getName().contains(name)) {
+            if (field instanceof UserSpecificCommentField) {
+                if (field.getName().contains(name)) {
+                    editor.getNode().setDisable(false);
+                }
+            } else if (field.getName().equals(StandardField.COMMENT.getName())) {
+                editor.getNode().setDisable(false);
+            } else {
                 editor.getNode().setDisable(true);
             }
         }
