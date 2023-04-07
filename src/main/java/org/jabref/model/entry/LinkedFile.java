@@ -17,14 +17,16 @@ import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.FilePreferences;
 
 /**
  * Represents the link to an external file (e.g. associated PDF file).
  * This class is {@link Serializable} which is needed for drag and drop in gui
  */
+@AllowedToUseLogic("Uses FileUtil from logic")
 public class LinkedFile implements Serializable {
 
     private static final String REGEX_URL = "^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)";
@@ -192,7 +194,7 @@ public class LinkedFile implements Serializable {
                     return Optional.empty();
                 }
             } else {
-                return FileHelper.find(link.get(), directories);
+                return FileUtil.find(link.get(), directories);
             }
         } catch (InvalidPathException ex) {
             return Optional.empty();
