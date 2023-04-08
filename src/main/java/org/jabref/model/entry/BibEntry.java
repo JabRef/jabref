@@ -918,7 +918,6 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
-
     public BibEntry withDate(Date date) {
         setDate(date);
         this.setChanged(false);
@@ -1158,5 +1157,4 @@ public class BibEntry implements Cloneable {
             }
         }
     }
-
 }
