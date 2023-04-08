@@ -42,7 +42,9 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jvnet.hk2.annotations.Contract;
 
+@Contract
 public interface PreferencesService {
 
     InternalPreferences getInternalPreferences();

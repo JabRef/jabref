@@ -54,6 +54,36 @@ public class BibtexImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
+        EncodingResult result = getEncodingResult(filePath);
+
+        // We replace unreadable characters
+        // Unfortunately, no warning will be issued to the user
+        // As this is a very seldom case, we accept that
+        CharsetDecoder decoder = result.encoding().newDecoder();
+        decoder.onMalformedInput(CodingErrorAction.REPLACE);
+
+        try (InputStreamReader inputStreamReader = new InputStreamReader(Files.newInputStream(filePath), decoder);
+             BufferedReader reader = new BufferedReader(inputStreamReader)) {
+            ParserResult parserResult = this.importDatabase(reader);
+            parserResult.getMetaData().setEncoding(result.encoding());
+            parserResult.getMetaData().setEncodingExplicitlySupplied(result.encodingExplicitlySupplied());
+            parserResult.setPath(filePath);
+            if (parserResult.getMetaData().getMode().isEmpty()) {
+                parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
+            }
+            return parserResult;
+        }
+    }
+
+    public static Charset getEncoding(Path filePath) throws IOException {
+        return getEncodingResult(filePath).encoding();
+    }
+
+    /**
+     * Determines the encoding of the supplied BibTeX file. If a JabRef encoding information is present, this information is used.
+     * If there is none present, {@link com.ibm.icu.text.CharsetDetector#CharsetDetector()} is used.
+     */
+    private static EncodingResult getEncodingResult(Path filePath) throws IOException {
         // We want to check if there is a JabRef encoding heading in the file, because that would tell us
         // which character encoding is used.
 
@@ -81,29 +111,16 @@ public class BibtexImporter extends Importer {
             encoding = suppliedEncoding.orElse(detectedCharset);
             LOGGER.debug("Encoding used to read the file: {}", encoding);
         }
+        EncodingResult result = new EncodingResult(encoding, encodingExplicitlySupplied);
+        return result;
+    }
 
-        // We replace unreadable characters
-        // Unfortunately, no warning will be issued to the user
-        // As this is a very seldom case, we accept that
-        CharsetDecoder decoder = encoding.newDecoder();
-        decoder.onMalformedInput(CodingErrorAction.REPLACE);
-
-        try (InputStreamReader inputStreamReader = new InputStreamReader(Files.newInputStream(filePath), decoder);
-             BufferedReader reader = new BufferedReader(inputStreamReader)) {
-            ParserResult parserResult = this.importDatabase(reader);
-            parserResult.getMetaData().setEncoding(encoding);
-            parserResult.getMetaData().setEncodingExplicitlySupplied(encodingExplicitlySupplied);
-            parserResult.setPath(filePath);
-            if (parserResult.getMetaData().getMode().isEmpty()) {
-                parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
-            }
-            return parserResult;
-        }
+    private record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
     }
 
     /**
      * This method does not set the metadata encoding information. The caller needs to set the encoding of the supplied
-     * reader manually to the meta data
+     * reader manually to the metadata
      */
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {

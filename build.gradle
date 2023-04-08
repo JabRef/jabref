@@ -179,6 +179,8 @@ dependencies {
     implementation "org.tinylog:tinylog-api:2.6.1"
     implementation "org.tinylog:slf4j-tinylog:2.6.1"
     implementation "org.tinylog:tinylog-impl:2.6.1"
+    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
+    implementation 'org.slf4j:jul-to-slf4j:2.0.7'
 
     implementation 'de.undercouch:citeproc-java:3.0.0-beta.2'
 
@@ -198,6 +200,24 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark:0.64.0'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
+
+    // JAX-RS implemented by Jersey
+    // API
+    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
+    // Implementation of the API
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.1'
+    // injection framework
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.1'
+    implementation 'org.glassfish.hk2:hk2-api:2.6.1'
+    // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
+    // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
+    // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
+    // HTTP server
+    // implementation 'org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1'
+    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.1'
+    testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.1'
+    // Allow objects "magically" to be mapped to JSON using GSON
+    // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.157'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'

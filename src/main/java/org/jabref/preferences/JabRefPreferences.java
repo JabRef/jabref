@@ -116,7 +116,9 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Singleton;
 import net.harawata.appdirs.AppDirsFactory;
+import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,6 +132,8 @@ import org.slf4j.LoggerFactory;
  * There are still some similar preferences classes (OpenOfficePreferences and SharedDatabasePreferences) which also use
  * the {@code java.util.prefs} API.
  */
+@Singleton
+@Service
 public class JabRefPreferences implements PreferencesService {
 
     // Push to application preferences

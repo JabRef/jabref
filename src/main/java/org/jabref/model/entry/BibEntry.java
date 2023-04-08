@@ -50,9 +50,45 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents a BibTex / BibLaTeX entry.
+ * Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
+ * <p>
+ *     Example:
+ *
+ *     <pre>{@code
+ * Some commment
+ * @misc{key,
+ *   fieldName = {fieldValue},
+ *   otherFieldName = {otherVieldValue}
+ * }
+ *     }</pre>
+ *
+ *     Then,
+ *     <ul>
+ *         <li>"Some comment" is the comment before the entry,</li>
+ *         <li>"misc" is the entry type</li>
+ *         <li>"key" the citation key</li>
+ *         <li>"fieldName" and "otherFieldName" the fields of the BibEntry</li>
+ *     </ul>
+ * </p>
+ * <p>
+ * A BibTeX entry has following properties:
+ * <ul>
+ *     <li>comments before entry</li>
+ *     <li>entry type</li>
+ *     <li>citation key</li>
+ *     <li>fields</li>
+ * </ul>
+ * In JabRef, this is modeled the following way:
+ * <ul>
+ *     <li>comments before entry --&gt; {@link BibEntry#commentsBeforeEntry}</li>
+ *     <li>entry type --&gt; {@link BibEntry#type}</li>
+ *     <li>citation key --&gt; contained in {@link BibEntry#fields} using they hashmap key {@link InternalField#KEY_FIELD}</li>
+ *     <li>fields --&gt; contained in {@link BibEntry#fields}</li>
+ * </ul>
+ * </p>
  * <p>
  * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCitationKey(String)} and {@link #withField(Field, String)}.
+ * </p>
  */
 @AllowedToUseLogic("because it needs access to parser and writers")
 public class BibEntry implements Cloneable {
@@ -814,6 +850,17 @@ public class BibEntry implements Cloneable {
         return sharedBibEntryData;
     }
 
+    public BibEntry withSharedBibEntryData(int sharedId, int version) {
+        sharedBibEntryData.setSharedID(sharedId);
+        sharedBibEntryData.setVersion(version);
+        return this;
+    }
+
+    public BibEntry withSharedBibEntryData(SharedBibEntryData sharedBibEntryData) {
+        sharedBibEntryData = sharedBibEntryData;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -828,9 +875,20 @@ public class BibEntry implements Cloneable {
                 && Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);
     }
 
+    /**
+     * On purpose, this hashes the "content" of the BibEntry, not the {@link #sharedBibEntryData}.
+     *
+     * The content is
+     *
+     * <ul>
+     *     <li>comments before entry</li>
+     *     <li>entry type</li>
+     *     <li>fields (including the citation key {@link InternalField#KEY_FIELD}</li>
+     * </ul>
+     */
     @Override
     public int hashCode() {
-        return Objects.hash(type.getValue(), fields);
+        return Objects.hash(commentsBeforeEntry, type.getValue(), fields);
     }
 
     public void registerListener(Object object) {
@@ -852,6 +910,15 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
+    /**
+     * A copy is made of the parameter
+     */
+    public BibEntry withFields(Map<Field, String> content) {
+        this.fields = FXCollections.observableMap(new HashMap<>(content));
+        return this;
+    }
+
+
     public BibEntry withDate(Date date) {
         setDate(date);
         this.setChanged(false);
@@ -869,6 +936,11 @@ public class BibEntry implements Cloneable {
      */
     public String getUserComments() {
         return commentsBeforeEntry;
+    }
+
+    public BibEntry withUserComments(String commentsBeforeEntry) {
+        this.commentsBeforeEntry = commentsBeforeEntry;
+        return this;
     }
 
     public List<ParsedEntryLink> getEntryLinkList(Field field, BibDatabase database) {
@@ -1086,4 +1158,5 @@ public class BibEntry implements Cloneable {
             }
         }
     }
+
 }

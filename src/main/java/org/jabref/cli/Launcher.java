@@ -33,6 +33,7 @@ import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.tinylog.configuration.Configuration;
 
 /**
@@ -47,6 +48,7 @@ public class Launcher {
     private static String[] ARGUMENTS;
 
     public static void main(String[] args) {
+        routeLoggingToSlf4J();
         ARGUMENTS = args;
         addLogToDisk();
         try {
@@ -85,6 +87,11 @@ public class Launcher {
         }
     }
 
+    private static void routeLoggingToSlf4J() {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+    }
+
     /**
      * This needs to be called as early as possible. After the first log write, it
      * is not possible to alter
@@ -93,10 +100,10 @@ public class Launcher {
     private static void addLogToDisk() {
         Path directory = Path.of(AppDirsFactory.getInstance()
                                                .getUserDataDir(
-                OS.APP_DIR_APP_NAME,
-                "logs",
-                OS.APP_DIR_APP_AUTHOR))
-                .resolve(new BuildInfo().version.toString());
+                                                       OS.APP_DIR_APP_NAME,
+                                                       "logs",
+                                                       OS.APP_DIR_APP_AUTHOR))
+                             .resolve(new BuildInfo().version.toString());
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -187,9 +194,9 @@ public class Launcher {
                         && !path.equals(currentIndexPath)) {
                     LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
                     Files.walk(path)
-                            .sorted(Comparator.reverseOrder())
-                            .map(Path::toFile)
-                            .forEach(File::delete);
+                         .sorted(Comparator.reverseOrder())
+                         .map(Path::toFile)
+                         .forEach(File::delete);
                 }
             }
         } catch (IOException e) {
