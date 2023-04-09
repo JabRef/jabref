@@ -204,7 +204,7 @@ public class URLDownload {
      */
     public boolean canBeReached() throws UnirestException {
 
-       // Set a custom Apache Client Builder to be able to allow circular redirects, otherwise downloads from springer might not work
+        // Set a custom Apache Client Builder to be able to allow circular redirects, otherwise downloads from springer might not work
         Unirest.config().httpClient(new ApacheClient.Builder()
                                     .withRequestConfig((c, r) -> RequestConfig.custom()
                                                        .setCircularRedirectsAllowed(true)
@@ -391,8 +391,8 @@ public class URLDownload {
             int status = ((HttpURLConnection) connection).getResponseCode();
 
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again
