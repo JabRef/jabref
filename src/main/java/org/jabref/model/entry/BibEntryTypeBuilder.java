@@ -29,7 +29,7 @@ public class BibEntryTypeBuilder {
     }
 
     public BibEntryTypeBuilder withImportantFields(Set<BibField> newFields) {
-        return withImportantFields(newFields.stream().map(BibField::getField).collect(Collectors.toCollection(LinkedHashSet::new)));
+        return withImportantFields(newFields.stream().map(BibField::field).collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
     public BibEntryTypeBuilder withImportantFields(Collection<Field> newFields) {

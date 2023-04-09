@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
-    <title>American Institute of Physics</title>
+    <title>American Institute of Physics 4th edition</title>
     <title-short>AIP</title-short>
     <id>http://www.zotero.org/styles/american-institute-of-physics</id>
     <link href="http://www.zotero.org/styles/american-institute-of-physics" rel="self"/>
     <link href="http://www.aip.org/pubservs/style/4thed/toc.html" rel="documentation"/>
+    <link href="https://publishing.aip.org/wp-content/uploads/2021/03/AIP_Style_4thed.pdf" rel="documentation"/>
     <!-- No attempt to make compound citations is made here <http://forums.zotero.org/discussion/4288/>-->
     <author>
       <name>Richard Karnesky</name>
       <email>karnesky+zotero@gmail.com</email>
       <uri>http://arc.nucapt.northwestern.edu/Richard_Karnesky</uri>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="physics"/>
-    <!--<category term="materials science"/>-->
     <summary>Common style use by AIP publications.</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2023-03-15T09:12:41+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
     <names variable="author">
-      <name delimiter=", " initialize-with="." and="text"/>
+      <name and="text" delimiter-precedes-last="always" initialize-with="."/>
       <label form="long" prefix=", " suffix=" "/>
       <substitute>
         <names variable="editor"/>
@@ -141,14 +144,18 @@
           </group>
         </else-if>
         <else>
-          <group delimiter=" ">
-            <text variable="container-title" form="short" text-case="title"/>
-            <group delimiter=", ">
-              <text variable="volume" font-weight="bold"/>
-              <group delimiter=" ">
-                <text variable="page-first"/>
-                <text macro="year-date" prefix="(" suffix=")"/>
+          <group delimiter=", ">
+            <text variable="title" quotes="true"/>
+            <group delimiter=" ">
+              <text variable="container-title" form="short" text-case="title"/>
+              <group>
+                <text variable="volume" font-weight="bold"/>
+                <text variable="issue" prefix="(" suffix=")"/>
               </group>
+            </group>
+            <group delimiter=" ">
+              <text variable="page"/>
+              <text macro="year-date" prefix="(" suffix=")"/>
             </group>
           </group>
         </else>
