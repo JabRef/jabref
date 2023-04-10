@@ -16,4 +16,17 @@ public class MsBibMappingTest {
         int lcid = MSBibMapping.getLCID("basque");
         assertEquals(1609, lcid);
     }
+
+    @Test
+    public void testGetInvalidLanguage() {
+        String lang = MSBibMapping.getLanguage(1234567);
+        assertEquals("english", lang);
+    }
+
+    @Test
+    public void testInvalidLCID() {
+        int lcid = MSBibMapping.getLCID("not a language");
+        assertEquals(1033, lcid);
+
+    }
 }
