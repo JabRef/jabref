@@ -13,7 +13,7 @@ jobs:
       issues: write
     steps:
     - name: GreetingFirstTimeCodeContribution
-      uses: peter-evans/create-or-update-comment@v2
+      uses: peter-evans/create-or-update-comment@v3
       with:
         issue-number: ${{ github.event.issue.number }}
         body: |
