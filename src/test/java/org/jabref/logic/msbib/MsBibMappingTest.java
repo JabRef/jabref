@@ -27,6 +27,5 @@ public class MsBibMappingTest {
     public void testInvalidLCID() {
         int lcid = MSBibMapping.getLCID("not a language");
         assertEquals(1033, lcid);
-
     }
 }
