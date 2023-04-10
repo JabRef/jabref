@@ -17,9 +17,11 @@ import javafx.util.StringConverter;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.google.common.base.Enums;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import jakarta.inject.Inject;
@@ -66,7 +68,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     public void initialize() {
         showDiff = EasyBind.map(plainTextOrDiffComboBox.valueProperty(), plainTextOrDiff -> plainTextOrDiff == PlainTextOrDiff.Diff);
         plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());
-        plainTextOrDiffComboBox.getSelectionModel().select(PlainTextOrDiff.Diff);
+
         plainTextOrDiffComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(PlainTextOrDiff plainTextOrDiff) {
@@ -81,7 +83,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         diffViewComboBox.disableProperty().bind(notShowDiffProperty());
         diffViewComboBox.getItems().addAll(DiffView.values());
-        diffViewComboBox.getSelectionModel().select(DiffView.UNIFIED);
+
         diffViewComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(DiffView diffView) {
@@ -105,11 +107,30 @@ public class ThreeWayMergeToolbar extends AnchorPane {
             }
         }));
 
-        diffHighlightingMethodToggleGroup.selectToggle(highlightWordsRadioButton);
-        plainTextOrDiffComboBox.valueProperty().set(PlainTextOrDiff.Diff);
-
         onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferencesService.getGuiPreferences().mergeShowChangedFieldOnlyProperty());
         onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());
+
+        loadSavedConfiguration();
+    }
+
+    private void loadSavedConfiguration() {
+        GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+
+        PlainTextOrDiff plainTextOrDiffPreference = guiPreferences.getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;
+        plainTextOrDiffComboBox.getSelectionModel().select(plainTextOrDiffPreference);
+
+        DiffView diffViewPreference = guiPreferences.getMergeShouldShowUnifiedDiff() ? DiffView.UNIFIED : DiffView.SPLIT;
+        diffViewComboBox.getSelectionModel().select(diffViewPreference);
+
+        diffHighlightingMethodToggleGroup.selectToggle(guiPreferences.getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
+    }
+
+    public void saveToolbarConfiguration() {
+        preferencesService.getGuiPreferences().setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);
+        preferencesService.getGuiPreferences().setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);
+
+        boolean highlightWordsRadioButtonValue = diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightWordsRadioButton);
+        preferencesService.getGuiPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);
     }
 
     public ObjectProperty<DiffView> diffViewProperty() {
@@ -185,6 +206,10 @@ public class ThreeWayMergeToolbar extends AnchorPane {
             this.value = value;
         }
 
+        public static PlainTextOrDiff parse(String name) {
+            return Enums.getIfPresent(PlainTextOrDiff.class, name).or(Diff);
+        }
+
         public String getValue() {
             return value;
         }
@@ -201,6 +226,10 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
         DiffView(String value) {
             this.value = value;
+        }
+
+        public static DiffView parse(String name) {
+            return Enums.getIfPresent(DiffView.class, name).or(UNIFIED);
         }
 
         public String getValue() {

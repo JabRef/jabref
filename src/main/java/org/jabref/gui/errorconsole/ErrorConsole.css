@@ -16,6 +16,11 @@
     -fx-fill: -jr-error;
 }
 
+.output .glyph-icon {
+    -fx-font-size: 18.0;
+    -fx-fill: -jr-warn;
+}
+
 .log .glyph-icon {
     -fx-font-size: 18.0;
     -fx-fill: -jr-info;
@@ -24,3 +29,16 @@
 .custom-buttons {
     -fx-padding: 5px;
 }
+
+.exception {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.output {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.log {
+    -fx-text-fill: -fx-text-base-color;
+}
+
