@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.nio.file.Path;
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -64,8 +66,6 @@ class ModsExporter extends Exporter {
 
             for (BibEntry bibEntry : entries) {
 
-                //ModsDefinition mods = new ModsDefinition();
-
                 bibEntry.getCitationKey().ifPresent(citeKey -> {
                     try {
                         addIdentifier(writer, new UnknownField("citekey"), citeKey);
@@ -82,10 +82,8 @@ class ModsExporter extends Exporter {
                 fieldMap.putAll(bibEntry.getFieldMap());
                 addGenre(writer, bibEntry.getType());
 
-              /*  OriginInfoDefinition originInfo = new OriginInfoDefinition();
-                PartDefinition partDefinition = new PartDefinition();
-                RelatedItemDefinition relatedItem = new RelatedItemDefinition();*/
-
+                List<String> originItems = new ArrayList<>();
+                List<String> parts = new ArrayList<>();
 
                 for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
                     Field field = entry.getKey();
@@ -119,51 +117,69 @@ class ModsExporter extends Exporter {
                         addIdentifier(writer, StandardField.DOI, value);
                     } else if (StandardField.PMID.equals(field)) {
                         addIdentifier(writer, StandardField.PMID, value);
+                    } else if (StandardField.PAGES.equals(field)) {
+                        addPart(parts, value);
+                    } else if (StandardField.VOLUME.equals(field)) {
+                        addPart(parts, value);
+                    } else if (StandardField.ISSUE.equals(field)) {
+                        addPart(parts, value);
                     }
-
+                    trackOriginInformation(originItems, field, value);
                 }
 
-                // does not handle the case of empty origin information <originInfo/>
-                writer.writeStartElement("mods", "originInfo", MODS_NAMESPACE_URI);
-                for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
-                    Field field = entry.getKey();
-                    String value = entry.getValue();
-
-                    addOriginInformation(writer,field, value); // might have to split this up?? the order is janky
+                // this can be abstracted to different method
+                if(originItems.isEmpty()) {
+                    writer.writeEmptyElement("mods", "originInfo", MODS_NAMESPACE_URI);
+                } else {
+                    writer.writeStartElement("mods", "originInfo", MODS_NAMESPACE_URI);
+                    for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
+                        Field field = entry.getKey();
+                        String value = entry.getValue();
+                        addOriginInformation(writer,field, value);
+                    }
+                    writer.writeEndElement();
                 }
-                writer.writeEndElement();
 
-                // for related items
+                // Write related items -- loop thru related items
                 writer.writeStartElement("mods", "relatedItem",MODS_NAMESPACE_URI);
                 writer.writeAttribute("type", "host");
-                writer.writeStartElement("mods","part", MODS_NAMESPACE_URI);
+
                 for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
                     Field field = entry.getKey();
                     String value = entry.getValue();
                     if (StandardField.JOURNAL.equals(field)) {
                         addJournal(writer, value);
-                    } else if (StandardField.PAGES.equals(field)) {
-                        addPages(writer, value); // STILL NEED TO CHANGE
-                    } else if (StandardField.VOLUME.equals(field)) {
-                        addDetail(writer, StandardField.VOLUME, value);
-                    } else if (StandardField.ISSUE.equals(field)) {
-                        addDetail(writer, StandardField.ISSUE, value);
                     }
                 }
-                // idea: store within data structure?
-                writer.writeEndElement(); // end part -- this is an issue because pages and detail should only be within part
+
+                if(parts.isEmpty()) {
+                    writer.writeEmptyElement("mods", "part", MODS_NAMESPACE_URI);
+                } else {
+                    writer.writeStartElement("mods","part", MODS_NAMESPACE_URI);
+                    for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
+                        Field field = entry.getKey();
+                        String value = entry.getValue();
+                        if (StandardField.PAGES.equals(field)) { // are these all parts?
+                            addPages(writer, value); // STILL NEED TO CHANGE
+                        } else if (StandardField.VOLUME.equals(field)) {
+                            addDetail(writer, StandardField.VOLUME, value);
+                        } else if (StandardField.ISSUE.equals(field)) {
+                            addDetail(writer, StandardField.ISSUE, value);
+                        }
+                    }
+                    writer.writeEndElement(); // end part
+                }
+
+
                 writer.writeEndElement(); // end relatedItem
 
                 writer.writeStartElement("mods","typeOfResource",MODS_NAMESPACE_URI);
                 writer.writeCharacters("text");
                 writer.writeEndElement(); // end typeOfResource
-
+                writer.writeEndElement(); // end mods
             }
-
-            // addRelatedAndOriginInfoToModsGroup(writer);
             // end element and close
-            writer.writeEndElement();
-            writer.writeEndElement();
+            writer.writeCharacters("\n");
             writer.writeEndDocument();
             writer.flush();
             writer.close();
@@ -175,7 +191,29 @@ class ModsExporter extends Exporter {
         }
     }
 
+    private void trackOriginInformation(List<String> originItems, Field field, String value) {
+        if (field.equals(StandardField.YEAR)) { // change later
+            originItems.add(value);
+        } else if (field.equals(new UnknownField("created"))) {
+            originItems.add(value);
+        } else if (field.equals(StandardField.MODIFICATIONDATE)) {
+            originItems.add(value);
+        } else if (field.equals(StandardField.CREATIONDATE)) {
+            originItems.add(value);
+        } else if (StandardField.PUBLISHER.equals(field)) {
+            originItems.add(value);
+        } else if (field.equals(new UnknownField("issuance"))) {
+            originItems.add(value);
+        } else if (field.equals(StandardField.ADDRESS)) {
+            originItems.add(value);
+        } else if (field.equals(StandardField.EDITION)) {
+            originItems.add(value);
+        }
+    }
 
+    private void addPart(List<String> part, String value) {
+        part.add(value);
+    }
     private void addRelatedAndOriginInfoToModsGroup(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement("mods", "relatedItem",MODS_NAMESPACE_URI);
         writer.writeAttribute("type", "host");
@@ -289,7 +327,9 @@ class ModsExporter extends Exporter {
         } else {
             BigInteger total = new BigInteger(value);
             writer.writeStartElement("mods", "extent",MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "total", MODS_NAMESPACE_URI);
             writer.writeCharacters(total.toString());
+            writer.writeEndElement();
             writer.writeEndElement();
         }
     }
