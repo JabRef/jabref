@@ -35,6 +35,7 @@ import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -58,6 +59,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
+    private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -66,6 +68,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final ImporterPreferences importerPreferences;
     private final SaveOrderConfig initialExportOrder;
     private final ImportExportPreferences importExportPreferences;
+    private final FilePreferences filePreferences;
 
     public ImportExportTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
         this.dialogService = dialogService;
@@ -75,6 +78,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         this.doiPreferences = preferencesService.getDOIPreferences();
         this.initialExportOrder = preferencesService.getExportSaveOrder();
         this.importExportPreferences = preferencesService.getImportExportPreferences();
+        this.filePreferences = preferencesService.getFilePreferences();
     }
 
     @Override
@@ -83,6 +87,8 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
         warnAboutDuplicatesOnImportProperty.setValue(importExportPreferences.shouldWarnAboutDuplicatesOnImport());
+
+        shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
 
         switch (initialExportOrder.getOrderType()) {
             case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
@@ -110,6 +116,8 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
         grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
+
+        filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
 
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
@@ -180,6 +188,10 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         return warnAboutDuplicatesOnImportProperty;
     }
 
+    public BooleanProperty shouldDownloadLinkedOnlineFiles() {
+        return shouldDownloadLinkedOnlineFiles;
+    }
+
     public void checkCustomApiKey() {
         final String apiKeyName = selectedApiKeyProperty.get().getName();
 
@@ -218,7 +230,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
                 urlDownload = new URLDownload(testUrlWithoutApiKey + apiKey);
                 // The HEAD request cannot be used because its response is not 200 (maybe 404 or 596...).
                 int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
-                keyValid = statusCode >= 200 && statusCode < 300;
+                keyValid = (statusCode >= 200) && (statusCode < 300);
 
                 URLDownload.setSSLVerification(defaultSslSocketFactory, defaultHostnameVerifier);
             } catch (IOException | kong.unirest.UnirestException e) {
@@ -234,4 +246,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
             dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection failed!"));
         }
     }
+
+
 }
