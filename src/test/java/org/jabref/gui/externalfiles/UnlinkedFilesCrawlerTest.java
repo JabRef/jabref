@@ -62,8 +62,6 @@ class UnlinkedFilesCrawlerTest {
         try (Stream<Path> filesInitially = Files.list(testRoot)) {
             int count = (int) filesInitially.count();
             assertEquals(fileNodeViewModel.getFileCount(), count - 1);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }
