@@ -25,8 +25,8 @@ import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -109,7 +109,7 @@ public class ImportAction {
     }
 
     private boolean fileIsPdf(Path filename) {
-        Optional<String> extension = FileHelper.getFileExtension(filename);
+        Optional<String> extension = FileUtil.getFileExtension(filename);
         return extension.isPresent() && StandardFileType.PDF.getExtensions().contains(extension.get());
     }
 

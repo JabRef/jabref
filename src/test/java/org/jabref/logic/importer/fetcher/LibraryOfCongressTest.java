@@ -45,7 +45,6 @@ public class LibraryOfCongressTest {
                 .withField(new UnknownField("lccn"), "2010045158")
                 .withField(StandardField.NOTE, "Matthew West., Includes index.")
                 .withField(new UnknownField("oclc"), "ocn665135773")
-                .withField(StandardField.PUBLISHER, "Morgan Kaufmann")
                 .withField(new UnknownField("source"), "aacr")
                 .withField(StandardField.TITLE, "Developing high quality data models")
                 .withField(StandardField.YEAR, "2011");

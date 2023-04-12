@@ -1580,7 +1580,6 @@
   </citation>
   <bibliography hanging-indent="true" et-al-min="21" et-al-use-first="19" et-al-use-last="true" entry-spacing="0" line-spacing="2">
     <sort>
-      <key macro="legal-cites"/>
       <key macro="author-bib"/>
       <key macro="date-sort-group"/>
       <key macro="date-sort-date" sort="ascending"/>

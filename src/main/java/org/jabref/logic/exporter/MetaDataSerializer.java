@@ -147,7 +147,7 @@ public class MetaDataSerializer {
         builder.append(FieldFactory.serializeFieldsList(
                 entryType.getOptionalFields()
                          .stream()
-                         .map(BibField::getField)
+                         .map(BibField::field)
                          .collect(Collectors.toList())));
         builder.append("]");
         return builder.toString();

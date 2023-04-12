@@ -5,7 +5,7 @@ gem "jekyll", "~> 4.3" # installed by `gem jekyll`
 # Homepage: https://github.com/paulrobertlloyd/jekyll-figure#jekyll-figure
 gem 'jekyll-figure'
 
-gem "just-the-docs", "0.4.0.rc3"
+gem "just-the-docs", "0.4.2"
 
 gem "jekyll-remote-theme"
 
