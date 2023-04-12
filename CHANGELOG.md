@@ -18,7 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We enabled updating an existing entry with data from InspireHEP. [#9351](https://github.com/JabRef/jabref/issues/9351)
 - We added a fetcher for the Bibliotheksverbund Bayern (experimental). [#9641](https://github.com/JabRef/jabref/pull/9641)
 - We enabled scrolling in the groups list when dragging a group on another group. [#2869](https://github.com/JabRef/jabref/pull/2869)
-
+- We added the option to automatically download online files when a new entry is created from an existing ID (e.g. DOI). The option can be disabled in the preferences under "Import and Export" [#9756](https://github.com/JabRef/jabref/issues/9756)
 
 
 
