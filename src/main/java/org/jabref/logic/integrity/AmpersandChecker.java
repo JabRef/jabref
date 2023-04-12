@@ -31,7 +31,7 @@ public class AmpersandChecker implements EntryChecker{
                     .count();
 
             if (unescapedAmpersands > 0) {
-                results.add(new IntegrityMessage(Localization.lang("Found " + unescapedAmpersands + " unescaped '&'"), entry, field.getKey()));
+                results.add(new IntegrityMessage(Localization.lang("Found %0 unescaped '&'", unescapedAmpersands), entry, field.getKey()));
                 // note: when changing the message - also do so in tests
             }
         }
