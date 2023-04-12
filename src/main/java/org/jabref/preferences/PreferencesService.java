@@ -38,7 +38,6 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -89,7 +88,7 @@ public interface PreferencesService {
 
     void flush();
 
-    List<BibEntryType> getBibEntryTypes(BibDatabaseMode mode);
+    BibEntryTypesManager getBibEntryTypesRepository();
 
     void storeCustomEntryTypes(BibEntryTypesManager entryTypesManager);
 

@@ -1149,14 +1149,17 @@ public class JabRefPreferences implements PreferencesService {
 
     //*************************************************************************************************************
     // CustomEntryTypes
-    //
-    // Note that here the pattern is broken: getBibEntryTypes returns something different than storeCustomEntryTypes
-    // stores. The proper opposite part would be storeBibEntryTypes, which is private, as it is called only by the
-    // latter method.
     //*************************************************************************************************************
 
     @Override
-    public List<BibEntryType> getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
+    public BibEntryTypesManager getBibEntryTypesRepository() {
+        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+        EnumSet.allOf(BibDatabaseMode.class).forEach(mode ->
+                bibEntryTypesManager.addCustomOrModifiedTypes(getBibEntryTypes(mode), mode));
+        return bibEntryTypesManager;
+    }
+
+    private List<BibEntryType> getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
         List<BibEntryType> storedEntryTypes = new ArrayList<>();
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
         try {

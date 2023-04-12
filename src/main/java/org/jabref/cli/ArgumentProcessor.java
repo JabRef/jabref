@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -604,8 +603,7 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             preferencesService.importPreferences(Path.of(cli.getPreferencesImport()));
-            EnumSet.allOf(BibDatabaseMode.class).forEach(mode ->
-                    Globals.entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(mode), mode));
+            Globals.entryTypesManager = preferencesService.getBibEntryTypesRepository();
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

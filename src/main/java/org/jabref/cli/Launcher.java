@@ -7,7 +7,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.Map;
 
 import org.jabref.gui.Globals;
@@ -25,7 +24,6 @@ import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -63,7 +61,7 @@ public class Launcher {
             // Init rest of preferences
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
-            applyPreferences(preferences);
+            initGlobals(preferences);
             clearOldSearchIndices();
 
             try {
@@ -138,7 +136,7 @@ public class Launcher {
         return true;
     }
 
-    private static void applyPreferences(PreferencesService preferences) {
+    private static void initGlobals(PreferencesService preferences) {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
@@ -148,9 +146,8 @@ public class Launcher {
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 Globals.getFileUpdateMonitor());
-        EnumSet.allOf(BibDatabaseMode.class).forEach(mode ->
-                Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.getBibEntryTypes(mode), mode));
-        // Initialize protected terms loader
+
+        Globals.entryTypesManager = preferences.getBibEntryTypesRepository();
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
     }
 
