@@ -169,10 +169,7 @@ public class MSBibMapping {
      * @return 1033 (american english) as default. LCID otherwise.
      */
     public static int getLCID(String language) {
-        if (!LANG_TO_LCID.containsKey(language)) {
-            return 1033;
-        }
-        return LANG_TO_LCID.get(language);
+        return LANG_TO_LCID.getOrDefault(language, 1033);
     }
 
     /**
@@ -182,10 +179,7 @@ public class MSBibMapping {
      * @return "english" as default. Corresponding language from BiMap otherwise.
      */
     public static String getLanguage(int LCID) {
-        if (!LANG_TO_LCID.containsValue(LCID)) {
-            return "english"; // -- default
-        }
-        return LANG_TO_LCID.inverse().get(LCID);
+        return LANG_TO_LCID.inverse().getOrDefault(LCID, "english");
     }
 
     public static String getMSBibField(Field field) {
