@@ -242,8 +242,6 @@ public class ImportHandler {
                                 dialogService,
                                 preferencesService).download());
         }
-
-
     }
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
