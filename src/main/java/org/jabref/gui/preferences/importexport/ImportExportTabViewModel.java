@@ -246,6 +246,4 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
             dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection failed!"));
         }
     }
-
-
 }
