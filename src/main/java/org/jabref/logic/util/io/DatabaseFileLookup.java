@@ -39,7 +39,7 @@ public class DatabaseFileLookup {
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
             fileCache.addAll(parseFileField(entry));
         }
-        this.pathOfDatabase = databaseContext.getDatabasePath().orElseThrow(() -> new NullPointerException("Database null"));
+        this.pathOfDatabase = databaseContext.getDatabasePath().orElse(Path.of(""));
     }
 
     /**
