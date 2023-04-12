@@ -4,13 +4,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.nio.file.Path;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+
+// relevant StAX imports
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -19,11 +23,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
-
-// relevant StAX imports
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
 
@@ -50,22 +49,10 @@ class ModsExporter extends Exporter {
         }
 
         try {
-            // create writer -- do this in separate method and return writer
-            XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
-            FileOutputStream fOutputStream = new FileOutputStream(file.toFile());
-            //XMLStreamWriter writer = outputFactory.createXMLStreamWriter(fOutputStream);
-            IndentingXMLStreamWriter writer = new IndentingXMLStreamWriter(outputFactory.createXMLStreamWriter(fOutputStream));
-            writer.setIndentStep("    ");
-            writer.writeDTD("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
-
-            writer.writeStartElement("mods", "modsCollection", MODS_NAMESPACE_URI);
-            writer.writeNamespace("mods", MODS_NAMESPACE_URI);
-            writer.writeNamespace("ns2", "http://www.w3.org/1999/xlink");
-            writer.writeNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-            writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation", MODS_SCHEMA_LOCATION);
+            // create writer
+            IndentingXMLStreamWriter writer = createWriter(file);
 
             for (BibEntry bibEntry : entries) {
-
                 bibEntry.getCitationKey().ifPresent(citeKey -> {
                     try {
                         addIdentifier(writer, new UnknownField("citekey"), citeKey);
@@ -127,67 +114,95 @@ class ModsExporter extends Exporter {
                     trackOriginInformation(originItems, field, value);
                 }
 
-                // this can be abstracted to different method
-                if(originItems.isEmpty()) {
-                    writer.writeEmptyElement("mods", "originInfo", MODS_NAMESPACE_URI);
-                } else {
-                    writer.writeStartElement("mods", "originInfo", MODS_NAMESPACE_URI);
-                    for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
-                        Field field = entry.getKey();
-                        String value = entry.getValue();
-                        addOriginInformation(writer,field, value);
-                    }
-                    writer.writeEndElement();
-                }
+                writeOriginInformation(writer, originItems, fieldMap);
 
-                // Write related items -- loop thru related items
-                writer.writeStartElement("mods", "relatedItem",MODS_NAMESPACE_URI);
-                writer.writeAttribute("type", "host");
-
-                for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
-                    Field field = entry.getKey();
-                    String value = entry.getValue();
-                    if (StandardField.JOURNAL.equals(field)) {
-                        addJournal(writer, value);
-                    }
-                }
-
-                if(parts.isEmpty()) {
-                    writer.writeEmptyElement("mods", "part", MODS_NAMESPACE_URI);
-                } else {
-                    writer.writeStartElement("mods","part", MODS_NAMESPACE_URI);
-                    for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
-                        Field field = entry.getKey();
-                        String value = entry.getValue();
-                        if (StandardField.PAGES.equals(field)) { // are these all parts?
-                            addPages(writer, value); // STILL NEED TO CHANGE
-                        } else if (StandardField.VOLUME.equals(field)) {
-                            addDetail(writer, StandardField.VOLUME, value);
-                        } else if (StandardField.ISSUE.equals(field)) {
-                            addDetail(writer, StandardField.ISSUE, value);
-                        }
-                    }
-                    writer.writeEndElement(); // end part
-                }
-
-
-                writer.writeEndElement(); // end relatedItem
-
-                writer.writeStartElement("mods","typeOfResource",MODS_NAMESPACE_URI);
-                writer.writeCharacters("text");
-                writer.writeEndElement(); // end typeOfResource
+                // Write related items
+                writeRelatedInformation(writer, parts, fieldMap);
                 writer.writeEndElement(); // end mods
             }
-            // end element and close
-            writer.writeCharacters("\n");
-            writer.writeEndDocument();
-            writer.flush();
-            writer.close();
 
+            // end element and close
+            closeWriter(writer);
         } catch (
                 XMLStreamException |
                 FileNotFoundException ex) {
             throw new SaveException(ex);
+        }
+    }
+
+    private IndentingXMLStreamWriter createWriter(final Path file) throws XMLStreamException, FileNotFoundException {
+        XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
+        FileOutputStream fOutputStream = new FileOutputStream(file.toFile());
+        IndentingXMLStreamWriter writer = new IndentingXMLStreamWriter(outputFactory.createXMLStreamWriter(fOutputStream));
+        writer.setIndentStep("    ");
+        writer.writeDTD("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
+
+        writer.writeStartElement("mods", "modsCollection", MODS_NAMESPACE_URI);
+        writer.writeNamespace("mods", MODS_NAMESPACE_URI);
+        writer.writeNamespace("ns2", "http://www.w3.org/1999/xlink");
+        writer.writeNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation", MODS_SCHEMA_LOCATION);
+        return writer;
+    }
+
+    private void closeWriter(XMLStreamWriter writer) throws XMLStreamException {
+        writer.writeCharacters("\n");
+        writer.writeEndDocument();
+        writer.flush();
+        writer.close();
+    }
+
+    private void writeOriginInformation(XMLStreamWriter writer, List<String> originItems, Map<Field, String> fieldMap) throws XMLStreamException {
+        if (originItems.isEmpty()) {
+            writer.writeEmptyElement("mods", "originInfo", MODS_NAMESPACE_URI);
+        } else {
+            writer.writeStartElement("mods", "originInfo", MODS_NAMESPACE_URI);
+            for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
+                Field field = entry.getKey();
+                String value = entry.getValue();
+                addOriginInformation(writer, field, value);
+            }
+            writer.writeEndElement();
+        }
+    }
+
+    private void writeRelatedInformation(XMLStreamWriter writer, List<String> parts, Map<Field, String> fieldMap) throws XMLStreamException {
+        writer.writeStartElement("mods", "relatedItem", MODS_NAMESPACE_URI);
+        writer.writeAttribute("type", "host");
+
+        for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
+            Field field = entry.getKey();
+            String value = entry.getValue();
+            if (StandardField.JOURNAL.equals(field)) {
+                addJournal(writer, value);
+            }
+        }
+        writePartInformation(writer, parts, fieldMap);
+
+        writer.writeEndElement(); // end relatedItem
+
+        writer.writeStartElement("mods", "typeOfResource", MODS_NAMESPACE_URI);
+        writer.writeCharacters("text");
+        writer.writeEndElement(); // end typeOfResource
+    }
+
+    private void writePartInformation(XMLStreamWriter writer, List<String> parts, Map<Field, String> fieldMap) throws XMLStreamException {
+        if (parts.isEmpty()) {
+            writer.writeEmptyElement("mods", "part", MODS_NAMESPACE_URI);
+        } else {
+            writer.writeStartElement("mods", "part", MODS_NAMESPACE_URI);
+            for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
+                Field field = entry.getKey();
+                String value = entry.getValue();
+                if (StandardField.PAGES.equals(field)) { // are these all parts?
+                    addPages(writer, value); // STILL NEED TO CHANGE
+                } else if (StandardField.VOLUME.equals(field)) {
+                    addDetail(writer, StandardField.VOLUME, value);
+                } else if (StandardField.ISSUE.equals(field)) {
+                    addDetail(writer, StandardField.ISSUE, value);
+                }
+            }
+            writer.writeEndElement(); // end part
         }
     }
 
@@ -214,55 +229,40 @@ class ModsExporter extends Exporter {
     private void addPart(List<String> part, String value) {
         part.add(value);
     }
-    private void addRelatedAndOriginInfoToModsGroup(XMLStreamWriter writer) throws XMLStreamException {
-        writer.writeStartElement("mods", "relatedItem",MODS_NAMESPACE_URI);
-        writer.writeAttribute("type", "host");
-
-        writer.writeStartElement("mods","part", MODS_NAMESPACE_URI);
-
-        // inside here, we need to call the other stuff..
-
-        writer.writeEndElement(); // end part
-        writer.writeEndElement(); // end relatedItem
-
-        writer.writeStartElement("mods","typeOfResource",MODS_NAMESPACE_URI);
-        writer.writeCharacters("text");
-        writer.writeEndElement(); // end typeOfResource
-    }
 
     private void addGenre(XMLStreamWriter writer, EntryType entryType) throws XMLStreamException {
-        writer.writeStartElement( "mods", "genre", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "genre", MODS_NAMESPACE_URI);
         writer.writeCharacters(entryType.getName());
         writer.writeEndElement();
     }
 
     private void addAbstract(XMLStreamWriter writer, String value) throws XMLStreamException {
-        writer.writeStartElement("mods", "abstract",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "abstract", MODS_NAMESPACE_URI);
         writer.writeCharacters(value);
         writer.writeEndElement(); // end abstract
     }
 
     private void addTitle(XMLStreamWriter writer, String value) throws XMLStreamException {
-        writer.writeStartElement("mods", "titleInfo",MODS_NAMESPACE_URI);
-        writer.writeStartElement("mods", "title",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "titleInfo", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "title", MODS_NAMESPACE_URI);
         writer.writeCharacters(value);
         writer.writeEndElement(); // end title
         writer.writeEndElement(); // end titleInfo
     }
 
     private void addAffiliation(XMLStreamWriter writer, String value) throws XMLStreamException {
-        writer.writeStartElement("mods", "name",MODS_NAMESPACE_URI);
-        writer.writeStartElement("mods", "affiliation",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "name", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "affiliation", MODS_NAMESPACE_URI);
         writer.writeCharacters(value);
         writer.writeEndElement(); // end affiliation
         writer.writeEndElement(); // end name
     }
 
     private void addLocation(XMLStreamWriter writer, String value) throws XMLStreamException {
-        writer.writeStartElement("mods","location", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "location", MODS_NAMESPACE_URI);
         String[] locations = value.split(", ");
         for (String location : locations) {
-            writer.writeStartElement("mods","physicalLocation",MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "physicalLocation", MODS_NAMESPACE_URI);
             writer.writeCharacters(location);
             writer.writeEndElement();
         }
@@ -272,7 +272,7 @@ class ModsExporter extends Exporter {
     private void addNote(XMLStreamWriter writer, String value) throws XMLStreamException {
         String[] notes = value.split(", ");
         for (String note : notes) {
-            writer.writeStartElement("mods","note", MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "note", MODS_NAMESPACE_URI);
             writer.writeCharacters(note);
             writer.writeEndElement();
         }
@@ -282,38 +282,29 @@ class ModsExporter extends Exporter {
         String[] urls = value.split(", ");
         writer.writeStartElement("mods", "location", MODS_NAMESPACE_URI);
         for (String url : urls) {
-            writer.writeStartElement("mods","url", MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "url", MODS_NAMESPACE_URI);
             writer.writeCharacters(url);
             writer.writeEndElement();
         }
         writer.writeEndElement();
-
-
     }
 
     private void addJournal(XMLStreamWriter writer, String value) throws XMLStreamException { // this may also need to be called within second for loop?
-        // Start RelatedItemDefinition
-/*        writer.writeStartElement("mods", "relatedItem", MODS_NAMESPACE_URI);
-        writer.writeAttribute("type", "host");*/
-
         // Start TitleInfoDefinition
-        writer.writeStartElement("mods", "titleInfo",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "titleInfo", MODS_NAMESPACE_URI);
 
         // Write title element
-        writer.writeStartElement("mods", "title",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "title", MODS_NAMESPACE_URI);
         writer.writeCharacters(value);
         writer.writeEndElement(); // End title element
 
         // End TitleInfoDefinition
         writer.writeEndElement(); // End titleInfo element
-
-        // End RelatedItemDefinition
-    /*    writer.writeEndElement(); // End relatedItem element*/
     }
 
     private void addLanguage(XMLStreamWriter writer, String value) throws XMLStreamException {
-        writer.writeStartElement("mods", "language",MODS_NAMESPACE_URI);
-        writer.writeStartElement("mods", "languageTerm",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "language", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "languageTerm", MODS_NAMESPACE_URI);
         writer.writeCharacters(value);
         writer.writeEndElement(); // end languageTerm
         writer.writeEndElement(); // end language
@@ -326,7 +317,7 @@ class ModsExporter extends Exporter {
             addStartAndEndPage(writer, value, MINUS);
         } else {
             BigInteger total = new BigInteger(value);
-            writer.writeStartElement("mods", "extent",MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "extent", MODS_NAMESPACE_URI);
             writer.writeStartElement("mods", "total", MODS_NAMESPACE_URI);
             writer.writeCharacters(total.toString());
             writer.writeEndElement();
@@ -338,8 +329,8 @@ class ModsExporter extends Exporter {
         String[] keywords = value.split(", ");
 
         for (String keyword : keywords) {
-            writer.writeStartElement("mods", "subject",MODS_NAMESPACE_URI);
-            writer.writeStartElement("mods", "topic",MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "subject", MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "topic", MODS_NAMESPACE_URI);
             writer.writeCharacters(keyword);
             writer.writeEndElement();
             writer.writeEndElement();
@@ -349,14 +340,14 @@ class ModsExporter extends Exporter {
     private void handleAuthors(XMLStreamWriter writer, String value) throws XMLStreamException {
         String[] authors = value.split("and");
         for (String author : authors) {
-            writer.writeStartElement("mods", "name",MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "name", MODS_NAMESPACE_URI);
             writer.writeAttribute("type", "personal");
 
             if (author.contains(",")) {
                 // if author contains ","  then this indicates that the author has a forename and family name
                 int commaIndex = author.indexOf(',');
                 String familyName = author.substring(0, commaIndex);
-                writer.writeStartElement("mods","namePart", MODS_NAMESPACE_URI);
+                writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
                 writer.writeAttribute("type", "family");
                 writer.writeCharacters(familyName);
                 writer.writeEndElement();
@@ -375,7 +366,7 @@ class ModsExporter extends Exporter {
                 writer.writeEndElement();
             } else {
                 // no "," indicates that there should only be a family name
-                writer.writeStartElement("mods", "namePart",MODS_NAMESPACE_URI);
+                writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
                 writer.writeAttribute("type", "family");
                 writer.writeCharacters(author);
                 writer.writeEndElement();
@@ -390,7 +381,7 @@ class ModsExporter extends Exporter {
             writer.writeStartElement("mods", "mods", MODS_NAMESPACE_URI);
             writer.writeAttribute("ID", value);
         }
-        writer.writeStartElement("mods", "identifier",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "identifier", MODS_NAMESPACE_URI);
         writer.writeAttribute("type", field.getName());
         writer.writeCharacters(value);
         writer.writeEndElement(); // end identifier
@@ -407,20 +398,20 @@ class ModsExporter extends Exporter {
             endPage = value.substring(minusIndex + 2);
         }
 
-        writer.writeStartElement("mods", "extent",MODS_NAMESPACE_URI);
-        writer.writeStartElement("mods", "start",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "extent", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "start", MODS_NAMESPACE_URI);
         writer.writeCharacters(startPage);
         writer.writeEndElement();
-        writer.writeStartElement("mods", "end",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "end", MODS_NAMESPACE_URI);
         writer.writeCharacters(endPage);
         writer.writeEndElement();
         writer.writeEndElement();
     }
 
     private void addDetail(XMLStreamWriter writer, Field field, String value) throws XMLStreamException {
-        writer.writeStartElement("mods","detail",MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "detail", MODS_NAMESPACE_URI);
         writer.writeAttribute("type", field.getName());
-        writer.writeStartElement("mods","number", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "number", MODS_NAMESPACE_URI);
         writer.writeCharacters(value);
         writer.writeEndElement(); // end number
         writer.writeEndElement(); // end detail
@@ -431,14 +422,14 @@ class ModsExporter extends Exporter {
         if (field.equals(StandardField.YEAR)) {
             addDate(writer, "dateIssued", value);
         } else if (field.equals(new UnknownField("created"))) {
-            addDate(writer,"dateCreated", value);
+            addDate(writer, "dateCreated", value);
         } else if (field.equals(StandardField.MODIFICATIONDATE)) {
-            addDate(writer,"dateModified", value);
+            addDate(writer, "dateModified", value);
         } else if (field.equals(StandardField.CREATIONDATE)) {
-            addDate(writer,"dateCaptured", value);
+            addDate(writer, "dateCaptured", value);
         } else if (StandardField.PUBLISHER.equals(field)) {
-            writer.writeStartElement("mods", "publisher",MODS_NAMESPACE_URI);
-            writer.writeAttribute("xsi",MODS_NAMESPACE_URI, "type","mods:stringPlusLanguagePlusSupplied");
+            writer.writeStartElement("mods", "publisher", MODS_NAMESPACE_URI);
+            writer.writeAttribute("xsi", MODS_NAMESPACE_URI, "type", "mods:stringPlusLanguagePlusSupplied");
             writer.writeCharacters(value);
             writer.writeEndElement();
         } else if (field.equals(new UnknownField("issuance"))) {
@@ -446,17 +437,17 @@ class ModsExporter extends Exporter {
             writer.writeCharacters(value);
             writer.writeEndElement();
         } else if (field.equals(StandardField.ADDRESS)) {
-            writer.writeStartElement("mods", "place",MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "place", MODS_NAMESPACE_URI);
             String[] places = value.split(", ");
             for (String place : places) {
-                writer.writeStartElement("mods", "placeTerm",MODS_NAMESPACE_URI);
+                writer.writeStartElement("mods", "placeTerm", MODS_NAMESPACE_URI);
                 writer.writeAttribute("type", "text");
                 writer.writeCharacters(place);
                 writer.writeEndElement();
             }
             writer.writeEndElement();
         } else if (field.equals(StandardField.EDITION)) {
-            writer.writeStartElement("mods", "edition",MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "edition", MODS_NAMESPACE_URI);
             writer.writeCharacters(value);
             writer.writeEndElement();
         }
