@@ -1152,7 +1152,7 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public BibEntryTypesManager getBibEntryTypesRepository() {
+    public BibEntryTypesManager getCustomEntryTypesRepository() {
         BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
         EnumSet.allOf(BibDatabaseMode.class).forEach(mode ->
                 bibEntryTypesManager.addCustomOrModifiedTypes(getBibEntryTypes(mode), mode));
@@ -1179,8 +1179,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    @Override
-    public void clearBibEntryTypes(BibDatabaseMode mode) {
+    private void clearBibEntryTypes(BibDatabaseMode mode) {
         try {
             Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
             prefsNode.clear();
@@ -1191,7 +1190,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void storeCustomEntryTypes(BibEntryTypesManager entryTypesManager) {
+    public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
         storeBibEntryTypes(entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX), BibDatabaseMode.BIBTEX);
         storeBibEntryTypes(entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), BibDatabaseMode.BIBLATEX);
     }

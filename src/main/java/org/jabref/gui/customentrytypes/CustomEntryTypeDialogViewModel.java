@@ -193,7 +193,7 @@ public class CustomEntryTypeDialogViewModel {
 
     public void resetAllCustomEntryTypes() {
         entryTypesManager.clearAllCustomEntryTypes(mode);
-        preferencesService.clearBibEntryTypes(mode);
+        preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
     }
 
     public void apply() {
@@ -217,6 +217,6 @@ public class CustomEntryTypeDialogViewModel {
         }
 
         preferencesService.getImportExportPreferences().setNonWrappableFields(multilineFields.stream().map(Field::getDisplayName).collect(Collectors.joining(";")));
-        preferencesService.storeCustomEntryTypes(entryTypesManager);
+        preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
     }
 }

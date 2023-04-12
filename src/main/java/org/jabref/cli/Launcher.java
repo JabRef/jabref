@@ -147,7 +147,7 @@ public class Launcher {
                 preferences.getImportFormatPreferences(),
                 Globals.getFileUpdateMonitor());
 
-        Globals.entryTypesManager = preferences.getBibEntryTypesRepository();
+        Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
     }
 
