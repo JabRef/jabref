@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
+import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.FieldProperty;
@@ -62,6 +63,10 @@ public class FieldViewModel {
 
     public BooleanProperty multiline() {
         return this.multiline;
+    }
+
+    public BibField toBibField() {
+        return new BibField(getField(), getFieldPriority());
     }
 
     @Override

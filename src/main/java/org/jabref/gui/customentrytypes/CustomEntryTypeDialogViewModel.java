@@ -205,10 +205,14 @@ public class CustomEntryTypeDialogViewModel {
             List<Field> multilineFieldsForType = allFields.stream().map(FieldViewModel::getField).filter(Field::isMultiLineDefined).collect(Collectors.toList());
             multilineFields.addAll(multilineFieldsForType);
 
-            List<OrFields> requiredFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.REQUIRED).map(FieldViewModel::getField).map(OrFields::new).collect(Collectors.toList());
-            List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
+            List<OrFields> required = allFields.stream()
+                                               .filter(field -> field.getFieldType() == FieldType.REQUIRED)
+                                               .map(FieldViewModel::getField)
+                                               .map(OrFields::new)
+                                               .collect(Collectors.toList());
+            List<BibField> fields = allFields.stream().map(FieldViewModel::toBibField).collect(Collectors.toList());
 
-            BibEntryType newType = new BibEntryType(type.getType(), otherFields, requiredFields);
+            BibEntryType newType = new BibEntryType(type.getType(), fields, required);
             entryTypesManager.addCustomOrModifiedType(newType, mode);
         }
 
