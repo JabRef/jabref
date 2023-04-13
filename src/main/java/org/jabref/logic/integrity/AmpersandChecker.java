@@ -1,20 +1,21 @@
 package org.jabref.logic.integrity;
 
-import com.google.common.base.CharMatcher;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+
+import com.google.common.base.CharMatcher;
+
 /**
  * Checks if the BibEntry contains unescaped ampersands.
  */
-public class AmpersandChecker implements EntryChecker{
+public class AmpersandChecker implements EntryChecker {
     // matches for an & preceded by any number of \
     private static final Pattern BACKSLASH_PRECEDED_AMPERSAND = Pattern.compile("\\\\*&");
 
