@@ -1,4 +1,4 @@
-package org.jabref.gui.customentrytypes;
+package org.jabref.gui.preferences.customentrytypes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,9 +16,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -39,31 +39,19 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
-public class CustomEntryTypeDialogViewModel {
-
-    public static final StringConverter<Field> FIELD_STRING_CONVERTER = new StringConverter<>() {
-        @Override
-        public String toString(Field object) {
-            return object != null ? object.getDisplayName() : "";
-        }
-
-        @Override
-        public Field fromString(String string) {
-            return FieldFactory.parseField(string);
-        }
-    };
+public class CustomEntryTypesViewModel implements PreferenceTabViewModel {
 
     private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey());
     private final ObjectProperty<EntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
-    private final BibDatabaseMode mode;
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
     private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
     private final DialogService dialogService;
+    private final BibDatabaseMode bibDatabaseMode;
 
     private final Validator entryTypeValidator;
     private final Validator fieldValidator;
@@ -71,14 +59,16 @@ public class CustomEntryTypeDialogViewModel {
 
     Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
 
-    public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, DialogService dialogService) {
-        this.mode = mode;
+    public CustomEntryTypesViewModel(BibDatabaseMode mode,
+                                     BibEntryTypesManager entryTypesManager,
+                                     DialogService dialogService,
+                                     PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
         this.dialogService = dialogService;
-        this.multiLineFields.addAll(preferencesService.getFieldContentParserPreferences().getNonWrappableFields());
+        this.bibDatabaseMode = mode;
 
-        addAllTypes();
+        this.multiLineFields.addAll(preferencesService.getFieldContentParserPreferences().getNonWrappableFields());
 
         entryTypeValidator = new FunctionBasedValidator<>(
                 entryTypeToAdd,
@@ -90,15 +80,15 @@ public class CustomEntryTypeDialogViewModel {
                 ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
-    public void addAllTypes() {
+    public void setValues() {
         if (this.entryTypesWithFields.size() > 0) {
             this.entryTypesWithFields.clear();
         }
-        Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(mode);
+        Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
 
         for (BibEntryType entryType : allTypes) {
             EntryTypeViewModel viewModel;
-            if (entryTypesManager.isCustomType(entryType.getType(), mode)) {
+            if (entryTypesManager.isCustomType(entryType.getType(), bibDatabaseMode)) {
                 viewModel = new CustomEntryTypeViewModel(entryType, isMultiline);
             } else {
                 viewModel = new EntryTypeViewModel(entryType, isMultiline);
@@ -107,12 +97,52 @@ public class CustomEntryTypeDialogViewModel {
         }
     }
 
-    public ObservableList<EntryTypeViewModel> entryTypes() {
-        return this.entryTypesWithFields;
+    public void storeSettings() {
+        Set<Field> multilineFields = new HashSet<>();
+        for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
+            BibEntryType type = typeViewModel.entryType().getValue();
+            List<FieldViewModel> allFields = typeViewModel.fields();
+
+            multilineFields.addAll(allFields.stream()
+                                            .filter(FieldViewModel::isMultiline)
+                                            .map(FieldViewModel::getField)
+                                            .toList());
+
+            List<OrFields> required = allFields.stream()
+                                               .filter(FieldViewModel::isRequired)
+                                               .map(FieldViewModel::getField)
+                                               .map(OrFields::new)
+                                               .collect(Collectors.toList());
+            List<BibField> fields = allFields.stream().map(FieldViewModel::toBibField).collect(Collectors.toList());
+
+            BibEntryType newType = new BibEntryType(type.getType(), fields, required);
+            entryTypesManager.addCustomOrModifiedType(newType, bibDatabaseMode);
+        }
+
+        for (var entryType : entryTypesToDelete) {
+            entryTypesManager.removeCustomOrModifiedEntryType(entryType, bibDatabaseMode);
+        }
+
+        preferencesService.getImportExportPreferences().setNonWrappableFields(
+                multilineFields.stream()
+                               .map(Field::getDisplayName)
+                               .collect(Collectors.joining(";")));
+        preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
     }
 
-    public ObservableList<Field> fieldsForAdding() {
-        return this.fieldsForAdding;
+    public EntryTypeViewModel addNewCustomEntryType() {
+        EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
+        BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
+        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);
+        this.entryTypesWithFields.add(viewModel);
+        this.entryTypeToAdd.setValue("");
+
+        return viewModel;
+    }
+
+    public void removeEntryType(EntryTypeViewModel focusedItem) {
+        entryTypesWithFields.remove(focusedItem);
+        entryTypesToDelete.add(focusedItem.entryType().getValue());
     }
 
     public void addNewField() {
@@ -135,14 +165,13 @@ public class CustomEntryTypeDialogViewModel {
         newFieldToAddProperty().setValue(null);
     }
 
-    public EntryTypeViewModel addNewCustomEntryType() {
-        EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
-        BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
-        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);
-        this.entryTypesWithFields.add(viewModel);
-        this.entryTypeToAdd.setValue("");
+    public void removeField(FieldViewModel focusedItem) {
+        selectedEntryType.getValue().removeField(focusedItem);
+    }
 
-        return viewModel;
+    public void resetAllCustomEntryTypes() {
+        entryTypesManager.clearAllCustomEntryTypes(bibDatabaseMode);
+        preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
     }
 
     public ObjectProperty<EntryTypeViewModel> selectedEntryTypeProperty() {
@@ -157,58 +186,19 @@ public class CustomEntryTypeDialogViewModel {
         return this.newFieldToAdd;
     }
 
+    public ObservableList<EntryTypeViewModel> entryTypes() {
+        return this.entryTypesWithFields;
+    }
+
+    public ObservableList<Field> fieldsForAdding() {
+        return this.fieldsForAdding;
+    }
+
     public ValidationStatus entryTypeValidationStatus() {
         return entryTypeValidator.getValidationStatus();
     }
 
     public ValidationStatus fieldValidationStatus() {
         return fieldValidator.getValidationStatus();
-    }
-
-    public void removeEntryType(EntryTypeViewModel focusedItem) {
-        entryTypesWithFields.remove(focusedItem);
-        entryTypesToDelete.add(focusedItem.entryType().getValue());
-    }
-
-    public void removeField(FieldViewModel focusedItem) {
-        selectedEntryType.getValue().removeField(focusedItem);
-    }
-
-    public void resetAllCustomEntryTypes() {
-        entryTypesManager.clearAllCustomEntryTypes(mode);
-        preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
-    }
-
-    public void apply() {
-        Set<Field> multilineFields = new HashSet<>();
-        for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
-            BibEntryType type = typeViewModel.entryType().getValue();
-            List<FieldViewModel> allFields = typeViewModel.fields();
-
-            multilineFields.addAll(allFields.stream()
-                                            .filter(FieldViewModel::isMultiline)
-                                            .map(FieldViewModel::getField)
-                                            .toList());
-
-            List<OrFields> required = allFields.stream()
-                                               .filter(FieldViewModel::isRequired)
-                                               .map(FieldViewModel::getField)
-                                               .map(OrFields::new)
-                                               .collect(Collectors.toList());
-            List<BibField> fields = allFields.stream().map(FieldViewModel::toBibField).collect(Collectors.toList());
-
-            BibEntryType newType = new BibEntryType(type.getType(), fields, required);
-            entryTypesManager.addCustomOrModifiedType(newType, mode);
-        }
-
-        for (var entryType : entryTypesToDelete) {
-            entryTypesManager.removeCustomOrModifiedEntryType(entryType, mode);
-        }
-
-        preferencesService.getImportExportPreferences().setNonWrappableFields(
-                multilineFields.stream()
-                               .map(Field::getDisplayName)
-                               .collect(Collectors.joining(";")));
-        preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
     }
 }

@@ -1,4 +1,4 @@
-package org.jabref.gui.customentrytypes;
+package org.jabref.gui.preferences.customentrytypes;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;

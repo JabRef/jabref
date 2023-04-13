@@ -1,4 +1,4 @@
-package org.jabref.gui.customentrytypes;
+package org.jabref.gui.preferences.customentrytypes;
 
 import java.util.function.Predicate;
 

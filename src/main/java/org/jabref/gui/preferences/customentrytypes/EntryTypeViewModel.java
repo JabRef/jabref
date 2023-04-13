@@ -1,4 +1,4 @@
-package org.jabref.gui.customentrytypes;
+package org.jabref.gui.preferences.customentrytypes;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +13,7 @@ import javafx.collections.ObservableList;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 
-import static org.jabref.gui.customentrytypes.FieldViewModel.Mandatory;
+import static org.jabref.gui.preferences.customentrytypes.FieldViewModel.Mandatory;
 
 public class EntryTypeViewModel {
 
