@@ -31,6 +31,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -54,7 +55,6 @@ public class CustomEntryTypeDialogViewModel {
 
     private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey());
     private final ObjectProperty<EntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
-    private final ObjectProperty<Field> selectedFieldToAdd = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final BibDatabaseMode mode;
@@ -80,11 +80,14 @@ public class CustomEntryTypeDialogViewModel {
 
         addAllTypes();
 
-        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
-        entryTypeValidator = new FunctionBasedValidator<>(entryTypeToAdd, notEmpty, ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
-        fieldValidator = new FunctionBasedValidator<>(newFieldToAdd,
-            input -> (input != null) && !input.getDisplayName().isEmpty(),
-            ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
+        entryTypeValidator = new FunctionBasedValidator<>(
+                entryTypeToAdd,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
+        fieldValidator = new FunctionBasedValidator<>(
+                newFieldToAdd,
+                input -> input != null && StringUtil.isNotBlank(input.getDisplayName()),
+                ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
     public void addAllTypes() {
@@ -114,14 +117,20 @@ public class CustomEntryTypeDialogViewModel {
 
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
-        FieldViewModel model = new FieldViewModel(field, FieldViewModel.Mandatory.REQUIRED, FieldPriority.IMPORTANT, false);
         ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
-        boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel -> fieldViewModel.nameProperty().getValue().equals(field.getDisplayName()));
+        boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel ->
+                fieldViewModel.nameProperty().getValue().equals(field.getDisplayName()));
 
         if (!fieldExists) {
-            this.selectedEntryType.getValue().addField(model);
+            this.selectedEntryType.getValue().addField(new FieldViewModel(
+                    field,
+                    FieldViewModel.Mandatory.REQUIRED,
+                    FieldPriority.IMPORTANT,
+                    false));
         } else {
-            dialogService.showWarningDialogAndWait(Localization.lang("Duplicate fields"), Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Duplicate fields"),
+                    Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
         }
         newFieldToAddProperty().setValue(null);
     }
@@ -138,10 +147,6 @@ public class CustomEntryTypeDialogViewModel {
 
     public ObjectProperty<EntryTypeViewModel> selectedEntryTypeProperty() {
         return this.selectedEntryType;
-    }
-
-    public ObjectProperty<Field> selectedFieldToAddProperty() {
-        return this.selectedFieldToAdd;
     }
 
     public StringProperty entryTypeToAddProperty() {
@@ -176,12 +181,14 @@ public class CustomEntryTypeDialogViewModel {
 
     public void apply() {
         Set<Field> multilineFields = new HashSet<>();
-        for (EntryTypeViewModel typeWithField : entryTypesWithFields) {
-            BibEntryType type = typeWithField.entryType().getValue();
-            List<FieldViewModel> allFields = typeWithField.fields();
+        for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
+            BibEntryType type = typeViewModel.entryType().getValue();
+            List<FieldViewModel> allFields = typeViewModel.fields();
 
-            List<Field> multilineFieldsForType = allFields.stream().map(FieldViewModel::getField).filter(Field::isMultiLineDefined).collect(Collectors.toList());
-            multilineFields.addAll(multilineFieldsForType);
+            multilineFields.addAll(allFields.stream()
+                                            .filter(FieldViewModel::isMultiline)
+                                            .map(FieldViewModel::getField)
+                                            .toList());
 
             List<OrFields> required = allFields.stream()
                                                .filter(FieldViewModel::isRequired)
@@ -198,7 +205,10 @@ public class CustomEntryTypeDialogViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, mode);
         }
 
-        preferencesService.getImportExportPreferences().setNonWrappableFields(multilineFields.stream().map(Field::getDisplayName).collect(Collectors.joining(";")));
+        preferencesService.getImportExportPreferences().setNonWrappableFields(
+                multilineFields.stream()
+                               .map(Field::getDisplayName)
+                               .collect(Collectors.joining(";")));
         preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
     }
 }

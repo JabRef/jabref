@@ -62,6 +62,10 @@ public class FieldViewModel {
         return multiline;
     }
 
+    public boolean isMultiline() {
+        return multiline.getValue();
+    }
+
     public FieldPriority getPriority() {
         return priorityProperty.getValue();
     }
