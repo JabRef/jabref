@@ -15,10 +15,9 @@
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab">
     <Label styleClass="titleHeader" text="%Custom entry types"/>
-    <HBox minHeight="-Infinity" minWidth="-Infinity"
-          prefHeight="400.0" prefWidth="550.0" spacing="10.0">
-        <VBox prefHeight="400.0" prefWidth="100.0" spacing="10.0">
-            <Label text="%Entry types"/>
+    <HBox spacing="10.0">
+        <VBox prefWidth="100.0" spacing="10.0">
+            <Label styleClass="sectionHeader" text="%Entry types"/>
             <TableView fx:id="entryTypesTable" minWidth="-Infinity" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="entryTypColumn"
@@ -44,8 +43,8 @@
                 </Button>
             </HBox>
         </VBox>
-        <VBox prefHeight="400.0" prefWidth="400.0" spacing="10.0" HBox.hgrow="ALWAYS">
-            <Label text="%Required and optional fields"/>
+        <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+            <Label styleClass="sectionHeader" text="%Required and optional fields"/>
             <TableView fx:id="fields" minWidth="-Infinity" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="fieldNameColumn"
