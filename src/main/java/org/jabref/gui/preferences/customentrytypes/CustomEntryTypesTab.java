@@ -135,6 +135,8 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
             if (type != null) {
                 var items = type.fields();
                 fields.setItems(items);
+            } else {
+                fields.setItems(null);
             }
         });
     }
@@ -240,15 +242,18 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         viewModel.addNewField();
     }
 
-    private void resetEntryTypes() {
+    @FXML
+    void resetEntryTypes() {
         boolean reset = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Reset entry types and fields to defaults"),
                 Localization.lang("This will reset all entry types to their default values and remove all custom entry types"),
                 Localization.lang("Reset to default"));
         if (reset) {
             viewModel.resetAllCustomEntryTypes();
+            fields.getSelectionModel().clearSelection();
+            entryTypesTable.getSelectionModel().clearSelection();
             viewModel.setValues();
-            this.entryTypesTable.refresh();
+            entryTypesTable.refresh();
         }
     }
 }

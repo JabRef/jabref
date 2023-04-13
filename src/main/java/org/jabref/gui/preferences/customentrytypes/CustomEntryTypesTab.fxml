@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root spacing="10.0" type="VBox"
@@ -60,7 +61,7 @@
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
-            <HBox spacing="10.0">
+            <HBox spacing="10.0" alignment="BASELINE_CENTER">
                 <ComboBox fx:id="addNewField" editable="true" prefWidth="150.0"/>
                 <Button fx:id="addNewFieldButton"
                         prefHeight="20.0" prefWidth="20.0"
@@ -70,6 +71,15 @@
                     </graphic>
                     <tooltip>
                         <Tooltip text="%Add new Field"/>
+                    </tooltip>
+                </Button>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button text="%Reset to default" onAction="#resetEntryTypes">
+                    <graphic>
+                        <JabRefIconView glyph="REFRESH"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%Reset entry types and fields to defaults"/>
                     </tooltip>
                 </Button>
             </HBox>
