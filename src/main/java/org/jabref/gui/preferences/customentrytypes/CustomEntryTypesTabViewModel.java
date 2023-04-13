@@ -39,7 +39,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
-public class CustomEntryTypesViewModel implements PreferenceTabViewModel {
+public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey());
     private final ObjectProperty<EntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
@@ -59,10 +59,10 @@ public class CustomEntryTypesViewModel implements PreferenceTabViewModel {
 
     Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
 
-    public CustomEntryTypesViewModel(BibDatabaseMode mode,
-                                     BibEntryTypesManager entryTypesManager,
-                                     DialogService dialogService,
-                                     PreferencesService preferencesService) {
+    public CustomEntryTypesTabViewModel(BibDatabaseMode mode,
+                                        BibEntryTypesManager entryTypesManager,
+                                        DialogService dialogService,
+                                        PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
         this.dialogService = dialogService;

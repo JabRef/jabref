@@ -39,7 +39,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
-public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesViewModel> implements PreferencesTab {
+public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> implements PreferencesTab {
 
     @FXML private TableView<EntryTypeViewModel> entryTypesTable;
     @FXML private TableColumn<EntryTypeViewModel, String> entryTypColumn;
@@ -76,7 +76,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                                            .orElse(preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode());
         BibEntryTypesManager entryTypesRepository = preferencesService.getCustomEntryTypesRepository();
 
-        this.viewModel = new CustomEntryTypesViewModel(mode, entryTypesRepository, dialogService, preferencesService);
+        this.viewModel = new CustomEntryTypesTabViewModel(mode, entryTypesRepository, dialogService, preferencesService);
 
         // As the state manager gets injected it's not available in the constructor
         this.localDragboard = stateManager.getLocalDragboard();
