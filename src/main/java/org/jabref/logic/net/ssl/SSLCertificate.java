@@ -63,8 +63,7 @@ public class SSLCertificate {
 
     /**
      * @return the SHA-256 of the <a href="https://en.wikipedia.org/wiki/X.690#DER_encoding">DER encoding</a>
-     *
-     * */
+     */
     public String getSHA256Thumbprint() {
         return sha256Thumbprint;
     }
