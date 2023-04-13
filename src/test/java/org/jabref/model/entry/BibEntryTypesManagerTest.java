@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.model.database.BibDatabaseMode;
@@ -31,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@AllowedToUseLogic("Requires MetaDataSerializer and MetaDataParser for parsing tests")
 class BibEntryTypesManagerTest {
 
     private static final EntryType UNKNOWN_TYPE = new UnknownEntryType("unknownType");

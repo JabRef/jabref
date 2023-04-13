@@ -68,7 +68,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @Override
     public String getTabName() {
-        return Localization.lang("Entry Types");
+        return Localization.lang("Entry types");
     }
 
     public void initialize() {
