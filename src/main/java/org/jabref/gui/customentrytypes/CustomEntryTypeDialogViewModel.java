@@ -112,27 +112,6 @@ public class CustomEntryTypeDialogViewModel {
         return this.fieldsForAdding;
     }
 
-    public enum FieldType {
-
-        REQUIRED(Localization.lang("Required")),
-        OPTIONAL(Localization.lang("Optional"));
-
-        private final String name;
-
-        FieldType(String name) {
-            this.name = name;
-        }
-
-        public String getDisplayName() {
-            return this.name;
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
-        }
-    }
-
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
         String fieldName = newFieldToAdd.getValue().getName();
@@ -206,7 +185,7 @@ public class CustomEntryTypeDialogViewModel {
             multilineFields.addAll(multilineFieldsForType);
 
             List<OrFields> required = allFields.stream()
-                                               .filter(field -> field.getFieldType() == FieldType.REQUIRED)
+                                               .filter(field -> field.getFieldType() == FieldViewModel.FieldType.REQUIRED)
                                                .map(FieldViewModel::getField)
                                                .map(OrFields::new)
                                                .collect(Collectors.toList());

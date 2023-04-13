@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
@@ -72,5 +72,26 @@ public class FieldViewModel {
     @Override
     public String toString() {
         return this.field.getDisplayName();
+    }
+
+    public enum FieldType {
+
+        REQUIRED(Localization.lang("Required")),
+        OPTIONAL(Localization.lang("Optional"));
+
+        private final String name;
+
+        FieldType(String name) {
+            this.name = name;
+        }
+
+        public String getDisplayName() {
+            return this.name;
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
     }
 }
