@@ -70,6 +70,9 @@ public class DatabaseFileLookup {
                     .collect(Collectors.toList());
     }
 
+    /**
+     * @return "" if the path does not exist
+     */
     public Path getPathOfDatabase() {
         return pathOfDatabase;
     }
