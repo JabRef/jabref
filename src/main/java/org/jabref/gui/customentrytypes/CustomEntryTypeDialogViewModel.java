@@ -114,10 +114,9 @@ public class CustomEntryTypeDialogViewModel {
 
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
-        String fieldName = newFieldToAdd.getValue().getName();
-        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT, false);
+        FieldViewModel model = new FieldViewModel(field, FieldViewModel.Mandatory.REQUIRED, FieldPriority.IMPORTANT, false);
         ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
-        boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel -> fieldViewModel.fieldName().getValue().equals(field.getDisplayName()));
+        boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel -> fieldViewModel.nameProperty().getValue().equals(field.getDisplayName()));
 
         if (!fieldExists) {
             this.selectedEntryType.getValue().addField(model);
@@ -185,7 +184,7 @@ public class CustomEntryTypeDialogViewModel {
             multilineFields.addAll(multilineFieldsForType);
 
             List<OrFields> required = allFields.stream()
-                                               .filter(field -> field.getFieldType() == FieldViewModel.FieldType.REQUIRED)
+                                               .filter(FieldViewModel::isRequired)
                                                .map(FieldViewModel::getField)
                                                .map(OrFields::new)
                                                .collect(Collectors.toList());

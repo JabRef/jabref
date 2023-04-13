@@ -1,7 +1,9 @@
 package org.jabref.gui.customentrytypes;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -15,17 +17,20 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class FieldViewModel {
 
-    private final BooleanProperty fieldTypeRequired = new SimpleBooleanProperty();
-    private final StringProperty fieldName = new SimpleStringProperty("");
     private final Field field;
-    private final FieldPriority fieldPriority;
+    private final StringProperty fieldName = new SimpleStringProperty("");
+    private final BooleanProperty required = new SimpleBooleanProperty();
     private final BooleanProperty multiline = new SimpleBooleanProperty();
+    private final ObjectProperty<FieldPriority> priorityProperty = new SimpleObjectProperty<>();
 
-    public FieldViewModel(Field field, FieldType fieldType, FieldPriority fieldPriority, boolean multiline) {
+    public FieldViewModel(Field field,
+                          Mandatory required,
+                          FieldPriority priorityProperty,
+                          boolean multiline) {
         this.field = field;
         this.fieldName.setValue(field.getDisplayName());
-        this.fieldTypeRequired.setValue(FieldType.REQUIRED.equals(fieldType));
-        this.fieldPriority = fieldPriority;
+        this.required.setValue(required == Mandatory.REQUIRED);
+        this.priorityProperty.setValue(priorityProperty);
         this.multiline.setValue(multiline);
 
         EasyBind.subscribe(this.multiline, multi -> {
@@ -37,61 +42,52 @@ public class FieldViewModel {
         });
     }
 
-    public FieldViewModel(Field field, boolean required, FieldPriority fieldPriority, boolean multiline) {
-        this(field, required ? FieldType.REQUIRED : FieldType.OPTIONAL, fieldPriority, multiline);
-    }
-
-    public BooleanProperty fieldTypeRequired() {
-        return this.fieldTypeRequired;
-    }
-
-    public StringProperty fieldName() {
-        return this.fieldName;
-    }
-
     public Field getField() {
-        return this.field;
+        return field;
     }
 
-    public FieldPriority getFieldPriority() {
-        return this.fieldPriority;
+    public StringProperty nameProperty() {
+        return fieldName;
     }
 
-    public FieldType getFieldType() {
-        return this.fieldTypeRequired.getValue() ? FieldType.REQUIRED : FieldType.OPTIONAL;
+    public BooleanProperty requiredProperty() {
+        return required;
     }
 
-    public BooleanProperty multiline() {
-        return this.multiline;
+    public boolean isRequired() {
+        return required.getValue();
+    }
+
+    public BooleanProperty multilineProperty() {
+        return multiline;
+    }
+
+    public FieldPriority getPriority() {
+        return priorityProperty.getValue();
     }
 
     public BibField toBibField() {
-        return new BibField(getField(), getFieldPriority());
+        return new BibField(field, priorityProperty.getValue());
     }
 
     @Override
     public String toString() {
-        return this.field.getDisplayName();
+        return field.getDisplayName();
     }
 
-    public enum FieldType {
+    public enum Mandatory {
 
         REQUIRED(Localization.lang("Required")),
         OPTIONAL(Localization.lang("Optional"));
 
         private final String name;
 
-        FieldType(String name) {
+        Mandatory(String name) {
             this.name = name;
         }
 
         public String getDisplayName() {
-            return this.name;
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
+            return name;
         }
     }
 }

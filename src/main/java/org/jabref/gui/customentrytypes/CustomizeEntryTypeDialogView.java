@@ -166,20 +166,20 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     }
 
     private void setupFieldsTable() {
-        fieldNameColumn.setCellValueFactory(item -> item.getValue().fieldName());
+        fieldNameColumn.setCellValueFactory(item -> item.getValue().nameProperty());
 
         fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));
-        fieldTypeColumn.setCellValueFactory(item -> item.getValue().fieldTypeRequired());
+        fieldTypeColumn.setCellValueFactory(item -> item.getValue().requiredProperty());
         makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
 
         fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
-        fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multiline());
+        fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multilineProperty());
         makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
         fieldTypeActionColumn.setSortable(false);
         fieldTypeActionColumn.setReorderable(false);
         fieldTypeActionColumn.setEditable(false);
-        fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().fieldName());
+        fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
 
         new ValueTableCellFactory<FieldViewModel, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())

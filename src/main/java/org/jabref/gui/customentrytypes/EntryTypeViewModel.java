@@ -13,6 +13,8 @@ import javafx.collections.ObservableList;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 
+import static org.jabref.gui.customentrytypes.FieldViewModel.Mandatory;
+
 public class EntryTypeViewModel {
 
     private final ObjectProperty<BibEntryType> entryType = new SimpleObjectProperty<>();
@@ -23,7 +25,7 @@ public class EntryTypeViewModel {
 
         List<FieldViewModel> allFieldsForType = entryType.getAllBibFields()
                        .stream().map(bibField -> new FieldViewModel(bibField.field(),
-                                   entryType.isRequired(bibField.field()),
+                                   entryType.isRequired(bibField.field()) ? Mandatory.REQUIRED : Mandatory.OPTIONAL,
                                    bibField.priority(),
                                    isMultiline.test(bibField.field())))
                                                  .collect(Collectors.toList());
