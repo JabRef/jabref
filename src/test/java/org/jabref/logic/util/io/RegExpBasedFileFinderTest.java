@@ -16,7 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RegExpBasedFileFinderTests {
+class RegExpBasedFileFinderTest {
     private static final List<String> PDF_EXTENSION = Collections.singletonList("pdf");
     private static final List<String> FILE_NAMES = List.of(
             "ACM_IEEE-CS.pdf",

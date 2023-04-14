@@ -9,7 +9,7 @@ import org.jabref.testutils.category.DatabaseTest;
  * Stores the credentials for the test systems
  */
 @DatabaseTest
-public class TestConnector {
+public class ConnectorTest {
 
     public static DBMSConnection getTestDBMSConnection(DBMSType dbmsType) throws SQLException, InvalidDBMSConnectionPropertiesException {
         DBMSConnectionProperties properties = getTestConnectionProperties(dbmsType);

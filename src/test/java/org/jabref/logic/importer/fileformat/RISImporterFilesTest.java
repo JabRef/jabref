@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class RISImporterTestFiles {
+class RISImporterFilesTest {
 
     private static final String FILE_ENDING = ".ris";
 

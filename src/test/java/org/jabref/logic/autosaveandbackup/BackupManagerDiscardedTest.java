@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for "discarded" flag
  */
-class BackupManagerTestDiscarded {
+class BackupManagerDiscardedTest {
 
     private BibDatabaseContext bibDatabaseContext;
     private BackupManager backupManager;

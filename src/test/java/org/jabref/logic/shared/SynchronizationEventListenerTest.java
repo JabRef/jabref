@@ -7,7 +7,7 @@ import org.jabref.testutils.category.DatabaseTest;
 import com.google.common.eventbus.Subscribe;
 
 @DatabaseTest
-public class SynchronizationTestEventListener {
+public class SynchronizationEventListenerTest {
 
     private SharedEntriesNotPresentEvent sharedEntriesNotPresentEvent;
     private UpdateRefusedEvent updateRefusedEvent;

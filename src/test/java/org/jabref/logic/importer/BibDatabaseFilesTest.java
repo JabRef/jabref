@@ -16,7 +16,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class BibDatabaseTestsWithFiles {
+public class BibDatabaseFilesTest {
 
     private ImportFormatPreferences importFormatPreferences;
 

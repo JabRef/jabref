@@ -11,8 +11,11 @@ import com.tngtech.archunit.library.GeneralCodingRules;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
+/**
+ * This class checks JabRef's shipped classes for architecture quality
+ */
 @AnalyzeClasses(packages = "org.jabref")
-class MainArchitectureTests {
+class MainArchitectureTest {
 
     public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.gui.Globals";
     private static final String PACKAGE_JAVAX_SWING = "javax.swing..";

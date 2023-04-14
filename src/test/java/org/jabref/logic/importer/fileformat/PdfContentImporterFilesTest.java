@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.mockito.Mockito.mock;
 
-class PdfContentImporterTestFiles {
+class PdfContentImporterFilesTest {
 
     private static final String FILE_ENDING = ".pdf";
 
