@@ -78,6 +78,19 @@ class DateTest {
     }
 
     @Test
+    void parseYearMonthRange() {
+        Date expectedDataRange = new Date(YearMonth.of(2015, Month.JANUARY), YearMonth.of(2015, Month.FEBRUARY));
+        assertEquals(Optional.of(expectedDataRange), Date.parse("2015-01/2015-02"));
+        // assertEquals(Optional.of(expectedDataRange), Date.parse("January 2015/February 2015"));
+    }
+
+    @Test
+    void parseYearMonthDayRange() {
+        Date expectedDataRange = new Date(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25));
+        assertEquals(Optional.of(expectedDataRange), Date.parse("2015-01-15/2015-02-25"));
+    }
+
+    @Test
     void parseZonedTime() {
         Optional<Date> expected = Optional.of(
                 new Date(ZonedDateTime.of(

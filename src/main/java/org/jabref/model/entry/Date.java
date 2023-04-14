@@ -47,8 +47,6 @@ public class Date {
                 "uuuu.MM.d",                            // covers 2015.10.15
                 "y-",                                   // covers 2015-
                 "-y",                                   // covers -2015
-                "y-M/y-M",                              // covers 2015-01/2015-02
-                "MMMM y/MMMM y",                        // covers January 2015/February 2015
                 "d MMMM y/d MMMM y",                    // covers 20 January 2015/20 February 2015
                 "y G",                                  // covers 1 BC
                 "y G / y G",                            // covers 30 BC / 5 AD
@@ -109,8 +107,12 @@ public class Date {
             return Optional.empty();
         }
 
-        // if dateString has format of uuuu/uuuu, treat as date range
-        if (dateString.matches("[0-9]{4}/[0-9]{4}")) {
+        // if dateString has range format, treat as date range
+        if (dateString.matches(
+            "\\d{4}/\\d{4}|" +                           // uuuu/uuuu 
+            "\\d{4}-\\d{2}/\\d{4}-\\d{2}|" +             // uuuu-mm/uuuu-mm 
+            "\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}"  // uuuu-mm/uuuu-mm 
+        )) {
             try {
                 String[] strDates = dateString.split("/");
                 TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0]);
