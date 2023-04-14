@@ -4,6 +4,7 @@ open module org.jabref {
 
     // SQL
     requires java.sql;
+    requires java.sql.rowset;
 
     // JavaFX
     requires javafx.base;
