@@ -58,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the pin button on the Global Search dialog was located at the bottom and not at the top. [#9362](https://github.com/JabRef/jabref/issues/9362)
 - We fixed the log text color in the event log console when using dark mode. [#9732](https://github.com/JabRef/jabref/issues/9732)
 - We fixed an issue where searching for unlinked files would include the current library's .bib file [#9735](https://github.com/JabRef/jabref/issues/9735)
+- We fixed an issue where it was no longer possible to connect to a shared mysql database due to an exception [#9761](https://github.com/JabRef/jabref/issues/9761)
 
 ### Removed
 
