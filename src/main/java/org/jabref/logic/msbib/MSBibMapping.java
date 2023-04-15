@@ -180,7 +180,7 @@ public class MSBibMapping {
      * @return "english" as default. Corresponding language from BiMap otherwise.
      */
     public static String getLanguage(int LCID) {
-        return LANG_TO_LCID.inverse().getOrDefault(BIBLATEX_TO_MS_BIB, BIBTEX_PREFIX);
+        return LANG_TO_LCID.inverse().getOrDefault(LCID, "english");
     }
 
     public static String getMSBibField(Field field) {
