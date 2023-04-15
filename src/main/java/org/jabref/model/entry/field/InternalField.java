@@ -6,20 +6,49 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * JabRef internal fields. These are not normal fields but mostly place holders with special functions.
+ * JabRef internal fields. These are not normal fields but mostly placeholders with special functions.
  */
 public enum InternalField implements Field {
+    /**
+     * The BibTeX key (which is used at \cite{key} in LaTeX
+     */
     KEY_FIELD("citationkey"),
+
     /**
      * field which indicates the entrytype
+     *
+     * Example: @misc{key}
      */
     TYPE_HEADER("entrytype"),
+
+    /**
+     * Used in old layout files
+     */
     OBSOLETE_TYPE_HEADER("bibtextype"),
-    MARKED_INTERNAL("__markedentry"), // used in old versions of JabRef. Currently used for conversion only
-    // all field names starting with "Jabref-internal-" are not appearing in .bib files
-    BIBTEX_STRING("__string"), // marker that the content is just a BibTeX string
-    INTERNAL_ALL_FIELD("all"), // virtual field to denote "all fields". Used in the meta data serialiization for save actions.
-    INTERNAL_ALL_TEXT_FIELDS_FIELD("all-text-fields"), // virtual field to denote "all text fields". Used in the meta data serialiization for save actions.
+
+    /**
+     * used in old versions of JabRef. Currently used for conversion only
+     */
+    MARKED_INTERNAL("__markedentry"),
+
+    /**
+     * Marker that the content is just a BibTeX string
+     */
+    BIBTEX_STRING("__string"),
+
+    /**
+     * virtual field to denote "all fields". Used in the metadata serialization for save actions.
+     */
+    INTERNAL_ALL_FIELD("all"),
+
+    /**
+     * virtual field to denote "all text fields". Used in the metadata serialization for save actions.
+     */
+    INTERNAL_ALL_TEXT_FIELDS_FIELD("all-text-fields"),
+
+    /**
+     * all field names starting with "Jabref-internal-" are not appearing in .bib files
+     */
     INTERNAL_ID_FIELD("JabRef-internal-id");
 
     private final String name;

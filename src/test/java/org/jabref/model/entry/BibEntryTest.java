@@ -64,7 +64,7 @@ class BibEntryTest {
     @Test
     void getFieldWorksWithBibFieldAsWell() throws Exception {
         entry.setField(StandardField.AUTHOR, "value");
-        assertEquals(Optional.of("value"), entry.getField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).getField()));
+        assertEquals(Optional.of("value"), entry.getField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).field()));
     }
 
     @Test
@@ -80,7 +80,7 @@ class BibEntryTest {
 
     @Test
     void setFieldWorksWithBibFieldAsWell() throws Exception {
-        entry.setField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).getField(), "value");
+        entry.setField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).field(), "value");
         assertEquals(Optional.of("value"), entry.getField(StandardField.AUTHOR));
     }
 

@@ -67,7 +67,7 @@ public class DefaultInjector implements PresenterFactory {
 
     @Override
     public <T> T instantiatePresenter(Class<T> clazz, Function<String, Object> injectionContext) {
-        LOGGER.debug("Instantiate " + clazz.getName());
+        LOGGER.debug("Instantiate {}", clazz.getName());
 
         // Use our own method to construct dependencies
         Injector.setInstanceSupplier(DefaultInjector::createDependency);
@@ -77,7 +77,7 @@ public class DefaultInjector implements PresenterFactory {
 
     @Override
     public void injectMembers(Object instance, Function<String, Object> injectionContext) {
-        LOGGER.debug("Inject into " + instance.getClass().getName());
+        LOGGER.debug("Inject into {}", instance.getClass().getName());
 
         // Use our own method to construct dependencies
         Injector.setInstanceSupplier(DefaultInjector::createDependency);

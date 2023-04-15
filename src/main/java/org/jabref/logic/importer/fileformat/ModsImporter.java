@@ -516,9 +516,9 @@ public class ModsImporter extends Importer implements Parser {
 
     private void putDate(Map<Field, String> fields, String elementName, String date) {
         if (date != null) {
+            Optional<Date> optionalParsedDate = Date.parse(date);
             switch (elementName) {
                 case "dateIssued" -> {
-                    Optional<Date> optionalParsedDate = Date.parse(date);
                     optionalParsedDate
                             .ifPresent(parsedDate -> fields.put(StandardField.DATE, parsedDate.getNormalized()));
 
@@ -534,10 +534,12 @@ public class ModsImporter extends Importer implements Parser {
                     fields.put(new UnknownField("created"), date);
                 }
                 case "dateCaptured" -> {
-                    fields.put(new UnknownField("captured"), date);
+                    optionalParsedDate
+                            .ifPresent(parsedDate -> fields.put(StandardField.CREATIONDATE, parsedDate.getNormalized()));
                 }
                 case "dateModified" -> {
-                    fields.put(new UnknownField("modified"), date);
+                    optionalParsedDate
+                            .ifPresent(parsedDate -> fields.put(StandardField.MODIFICATIONDATE, parsedDate.getNormalized()));
                 }
             }
         }
