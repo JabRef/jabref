@@ -17,9 +17,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added "Attach file from URL" to right-click context menu to download and store a file with the reference library. [#9646](https://github.com/JabRef/jabref/issues/9646)
 - We enabled updating an existing entry with data from InspireHEP. [#9351](https://github.com/JabRef/jabref/issues/9351)
 - We added a fetcher for the Bibliotheksverbund Bayern (experimental). [#9641](https://github.com/JabRef/jabref/pull/9641)
+- We added support for multiple languages for exporting to and importing references from MS Office. [#9699](https://github.com/JabRef/jabref/issues/9699)
 - We enabled scrolling in the groups list when dragging a group on another group. [#2869](https://github.com/JabRef/jabref/pull/2869)
 - We added the option to automatically download online files when a new entry is created from an existing ID (e.g. DOI). The option can be disabled in the preferences under "Import and Export" [#9756](https://github.com/JabRef/jabref/issues/9756)
-
 
 
 ### Changed
@@ -37,6 +37,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the Medline importer to correctly import ISO dates for `revised`. [#9536](https://github.com/JabRef/jabref/issues/9536)
 - To avoid cluttering of the directory, We always delete the `.sav` file upon successful write. [#9675](https://github.com/JabRef/jabref/pull/9675)
 - We improved the unlinking/deletion of multiple linked files of an entry using the <kbd>Delete</kbd> key. [#9473](https://github.com/JabRef/jabref/issues/9473)
+- We moved the custom entry types dialog into the preferences dialog. [#9760](https://github.com/JabRef/jabref/pull/9760)
+
 
 
 ### Fixed
@@ -57,6 +59,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the double paste issue when <kbd>Cmd</kbd> + <kbd>v</kbd> is pressed on 'New entry from plaintext' dialog. [#9367](https://github.com/JabRef/jabref/issues/9367)
 - We fixed an issue where the pin button on the Global Search dialog was located at the bottom and not at the top. [#9362](https://github.com/JabRef/jabref/issues/9362)
 - We fixed the log text color in the event log console when using dark mode. [#9732](https://github.com/JabRef/jabref/issues/9732)
+- We fixed an issue where searching for unlinked files would include the current library's .bib file [#9735](https://github.com/JabRef/jabref/issues/9735)
+- We fixed an issue where it was no longer possible to connect to a shared mysql database due to an exception [#9761](https://github.com/JabRef/jabref/issues/9761)
 
 ### Removed
 
@@ -381,7 +385,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the union/intersection view button in the group sidepane to the left of the other controls. [#8202](https://github.com/JabRef/jabref/pull/8202)
 - We improved the Drag and Drop behavior in the "Customize Entry Types" Dialog [#6338](https://github.com/JabRef/jabref/issues/6338)
 - When determining the URL of an ArXiV eprint, the URL now points to the version [#8149](https://github.com/JabRef/jabref/pull/8149)
-- We Included all standard fields with citation key when exporting to Old OpenOffice/LibreOffice Calc Format [#8176](https://github.com/JabRef/jabref/pull/8176)
+- We Included all standard fields with citation key when exporting to Old OpenOffice/LibreExpoa Calc Format [#8176](https://github.com/JabRef/jabref/pull/8176)
 - In case the database is encoded with `UTF8`, the `% Encoding` marker is not written anymore
 - The written `.bib` file has the same line endings [#390](https://github.com/koppor/jabref/issues/390)
 - The written `.bib` file always has a final line break

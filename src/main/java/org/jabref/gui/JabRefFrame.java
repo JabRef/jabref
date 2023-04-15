@@ -60,7 +60,6 @@ import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
-import org.jabref.gui.customentrytypes.CustomizeEntryAction;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
@@ -950,8 +949,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this, stateManager)),
-                factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(stateManager, Globals.entryTypesManager))
+                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this, stateManager))
         );
 
         help.getItems().addAll(

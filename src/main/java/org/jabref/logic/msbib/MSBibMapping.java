@@ -25,6 +25,7 @@ public class MSBibMapping {
 
     private static final BiMap<Field, String> BIBLATEX_TO_MS_BIB = HashBiMap.create();
 
+    // see https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a
     private static final BiMap<String, Integer> LANG_TO_LCID = HashBiMap.create();
 
     static {
@@ -172,7 +173,7 @@ public class MSBibMapping {
         if (!LANG_TO_LCID.containsKey(language)) {
             return 1033;
         }
-        return LANG_TO_LCID.get(language);
+        return LANG_TO_LCID.getOrDefault(language, 1033);
     }
 
     /**
