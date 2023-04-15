@@ -42,7 +42,7 @@ public class ContentSelectorView extends AbstractPropertiesTabView<ContentSelect
 
     @Override
     public String getTabName() {
-        return Localization.lang("Manage content selectors");
+        return Localization.lang("Content selectors");
     }
 
     @FXML
