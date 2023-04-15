@@ -1,4 +1,4 @@
-package org.jabref.gui.contentselector;
+package org.jabref.gui.libraryproperties.contentselectors;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
@@ -24,19 +23,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ContentSelectorDialogViewModelTest {
-    private final LibraryTab libraryTab = mock(LibraryTab.class);
+public class ContentSelectorViewModelTest {
     private final DialogService dialogService = mock(DialogService.class);
     private final List<StandardField> DEFAULT_FIELDS = Arrays.asList(
             StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
-    private ContentSelectorDialogViewModel viewModel;
-    private BibDatabaseContext bibDatabaseContext;
+    private ContentSelectorViewModel viewModel;
+    private BibDatabaseContext databaseContext;
 
     @BeforeEach
     void setUp() {
-        bibDatabaseContext = new BibDatabaseContext();
-        when(libraryTab.getBibDatabaseContext()).thenReturn(bibDatabaseContext);
-        viewModel = new ContentSelectorDialogViewModel(libraryTab, dialogService);
+        databaseContext = new BibDatabaseContext();
+        viewModel = new ContentSelectorViewModel(databaseContext, dialogService);
     }
 
     @Test
@@ -122,10 +119,10 @@ public class ContentSelectorDialogViewModelTest {
         addField(testField);
         addKeyword(testField, "test1");
         addKeyword(testField, "test2");
-        viewModel.saveChanges();
+        viewModel.storeSettings();
 
-        List<String> result = bibDatabaseContext.getMetaData()
-                                                .getContentSelectorValuesForField(testField);
+        List<String> result = databaseContext.getMetaData()
+                                             .getContentSelectorValuesForField(testField);
         List<String> expected = Arrays.asList("test1", "test2");
 
         assertEquals(expected, result);

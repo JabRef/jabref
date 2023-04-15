@@ -58,7 +58,6 @@ import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
-import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
@@ -945,11 +944,7 @@ public class JabRefFrame extends BorderPane {
         );
 
         options.getItems().addAll(
-                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this, Globals.TASK_EXECUTOR)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this, stateManager))
+                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this, Globals.TASK_EXECUTOR))
         );
 
         help.getItems().addAll(

@@ -1,4 +1,4 @@
-package org.jabref.gui.contentselector;
+package org.jabref.gui.libraryproperties.contentselectors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,70 +20,78 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
+import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
-class ContentSelectorDialogViewModel extends AbstractViewModel {
+public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
     private static final List<Field> DEFAULT_FIELD_NAMES = Arrays.asList(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
 
-    private final LibraryTab libraryTab;
+    private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
     private final DialogService dialogService;
     private final Map<Field, List<String>> fieldKeywordsMap = new HashMap<>();
 
-    private ListProperty<Field> fields = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private ListProperty<String> keywords = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
-    private StringProperty selectedKeyword = new SimpleStringProperty();
+    private final ListProperty<Field> fields = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<String> keywords = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
+    private final StringProperty selectedKeyword = new SimpleStringProperty();
 
-    ContentSelectorDialogViewModel(LibraryTab libraryTab, DialogService dialogService) {
-        this.libraryTab = libraryTab;
-        this.metaData = libraryTab.getBibDatabaseContext().getMetaData();
+    ContentSelectorViewModel(BibDatabaseContext databaseContext, DialogService dialogService) {
+        this.databaseContext = databaseContext;
+        this.metaData = databaseContext.getMetaData();
         this.dialogService = dialogService;
-        populateFieldNameKeywordsMapWithExistingValues();
-        populateFieldNamesListWithValues();
     }
 
-    private void populateFieldNamesListWithValues() {
+    @Override
+    public void setValues() {
+        // Populate Field names list
         List<Field> existingFields = new ArrayList<>(fieldKeywordsMap.keySet());
         fields.addAll(existingFields);
 
         if (fields.isEmpty()) {
             DEFAULT_FIELD_NAMES.forEach(this::addFieldIfUnique);
         }
-    }
 
-    private void populateFieldNameKeywordsMapWithExistingValues() {
+        // Populate field names keyword map
         metaData.getContentSelectors().getContentSelectors().forEach(
                 existingContentSelector -> fieldKeywordsMap.put(existingContentSelector.getField(), new ArrayList<>(existingContentSelector.getValues()))
         );
     }
 
-    ListProperty<Field> getFieldNamesBackingList() {
+    @Override
+    public void storeSettings() {
+        List<Field> metaDataFields = metaData.getContentSelectors().getFieldsWithSelectors();
+        fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaDataFields, field, keywords));
+
+        List<Field> fieldNamesToRemove = filterFieldsToRemove();
+        fieldNamesToRemove.forEach(metaData::clearContentSelectors);
+    }
+
+    public ListProperty<Field> getFieldNamesBackingList() {
         return fields;
     }
 
-    ObjectProperty<Field> selectedFieldProperty() {
+    public ObjectProperty<Field> selectedFieldProperty() {
         return selectedField;
     }
 
-    BooleanBinding isFieldNameListEmpty() {
+    public BooleanBinding isFieldNameListEmpty() {
         return Bindings.isEmpty(fields);
     }
 
-    BooleanBinding isNoFieldNameSelected() {
+    public BooleanBinding isNoFieldNameSelected() {
         return Bindings.isEmpty(selectedField.asString());
     }
 
-    ListProperty<String> getKeywordsBackingList() {
+    public ListProperty<String> getKeywordsBackingList() {
         return keywords;
     }
 
@@ -169,17 +177,6 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
     private void removeKeyword(Field field, String keywordToRemove) {
         fieldKeywordsMap.get(field).remove(keywordToRemove);
         keywords.remove(keywordToRemove);
-    }
-
-    void saveChanges() {
-        List<Field> metaDataFields = metaData.getContentSelectors().getFieldsWithSelectors();
-        fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaDataFields, field, keywords));
-
-        List<Field> fieldNamesToRemove = filterFieldsToRemove();
-        fieldNamesToRemove.forEach(metaData::clearContentSelectors);
-
-        libraryTab.setupMainPanel();
-        libraryTab.markNonUndoableBaseChanged();
     }
 
     private List<Field> filterFieldsToRemove() {
