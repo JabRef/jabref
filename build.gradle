@@ -111,7 +111,7 @@ dependencies {
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
     // 3.0.0-alpha3 is apparently newer than RC
-    implementation 'org.apache.pdfbox:pdfbox:3.0.-alpha3'
+    implementation 'org.apache.pdfbox:pdfbox:3.0.0-alpha3'
     implementation 'org.apache.pdfbox:fontbox:3.0.0-alpha3'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-alpha3'
 
