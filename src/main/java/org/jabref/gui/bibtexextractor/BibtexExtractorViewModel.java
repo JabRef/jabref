@@ -56,7 +56,8 @@ public class BibtexExtractorViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                importFormatReader);
+                importFormatReader,
+                taskExecutor);
     }
 
     public StringProperty inputTextProperty() {
