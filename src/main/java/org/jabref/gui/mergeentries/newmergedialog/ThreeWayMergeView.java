@@ -191,4 +191,8 @@ public class ThreeWayMergeView extends VBox {
     public BibEntry getRightEntry() {
         return viewModel.getRightEntry();
     }
+
+    public void saveConfiguration() {
+        toolbar.saveToolbarConfiguration();
+    }
 }

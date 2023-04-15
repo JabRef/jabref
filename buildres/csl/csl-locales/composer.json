@@ -1,0 +1,19 @@
+{
+    "name": "citation-style-language/locales",
+    "description": "Citation Style Language (CSL) Locales",
+    "type": "library",
+    "license": "CC-BY-SA-3.0",
+    "homepage": "http://citationstyles.org/",
+    "authors": [
+        {
+            "name": "Citation Style Language (CSL) Team",
+            "homepage": "http://citationstyles.org/about/#Credits"
+        }
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
+    "require": {}
+}

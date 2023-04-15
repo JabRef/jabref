@@ -177,7 +177,7 @@
   <!--Makro Darstellung Jahrgang, Ausgabe und Seitenzahl in Literaturverzeichnis-->
   <macro name="locators">
     <choose>
-      <if type="article article-journal article-magazine chapter">
+      <if type="article article-journal article-magazine chapter article-newspaper" match="any">
         <text variable="volume" prefix=" " suffix=". Jg."/>
         <text variable="issue" prefix=" (" suffix=")."/>
         <text term="page" form="short" prefix=" "/>

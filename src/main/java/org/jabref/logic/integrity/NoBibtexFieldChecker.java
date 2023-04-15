@@ -22,7 +22,7 @@ public class NoBibtexFieldChecker implements EntryChecker {
         return BiblatexEntryTypeDefinitions.ALL.stream()
                                                .flatMap(type -> type.getAllBibFields().stream())
                                                .filter(field -> !allBibtexFields.contains(field))
-                                               .map(BibField::getField)
+                                               .map(BibField::field)
                                                // these fields are displayed by JabRef as default
                                                .filter(field -> !field.equals(StandardField.ABSTRACT))
                                                .filter(field -> !field.equals(StandardField.COMMENT))
