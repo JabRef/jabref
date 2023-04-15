@@ -34,7 +34,7 @@
     <category citation-format="note"/>
     <category field="generic-base"/>
     <summary>Chicago format with full notes and bibliography</summary>
-    <updated>2017-10-12T12:00:00+00:00</updated>
+    <updated>2022-01-16T19:46:01+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -185,9 +185,12 @@
           <text macro="editor"/>
           <text macro="translator"/>
           <choose>
-            <if type="article-magazine article-newspaper webpage post-weblog" match="any">
-              <text variable="container-title"/>
+            <if type="article-magazine article-newspaper" match="any">
+              <text variable="container-title" font-style="italic"/>
             </if>
+            <else-if type="webpage post-weblog" match="any">
+              <text variable="container-title"/>
+            </else-if>
           </choose>
         </substitute>
       </names>
@@ -218,6 +221,11 @@
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
+        <choose>
+          <if type="article-magazine article-newspaper webpage post-weblog" match="any">
+            <text variable="container-title"/>
+          </if>
+        </choose>
         <text macro="title"/>
       </substitute>
     </names>
@@ -561,7 +569,20 @@
                 <text term="section" form="symbol"/>
                 <text variable="section"/>
               </group>
-              <text variable="page"/>
+              <group delimiter=", ">
+                <text variable="page"/>
+                <choose>
+                  <if locator="page" match="any">
+                    <text variable="locator"/>
+                  </if>
+                  <else>
+                    <group delimiter=" ">
+                      <label variable="locator" form="short"/>
+                      <text variable="locator"/>
+                    </group>
+                  </else>
+                </choose>
+              </group>
             </if>
             <else>
               <text variable="number" prefix="No. "/>
@@ -1145,9 +1166,17 @@
     <choose>
       <if type="article-journal bill legislation legal_case" match="none">
         <choose>
-          <if type="speech" variable="publisher publisher-place" match="any">
-            <text macro="issue"/>
+          <!-- We need a perdiod here when the container title gets moved up into author position, otherwise a comma (below)-->
+          <if type="article-newspaper article-magazine" match="any">
+            <choose>
+              <if variable="author editor" match="none">
+                <text macro="issue"/>
+              </if>
+            </choose>
           </if>
+          <else-if type="speech" variable="publisher publisher-place" match="any">
+            <text macro="issue"/>
+          </else-if>
         </choose>
       </if>
     </choose>
@@ -1158,9 +1187,16 @@
         <choose>
           <if type="article-journal" match="none">
             <choose>
-              <if type="speech" variable="publisher publisher-place" match="none">
-                <text macro="issue"/>
+              <if type="article-newspaper article-magazine" match="any">
+                <choose>
+                  <if variable="author editor" match="any">
+                    <text macro="issue"/>
+                  </if>
+                </choose>
               </if>
+              <else-if type="speech" variable="publisher publisher-place" match="none">
+                <text macro="issue"/>
+              </else-if>
             </choose>
           </if>
           <else-if variable="volume issue" match="none">

@@ -4,6 +4,7 @@ open module org.jabref {
 
     // SQL
     requires java.sql;
+    requires java.sql.rowset;
 
     // JavaFX
     requires javafx.base;
@@ -87,15 +88,12 @@ open module org.jabref {
     requires org.apache.commons.lang3;
     requires org.antlr.antlr4.runtime;
     requires org.fxmisc.flowless;
-    requires org.apache.tika.core;
-    uses org.apache.tika.detect.AutoDetectReader;
+
     requires pdfbox;
     requires xmpbox;
     requires com.ibm.icu;
 
     requires flexmark;
-    requires flexmark.ext.gfm.strikethrough;
-    requires flexmark.ext.gfm.tasklist;
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;

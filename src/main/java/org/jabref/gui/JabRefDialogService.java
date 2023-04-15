@@ -26,6 +26,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -49,6 +50,7 @@ import org.jabref.logic.l10n.Localization;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Notifications;
 import org.controlsfx.control.TaskProgressView;
+import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
 import org.slf4j.Logger;
@@ -267,6 +269,30 @@ public class JabRefDialogService implements DialogService {
         if (dialog.getOwner() == null) {
             dialog.initOwner(mainWindow);
         }
+        return dialog.showAndWait();
+    }
+
+    @Override
+    public Optional<String> showPasswordDialogAndWait(String title, String header, String content) {
+        javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
+        dialog.setTitle(title);
+        dialog.setHeaderText(header);
+
+        CustomPasswordField passwordField = new CustomPasswordField();
+
+        HBox box = new HBox();
+        box.setSpacing(10);
+        box.getChildren().addAll(new Label(content), passwordField);
+        dialog.setTitle(title);
+        dialog.getDialogPane().setContent(box);
+
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                return passwordField.getText();
+            }
+            return null;
+        });
         return dialog.showAndWait();
     }
 

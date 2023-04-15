@@ -41,6 +41,7 @@ import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -80,7 +81,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
                      ClipBoardManager clipBoardManager,
-                     ImportFormatReader importFormatReader) {
+                     ImportFormatReader importFormatReader,
+                     TaskExecutor taskExecutor) {
         super();
 
         this.libraryTab = libraryTab;
@@ -99,7 +101,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 undoManager,
                 stateManager,
                 dialogService,
-                importFormatReader);
+                importFormatReader,
+                taskExecutor);
 
         localDragboard = stateManager.getLocalDragboard();
 

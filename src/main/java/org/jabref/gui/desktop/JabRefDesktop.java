@@ -23,13 +23,13 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ public class JabRefDesktop {
             // Find the default directory for this field type:
             List<Path> directories = databaseContext.getFileDirectories(preferencesService.getFilePreferences());
 
-            Optional<Path> file = FileHelper.find(link, directories);
+            Optional<Path> file = FileUtil.find(link, directories);
 
             // Check that the file exists:
             if (file.isEmpty() || !Files.exists(file.get())) {
@@ -131,7 +131,6 @@ public class JabRefDesktop {
 
     public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
             DOI.parse(link)
-                        .map(identifier -> (DOI) identifier)
                         .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
                         .ifPresent(uri -> {
                             try {
@@ -160,7 +159,7 @@ public class JabRefDesktop {
             return true;
         }
 
-        Optional<Path> file = FileHelper.find(databaseContext, link, preferencesService.getFilePreferences());
+        Optional<Path> file = FileUtil.find(databaseContext, link, preferencesService.getFilePreferences());
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();

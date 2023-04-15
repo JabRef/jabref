@@ -8,6 +8,7 @@
     <link href="http://www.zotero.org/styles/zeitschrift-fur-ostmitteleuropa-forschung" rel="template"/>
     <link href="https://www.vandenhoeck-ruprecht-verlage.com/service/autorinnen-und-autoren/" rel="documentation"/>
     <link href="https://github.com/citation-style-language/styles/files/6877364/Redaktionsrichtlinien_ZfGD_01.1.pdf" rel="documentation"/>
+    <link href="https://direkt.historicum.net/hbxykvpexs" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
     </author>
@@ -16,12 +17,12 @@
     <category field="humanities"/>
     <issn>1610-5982</issn>
     <eissn>2196-8292</eissn>
-    <updated>2021-07-26T10:07:30+00:00</updated>
+    <updated>2023-03-13T09:23:25+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
     <terms>
-      <term name="et-al">u. a.</term>
+      <term name="et-al">u.a.</term>
       <term name="accessed">gesehen am</term>
       <term name="issue" form="short">H.</term>
     </terms>
@@ -29,15 +30,15 @@
   <macro name="contributors-long">
     <choose>
       <if variable="author">
-        <names variable="author" font-variant="normal">
-          <name font-variant="normal" delimiter-precedes-last="always"/>
+        <names variable="author">
+          <name delimiter="/" delimiter-precedes-last="always"/>
         </names>
       </if>
       <else>
         <choose>
           <if type="book">
-            <names variable="editor" font-variant="normal">
-              <name font-variant="normal" delimiter-precedes-last="always"/>
+            <names variable="editor">
+              <name delimiter="/" delimiter-precedes-last="always"/>
               <label form="short" prefix=" (" suffix=".)"/>
             </names>
           </if>
@@ -85,7 +86,7 @@
         <choose>
           <if type="chapter">
             <names variable="editor">
-              <name delimiter-precedes-last="always"/>
+              <name delimiter="/" delimiter-precedes-last="always"/>
               <label prefix=" (" form="short" suffix=".)"/>
             </names>
           </if>
@@ -117,7 +118,7 @@
   <macro name="translatedby">
     <names variable="translator">
       <label form="verb-short" text-case="lowercase" suffix=". "/>
-      <name delimiter=", " delimiter-precedes-last="always"/>
+      <name delimiter="/" delimiter-precedes-last="always"/>
     </names>
   </macro>
   <macro name="title-long">
@@ -297,7 +298,7 @@
       <text variable="locator"/>
     </group>
   </macro>
-  <citation et-al-subsequent-min="3" et-al-subsequent-use-first="2" disambiguate-add-names="true">
+  <citation et-al-min="4" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="2" disambiguate-add-names="true">
     <layout suffix="." delimiter="; ">
       <choose>
         <if position="ibid-with-locator">

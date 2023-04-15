@@ -10,6 +10,9 @@ src-gen/
 docs/book.pdf
 docs/_book/
 
+# Jekyll for docs/
+docs/Gemfile.lock
+
 # ignore the generated markdown file if the user forgets to delete it
 status.md
 

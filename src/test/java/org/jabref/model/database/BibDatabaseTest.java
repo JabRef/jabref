@@ -15,7 +15,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.event.TestEventListener;
+import org.jabref.model.event.EventListenerTest;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -291,7 +291,7 @@ class BibDatabaseTest {
     @Test
     void insertEntryPostsAddedEntryEvent() {
         BibEntry expectedEntry = new BibEntry();
-        TestEventListener tel = new TestEventListener();
+        EventListenerTest tel = new EventListenerTest();
         database.registerListener(tel);
         database.insertEntry(expectedEntry);
         assertEquals(Collections.singletonList(expectedEntry), tel.getAddedEntries());
@@ -302,7 +302,7 @@ class BibDatabaseTest {
     void insertMultipleEntriesPostsAddedEntryEvent() {
         BibEntry firstEntry = new BibEntry();
         BibEntry secondEntry = new BibEntry();
-        TestEventListener tel = new TestEventListener();
+        EventListenerTest tel = new EventListenerTest();
         database.registerListener(tel);
         database.insertEntries(firstEntry, secondEntry);
         assertEquals(firstEntry, tel.getFirstInsertedEntry());
@@ -314,7 +314,7 @@ class BibDatabaseTest {
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
         List<BibEntry> expectedEntries = Arrays.asList(entry1, entry2);
-        TestEventListener tel = new TestEventListener();
+        EventListenerTest tel = new EventListenerTest();
         database.insertEntries(expectedEntries);
         database.registerListener(tel);
         database.removeEntries(expectedEntries);
@@ -325,7 +325,7 @@ class BibDatabaseTest {
     @Test
     void changingEntryPostsChangeEntryEvent() {
         BibEntry entry = new BibEntry();
-        TestEventListener tel = new TestEventListener();
+        EventListenerTest tel = new EventListenerTest();
         database.insertEntry(entry);
         database.registerListener(tel);
 
