@@ -225,7 +225,6 @@ public class BibtexParser implements Parser {
             skipWhitespace();
         }
 
-        // Instantiate meta data
         try {
             parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
         } catch (ParseException exception) {

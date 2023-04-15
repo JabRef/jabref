@@ -14,7 +14,7 @@ import org.mockito.Answers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ModsImporterTestFiles {
+class ModsImporterFilesTest {
 
     private static final String FILE_ENDING = ".xml";
     private ImportFormatPreferences importFormatPreferences;

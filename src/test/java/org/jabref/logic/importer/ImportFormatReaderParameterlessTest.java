@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ImportFormatReaderTestParameterless {
+class ImportFormatReaderParameterlessTest {
 
     private ImportFormatReader reader;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
@@ -32,7 +32,7 @@ class ImportFormatReaderTestParameterless {
 
     @Test
     void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound() throws Exception {
-        Path file = Path.of(ImportFormatReaderTestParameterless.class.getResource("fileformat/emptyFile.xml").toURI());
+        Path file = Path.of(ImportFormatReaderParameterlessTest.class.getResource("fileformat/emptyFile.xml").toURI());
         assertThrows(ImportException.class, () -> reader.importUnknownFormat(file, fileMonitor));
     }
 

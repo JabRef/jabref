@@ -9,7 +9,7 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
 
-public class TestEventListener {
+public class EventListenerTest {
 
     private List<BibEntry> addedEntries;
     private BibEntry firstInsertedEntry;

@@ -26,11 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
-public class SynchronizationTestSimulator {
+public class SynchronizationSimulatorTest {
 
     private BibDatabaseContext clientContextA;
     private BibDatabaseContext clientContextB;
-    private SynchronizationTestEventListener eventListenerB; // used to monitor occurring events
+    private SynchronizationEventListenerTest eventListenerB; // used to monitor occurring events
     private final GlobalCitationKeyPattern pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
 
     private BibEntry getBibEntryExample(int index) {
@@ -44,7 +44,7 @@ public class SynchronizationTestSimulator {
 
     @BeforeEach
     public void setup() throws Exception {
-        DBMSConnection dbmsConnection = TestConnector.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter());
+        DBMSConnection dbmsConnection = ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter());
         TestManager.clearTables(dbmsConnection);
 
         clientContextA = new BibDatabaseContext();
@@ -56,8 +56,8 @@ public class SynchronizationTestSimulator {
         DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', pattern, new DummyFileUpdateMonitor());
         clientContextB.convertToSharedDatabase(synchronizerB);
         // use a second connection, because this is another client (typically on another machine)
-        clientContextB.getDBMSSynchronizer().openSharedDatabase(TestConnector.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter()));
-        eventListenerB = new SynchronizationTestEventListener();
+        clientContextB.getDBMSSynchronizer().openSharedDatabase(ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter()));
+        eventListenerB = new SynchronizationEventListenerTest();
         clientContextB.getDBMSSynchronizer().registerListener(eventListenerB);
     }
 

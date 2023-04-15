@@ -1,4 +1,4 @@
-package org.jabref.styletester;
+package org.jabref.testutils.interactive.styletester;
 
 import javafx.application.Application;
 import javafx.scene.Scene;

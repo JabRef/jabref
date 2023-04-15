@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class BiblioscapeImporterTestFiles {
+public class BiblioscapeImporterFilesTest {
 
     private static final String FILE_ENDING = ".txt";
 

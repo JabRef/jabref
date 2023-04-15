@@ -28,7 +28,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 
-public class MSBibExportFormatTestFiles {
+public class MSBibExportFormatFilesTest {
 
     private static Path resourceDir;
     public BibDatabaseContext databaseContext;
@@ -39,7 +39,7 @@ public class MSBibExportFormatTestFiles {
 
     static Stream<String> fileNames() throws IOException, URISyntaxException {
         // we have to point it to one existing file, otherwise it will return the default class path
-        resourceDir = Path.of(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
+        resourceDir = Path.of(MSBibExportFormatFilesTest.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString())
                          .filter(n -> n.endsWith(".bib"))

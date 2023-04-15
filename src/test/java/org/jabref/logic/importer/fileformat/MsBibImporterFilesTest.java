@@ -7,36 +7,36 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class CopacImporterTestFiles {
+public class MsBibImporterFilesTest {
 
-    private static final String FILE_ENDING = ".txt";
+    private static final String FILE_ENDING = ".xml";
 
     private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("CopacImporterTest")
+        Predicate<String> fileName = name -> name.startsWith("MsBib")
                 && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    private static Stream<String> nonCopacfileNames() throws IOException {
-        Predicate<String> fileName = name -> !name.startsWith("CopacImporterTest");
+    private static Stream<String> invalidFileNames() throws IOException {
+        Predicate<String> fileName = name -> !name.contains("MsBib");
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new CopacImporter(), fileName);
+        ImporterTestEngine.testIsRecognizedFormat(new MsBibImporter(), fileName);
     }
 
     @ParameterizedTest
-    @MethodSource("nonCopacfileNames")
+    @MethodSource("invalidFileNames")
     public void testIsNotRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsNotRecognizedFormat(new CopacImporter(), fileName);
+        ImporterTestEngine.testIsNotRecognizedFormat(new MsBibImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     public void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(new CopacImporter(), fileName, FILE_ENDING);
+        ImporterTestEngine.testImportEntries(new MsBibImporter(), fileName, FILE_ENDING);
     }
 }

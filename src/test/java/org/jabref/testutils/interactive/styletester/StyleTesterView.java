@@ -1,4 +1,4 @@
-package org.jabref.styletester;
+package org.jabref.testutils.interactive.styletester;
 
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
