@@ -7,14 +7,21 @@ import java.util.Set;
 
 public class UnknownField implements Field {
     private final String name;
+    private final Set<FieldProperty> properties;
 
     public UnknownField(String name) {
         this.name = name;
+        this.properties = EnumSet.noneOf(FieldProperty.class);
+    }
+
+    public UnknownField(String name, FieldProperty first, FieldProperty... rest) {
+        this.name = name;
+        this.properties = EnumSet.of(first, rest);
     }
 
     @Override
     public Set<FieldProperty> getProperties() {
-        return EnumSet.noneOf(FieldProperty.class);
+        return properties;
     }
 
     @Override
@@ -47,7 +54,7 @@ public class UnknownField implements Field {
     @Override
     public String toString() {
         return "UnknownField{" +
-                "name='" + name + '\'' +
-                '}';
+               "name='" + name + '\'' +
+               '}';
     }
 }

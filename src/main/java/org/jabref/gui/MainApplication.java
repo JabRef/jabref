@@ -27,7 +27,6 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage mainStage) {
         FallbackExceptionHandler.installExceptionHandler();
-
         Globals.startBackgroundTasks();
         new JabRefGUI(mainStage, parserResults, isBlank, preferences);
     }

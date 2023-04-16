@@ -8,7 +8,7 @@ import java.util.Locale;
 public class OS {
     public static final String NEWLINE = System.lineSeparator();
 
-    public static final String APP_DIR_APP_NAME = "JabRef";
+    public static final String APP_DIR_APP_NAME = "jabref";
     public static final String APP_DIR_APP_AUTHOR = "org.jabref";
 
     // File separator obtained from system

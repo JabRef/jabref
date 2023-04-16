@@ -1,6 +1,11 @@
 name: Automerge Pull Requests
-on: [pull_request]
-
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
 jobs:
   automerge:
     name: Automerge Dependency Updates
@@ -16,12 +21,12 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Auto approve
-        uses: hmarr/auto-approve-action@v3.1.0
+        uses: hmarr/auto-approve-action@v3.2.1
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Merge pull requests
-        uses: pascalgn/automerge-action@v0.15.5
+        uses: pascalgn/automerge-action@v0.15.6
         if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           MERGE_METHOD: "merge"

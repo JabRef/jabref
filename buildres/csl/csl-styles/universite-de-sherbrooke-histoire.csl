@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="fr-CA" version="1.0" demote-non-dropping-particle="never">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="never" default-locale="fr-CA">
   <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) and with EditPad Pro 7-->
   <info>
     <title>Université de Sherbrooke - Histoire (Français - Canada)</title>
@@ -36,7 +36,7 @@
       <if variable="author">
         <names variable="author">
           <name sort-separator=", " delimiter=", " and="text" delimiter-precedes-last="never" name-as-sort-order="first">
-            <name-part name="family" text-case="uppercase"/>
+            <name-part name="family"/>
           </name>
           <et-al font-style="italic"/>
         </names>
@@ -49,7 +49,7 @@
   <macro name="editor">
     <names variable="editor">
       <name sort-separator=", " delimiter=", " and="text" delimiter-precedes-last="never" name-as-sort-order="first">
-        <name-part name="family" text-case="uppercase"/>
+        <name-part name="family"/>
       </name>
       <et-al font-style="italic"/>
       <label form="short" prefix=", "/>
@@ -57,24 +57,21 @@
   </macro>
   <macro name="editor-chapter">
     <names variable="editor">
-      <name sort-separator=" " delimiter=", " and="text" delimiter-precedes-last="never" form="long">
-      </name>
+      <name sort-separator=" " delimiter=", " and="text" delimiter-precedes-last="never" form="long"></name>
       <et-al font-style="italic"/>
       <label form="short" prefix=", "/>
     </names>
   </macro>
   <macro name="translator">
     <names variable="translator">
-      <name form="long" and="text" delimiter-precedes-last="never" prefix=" Traduit par " suffix=". ">
-      </name>
+      <name form="long" and="text" delimiter-precedes-last="never" prefix=" Traduit par " suffix=". "></name>
     </names>
   </macro>
   <macro name="author-note">
     <choose>
       <if variable="author">
         <names variable="author">
-          <name sort-separator=" " delimiter=", " and="text" form="long">
-          </name>
+          <name sort-separator=" " delimiter=", " and="text" form="long"></name>
           <et-al font-style="italic"/>
         </names>
       </if>
@@ -88,16 +85,14 @@
   </macro>
   <macro name="editor-note">
     <names variable="editor">
-      <name sort-separator=" " delimiter=", " and="text" form="long">
-      </name>
+      <name sort-separator=" " delimiter=", " and="text" form="long"></name>
       <et-al font-style="italic"/>
       <label form="short" prefix=", "/>
     </names>
   </macro>
   <macro name="translator-note">
     <names variable="translator">
-      <name form="long" delimiter=", " and="text" delimiter-precedes-last="never" prefix=", traduit par ">
-      </name>
+      <name form="long" delimiter=", " and="text" delimiter-precedes-last="never" prefix=", traduit par "></name>
     </names>
   </macro>
   <macro name="title-chapter-complete-ref">
@@ -159,7 +154,7 @@
           <names variable="interviewer" delimiter=", ">
             <label form="verb" prefix=" " suffix=" "/>
             <name sort-separator=" ">
-              <name-part name="family" text-case="uppercase"/>
+              <name-part name="family"/>
             </name>
             <et-al font-style="italic"/>
           </names>
@@ -226,7 +221,7 @@
           <names variable="interviewer" delimiter=", ">
             <label form="verb" prefix=" " suffix=" "/>
             <name sort-separator=" ">
-              <name-part name="family" text-case="uppercase"/>
+              <name-part name="family"/>
             </name>
             <et-al font-style="italic"/>
           </names>

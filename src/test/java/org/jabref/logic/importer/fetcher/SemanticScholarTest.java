@@ -30,7 +30,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     private static final String DOI = "10.23919/IFIPNetworking52078.2021.9472772";
 
     private final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.AUTHOR, "Igor Steinmacher and Tayana Conte and Christoph Treude and M. Gerosa")
+            .withField(StandardField.AUTHOR, "Igor Steinmacher and T. Conte and Christoph Treude and M. Gerosa")
             .withField(StandardField.YEAR, "2016")
             .withField(StandardField.DOI, "10.1145/2884781.2884806")
             .withField(StandardField.TITLE, "Overcoming Open Source Project Entry Barriers with a Portal for Newcomers")

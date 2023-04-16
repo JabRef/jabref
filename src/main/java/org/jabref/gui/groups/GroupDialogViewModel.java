@@ -364,6 +364,8 @@ public class GroupDialogViewModel {
             }
 
             if (resultingGroup != null) {
+                preferencesService.getGroupsPreferences().setDefaultHierarchicalContext(groupHierarchySelectedProperty.getValue());
+
                 resultingGroup.setColor(colorProperty.getValue());
                 resultingGroup.setDescription(descriptionProperty.getValue());
                 resultingGroup.setIconName(iconProperty.getValue());
@@ -384,7 +386,7 @@ public class GroupDialogViewModel {
             // creating new group -> defaults!
             colorProperty.setValue(IconTheme.getDefaultGroupColor());
             typeExplicitProperty.setValue(true);
-            groupHierarchySelectedProperty.setValue(GroupHierarchyType.INDEPENDENT);
+            groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
         } else {
             nameProperty.setValue(editedGroup.getName());
             colorProperty.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));

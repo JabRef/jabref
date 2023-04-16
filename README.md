@@ -35,7 +35,7 @@ It supports you in every step of your research work.
 
 - Native BibTeX and Biblatex support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
-- Format references in one of the many thousand built-in citation styles or create your style
+- Format references using one of thousands of built-in citation styles or create your own style
 - Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
 
 ### Share

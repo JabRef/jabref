@@ -98,7 +98,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "19"
+    version = "20"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -120,34 +120,32 @@ dependencies {
     implementation 'org.apache.lucene:lucene-analysis-common:9.5.0'
     implementation 'org.apache.lucene:lucene-highlighter:9.5.0'
 
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'com.h2database:h2-mvstore:2.1.214'
-
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.6.0'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.71.1'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.4.1'
-    implementation 'org.libreoffice:unoloader:7.4.1'
+    implementation 'org.libreoffice:unoloader:7.5.1'
+    implementation 'org.libreoffice:libreoffice:7.5.1'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
-    antlr4 'org.antlr:antlr4:4.9.3'
-    implementation 'org.antlr:antlr4-runtime:4.9.3'
+    antlr4 'org.antlr:antlr4:4.12.0'
+    implementation 'org.antlr:antlr4-runtime:4.12.0'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.4.0.202211300538-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.5.0.202303070854-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.14.1'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.1'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.14.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.7'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
-    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation 'org.postgresql:postgresql:42.6.0'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -174,15 +172,15 @@ dependencies {
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.2'
 
-    implementation 'org.jsoup:jsoup:1.15.3'
-    implementation 'com.konghq:unirest-java:3.14.1'
+    implementation 'org.jsoup:jsoup:1.15.4'
+    implementation 'com.konghq:unirest-java:3.14.2'
 
-    implementation 'org.slf4j:slf4j-api:2.0.6'
-    implementation "org.tinylog:tinylog-api:2.5.0"
-    implementation "org.tinylog:slf4j-tinylog:2.5.0"
-    implementation "org.tinylog:tinylog-impl:2.5.0"
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation "org.tinylog:tinylog-api:2.6.1"
+    implementation "org.tinylog:slf4j-tinylog:2.6.1"
+    implementation "org.tinylog:tinylog-impl:2.6.1"
 
-    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
+    implementation 'de.undercouch:citeproc-java:3.0.0-beta.2'
 
     // jakarta.activation is already dependency of glassfish
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
@@ -198,16 +196,14 @@ dependencies {
     }
 
     implementation 'com.vladsch.flexmark:flexmark:0.64.0'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.0'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.64.0'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.154'
+    testImplementation 'io.github.classgraph:classgraph:4.8.157'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.9.2'
 
-    testImplementation 'org.mockito:mockito-core:5.0.0'
+    testImplementation 'org.mockito:mockito-core:5.2.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.0.1'
@@ -216,7 +212,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.6.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.9.3'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
@@ -259,8 +255,6 @@ processResources {
 
 task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateSearchGrammarSource",
-                                "generateMedlineSource",
-                                "generateBibtexmlSource",
                                 "generateEndnoteSource",
                                 "generateModsSource",
                                 "generateCitaviSource"]) {
@@ -288,24 +282,6 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
-}
-
-task generateMedlineSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the medline importer."
-
-    schemaFile = "src/main/resources/xjc/medline/medline.xsd"
-    outputDirectory = "src-gen/main/java"
-    javaPackage = "org.jabref.logic.importer.fileformat.medline"
-}
-
-task generateBibtexmlSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the bibtexml importer."
-
-    schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
-    outputDirectory = "src-gen/main/java/"
-    javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
 }
 
 task generateEndnoteSource(type: XjcTask) {
@@ -424,7 +400,7 @@ test {
     }
 
     moduleOptions {
-        // TODO: Remove this as soon as archunit is modularized
+        // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
     }
 
