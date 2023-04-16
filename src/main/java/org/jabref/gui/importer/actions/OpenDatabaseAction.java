@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -178,9 +177,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
-        LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
-        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, stateManager, themeManager, file, backgroundTask, Globals.IMPORT_FORMAT_READER);
-
+        // The backgroundTask is executed within the method createLibraryTab
+        LibraryTab newTab = LibraryTab.createLibraryTab(backgroundTask, file, preferencesService, stateManager, frame, themeManager);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 
@@ -195,46 +193,51 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
 
+        ParserResult parserResult = null;
         if (BackupManager.backupFileDiffers(fileToLoad)) {
-            BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
+            // In case the backup differs, ask the user what to do.
+            // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService).orElse(null);
         }
 
-        ParserResult result;
         try {
-            result = OpenDatabase.loadDatabase(fileToLoad,
-                    preferencesService.getImportFormatPreferences(),
-                    Globals.getFileUpdateMonitor());
-            if (result.hasWarnings()) {
+            if (parserResult == null) {
+                // No backup was restored, do the "normal" loading
+                parserResult = OpenDatabase.loadDatabase(fileToLoad,
+                        preferencesService.getImportFormatPreferences(),
+                        Globals.getFileUpdateMonitor());
+            }
+
+            if (parserResult.hasWarnings()) {
                 String content = Localization.lang("Please check your library file for wrong syntax.")
-                        + "\n\n" + result.getErrorMessage();
+                        + "\n\n" + parserResult.getErrorMessage();
                 DefaultTaskExecutor.runInJavaFXThread(() ->
                         dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
             }
         } catch (IOException e) {
-            result = ParserResult.fromError(e);
+            parserResult = ParserResult.fromError(e);
             LOGGER.error("Error opening file '{}'", fileToLoad, e);
         }
 
-        if (result.getDatabase().isShared()) {
+        if (parserResult.getDatabase().isShared()) {
             try {
-                new SharedDatabaseUIManager(frame).openSharedDatabaseFromParserResult(result);
+                new SharedDatabaseUIManager(frame, preferencesService).openSharedDatabaseFromParserResult(parserResult);
             } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                     NotASharedDatabaseException e) {
-                result.getDatabaseContext().clearDatabasePath(); // do not open the original file
-                result.getDatabase().clearSharedDatabaseID();
+                parserResult.getDatabaseContext().clearDatabasePath(); // do not open the original file
+                parserResult.getDatabase().clearSharedDatabaseID();
                 LOGGER.error("Connection error", e);
 
                 throw e;
             }
         }
-        return result;
+        return parserResult;
     }
 
     private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Map<String, String> properties = new HashMap<>();
-        Map<String, Double> measurements = new HashMap<>();
-        measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
-
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(
+                "OpenNewDatabase",
+                Map.of(),
+                Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
     }
 }

@@ -35,6 +35,8 @@ public class SentenceCaseFormatterTest {
                         "England’s Monitor; the History of the Separation"),
                 Arguments.of("Dr. schultz: a dentist turned bounty hunter.",
                         "Dr. schultz: a dentist turned bounty hunter."),
+                Arguments.of("Wetting-and-drying",
+                        "wetting-and-drying"),
                 Arguments.of("Example case. {EXCLUDED SENTENCE.}",
                         "Example case. {EXCLUDED SENTENCE.}"),
                 Arguments.of("I have {Aa} dream", new SentenceCaseFormatter().getExampleInput()));

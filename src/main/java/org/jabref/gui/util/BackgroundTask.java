@@ -257,7 +257,7 @@ public abstract class BackgroundTask<V> {
         updateProgress(new BackgroundProgress(workDone, max));
     }
 
-    protected void updateMessage(String newMessage) {
+    public void updateMessage(String newMessage) {
         message.setValue(newMessage);
     }
 

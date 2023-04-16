@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.externalfiletypes;
 
-import javax.inject.Inject;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -18,6 +16,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 

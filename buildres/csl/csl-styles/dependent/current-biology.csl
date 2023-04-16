@@ -5,7 +5,7 @@
     <title>Current Biology</title>
     <id>http://www.zotero.org/styles/current-biology</id>
     <link href="http://www.zotero.org/styles/current-biology" rel="self"/>
-    <link href="http://www.zotero.org/styles/cell-numeric-superscript" rel="independent-parent"/>
+    <link href="http://www.zotero.org/styles/cell" rel="independent-parent"/>
     <link href="http://www.cell.com/current-biology/authors" rel="documentation"/>
     <category citation-format="numeric"/>
     <category field="biology"/>

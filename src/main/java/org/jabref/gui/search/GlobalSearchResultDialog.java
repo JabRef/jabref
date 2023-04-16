@@ -1,6 +1,5 @@
 package org.jabref.gui.search;
 
-import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -8,6 +7,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -21,6 +21,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
@@ -58,6 +59,11 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         resultsTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
         resultsTable.getSelectionModel().selectFirst();
+
+        if (resultsTable.getSelectionModel().getSelectedItem() != null) {
+            previewViewer.setEntry(resultsTable.getSelectionModel().getSelectedItem().getEntry());
+        }
+
         resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
@@ -75,6 +81,16 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             keepOnTop.setGraphic(value
                     ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
                     : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
+        });
+
+        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
+            getDialogPane().setPrefHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
+            getDialogPane().setPrefWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
+        });
+
+        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
+            preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
+            preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
         });
     }
 }

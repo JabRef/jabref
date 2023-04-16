@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileHelper;
 
 class CitationKeyBasedFileFinder implements FileFinder {
 
@@ -66,7 +65,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
     }
 
     private boolean matches(String filename, String citeKey) {
-        boolean startsWithKey = filename.startsWith(citeKey);
+        boolean startsWithKey = filename.startsWith(FileNameCleaner.cleanFileName(citeKey));
         if (startsWithKey) {
             // The file name starts with the key, that's already a good start
             // However, we do not want to match "JabRefa" for "JabRef" since this is probably a file belonging to another entry published in the same time / same name
@@ -83,7 +82,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
         Objects.requireNonNull(extensions, "Extensions must not be null!");
 
         BiPredicate<Path, BasicFileAttributes> isFileWithCorrectExtension = (path, attributes) -> !Files.isDirectory(path)
-                && extensions.contains(FileHelper.getFileExtension(path).orElse(""));
+                && extensions.contains(FileUtil.getFileExtension(path).orElse(""));
 
         Set<Path> result = new HashSet<>();
         for (Path directory : directories) {

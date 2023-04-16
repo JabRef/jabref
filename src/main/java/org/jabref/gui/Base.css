@@ -1,5 +1,4 @@
 
-
 .root {
     -jr-row-odd-background: -fx-control-inner-background-alt;
     -jr-row-even-background: -fx-control-inner-background;
@@ -256,7 +255,7 @@
 }
 
 .unchanged {
-    -rtfx-background-color:#0000;
+    -rtfx-background-color: #0000;
 }
 
 .updated {
@@ -280,17 +279,31 @@
  * The base css file defining the style that is valid for every pane and dialog.
  */
 
+TextFlow > * {
+    -fx-fill: -fx-text-background-color;
+}
+
+TextFlow > .hyperlink,
 .hyperlink {
     -fx-padding: 0;
     -fx-underline: false;
     -fx-border-style: null;
     -fx-border-color: null;
     -fx-text-fill: -jr-theme;
+    -fx-fill: -jr-theme;
 }
 
+TextFlow > .hyperlink:visited,
 .hyperlink:visited {
     -fx-text-fill: -jr-accent;
+    -fx-fill: -jr-accent;
 }
+
+.TextFlow > .hyperlink:hover,
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
 
 .glyph-icon {
     /* This adjusts text alignment within the bounds of text nodes so that
@@ -329,19 +342,27 @@ TextFlow > .tooltip-text-monospaced {
     -fx-font-family: monospace;
 }
 
+
+.radio-button > .radio,
+.check-box > .box {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-text-fill: -fx-text-base-color;
+}
+
 .button,
 .toggle-button,
-.radio-button > .radio,
-.check-box > .box,
 .menu-button,
 .choice-box,
 .combo-box-base,
 .combo-box-base:editable > .arrow-button {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
-    -fx-background-radius: 0;
+    -fx-background-radius: 4px;
     -fx-text-fill: -fx-text-base-color;
 }
+
 
 .button {
     -fx-background-color: transparent;
@@ -653,6 +674,11 @@ TextFlow > .tooltip-text-monospaced {
 
 .merge-header {
     -fx-background-color: -jr-row-even-background;
+}
+
+.lib-change-header {
+    -fx-font-size: 130%;
+    -fx-padding: 0.2em 0em 0.2em 0.2em;
 }
 
 .table-view .groupColumnBackground {
@@ -1253,7 +1279,17 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -jr-warn;
 }
 
+.info-message {
+    -fx-fill: -jr-info;
+    -fx-text-fill: -jr-info;
+}
+
 .warning-message {
+    -fx-fill: -jr-warn;
+    -fx-text-fill: -jr-warn;
+}
+
+.error-message {
     -fx-fill: -jr-error;
     -fx-text-fill: -jr-error;
 }
@@ -1287,6 +1323,11 @@ We want to have a look that matches our icons in the tool-bar */
 
 .code-area .text {
     -fx-fill: -fx-text-background-color;
+}
+
+#bibtexcodearea {
+    -fx-padding: 4 4 4 4;
+    -fx-background-color: -fx-control-inner-background;
 }
 
 .code-area .selection {
@@ -1380,4 +1421,8 @@ TextFlow * {
 
 .rating > .container > .button.strong {
     -fx-icon-color: -fx-text-base-color;
+}
+
+.table-column .rotated > .label {
+    -fx-content-display: graphic-only;
 }

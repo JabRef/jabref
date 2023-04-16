@@ -213,7 +213,7 @@ public class ThemeManager {
         if (appearancePreferences.shouldOverrideDefaultFontSize()) {
             scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getMainFontSize() + "pt;");
         } else {
-            scene.getRoot().setStyle("");
+            scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getDefaultFontSize() + "pt;");
         }
     }
 

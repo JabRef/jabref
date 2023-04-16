@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.Globals;
@@ -27,7 +26,6 @@ import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.exporter.XmpPdfExporter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
@@ -41,12 +39,12 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -55,7 +53,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -75,10 +72,11 @@ public class ArgumentProcessor {
     private boolean noGUINeeded;
 
     public ArgumentProcessor(String[] args, Mode startupMode, PreferencesService preferencesService) throws org.apache.commons.cli.ParseException {
-        cli = new JabRefCLI(args);
+        this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         this.preferencesService = preferencesService;
-        parserResults = processArguments();
+
+        this.parserResults = processArguments();
     }
 
     /**
@@ -187,7 +185,7 @@ public class ArgumentProcessor {
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
-            JabRefCLI.printUsage();
+            JabRefCLI.printUsage(preferencesService);
             noGUINeeded = true;
             return Collections.emptyList();
         }
@@ -288,8 +286,8 @@ public class ArgumentProcessor {
             return;
         }
 
-        Vector<String> citeKeys = new Vector<>();
-        Vector<String> pdfs = new Vector<>();
+        List<String> citeKeys = new ArrayList<>();
+        List<String> pdfs = new ArrayList<>();
         for (String fileOrCiteKey : filesAndCitekeys.split(",")) {
             if (fileOrCiteKey.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
                 pdfs.add(fileOrCiteKey);
@@ -323,7 +321,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadatatoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> citeKeys, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
+    private void writeMetadatatoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, List<String> citeKeys, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
         for (String citeKey : citeKeys) {
             List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
             if (bibEntryList.isEmpty()) {
@@ -336,11 +334,11 @@ public class ArgumentProcessor {
         }
     }
 
-    private void writeMetadatatoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> fileNames, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
-        for (String fileName : fileNames) {
+    private void writeMetadatatoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, List<String> pdfs, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter, EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter, boolean writeXMP, boolean embeddBibfile) {
+        for (String fileName : pdfs) {
             Path filePath = Path.of(fileName);
             if (!filePath.isAbsolute()) {
-                filePath = FileHelper.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileHelper.find(fileName, List.of(Path.of("").toAbsolutePath())).orElse(filePath));
+                filePath = FileUtil.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileUtil.find(fileName, List.of(Path.of("").toAbsolutePath())).orElse(filePath));
             }
             if (Files.exists(filePath)) {
                 try {
@@ -389,8 +387,8 @@ public class ArgumentProcessor {
             switch (data.length) {
                 case 3 -> formatName = data[2];
                 case 2 ->
-                        // default exporter: HTML table (with Abstract & BibTeX)
-                        formatName = "tablerefsabsbib";
+                        // default exporter: bib file
+                        formatName = "bib";
                 default -> {
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
                                                    .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
@@ -399,18 +397,29 @@ public class ArgumentProcessor {
                 }
             }
 
-            // export new database
-            Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(formatName);
-            if (exporter.isEmpty()) {
-                System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
+            if (formatName.equals("bib")) {
+                // output a bib file as default or if
+                // provided exportFormat is "bib"
+                saveDatabase(new BibDatabase(matches), data[1]);
+                LOGGER.debug("Finished export");
             } else {
-                // We have an TemplateExporter instance:
-                try {
-                    System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    exporter.get().export(databaseContext, Path.of(data[1]), matches);
-                } catch (Exception ex) {
-                    System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
-                            + Throwables.getStackTraceAsString(ex));
+                // export new database
+                ExporterFactory exporterFactory = ExporterFactory.create(
+                        preferencesService,
+                        Globals.entryTypesManager,
+                        Globals.journalAbbreviationRepository);
+                Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
+                if (exporter.isEmpty()) {
+                    System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
+                } else {
+                    // We have an TemplateExporter instance:
+                    try {
+                        System.out.println(Localization.lang("Exporting") + ": " + data[1]);
+                        exporter.get().export(databaseContext, Path.of(data[1]), matches, Collections.emptyList());
+                    } catch (Exception ex) {
+                        System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
+                                + Throwables.getStackTraceAsString(ex));
+                    }
                 }
             }
         } else {
@@ -562,23 +571,27 @@ public class ArgumentProcessor {
             // format to the given file.
             ParserResult pr = loaded.get(loaded.size() - 1);
 
-            // Set the global variable for this database's file directory before exporting,
-            // so formatters can resolve linked files correctly.
-            // (This is an ugly hack!)
             Path path = pr.getPath().get().toAbsolutePath();
             BibDatabaseContext databaseContext = pr.getDatabaseContext();
             databaseContext.setDatabasePath(path);
-            Globals.prefs.fileDirForDatabase = databaseContext
+            List<Path> fileDirForDatabase = databaseContext
                     .getFileDirectories(preferencesService.getFilePreferences());
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
-            Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(data[1]);
+            ExporterFactory exporterFactory = ExporterFactory.create(
+                    preferencesService,
+                    Globals.entryTypesManager,
+                    Globals.journalAbbreviationRepository);
+            Optional<Exporter> exporter = exporterFactory.getExporterByName(data[1]);
             if (exporter.isEmpty()) {
                 System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);
             } else {
                 // We have an exporter:
                 try {
-                    exporter.get().export(pr.getDatabaseContext(), Path.of(data[0]),
-                            pr.getDatabaseContext().getDatabase().getEntries());
+                    exporter.get().export(
+                            pr.getDatabaseContext(),
+                            Path.of(data[0]),
+                            pr.getDatabaseContext().getDatabase().getEntries(),
+                            fileDirForDatabase);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                             + Throwables.getStackTraceAsString(ex));
@@ -590,22 +603,7 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             preferencesService.importPreferences(Path.of(cli.getPreferencesImport()));
-            Globals.entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
-                    preferencesService.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
-            List<TemplateExporter> customExporters =
-                    preferencesService.getCustomExportFormats(Globals.journalAbbreviationRepository);
-            LayoutFormatterPreferences layoutPreferences =
-                    preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
-            SavePreferences savePreferences = preferencesService.getSavePreferencesForExport();
-            XmpPreferences xmpPreferences = preferencesService.getXmpPreferences();
-            BibDatabaseMode bibDatabaseMode = preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode();
-            Globals.exportFactory = ExporterFactory.create(
-                    customExporters,
-                    layoutPreferences,
-                    savePreferences,
-                    xmpPreferences,
-                    bibDatabaseMode,
-                    Globals.entryTypesManager);
+            Globals.entryTypesManager = preferencesService.getCustomEntryTypesRepository();
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

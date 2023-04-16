@@ -7,8 +7,7 @@
     <id>http://www.zotero.org/styles/nottingham-trent-university-library-harvard</id>
     <link href="http://www.zotero.org/styles/nottingham-trent-university-library-harvard" rel="self"/>
     <link href="http://www.zotero.org/styles/harvard-anglia-ruskin-university" rel="template"/>
-    <link href="https://www4.ntu.ac.uk/library/developing_skills/referencing_plagiarism/referencing_support/index.html" rel="documentation"/>
-    <link href="https://now.ntu.ac.uk/d2l/lor/viewer/view.d2l?ou=52836&amp;loIdentId=25435&amp;contentTopicId=1019510" rel="documentation"/>
+    <link href="https://www.ntu.ac.uk/m/library/referencing-made-easy" rel="documentation"/>
     <author>
       <name>Richard Cross</name>
       <email>richard.cross@ntu.ac.uk</email>
@@ -20,6 +19,11 @@
     <updated>2018-05-18T13:02:41+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale>
+    <terms>
+      <term name="post-weblog">online blog</term>
+    </terms>
+  </locale>
   <macro name="editor">
     <names variable="editor" delimiter=", ">
       <name et-al-use-last="true" initialize-with=". " name-as-sort-order="all"/>
@@ -83,7 +87,7 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="bill book graphic legal_case legislation motion_picture report song thesis webpage post-weblog" match="any">
+      <if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
         <text variable="title" font-style="italic"/>
       </if>
       <else>
@@ -98,10 +102,15 @@
           </if>
         </choose>
       </if>
+    </choose>
+    <choose>
+      <if type="post-weblog" variable="URL" match="all">
+        <text term="post-weblog" prefix=" [" suffix="]"/>
+      </if>
       <else-if type="report webpage paper-conference article article-journal article-magazine article-newspaper patent post-weblog bill" match="any">
         <choose>
           <if match="any" variable="URL">
-            <text value=" [online]"/>
+            <text term="online" prefix=" [" suffix="]"/>
           </if>
         </choose>
       </else-if>

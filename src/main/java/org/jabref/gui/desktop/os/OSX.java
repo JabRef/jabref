@@ -52,4 +52,9 @@ public class OSX implements NativeDesktop {
     public Path getApplicationDirectory() {
         return Path.of("/Applications");
     }
+
+    @Override
+    public Path getDefaultFileChooserDirectory() {
+        return Path.of(System.getProperty("user.home") + "/Documents");
+    }
 }

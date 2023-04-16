@@ -7,12 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.swing.filechooser.FileSystemView;
-
-import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.os.DefaultDesktop;
@@ -25,12 +23,13 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.util.FileHelper;
+import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -40,7 +39,6 @@ import org.slf4j.LoggerFactory;
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
-@AllowedToUseSwing("Needs access to swing for the user's os dependent file chooser path")
 public class JabRefDesktop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDesktop.class);
@@ -57,7 +55,9 @@ public class JabRefDesktop {
     public static void openExternalViewer(BibDatabaseContext databaseContext,
                                           PreferencesService preferencesService,
                                           String initialLink,
-                                          Field initialField)
+                                          Field initialField,
+                                          DialogService dialogService,
+                                          BibEntry entry)
             throws IOException {
         String link = initialLink;
         Field field = initialField;
@@ -65,7 +65,7 @@ public class JabRefDesktop {
             // Find the default directory for this field type:
             List<Path> directories = databaseContext.getFileDirectories(preferencesService.getFilePreferences());
 
-            Optional<Path> file = FileHelper.find(link, directories);
+            Optional<Path> file = FileUtil.find(link, directories);
 
             // Check that the file exists:
             if (file.isEmpty() || !Files.exists(file.get())) {
@@ -87,12 +87,20 @@ public class JabRefDesktop {
             openDoi(link);
             return;
         } else if (StandardField.EPRINT.equals(field)) {
-            link = ArXivIdentifier.parse(link)
-                                  .map(ArXivIdentifier::getExternalURI)
-                                  .filter(Optional::isPresent)
-                                  .map(Optional::get)
-                                  .map(URI::toASCIIString)
-                                  .orElse(link);
+            IdentifierParser identifierParser = new IdentifierParser(entry);
+            link = identifierParser.parse(StandardField.EPRINT)
+                    .flatMap(Identifier::getExternalURI)
+                    .map(URI::toASCIIString)
+                    .orElse(link);
+
+            if (Objects.equals(link, initialLink)) {
+                Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
+                if (eprintTypeOpt.isEmpty()) {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please set the eprinttype field"));
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please verify that the eprint field has a valid '%0' id", eprintTypeOpt.get()));
+                }
+            }
             // should be opened in browser
             field = StandardField.URL;
         }
@@ -122,8 +130,7 @@ public class JabRefDesktop {
     }
 
     public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
-        IdentifierParser.parse(StandardField.DOI, link)
-                        .map(identifier -> (DOI) identifier)
+            DOI.parse(link)
                         .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
                         .ifPresent(uri -> {
                             try {
@@ -152,7 +159,7 @@ public class JabRefDesktop {
             return true;
         }
 
-        Optional<Path> file = FileHelper.find(databaseContext, link, preferencesService.getFilePreferences());
+        Optional<Path> file = FileUtil.find(databaseContext, link, preferencesService.getFilePreferences());
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
@@ -290,21 +297,6 @@ public class JabRefDesktop {
                 }
             }
         }
-    }
-
-    /**
-     * Get the user's default file chooser directory
-     *
-     * @return The path to the directory
-     */
-    public static String getDefaultFileChooserDirectory() {
-        // Property "user.home" might be "difficult" on Windows
-        // See https://stackoverflow.com/a/586917/873282 for a longer discussion
-        // The proposed solution is to use Swing's FileSystemView
-        // See https://stackoverflow.com/a/32914568/873282
-        // As of 2022, System.getProperty("user.home") returns c:\Users\USERNAME on Windows 10, whereas
-        // the FileSystemView returns C:\Users\USERNAME\Documents, which is the "better" directory
-        return FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
     }
 
     // TODO: Move to OS.java

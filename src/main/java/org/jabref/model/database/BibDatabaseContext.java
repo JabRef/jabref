@@ -27,8 +27,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
+ * Represents everything related to a BIB file.
+ *
+ * <p> The entries are stored in BibDatabase, the other data in MetaData
  * and the options relevant for this file in Defaults.
+ * </p>
+ * <p>
+ *     To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+ * </p>
  */
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
@@ -158,6 +164,8 @@ public class BibDatabaseContext {
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
         // 3. BIB file directory or Main file directory
+        // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
+        // (in the metadata of the bib file)
         if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
@@ -169,7 +177,7 @@ public class BibDatabaseContext {
             });
         } else {
             // Main file directory
-            preferences.getFileDirectory().ifPresent(fileDirs::add);
+            preferences.getMainFileDirectory().ifPresent(fileDirs::add);
         }
 
         return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
@@ -181,7 +189,9 @@ public class BibDatabaseContext {
      * @return the path - or an empty optional, if none of the directories exists
      */
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
-        return getFileDirectories(preferences).stream().filter(Files::exists).findFirst();
+        return getFileDirectories(preferences).stream()
+                                              .filter(Files::exists)
+                                              .findFirst();
     }
 
     private Path getFileDirectoryPath(String directoryName) {
@@ -244,13 +254,17 @@ public class BibDatabaseContext {
 
     public Path getFulltextIndexPath() {
         Path appData = getFulltextIndexBasePath();
+        Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData);
-            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
+            return indexPath;
         }
 
-        return appData.resolve("unsaved");
+        indexPath = appData.resolve("unsaved");
+        LOGGER.debug("Using index for unsaved database: {}", indexPath);
+        return indexPath;
     }
 
     @Override

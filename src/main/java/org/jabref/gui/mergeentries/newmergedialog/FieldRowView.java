@@ -1,24 +1,18 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.CompoundEdit;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 
-import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selection;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldNameCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.FieldValueCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.MergedFieldCell;
 import org.jabref.gui.mergeentries.newmergedialog.cell.sidebuttons.ToggleMergeUnmergeButton;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.UnifiedDiffHighlighter;
-import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMerger;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.entry.BibEntry;
@@ -29,8 +23,6 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel.Selection;
 
 /**
  * A controller class to control left, right and merged field values
@@ -48,15 +40,23 @@ public class FieldRowView {
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
-    private final CompoundEdit fieldsMergedEdit = new CompoundEdit();
+    private GridPane parent;
 
     public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
-        viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry);
+        viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
         fieldNameCell = new FieldNameCell(field.getDisplayName(), rowIndex);
         leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex);
         rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
+
+        // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
+        // This won't be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
+        leftValueCell.parentProperty().addListener(e -> {
+            if (leftValueCell.getParent() instanceof GridPane grid) {
+                parent = grid;
+            }
+        });
 
         if (FieldMergerFactory.canMerge(field)) {
             ToggleMergeUnmergeButton toggleMergeUnmergeButton = new ToggleMergeUnmergeButton(field);
@@ -66,9 +66,9 @@ public class FieldRowView {
             EasyBind.listen(toggleMergeUnmergeButton.fieldStateProperty(), ((observableValue, old, fieldState) -> {
                 LOGGER.debug("Field merge state is {} for field {}", fieldState, field);
                 if (fieldState == ToggleMergeUnmergeButton.FieldState.MERGED) {
-                    new MergeCommand(fieldMergerFactory.create(field)).execute();
+                    viewModel.mergeFields();
                 } else {
-                    new UnmergeCommand().execute();
+                    viewModel.unmergeFields();
                 }
             }));
         }
@@ -173,6 +173,20 @@ public class FieldRowView {
         }
     }
 
+    public void hide() {
+        if (parent != null) {
+            parent.getChildren().removeAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
+        }
+    }
+
+    public void show() {
+        if (parent != null) {
+            if (!parent.getChildren().contains(leftValueCell)) {
+                parent.getChildren().addAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
+            }
+        }
+    }
+
     public void hideDiff() {
         if (!rightValueCell.isVisible()) {
             return;
@@ -189,70 +203,12 @@ public class FieldRowView {
         getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());
     }
 
-    public class MergeCommand extends SimpleCommand {
-        private final FieldMerger fieldMerger;
-
-        public MergeCommand(FieldMerger fieldMerger) {
-            this.fieldMerger = fieldMerger;
-
-            this.executable.bind(viewModel.hasEqualLeftAndRightBinding().not());
-        }
-
-        @Override
-        public void execute() {
-            assert !viewModel.getLeftFieldValue().equals(viewModel.getRightFieldValue());
-
-            String oldLeftFieldValue = viewModel.getLeftFieldValue();
-            String oldRightFieldValue = viewModel.getRightFieldValue();
-
-            String mergedFields = fieldMerger.merge(viewModel.getLeftFieldValue(), viewModel.getRightFieldValue());
-            viewModel.setLeftFieldValue(mergedFields);
-            viewModel.setRightFieldValue(mergedFields);
-
-            if (fieldsMergedEdit.canRedo()) {
-                fieldsMergedEdit.redo();
-            } else {
-                fieldsMergedEdit.addEdit(new MergeFieldsUndo(oldLeftFieldValue, oldRightFieldValue, mergedFields));
-                fieldsMergedEdit.end();
-            }
-        }
+    public boolean hasEqualLeftAndRightValues() {
+        return viewModel.hasEqualLeftAndRightValues();
     }
 
-    public class UnmergeCommand extends SimpleCommand {
-
-        public UnmergeCommand() { }
-
-        @Override
-        public void execute() {
-            if (fieldsMergedEdit.canUndo()) {
-                fieldsMergedEdit.undo();
-            }
-        }
-    }
-
-    class MergeFieldsUndo extends AbstractUndoableEdit {
-        private final String oldLeft;
-        private final String oldRight;
-        private final String mergedFields;
-
-        MergeFieldsUndo(String oldLeft, String oldRight, String mergedFields) {
-            this.oldLeft = oldLeft;
-            this.oldRight = oldRight;
-            this.mergedFields = mergedFields;
-        }
-
-        @Override
-        public void undo() throws CannotUndoException {
-            super.undo();
-            viewModel.setLeftFieldValue(oldLeft);
-            viewModel.setRightFieldValue(oldRight);
-        }
-
-        @Override
-        public void redo() throws CannotRedoException {
-            super.redo();
-            viewModel.setLeftFieldValue(mergedFields);
-            viewModel.setRightFieldValue(mergedFields);
-        }
+    @Override
+    public String toString() {
+        return "FieldRowView [shouldShowDiffs=" + shouldShowDiffs.get() + ", fieldNameCell=" + fieldNameCell + ", leftValueCell=" + leftValueCell + ", rightValueCell=" + rightValueCell + ", mergedValueCell=" + mergedValueCell + "]";
     }
 }

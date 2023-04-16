@@ -56,7 +56,7 @@ public class FilePreferences {
         return user.getValue();
     }
 
-    public Optional<Path> getFileDirectory() {
+    public Optional<Path> getMainFileDirectory() {
         if (StringUtil.isBlank(mainFileDirectory.getValue())) {
             return Optional.empty();
         } else {

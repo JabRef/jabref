@@ -5,7 +5,7 @@
     <title-short>Neg Res</title-short>
     <id>http://www.zotero.org/styles/negative-results</id>
     <link href="http://www.zotero.org/styles/negative-results" rel="self"/>
-    <link href="http://www.zotero.org/styles/cell" rel="independent-parent"/>
+    <link href="http://www.zotero.org/styles/stem-cell-reports" rel="independent-parent"/>
     <link href="http://www.negative-results.org/index.php/instructions-for-authors/#References" rel="documentation"/>
     <category citation-format="author-date"/>
     <category field="science"/>

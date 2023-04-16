@@ -56,7 +56,8 @@ public class BibtexExtractorViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                importFormatReader);
+                importFormatReader,
+                taskExecutor);
     }
 
     public StringProperty inputTextProperty() {
@@ -83,7 +84,7 @@ public class BibtexExtractorViewModel {
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure((e) -> {
                           if (e instanceof FetcherException) {
-                              String msg = Localization.lang("There are connection issues with a JabRef server. Detailed information: %0.",
+                              String msg = Localization.lang("There are connection issues with a JabRef server. Detailed information: %0",
                                       e.getMessage());
                               dialogService.notify(msg);
                           } else {

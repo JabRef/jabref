@@ -7,8 +7,8 @@
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
     <link href="http://www.journalofhearingscience.com/index.php?/content/get_cont/3" rel="documentation"/>
     <author>
-      <name>Mateusz Rusiniak</name>
-      <email>m.rusiniak@ifps.org.pl</email>
+      <name>Aleksandra Mankiewicz-Malinowska</name>
+      <email>a.malinowska@ifps.org.pl</email>
     </author>
     <category citation-format="numeric"/>
     <category field="medicine"/>
@@ -89,22 +89,22 @@
   </macro>
   <macro name="container-title">
     <choose>
-      <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="any">
-        <group suffix="." delimiter=" ">
-          <text variable="container-title" form="short"/>
-          <choose>
-            <if variable="URL">
-              <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
-            </if>
-          </choose>
-        </group>
-        <text macro="edition" prefix=" "/>
+      <if type="article-journal article-newspaper" match="any">
+        <text variable="container-title" form="short" strip-periods="true" suffix=","/>
       </if>
+      <else-if type="article-magazine article-newspaper" match="any">
+        <text variable="container-title" suffix=","/>
+      </else-if>
+      <else-if type="chapter paper-conference" match="any">
+        <group delimiter=". " suffix=".">
+          <text variable="container-title"/>
+        </group>
+      </else-if>
       <!--add event-name and event-place once they become available-->
       <else-if type="bill">
         <group delimiter=", ">
           <group delimiter=". ">
-            <text variable="container-title" form="short"/>
+            <text variable="container-title"/>
             <group delimiter=" ">
               <text term="section" form="short" text-case="capitalize-first"/>
               <text variable="section"/>
@@ -114,7 +114,7 @@
         </group>
       </else-if>
       <else>
-        <text variable="container-title" suffix="." form="short"/>
+        <text variable="container-title" suffix="."/>
       </else>
     </choose>
   </macro>
@@ -151,7 +151,7 @@
   </macro>
   <macro name="date">
     <choose>
-      <if type="article-journal article-magazine article-newspaper" match="any">
+      <if type="article-magazine article-newspaper" match="any">
         <group suffix=";" delimiter=" ">
           <date variable="issued" delimiter=" ">
             <date-part name="year"/>
@@ -161,6 +161,9 @@
           <text macro="accessed-date"/>
         </group>
       </if>
+      <else-if type="article-journal" match="any">
+        <date variable="issued" form="numeric" date-parts="year" suffix=";"/>
+      </else-if>
       <else-if type="bill">
         <group delimiter=", ">
           <date variable="issued" delimiter=" ">
@@ -191,10 +194,10 @@
   <macro name="pages">
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
-        <text variable="page" prefix=":"/>
+        <text variable="page"/>
       </if>
       <else>
-        <text variable="page" prefix=" p. "/>
+        <text variable="page" prefix="p. "/>
       </else>
     </choose>
   </macro>
@@ -202,6 +205,7 @@
     <choose>
       <if type="article-journal article-magazine" match="any">
         <text variable="volume"/>
+        <text variable="issue" prefix="(" suffix=")"/>
       </if>
     </choose>
   </macro>
@@ -233,8 +237,8 @@
         <text macro="editor"/>
         <text macro="container-title"/>
         <text macro="publisher"/>
-        <group>
-          <text macro="date"/>
+        <text macro="date"/>
+        <group delimiter=": ">
           <text macro="journal-location"/>
           <text macro="pages"/>
         </group>

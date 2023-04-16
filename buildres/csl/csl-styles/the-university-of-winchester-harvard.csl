@@ -12,8 +12,8 @@
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <summary>Harvard style for the University of Winchester, based on the revised guidelines from 7th September 2016.</summary>
-    <updated>2017-10-12T13:16:59+00:00</updated>
+    <summary>Harvard style for the University of Winchester, based on the revised guidelines from 6th October 2022.</summary>
+    <updated>2023-01-16T09:18:31+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -39,10 +39,16 @@
   <macro name="secondary-contributors">
     <choose>
       <if type="chapter paper-conference" match="none">
-        <names variable="translator editor" delimiter=", " prefix=" ">
-          <label form="verb-short" text-case="capitalize-first"/>
-          <name prefix=" " and="text" initialize-with=". "/>
-        </names>
+        <group delimiter=". " suffix="." prefix=" ">
+          <names variable="translator" delimiter=", ">
+            <label form="verb-short" text-case="capitalize-first" strip-periods="true"/>
+            <name prefix=" " and="text" initialize-with=". "/>
+          </names>
+          <names variable="editor" delimiter=", ">
+            <label form="verb" text-case="capitalize-first"/>
+            <name prefix=" " and="text" initialize-with=". "/>
+          </names>
+        </group>
       </if>
     </choose>
   </macro>
@@ -145,7 +151,7 @@
             </if>
           </choose>
           <choose>
-            <if type="article-journal article-magazine" match="none">
+            <if type="article-journal article-magazine article-newspaper" match="none">
               <group delimiter=": ">
                 <text variable="publisher-place"/>
                 <text variable="publisher"/>
@@ -180,34 +186,13 @@
       <if type="bill legal_case legislation" match="none">
         <choose>
           <if variable="issued">
-            <group prefix=" (" suffix=")">
-              <choose>
-                <if type="webpage" match="any">
-                  <date variable="issued">
-                    <date-part name="day" form="numeric-leading-zeros"/>
-                    <date-part prefix="/" name="month" form="numeric-leading-zeros"/>
-                    <date-part prefix="/" name="year"/>
-                  </date>
-                </if>
-                <else>
-                  <date variable="issued">
-                    <date-part name="year"/>
-                  </date>
-                </else>
-              </choose>
+            <group>
+              <date date-parts="year" form="text" variable="issued"/>
               <text variable="year-suffix"/>
-              <choose>
-                <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song webpage thesis" match="none">
-                  <date variable="issued">
-                    <date-part prefix="/" name="day"/>
-                    <date-part prefix="/" name="month"/>
-                  </date>
-                </if>
-              </choose>
             </group>
           </if>
           <else>
-            <group prefix=" (" suffix=")">
+            <group>
               <text term="no date" form="short"/>
               <text variable="year-suffix" prefix="-"/>
             </group>
@@ -270,10 +255,8 @@
           <text variable="page"/>
         </group>
       </if>
-      <else-if type="article-newspaper">
-        <group delimiter=" " prefix=": ">
-          <text variable="page"/>
-        </group>
+      <else-if type="article-newspaper article-magazine">
+        <text variable="page" prefix=", "/>
       </else-if>
       <else-if type="book graphic motion_picture report song chapter paper-conference" match="any">
         <group prefix=" " delimiter=", ">
@@ -331,9 +314,18 @@
     <choose>
       <if type="bill legal_case legislation" match="none">
         <choose>
-          <if type="article-journal article-newspaper article-magazine" match="any">
+          <if type="article-journal" match="any">
             <text variable="container-title" font-style="italic"/>
           </if>
+          <else-if type="article-magazine article-newspaper" match="any">
+            <group delimiter=", ">
+              <text variable="container-title" font-style="italic"/>
+              <date variable="issued">
+                <date-part name="day" suffix=" "/>
+                <date-part name="month"/>
+              </date>
+            </group>
+          </else-if>
           <else>
             <text variable="container-title" font-style="italic" text-case="title"/>
           </else>
@@ -370,7 +362,7 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="false" collapse="year" givenname-disambiguation-rule="by-cite">
     <sort>
       <key macro="author"/>
       <key macro="issued-sort"/>
@@ -390,11 +382,11 @@
       <key macro="author"/>
       <key macro="issued-sort" sort="ascending"/>
     </sort>
-    <layout>
+    <layout suffix=".">
       <group>
         <group delimiter=" ">
           <text macro="author"/>
-          <text macro="issued"/>
+          <text macro="issued" prefix=" (" suffix=")"/>
           <text macro="title" prefix=" " suffix="."/>
           <text macro="container"/>
         </group>

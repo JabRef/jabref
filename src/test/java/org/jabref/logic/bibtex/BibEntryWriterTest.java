@@ -184,7 +184,6 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripTest() throws IOException {
-        // @formatter:off
         String bibtexEntry = """
                 @Article{test,
                   Author                   = {Foo Bar},
@@ -193,7 +192,63 @@ class BibEntryWriterTest {
                   Number                   = {1}
                 }
                 """.replaceAll("\n", OS.NEWLINE);
-        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
+    void roundTripKeepsFilePathWithBackslashes() throws IOException {
+        String bibtexEntry = """
+                @Article{,
+                  file = {Tagungen\\2013\\KWTK45},
+                }
+                """.replaceAll("\n", OS.NEWLINE);
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
+    void roundTripKeepsEscapedCharacters() throws IOException {
+        String bibtexEntry = """
+                @Article{,
+                  demofield = {Tagungen\\2013\\KWTK45},
+                }
+                """.replaceAll("\n", OS.NEWLINE);
+
+        // read in bibtex string
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(bibtexEntry, stringWriter.toString());
+    }
+
+    @Test
+    void roundTripKeepsFilePathEndingWithBackslash() throws IOException {
+        String bibtexEntry = """
+                @Article{,
+                  file = {dir\\},
+                }
+                """.replaceAll("\n", OS.NEWLINE);
 
         // read in bibtex string
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
@@ -856,7 +911,7 @@ class BibEntryWriterTest {
     @MethodSource("testGetFormattedFieldNameData")
     void testGetFormattedFieldName(String expected, String fieldName, int indent) {
         Field field = FieldFactory.parseField(fieldName);
-        assertEquals(expected, bibEntryWriter.getFormattedFieldName(field, indent));
+        assertEquals(expected, BibEntryWriter.getFormattedFieldName(field, indent));
     }
 
     static Stream<Arguments> testGetLengthOfLongestFieldNameData() {
@@ -871,6 +926,6 @@ class BibEntryWriterTest {
     @ParameterizedTest
     @MethodSource("testGetLengthOfLongestFieldNameData")
     void testGetLengthOfLongestFieldName(int expected, BibEntry entry) {
-        assertEquals(expected, bibEntryWriter.getLengthOfLongestFieldName(entry));
+        assertEquals(expected, BibEntryWriter.getLengthOfLongestFieldName(entry));
     }
 }

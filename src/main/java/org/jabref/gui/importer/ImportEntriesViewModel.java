@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -13,7 +15,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiles.ImportHandler;
@@ -49,6 +50,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final ObservableList<BibEntry> entries;
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
+    private final ObjectProperty<BibDatabaseContext> selectedDb;
 
     /**
      * @param databaseContext the database to import into
@@ -74,12 +76,16 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.entries = FXCollections.observableArrayList();
         this.message = new SimpleStringProperty();
         this.message.bind(task.messageProperty());
+        this.selectedDb = new SimpleObjectProperty<>();
 
         task.onSuccess(parserResult -> {
             // store the complete parser result (to import groups, ... later on)
             this.parserResult = parserResult;
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(parserResult.getDatabase().getEntries());
+            if (entries.isEmpty()) {
+               task.updateMessage(Localization.lang("No entries corresponding to given query"));
+            }
         }).onFailure(ex -> {
             LOGGER.error("Error importing", ex);
             dialogService.showErrorDialogAndWait(ex);
@@ -94,6 +100,14 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return message;
     }
 
+    public ObjectProperty<BibDatabaseContext> selectedDbProperty() {
+        return selectedDb;
+    }
+
+    public BibDatabaseContext getSelectedDb() {
+        return selectedDb.get();
+    }
+
     public ObservableList<BibEntry> getEntries() {
         return entries;
     }
@@ -101,7 +115,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent() ||
                 new DuplicateCheck(entryTypesManager)
-                .containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode()).isPresent();
+                .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
     }
 
     /**
@@ -152,24 +166,28 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             }
         }
 
-        new DatabaseMerger(preferences.getKeywordDelimiter()).mergeStrings(databaseContext.getDatabase(), parserResult.getDatabase());
-        new DatabaseMerger(preferences.getKeywordDelimiter()).mergeMetaData(databaseContext.getMetaData(),
+        new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeStrings(
+                databaseContext.getDatabase(),
+                parserResult.getDatabase());
+        new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
+                databaseContext.getMetaData(),
                 parserResult.getMetaData(),
                 parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
 
-        JabRefGUI.getMainFrame().getCurrentLibraryTab().markBaseChanged();
+//        JabRefGUI.getMainFrame().getCurrentLibraryTab().markBaseChanged();
     }
 
     private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
         ImportHandler importHandler = new ImportHandler(
-                databaseContext,
+                selectedDb.getValue(),
                 preferences,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,
-                Globals.IMPORT_FORMAT_READER);
+                Globals.IMPORT_FORMAT_READER,
+                taskExecutor);
         importHandler.importEntries(entriesToImport);
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }
@@ -197,7 +215,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         Optional<BibEntry> other = new DuplicateCheck(entryTypesManager).containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode());
         if (other.isPresent()) {
             DuplicateResolverDialog dialog = new DuplicateResolverDialog(other.get(),
-                    entry, DuplicateResolverDialog.DuplicateResolverType.INSPECTION, databaseContext, stateManager, dialogService);
+                    entry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, databaseContext, stateManager, dialogService, preferences);
 
             DuplicateResolverDialog.DuplicateResolverResult result = dialogService.showCustomDialogAndWait(dialog)
                                                                                   .orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
@@ -228,7 +246,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         other = findInternalDuplicate(entry);
         if (other.isPresent()) {
             DuplicateResolverDialog diag = new DuplicateResolverDialog(entry,
-                    other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH, databaseContext, stateManager, dialogService);
+                    other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH, databaseContext, stateManager, dialogService, preferences);
 
             DuplicateResolverDialog.DuplicateResolverResult answer = dialogService.showCustomDialogAndWait(diag)
                                                                                   .orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -22,6 +20,7 @@ import javafx.stage.Screen;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -42,6 +41,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
@@ -50,6 +50,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
     @Inject StateManager stateManager;
     @Inject ImportFormatReader importFormatReader;
+    @Inject TaskExecutor taskExecutor;
 
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
@@ -121,7 +122,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
-        viewModel = new EntryTypeViewModel(preferencesService, libraryTab, dialogService, stateManager, importFormatReader);
+        viewModel = new EntryTypeViewModel(preferencesService, libraryTab, dialogService, stateManager, importFormatReader, taskExecutor);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
         idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());

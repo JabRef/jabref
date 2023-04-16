@@ -120,7 +120,7 @@
           </date>
         </group>
         <choose>
-          <if type="book thesis">
+          <if type="book thesis" match="any">
             <group delimiter=". ">
               <text macro="title"/>
               <text macro="edition"/>

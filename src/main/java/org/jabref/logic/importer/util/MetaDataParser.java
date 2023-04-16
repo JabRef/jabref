@@ -15,6 +15,8 @@ import java.util.Optional;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -34,6 +36,30 @@ public class MetaDataParser {
 
     public MetaDataParser(FileUpdateMonitor fileMonitor) {
         MetaDataParser.fileMonitor = fileMonitor;
+    }
+
+    public static Optional<BibEntryType> parseCustomEntryType(String comment) {
+        String rest = comment.substring(MetaData.ENTRYTYPE_FLAG.length());
+        int indexEndOfName = rest.indexOf(':');
+        if (indexEndOfName < 0) {
+            return Optional.empty();
+        }
+        String fieldsDescription = rest.substring(indexEndOfName + 2);
+
+        int indexEndOfRequiredFields = fieldsDescription.indexOf(']');
+        int indexEndOfOptionalFields = fieldsDescription.indexOf(']', indexEndOfRequiredFields + 1);
+        if ((indexEndOfRequiredFields < 4) || (indexEndOfOptionalFields < (indexEndOfRequiredFields + 6))) {
+            return Optional.empty();
+        }
+        EntryType type = EntryTypeFactory.parse(rest.substring(0, indexEndOfName));
+        String reqFields = fieldsDescription.substring(4, indexEndOfRequiredFields);
+        String optFields = fieldsDescription.substring(indexEndOfRequiredFields + 6, indexEndOfOptionalFields);
+
+        BibEntryTypeBuilder entryTypeBuilder = new BibEntryTypeBuilder()
+                .withType(type)
+                .withImportantFields(FieldFactory.parseFieldList(optFields))
+                .withRequiredFields(FieldFactory.parseOrFieldsList(reqFields));
+        return Optional.of(entryTypeBuilder.build());
     }
 
     /**
@@ -90,6 +116,8 @@ public class MetaDataParser {
                 metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
                 metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
+            } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
+                metaData.setVersionDBStructure(getSingleItem(value));
             } else {
                 // Keep meta data items that we do not know in the file
                 metaData.putUnknownMetaDataItem(entry.getKey(), value);

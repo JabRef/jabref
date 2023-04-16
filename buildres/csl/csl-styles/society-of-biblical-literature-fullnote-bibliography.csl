@@ -33,12 +33,21 @@
     <category citation-format="note"/>
     <category field="theology"/>
     <summary>Society of Biblical Literature format with full notes and bibliography</summary>
-    <updated>2022-06-29T13:58:51+00:00</updated>
+    <updated>2022-07-02T02:53:27+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
     <terms>
+      <term name="article-journal" form="short">art.</term>
       <term name="editor" form="verb-short">ed.</term>
+      <term name="page" form="short">
+        <single>p. </single>
+        <multiple>pp. </multiple>
+      </term>
+      <term name="paragraph" form="short">
+        <single>¶</single>
+        <multiple>¶¶</multiple>
+      </term>
       <term name="section" form="short">
         <single>§</single>
         <multiple>§§</multiple>
@@ -675,12 +684,13 @@
     </choose>
   </macro>
   <macro name="event-note">
-    <!-- Support citation of unpublished conference presentations per SBLHS2 §6.3.8. -->
+    <!-- Support citation of unpublished conference presentations per SBLHS2 §6.3.8. Corrects for dropping of event-title information. -->
     <choose>
       <if type="speech" match="any">
         <group delimiter=" ">
           <text variable="genre"/>
           <text term="presented at" suffix=" "/>
+          <text macro="event-title" suffix=", "/>
         </group>
       </if>
     </choose>
@@ -689,8 +699,22 @@
   <macro name="event">
     <group>
       <text term="presented at" suffix=" "/>
-      <text variable="event"/>
+      <text macro="event-title"/>
     </group>
+  </macro>
+  <macro name="event-title">
+    <choose>
+      <!-- TODO: We expect "event-title" to be used,
+           but processors and applications may not be updated yet.
+           This macro ensures that either "event" or "event-title" can be accpeted.
+           Remove if procesor logic and application adoption can handle this. -->
+      <if variable="event-title">
+        <text variable="event-title"/>
+      </if>
+      <else>
+        <text variable="event"/>
+      </else>
+    </choose>
   </macro>
   <macro name="originally-published">
     <group delimiter=", ">
@@ -814,6 +838,10 @@
                 </choose>
               </group>
             </if>
+            <else>
+              <label variable="locator" form="short"/>
+              <text variable="locator"/>
+            </else>
           </choose>
         </if>
         <else-if variable="volume">
@@ -854,7 +882,22 @@
         <text macro="pages"/>
       </if>
       <else-if type="article-journal">
-        <text variable="locator" prefix=": "/>
+        <!-- Add support for individually paginated, electronic journal articles per https://sblhs2.com/2018/05/03/electronic-journals-with-individually-paginated-articles/ -->
+        <choose>
+          <if variable="number">
+            <group delimiter=" " prefix=": ">
+              <text term="article-journal" form="short"/>
+              <text variable="number"/>
+            </group>
+            <group prefix=", ">
+              <label variable="locator" form="short"/>
+              <text variable="locator"/>
+            </group>
+          </if>
+          <else>
+            <text variable="locator" prefix=": "/>
+          </else>
+        </choose>
       </else-if>
       <else-if type="entry-dictionary entry-encyclopedia" match="any">
         <choose>
@@ -876,7 +919,37 @@
   <macro name="pages">
     <choose>
       <if type="article-journal">
-        <text variable="page" prefix=": "/>
+        <!-- Add support for individually paginated, electronic journal articles per https://sblhs2.com/2018/05/03/electronic-journals-with-individually-paginated-articles/ -->
+        <choose>
+          <if variable="number">
+            <text term="article-journal" form="short" prefix=": "/>
+            <text variable="number" prefix=" " suffix=", "/>
+            <choose>
+              <if variable="locator">
+                <label variable="locator" form="short"/>
+                <text variable="locator"/>
+              </if>
+              <else-if variable="page">
+                <label variable="page" form="short"/>
+                <text variable="page"/>
+              </else-if>
+              <else>
+                <!-- Is there not a term for "no page"? See SBLHS2 §8.1.3 and CMS17 §10.42 where the same abbreviation applies to "no place," "no publisher," and "no page." -->
+                <text value="n.p."/>
+              </else>
+            </choose>
+          </if>
+          <else>
+            <choose>
+              <if variable="locator">
+                <text variable="locator" prefix=": "/>
+              </if>
+              <else>
+                <text variable="page" prefix=": "/>
+              </else>
+            </choose>
+          </else>
+        </choose>
       </if>
       <else-if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
         <choose>
@@ -906,7 +979,26 @@
   <macro name="locators-journal">
     <choose>
       <if type="article-journal">
-        <text variable="page" prefix=": "/>
+        <!-- Add support for individually paginated, electronic journal articles per https://sblhs2.com/2018/05/03/electronic-journals-with-individually-paginated-articles/ -->
+        <choose>
+          <if variable="number">
+            <text term="article-journal" form="short" prefix=": "/>
+            <text variable="number" prefix=" " suffix=", "/>
+            <choose>
+              <if variable="page">
+                <label variable="page" form="short"/>
+                <text variable="page"/>
+              </if>
+              <else>
+                <!-- Is there not a term for "no page"? See SBLHS2 §8.1.3 and CMS17 §10.42 where the same abbreviation applies to "no place," "no publisher," and "no page." -->
+                <text value="n.p."/>
+              </else>
+            </choose>
+          </if>
+          <else>
+            <text variable="page" prefix=": "/>
+          </else>
+        </choose>
       </if>
     </choose>
   </macro>

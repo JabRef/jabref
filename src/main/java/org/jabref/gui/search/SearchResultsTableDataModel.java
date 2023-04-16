@@ -13,6 +13,7 @@ import javafx.collections.transformation.SortedList;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableFieldValueFormatter;
+import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -25,13 +26,13 @@ public class SearchResultsTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
-    private final PreferencesService preferencesService;
+    private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
 
     public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, StateManager stateManager) {
-        this.preferencesService = preferencesService;
+        this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = bibDatabaseContext;
-        this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
+        this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
 
         ObservableList<BibEntryTableViewModel> entriesViewModel = FXCollections.observableArrayList();
         for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
@@ -57,6 +58,6 @@ public class SearchResultsTableDataModel {
     }
 
     public void refresh() {
-        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
+        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
     }
 }

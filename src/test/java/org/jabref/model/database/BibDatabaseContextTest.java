@@ -94,10 +94,9 @@ class BibDatabaseContextTest {
     @Test
     void getUserFileDirectoryIfAllAreEmpty() {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        Path userDirJabRef = JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory();
 
-        Path userDirJabRef = Path.of(JabRefDesktop.getDefaultFileChooserDirectory(), "JabRef");
-
-        when(fileDirPrefs.getFileDirectory()).thenReturn(Optional.of(userDirJabRef));
+        when(fileDirPrefs.getMainFileDirectory()).thenReturn(Optional.of(userDirJabRef));
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(Path.of("biblio.bib"));
         assertEquals(Collections.singletonList(userDirJabRef), database.getFileDirectories(fileDirPrefs));

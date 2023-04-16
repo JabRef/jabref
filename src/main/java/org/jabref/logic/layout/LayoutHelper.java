@@ -3,7 +3,9 @@ package org.jabref.logic.layout;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -35,12 +37,18 @@ public class LayoutHelper {
 
     private final PushbackReader in;
     private final List<StringInt> parsedEntries = new ArrayList<>();
-    private final LayoutFormatterPreferences prefs;
+    private final List<Path> fileDirForDatabase;
+    private final LayoutFormatterPreferences preferences;
     private boolean endOfFile;
 
-    public LayoutHelper(Reader in, LayoutFormatterPreferences prefs) {
+    public LayoutHelper(Reader in, List<Path> fileDirForDatabase, LayoutFormatterPreferences preferences) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
-        this.prefs = Objects.requireNonNull(prefs);
+        this.preferences = Objects.requireNonNull(preferences);
+        this.fileDirForDatabase = fileDirForDatabase;
+    }
+
+    public LayoutHelper(Reader in, LayoutFormatterPreferences preferences) {
+        this(in, Collections.emptyList(), preferences);
     }
 
     public Layout getLayoutFromText() throws IOException {
@@ -54,7 +62,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(parsedEntries, prefs);
+        return new Layout(parsedEntries, fileDirForDatabase, preferences);
     }
 
     public static String getCurrentGroup() {

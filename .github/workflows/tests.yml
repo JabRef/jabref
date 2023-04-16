@@ -31,7 +31,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run check style reporter
@@ -57,7 +57,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
@@ -89,7 +89,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
@@ -123,7 +123,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
@@ -149,10 +149,10 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          if [ "CODECOV_TOKEN" == "" ]; then
-            echo ::set-output name=secretspresent::false
+          if [ "$CODECOV_TOKEN" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=secretspresent::true
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
           fi
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
@@ -161,11 +161,11 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 18
+          java-version: 19
           distribution: 'temurin'
           cache: 'gradle'
       - name: Update test coverage metrics
-        if: ${{ steps.checksecrets.outputs.secretspresent }}
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
         env:
           CI: "true"

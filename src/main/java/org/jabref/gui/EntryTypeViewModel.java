@@ -16,6 +16,7 @@ import javafx.concurrent.Worker;
 
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -53,17 +54,20 @@ public class EntryTypeViewModel {
     private final Validator idFieldValidator;
     private final StateManager stateManager;
     private final ImportFormatReader importFormatReader;
+    private final TaskExecutor taskExecutor;
 
     public EntryTypeViewModel(PreferencesService preferences,
                               LibraryTab libraryTab,
                               DialogService dialogService,
                               StateManager stateManager,
-                              ImportFormatReader importFormatReader) {
+                              ImportFormatReader importFormatReader,
+                              TaskExecutor taskExecutor) {
         this.libraryTab = libraryTab;
         this.preferencesService = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.importFormatReader = importFormatReader;
+        this.taskExecutor = taskExecutor;
 
         fetchers.addAll(WebFetchers.getIdBasedFetchers(
                 preferences.getImportFormatPreferences(),
@@ -150,7 +154,7 @@ public class EntryTypeViewModel {
             if (exception instanceof FetcherClientException) {
                 dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the client side. Please check connection and identifier for correctness.") + "\n" + fetcherExceptionMessage);
             } else if (exception instanceof FetcherServerException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try agan later.") + "\n" + fetcherExceptionMessage);
+                dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Bibliographic data not found. Cause is likely the server side. Please try again later.") + "\n" + fetcherExceptionMessage);
             } else {
                 dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage));
             }
@@ -173,7 +177,8 @@ public class EntryTypeViewModel {
                         libraryTab.getUndoManager(),
                         stateManager,
                         dialogService,
-                        importFormatReader);
+                        importFormatReader,
+                        taskExecutor);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
 
                 searchSuccesfulProperty.set(true);

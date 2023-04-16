@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.journals;
 
-import javax.inject.Inject;
-
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -14,6 +12,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -34,6 +33,7 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
 /**
@@ -58,6 +58,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML private Button removeAbbreviationListButton;
 
     @FXML private CustomTextField searchBox;
+    @FXML private CheckBox useFJournal;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
@@ -72,7 +73,11 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML
     private void initialize() {
-        viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, abbreviationRepository);
+        viewModel = new JournalAbbreviationsTabViewModel(
+                preferencesService.getJournalAbbreviationPreferences(),
+                dialogService,
+                taskExecutor,
+                abbreviationRepository);
 
         filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
 
@@ -126,9 +131,10 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         loadingLabel.visibleProperty().bind(viewModel.isLoadingProperty());
         progressIndicator.visibleProperty().bind(viewModel.isLoadingProperty());
 
-        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
-            filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() || abbreviation.containsCaseIndependent(searchTerm));
-        });
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) ->
+                filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() || abbreviation.containsCaseIndependent(searchTerm)));
+
+        useFJournal.selectedProperty().bindBidirectional(viewModel.useFJournalProperty());
     }
 
     private void setAnimations() {
@@ -142,9 +148,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
-                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> {
-                    addAbbreviationActions();
-                }),
+                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> addAbbreviationActions()),
                 new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
         );
     }

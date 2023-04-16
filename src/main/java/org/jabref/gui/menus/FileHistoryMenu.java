@@ -11,22 +11,19 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileHistory;
-import org.jabref.preferences.PreferencesService;
 
 public class FileHistoryMenu extends Menu {
 
     private final FileHistory history;
-    private final PreferencesService preferences;
     private final DialogService dialogService;
     private final OpenDatabaseAction openDatabaseAction;
 
-    public FileHistoryMenu(PreferencesService preferences, DialogService dialogService, OpenDatabaseAction openDatabaseAction) {
+    public FileHistoryMenu(FileHistory fileHistory, DialogService dialogService, OpenDatabaseAction openDatabaseAction) {
         setText(Localization.lang("Recent libraries"));
 
-        this.preferences = preferences;
+        this.history = fileHistory;
         this.dialogService = dialogService;
         this.openDatabaseAction = openDatabaseAction;
-        history = preferences.getGuiPreferences().getFileHistory();
         if (history.isEmpty()) {
             setDisable(true);
         } else {
@@ -46,10 +43,10 @@ public class FileHistoryMenu extends Menu {
         }
         char key = keyEvent.getCharacter().charAt(0);
         int num = Character.getNumericValue(key);
-        if (num <= 0 || num > history.getHistory().size()) {
+        if (num <= 0 || num > history.size()) {
             return false;
         }
-        this.openFile(history.getFileAt(Integer.parseInt(keyEvent.getCharacter()) - 1));
+        this.openFile(history.get(Integer.parseInt(keyEvent.getCharacter()) - 1));
         return true;
     }
 
@@ -66,7 +63,7 @@ public class FileHistoryMenu extends Menu {
     private void setItems() {
         getItems().clear();
         for (int index = 0; index < history.size(); index++) {
-            addItem(history.getFileAt(index), index + 1);
+            addItem(history.get(index), index + 1);
         }
     }
 

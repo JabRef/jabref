@@ -14,6 +14,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -39,6 +41,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -101,16 +104,18 @@ public class GlobalSearchBar extends HBox {
     private final UndoManager undoManager;
 
     private final SearchPreferences searchPreferences;
+    private final DialogService dialogService;
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
-    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager) {
+    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.searchPreferences = preferencesService.getSearchPreferences();
         this.undoManager = undoManager;
+        this.dialogService = dialogService;
 
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
@@ -133,6 +138,19 @@ public class GlobalSearchBar extends HBox {
                     event.consume();
                 }
             }
+        });
+
+        searchField.setContextMenu(SearchFieldRightClickMenu.create(
+                keyBindingRepository,
+                stateManager,
+                searchField));
+
+        ObservableList<String> search = stateManager.getWholeSearchHistory();
+        search.addListener((ListChangeListener.Change<? extends String> change) -> {
+            searchField.setContextMenu(SearchFieldRightClickMenu.create(
+                    keyBindingRepository,
+                    stateManager,
+                    searchField));
         });
 
         ClipBoardManager.addX11Support(searchField);
@@ -240,7 +258,7 @@ public class GlobalSearchBar extends HBox {
             globalSearchActive.setValue(true);
             globalSearchResultDialog = new GlobalSearchResultDialog(undoManager);
             performSearch();
-            globalSearchResultDialog.showAndWait();
+            dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);
         });
     }
@@ -289,6 +307,7 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
+        this.stateManager.addSearchHistory(searchField.textProperty().get());
         stateManager.setSearchQuery(searchQuery);
     }
 

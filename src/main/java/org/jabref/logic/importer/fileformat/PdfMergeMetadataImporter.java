@@ -10,14 +10,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.DefaultInjector;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.IsbnFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PdfMergeMetadataImporter extends Importer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInjector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
 
     private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
@@ -45,10 +45,10 @@ public class PdfMergeMetadataImporter extends Importer {
         this.metadataImporters = new ArrayList<>();
         this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
-        if (importFormatPreferences.getGrobidPreferences().isGrobidEnabled()) {
+        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
             this.metadataImporters.add(new PdfGrobidImporter(importFormatPreferences));
         }
-        this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.getXmpPreferences()));
+        this.metadataImporters.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         this.metadataImporters.add(new PdfContentImporter(importFormatPreferences));
     }
 
@@ -96,7 +96,10 @@ public class PdfMergeMetadataImporter extends Importer {
             }
             if (candidate.hasField(StandardField.ISBN)) {
                 try {
-                    new IsbnFetcher(importFormatPreferences).performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent(fetchedCandidates::add);
+                    new IsbnFetcher(importFormatPreferences)
+                            .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+                            // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
+                            .performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
                     LOGGER.error("Fetching failed for ISBN \"{}\".", candidate.getField(StandardField.ISBN).get(), e);
                 }
@@ -144,7 +147,7 @@ public class PdfMergeMetadataImporter extends Importer {
 
     public static class EntryBasedFetcherWrapper extends PdfMergeMetadataImporter implements EntryBasedFetcher {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInjector.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(EntryBasedFetcherWrapper.class);
         private final FilePreferences filePreferences;
         private final BibDatabaseContext databaseContext;
 
@@ -165,7 +168,7 @@ public class PdfMergeMetadataImporter extends Importer {
                             return result.getDatabase().getEntries();
                         }
                     } catch (IOException e) {
-                        LOGGER.error("Cannot read \"{}\"", filePath.get(), e);
+                        LOGGER.error("Cannot read {}", filePath.get(), e);
                     }
                 }
             }

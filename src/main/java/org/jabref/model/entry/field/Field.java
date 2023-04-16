@@ -35,4 +35,8 @@ public interface Field {
     default boolean isNumeric() {
         return getProperties().contains(FieldProperty.NUMERIC);
     }
+
+    default boolean isMultiLineDefined() {
+        return getProperties().contains(FieldProperty.MULTILINE_TEXT);
+    }
 }

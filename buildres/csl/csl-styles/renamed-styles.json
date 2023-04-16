@@ -509,6 +509,7 @@
     "wirtschaftsuniversitat-wien-master-management": "wirtschaftsuniversitat-wien-author-date",
     "world-journal-of-biological-psychiatry": "the-world-journal-of-biological-psychiatry",
     "world-allergy-organization-journal": "wao-journal",
+    "world-politcs": "world-politics",
     "zeitschrift-fuer-digitale-geisteswissenschaften": "zeitschrift-fur-digitale-geisteswissenschaften",
     "integration-the-vlsi-journal": "integration",
     "lwt-food-science-and-technology": "lwt",
@@ -534,5 +535,10 @@
     "prifysgol-caerdydd-harvard": "cardiff-university-harvard",
     "harvard-cardiff-university-old":"cardiff-university-harvard",
     "harvard-oxford-brookes-university-faculty-of-health-and-life-sciences": "harvard-cite-them-right",
-    "bluebook2": "bluebook-law-review"
+    "bluebook2": "bluebook-law-review",
+    "moore-theological-college": "society-of-biblical-literature-fullnote-bibliography",
+    "cell-numeric-superscript": "cell",
+    "bursa-uludag-universitesi-sosyal-bilimler-enstitusu": "apa",
+    "bursa-uludag-universitesi-sosyal-bilimler-enstitusu-metinici-atif": "apa",
+    "bursa-uludag-universitesi-fen-bilimleri-enstitusu": "apa"
 }

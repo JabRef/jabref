@@ -125,7 +125,6 @@
                 <text variable="container-title" suffix=" " form="short" strip-periods="true"/>
                 <text variable="volume" suffix=":"/>
                 <text variable="page" suffix="."/>
-                <text prefix=" doi: " variable="DOI"/>
               </group>
             </else>
           </choose>
