@@ -220,7 +220,7 @@
                 <text variable="publisher"/>
               </group>
               <group>
-                <label variable="page" form="short" suffix=" "/>
+                <label variable="page" form="short" prefix=", " suffix=" "/>
                 <text variable="page"/>
               </group>
             </if>

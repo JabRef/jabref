@@ -62,6 +62,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private final Path temporaryFile;
 
     private final FileLock temporaryFileLock;
+
     /**
      * A backup of the target file (if it exists), created when the stream is closed
      */
@@ -75,7 +76,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      * Creates a new output stream to write to or replace the file at the specified path.
      *
      * @param path       the path of the file to write to or replace
-     * @param keepBackup whether to keep the backup file after a successful write process
+     * @param keepBackup whether to keep the backup file (.sav) after a successful write process
      */
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
         // Files.newOutputStream(getPathOfTemporaryFile(path)) leads to a "sun.nio.ch.ChannelOutputStream", which does not offer "lock"
@@ -84,7 +85,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     /**
      * Creates a new output stream to write to or replace the file at the specified path.
-     * The backup file is deleted when write was successful.
+     * The backup file (.sav) is deleted when write was successful.
      *
      * @param path the path of the file to write to or replace
      */
@@ -238,7 +239,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             }
 
             if (!keepBackup) {
-                // Remove backup file
+                // Remove backup file for saving
                 Files.deleteIfExists(backupFile);
             }
         } finally {

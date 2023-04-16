@@ -11,8 +11,8 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
@@ -37,8 +37,6 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -54,8 +52,6 @@ public interface PreferencesService {
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
 
     KeyBindingRepository getKeyBindingRepository();
-
-    void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences);
 
     FilePreferences getFilePreferences();
 
@@ -91,11 +87,9 @@ public interface PreferencesService {
 
     void flush();
 
-    List<BibEntryType> getBibEntryTypes(BibDatabaseMode mode);
+    BibEntryTypesManager getCustomEntryTypesRepository();
 
-    void storeCustomEntryTypes(BibEntryTypesManager entryTypesManager);
-
-    void clearBibEntryTypes(BibDatabaseMode mode);
+    void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
 
     CleanupPreferences getCleanupPreferences();
 
@@ -159,27 +153,17 @@ public interface PreferencesService {
     // MainTablePreferences
     //*************************************************************************************************************
 
-    void updateMainTableColumns();
-
-    ColumnPreferences getColumnPreferences();
-
-    void storeMainTableColumnPreferences(ColumnPreferences columnPreferences);
+    ColumnPreferences getMainTableColumnPreferences();
 
     MainTablePreferences getMainTablePreferences();
 
-    void storeMainTablePreferences(MainTablePreferences mainTablePreferences);
-
-    MainTableNameFormatPreferences getMainTableNameFormatPreferences();
-
-    void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+    NameDisplayPreferences getNameDisplayPreferences();
 
     //*************************************************************************************************************
     // SearchDialogColumnPreferences
     //*************************************************************************************************************
 
     ColumnPreferences getSearchDialogColumnPreferences();
-
-    void storeSearchDialogColumnPreferences(ColumnPreferences columnPreferences);
 
     //*************************************************************************************************************
     // AppearancePreferences

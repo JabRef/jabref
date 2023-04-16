@@ -55,9 +55,11 @@ public class MSBibDatabase {
      */
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         if (entries == null) {
-            addEntriesForExport(database.getEntries());
+            var resolvedEntries = database.resolveForStrings(database.getEntries(), false);
+            addEntriesForExport(resolvedEntries);
         } else {
-            addEntriesForExport(entries);
+            var resolvedEntries = database.resolveForStrings(entries, false);
+            addEntriesForExport(resolvedEntries);
         }
     }
 

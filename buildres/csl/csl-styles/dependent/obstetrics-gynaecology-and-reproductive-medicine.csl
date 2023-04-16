@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-GB">
+  <!-- Medicine Publishing, generated from "mp" metadata at https://github.com/citation-style-language/journals -->
+  <info>
+    <title>Obstetrics, Gynaecology and Reproductive Medicine</title>
+    <id>http://www.zotero.org/styles/obstetrics-gynaecology-and-reproductive-medicine</id>
+    <link href="http://www.zotero.org/styles/obstetrics-gynaecology-and-reproductive-medicine" rel="self"/>
+    <link href="http://www.zotero.org/styles/medicine-publishing" rel="independent-parent"/>
+    <link href="https://www.obstetrics-gynaecology-journal.com/authorinfo" rel="documentation"/>
+    <category citation-format="numeric"/>
+    <category field="medicine"/>
+    <issn>1751-7214</issn>
+    <eissn>1879-3622</eissn>
+    <updated>2022-02-24T12:00:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

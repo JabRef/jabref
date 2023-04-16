@@ -6,7 +6,7 @@
     <id>http://www.zotero.org/styles/geophysical-journal-international</id>
     <link href="http://www.zotero.org/styles/geophysical-journal-international" rel="self"/>
     <link href="http://www.zotero.org/styles/hydrological-sciences-journal" rel="template"/>
-    <link href="https://academic.oup.com/gji/pages/General_Instructions" rel="documentation"/>
+    <link href="https://academic.oup.com/gji/pages/General_Instructions?login=false#Preparation%20of%20Manuscripts" rel="documentation"/>
     <author>
       <name>Patrick O'Brien, PhD</name>
     </author>
@@ -15,7 +15,7 @@
     <category field="physics"/>
     <issn>0956-540X</issn>
     <eissn>1365-246X</eissn>
-    <updated>2018-08-01T14:25:30+00:00</updated>
+    <updated>2023-01-25T09:03:13+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container-contributors">
@@ -174,8 +174,8 @@
       </if>
       <else-if type="thesis" match="any">
         <group delimiter=", ">
-          <text variable="publisher-place"/>
           <text variable="publisher"/>
+          <text variable="publisher-place"/>
         </group>
       </else-if>
       <else>
@@ -185,7 +185,6 @@
           </if>
         </choose>
         <group delimiter=": ">
-          <text variable="publisher-place"/>
           <text variable="publisher"/>
         </group>
       </else>
@@ -213,12 +212,10 @@
   <macro name="issued">
     <choose>
       <if variable="issued">
-        <group prefix=" (" suffix=")">
-          <date variable="issued">
-            <date-part name="year"/>
-          </date>
+        <group>
+          <date date-parts="year" form="numeric" variable="issued"/>
           <choose>
-            <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="none">
+            <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song thesis" match="none">
               <date variable="issued">
                 <date-part prefix=", " name="month"/>
                 <date-part prefix=" " name="day"/>
@@ -300,10 +297,12 @@
       <key macro="issued-year"/>
       <key macro="author"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter=", ">
-      <group delimiter=" ">
-        <text macro="author-short"/>
-        <text macro="issued-year"/>
+    <layout delimiter="; " prefix="(" suffix=")">
+      <group delimiter=", ">
+        <group delimiter=" ">
+          <text macro="author-short"/>
+          <text macro="issued-year"/>
+        </group>
         <text macro="citation-locator"/>
       </group>
     </layout>
@@ -315,20 +314,22 @@
     </sort>
     <layout>
       <group suffix=".">
-        <text macro="author" suffix="."/>
-        <text macro="issued" suffix=" "/>
         <group delimiter=". ">
+          <group delimiter=", ">
+            <text macro="author"/>
+            <text macro="issued"/>
+          </group>
           <text macro="title"/>
           <group>
             <text macro="secondary-contributors"/>
             <group delimiter=" ">
               <text macro="container-title"/>
               <text variable="collection-title"/>
-              <text macro="container-contributors"/>
             </group>
           </group>
         </group>
         <text macro="locators"/>
+        <text macro="container-contributors" prefix=", "/>
         <group delimiter=", " prefix=", ">
           <text macro="event"/>
           <text macro="publisher"/>

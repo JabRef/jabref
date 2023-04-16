@@ -18,7 +18,7 @@
       <email>ssha2@ucl.dk</email>
     </contributor>
     <category citation-format="author-date"/>
-    <updated>2021-02-10T05:28:52+00:00</updated>
+    <updated>2022-09-06T01:29:31+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="da">
@@ -389,8 +389,8 @@ Adds page number or other locator to citations.
     </choose>
   </macro>
   <!--                                                                                                               CITATION
--->
-  <citation et-al-min="4" et-al-use-first="1" delimiter-precedes-last="never" givenname-disambiguation-rule="all-names-with-initials" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" collapse="year-suffix" cite-group-delimiter=", " name-form="short">
+disambiguate-add-givenname="false" kan ændres til true hvis initialer skal med-->
+  <citation et-al-min="4" et-al-use-first="1" delimiter-precedes-last="never" givenname-disambiguation-rule="all-names-with-initials" disambiguate-add-givenname="false" disambiguate-add-year-suffix="true" collapse="year-suffix" cite-group-delimiter=", " name-form="short">
     <sort>
       <key macro="alphabetize"/>
     </sort>

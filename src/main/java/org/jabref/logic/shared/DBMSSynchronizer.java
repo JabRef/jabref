@@ -328,7 +328,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         synchronizeLocalMetaData();
     }
 
-    // Synchronizes local BibEntries only if last entry changes still remain
+    /**
+     * Synchronizes local BibEntries only if last entry changes still remain
+     */
     public void pullLastEntryChanges() {
         if (!lastEntryChanged.isEmpty()) {
             if (!checkCurrentConnection()) {
@@ -336,11 +338,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
             synchronizeLocalMetaData();
             pullWithLastEntry();
-            synchronizeLocalDatabase(); // Pull changes for the case that there were some
+            // Pull changes for the case that there were some
+            synchronizeLocalDatabase();
         }
     }
 
-    // Synchronizes local BibEntries and pulls remaining last entry changes
+    /**
+     * Synchronizes local BibEntries and pulls remaining last entry changes
+     */
     private void pullWithLastEntry() {
         if (!lastEntryChanged.isEmpty() && isPresentLocalBibEntry(lastEntryChanged.get())) {
             synchronizeSharedEntry(lastEntryChanged.get());
@@ -363,7 +368,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
             return isValid;
         } catch (SQLException e) {
-            LOGGER.error("SQL Error:", e);
+            LOGGER.error("SQL Error during connection check", e);
             return false;
         }
     }

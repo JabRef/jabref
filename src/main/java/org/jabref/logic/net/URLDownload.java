@@ -43,10 +43,11 @@ import javax.net.ssl.X509TrustManager;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.util.FileHelper;
 
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import kong.unirest.apache.ApacheClient;
+import org.apache.http.client.config.RequestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ import org.slf4j.LoggerFactory;
  */
 public class URLDownload {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
 
@@ -202,7 +203,14 @@ public class URLDownload {
      * @return the status code of the response
      */
     public boolean canBeReached() throws UnirestException {
-        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+
+        // Set a custom Apache Client Builder to be able to allow circular redirects, otherwise downloads from springer might not work
+        Unirest.config().httpClient(new ApacheClient.Builder()
+                                    .withRequestConfig((c, r) -> RequestConfig.custom()
+                                                       .setCircularRedirectsAllowed(true)
+                                                       .build()));
+
+        Unirest.config().setDefaultHeader("User-Agent", USER_AGENT);
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
         return (statusCode >= 200) && (statusCode < 300);
@@ -333,7 +341,7 @@ public class URLDownload {
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
         String fileName = "jabref-" + FileUtil.getBaseName(fileNameWithExtension);
-        String extension = "." + FileHelper.getFileExtension(fileNameWithExtension).orElse("tmp");
+        String extension = "." + FileUtil.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
@@ -383,8 +391,8 @@ public class URLDownload {
             int status = ((HttpURLConnection) connection).getResponseCode();
 
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again

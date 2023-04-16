@@ -35,7 +35,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
      */
     @Override
     public void setUp() throws SQLException {
-        
+
         if (CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
             // checkTableAvailability does not distinguish if same table name exists in different schemas
             // VERSION_DB_STRUCT_DEFAULT must be forced
@@ -116,11 +116,11 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                     bibEntry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1));
                 }
                 if (generatedKeys.next()) {
-                    LOGGER.error("Error: Some shared IDs left unassigned");
+                    LOGGER.error("Some shared IDs left unassigned");
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during entry insertion", e);
         }
     }
 
@@ -146,12 +146,12 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         try {
             connection.createStatement().execute("LISTEN jabrefLiveUpdate");
             // Do not use `new PostgresSQLNotificationListener(...)` as the object has to exist continuously!
-            // Otherwise the listener is going to be deleted by GC.
+            // Otherwise, the listener is going to be deleted by Java's garbage collector.
             PGConnection pgConnection = connection.unwrap(PGConnection.class);
             listener = new PostgresSQLNotificationListener(dbmsSynchronizer, pgConnection);
             JabRefExecutorService.INSTANCE.execute(listener);
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during starting the notification listener", e);
         }
     }
 
@@ -161,7 +161,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             listener.stop();
             connection.close();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during stopping the notification listener", e);
         }
     }
 
@@ -170,7 +170,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         try {
             connection.createStatement().execute("NOTIFY jabrefLiveUpdate, '" + PROCESSOR_ID + "';");
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during client notification", e);
         }
     }
 }

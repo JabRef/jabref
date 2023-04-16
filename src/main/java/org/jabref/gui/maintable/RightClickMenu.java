@@ -18,6 +18,7 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
+import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
@@ -70,8 +71,10 @@ public class RightClickMenu {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(libraryTab, dialogService, stateManager, preferencesService.getFilePreferences())),
+                factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferencesService)),
                 factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService)),
+
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferencesService)),
 

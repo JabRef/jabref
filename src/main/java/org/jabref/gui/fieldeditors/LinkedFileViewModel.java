@@ -58,7 +58,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
@@ -111,7 +110,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     if (linkedFile.isOnlineLink()) {
                         return true;
                     } else {
-                        Optional<Path> path = FileHelper.find(databaseContext, link, preferences.getFilePreferences());
+                        Optional<Path> path = FileUtil.find(databaseContext, link, preferences.getFilePreferences());
                         return path.isPresent() && Files.exists(path.get());
                     }
                 },
@@ -222,7 +221,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void openFolder() {
         try {
             if (!linkedFile.isOnlineLink()) {
-                Optional<Path> resolvedPath = FileHelper.find(
+                Optional<Path> resolvedPath = FileUtil.find(
                         databaseContext,
                         linkedFile.getLink(),
                         preferences.getFilePreferences());
@@ -385,7 +384,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
 
         if (file.isEmpty()) {
-            LOGGER.warn("Could not find file " + linkedFile.getLink());
+            LOGGER.warn("Could not find file {}", linkedFile.getLink());
             return true;
         }
 
@@ -407,7 +406,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return true;
                 } catch (IOException ex) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Cannot delete file"), Localization.lang("File permission error"));
-                    LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                    LOGGER.warn("File permission error while deleting: {}", linkedFile, ex);
                 }
             }
         }
@@ -490,13 +489,17 @@ public class LinkedFileViewModel extends AbstractViewModel {
             if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
-                                urlDownload.getSource().toString()))) {
+                                          urlDownload.getSource().toString()))) {
                     return true;
                 } else {
                     dialogService.notify(Localization.lang("Download operation canceled."));
+                    return false;
                 }
+            } else {
+                LOGGER.error("Error while checking if the file can be downloaded", ex);
+                dialogService.notify(Localization.lang("Error downloading"));
+                return false;
             }
-            return false;
         }
         return true;
     }
@@ -508,8 +511,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
                     ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
-                    String suggestedTypeName = externalFileType.getName();
-                    linkedFile.setFileType(suggestedTypeName);
+
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
                     String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileDirectoryPattern());
                     suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);

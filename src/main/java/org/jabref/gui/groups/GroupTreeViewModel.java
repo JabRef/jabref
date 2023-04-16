@@ -635,6 +635,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
+    public boolean hasSubgroups(GroupNodeViewModel groupnode) {
+        return groupnode.getChildren().size() > 0;
+    }
+
     public boolean canAddEntriesIn(GroupNodeViewModel groupnode) {
         AbstractGroup group = groupnode.getGroupNode().getGroup();
         if (group instanceof AllEntriesGroup) {

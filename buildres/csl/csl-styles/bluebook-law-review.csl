@@ -187,11 +187,16 @@
             <if type="article-newspaper thesis" match="any">
               <group suffix=", ">
                 <date variable="issued">
-                  <date-part name="month"/>
+                  <date-part name="month" form="short"/>
                   <date-part name="day" prefix=" "/>
                 </date>
               </group>
             </if>
+            <else-if type="article-magazine">
+              <date variable="issued">
+                <date-part name="month" suffix=" " form="short"/>
+              </date>
+            </else-if>
           </choose>
           <date variable="issued">
             <date-part name="year"/>

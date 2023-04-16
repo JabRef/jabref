@@ -49,6 +49,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
                 .withField(StandardField.TITLE, "Slice theorem and orbit type stratification in infinite dimensions")
                 .withField(StandardField.YEAR, "2018")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
+                .withField(StandardField.DOI, "10.48550/arXiv.1812.04698")
                 .withField(StandardField.EPRINT, "1812.04698")
                 .withField(StandardField.JOURNAL, "arXiv e-prints")
                 .withField(StandardField.KEYWORDS, "Mathematics - Differential Geometry, Mathematical Physics, 58B25, (58D19, 58B20, 22E99, 58A35)")

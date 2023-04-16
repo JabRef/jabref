@@ -27,8 +27,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
+ * Represents everything related to a BIB file.
+ *
+ * <p> The entries are stored in BibDatabase, the other data in MetaData
  * and the options relevant for this file in Defaults.
+ * </p>
+ * <p>
+ *     To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+ * </p>
  */
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
@@ -248,13 +254,17 @@ public class BibDatabaseContext {
 
     public Path getFulltextIndexPath() {
         Path appData = getFulltextIndexBasePath();
+        Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData);
-            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
+            return indexPath;
         }
 
-        return appData.resolve("unsaved");
+        indexPath = appData.resolve("unsaved");
+        LOGGER.debug("Using index for unsaved database: {}", indexPath);
+        return indexPath;
     }
 
     @Override

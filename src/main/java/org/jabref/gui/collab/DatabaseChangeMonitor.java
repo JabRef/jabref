@@ -8,9 +8,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -39,8 +37,6 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                  TaskExecutor taskExecutor,
                                  DialogService dialogService,
                                  PreferencesService preferencesService,
-                                 StateManager stateManager,
-                                 ThemeManager themeManager,
                                  LibraryTab.DatabaseNotification notificationPane) {
         this.database = database;
         this.fileMonitor = fileMonitor;
@@ -63,7 +59,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 Localization.lang("The library has been modified by another program."),
                 List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
                         new Action(Localization.lang("Review changes"), event -> {
-                            dialogService.showCustomDialogAndWait(new DatabaseChangesResolverDialog(changes, database, dialogService, stateManager, themeManager, preferencesService, Localization.lang("External Changes Resolver")));
+                            dialogService.showCustomDialogAndWait(new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver")));
                             notificationPane.hide();
                         })),
                 Duration.ZERO));

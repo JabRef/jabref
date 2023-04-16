@@ -10,9 +10,11 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.preferences.appearance.AppearanceTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
+import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
 import org.jabref.gui.preferences.customexporter.CustomExporterTab;
 import org.jabref.gui.preferences.customimporter.CustomImporterTab;
 import org.jabref.gui.preferences.entry.EntryTab;
@@ -77,6 +79,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new NameFormatterTab(),
                 new CustomImporterTab(),
                 new CustomExporterTab(),
+                new CustomEntryTypesTab(),
                 new XmpPrivacyTab(),
                 new NetworkTab(),
                 new AppearanceTab()
@@ -157,9 +160,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      * Reloads the preferences into the UI
      */
     private void updateAfterPreferenceChanges() {
-        // Reload internal preferences cache
-        preferences.updateMainTableColumns();
-
         setValues();
 
         frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
@@ -201,6 +201,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         frame.setupAllTables();
         frame.getGlobalSearchBar().updateHintVisibility();
+        Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         dialogService.notify(Localization.lang("Preferences recorded."));
 
         updateAfterPreferenceChanges();
