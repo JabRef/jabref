@@ -60,7 +60,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 20
-          distribution: 'liberica'
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Clean up keychain
         if: (matrix.os == 'self-hosted') && (steps.checksecrets.outputs.secretspresent == 'YES')
