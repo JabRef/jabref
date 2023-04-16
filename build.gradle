@@ -80,6 +80,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
 }
 
@@ -161,7 +162,7 @@ dependencies {
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
 
-    implementation 'com.github.JabRef:afterburner.fx:testmoduleinfo-SNAPSHOT'
+    implementation 'org.jabref:afterburner.fx:1.1.0-SNAPSHOT'
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
