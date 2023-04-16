@@ -81,6 +81,7 @@ repositories {
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://sandec.jfrog.io/ui/native/repo' }
 }
 
 configurations {
