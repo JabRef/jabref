@@ -34,6 +34,7 @@ public class ContentSelectorViewModelTest {
     void setUp() {
         databaseContext = new BibDatabaseContext();
         viewModel = new ContentSelectorViewModel(databaseContext, dialogService);
+        viewModel.setValues();
     }
 
     @Test
