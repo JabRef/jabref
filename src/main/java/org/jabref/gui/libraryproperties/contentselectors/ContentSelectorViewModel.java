@@ -34,7 +34,6 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
     private static final List<Field> DEFAULT_FIELD_NAMES = Arrays.asList(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
 
-    private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
     private final DialogService dialogService;
     private final Map<Field, List<String>> fieldKeywordsMap = new HashMap<>();
@@ -45,13 +44,17 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     private final StringProperty selectedKeyword = new SimpleStringProperty();
 
     ContentSelectorViewModel(BibDatabaseContext databaseContext, DialogService dialogService) {
-        this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
         this.dialogService = dialogService;
     }
 
     @Override
     public void setValues() {
+        // Populate field names keyword map
+        metaData.getContentSelectors().getContentSelectors().forEach(
+                existingContentSelector -> fieldKeywordsMap.put(existingContentSelector.getField(), new ArrayList<>(existingContentSelector.getValues()))
+        );
+
         // Populate Field names list
         List<Field> existingFields = new ArrayList<>(fieldKeywordsMap.keySet());
         fields.addAll(existingFields);
@@ -59,11 +62,6 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
         if (fields.isEmpty()) {
             DEFAULT_FIELD_NAMES.forEach(this::addFieldIfUnique);
         }
-
-        // Populate field names keyword map
-        metaData.getContentSelectors().getContentSelectors().forEach(
-                existingContentSelector -> fieldKeywordsMap.put(existingContentSelector.getField(), new ArrayList<>(existingContentSelector.getValues()))
-        );
     }
 
     @Override
