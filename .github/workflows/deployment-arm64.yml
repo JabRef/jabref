@@ -59,7 +59,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'liberica'
           cache: 'gradle'
       - name: Clean up keychain

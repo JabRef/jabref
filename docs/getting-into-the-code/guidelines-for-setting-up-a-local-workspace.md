@@ -51,7 +51,7 @@ We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref).
 The Community Edition works well.
 Most contributors use the Ultimate Edition, because they are students getting that edition for free.
 
-For advanced users, [Eclipse](https://eclipse.org) (`2022-09` or newer) is also possible. For JDK19 you need to install the addtional [support for jdk19 as extension](https://marketplace.eclipse.org/content/java-19-support-eclipse-2022-09-425)). 
+For advanced users, [Eclipse](https://eclipse.org) (`2023-03` or newer) is also possible. For JDK20 you need to install the addtional [support for jdk20 as extension](https://marketplace.eclipse.org/content/java-20-support-eclipse-2023-03-427)). 
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download\_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse.
 On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
