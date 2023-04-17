@@ -126,8 +126,8 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
-        grobidPreferences.setGrobidDemanded(grobidDisabledProperty.getValue());
-        grobidPreferences.setGrobidOptOut(grobidDemandedProperty.getValue());
+        grobidPreferences.setGrobidDemanded(grobidDemandedProperty.getValue());
+        grobidPreferences.setGrobidOptOut(grobidDisabledProperty.getValue());
 
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
 

@@ -496,7 +496,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
         defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
-        defaults.put(GROBID_DEMANDED, Boolean.FALSE);
+        defaults.put(GROBID_DEMANDED, Boolean.TRUE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
 
         defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
