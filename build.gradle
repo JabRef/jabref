@@ -6,7 +6,7 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
 
-    id 'com.github.andygoossens.modernizer' version '1.7.0'
+    id 'com.github.andygoossens.modernizer' version '1.8.0'
 
     id 'me.champeau.gradle.jmh' version '0.5.3'
 
