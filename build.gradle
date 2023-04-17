@@ -82,7 +82,7 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
-    maven { url 'https://sandec.jfrog.io/ui/native/repo' }
+    maven { url 'https://sandec.jfrog.io/artifactory/repo/' }
 }
 
 configurations {
@@ -176,6 +176,8 @@ dependencies {
 
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.72.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
+        exclude group: 'com.dlsc.unitfx'
+        exclude group: 'org.apache.logging.log4j'
     }
 
 
