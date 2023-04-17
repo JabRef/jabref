@@ -68,7 +68,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We removed the support of BibTeXML. [#9540](https://github.com/JabRef/jabref/issues/9540)
 - We removed support for Markdown syntax for strikethrough and task lists in comment fields. [#9726](https://github.com/JabRef/jabref/pull/9726)
-- We removed the options menu. [#9768](https://github.com/JabRef/jabref/pull/9768)
+- We removed the options menu, because the two contents were moved to the File menu or the properties of the library. [#9768](https://github.com/JabRef/jabref/pull/9768)
 
 
 
