@@ -359,7 +359,7 @@ You can compile and run tests with IntelliJ's faster internal build system
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 
 Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
-Navigate to **File > Settings... > Plugins".
+Navigate to **File > Settings... > Plugins"**.
 On the top, click on "Marketplace".
 Then, search for "Checkstyle".
 Click on "Install" choose "CheckStyle-IDEA".
