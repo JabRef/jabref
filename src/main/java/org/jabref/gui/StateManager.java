@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +29,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
@@ -218,7 +220,26 @@ public class StateManager {
     public void addSearchHistory(String search) {
         searchHistory.remove(search);
         searchHistory.add(search);
+
+        StringSimilarity checker = new StringSimilarity();
+        int size = searchHistory.size();
+
+        if(size > 1) {
+            ArrayList<String> stringArrayList = new ArrayList<>();
+            for(int i = size - 2; i >= 0; i--) {
+                String prev = searchHistory.get(i);
+                if(checker.isSimilar(prev, search)) {
+                    stringArrayList.add(prev);
+                } else {
+                    break; // dont remove non-continuous items
+                }
+            }
+            for(String s : stringArrayList) {
+                searchHistory.remove(s);
+            }
+        }
     }
+
 
     public ObservableList<String> getWholeSearchHistory() {
         return searchHistory;
