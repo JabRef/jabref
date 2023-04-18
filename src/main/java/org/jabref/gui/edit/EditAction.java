@@ -48,6 +48,7 @@ public class EditAction extends SimpleCommand {
     public void execute() {
         stateManager.getFocusOwner().ifPresent(focusOwner -> {
             LOGGER.debug("focusOwner: {}; Action: {}", focusOwner.toString(), action.getText());
+
             if (focusOwner instanceof TextInputControl) {
                 // Focus is on text field -> copy/paste/cut selected text
                 TextInputControl textInput = (TextInputControl) focusOwner;
@@ -75,7 +76,7 @@ public class EditAction extends SimpleCommand {
                     case CUT -> frame.getCurrentLibraryTab().cut();
                     case PASTE -> frame.getCurrentLibraryTab().paste();
                     case DELETE_ENTRY -> frame.getCurrentLibraryTab().delete(false);
-                    default -> throw new IllegalStateException("Only cut/copy/paste supported but got " + action);
+                    default ->  LOGGER.debug("Only cut/copy/paste supported but got: {}", action);
                 }
             }
         });
