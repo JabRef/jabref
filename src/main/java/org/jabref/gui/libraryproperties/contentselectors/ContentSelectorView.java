@@ -1,4 +1,4 @@
-package org.jabref.gui.contentselector;
+package org.jabref.gui.libraryproperties.contentselectors;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -6,57 +6,48 @@ import java.util.function.Supplier;
 import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionModel;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
-import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 
-public class ContentSelectorDialogView extends BaseDialog<Void> {
+public class ContentSelectorView extends AbstractPropertiesTabView<ContentSelectorViewModel> {
 
-    @FXML private Button addFieldNameButton;
     @FXML private Button removeFieldNameButton;
     @FXML private Button addKeywordButton;
     @FXML private Button removeKeywordButton;
     @FXML private ListView<Field> fieldsListView;
     @FXML private ListView<String> keywordsListView;
-    @FXML private ButtonType saveButton;
 
     @Inject private DialogService dialogService;
-    @Inject private ThemeManager themeManager;
 
-    private final LibraryTab libraryTab;
-    private ContentSelectorDialogViewModel viewModel;
+    private final BibDatabaseContext databaseContext;
 
-    public ContentSelectorDialogView(LibraryTab libraryTab) {
-        this.setTitle(Localization.lang("Manage content selectors"));
-        this.getDialogPane().setPrefSize(375, 475);
-
-        this.libraryTab = libraryTab;
+    public ContentSelectorView(BibDatabaseContext databaseContext) {
+        this.databaseContext = databaseContext;
 
         ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
+                  .root(this)
+                  .load();
+    }
 
-        ControlHelper.setAction(saveButton, getDialogPane(), event -> saveChangesAndClose());
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
+    @Override
+    public String getTabName() {
+        return Localization.lang("Content selectors");
     }
 
     @FXML
     public void initialize() {
-        viewModel = new ContentSelectorDialogViewModel(libraryTab, dialogService);
+        this.viewModel = new ContentSelectorViewModel(databaseContext, dialogService);
 
         initFieldNameComponents();
         initKeywordsComponents();
@@ -114,10 +105,5 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
 
     private Optional<String> getSelectedKeyword() {
         return Optional.of(keywordsListView.getSelectionModel()).map(SelectionModel::getSelectedItem);
-    }
-
-    private void saveChangesAndClose() {
-        viewModel.saveChanges();
-        close();
     }
 }
