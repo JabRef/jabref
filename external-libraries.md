@@ -532,6 +532,7 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
 com.google.j2objc:j2objc-annotations:1.3
 com.googlecode.javaewah:JavaEWAH:1.1.13
 com.h2database:h2-mvstore:2.1.214
+com.konghq:unirest-java:3.13.10
 com.konghq:unirest-java:3.14.1
 com.microsoft.azure:applicationinsights-core:2.4.1
 com.microsoft.azure:applicationinsights-logging-log4j2:2.4.1

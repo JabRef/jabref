@@ -71,7 +71,6 @@ public class ExporterFactory {
         exporters.add(new TemplateExporter("RIS", "ris", "ris", "ris", StandardFileType.RIS, layoutPreferences, savePreferences, BlankLineBehaviour.DELETE_BLANKS));
         exporters.add(new TemplateExporter("MIS Quarterly", "misq", "misq", "misq", StandardFileType.RTF, layoutPreferences, savePreferences));
         exporters.add(new TemplateExporter("CSL YAML", "yaml", "yaml", null, StandardFileType.YAML, layoutPreferences, savePreferences, BlankLineBehaviour.DELETE_BLANKS));
-        exporters.add(new BibTeXMLExporter());
         exporters.add(new OpenOfficeDocumentCreator());
         exporters.add(new OpenDocumentSpreadsheetCreator());
         exporters.add(new MSBibExporter());

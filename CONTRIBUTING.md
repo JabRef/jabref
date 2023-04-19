@@ -10,7 +10,7 @@ General overview about contributing for programmers and non-programmers is avail
 ## Pull Request Process
 
 1. Understand the basics listed at <https://devdocs.jabref.org/contributing>.
-2. Follow the "formal requirements". They are not too hard, they merely support the maintainers to focus on supportive feedback than just stating the obvious. The also have helpful hints how to work with localization.
+2. Follow the "formal requirements". They are not too hard, they merely support the maintainers to focus on supportive feedback than just stating the obvious. They also have helpful hints how to work with localization.
 3. Create a pull request. You can create a draft pull request to enable automatic checks.
 4. Wait for feedback of the developers
 5. Address the feedback of the developers

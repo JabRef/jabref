@@ -61,7 +61,7 @@ public class TrustStoreManager {
         }
     }
 
-    public boolean isCertificateExist(String alias) {
+    public boolean certificateExists(String alias) {
         Objects.requireNonNull(alias);
         try {
             return store.isCertificateEntry(alias);

@@ -33,6 +33,7 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     @FXML private TextField grobidURL;
 
     @FXML private CheckBox warnAboutDuplicatesOnImport;
+    @FXML private CheckBox downloadLinkedOnlineFiles;
 
     public ImportExportTab() {
         ViewLoader.view(this)
@@ -64,6 +65,8 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
         grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
+
+        downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
 
         new ViewModelListCellFactory<FetcherApiKey>()
                 .withText(FetcherApiKey::getName)

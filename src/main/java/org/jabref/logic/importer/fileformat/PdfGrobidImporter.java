@@ -12,9 +12,9 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.util.FileHelper;
 
 /**
  * Wraps the GrobidService function to be used as an Importer.
@@ -80,7 +80,7 @@ public class PdfGrobidImporter extends Importer {
     @Override
     public boolean isRecognizedFormat(Path filePath) throws IOException {
         Objects.requireNonNull(filePath);
-        Optional<String> extension = FileHelper.getFileExtension(filePath);
+        Optional<String> extension = FileUtil.getFileExtension(filePath);
         if (extension.isEmpty()) {
             return false;
         }

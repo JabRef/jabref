@@ -41,6 +41,7 @@ import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -80,7 +81,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
                      ClipBoardManager clipBoardManager,
-                     ImportFormatReader importFormatReader) {
+                     ImportFormatReader importFormatReader,
+                     TaskExecutor taskExecutor) {
         super();
 
         this.libraryTab = libraryTab;
@@ -99,7 +101,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 undoManager,
                 stateManager,
                 dialogService,
-                importFormatReader);
+                importFormatReader,
+                taskExecutor);
 
         localDragboard = stateManager.getLocalDragboard();
 
@@ -322,9 +325,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void paste() {
         List<BibEntry> entriesToAdd;
-            entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipbaord()
+            entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipboard()
             .map(importHandler::handleBibTeXData)
-            .orElseGet(this::handleNonBibteXStringData);
+            .orElseGet(this::handleNonBibTeXStringData);
 
         for (BibEntry entry : entriesToAdd) {
             importHandler.importEntryWithDuplicateCheck(database, entry);
@@ -334,7 +337,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
-    private List<BibEntry> handleNonBibteXStringData() {
+    private List<BibEntry> handleNonBibTeXStringData() {
         String data = ClipBoardManager.getContents();
         List<BibEntry> entries = new ArrayList<>();
         try {

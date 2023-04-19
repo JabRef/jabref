@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 /**
- * This class provides helping methods for database tests. Furthermore it determines database systems which are ready to
+ * This class provides helping methods for database tests. Furthermore, it determines database systems which are ready to
  * be used for tests.
  */
 public class TestManager {

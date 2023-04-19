@@ -60,4 +60,22 @@ class INSPIREFetcherTest {
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"hep-ph/9802379\"");
         assertEquals(Collections.singletonList(article), fetchedEntries);
     }
+
+    @Test
+    public void searchByExistingEntry() throws Exception {
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Melnikov:1998pr")
+                .withField(StandardField.AUTHOR, "Melnikov, Kirill and Yelkhovsky, Alexander")
+                .withField(StandardField.TITLE, "Top quark production at threshold with O(alpha-s**2) accuracy")
+                .withField(StandardField.DOI, "10.1016/S0550-3213(98)00348-4")
+                .withField(StandardField.JOURNAL, "Nucl. Phys. B")
+                .withField(StandardField.PAGES, "59--72")
+                .withField(StandardField.VOLUME, "528")
+                .withField(StandardField.YEAR, "1998")
+                .withField(StandardField.EPRINT, "hep-ph/9802379")
+                .withField(StandardField.ARCHIVEPREFIX, "arXiv")
+                .withField(new UnknownField("reportnumber"), "BUDKER-INP-1998-7, TTP-98-10");
+        List<BibEntry> fetchedEntries = fetcher.performSearch(article);
+        assertEquals(Collections.singletonList(article), fetchedEntries);
+    }
 }

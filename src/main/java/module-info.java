@@ -4,6 +4,7 @@ open module org.jabref {
 
     // SQL
     requires java.sql;
+    requires java.sql.rowset;
 
     // JavaFX
     requires javafx.base;
@@ -77,7 +78,7 @@ open module org.jabref {
     requires unirest.java;
     requires org.apache.httpcomponents.httpclient;
     requires org.jsoup;
-    requires commons.csv;
+    requires org.apache.commons.csv;
     requires io.github.javadiffutils;
     requires java.string.similarity;
     requires ojdbc10;
@@ -87,15 +88,12 @@ open module org.jabref {
     requires org.apache.commons.lang3;
     requires org.antlr.antlr4.runtime;
     requires org.fxmisc.flowless;
-    requires org.apache.tika.core;
-    uses org.apache.tika.detect.AutoDetectReader;
+
     requires pdfbox;
     requires xmpbox;
     requires com.ibm.icu;
 
     requires flexmark;
-    requires flexmark.ext.gfm.strikethrough;
-    requires flexmark.ext.gfm.tasklist;
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;
@@ -103,7 +101,7 @@ open module org.jabref {
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
-    uses org.apache.lucene.codecs.lucene94.Lucene94Codec;
+    uses org.apache.lucene.codecs.lucene95.Lucene95Codec;
 
     requires org.apache.lucene.queryparser;
     uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;

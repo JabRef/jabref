@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
@@ -113,7 +112,6 @@ public class ImporterTest {
         return Stream.of(
                 new BiblioscapeImporter(),
                 new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()),
-                new BibTeXMLImporter(),
                 new CopacImporter(),
                 new EndnoteImporter(importFormatPreferences),
                 new InspecImporter(),
