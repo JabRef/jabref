@@ -534,7 +534,6 @@ jlink {
         requires 'java.naming';
         requires 'java.security.sasl';
         requires 'jakarta.activation';
-        requires 'com.fasterxml.jackson.annotation';
         requires 'jdk.security.jgss';
         requires 'java.logging';
         requires 'jdk.xml.dom';
@@ -555,10 +554,8 @@ jlink {
         uses 'org.eclipse.jgit.lib.GpgSigner';
         uses 'org.eclipse.jgit.transport.SshSessionFactory';
         uses 'org.kordamp.ikonli.IkonHandler';
-        uses 'org.controlsfx.glyphfont.GlyphFont';
         uses 'org.eclipse.jgit.lib.GpgSignatureVerifierFactory';
         uses 'org.mariadb.jdbc.LocalInfileInterceptor';
-        uses 'com.sun.webkit.plugin.PluginHandler';
         provides 'java.sql.Driver' with 'oracle.jdbc.OracleDriver',
                 'org.mariadb.jdbc.Driver',
                 'org.postgresql.Driver';
@@ -626,130 +623,13 @@ jlink {
                 'org.kordamp.ikonli.materialdesign2.MaterialDesignXIkonHandler',
                 'org.kordamp.ikonli.materialdesign2.MaterialDesignYIkonHandler',
                 'org.kordamp.ikonli.materialdesign2.MaterialDesignZIkonHandler';
-        provides 'org.apache.lucene.analysis.TokenFilterFactory' with 'org.apache.lucene.analysis.ar.ArabicNormalizationFilterFactory',
-                'org.apache.lucene.analysis.ar.ArabicStemFilterFactory',
-                'org.apache.lucene.analysis.bg.BulgarianStemFilterFactory',
-                'org.apache.lucene.analysis.bn.BengaliNormalizationFilterFactory',
-                'org.apache.lucene.analysis.bn.BengaliStemFilterFactory',
-                'org.apache.lucene.analysis.boost.DelimitedBoostTokenFilterFactory',
-                'org.apache.lucene.analysis.br.BrazilianStemFilterFactory',
-                'org.apache.lucene.analysis.cjk.CJKBigramFilterFactory',
-                'org.apache.lucene.analysis.cjk.CJKWidthFilterFactory',
-                'org.apache.lucene.analysis.ckb.SoraniNormalizationFilterFactory',
-                'org.apache.lucene.analysis.ckb.SoraniStemFilterFactory',
-                'org.apache.lucene.analysis.classic.ClassicFilterFactory',
-                'org.apache.lucene.analysis.commongrams.CommonGramsFilterFactory',
-                'org.apache.lucene.analysis.commongrams.CommonGramsQueryFilterFactory',
-                'org.apache.lucene.analysis.compound.DictionaryCompoundWordTokenFilterFactory',
-                'org.apache.lucene.analysis.compound.HyphenationCompoundWordTokenFilterFactory',
-                'org.apache.lucene.analysis.core.DecimalDigitFilterFactory',
-                'org.apache.lucene.analysis.core.FlattenGraphFilterFactory',
-                'org.apache.lucene.analysis.core.LowerCaseFilterFactory',
-                'org.apache.lucene.analysis.core.StopFilterFactory',
-                'org.apache.lucene.analysis.core.TypeTokenFilterFactory',
-                'org.apache.lucene.analysis.core.UpperCaseFilterFactory',
-                'org.apache.lucene.analysis.cz.CzechStemFilterFactory',
-                'org.apache.lucene.analysis.de.GermanLightStemFilterFactory',
-                'org.apache.lucene.analysis.de.GermanMinimalStemFilterFactory',
-                'org.apache.lucene.analysis.de.GermanNormalizationFilterFactory',
-                'org.apache.lucene.analysis.de.GermanStemFilterFactory',
-                'org.apache.lucene.analysis.el.GreekLowerCaseFilterFactory',
-                'org.apache.lucene.analysis.el.GreekStemFilterFactory',
-                'org.apache.lucene.analysis.en.EnglishMinimalStemFilterFactory',
-                'org.apache.lucene.analysis.en.EnglishPossessiveFilterFactory',
-                'org.apache.lucene.analysis.en.KStemFilterFactory',
-                'org.apache.lucene.analysis.en.PorterStemFilterFactory',
-                'org.apache.lucene.analysis.es.SpanishLightStemFilterFactory',
-                'org.apache.lucene.analysis.es.SpanishMinimalStemFilterFactory',
-                'org.apache.lucene.analysis.es.SpanishPluralStemFilterFactory',
-                'org.apache.lucene.analysis.fa.PersianNormalizationFilterFactory',
-                'org.apache.lucene.analysis.fa.PersianStemFilterFactory',
-                'org.apache.lucene.analysis.fi.FinnishLightStemFilterFactory',
-                'org.apache.lucene.analysis.fr.FrenchLightStemFilterFactory',
-                'org.apache.lucene.analysis.fr.FrenchMinimalStemFilterFactory',
-                'org.apache.lucene.analysis.ga.IrishLowerCaseFilterFactory',
-                'org.apache.lucene.analysis.gl.GalicianMinimalStemFilterFactory',
-                'org.apache.lucene.analysis.gl.GalicianStemFilterFactory',
-                'org.apache.lucene.analysis.hi.HindiNormalizationFilterFactory',
-                'org.apache.lucene.analysis.hi.HindiStemFilterFactory',
-                'org.apache.lucene.analysis.hu.HungarianLightStemFilterFactory',
-                'org.apache.lucene.analysis.hunspell.HunspellStemFilterFactory',
-                'org.apache.lucene.analysis.id.IndonesianStemFilterFactory',
-                'org.apache.lucene.analysis.in.IndicNormalizationFilterFactory',
-                'org.apache.lucene.analysis.it.ItalianLightStemFilterFactory',
-                'org.apache.lucene.analysis.lv.LatvianStemFilterFactory',
-                'org.apache.lucene.analysis.minhash.MinHashFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.CapitalizationFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.CodepointCountFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.ConcatenateGraphFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.DateRecognizerFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.DelimitedTermFrequencyTokenFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.DropIfFlaggedFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.FingerprintFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.FixBrokenOffsetsFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.HyphenatedWordsFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.KeepWordFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.KeywordMarkerFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.KeywordRepeatFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.LengthFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.LimitTokenCountFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.LimitTokenOffsetFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.LimitTokenPositionFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.ProtectedTermFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.RemoveDuplicatesTokenFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.ScandinavianFoldingFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.ScandinavianNormalizationFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.StemmerOverrideFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.TrimFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.TruncateTokenFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.TypeAsSynonymFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.WordDelimiterFilterFactory',
-                'org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilterFactory',
-                'org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory',
-                'org.apache.lucene.analysis.ngram.NGramFilterFactory',
-                'org.apache.lucene.analysis.no.NorwegianLightStemFilterFactory',
-                'org.apache.lucene.analysis.no.NorwegianMinimalStemFilterFactory',
-                'org.apache.lucene.analysis.no.NorwegianNormalizationFilterFactory',
-                'org.apache.lucene.analysis.pattern.PatternCaptureGroupFilterFactory',
-                'org.apache.lucene.analysis.pattern.PatternReplaceFilterFactory',
-                'org.apache.lucene.analysis.pattern.PatternTypingFilterFactory',
-                'org.apache.lucene.analysis.payloads.DelimitedPayloadTokenFilterFactory',
-                'org.apache.lucene.analysis.payloads.NumericPayloadTokenFilterFactory',
-                'org.apache.lucene.analysis.payloads.TokenOffsetPayloadTokenFilterFactory',
-                'org.apache.lucene.analysis.payloads.TypeAsPayloadTokenFilterFactory',
-                'org.apache.lucene.analysis.pt.PortugueseLightStemFilterFactory',
-                'org.apache.lucene.analysis.pt.PortugueseMinimalStemFilterFactory',
-                'org.apache.lucene.analysis.pt.PortugueseStemFilterFactory',
-                'org.apache.lucene.analysis.reverse.ReverseStringFilterFactory',
-                'org.apache.lucene.analysis.ru.RussianLightStemFilterFactory',
-                'org.apache.lucene.analysis.shingle.FixedShingleFilterFactory',
-                'org.apache.lucene.analysis.shingle.ShingleFilterFactory',
-                'org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory',
-                'org.apache.lucene.analysis.sr.SerbianNormalizationFilterFactory',
-                'org.apache.lucene.analysis.sv.SwedishLightStemFilterFactory',
-                'org.apache.lucene.analysis.sv.SwedishMinimalStemFilterFactory',
-                'org.apache.lucene.analysis.synonym.SynonymFilterFactory',
-                'org.apache.lucene.analysis.synonym.SynonymGraphFilterFactory',
-                'org.apache.lucene.analysis.te.TeluguNormalizationFilterFactory',
-                'org.apache.lucene.analysis.te.TeluguStemFilterFactory',
-                'org.apache.lucene.analysis.tr.ApostropheFilterFactory',
-                'org.apache.lucene.analysis.tr.TurkishLowerCaseFilterFactory',
-                'org.apache.lucene.analysis.util.ElisionFilterFactory';
-        provides 'org.apache.lucene.analysis.CharFilterFactory' with 'org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory',
-                'org.apache.lucene.analysis.charfilter.MappingCharFilterFactory',
-                'org.apache.lucene.analysis.cjk.CJKWidthCharFilterFactory',
-                'org.apache.lucene.analysis.fa.PersianCharFilterFactory',
-                'org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory';
         provides 'org.apache.lucene.codecs.KnnVectorsFormat' with 'org.apache.lucene.codecs.lucene95.Lucene95HnswVectorsFormat';
         provides 'org.apache.lucene.codecs.Codec' with 'org.apache.lucene.codecs.lucene95.Lucene95Codec';
         provides 'org.apache.lucene.codecs.PostingsFormat' with 'org.apache.lucene.codecs.lucene90.Lucene90PostingsFormat',
                 'org.apache.lucene.sandbox.codecs.idversion.IDVersionPostingsFormat';
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
-                'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin',
-                'org.apache.lucene.analysis.standard.StandardTokenizerFactory',
-                'org.apache.lucene.analysis.th.ThaiTokenizerFactory',
-                'org.apache.lucene.analysis.wikipedia.WikipediaTokenizerFactory';
+                'org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin';
+
     }
 
     jpackage {

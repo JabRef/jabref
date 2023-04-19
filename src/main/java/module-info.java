@@ -107,6 +107,8 @@ open module org.jabref {
     uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.highlighter;
+    uses org.apache.lucene.analysis.en.EnglishAnalyzer;
+    uses org.apache.lucene.analysis.en.PorterStemFilter;
 
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
