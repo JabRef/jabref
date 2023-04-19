@@ -551,6 +551,7 @@ jlink {
         requires 'java.compiler';
         requires 'java.sql.rowset';
         requires 'java.transaction.xa';
+        requires 'com.google.gson'
         uses 'org.eclipse.jgit.lib.GpgSigner';
         uses 'org.eclipse.jgit.transport.SshSessionFactory';
         uses 'org.kordamp.ikonli.IkonHandler';
