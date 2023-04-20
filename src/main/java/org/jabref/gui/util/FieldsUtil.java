@@ -14,7 +14,7 @@ import org.jabref.model.entry.field.UnknownField;
 
 public class FieldsUtil {
 
-    public static StringConverter<Field> fieldStringConverter = new StringConverter<>() {
+    public static final StringConverter<Field> FIELD_STRING_CONVERTER = new StringConverter<>() {
         @Override
         public String toString(Field object) {
             if (object != null) {

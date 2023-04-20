@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 public class MetaData {
 
     public static final String META_FLAG = "jabref-meta: ";
+    public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
     public static final String SAVE_ACTIONS = "saveActions";
     public static final String PREFIX_KEYPATTERN = "keypattern_";

@@ -6,7 +6,6 @@ on:
    branches:
     - arm64mac-release
 
-
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
@@ -59,8 +58,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
-          distribution: 'liberica'
+          java-version: 20
+          distribution: 'temurin'
           cache: 'gradle'
       - name: Clean up keychain
         if: (matrix.os == 'self-hosted') && (steps.checksecrets.outputs.secretspresent == 'YES')

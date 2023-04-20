@@ -42,8 +42,8 @@ class DBMSProcessorTest {
     @BeforeEach
     public void setup() throws Exception {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
-        this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType));
+        this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(ConnectorTest.getTestDBMSConnection(dbmsType));
         TestManager.clearTables(this.dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
     }

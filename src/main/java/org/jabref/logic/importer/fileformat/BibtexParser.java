@@ -34,7 +34,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -316,11 +315,11 @@ public class BibtexParser implements Parser {
                     dumpTextReadSoFarToString();
                 }
             }
-        } else if (comment.substring(0, Math.min(comment.length(), BibEntryTypesManager.ENTRYTYPE_FLAG.length()))
-                          .equals(BibEntryTypesManager.ENTRYTYPE_FLAG)) {
+        } else if (comment.substring(0, Math.min(comment.length(), MetaData.ENTRYTYPE_FLAG.length()))
+                          .equals(MetaData.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
-            Optional<BibEntryType> typ = BibEntryTypesManager.parse(comment);
+            Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(comment);
             if (typ.isPresent()) {
                 entryTypes.add(typ.get());
             } else {
