@@ -401,6 +401,12 @@ run {
                 'javafx.base/com.sun.javafx.event' : 'com.jfoenix'
         ]
     }
+
+    if (project.hasProperty('application')){
+        if (application == 'httpserver'){
+            main = 'org.jabref.http.server.Server'
+        }
+    }
 }
 
 javadoc {
