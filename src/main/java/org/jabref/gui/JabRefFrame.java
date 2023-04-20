@@ -58,7 +58,6 @@ import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
-import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
@@ -767,7 +766,6 @@ public class JabRefFrame extends BorderPane {
         Menu lookup = new Menu(Localization.lang("Lookup"));
         Menu view = new Menu(Localization.lang("View"));
         Menu tools = new Menu(Localization.lang("Tools"));
-        Menu options = new Menu(Localization.lang("Options"));
         Menu help = new Menu(Localization.lang("Help"));
 
         file.getItems().addAll(
@@ -797,8 +795,13 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
+                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this, taskExecutor)),
+
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                factory.createMenuItem(StandardActions.QUIT, new CloseAction()));
+                factory.createMenuItem(StandardActions.QUIT, new CloseAction())
+        );
 
         edit.getItems().addAll(
                 factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
@@ -944,14 +947,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, prefs, dialogService))
         );
 
-        options.getItems().addAll(
-                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this, Globals.TASK_EXECUTOR)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this, stateManager))
-        );
-
         help.getItems().addAll(
                 factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService)),
                 factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/", dialogService)),
@@ -990,7 +985,6 @@ public class JabRefFrame extends BorderPane {
                 lookup,
                 tools,
                 view,
-                options,
                 help);
         menu.setUseSystemMenuBar(true);
         return menu;
