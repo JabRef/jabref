@@ -88,7 +88,7 @@ public class SaveOrderConfigPanel extends VBox {
         new ViewModelListCellFactory<Field>()
                 .withText(FieldsUtil::getNameWithType)
                 .install(field);
-        field.setConverter(FieldsUtil.fieldStringConverter);
+        field.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         field.itemsProperty().bindBidirectional(viewModel.sortableFieldsProperty());
         field.valueProperty().bindBidirectional(criterionViewModel.fieldProperty());
         sortCriterionList.add(field, 1, row);

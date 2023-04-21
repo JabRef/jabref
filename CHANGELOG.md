@@ -17,13 +17,15 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added "Attach file from URL" to right-click context menu to download and store a file with the reference library. [#9646](https://github.com/JabRef/jabref/issues/9646)
 - We enabled updating an existing entry with data from InspireHEP. [#9351](https://github.com/JabRef/jabref/issues/9351)
 - We added a fetcher for the Bibliotheksverbund Bayern (experimental). [#9641](https://github.com/JabRef/jabref/pull/9641)
+- We added support for multiple languages for exporting to and importing references from MS Office. [#9699](https://github.com/JabRef/jabref/issues/9699)
 - We enabled scrolling in the groups list when dragging a group on another group. [#2869](https://github.com/JabRef/jabref/pull/2869)
-
-
+- We added the option to automatically download online files when a new entry is created from an existing ID (e.g. DOI). The option can be disabled in the preferences under "Import and Export" [#9756](https://github.com/JabRef/jabref/issues/9756)
+- We added a new Integrity check for unscaped ampersands. [koppor#585](https://github.com/koppor/jabref/issues/585)
 
 
 ### Changed
 
+- We upgraded to Lucene 9.5 for the fulltext search. The search index will be rebuild. [#9584](https://github.com/JabRef/jabref/pull/9584)
 - 'Get full text' now also checks the file url. [#568](https://github.com/koppor/jabref/issues/568)
 - JabRef writes a new backup file only if there is a change. Before, JabRef created a backup upon start. [#9679](https://github.com/JabRef/jabref/pull/9679)
 - We modified the `Add Group` dialog to use the most recently selected group hierarchical context. [#9141](https://github.com/JabRef/jabref/issues/9141)
@@ -37,7 +39,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the Medline importer to correctly import ISO dates for `revised`. [#9536](https://github.com/JabRef/jabref/issues/9536)
 - To avoid cluttering of the directory, We always delete the `.sav` file upon successful write. [#9675](https://github.com/JabRef/jabref/pull/9675)
 - We improved the unlinking/deletion of multiple linked files of an entry using the <kbd>Delete</kbd> key. [#9473](https://github.com/JabRef/jabref/issues/9473)
-- We refactored the class ModsExporter to use  StAX instead of JAXB
+- We improved the ModsExporter [TODO](TODO)
+- We moved the custom entry types dialog into the preferences dialog. [#9760](https://github.com/JabRef/jabref/pull/9760)
+- We moved the manage content selectors dialog to the library properties. [#9768](https://github.com/JabRef/jabref/pull/9768)
+- We moved the preferences menu command from the options menu to the file menu. [#9768](https://github.com/JabRef/jabref/pull/9768)
 
 ### Fixed
 
@@ -52,15 +57,19 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the password is saved locally if user wants to use proxy with authentication. [#8055](https://github.com/JabRef/jabref/issues/8055)
 - JabRef is now more relaxed when parsing field content: In case a field content ended with `\`, the combination `\}` was treated as plain `}`. [#9668](https://github.com/JabRef/jabref/issues/9668)
 - We resolved an issue that cut off the number of group entries when it exceedet four digits. [#8797](https://github.com/JabRef/jabref/issues/8797)
+- We fixed the issue where the size of the global search window was not retained after closing. [#9362](https://github.com/JabRef/jabref/issues/9362)
 - We fixed an issue where the Global Search UI preview is still white in dark theme. [#9362](https://github.com/JabRef/jabref/issues/9362)
 - We fixed the double paste issue when <kbd>Cmd</kbd> + <kbd>v</kbd> is pressed on 'New entry from plaintext' dialog. [#9367](https://github.com/JabRef/jabref/issues/9367)
-
+- We fixed an issue where the pin button on the Global Search dialog was located at the bottom and not at the top. [#9362](https://github.com/JabRef/jabref/issues/9362)
+- We fixed the log text color in the event log console when using dark mode. [#9732](https://github.com/JabRef/jabref/issues/9732)
+- We fixed an issue where searching for unlinked files would include the current library's .bib file [#9735](https://github.com/JabRef/jabref/issues/9735)
+- We fixed an issue where it was no longer possible to connect to a shared mysql database due to an exception [#9761](https://github.com/JabRef/jabref/issues/9761)
 
 ### Removed
 
 - We removed the support of BibTeXML. [#9540](https://github.com/JabRef/jabref/issues/9540)
 - We removed support for Markdown syntax for strikethrough and task lists in comment fields. [#9726](https://github.com/JabRef/jabref/pull/9726)
-
+- We removed the options menu, because the two contents were moved to the File menu or the properties of the library. [#9768](https://github.com/JabRef/jabref/pull/9768)
 
 
 

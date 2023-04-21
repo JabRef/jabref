@@ -1,6 +1,11 @@
 name: Automerge Pull Requests
-on: [pull_request]
-
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
 jobs:
   automerge:
     name: Automerge Dependency Updates

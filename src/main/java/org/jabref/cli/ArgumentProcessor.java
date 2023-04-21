@@ -603,8 +603,7 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             preferencesService.importPreferences(Path.of(cli.getPreferencesImport()));
-            Globals.entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
-                    preferencesService.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
+            Globals.entryTypesManager = preferencesService.getCustomEntryTypesRepository();
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

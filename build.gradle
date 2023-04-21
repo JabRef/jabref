@@ -6,7 +6,7 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
 
-    id 'com.github.andygoossens.modernizer' version '1.7.0'
+    id 'com.github.andygoossens.modernizer' version '1.8.0'
 
     id 'me.champeau.gradle.jmh' version '0.5.3'
 
@@ -80,6 +80,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
 }
 
@@ -114,18 +115,18 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation 'org.apache.lucene:lucene-core:9.4.2'
-    implementation 'org.apache.lucene:lucene-queryparser:9.4.2'
-    implementation 'org.apache.lucene:lucene-queries:9.4.2'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.4.2'
-    implementation 'org.apache.lucene:lucene-highlighter:9.4.2'
+    implementation 'org.apache.lucene:lucene-core:9.5.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.5.0'
+    implementation 'org.apache.lucene:lucene-queries:9.5.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.5.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.5.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'com.h2database:h2-mvstore:2.1.214'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.71.1'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.73'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
@@ -143,7 +144,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.14.2'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.7'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
     implementation 'org.postgresql:postgresql:42.6.0'
 
@@ -161,7 +162,7 @@ dependencies {
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
 
-    implementation 'com.github.JabRef:afterburner.fx:testmoduleinfo-SNAPSHOT'
+    implementation 'org.jabref:afterburner.fx:1.1.0-SNAPSHOT'
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
@@ -203,7 +204,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.9.2'
 
-    testImplementation 'org.mockito:mockito-core:5.2.0'
+    testImplementation 'org.mockito:mockito-core:5.3.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.0.1'

@@ -376,7 +376,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(certPath -> SSLCertificate.fromPath(certPath).ifPresent(sslCertificate -> {
-            if (!trustStoreManager.isCertificateExist(formatCustomAlias(sslCertificate.getSHA256Thumbprint()))) {
+            if (!trustStoreManager.certificateExists(formatCustomAlias(sslCertificate.getSHA256Thumbprint()))) {
                 customCertificateListProperty.add(CustomCertificateViewModel.fromSSLCertificate(sslCertificate)
                                                                             .setPath(certPath.toAbsolutePath().toString()));
             } else {

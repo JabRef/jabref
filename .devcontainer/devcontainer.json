@@ -16,7 +16,8 @@
             "extensions": [
                 "vscjava.vscode-java-pack",
                 "vscjava.vscode-gradle",
-                "shengchen.vscode-checkstyle"
+                "shengchen.vscode-checkstyle",
+                "DavidAnson.vscode-markdownlint"
             ]
         }
     },
@@ -35,8 +36,8 @@
 
         // Install java
         "java": {
-            "version": "18",
-            "installGradle": true,
+            "version": "20",
+            "installGradle": false,
             "jdkDistro": "sem"
         }
     }
