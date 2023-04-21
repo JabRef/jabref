@@ -52,7 +52,9 @@ public class Date {
                 "y G / y G",                            // covers 30 BC / 5 AD
                 "yyyy G / yyyy G",                      // covers 0030 BC / 0005 AD
                 "yyyy-MM G / yyyy-MM G",                // covers 0030-01 BC / 0005-02 AD
-                "y?"                                    // covers 2023?
+                "y?",                                    // covers 2023?
+                "d MMMM y",                                    // covers 20 January 2015
+                "d MMMM y / d MMMM y"
                 );
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
@@ -109,14 +111,42 @@ public class Date {
 
         // if dateString has range format, treat as date range
         if (dateString.matches(
-            "\\d{4}/\\d{4}|" +                           // uuuu/uuuu 
-            "\\d{4}-\\d{2}/\\d{4}-\\d{2}|" +             // uuuu-mm/uuuu-mm 
-            "\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}"  // uuuu-mm/uuuu-mm 
+            "\\d{4}/\\d{4}|" +                           // uuuu/uuuu
+            "\\d{4}-\\d{2}/\\d{4}-\\d{2}|" +             // uuuu-mm/uuuu-mm
+            "\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}|"+  // uuuu-mm-dd/uuuu-mm-dd
+            "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                    "( |\\-)(\\d{1,4})/(January|February|March|April|May|June|July|August|September|October|November" +
+                    "|December)( |\\-)(\\d{1,4})(?i-)|"+ // January 2015/January 2015
+                "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                    "( |\\-)(\\d{1,4})/(\\d{1,2})( )" +
+                    "(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                    "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
         )) {
             try {
                 String[] strDates = dateString.split("/");
-                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0]);
-                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1]);
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0].strip());
+                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
+                return Optional.of(new Date(parsedDate, parsedEndDate));
+            } catch (DateTimeParseException e) {
+                LOGGER.debug("Invalid Date format", e);
+                return Optional.empty();
+            }
+        } else if (dateString.matches(
+                "\\d{4} / \\d{4}|" +                           // uuuu / uuuu
+                        "\\d{4}-\\d{2} / \\d{4}-\\d{2}|" +             // uuuu-mm / uuuu-mm
+                        "\\d{4}-\\d{2}-\\d{2} / \\d{4}-\\d{2}-\\d{2}|"+  // uuuu-mm-dd / uuuu-mm-dd
+                        "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4}) / (January|February|March|April|May|June|July|August|September|October|November" +
+                        "|December)( |\\-)(\\d{1,4})(?i-)|"+ // January 2015/January 2015
+                        "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4}) / (\\d{1,2})( )" +
+                        "(January|February|March|April|May|June|July|August|September|October|November|December)" +
+                        "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
+        )) {
+            try {
+                String[] strDates = dateString.split(" / ");
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0].strip());
+                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
                 LOGGER.debug("Invalid Date format", e);

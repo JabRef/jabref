@@ -45,7 +45,8 @@ class DateTest {
                 Arguments.of(YearMonth.of(2020, Month.JANUARY), "Jan, 2020"),
                 Arguments.of(LocalDate.of(2015, Month.OCTOBER, 15), "2015.10.15"),
                 Arguments.of(LocalDate.of(-10000, Month.OCTOBER, 15), "-10000-10-15"),
-                Arguments.of(YearMonth.of(2015, Month.NOVEMBER), "2015/11")
+                Arguments.of(YearMonth.of(2015, Month.NOVEMBER), "2015/11"),
+                Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "15 January 2015")
                 );
     }
 
@@ -81,13 +82,24 @@ class DateTest {
     void parseYearMonthRange() {
         Date expectedDataRange = new Date(YearMonth.of(2015, Month.JANUARY), YearMonth.of(2015, Month.FEBRUARY));
         assertEquals(Optional.of(expectedDataRange), Date.parse("2015-01/2015-02"));
-        // assertEquals(Optional.of(expectedDataRange), Date.parse("January 2015/February 2015"));
     }
 
     @Test
     void parseYearMonthDayRange() {
         Date expectedDataRange = new Date(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25));
         assertEquals(Optional.of(expectedDataRange), Date.parse("2015-01-15/2015-02-25"));
+    }
+
+    @Test
+    void parseYearMonthDayRange2() {
+        Date expectedDataRange = new Date(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25));
+        assertEquals(Optional.of(expectedDataRange), Date.parse("15 January 2015 / 25 February 2015"));
+    }
+
+    @Test
+    void parseYearMonthDayRange3() {
+        Date expectedDataRange = new Date(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25));
+        assertEquals(Optional.of(expectedDataRange), Date.parse("15 January 2015/25 February 2015"));
     }
 
     @Test
