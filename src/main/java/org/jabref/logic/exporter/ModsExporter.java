@@ -53,14 +53,11 @@ class ModsExporter extends Exporter {
             IndentingXMLStreamWriter writer = createWriter(file);
 
             for (BibEntry bibEntry : entries) {
-                bibEntry.getCitationKey().ifPresent(citeKey -> {
-                    try {
-                        addIdentifier(writer, new UnknownField("citekey"), citeKey);
-                    } catch (
-                            XMLStreamException e) {
-                        throw new RuntimeException(e); // cant throw SaveException?
-                    }
-                });
+                if(!bibEntry.getCitationKey().isEmpty()) {
+                    String citekey = String.valueOf(bibEntry.getCitationKey());
+                    addIdentifier(writer, new UnknownField("citekey"), citekey);
+                }
+
                 if (!bibEntry.getCitationKey().isPresent()) {
                     writer.writeStartElement("mods", "mods", MODS_NAMESPACE_URI);
                 }
