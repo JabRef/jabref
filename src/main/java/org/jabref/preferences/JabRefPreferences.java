@@ -68,6 +68,7 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -75,6 +76,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -238,6 +240,11 @@ public class JabRefPreferences implements PreferencesService {
 
     // merge related
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
+    public static final String MERGE_ENTRIES_SHOULD_SHOW_DIFF = "mergeEntriesShouldShowDiff";
+    public static final String MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF = "mergeEntriesShouldShowUnifiedDiff";
+    public static final String MERGE_ENTRIES_HIGHLIGHT_WORDS = "mergeEntriesHighlightWords";
+
+
     public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = "mergeShowOnlyChangedFields";
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
@@ -256,7 +263,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
-
+    public static final String SEARCH_WINDOW_HEIGHT = "searchWindowHeight";
+    public static final String SEARCH_WINDOW_WIDTH = "searchWindowWidth";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
     public static final String GROBID_OPT_OUT = "grobidOptOut";
@@ -480,6 +488,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
+        defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);
+        defaults.put(SEARCH_WINDOW_WIDTH, 600.0);
 
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
@@ -587,6 +597,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
+        defaults.put(MERGE_ENTRIES_SHOULD_SHOW_DIFF, Boolean.TRUE);
+        defaults.put(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, Boolean.TRUE);
+        defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
@@ -781,13 +794,6 @@ public class JabRefPreferences implements PreferencesService {
             LOGGER.warn("Unable to convert String to List", e);
         }
         return result;
-    }
-
-    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
-        return switch (mode) {
-            case BIBTEX -> PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES);
-            case BIBLATEX -> PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
-        };
     }
 
     private static Optional<String> getNextUnit(Reader data) throws IOException {
@@ -1157,21 +1163,24 @@ public class JabRefPreferences implements PreferencesService {
 
     //*************************************************************************************************************
     // CustomEntryTypes
-    //
-    // Note that here the pattern is broken: getBibEntryTypes returns something different than storeCustomEntryTypes
-    // stores. The proper opposite part would be storeBibEntryTypes, which is private, as it is called only by the
-    // latter method.
     //*************************************************************************************************************
 
     @Override
-    public List<BibEntryType> getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
+    public BibEntryTypesManager getCustomEntryTypesRepository() {
+        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+        EnumSet.allOf(BibDatabaseMode.class).forEach(mode ->
+                bibEntryTypesManager.addCustomOrModifiedTypes(getBibEntryTypes(mode), mode));
+        return bibEntryTypesManager;
+    }
+
+    private List<BibEntryType> getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
         List<BibEntryType> storedEntryTypes = new ArrayList<>();
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
         try {
             Arrays.stream(prefsNode.keys())
                   .map(key -> prefsNode.get(key, null))
                   .filter(Objects::nonNull)
-                  .forEach(typeString -> BibEntryTypesManager.parse(typeString).ifPresent(storedEntryTypes::add));
+                  .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(storedEntryTypes::add));
         } catch (BackingStoreException e) {
             LOGGER.info("Parsing customized entry types failed.", e);
         }
@@ -1184,8 +1193,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    @Override
-    public void clearBibEntryTypes(BibDatabaseMode mode) {
+    private void clearBibEntryTypes(BibDatabaseMode mode) {
         try {
             Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
             prefsNode.clear();
@@ -1196,15 +1204,10 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void storeCustomEntryTypes(BibEntryTypesManager entryTypesManager) {
-        storeBibEntryTypes(BibDatabaseMode.BIBTEX, entryTypesManager);
-        storeBibEntryTypes(BibDatabaseMode.BIBLATEX, entryTypesManager);
-    }
-
-    private void storeBibEntryTypes(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager entryTypesManager) {
-        Collection<BibEntryType> customBiblatexBibTexTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
-
-        storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
+    public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
+        clearAllBibEntryTypes();
+        storeBibEntryTypes(entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX), BibDatabaseMode.BIBTEX);
+        storeBibEntryTypes(entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), BibDatabaseMode.BIBLATEX);
     }
 
     private void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
@@ -1215,12 +1218,18 @@ public class JabRefPreferences implements PreferencesService {
             clearBibEntryTypes(bibDatabaseMode);
 
             // store current custom types
-            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
+            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypes(type)));
 
             prefsNode.flush();
         } catch (BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
         }
+    }
+
+    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
+        return mode == BibDatabaseMode.BIBTEX
+                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
+                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
 
     @Override
@@ -2510,6 +2519,9 @@ public class JabRefPreferences implements PreferencesService {
                 getFileHistory(),
                 get(ID_ENTRY_GENERATOR),
                 DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF),
+                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS),
                 getDouble(SIDE_PANE_WIDTH),
                 getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS));
 
@@ -2535,6 +2547,9 @@ public class JabRefPreferences implements PreferencesService {
         guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(guiPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
+        EasyBind.listen(guiPreferences.mergeShouldShowDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, newValue));
+        EasyBind.listen(guiPreferences.mergeShouldShowUnifiedDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, newValue));
+        EasyBind.listen(guiPreferences.mergeHighlightWordsProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
 
@@ -2578,7 +2593,9 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SEARCH_REG_EXP),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
-                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP));
+                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),
+                getDouble(SEARCH_WINDOW_HEIGHT),
+                getDouble(SEARCH_WINDOW_WIDTH));
 
         EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(searchPreferences.getSearchDisplayMode()).toString()));
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
@@ -2587,7 +2604,10 @@ public class JabRefPreferences implements PreferencesService {
             putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));
             putBoolean(SEARCH_KEEP_SEARCH_STRING, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.KEEP_SEARCH_STRING));
         });
+
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
+        EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
+        EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));
 
         return searchPreferences;
     }

@@ -115,7 +115,6 @@ public enum StandardActions implements Action {
     SHOW_PREFS(Localization.lang("Preferences"), IconTheme.JabRefIcons.PREFERENCES),
     MANAGE_JOURNALS(Localization.lang("Manage journal abbreviations")),
     CUSTOMIZE_KEYBINDING(Localization.lang("Customize key bindings"), IconTheme.JabRefIcons.KEY_BINDINGS),
-    MANAGE_CONTENT_SELECTORS(Localization.lang("Manage content selectors"), IconTheme.JabRefIcons.SELECTORS),
 
     EDIT_ENTRY(Localization.lang("Open entry editor"), IconTheme.JabRefIcons.EDIT_ENTRY, KeyBinding.EDIT_ENTRY),
     SHOW_PDF_VIEWER(Localization.lang("Open document viewer"), IconTheme.JabRefIcons.PDF_FILE),
@@ -177,7 +176,17 @@ public enum StandardActions implements Action {
     EDIT_LIST(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT),
     VIEW_LIST(Localization.lang("View"), IconTheme.JabRefIcons.FILE),
     REMOVE_LIST(Localization.lang("Remove"), IconTheme.JabRefIcons.REMOVE),
-    RELOAD_LIST(Localization.lang("Reload"), IconTheme.JabRefIcons.REFRESH);
+    RELOAD_LIST(Localization.lang("Reload"), IconTheme.JabRefIcons.REFRESH),
+
+    GROUP_REMOVE(Localization.lang("Remove group")),
+    GROUP_REMOVE_KEEP_SUBGROUPS(Localization.lang("Keep subgroups")),
+    GROUP_REMOVE_WITH_SUBGROUPS(Localization.lang("Also remove subgroups")),
+    GROUP_EDIT(Localization.lang("Edit group")),
+    GROUP_SUBGROUP_ADD(Localization.lang("Add subgroup")),
+    GROUP_SUBGROUP_REMOVE(Localization.lang("Remove subgroups")),
+    GROUP_SUBGROUP_SORT(Localization.lang("Sort subgroups A-Z")),
+    GROUP_ENTRIES_ADD(Localization.lang("Add selected entries to this group")),
+    GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group"));
 
     private final String text;
     private final String description;

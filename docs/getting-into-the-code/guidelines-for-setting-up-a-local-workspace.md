@@ -51,18 +51,18 @@ We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref).
 The Community Edition works well.
 Most contributors use the Ultimate Edition, because they are students getting that edition for free.
 
-For advanced users, [Eclipse](https://eclipse.org) (`2022-09` or newer) is also possible. For JDK19 you need to install the addtional [support for jdk19 as extension](https://marketplace.eclipse.org/content/java-19-support-eclipse-2022-09-425)). 
+For advanced users, [Eclipse](https://eclipse.org) (`2023-03` or newer) is also possible. For JDK20 you need to install the addtional [support for jdk20 as extension](https://marketplace.eclipse.org/content/java-20-support-eclipse-2023-03-427)). 
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download\_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse.
 On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
-### Java Development Kit 19
+### Java Development Kit 20
 
-For Eclipse, a working Java (Development Kit) 19 installation is required.
+For Eclipse, a working Java (Development Kit) 20 installation is required.
 In the case of IntelliJ, this will be downloaded inside the IDE (if you follow the steps below).
 
-In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 19 (e.g., `javac 19`).
+In the command line (terminal in Linux, cmd in Windows) run `javac -version` and make sure that the reported version is Java 20 (e.g., `javac 20`).
 If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
-Please head to <https://adoptium.net/de/temurin/releases> to download JDK 19.
+Please head to <https://adoptium.net/de/temurin/releases> to download JDK 20.
 
 
 ## Get the code
@@ -166,21 +166,21 @@ Once set up, IntelliJ IDEA's internal system can be used for subsequent builds.
 
 In case IntelliJ's internal build system does not work, just stick with using Gradle.
 
-### Ensure that JDK 19 is available to IntelliJ
+### Ensure that JDK 20 is available to IntelliJ
 
-Ensure you have a Java 19 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.
+Ensure you have a Java 20 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.
 
-{% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 19 is missing." %}
+{% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 20 is missing." %}
 ![Plattform Settings - SDKs](../images/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 {% endfigure %}
 
-If there is another JDK than JDK 19 selected, click on the plus button and choose "Download JDK..."
+If there is another JDK than JDK 20 selected, click on the plus button and choose "Download JDK..."
 
 {% figure caption:"Download JDK..." %}
 ![Plattform Settings - SDKs - plus button - Download JDK...](guidelines-select-download-jdk.png)
 {% endfigure %}
 
-Select JDK version 19 and then Eclipse Temurin (showing JDK 18 as example).
+Select JDK version 20 and then Eclipse Temurin (showing JDK 18 as example).
 
 {% figure caption:"Example for JDK 18 - Choose Eclipse Temurin" %}
 ![Download Eclipse Temurin](guidelines-select-jdk-18-eclipse-temurin.png)
@@ -192,7 +192,7 @@ After clicking "Download", IntelliJ installs Eclipse Temurin:
 ![IntelliJ installs Eclipse Temurin](guidelines-intellij-installs-temurin.png)
 {% endfigure %}
 
-Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 19
+Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 20
 
 {% figure caption:"Project SDK is pinned to the downloaded SDK (showing JDK 18 as example)" %}
 ![Project SDK is JDK 18](guidelines-intellij-project-settings-jdk18.png)
@@ -202,7 +202,7 @@ Click "OK" to store the changes.
 
 ### Configure the Build System
 
-Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select a JDK 19.
+Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select a JDK 20.
 
 {% figure caption:"Gradle JVM is project SDK (showing JDK 18 as example)" %}
 ![Gradle JVM is project SDK](guidelines-settings-gradle-gradlejvm-is-projectjvm.png)
@@ -359,7 +359,7 @@ You can compile and run tests with IntelliJ's faster internal build system
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 
 Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
-Navigate to **File > Settings... > Plugins".
+Navigate to **File > Settings... > Plugins"**.
 On the top, click on "Marketplace".
 Then, search for "Checkstyle".
 Click on "Install" choose "CheckStyle-IDEA".
@@ -578,7 +578,7 @@ We invite you to read on at our [tool recommendations](../code-howtos/tools.md).
 
 ### Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 19 is installed is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 20 is installed is following error message:
 
 ```text
 compileJava FAILED
@@ -629,9 +629,9 @@ This can include different modules.
 There might be problems with building if you have OpenJFX libraries in local maven repository, resulting in errors like this:
 
 ```text
- > Could not find javafx-fxml-19-mac.jar (org.openjfx:javafx-fxml:19).
+ > Could not find javafx-fxml-20-mac.jar (org.openjfx:javafx-fxml:20).
      Searched in the following locations:
-         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/19/javafx-fxml-19-mac.jar
+         file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/20/javafx-fxml-20-mac.jar
 ```
 
 As a workaround, you can remove all local OpenJFX artifacts by deleting the whole OpenJFX folder from specified location.

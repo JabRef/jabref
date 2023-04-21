@@ -38,9 +38,9 @@ public class CopyMoreActionTest {
     private PreferencesService preferencesService = mock(PreferencesService.class);
     private StateManager stateManager = mock(StateManager.class);
     private BibEntry entry;
-    private List<String> titles = new ArrayList<String>();
-    private List<String> keys = new ArrayList<String>();
-    private List<String> dois = new ArrayList<String>();
+    private List<String> titles = new ArrayList<>();
+    private List<String> keys = new ArrayList<>();
+    private List<String> dois = new ArrayList<>();
 
     @BeforeEach
     public void setUp() {
