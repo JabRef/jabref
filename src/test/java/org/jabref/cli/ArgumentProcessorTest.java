@@ -15,7 +15,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -41,7 +41,7 @@ class ArgumentProcessorTest {
 
     @BeforeEach()
     void setup() {
-        when(savePreferences.getSaveOrder()).thenReturn(SaveOrderConfig.getDefaultSaveOrder());
+        when(savePreferences.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
         when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
         when(preferencesService.getSearchPreferences()).thenReturn(

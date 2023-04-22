@@ -47,7 +47,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GeneralPreferences;
@@ -83,7 +83,7 @@ public class BibtexDatabaseWriterTest {
     void setUp() {
         generalPreferences = mock(GeneralPreferences.class);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
+        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         entryTypesManager = new BibEntryTypesManager();
         stringWriter = new StringWriter();
@@ -700,11 +700,11 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeSaveOrderConfig() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(SaveOrderConfig.OrderType.SPECIFIED,
-                List.of(new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                        new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
-                        new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false)));
-        metaData.setSaveOrderConfig(saveOrderConfig);
+        SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.SPECIFIED,
+                List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
+                        new SaveOrder.SortCriterion(StandardField.YEAR, true),
+                        new SaveOrder.SortCriterion(StandardField.ABSTRACT, false)));
+        metaData.setSaveOrderConfig(saveOrder);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
@@ -761,11 +761,11 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeEntriesSorted() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(SaveOrderConfig.OrderType.SPECIFIED,
-                List.of(new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                        new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
-                        new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false)));
-        metaData.setSaveOrderConfig(saveOrderConfig);
+        SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.SPECIFIED,
+                List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
+                        new SaveOrder.SortCriterion(StandardField.YEAR, true),
+                        new SaveOrder.SortCriterion(StandardField.ABSTRACT, false)));
+        metaData.setSaveOrderConfig(saveOrder);
 
         BibEntry firstEntry = new BibEntry();
         firstEntry.setType(StandardEntryType.Article);

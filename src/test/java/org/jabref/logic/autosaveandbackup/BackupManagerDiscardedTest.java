@@ -15,7 +15,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +55,7 @@ class BackupManagerDiscardedTest {
 
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(savePreferences.shouldMakeBackup()).thenReturn(false);
-        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
+        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
         when(savePreferences.withMakeBackup(anyBoolean())).thenReturn(savePreferences);
         when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
 

@@ -61,7 +61,7 @@ public class MetaData {
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
     private Charset encoding;
-    private SaveOrderConfig saveOrderConfig;
+    private SaveOrder saveOrder;
     private String defaultCiteKeyPattern;
     private FieldFormatterCleanups saveActions;
     private BibDatabaseMode mode;
@@ -80,12 +80,12 @@ public class MetaData {
         // Do nothing
     }
 
-    public Optional<SaveOrderConfig> getSaveOrderConfig() {
-        return Optional.ofNullable(saveOrderConfig);
+    public Optional<SaveOrder> getSaveOrderConfig() {
+        return Optional.ofNullable(saveOrder);
     }
 
-    public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
-        this.saveOrderConfig = saveOrderConfig;
+    public void setSaveOrderConfig(SaveOrder saveOrder) {
+        this.saveOrder = saveOrder;
         postChange();
     }
 
@@ -270,7 +270,7 @@ public class MetaData {
     }
 
     public void clearSaveOrderConfig() {
-        saveOrderConfig = null;
+        saveOrder = null;
         postChange();
     }
 
@@ -374,7 +374,7 @@ public class MetaData {
                 && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
                 && Objects.equals(encoding, metaData.encoding)
                 && Objects.equals(encodingExplicitlySupplied, metaData.encodingExplicitlySupplied)
-                && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
+                && Objects.equals(saveOrder, metaData.saveOrder)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, metaData.userFileDirectory)
                 && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
@@ -388,12 +388,12 @@ public class MetaData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrderConfig, citeKeyPatterns, userFileDirectory,
+        return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
                 laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, defaultFileDirectory, contentSelectors, VersionDBStructure);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrderConfig + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + VersionDBStructure + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + VersionDBStructure + "]";
     }
 }

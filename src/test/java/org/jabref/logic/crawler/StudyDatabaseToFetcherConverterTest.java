@@ -15,7 +15,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.GeneralPreferences;
 
@@ -46,7 +46,7 @@ class StudyDatabaseToFetcherConverterTest {
         importerPreferences = mock(ImporterPreferences.class);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         timestampPreferences = mock(TimestampPreferences.class);
-        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
+        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());

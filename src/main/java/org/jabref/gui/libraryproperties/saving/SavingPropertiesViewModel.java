@@ -20,7 +20,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -42,14 +42,14 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
-    private final SaveOrderConfig initialSaveOrderConfig;
+    private final SaveOrder initialSaveOrder;
     private final PreferencesService preferencesService;
 
     public SavingPropertiesViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService) {
         this.databaseContext = databaseContext;
         this.preferencesService = preferencesService;
         this.initialMetaData = databaseContext.getMetaData();
-        this.initialSaveOrderConfig = initialMetaData.getSaveOrderConfig().orElseGet(preferencesService::getExportSaveOrder);
+        this.initialSaveOrder = initialMetaData.getSaveOrderConfig().orElseGet(preferencesService::getExportSaveOrder);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         // SaveOrderConfigPanel
 
-        switch (initialSaveOrderConfig.getOrderType()) {
+        switch (initialSaveOrder.getOrderType()) {
             case SPECIFIED -> saveInSpecifiedOrderProperty.setValue(true);
             case ORIGINAL -> saveInOriginalProperty.setValue(true);
             case TABLE -> saveInTableOrderProperty.setValue(true);
@@ -68,9 +68,9 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         fieldNames.add(InternalField.TYPE_HEADER); // allow entrytype field as sort criterion
         fieldNames.sort(Comparator.comparing(Field::getDisplayName));
         sortableFieldsProperty.addAll(fieldNames);
-        sortCriteriaProperty.addAll(initialSaveOrderConfig.getSortCriteria().stream()
-                                                          .map(SortCriterionViewModel::new)
-                                                          .toList());
+        sortCriteriaProperty.addAll(initialSaveOrder.getSortCriteria().stream()
+                                                    .map(SortCriterionViewModel::new)
+                                                    .toList());
 
         // FieldFormatterCleanupsPanel
 
@@ -110,15 +110,15 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             }
         }
 
-        SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
-                SaveOrderConfig.OrderType.fromBooleans(saveInSpecifiedOrderProperty.getValue(), saveInOriginalProperty.getValue()),
+        SaveOrder newSaveOrder = new SaveOrder(
+                SaveOrder.OrderType.fromBooleans(saveInSpecifiedOrderProperty.getValue(), saveInOriginalProperty.getValue()),
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
 
-        if (!newSaveOrderConfig.equals(initialSaveOrderConfig)) {
-            if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
+        if (!newSaveOrder.equals(initialSaveOrder)) {
+            if (newSaveOrder.equals(SaveOrder.getDefaultSaveOrder())) {
                 newMetaData.clearSaveOrderConfig();
             } else {
-                newMetaData.setSaveOrderConfig(newSaveOrderConfig);
+                newMetaData.setSaveOrderConfig(newSaveOrder);
             }
         }
 

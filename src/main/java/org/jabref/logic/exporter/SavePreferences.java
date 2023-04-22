@@ -2,7 +2,7 @@ package org.jabref.logic.exporter;
 
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 
 public class SavePreferences {
 
@@ -13,7 +13,7 @@ public class SavePreferences {
 
     private final boolean reformatFile;
     private boolean saveInOriginalOrder;
-    private SaveOrderConfig saveOrder;
+    private SaveOrder saveOrder;
     private boolean makeBackup;
     private DatabaseSaveType saveType;
     private boolean takeMetadataSaveOrderInAccount;
@@ -21,7 +21,7 @@ public class SavePreferences {
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     private SavePreferences(Boolean saveInOriginalOrder,
-                            SaveOrderConfig saveOrder,
+                            SaveOrder saveOrder,
                             Boolean makeBackup,
                             DatabaseSaveType saveType,
                             Boolean takeMetadataSaveOrderInAccount,
@@ -40,7 +40,7 @@ public class SavePreferences {
     }
 
     public SavePreferences(Boolean saveInOriginalOrder,
-                           SaveOrderConfig saveOrder,
+                           SaveOrder saveOrder,
                            DatabaseSaveType saveType,
                            Boolean takeMetadataSaveOrderInAccount,
                            Boolean reformatFile,
@@ -66,11 +66,11 @@ public class SavePreferences {
         return this;
     }
 
-    public SaveOrderConfig getSaveOrder() {
+    public SaveOrder getSaveOrder() {
         return saveOrder;
     }
 
-    public SavePreferences withSaveOrder(SaveOrderConfig newSaveOrder) {
+    public SavePreferences withSaveOrder(SaveOrder newSaveOrder) {
         this.saveOrder = newSaveOrder;
         return this;
     }

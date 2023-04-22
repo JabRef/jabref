@@ -34,7 +34,7 @@ import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -66,7 +66,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final DOIPreferences doiPreferences;
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
-    private final SaveOrderConfig initialExportOrder;
+    private final SaveOrder initialExportOrder;
     private final ImportExportPreferences importExportPreferences;
     private final FilePreferences filePreferences;
 
@@ -122,10 +122,10 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
 
-        SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
-                SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInOriginalProperty.getValue()),
+        SaveOrder newSaveOrder = new SaveOrder(
+                SaveOrder.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInOriginalProperty.getValue()),
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
-        preferencesService.storeExportSaveOrder(newSaveOrderConfig);
+        preferencesService.storeExportSaveOrder(newSaveOrder);
 
         importExportPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
 

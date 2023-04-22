@@ -39,7 +39,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.GeneralPreferences;
 
@@ -98,7 +98,7 @@ public abstract class BibDatabaseWriter {
 
     private static List<Comparator<BibEntry>> getSaveComparators(MetaData metaData, SavePreferences preferences) {
         List<Comparator<BibEntry>> comparators = new ArrayList<>();
-        Optional<SaveOrderConfig> saveOrder = getSaveOrder(metaData, preferences);
+        Optional<SaveOrder> saveOrder = getSaveOrder(metaData, preferences);
 
         // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
         // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
@@ -142,7 +142,7 @@ public abstract class BibDatabaseWriter {
         return sorted;
     }
 
-    private static Optional<SaveOrderConfig> getSaveOrder(MetaData metaData, SavePreferences preferences) {
+    private static Optional<SaveOrder> getSaveOrder(MetaData metaData, SavePreferences preferences) {
         /* three options:
          * 1. original order
          * 2. order specified in metaData

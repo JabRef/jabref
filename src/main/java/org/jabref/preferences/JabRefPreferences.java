@@ -113,7 +113,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.groups.GroupHierarchyType;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
@@ -2073,23 +2073,23 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public SaveOrderConfig getExportSaveOrder() {
-        List<SaveOrderConfig.SortCriterion> sortCriteria = List.of(
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
-                new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
+    public SaveOrder getExportSaveOrder() {
+        List<SaveOrder.SortCriterion> sortCriteria = List.of(
+                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
+                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
+                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
         );
 
-        return new SaveOrderConfig(
-                SaveOrderConfig.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
+        return new SaveOrder(
+                SaveOrder.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
                 sortCriteria
         );
     }
 
     @Override
-    public void storeExportSaveOrder(SaveOrderConfig config) {
-        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.ORIGINAL);
-        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.SPECIFIED);
+    public void storeExportSaveOrder(SaveOrder config) {
+        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.getOrderType() == SaveOrder.OrderType.ORIGINAL);
+        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.getOrderType() == SaveOrder.OrderType.SPECIFIED);
 
         put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
         put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());
@@ -2099,13 +2099,13 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.getSortCriteria().get(2).descending);
     }
 
-    private SaveOrderConfig loadTableSaveOrder() {
-        SaveOrderConfig config = new SaveOrderConfig();
+    private SaveOrder loadTableSaveOrder() {
+        SaveOrder config = new SaveOrder();
         List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
 
         for (var column : sortOrder) {
             boolean descending = (column.getSortType() == SortType.DESCENDING);
-            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
+            config.getSortCriteria().add(new SaveOrder.SortCriterion(
                     FieldFactory.parseField(column.getQualifier()),
                     descending));
         }
@@ -2116,7 +2116,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public SavePreferences getSavePreferencesForExport() {
         Boolean saveInOriginalOrder = this.getBoolean(EXPORT_IN_ORIGINAL_ORDER);
-        SaveOrderConfig saveOrder = null;
+        SaveOrder saveOrder = null;
         if (!saveInOriginalOrder) {
             if (this.getBoolean(EXPORT_IN_SPECIFIED_ORDER)) {
                 saveOrder = this.getExportSaveOrder();

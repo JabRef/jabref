@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Format: &lt;choice>, pair of field + ascending (boolean)
  */
-public class SaveOrderConfig {
+public class SaveOrder {
 
     public enum OrderType {
         SPECIFIED("specified"),
@@ -33,33 +33,33 @@ public class SaveOrderConfig {
             return name;
         }
 
-        public static SaveOrderConfig.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
-            SaveOrderConfig.OrderType orderType = SaveOrderConfig.OrderType.TABLE;
+        public static SaveOrder.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
+            SaveOrder.OrderType orderType = SaveOrder.OrderType.TABLE;
             if (saveInSpecifiedOrder) {
-                orderType = SaveOrderConfig.OrderType.SPECIFIED;
+                orderType = SaveOrder.OrderType.SPECIFIED;
             } else if (saveInOriginalOrder) {
-                orderType = SaveOrderConfig.OrderType.ORIGINAL;
+                orderType = SaveOrder.OrderType.ORIGINAL;
             }
 
             return orderType;
         }
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrderConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrder.class);
 
     private final List<SortCriterion> sortCriteria = new ArrayList<>();
     private OrderType orderType;
 
-    public SaveOrderConfig() {
+    public SaveOrder() {
         this.orderType = OrderType.ORIGINAL;
     }
 
-    public SaveOrderConfig(OrderType orderType, List<SortCriterion> sortCriteria) {
+    public SaveOrder(OrderType orderType, List<SortCriterion> sortCriteria) {
         this.orderType = orderType;
         this.sortCriteria.addAll(sortCriteria);
     }
 
-    private SaveOrderConfig(List<String> data) {
+    private SaveOrder(List<String> data) {
         Objects.requireNonNull(data);
 
         if (data.isEmpty()) {
@@ -84,12 +84,12 @@ public class SaveOrderConfig {
         }
     }
 
-    public static SaveOrderConfig parse(List<String> orderedData) {
-        return new SaveOrderConfig(orderedData);
+    public static SaveOrder parse(List<String> orderedData) {
+        return new SaveOrder(orderedData);
     }
 
-    public static SaveOrderConfig getDefaultSaveOrder() {
-        SaveOrderConfig standard = new SaveOrderConfig();
+    public static SaveOrder getDefaultSaveOrder() {
+        SaveOrder standard = new SaveOrder();
         standard.orderType = OrderType.ORIGINAL;
         return standard;
     }
@@ -107,7 +107,7 @@ public class SaveOrderConfig {
         if (this == o) {
             return true;
         }
-        if (o instanceof SaveOrderConfig that) {
+        if (o instanceof SaveOrder that) {
             return Objects.equals(sortCriteria, that.sortCriteria) &&
                     Objects.equals(orderType, that.orderType);
         }

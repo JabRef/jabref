@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -38,7 +38,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         this(new OrFields(field), false);
     }
 
-    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
+    public FieldComparator(SaveOrder.SortCriterion sortCriterion) {
         this(new OrFields(sortCriterion.field), sortCriterion.descending);
     }
 

@@ -51,7 +51,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -1473,12 +1473,12 @@ class BibtexParserTest {
                 new StringReader(
                         "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"));
 
-        Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
+        Optional<SaveOrder> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
-        assertEquals(new SaveOrderConfig(SaveOrderConfig.OrderType.SPECIFIED, List.of(
-                new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
-                new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false))),
+        assertEquals(new SaveOrder(SaveOrder.OrderType.SPECIFIED, List.of(
+                new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
+                new SaveOrder.SortCriterion(StandardField.YEAR, true),
+                new SaveOrder.SortCriterion(StandardField.ABSTRACT, false))),
                 saveOrderConfig.get());
     }
 
