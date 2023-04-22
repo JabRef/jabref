@@ -17,7 +17,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.eclipse.jgit.api.Git;
@@ -46,17 +46,14 @@ class CrawlerTest {
     String hashCodeQuantum = String.valueOf("Quantum".hashCode());
     String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
 
-    GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
 
     @Test
     public void testWhetherAllFilesAreCreated() throws Exception {
         setUp();
         Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
                 gitHandler,
-                generalPreferences,
-                importFormatPreferences,
-                importerPreferences,
-                savePreferences,
+                preferencesService,
                 entryTypesManager,
                 new DummyFileUpdateMonitor());
 
@@ -101,7 +98,6 @@ class CrawlerTest {
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
-        when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 

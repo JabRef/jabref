@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
@@ -25,6 +24,7 @@ import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -57,13 +57,19 @@ public abstract class BibDatabaseWriter {
     protected final BibWriter bibWriter;
     protected final GeneralPreferences generalPreferences;
     protected final SavePreferences savePreferences;
+    protected final CitationKeyPatternPreferences keyPatternPreferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
 
-    public BibDatabaseWriter(BibWriter bibWriter, GeneralPreferences generalPreferences, SavePreferences savePreferences, BibEntryTypesManager entryTypesManager) {
+    public BibDatabaseWriter(BibWriter bibWriter,
+                             GeneralPreferences generalPreferences,
+                             SavePreferences savePreferences,
+                             CitationKeyPatternPreferences keyPatternPreferences,
+                             BibEntryTypesManager entryTypesManager) {
         this.bibWriter = Objects.requireNonNull(bibWriter);
         this.generalPreferences = generalPreferences;
         this.savePreferences = savePreferences;
+        this.keyPatternPreferences = keyPatternPreferences;
         this.entryTypesManager = entryTypesManager;
     }
 
@@ -82,7 +88,7 @@ public abstract class BibDatabaseWriter {
         List<FieldFormatterCleanup> preSaveCleanups =
                 Stream.of(new TrimWhitespaceFormatter())
                       .map(formatter -> new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, formatter))
-                      .collect(Collectors.toList());
+                      .toList();
         for (FieldFormatterCleanup formatter : preSaveCleanups) {
             for (BibEntry entry : toChange) {
                 changes.addAll(formatter.cleanup(entry));
@@ -112,7 +118,7 @@ public abstract class BibDatabaseWriter {
             List<FieldComparator> fieldComparators = saveOrder.get()
                                                               .getSortCriteria().stream()
                                                               .map(FieldComparator::new)
-                                                              .collect(Collectors.toList());
+                                                              .toList();
             comparators.addAll(fieldComparators);
             comparators.add(new FieldComparator(InternalField.KEY_FIELD));
         }
@@ -199,7 +205,7 @@ public abstract class BibDatabaseWriter {
         List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, savePreferences);
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
-        if (savePreferences.getCitationKeyPatternPreferences().shouldGenerateCiteKeysBeforeSaving()) {
+        if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
             saveActionsFieldChanges.addAll(keyChanges);
         }
@@ -222,7 +228,7 @@ public abstract class BibDatabaseWriter {
 
         if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData(), savePreferences.getCitationKeyPatternPreferences().getKeyPattern());
+            writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPattern());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
@@ -269,7 +275,7 @@ public abstract class BibDatabaseWriter {
                                              .stream()
                                              .map(database::getString)
                                              .sorted(new BibtexStringComparator(true))
-                                             .collect(Collectors.toList());
+                                             .toList();
         // First, make a Map of all entries:
         Map<String, BibtexString> remaining = new HashMap<>();
         int maxKeyLength = 0;
@@ -331,7 +337,7 @@ public abstract class BibDatabaseWriter {
      */
     protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         List<FieldChange> changes = new ArrayList<>();
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, savePreferences.getCitationKeyPatternPreferences());
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, keyPatternPreferences);
         for (BibEntry bes : entries) {
             Optional<String> oldKey = bes.getCitationKey();
             if (StringUtil.isBlank(oldKey)) {

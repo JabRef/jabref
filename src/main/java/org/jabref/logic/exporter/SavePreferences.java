@@ -1,12 +1,14 @@
 package org.jabref.logic.exporter;
 
 import org.jabref.logic.bibtex.FieldWriterPreferences;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.metadata.SaveOrder;
 
 public class SavePreferences {
 
-    public enum DatabaseSaveType { ALL, PLAIN_BIBTEX }
+    public enum DatabaseSaveType {
+        ALL,
+        PLAIN_BIBTEX
+    }
 
     // Encoding written at the top of the .bib file.
     public static final String ENCODING_PREFIX = "Encoding: ";
@@ -18,7 +20,6 @@ public class SavePreferences {
     private DatabaseSaveType saveType;
     private boolean takeMetadataSaveOrderInAccount;
     private final FieldWriterPreferences fieldWriterPreferences;
-    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     private SavePreferences(Boolean saveInOriginalOrder,
                             SaveOrder saveOrder,
@@ -26,8 +27,7 @@ public class SavePreferences {
                             DatabaseSaveType saveType,
                             Boolean takeMetadataSaveOrderInAccount,
                             Boolean reformatFile,
-                            FieldWriterPreferences fieldWriterPreferences,
-                            CitationKeyPatternPreferences citationKeyPatternPreferences) {
+                            FieldWriterPreferences fieldWriterPreferences) {
 
         this.saveInOriginalOrder = saveInOriginalOrder;
         this.saveOrder = saveOrder;
@@ -36,25 +36,6 @@ public class SavePreferences {
         this.takeMetadataSaveOrderInAccount = takeMetadataSaveOrderInAccount;
         this.reformatFile = reformatFile;
         this.fieldWriterPreferences = fieldWriterPreferences;
-        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
-    }
-
-    public SavePreferences(Boolean saveInOriginalOrder,
-                           SaveOrder saveOrder,
-                           DatabaseSaveType saveType,
-                           Boolean takeMetadataSaveOrderInAccount,
-                           Boolean reformatFile,
-                           FieldWriterPreferences fieldWriterPreferences,
-                           CitationKeyPatternPreferences citationKeyPatternPreferences) {
-
-        this(saveInOriginalOrder,
-                saveOrder,
-                false,
-                saveType,
-                takeMetadataSaveOrderInAccount,
-                reformatFile,
-                fieldWriterPreferences,
-                citationKeyPatternPreferences);
     }
 
     public boolean takeMetadataSaveOrderInAccount() {
@@ -113,9 +94,5 @@ public class SavePreferences {
 
     public FieldWriterPreferences getFieldWriterPreferences() {
         return fieldWriterPreferences;
-    }
-
-    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
-        return citationKeyPatternPreferences;
     }
 }

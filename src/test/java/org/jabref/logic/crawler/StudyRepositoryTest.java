@@ -18,8 +18,6 @@ import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -32,6 +30,7 @@ import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,11 +48,10 @@ import static org.mockito.Mockito.when;
 class StudyRepositoryTest {
     private static final String NON_EXISTING_DIRECTORY = "nonExistingTestRepositoryDirectory";
     CitationKeyPatternPreferences citationKeyPatternPreferences;
+    PreferencesService preferencesService;
     GeneralPreferences generalPreferences;
     ImportFormatPreferences importFormatPreferences;
-    ImporterPreferences importerPreferences;
     SavePreferences savePreferences;
-    TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
     @TempDir
     Path tempRepositoryDirectory;
@@ -71,8 +69,7 @@ class StudyRepositoryTest {
         generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        importerPreferences = mock(ImporterPreferences.class);
-        timestampPreferences = mock(TimestampPreferences.class);
+        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -86,11 +83,13 @@ class StudyRepositoryTest {
                 ',');
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
-        when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
-        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
+        when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.fieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
-        when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
+        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferencesService.getTimestampPreferences().getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
         getTestStudyRepository();
     }
@@ -102,11 +101,8 @@ class StudyRepositoryTest {
         assertThrows(IOException.class, () -> new StudyRepository(
                 nonExistingRepositoryDirectory,
                 gitHandler,
-                generalPreferences,
-                importFormatPreferences,
-                importerPreferences,
+                preferencesService,
                 new DummyFileUpdateMonitor(),
-                savePreferences,
                 entryTypesManager));
     }
 
@@ -178,11 +174,8 @@ class StudyRepositoryTest {
         studyRepository = new StudyRepository(
                 tempRepositoryDirectory,
                 gitHandler,
-                generalPreferences,
-                importFormatPreferences,
-                importerPreferences,
+                preferencesService,
                 new DummyFileUpdateMonitor(),
-                savePreferences,
                 entryTypesManager);
         return studyRepository;
     }

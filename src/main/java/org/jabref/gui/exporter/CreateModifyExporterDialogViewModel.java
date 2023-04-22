@@ -39,7 +39,9 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     private final JournalAbbreviationRepository repository;
 
-    public CreateModifyExporterDialogViewModel(ExporterViewModel exporter, DialogService dialogService, PreferencesService preferences,
+    public CreateModifyExporterDialogViewModel(ExporterViewModel exporter,
+                                               DialogService dialogService,
+                                               PreferencesService preferences,
                                                JournalAbbreviationRepository repository) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -69,8 +71,12 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(repository);
         SavePreferences savePreferences = preferences.getSavePreferencesForExport();
-        TemplateExporter format = new TemplateExporter(name.get(), layoutFile.get(), extension.get(),
-                layoutPreferences, savePreferences);
+        TemplateExporter format = new TemplateExporter(
+                name.get(),
+                layoutFile.get(),
+                extension.get(),
+                layoutPreferences,
+                savePreferences);
         format.setCustomExport(true);
         return new ExporterViewModel(format);
     }
