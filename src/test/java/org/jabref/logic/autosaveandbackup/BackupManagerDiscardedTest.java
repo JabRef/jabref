@@ -73,8 +73,8 @@ class BackupManagerDiscardedTest {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
             new BibtexDatabaseWriter(
                     bibWriter,
-                    preferencesService.getGeneralPreferences(),
                     savePreferences,
+                    preferencesService.getFieldWriterPreferences(),
                     preferencesService.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager)
                     .saveDatabase(bibDatabaseContext);

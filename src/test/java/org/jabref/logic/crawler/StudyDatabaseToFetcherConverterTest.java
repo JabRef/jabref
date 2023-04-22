@@ -12,12 +12,11 @@ import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,11 +28,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class StudyDatabaseToFetcherConverterTest {
-    GeneralPreferences generalPreferences;
-    ImportFormatPreferences importFormatPreferences;
-    ImporterPreferences importerPreferences;
     SavePreferences savePreferences;
-    TimestampPreferences timestampPreferences;
+    PreferencesService preferencesService;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler;
     @TempDir
@@ -41,15 +37,13 @@ class StudyDatabaseToFetcherConverterTest {
 
     @BeforeEach
     void setUpMocks() {
-        generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        importerPreferences = mock(ImporterPreferences.class);
+        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
-        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+
         entryTypesManager = new BibEntryTypesManager();
         gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     }
@@ -62,16 +56,13 @@ class StudyDatabaseToFetcherConverterTest {
         StudyRepository studyRepository = new StudyRepository(
                 tempRepositoryDirectory,
                 gitHandler,
-                generalPreferences,
-                importFormatPreferences,
-                importerPreferences,
+                preferencesService,
                 new DummyFileUpdateMonitor(),
-                savePreferences,
                 entryTypesManager);
         StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),
-                importFormatPreferences,
-                importerPreferences);
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(ImporterPreferences.class));
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         Assertions.assertEquals(

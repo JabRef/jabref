@@ -534,8 +534,8 @@ public class ArgumentProcessor {
 
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,
-                        preferencesService.getGeneralPreferences(),
                         preferencesService.getSavePreferences(),
+                        preferencesService.getFieldWriterPreferences(),
                         preferencesService.getCitationKeyPatternPreferences(),
                         Globals.entryTypesManager);
                 databaseWriter.saveDatabase(new BibDatabaseContext(newBase));

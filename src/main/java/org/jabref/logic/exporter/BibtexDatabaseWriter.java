@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -19,7 +20,6 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.GeneralPreferences;
 
 /**
  * Writes a .bib file following the BibTeX / BibLaTeX format using the provided {@link BibWriter}
@@ -32,21 +32,33 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     private static final String PREAMBLE_PREFIX = "@Preamble";
     private static final String STRING_PREFIX = "@String";
 
+    private final FieldWriterPreferences fieldWriterPreferences;
+
     public BibtexDatabaseWriter(BibWriter bibWriter,
-                                GeneralPreferences generalPreferences,
                                 SavePreferences savePreferences,
+                                FieldWriterPreferences fieldWriterPreferences,
                                 CitationKeyPatternPreferences citationKeyPatternPreferences,
                                 BibEntryTypesManager entryTypesManager) {
-        super(bibWriter, generalPreferences, savePreferences, citationKeyPatternPreferences, entryTypesManager);
+        super(bibWriter,
+                savePreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager);
+
+        this.fieldWriterPreferences = fieldWriterPreferences;
     }
 
     public BibtexDatabaseWriter(Writer writer,
                                 String newline,
-                                GeneralPreferences generalPreferences,
                                 SavePreferences savePreferences,
+                                FieldWriterPreferences fieldWriterPreferences,
                                 CitationKeyPatternPreferences citationKeyPatternPreferences,
                                 BibEntryTypesManager entryTypesManager) {
-        super(new BibWriter(writer, newline), generalPreferences, savePreferences, citationKeyPatternPreferences, entryTypesManager);
+        super(new BibWriter(writer, newline),
+                savePreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager);
+
+        this.fieldWriterPreferences = fieldWriterPreferences;
     }
 
     @Override
@@ -98,9 +110,8 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
             bibWriter.write("{}");
         } else {
             try {
-                String formatted = new FieldWriter(savePreferences.getFieldWriterPreferences())
-                        .write(InternalField.BIBTEX_STRING, bibtexString.getContent()
-                        );
+                String formatted = new FieldWriter(fieldWriterPreferences)
+                        .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
                 bibWriter.write(formatted);
             } catch (InvalidFieldValueException ex) {
                 throw new IOException(ex);
@@ -143,7 +154,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(savePreferences.getFieldWriterPreferences()), entryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldWriterPreferences), entryTypesManager);
         bibtexEntryWriter.write(entry, bibWriter, mode, savePreferences.shouldReformatFile());
     }
 }

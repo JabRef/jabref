@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.model.metadata.SaveOrder;
 
 public class SavePreferences {
@@ -19,15 +18,13 @@ public class SavePreferences {
     private boolean makeBackup;
     private DatabaseSaveType saveType;
     private boolean takeMetadataSaveOrderInAccount;
-    private final FieldWriterPreferences fieldWriterPreferences;
 
     public SavePreferences(Boolean saveInOriginalOrder,
                             SaveOrder saveOrder,
                             Boolean makeBackup,
                             DatabaseSaveType saveType,
                             Boolean takeMetadataSaveOrderInAccount,
-                            Boolean reformatFile,
-                            FieldWriterPreferences fieldWriterPreferences) {
+                            Boolean reformatFile) {
 
         this.saveInOriginalOrder = saveInOriginalOrder;
         this.saveOrder = saveOrder;
@@ -35,7 +32,6 @@ public class SavePreferences {
         this.saveType = saveType;
         this.takeMetadataSaveOrderInAccount = takeMetadataSaveOrderInAccount;
         this.reformatFile = reformatFile;
-        this.fieldWriterPreferences = fieldWriterPreferences;
     }
 
     public boolean takeMetadataSaveOrderInAccount() {
@@ -90,9 +86,5 @@ public class SavePreferences {
 
     public boolean shouldReformatFile() {
         return reformatFile;
-    }
-
-    public FieldWriterPreferences getFieldWriterPreferences() {
-        return fieldWriterPreferences;
     }
 }

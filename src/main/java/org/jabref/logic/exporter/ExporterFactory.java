@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -38,6 +39,7 @@ public class ExporterFactory {
                 preferencesService.getLayoutFormatterPreferences(abbreviationRepository),
                 preferencesService.getSavePreferencesForExport(),
                 preferencesService.getXmpPreferences(),
+                preferencesService.getFieldWriterPreferences(),
                 preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
                 entryTypesManager);
     }
@@ -46,6 +48,7 @@ public class ExporterFactory {
                                          LayoutFormatterPreferences layoutPreferences,
                                          SavePreferences savePreferences,
                                          XmpPreferences xmpPreferences,
+                                         FieldWriterPreferences fieldWriterPreferences,
                                          BibDatabaseMode bibDatabaseMode,
                                          BibEntryTypesManager entryTypesManager) {
 
@@ -77,7 +80,7 @@ public class ExporterFactory {
         exporters.add(new ModsExporter());
         exporters.add(new XmpExporter(xmpPreferences));
         exporters.add(new XmpPdfExporter(xmpPreferences));
-        exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, entryTypesManager, savePreferences.getFieldWriterPreferences()));
+        exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, entryTypesManager, fieldWriterPreferences));
 
         // Now add custom export formats
         exporters.addAll(customFormats);

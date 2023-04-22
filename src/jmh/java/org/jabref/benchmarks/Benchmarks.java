@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.Globals;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -34,7 +35,6 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.openjdk.jmh.Main;
@@ -83,8 +83,8 @@ public class Benchmarks {
         BibWriter bibWriter = new BibWriter(outputWriter, OS.NEWLINE);
         BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
-                mock(GeneralPreferences.class),
                 mock(SavePreferences.class),
+                mock(FieldWriterPreferences.class),
                 mock(CitationKeyPatternPreferences.class),
                 new BibEntryTypesManager());
         databaseWriter.savePartOfDatabase(new BibDatabaseContext(database, new MetaData()), database.getEntries());

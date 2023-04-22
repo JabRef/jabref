@@ -41,7 +41,6 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.GeneralPreferences;
 
 /**
  * A generic writer for our database. This is independent of the concrete serialization format.
@@ -55,19 +54,16 @@ public abstract class BibDatabaseWriter {
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     protected final BibWriter bibWriter;
-    protected final GeneralPreferences generalPreferences;
     protected final SavePreferences savePreferences;
     protected final CitationKeyPatternPreferences keyPatternPreferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
 
     public BibDatabaseWriter(BibWriter bibWriter,
-                             GeneralPreferences generalPreferences,
                              SavePreferences savePreferences,
                              CitationKeyPatternPreferences keyPatternPreferences,
                              BibEntryTypesManager entryTypesManager) {
         this.bibWriter = Objects.requireNonNull(bibWriter);
-        this.generalPreferences = generalPreferences;
         this.savePreferences = savePreferences;
         this.keyPatternPreferences = keyPatternPreferences;
         this.entryTypesManager = entryTypesManager;

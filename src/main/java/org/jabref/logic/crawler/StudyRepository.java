@@ -427,8 +427,8 @@ public class StudyRepository {
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                     bibWriter,
-                    preferencesService.getGeneralPreferences(),
                     preferencesService.getSavePreferences(),
+                    preferencesService.getFieldWriterPreferences(),
                     preferencesService.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));

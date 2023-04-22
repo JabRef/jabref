@@ -238,8 +238,8 @@ public class SaveDatabaseAction {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
                 BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,
-                        preferences.getGeneralPreferences(),
                         savePreferences,
+                        preferences.getFieldWriterPreferences(),
                         preferences.getCitationKeyPatternPreferences(),
                         entryTypesManager);
 

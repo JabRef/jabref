@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -45,12 +46,14 @@ public class DocBook5ExporterTest {
     void setUp() throws URISyntaxException {
         xmlFile = Path.of(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
 
-        List<TemplateExporter> customFormats = new ArrayList<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        SavePreferences savePreferences = mock(SavePreferences.class);
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
+        ExporterFactory exporterFactory = ExporterFactory.create(
+                new ArrayList<>(),
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(SavePreferences.class),
+                mock(XmpPreferences.class),
+                mock(FieldWriterPreferences.class),
+                BibDatabaseMode.BIBTEX,
+                mock(BibEntryTypesManager.class));
 
         exporter = exporterFactory.getExporterByName("docbook5").get();
 

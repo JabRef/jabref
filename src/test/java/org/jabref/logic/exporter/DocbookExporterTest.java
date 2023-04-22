@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -33,13 +34,14 @@ public class DocbookExporterTest {
 
     @BeforeEach
     public void setUp() {
-        List<TemplateExporter> customFormats = new ArrayList<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        SavePreferences savePreferences = mock(SavePreferences.class);
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
-
+        ExporterFactory exporterFactory = ExporterFactory.create(
+                new ArrayList<>(),
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(SavePreferences.class),
+                mock(XmpPreferences.class),
+                mock(FieldWriterPreferences.class),
+                BibDatabaseMode.BIBTEX,
+                mock(BibEntryTypesManager.class));
         exportFormat = exporterFactory.getExporterByName("docbook4").get();
     }
 

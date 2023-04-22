@@ -2139,8 +2139,7 @@ public class JabRefPreferences implements PreferencesService {
                 false,
                 SavePreferences.DatabaseSaveType.ALL,
                 true,
-                this.getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                this.getFieldWriterPreferences());
+                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT));
     }
 
     @Override
