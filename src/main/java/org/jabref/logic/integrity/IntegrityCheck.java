@@ -37,8 +37,9 @@ public class IntegrityCheck {
                 new HTMLCharacterChecker(),
                 new EntryLinkChecker(bibDatabaseContext.getDatabase()),
                 new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
-                new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase())
-        ));
+                new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
+                new AmpersandChecker()
+                ));
         if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),

@@ -71,7 +71,6 @@ public class MSBibConverter {
         result.journalName = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(null);
 
         // Value must be converted
-        // Currently only english is supported
         entry.getLatexFreeField(StandardField.LANGUAGE)
              .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang))));
         StringBuilder sbNumber = new StringBuilder();

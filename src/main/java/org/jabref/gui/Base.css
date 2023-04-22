@@ -1279,7 +1279,17 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -jr-warn;
 }
 
+.info-message {
+    -fx-fill: -jr-info;
+    -fx-text-fill: -jr-info;
+}
+
 .warning-message {
+    -fx-fill: -jr-warn;
+    -fx-text-fill: -jr-warn;
+}
+
+.error-message {
     -fx-fill: -jr-error;
     -fx-text-fill: -jr-error;
 }
