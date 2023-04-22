@@ -15,8 +15,7 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -55,9 +54,7 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
-    FieldWriterPreferences getFieldWriterPreferences();
-
-    FieldContentFormatterPreferences getFieldContentParserPreferences();
+    FieldPreferences getFieldPreferences();
 
     OpenOfficePreferences getOpenOfficePreferences();
 

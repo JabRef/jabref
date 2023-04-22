@@ -25,7 +25,7 @@ class PdfEmbeddedBibFileImporterTest {
     @BeforeEach
     void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.fieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(List.of());
         importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
     }
 

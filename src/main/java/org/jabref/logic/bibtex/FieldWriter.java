@@ -19,21 +19,21 @@ public class FieldWriter {
     private static final char FIELD_END = '}';
 
     private final boolean neverFailOnHashes;
-    private final FieldWriterPreferences preferences;
+    private final FieldPreferences preferences;
     private final FieldContentFormatter formatter;
 
-    public FieldWriter(FieldWriterPreferences preferences) {
+    public FieldWriter(FieldPreferences preferences) {
         this(true, preferences);
     }
 
-    private FieldWriter(boolean neverFailOnHashes, FieldWriterPreferences preferences) {
+    private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {
         this.neverFailOnHashes = neverFailOnHashes;
         this.preferences = preferences;
 
-        formatter = new FieldContentFormatter(preferences.getFieldContentFormatterPreferences());
+        formatter = new FieldContentFormatter(preferences);
     }
 
-    public static FieldWriter buildIgnoreHashes(FieldWriterPreferences prefs) {
+    public static FieldWriter buildIgnoreHashes(FieldPreferences prefs) {
         return new FieldWriter(true, prefs);
     }
 
@@ -166,7 +166,7 @@ public class FieldWriter {
     }
 
     private boolean shouldResolveStrings(Field field) {
-        if (preferences.isResolveStrings()) {
+        if (preferences.shouldResolveStrings()) {
             // Resolve strings for the list of fields only
             return preferences.getResolveStringsForFields().contains(field);
         }

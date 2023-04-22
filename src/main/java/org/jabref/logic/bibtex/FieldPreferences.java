@@ -4,23 +4,24 @@ import java.util.List;
 
 import org.jabref.model.entry.field.Field;
 
-public class FieldWriterPreferences {
+public class FieldPreferences {
 
     private final boolean resolveStrings;
     private final List<Field> resolveStringsForFields;
-    private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
+    private final List<Field> nonWrappableFields;
 
     /**
      * @param resolveStrings true - The character {@link FieldWriter#BIBTEX_STRING_START_END_SYMBOL} should be interpreted as indicator of BibTeX strings
      */
-    public FieldWriterPreferences(boolean resolveStrings, List<Field> resolveStringsForFields,
-                                  FieldContentFormatterPreferences fieldContentFormatterPreferences) {
+    public FieldPreferences(boolean resolveStrings,
+                            List<Field> resolveStringsForFields,
+                            List<Field> nonWrappableFields) {
         this.resolveStrings = resolveStrings;
         this.resolveStringsForFields = resolveStringsForFields;
-        this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
+        this.nonWrappableFields = nonWrappableFields;
     }
 
-    public boolean isResolveStrings() {
+    public boolean shouldResolveStrings() {
         return resolveStrings;
     }
 
@@ -28,7 +29,7 @@ public class FieldWriterPreferences {
         return resolveStringsForFields;
     }
 
-    public FieldContentFormatterPreferences getFieldContentFormatterPreferences() {
-        return fieldContentFormatterPreferences;
+    public List<Field> getNonWrappableFields() {
+        return nonWrappableFields;
     }
 }

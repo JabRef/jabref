@@ -237,7 +237,7 @@ public class BackupManager {
             new BibtexDatabaseWriter(
                     bibWriter,
                     savePreferences,
-                    preferences.getFieldWriterPreferences(),
+                    preferences.getFieldPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
                     entryTypesManager)
                     .saveDatabase(bibDatabaseContext);

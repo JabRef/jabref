@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -55,7 +55,7 @@ public class OpenOfficeDocumentCreatorTest {
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 mock(SavePreferences.class),
                 mock(XmpPreferences.class),
-                mock(FieldWriterPreferences.class),
+                mock(FieldPreferences.class),
                 BibDatabaseMode.BIBTEX,
                 mock(BibEntryTypesManager.class));
 

@@ -13,8 +13,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -100,8 +99,7 @@ class SaveDatabaseActionTest {
         file = Files.createTempFile("JabRef", ".bib");
         file.toFile().deleteOnExit();
 
-        FieldWriterPreferences fieldWriterPreferences = mock(FieldWriterPreferences.class);
-        when(fieldWriterPreferences.getFieldContentFormatterPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         SavePreferences savePreferences = mock(SavePreferences.class);
         // In case a "thenReturn" is modified, the whole mock has to be recreated
         dbContext = mock(BibDatabaseContext.class);
@@ -116,8 +114,7 @@ class SaveDatabaseActionTest {
         when(dbContext.getMetaData()).thenReturn(metaData);
         when(dbContext.getEntries()).thenReturn(database.getEntries());
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
-        when(preferences.getFieldWriterPreferences()).thenReturn(fieldWriterPreferences);
-        when(preferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
+        when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
         when(preferences.getSavePreferences()).thenReturn(savePreferences);
         when(libraryTab.frame()).thenReturn(jabRefFrame);
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);

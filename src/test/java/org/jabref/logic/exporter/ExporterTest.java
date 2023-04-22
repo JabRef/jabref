@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -49,7 +49,7 @@ public class ExporterTest {
                 mock(LayoutFormatterPreferences.class),
                 mock(SavePreferences.class),
                 mock(XmpPreferences.class),
-                mock(FieldWriterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 BibDatabaseMode.BIBTEX,
                 mock(BibEntryTypesManager.class));
 

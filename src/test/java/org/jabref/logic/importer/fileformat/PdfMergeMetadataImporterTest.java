@@ -35,7 +35,7 @@ class PdfMergeMetadataImporterTest {
         when(grobidPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.fieldContentFormatterPreferences().getNonWrappableFields()).thenReturn(List.of());
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(List.of());
         when(importFormatPreferences.grobidPreferences()).thenReturn(grobidPreferences);
 
         importer = new PdfMergeMetadataImporter(importFormatPreferences);

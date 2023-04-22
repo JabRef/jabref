@@ -239,7 +239,7 @@ public class SaveDatabaseAction {
                 BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,
                         savePreferences,
-                        preferences.getFieldWriterPreferences(),
+                        preferences.getFieldPreferences(),
                         preferences.getCitationKeyPatternPreferences(),
                         entryTypesManager);
 

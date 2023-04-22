@@ -16,7 +16,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -235,7 +235,7 @@ public class ArgumentProcessor {
                         preferencesService.getFilePreferences(),
                         preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
                         Globals.entryTypesManager,
-                        preferencesService.getFieldWriterPreferences(),
+                        preferencesService.getFieldPreferences(),
                         cli.isWriteXMPtoPdf() || cli.isWriteMetadatatoPdf(),
                         cli.isEmbeddBibfileInPdf() || cli.isWriteMetadatatoPdf());
             }
@@ -265,7 +265,7 @@ public class ArgumentProcessor {
         return loaded;
     }
 
-    private void writeMetadatatoPdf(List<ParserResult> loaded, String filesAndCitekeys, XmpPreferences xmpPreferences, FilePreferences filePreferences, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, boolean writeXMP, boolean embeddBibfile) {
+    private void writeMetadatatoPdf(List<ParserResult> loaded, String filesAndCitekeys, XmpPreferences xmpPreferences, FilePreferences filePreferences, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldPreferences fieldPreferences, boolean writeXMP, boolean embeddBibfile) {
         if (loaded.isEmpty()) {
             LOGGER.error("The write xmp option depends on a valid import option.");
             return;
@@ -275,7 +275,7 @@ public class ArgumentProcessor {
         BibDatabase dataBase = pr.getDatabase();
 
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
-        EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldWriterPreferences);
+        EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldPreferences);
 
         if ("all".equals(filesAndCitekeys)) {
             for (BibEntry entry : dataBase.getEntries()) {
@@ -535,7 +535,7 @@ public class ArgumentProcessor {
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,
                         preferencesService.getSavePreferences(),
-                        preferencesService.getFieldWriterPreferences(),
+                        preferencesService.getFieldPreferences(),
                         preferencesService.getCitationKeyPatternPreferences(),
                         Globals.entryTypesManager);
                 databaseWriter.saveDatabase(new BibDatabaseContext(newBase));

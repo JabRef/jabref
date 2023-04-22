@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.jabref.gui.Globals;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -84,7 +84,7 @@ public class Benchmarks {
         BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
                 mock(SavePreferences.class),
-                mock(FieldWriterPreferences.class),
+                mock(FieldPreferences.class),
                 mock(CitationKeyPatternPreferences.class),
                 new BibEntryTypesManager());
         databaseWriter.savePartOfDatabase(new BibDatabaseContext(database, new MetaData()), database.getEntries());

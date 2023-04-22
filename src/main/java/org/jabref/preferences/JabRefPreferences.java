@@ -61,8 +61,7 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -2066,7 +2065,7 @@ public class JabRefPreferences implements PreferencesService {
         return new ImportFormatPreferences(
                 getBibEntryPreferences(),
                 getCitationKeyPatternPreferences(),
-                getFieldContentParserPreferences(),
+                getFieldPreferences(),
                 getXmpPreferences(),
                 getDOIPreferences(),
                 getGrobidPreferences());
@@ -2143,17 +2142,15 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public FieldContentFormatterPreferences getFieldContentParserPreferences() {
-        return new FieldContentFormatterPreferences(
-                getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
-    }
-
-    @Override
-    public FieldWriterPreferences getFieldWriterPreferences() {
-        return new FieldWriterPreferences(
+    public FieldPreferences getFieldPreferences() {
+        return new FieldPreferences(
                 !getBoolean(DO_NOT_RESOLVE_STRINGS),
-                getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
-                getFieldContentParserPreferences());
+                getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()
+                                                         .map(FieldFactory::parseField)
+                                                         .collect(Collectors.toList()),
+                getStringList(NON_WRAPPABLE_FIELDS).stream()
+                                                   .map(FieldFactory::parseField)
+                                                   .collect(Collectors.toList()));
     }
 
     @Override

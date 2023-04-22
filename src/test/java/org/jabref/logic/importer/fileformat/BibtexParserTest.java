@@ -1155,7 +1155,7 @@ class BibtexParserTest {
 
     @Test
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
-        when(importFormatPreferences.fieldContentFormatterPreferences().getNonWrappableFields())
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields())
                 .thenReturn(List.of(StandardField.FILE));
         BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
         ParserResult result = parser
