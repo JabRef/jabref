@@ -81,9 +81,10 @@ public class MainTableHeaderContextMenu extends ContextMenu {
             this.getItems().add(itemToAdd);
         }
 
+        separator = new SeparatorMenuItem();
         this.getItems().add(separator);
 
-        RightClickMenuMoreItem itemToAdd = new RightClickMenuMoreItem("More");
+        RightClickMenuMoreItem itemToAdd = new RightClickMenuMoreItem("More...");
         this.getItems().add(itemToAdd);
     }
 

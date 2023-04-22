@@ -18,9 +18,15 @@ public class ShowPreferencesAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
     }
 
-    public ShowPreferencesAction(JabRefFrame jabRefFrame, TaskExecutor taskExecutor, PreferencesTab tab) {
+    /**
+     * Creates an action to open a preferences window at a specific tab
+     * @param jabRefFrame
+     * @param taskExecutor
+     * @param preferencesTab Tab in the preferences window to be shown
+     */
+    public ShowPreferencesAction(JabRefFrame jabRefFrame, TaskExecutor taskExecutor, PreferencesTab preferencesTab) {
         this(jabRefFrame, taskExecutor);
-        this.preferencesTab = tab;
+        this.preferencesTab = preferencesTab;
     }
 
     @Override

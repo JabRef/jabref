@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -124,7 +125,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         });
 
         if (this.tabToBeFound != null) {
-            preferenceTabList.getSelectionModel().select(findPreferencesTab(this.tabToBeFound));
+            Optional<PreferencesTab> foundPreferenceTab = findPreferencesTab(this.tabToBeFound);
+            foundPreferenceTab.ifPresent(preferencesTab -> preferenceTabList.getSelectionModel().select(preferencesTab));
         } else {
             preferenceTabList.getSelectionModel().selectFirst();
         }
@@ -135,14 +137,15 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         viewModel.setValues();
     }
 
-    PreferencesTab findPreferencesTab(PreferencesTab tabToBeFound) {
+    Optional<PreferencesTab> findPreferencesTab(PreferencesTab tabToBeFound) {
+        Optional<PreferencesTab> foundTab = Optional.empty();
         for (int i = 0; i < viewModel.getPreferenceTabs().size(); i++) {
             boolean isTabFound = viewModel.getPreferenceTabs().get(i).getTabName().equals(tabToBeFound.getTabName());
             if (isTabFound) {
-                return viewModel.getPreferenceTabs().get(i);
+                foundTab = Optional.ofNullable(viewModel.getPreferenceTabs().get(i));
             }
         }
-        return null;
+        return foundTab;
     }
 
     @FXML
