@@ -9,6 +9,7 @@ import java.util.Map;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -31,12 +32,21 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     private static final String PREAMBLE_PREFIX = "@Preamble";
     private static final String STRING_PREFIX = "@String";
 
-    public BibtexDatabaseWriter(BibWriter bibWriter, GeneralPreferences generalPreferences, SavePreferences savePreferences, BibEntryTypesManager entryTypesManager) {
-        super(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+    public BibtexDatabaseWriter(BibWriter bibWriter,
+                                GeneralPreferences generalPreferences,
+                                SavePreferences savePreferences,
+                                CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                BibEntryTypesManager entryTypesManager) {
+        super(bibWriter, generalPreferences, savePreferences, citationKeyPatternPreferences, entryTypesManager);
     }
 
-    public BibtexDatabaseWriter(Writer writer, String newline, GeneralPreferences generalPreferences, SavePreferences savePreferences, BibEntryTypesManager entryTypesManager) {
-        super(new BibWriter(writer, newline), generalPreferences, savePreferences, entryTypesManager);
+    public BibtexDatabaseWriter(Writer writer,
+                                String newline,
+                                GeneralPreferences generalPreferences,
+                                SavePreferences savePreferences,
+                                CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                BibEntryTypesManager entryTypesManager) {
+        super(new BibWriter(writer, newline), generalPreferences, savePreferences, citationKeyPatternPreferences, entryTypesManager);
     }
 
     @Override

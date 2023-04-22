@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -75,6 +76,7 @@ public class BibtexDatabaseWriterTest {
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
     private GeneralPreferences generalPreferences;
     private SavePreferences savePreferences;
+    private CitationKeyPatternPreferences citationKeyPatternPreferences;
     private BibEntryTypesManager entryTypesManager;
     private StringWriter stringWriter;
     private BibWriter bibWriter;
@@ -85,10 +87,16 @@ public class BibtexDatabaseWriterTest {
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
+        citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
         entryTypesManager = new BibEntryTypesManager();
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(
+                bibWriter,
+                generalPreferences,
+                savePreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager);
 
         database = new BibDatabase();
         metaData = new MetaData();
@@ -449,7 +457,12 @@ public class BibtexDatabaseWriterTest {
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+                    bibWriter,
+                    generalPreferences,
+                    savePreferences,
+                    citationKeyPatternPreferences,
+                    entryTypesManager);
             databaseWriter.saveDatabase(context);
         }
 
@@ -468,7 +481,12 @@ public class BibtexDatabaseWriterTest {
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+                    bibWriter,
+                    generalPreferences,
+                    savePreferences,
+                    citationKeyPatternPreferences,
+                    entryTypesManager);
             databaseWriter.saveDatabase(context);
         }
 
@@ -487,7 +505,12 @@ public class BibtexDatabaseWriterTest {
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+                    bibWriter,
+                    generalPreferences,
+                    savePreferences,
+                    citationKeyPatternPreferences,
+                    entryTypesManager);
             databaseWriter.saveDatabase(context);
         }
 
@@ -542,7 +565,12 @@ public class BibtexDatabaseWriterTest {
 
         // we need a new writer because "\n" instead of "OS.NEWLINE"
         bibWriter = new BibWriter(stringWriter, "\n");
-        databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(
+                bibWriter,
+                generalPreferences,
+                savePreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager);
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(bibEntry, stringWriter.toString());
     }
@@ -571,7 +599,12 @@ public class BibtexDatabaseWriterTest {
 
         // we need a new writer because "\n" instead of "OS.NEWLINE"
         bibWriter = new BibWriter(stringWriter, "\n");
-        databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(
+                bibWriter,
+                generalPreferences,
+                savePreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager);
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(bibEntry, stringWriter.toString());
     }
@@ -923,7 +956,12 @@ public class BibtexDatabaseWriterTest {
         // write a second time
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(
+                bibWriter,
+                generalPreferences,
+                savePreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager);
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         assertEquals("@Article{test," + OS.NEWLINE +
@@ -998,7 +1036,12 @@ public class BibtexDatabaseWriterTest {
         // write a second time
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        databaseWriter = new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager);
+        databaseWriter = new BibtexDatabaseWriter(
+                bibWriter,
+                generalPreferences,
+                savePreferences,
+                citationKeyPatternPreferences,
+                entryTypesManager);
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         // returns tu original entry, not to the last saved one

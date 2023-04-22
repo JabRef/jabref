@@ -30,7 +30,6 @@ import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -226,7 +225,6 @@ public class BackupManager {
         }
 
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
-        GeneralPreferences generalPreferences = preferences.getGeneralPreferences();
         SavePreferences savePreferences = preferences.getSavePreferences()
                                                      .withMakeBackup(false);
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
@@ -236,7 +234,12 @@ public class BackupManager {
         //          This MUST NOT create a broken backup file that then jabref wants to "restore" from?
         try (Writer writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
+            new BibtexDatabaseWriter(
+                    bibWriter,
+                    preferences.getGeneralPreferences(),
+                    savePreferences,
+                    preferences.getCitationKeyPatternPreferences(),
+                    entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
             backupFilesQueue.add(backupPath);
 

@@ -71,7 +71,12 @@ class BackupManagerDiscardedTest {
     private void saveDatabase() throws IOException {
         try (Writer writer = new AtomicFileWriter(testBib, StandardCharsets.UTF_8, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            new BibtexDatabaseWriter(bibWriter, preferencesService.getGeneralPreferences(), savePreferences, bibEntryTypesManager)
+            new BibtexDatabaseWriter(
+                    bibWriter,
+                    preferencesService.getGeneralPreferences(),
+                    savePreferences,
+                    preferencesService.getCitationKeyPatternPreferences(),
+                    bibEntryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         }
     }

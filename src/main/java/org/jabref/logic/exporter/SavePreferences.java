@@ -21,7 +21,7 @@ public class SavePreferences {
     private boolean takeMetadataSaveOrderInAccount;
     private final FieldWriterPreferences fieldWriterPreferences;
 
-    private SavePreferences(Boolean saveInOriginalOrder,
+    public SavePreferences(Boolean saveInOriginalOrder,
                             SaveOrder saveOrder,
                             Boolean makeBackup,
                             DatabaseSaveType saveType,
