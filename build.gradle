@@ -429,6 +429,8 @@ task databaseTest(type: Test) {
         events = ["FAILED"]
         exceptionFormat "full"
     }
+
+    maxParallelForks = 1
 }
 
 task fetcherTest(type: Test) {
@@ -464,6 +466,8 @@ processTestResources.dependsOn copyTestResources
 
 tasks.withType(Test) {
     reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
+    // Enable parallel tests. See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
 }
 
 task jacocoPrepare() {
