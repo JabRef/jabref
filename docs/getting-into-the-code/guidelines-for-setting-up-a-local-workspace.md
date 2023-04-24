@@ -88,7 +88,7 @@ mkdir git-repositories
 cd git-repositories
 ```
 
-**Note that putting the repo jabref directly under `C:\` or any other drive letter under windows causes compile errors. Further, if you are building on windows, make sure that the absolute path to the location of the clone does not contain folders starting with 'u' (negative example: C:\university\jabref) as this may currently also cause [compile errors](https://github.com/JabRef/jabref/issues/9783).**
+**Note that putting the repo jabref directly under `C:\` or any other drive letter under windows causes compile errors. Further, if you are building on windows, make sure that the absolute path to the location of the clone does not contain folders starting with '`u`' (negative example: `C:\university\jabref`) as this may currently also cause [compile errors](https://github.com/JabRef/jabref/issues/9783).**
 
 Initial cloning might be very slow (`27.00 KiB/s`).
 
