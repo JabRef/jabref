@@ -83,7 +83,7 @@ public class BibtexDatabaseWriterTest {
 
     @BeforeEach
     void setUp() {
-        fieldPreferences = mock(FieldPreferences.class);
+        fieldPreferences = new FieldPreferences(true, Collections.emptyList(), Collections.emptyList());
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
@@ -102,6 +102,7 @@ public class BibtexDatabaseWriterTest {
         metaData = new MetaData();
         bibtexContext = new BibDatabaseContext(database, metaData);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.fieldPreferences()).thenReturn(fieldPreferences);
     }
 
     @Test
