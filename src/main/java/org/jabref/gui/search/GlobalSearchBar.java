@@ -109,6 +109,8 @@ public class GlobalSearchBar extends HBox {
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
+    private final JabRefFrame frame;
+
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
         this.stateManager = stateManager;
@@ -116,6 +118,7 @@ public class GlobalSearchBar extends HBox {
         this.searchPreferences = preferencesService.getSearchPreferences();
         this.undoManager = undoManager;
         this.dialogService = dialogService;
+        this.frame = frame;
 
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
@@ -143,14 +146,16 @@ public class GlobalSearchBar extends HBox {
         searchField.setContextMenu(SearchFieldRightClickMenu.create(
                 keyBindingRepository,
                 stateManager,
-                searchField));
+                searchField,
+                frame));
 
         ObservableList<String> search = stateManager.getWholeSearchHistory();
         search.addListener((ListChangeListener.Change<? extends String> change) -> {
             searchField.setContextMenu(SearchFieldRightClickMenu.create(
                     keyBindingRepository,
                     stateManager,
-                    searchField));
+                    searchField,
+                    frame));
         });
 
         ClipBoardManager.addX11Support(searchField);
