@@ -25,7 +25,6 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -63,7 +62,7 @@ public class Launcher {
             // Init rest of preferences
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
-            applyPreferences(preferences);
+            initGlobals(preferences);
             clearOldSearchIndices();
 
             try {
@@ -140,7 +139,7 @@ public class Launcher {
         return true;
     }
 
-    private static void applyPreferences(PreferencesService preferences) {
+    private static void initGlobals(PreferencesService preferences) {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
@@ -150,11 +149,8 @@ public class Launcher {
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 Globals.getFileUpdateMonitor());
-        Globals.entryTypesManager.addCustomOrModifiedTypes(
-                preferences.getBibEntryTypes(BibDatabaseMode.BIBTEX),
-                preferences.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
 
-        // Initialize protected terms loader
+        Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
     }
 

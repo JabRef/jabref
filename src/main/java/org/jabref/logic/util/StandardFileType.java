@@ -10,7 +10,6 @@ import org.jabref.model.util.OptionalUtil;
  */
 public enum StandardFileType implements FileType {
 
-    BIBTEXML("BibTeXML", "bibx", "xml"),
     ENDNOTE("Endnote", "ref", "enw"),
     ISI("Isi", "isi", "txt"),
     MEDLINE("Medline", "nbib", "xml"),
