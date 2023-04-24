@@ -13,20 +13,16 @@ public class SavePreferences {
     public static final String ENCODING_PREFIX = "Encoding: ";
 
     private final boolean reformatFile;
-    private boolean saveInOriginalOrder;
     private SaveOrder saveOrder;
     private boolean makeBackup;
     private DatabaseSaveType saveType;
     private boolean takeMetadataSaveOrderInAccount;
 
-    public SavePreferences(Boolean saveInOriginalOrder,
-                            SaveOrder saveOrder,
-                            Boolean makeBackup,
-                            DatabaseSaveType saveType,
-                            Boolean takeMetadataSaveOrderInAccount,
-                            Boolean reformatFile) {
-
-        this.saveInOriginalOrder = saveInOriginalOrder;
+    public SavePreferences(SaveOrder saveOrder,
+                           Boolean makeBackup,
+                           DatabaseSaveType saveType,
+                           Boolean takeMetadataSaveOrderInAccount,
+                           Boolean reformatFile) {
         this.saveOrder = saveOrder;
         this.makeBackup = makeBackup;
         this.saveType = saveType;
@@ -49,15 +45,6 @@ public class SavePreferences {
 
     public SavePreferences withSaveOrder(SaveOrder newSaveOrder) {
         this.saveOrder = newSaveOrder;
-        return this;
-    }
-
-    public boolean shouldSaveInOriginalOrder() {
-        return saveInOriginalOrder;
-    }
-
-    public SavePreferences withSaveInOriginalOrder(Boolean newSaveInOriginalOrder) {
-        this.saveInOriginalOrder = newSaveInOriginalOrder;
         return this;
     }
 

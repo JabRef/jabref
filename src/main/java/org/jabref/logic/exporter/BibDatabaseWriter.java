@@ -151,7 +151,7 @@ public abstract class BibDatabaseWriter {
          * 3. order specified in preferences
          */
 
-        if (preferences.shouldSaveInOriginalOrder()) {
+        if (preferences.getSaveOrder().getOrderType() == SaveOrder.OrderType.ORIGINAL) {
             return Optional.empty();
         }
 

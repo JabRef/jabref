@@ -2114,18 +2114,16 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SavePreferences getSavePreferencesForExport() {
-        Boolean saveInOriginalOrder = this.getBoolean(EXPORT_IN_ORIGINAL_ORDER);
-        SaveOrder saveOrder = null;
-        if (!saveInOriginalOrder) {
-            if (this.getBoolean(EXPORT_IN_SPECIFIED_ORDER)) {
-                saveOrder = this.getExportSaveOrder();
-            } else {
-                saveOrder = this.loadTableSaveOrder();
-            }
-        }
+        SaveOrder.OrderType orderType = SaveOrder.OrderType.fromBooleans(
+                getBoolean(EXPORT_IN_SPECIFIED_ORDER),
+                getBoolean(EXPORT_IN_ORIGINAL_ORDER));
+        SaveOrder saveOrder = switch (orderType) {
+            case TABLE -> this.loadTableSaveOrder();
+            case SPECIFIED -> this.getExportSaveOrder();
+            case ORIGINAL -> null;
+        };
 
         return getSavePreferences()
-                .withSaveInOriginalOrder(saveInOriginalOrder)
                 .withSaveOrder(saveOrder)
                 .withTakeMetadataSaveOrderInAccount(false);
     }
@@ -2133,7 +2131,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public SavePreferences getSavePreferences() {
         return new SavePreferences(
-                false,
                 null,
                 false,
                 SavePreferences.DatabaseSaveType.ALL,

@@ -57,7 +57,6 @@ class BackupManagerDiscardedTest {
         when(savePreferences.shouldMakeBackup()).thenReturn(false);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
         when(savePreferences.withMakeBackup(anyBoolean())).thenReturn(savePreferences);
-        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
 
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
