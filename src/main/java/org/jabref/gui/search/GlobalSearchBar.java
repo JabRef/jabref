@@ -107,6 +107,7 @@ public class GlobalSearchBar extends HBox {
     private final DialogService dialogService;
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
+    public static final BooleanProperty searchBoxFocused = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
@@ -307,7 +308,12 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
-        this.stateManager.addSearchHistory(searchField.textProperty().get());
+        searchBoxFocused.bind(searchField.focusedProperty());
+        searchBoxFocused.addListener((observable, oldPropertyValue, newPropertyValue) -> {
+            if (!(newPropertyValue || searchField.textProperty().get().isEmpty())) {
+                this.stateManager.addSearchHistory(searchField.textProperty().get());
+            }
+        });
         stateManager.setSearchQuery(searchQuery);
     }
 

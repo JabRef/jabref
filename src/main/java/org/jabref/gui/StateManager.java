@@ -27,6 +27,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -216,8 +217,10 @@ public class StateManager {
     }
 
     public void addSearchHistory(String search) {
-        searchHistory.remove(search);
-        searchHistory.add(search);
+        if (!GlobalSearchBar.searchBoxFocused.get()) {
+            searchHistory.remove(search);
+            searchHistory.add(search);
+        }
     }
 
     public ObservableList<String> getWholeSearchHistory() {
