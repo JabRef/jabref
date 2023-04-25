@@ -45,7 +45,6 @@ public class GrobidPreferences {
         this.grobidOptOut.set(grobidOptOut);
     }
 
-
     public boolean isGrobidDemanded() {
         return grobidDemanded.get();
     }

@@ -7,8 +7,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
 
 
-public class
-RemoteServicesConfigPanel extends VBox {
+public class RemoteServicesConfigPanel extends VBox {
     @FXML private RadioButton gorbidEnabled;
     @FXML private RadioButton gorbidDisabled;
     @FXML private RadioButton gorbidDemanded;
@@ -27,17 +26,16 @@ RemoteServicesConfigPanel extends VBox {
         gorbidDisabled.selectedProperty().bindBidirectional(viewModel.gorbidDisabledProperty());
         gorbidDemanded.selectedProperty().bindBidirectional(viewModel.gorbidDemandedProperty());
     }
+
     public BooleanProperty gorbidEnabledProperty() {
         return viewModel.gorbidEnabledProperty();
     }
+
     public BooleanProperty gorbidDisabledProperty() {
         return viewModel.gorbidDisabledProperty();
     }
+
     public BooleanProperty gorbidDemandedProperty() {
         return viewModel.gorbidDemandedProperty();
     }
-
-
-
-
 }
