@@ -50,8 +50,7 @@ public class SaveOrder {
     private final List<SortCriterion> sortCriteria = new ArrayList<>();
     private OrderType orderType;
 
-    public SaveOrder() {
-        this.orderType = OrderType.ORIGINAL;
+    private SaveOrder() {
     }
 
     public SaveOrder(OrderType orderType, List<SortCriterion> sortCriteria) {

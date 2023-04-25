@@ -24,7 +24,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -80,9 +79,6 @@ class StudyRepositoryTest {
                 GlobalCitationKeyPattern.fromPattern("[auth][year]"),
                 "",
                 ',');
-        when(saveConfiguration.getSaveOrder()).thenReturn(new SaveOrder());
-        when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
-        when(preferencesService.getSavePreferences()).thenReturn(saveConfiguration);
         when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');

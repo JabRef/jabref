@@ -7,7 +7,7 @@ public class SaveConfiguration {
     // Encoding written at the top of the .bib file.
     public static final String ENCODING_PREFIX = "Encoding: ";
 
-    private final boolean reformatFile;
+    private boolean reformatFile;
     private SaveOrder saveOrder;
     private boolean makeBackup;
     private BibDatabaseWriter.SaveType saveType;
@@ -23,6 +23,14 @@ public class SaveConfiguration {
         this.saveType = saveType;
         this.useMetadataSaveOrder = useMetadataSaveOrder;
         this.reformatFile = reformatFile;
+    }
+
+    public SaveConfiguration() {
+        this(SaveOrder.getDefaultSaveOrder(),
+                false,
+                BibDatabaseWriter.SaveType.ALL,
+                true,
+                false);
     }
 
     public boolean useMetadataSaveOrder() {
@@ -68,5 +76,10 @@ public class SaveConfiguration {
 
     public boolean shouldReformatFile() {
         return reformatFile;
+    }
+
+    public SaveConfiguration withReformatOnSave(boolean newReformat) {
+        this.reformatFile = newReformat;
+        return this;
     }
 }

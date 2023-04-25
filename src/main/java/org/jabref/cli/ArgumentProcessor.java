@@ -25,6 +25,7 @@ import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.XmpPdfExporter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
@@ -531,10 +532,12 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+                SaveConfiguration saveConfiguration = new SaveConfiguration()
+                        .withReformatOnSave(preferencesService.getImportExportPreferences().shouldAlwaysReformatOnSave());
 
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,
-                        preferencesService.getSavePreferences(),
+                        saveConfiguration,
                         preferencesService.getFieldPreferences(),
                         preferencesService.getCitationKeyPatternPreferences(),
                         Globals.entryTypesManager);

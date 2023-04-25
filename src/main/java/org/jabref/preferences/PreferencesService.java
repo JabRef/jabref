@@ -72,8 +72,6 @@ public interface PreferencesService {
 
     SaveConfiguration getSavePreferencesForExport();
 
-    SaveConfiguration getSavePreferences();
-
     SaveOrder getExportSaveOrder();
 
     void storeExportSaveOrder(SaveOrder config);

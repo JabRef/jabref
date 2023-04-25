@@ -225,8 +225,10 @@ public class BackupManager {
         }
 
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
-        SaveConfiguration saveConfiguration = preferences.getSavePreferences()
-                                                         .withMakeBackup(false);
+        SaveConfiguration saveConfiguration = new SaveConfiguration()
+                .withMakeBackup(false)
+                .withReformatOnSave(preferences.getImportExportPreferences().shouldAlwaysReformatOnSave());
+
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         // We want to have successful backups only
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"

@@ -53,13 +53,12 @@ class BackupManagerDiscardedTest {
 
         bibEntryTypesManager = new BibEntryTypesManager();
 
-        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
+        saveConfiguration = mock(SaveConfiguration.class);
         when(saveConfiguration.shouldMakeBackup()).thenReturn(false);
-        when(saveConfiguration.getSaveOrder()).thenReturn(new SaveOrder());
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(saveConfiguration.withMakeBackup(anyBoolean())).thenReturn(saveConfiguration);
 
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferencesService.getSavePreferences()).thenReturn(saveConfiguration);
 
         saveDatabase();
 

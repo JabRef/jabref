@@ -85,7 +85,7 @@ public class BibtexDatabaseWriterTest {
     void setUp() {
         fieldPreferences = new FieldPreferences(true, Collections.emptyList(), Collections.emptyList());
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
-        when(saveConfiguration.getSaveOrder()).thenReturn(new SaveOrder());
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
         citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();

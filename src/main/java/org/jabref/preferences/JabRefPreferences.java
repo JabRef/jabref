@@ -67,7 +67,6 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -2121,22 +2120,13 @@ public class JabRefPreferences implements PreferencesService {
         SaveOrder saveOrder = switch (orderType) {
             case TABLE -> this.loadTableSaveOrder();
             case SPECIFIED -> this.getExportSaveOrder();
-            case ORIGINAL -> new SaveOrder();
+            case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
         };
 
-        return getSavePreferences()
+        return new SaveConfiguration()
                 .withSaveOrder(saveOrder)
-                .withMetadataSaveOrder(false);
-    }
-
-    @Override
-    public SaveConfiguration getSavePreferences() {
-        return new SaveConfiguration(
-                new SaveOrder(), // ORIGINAL
-                false,
-                BibDatabaseWriter.SaveType.ALL,
-                true,
-                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT));
+                .withMetadataSaveOrder(false)
+                .withReformatOnSave(getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT));
     }
 
     @Override

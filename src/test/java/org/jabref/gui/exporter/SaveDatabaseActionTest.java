@@ -27,6 +27,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -60,8 +61,8 @@ class SaveDatabaseActionTest {
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.getImportExportPreferences()).thenReturn(mock(ImportExportPreferences.class));
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
-
         saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class)));
     }
 
@@ -109,7 +110,7 @@ class SaveDatabaseActionTest {
         libraryTab = mock(LibraryTab.class);
         MetaData metaData = mock(MetaData.class);
         when(saveConfiguration.withSaveType(any(BibDatabaseWriter.SaveType.class))).thenReturn(saveConfiguration);
-        when(saveConfiguration.getSaveOrder()).thenReturn(new SaveOrder());
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         GlobalCitationKeyPattern emptyGlobalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern("");
         when(metaData.getCiteKeyPattern(any(GlobalCitationKeyPattern.class))).thenReturn(emptyGlobalCitationKeyPattern);
         when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
@@ -119,7 +120,6 @@ class SaveDatabaseActionTest {
         when(dbContext.getEntries()).thenReturn(database.getEntries());
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
-        when(preferences.getSavePreferences()).thenReturn(saveConfiguration);
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class));
         when(preferences.getCitationKeyPatternPreferences().getKeyPattern()).thenReturn(emptyGlobalCitationKeyPattern);
         when(libraryTab.frame()).thenReturn(jabRefFrame);
