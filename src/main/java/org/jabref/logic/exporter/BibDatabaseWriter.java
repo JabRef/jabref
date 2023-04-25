@@ -52,6 +52,8 @@ import org.jabref.model.strings.StringUtil;
  */
 public abstract class BibDatabaseWriter {
 
+    public enum SaveType { ALL, PLAIN_BIBTEX }
+
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     protected final BibWriter bibWriter;
     protected final SavePreferences savePreferences;
@@ -184,7 +186,7 @@ public abstract class BibDatabaseWriter {
         }
 
         // Some file formats write something at the start of the file (like the encoding)
-        if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+        if (savePreferences.getSaveType() != SaveType.PLAIN_BIBTEX) {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
             writeProlog(bibDatabaseContext, charset);
         }
@@ -222,7 +224,7 @@ public abstract class BibDatabaseWriter {
             writeEntry(entry, bibDatabaseContext.getMode());
         }
 
-        if (savePreferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
+        if (savePreferences.getSaveType() != SaveType.PLAIN_BIBTEX) {
             // Write meta data.
             writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPattern());
 

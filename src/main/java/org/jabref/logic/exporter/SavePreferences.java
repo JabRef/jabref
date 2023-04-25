@@ -4,23 +4,18 @@ import org.jabref.model.metadata.SaveOrder;
 
 public class SavePreferences {
 
-    public enum DatabaseSaveType {
-        ALL,
-        PLAIN_BIBTEX
-    }
-
     // Encoding written at the top of the .bib file.
     public static final String ENCODING_PREFIX = "Encoding: ";
 
     private final boolean reformatFile;
     private SaveOrder saveOrder;
     private boolean makeBackup;
-    private DatabaseSaveType saveType;
+    private BibDatabaseWriter.SaveType saveType;
     private boolean useMetadataSaveOrder;
 
     public SavePreferences(SaveOrder saveOrder,
                            Boolean makeBackup,
-                           DatabaseSaveType saveType,
+                           BibDatabaseWriter.SaveType saveType,
                            Boolean useMetadataSaveOrder,
                            Boolean reformatFile) {
         this.saveOrder = saveOrder;
@@ -62,11 +57,11 @@ public class SavePreferences {
         return this;
     }
 
-    public DatabaseSaveType getSaveType() {
+    public BibDatabaseWriter.SaveType getSaveType() {
         return saveType;
     }
 
-    public SavePreferences withSaveType(DatabaseSaveType newSaveType) {
+    public SavePreferences withSaveType(BibDatabaseWriter.SaveType newSaveType) {
         this.saveType = newSaveType;
         return this;
     }

@@ -24,6 +24,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
@@ -91,7 +92,7 @@ public class SaveDatabaseAction {
     public void saveSelectedAsPlain() {
         askForSavePath().ifPresent(path -> {
             try {
-                saveDatabase(path, true, StandardCharsets.UTF_8, SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
+                saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX);
                 frame.getFileHistory().newFile(path);
                 dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
@@ -209,7 +210,7 @@ public class SaveDatabaseAction {
             libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
             // Save the database
-            boolean success = saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL);
+            boolean success = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.ALL);
 
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
@@ -227,7 +228,7 @@ public class SaveDatabaseAction {
         }
     }
 
-    private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
+    private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType) throws SaveException {
         // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManager.performBackup
 
         SavePreferences savePreferences = preferences.getSavePreferences()
@@ -263,7 +264,7 @@ public class SaveDatabaseAction {
         }
     }
 
-    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, SavePreferences.DatabaseSaveType saveType) throws SaveException {
+    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType) throws SaveException {
         DialogPane pane = new DialogPane();
         VBox vbox = new VBox();
         vbox.getChildren().addAll(

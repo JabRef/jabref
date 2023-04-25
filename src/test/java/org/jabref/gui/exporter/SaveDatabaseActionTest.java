@@ -15,6 +15,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabase;
@@ -105,7 +106,7 @@ class SaveDatabaseActionTest {
         dbContext = mock(BibDatabaseContext.class);
         libraryTab = mock(LibraryTab.class);
         MetaData metaData = mock(MetaData.class);
-        when(savePreferences.withSaveType(any(SavePreferences.DatabaseSaveType.class))).thenReturn(savePreferences);
+        when(savePreferences.withSaveType(any(BibDatabaseWriter.SaveType.class))).thenReturn(savePreferences);
         GlobalCitationKeyPattern emptyGlobalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern("");
         when(metaData.getCiteKeyPattern(any(GlobalCitationKeyPattern.class))).thenReturn(emptyGlobalCitationKeyPattern);
         when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));

@@ -67,6 +67,7 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -2099,17 +2100,17 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private SaveOrder loadTableSaveOrder() {
-        SaveOrder config = new SaveOrder();
         List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
+        List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
 
         for (var column : sortOrder) {
             boolean descending = (column.getSortType() == SortType.DESCENDING);
-            config.getSortCriteria().add(new SaveOrder.SortCriterion(
+            criteria.add(new SaveOrder.SortCriterion(
                     FieldFactory.parseField(column.getQualifier()),
                     descending));
         }
 
-        return config;
+        return new SaveOrder(SaveOrder.OrderType.TABLE, criteria);
     }
 
     @Override
@@ -2133,7 +2134,7 @@ public class JabRefPreferences implements PreferencesService {
         return new SavePreferences(
                 new SaveOrder(), // ORIGINAL
                 false,
-                SavePreferences.DatabaseSaveType.ALL,
+                BibDatabaseWriter.SaveType.ALL,
                 true,
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT));
     }
