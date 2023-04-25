@@ -1,11 +1,10 @@
 package org.jabref.gui.commonfxcontrols;
 
-import com.airhacks.afterburner.views.ViewLoader;
 import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
-
+import com.airhacks.afterburner.views.ViewLoader;
 
 public class RemoteServicesConfigPanel extends VBox {
     @FXML private RadioButton gorbidEnabled;

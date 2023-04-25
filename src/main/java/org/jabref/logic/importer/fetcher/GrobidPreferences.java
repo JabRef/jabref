@@ -57,7 +57,6 @@ public class GrobidPreferences {
         this.grobidDemanded.set(grobidDemanded);
     }
 
-
     public String getGrobidURL() {
         return grobidURL.get();
     }

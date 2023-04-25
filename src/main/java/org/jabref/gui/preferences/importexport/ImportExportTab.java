@@ -66,7 +66,6 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         RemoteServicesConfigPanel.gorbidDisabledProperty().bindBidirectional(viewModel.grobidDisabledProperty());
         RemoteServicesConfigPanel.gorbidEnabledProperty().bindBidirectional(viewModel.grobidEnabledProperty());
 
-
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
         grobidURL.disableProperty().bind(viewModel.grobidEnabledProperty().not());
 
