@@ -23,7 +23,7 @@ import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -225,8 +225,8 @@ public class BackupManager {
         }
 
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
-        SavePreferences savePreferences = preferences.getSavePreferences()
-                                                     .withMakeBackup(false);
+        SaveConfiguration saveConfiguration = preferences.getSavePreferences()
+                                                         .withMakeBackup(false);
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         // We want to have successful backups only
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
@@ -236,7 +236,7 @@ public class BackupManager {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
             new BibtexDatabaseWriter(
                     bibWriter,
-                    savePreferences,
+                    saveConfiguration,
                     preferences.getFieldPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
                     entryTypesManager)

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class StudyDatabaseToFetcherConverterTest {
-    SavePreferences savePreferences;
+    SaveConfiguration saveConfiguration;
     PreferencesService preferencesService;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler;
@@ -38,9 +38,9 @@ class StudyDatabaseToFetcherConverterTest {
     @BeforeEach
     void setUpMocks() {
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-        savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
-        when(savePreferences.useMetadataSaveOrder()).thenReturn(true);
+        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
+        when(saveConfiguration.getSaveOrder()).thenReturn(new SaveOrder());
+        when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
         when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
 

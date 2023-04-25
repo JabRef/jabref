@@ -56,17 +56,17 @@ public abstract class BibDatabaseWriter {
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     protected final BibWriter bibWriter;
-    protected final SavePreferences savePreferences;
+    protected final SaveConfiguration saveConfiguration;
     protected final CitationKeyPatternPreferences keyPatternPreferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
 
     public BibDatabaseWriter(BibWriter bibWriter,
-                             SavePreferences savePreferences,
+                             SaveConfiguration saveConfiguration,
                              CitationKeyPatternPreferences keyPatternPreferences,
                              BibEntryTypesManager entryTypesManager) {
         this.bibWriter = Objects.requireNonNull(bibWriter);
-        this.savePreferences = savePreferences;
+        this.saveConfiguration = saveConfiguration;
         this.keyPatternPreferences = keyPatternPreferences;
         this.entryTypesManager = entryTypesManager;
     }
@@ -100,7 +100,7 @@ public abstract class BibDatabaseWriter {
         return applySaveActions(Collections.singletonList(entry), metaData);
     }
 
-    private static List<Comparator<BibEntry>> getSaveComparators(MetaData metaData, SavePreferences preferences) {
+    private static List<Comparator<BibEntry>> getSaveComparators(MetaData metaData, SaveConfiguration preferences) {
         List<Comparator<BibEntry>> comparators = new ArrayList<>();
         Optional<SaveOrder> saveOrder = getSaveOrder(metaData, preferences);
 
@@ -129,7 +129,7 @@ public abstract class BibDatabaseWriter {
      * non-database save operation (such as the exportDatabase call), we do not wish to use the global preference of
      * saving in standard order.
      */
-    public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entriesToSort, SavePreferences preferences) {
+    public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entriesToSort, SaveConfiguration preferences) {
         Objects.requireNonNull(bibDatabaseContext);
         Objects.requireNonNull(entriesToSort);
 
@@ -146,7 +146,7 @@ public abstract class BibDatabaseWriter {
         return sorted;
     }
 
-    private static Optional<SaveOrder> getSaveOrder(MetaData metaData, SavePreferences preferences) {
+    private static Optional<SaveOrder> getSaveOrder(MetaData metaData, SaveConfiguration preferences) {
         /* three options:
          * 1. original order
          * 2. order specified in metaData
@@ -186,7 +186,7 @@ public abstract class BibDatabaseWriter {
         }
 
         // Some file formats write something at the start of the file (like the encoding)
-        if (savePreferences.getSaveType() != SaveType.PLAIN_BIBTEX) {
+        if (saveConfiguration.getSaveType() != SaveType.PLAIN_BIBTEX) {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
             writeProlog(bibDatabaseContext, charset);
         }
@@ -200,7 +200,7 @@ public abstract class BibDatabaseWriter {
         writeStrings(bibDatabaseContext.getDatabase());
 
         // Write database entries.
-        List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, savePreferences);
+        List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, saveConfiguration);
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
         if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
@@ -224,7 +224,7 @@ public abstract class BibDatabaseWriter {
             writeEntry(entry, bibDatabaseContext.getMode());
         }
 
-        if (savePreferences.getSaveType() != SaveType.PLAIN_BIBTEX) {
+        if (saveConfiguration.getSaveType() != SaveType.PLAIN_BIBTEX) {
             // Write meta data.
             writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPattern());
 

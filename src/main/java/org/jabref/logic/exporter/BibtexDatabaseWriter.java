@@ -35,12 +35,12 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     private final FieldPreferences fieldPreferences;
 
     public BibtexDatabaseWriter(BibWriter bibWriter,
-                                SavePreferences savePreferences,
+                                SaveConfiguration saveConfiguration,
                                 FieldPreferences fieldPreferences,
                                 CitationKeyPatternPreferences citationKeyPatternPreferences,
                                 BibEntryTypesManager entryTypesManager) {
         super(bibWriter,
-                savePreferences,
+                saveConfiguration,
                 citationKeyPatternPreferences,
                 entryTypesManager);
 
@@ -49,12 +49,12 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
     public BibtexDatabaseWriter(Writer writer,
                                 String newline,
-                                SavePreferences savePreferences,
+                                SaveConfiguration saveConfiguration,
                                 FieldPreferences fieldPreferences,
                                 CitationKeyPatternPreferences citationKeyPatternPreferences,
                                 BibEntryTypesManager entryTypesManager) {
         super(new BibWriter(writer, newline),
-                savePreferences,
+                saveConfiguration,
                 citationKeyPatternPreferences,
                 entryTypesManager);
 
@@ -93,7 +93,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     @Override
     protected void writeString(BibtexString bibtexString, int maxKeyLength) throws IOException {
         // If the string has not been modified, write it back as it was
-        if (!savePreferences.shouldReformatFile() && !bibtexString.hasChanged()) {
+        if (!saveConfiguration.shouldReformatFile() && !bibtexString.hasChanged()) {
             bibWriter.write(bibtexString.getParsedSerialization());
             return;
         }
@@ -141,7 +141,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
         // Writes the file encoding information.
         bibWriter.write("% ");
-        bibWriter.writeLine(SavePreferences.ENCODING_PREFIX + encoding);
+        bibWriter.writeLine(SaveConfiguration.ENCODING_PREFIX + encoding);
     }
 
     @Override
@@ -155,6 +155,6 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
-        bibtexEntryWriter.write(entry, bibWriter, mode, savePreferences.shouldReformatFile());
+        bibtexEntryWriter.write(entry, bibWriter, mode, saveConfiguration.shouldReformatFile());
     }
 }

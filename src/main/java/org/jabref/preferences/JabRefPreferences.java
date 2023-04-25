@@ -69,7 +69,7 @@ import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -2114,7 +2114,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public SavePreferences getSavePreferencesForExport() {
+    public SaveConfiguration getSavePreferencesForExport() {
         SaveOrder.OrderType orderType = SaveOrder.OrderType.fromBooleans(
                 getBoolean(EXPORT_IN_SPECIFIED_ORDER),
                 getBoolean(EXPORT_IN_ORIGINAL_ORDER));
@@ -2130,8 +2130,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public SavePreferences getSavePreferences() {
-        return new SavePreferences(
+    public SaveConfiguration getSavePreferences() {
+        return new SaveConfiguration(
                 new SaveOrder(), // ORIGINAL
                 false,
                 BibDatabaseWriter.SaveType.ALL,
@@ -2264,7 +2264,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
-        SavePreferences savePreferences = getSavePreferencesForExport();
+        SaveConfiguration saveConfiguration = getSavePreferencesForExport();
         List<TemplateExporter> formats = new ArrayList<>();
 
         for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {
@@ -2274,7 +2274,7 @@ public class JabRefPreferences implements PreferencesService {
                     formatData.get(EXPORTER_FILENAME_INDEX),
                     formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
-                    savePreferences);
+                    saveConfiguration);
             format.setCustomExport(true);
             formats.add(format);
         }

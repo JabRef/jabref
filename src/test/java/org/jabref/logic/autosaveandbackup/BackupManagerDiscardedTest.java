@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -37,7 +37,7 @@ class BackupManagerDiscardedTest {
     private BibDatabaseContext bibDatabaseContext;
     private BackupManager backupManager;
     private Path testBib;
-    private SavePreferences savePreferences;
+    private SaveConfiguration saveConfiguration;
     private PreferencesService preferencesService;
     private BibEntryTypesManager bibEntryTypesManager;
 
@@ -53,13 +53,13 @@ class BackupManagerDiscardedTest {
 
         bibEntryTypesManager = new BibEntryTypesManager();
 
-        savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(savePreferences.shouldMakeBackup()).thenReturn(false);
-        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
-        when(savePreferences.withMakeBackup(anyBoolean())).thenReturn(savePreferences);
+        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
+        when(saveConfiguration.shouldMakeBackup()).thenReturn(false);
+        when(saveConfiguration.getSaveOrder()).thenReturn(new SaveOrder());
+        when(saveConfiguration.withMakeBackup(anyBoolean())).thenReturn(saveConfiguration);
 
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
+        when(preferencesService.getSavePreferences()).thenReturn(saveConfiguration);
 
         saveDatabase();
 
@@ -72,7 +72,7 @@ class BackupManagerDiscardedTest {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
             new BibtexDatabaseWriter(
                     bibWriter,
-                    savePreferences,
+                    saveConfiguration,
                     preferencesService.getFieldPreferences(),
                     preferencesService.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager)

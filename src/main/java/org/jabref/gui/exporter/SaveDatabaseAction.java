@@ -28,7 +28,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -231,15 +231,15 @@ public class SaveDatabaseAction {
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType) throws SaveException {
         // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManager.performBackup
 
-        SavePreferences savePreferences = preferences.getSavePreferences()
-                                                      .withSaveType(saveType);
+        SaveConfiguration saveConfiguration = preferences.getSavePreferences()
+                                                         .withSaveType(saveType);
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
         synchronized (bibDatabaseContext) {
-            try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, savePreferences.shouldMakeBackup())) {
+            try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
                 BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,
-                        savePreferences,
+                        saveConfiguration,
                         preferences.getFieldPreferences(),
                         preferences.getCitationKeyPatternPreferences(),
                         entryTypesManager);

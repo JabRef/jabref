@@ -47,7 +47,7 @@ public class ExporterTest {
         ExporterFactory exporterFactory = ExporterFactory.create(
                 new ArrayList<>(),
                 mock(LayoutFormatterPreferences.class),
-                mock(SavePreferences.class),
+                mock(SaveConfiguration.class),
                 mock(XmpPreferences.class),
                 mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 BibDatabaseMode.BIBTEX,

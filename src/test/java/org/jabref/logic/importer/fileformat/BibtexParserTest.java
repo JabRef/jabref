@@ -17,7 +17,7 @@ import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
@@ -1273,7 +1273,7 @@ class BibtexParserTest {
     void parseRemovesEncodingLineAndSeparatorInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = parser.parse(
-                new StringReader(SavePreferences.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
+                new StringReader(SaveConfiguration.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
@@ -1732,10 +1732,10 @@ class BibtexParserTest {
         BibEntry expected = new BibEntry();
         expected.setType(StandardEntryType.Article);
         expected.setCitationKey("test");
-        expected.setField(StandardField.AUTHOR, SavePreferences.ENCODING_PREFIX);
+        expected.setField(StandardField.AUTHOR, SaveConfiguration.ENCODING_PREFIX);
 
         List<BibEntry> parsed = parser
-                .parseEntries("@article{test,author={" + SavePreferences.ENCODING_PREFIX + "}}");
+                .parseEntries("@article{test,author={" + SaveConfiguration.ENCODING_PREFIX + "}}");
 
         assertEquals(List.of(expected), parsed);
     }

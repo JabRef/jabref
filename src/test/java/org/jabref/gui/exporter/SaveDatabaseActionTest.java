@@ -16,7 +16,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.BibDatabaseWriter;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -101,12 +101,12 @@ class SaveDatabaseActionTest {
         file.toFile().deleteOnExit();
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
-        SavePreferences savePreferences = mock(SavePreferences.class);
+        SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
         // In case a "thenReturn" is modified, the whole mock has to be recreated
         dbContext = mock(BibDatabaseContext.class);
         libraryTab = mock(LibraryTab.class);
         MetaData metaData = mock(MetaData.class);
-        when(savePreferences.withSaveType(any(BibDatabaseWriter.SaveType.class))).thenReturn(savePreferences);
+        when(saveConfiguration.withSaveType(any(BibDatabaseWriter.SaveType.class))).thenReturn(saveConfiguration);
         GlobalCitationKeyPattern emptyGlobalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern("");
         when(metaData.getCiteKeyPattern(any(GlobalCitationKeyPattern.class))).thenReturn(emptyGlobalCitationKeyPattern);
         when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
@@ -116,7 +116,7 @@ class SaveDatabaseActionTest {
         when(dbContext.getEntries()).thenReturn(database.getEntries());
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
-        when(preferences.getSavePreferences()).thenReturn(savePreferences);
+        when(preferences.getSavePreferences()).thenReturn(saveConfiguration);
         when(libraryTab.frame()).thenReturn(jabRefFrame);
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(libraryTab.getUndoManager()).thenReturn(mock(CountingUndoManager.class));

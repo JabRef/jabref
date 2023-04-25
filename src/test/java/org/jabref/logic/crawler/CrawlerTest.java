@@ -9,7 +9,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -40,7 +40,7 @@ class CrawlerTest {
     Path tempRepositoryDirectory;
     ImportFormatPreferences importFormatPreferences;
     ImporterPreferences importerPreferences;
-    SavePreferences savePreferences;
+    SaveConfiguration saveConfiguration;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     String hashCodeQuantum = String.valueOf("Quantum".hashCode());
@@ -95,9 +95,9 @@ class CrawlerTest {
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class);
-        savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
-        when(savePreferences.useMetadataSaveOrder()).thenReturn(true);
+        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
+        when(saveConfiguration.getSaveOrder()).thenReturn(new SaveOrder());
+        when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 

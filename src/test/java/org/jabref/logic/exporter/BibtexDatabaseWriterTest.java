@@ -74,7 +74,7 @@ public class BibtexDatabaseWriterTest {
     private BibDatabaseContext bibtexContext;
     private ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-    private SavePreferences savePreferences;
+    private SaveConfiguration saveConfiguration;
     private FieldPreferences fieldPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
     private BibEntryTypesManager entryTypesManager;
@@ -84,16 +84,16 @@ public class BibtexDatabaseWriterTest {
     @BeforeEach
     void setUp() {
         fieldPreferences = new FieldPreferences(true, Collections.emptyList(), Collections.emptyList());
-        savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
-        when(savePreferences.useMetadataSaveOrder()).thenReturn(true);
+        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
+        when(saveConfiguration.getSaveOrder()).thenReturn(new SaveOrder());
+        when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
         citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
-                savePreferences,
+                saveConfiguration,
                 fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
@@ -459,7 +459,7 @@ public class BibtexDatabaseWriterTest {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                     bibWriter,
-                    savePreferences,
+                    saveConfiguration,
                     fieldPreferences,
                     citationKeyPatternPreferences,
                     entryTypesManager);
@@ -483,7 +483,7 @@ public class BibtexDatabaseWriterTest {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                     bibWriter,
-                    savePreferences,
+                    saveConfiguration,
                     fieldPreferences,
                     citationKeyPatternPreferences,
                     entryTypesManager);
@@ -507,7 +507,7 @@ public class BibtexDatabaseWriterTest {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                     bibWriter,
-                    savePreferences,
+                    saveConfiguration,
                     fieldPreferences,
                     citationKeyPatternPreferences,
                     entryTypesManager);
@@ -528,7 +528,7 @@ public class BibtexDatabaseWriterTest {
         BibWriter bibWriter = new BibWriter(stringWriter, context.getDatabase().getNewLineSeparator());
         BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
-                savePreferences,
+                saveConfiguration,
                 fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
@@ -571,7 +571,7 @@ public class BibtexDatabaseWriterTest {
         bibWriter = new BibWriter(stringWriter, "\n");
         databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
-                savePreferences,
+                saveConfiguration,
                 fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
@@ -604,7 +604,7 @@ public class BibtexDatabaseWriterTest {
         bibWriter = new BibWriter(stringWriter, "\n");
         databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
-                savePreferences,
+                saveConfiguration,
                 fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
@@ -680,7 +680,7 @@ public class BibtexDatabaseWriterTest {
         entry.setChanged(false);
         database.insertEntry(entry);
 
-        when(savePreferences.shouldReformatFile()).thenReturn(true);
+        when(saveConfiguration.shouldReformatFile()).thenReturn(true);
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
         assertEquals("@Article{," + OS.NEWLINE + "  author = {Mr. author}," + OS.NEWLINE + "}"
@@ -705,7 +705,7 @@ public class BibtexDatabaseWriterTest {
         string.setParsedSerialization("wrong serialization");
         database.addString(string);
 
-        when(savePreferences.shouldReformatFile()).thenReturn(true);
+        when(saveConfiguration.shouldReformatFile()).thenReturn(true);
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("@String{name = {content}}" + OS.NEWLINE, stringWriter.toString());
@@ -956,7 +956,7 @@ public class BibtexDatabaseWriterTest {
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
-                savePreferences,
+                saveConfiguration,
                 fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
@@ -1036,7 +1036,7 @@ public class BibtexDatabaseWriterTest {
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
-                savePreferences,
+                saveConfiguration,
                 fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);

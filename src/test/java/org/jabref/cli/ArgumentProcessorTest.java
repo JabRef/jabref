@@ -10,7 +10,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.cli.ArgumentProcessor.Mode;
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -35,14 +35,14 @@ class ArgumentProcessorTest {
     private ArgumentProcessor processor;
     private BibtexImporter bibtexImporter;
     private final PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-    private final SavePreferences savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
+    private final SaveConfiguration saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
     @BeforeEach()
     void setup() {
-        when(savePreferences.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(preferencesService.getSavePreferences()).thenReturn(saveConfiguration);
         when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
         when(preferencesService.getSearchPreferences()).thenReturn(
                 new SearchPreferences(null, EnumSet.noneOf(SearchRules.SearchFlags.class), false)

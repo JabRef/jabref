@@ -53,7 +53,7 @@ public class OpenOfficeDocumentCreatorTest {
         ExporterFactory exporterFactory = ExporterFactory.create(
                 new ArrayList<>(),
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(SavePreferences.class),
+                mock(SaveConfiguration.class),
                 mock(XmpPreferences.class),
                 mock(FieldPreferences.class),
                 BibDatabaseMode.BIBTEX,

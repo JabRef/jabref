@@ -14,7 +14,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.database.DatabaseMerger;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.io.FileUtil;
@@ -50,7 +50,7 @@ class StudyRepositoryTest {
     PreferencesService preferencesService;
     GeneralPreferences generalPreferences;
     ImportFormatPreferences importFormatPreferences;
-    SavePreferences savePreferences;
+    SaveConfiguration saveConfiguration;
     BibEntryTypesManager entryTypesManager;
     @TempDir
     Path tempRepositoryDirectory;
@@ -66,7 +66,7 @@ class StudyRepositoryTest {
     @BeforeEach
     public void setUpMocks() throws Exception {
         generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
@@ -80,9 +80,9 @@ class StudyRepositoryTest {
                 GlobalCitationKeyPattern.fromPattern("[auth][year]"),
                 "",
                 ',');
-        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
-        when(savePreferences.useMetadataSaveOrder()).thenReturn(true);
-        when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
+        when(saveConfiguration.getSaveOrder()).thenReturn(new SaveOrder());
+        when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
+        when(preferencesService.getSavePreferences()).thenReturn(saveConfiguration);
         when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
