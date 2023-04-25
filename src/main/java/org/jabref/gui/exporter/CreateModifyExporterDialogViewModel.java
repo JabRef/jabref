@@ -70,7 +70,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(repository);
-        SaveConfiguration saveConfiguration = preferences.getSavePreferencesForExport();
+        SaveConfiguration saveConfiguration = preferences.getExportConfiguration();
         TemplateExporter format = new TemplateExporter(
                 name.get(),
                 layoutFile.get(),

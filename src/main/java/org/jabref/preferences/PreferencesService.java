@@ -70,7 +70,7 @@ public interface PreferencesService {
 
     ImportFormatPreferences getImportFormatPreferences();
 
-    SaveConfiguration getSavePreferencesForExport();
+    SaveConfiguration getExportConfiguration();
 
     SaveOrder getExportSaveOrder();
 

@@ -2113,7 +2113,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public SaveConfiguration getSavePreferencesForExport() {
+    public SaveConfiguration getExportConfiguration() {
         SaveOrder.OrderType orderType = SaveOrder.OrderType.fromBooleans(
                 getBoolean(EXPORT_IN_SPECIFIED_ORDER),
                 getBoolean(EXPORT_IN_ORIGINAL_ORDER));
@@ -2126,7 +2126,7 @@ public class JabRefPreferences implements PreferencesService {
         return new SaveConfiguration()
                 .withSaveOrder(saveOrder)
                 .withMetadataSaveOrder(false)
-                .withReformatOnSave(getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT));
+                .withReformatOnSave(getImportExportPreferences().shouldAlwaysReformatOnSave());
     }
 
     @Override
@@ -2254,7 +2254,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
-        SaveConfiguration saveConfiguration = getSavePreferencesForExport();
+        SaveConfiguration saveConfiguration = getExportConfiguration();
         List<TemplateExporter> formats = new ArrayList<>();
 
         for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {

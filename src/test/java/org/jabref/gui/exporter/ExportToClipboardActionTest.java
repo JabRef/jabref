@@ -70,7 +70,7 @@ public class ExportToClipboardActionTest {
 
         taskExecutor = new CurrentThreadTaskExecutor();
         when(preferences.getCustomExportFormats(any())).thenReturn(List.of());
-        when(preferences.getSavePreferencesForExport()).thenReturn(mock(SaveConfiguration.class));
+        when(preferences.getExportConfiguration()).thenReturn(mock(SaveConfiguration.class));
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);
     }

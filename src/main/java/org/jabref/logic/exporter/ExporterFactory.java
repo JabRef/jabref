@@ -37,7 +37,7 @@ public class ExporterFactory {
         return ExporterFactory.create(
                 preferencesService.getCustomExportFormats(abbreviationRepository),
                 preferencesService.getLayoutFormatterPreferences(abbreviationRepository),
-                preferencesService.getSavePreferencesForExport(),
+                preferencesService.getExportConfiguration(),
                 preferencesService.getXmpPreferences(),
                 preferencesService.getFieldPreferences(),
                 preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
