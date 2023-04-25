@@ -155,7 +155,7 @@ public abstract class BibDatabaseWriter {
             return Optional.empty();
         }
 
-        if (preferences.takeMetadataSaveOrderInAccount()) {
+        if (preferences.useMetadataSaveOrder()) {
             return metaData.getSaveOrderConfig();
         }
 

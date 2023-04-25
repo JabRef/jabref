@@ -81,7 +81,7 @@ class StudyRepositoryTest {
                 "",
                 ',');
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
-        when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
+        when(savePreferences.useMetadataSaveOrder()).thenReturn(true);
         when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
         when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());

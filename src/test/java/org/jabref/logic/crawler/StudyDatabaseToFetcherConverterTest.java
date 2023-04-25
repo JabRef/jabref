@@ -40,7 +40,7 @@ class StudyDatabaseToFetcherConverterTest {
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrder());
-        when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
+        when(savePreferences.useMetadataSaveOrder()).thenReturn(true);
         when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
 

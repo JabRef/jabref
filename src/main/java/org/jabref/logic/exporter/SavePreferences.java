@@ -16,26 +16,26 @@ public class SavePreferences {
     private SaveOrder saveOrder;
     private boolean makeBackup;
     private DatabaseSaveType saveType;
-    private boolean takeMetadataSaveOrderInAccount;
+    private boolean useMetadataSaveOrder;
 
     public SavePreferences(SaveOrder saveOrder,
                            Boolean makeBackup,
                            DatabaseSaveType saveType,
-                           Boolean takeMetadataSaveOrderInAccount,
+                           Boolean useMetadataSaveOrder,
                            Boolean reformatFile) {
         this.saveOrder = saveOrder;
         this.makeBackup = makeBackup;
         this.saveType = saveType;
-        this.takeMetadataSaveOrderInAccount = takeMetadataSaveOrderInAccount;
+        this.useMetadataSaveOrder = useMetadataSaveOrder;
         this.reformatFile = reformatFile;
     }
 
-    public boolean takeMetadataSaveOrderInAccount() {
-        return takeMetadataSaveOrderInAccount;
+    public boolean useMetadataSaveOrder() {
+        return useMetadataSaveOrder;
     }
 
-    public SavePreferences withTakeMetadataSaveOrderInAccount(boolean newTakeMetadataSaveOrderInAccount) {
-        this.takeMetadataSaveOrderInAccount = newTakeMetadataSaveOrderInAccount;
+    public SavePreferences withMetadataSaveOrder(boolean newTakeMetadataSaveOrderInAccount) {
+        this.useMetadataSaveOrder = newTakeMetadataSaveOrderInAccount;
         return this;
     }
 

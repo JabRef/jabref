@@ -2120,18 +2120,18 @@ public class JabRefPreferences implements PreferencesService {
         SaveOrder saveOrder = switch (orderType) {
             case TABLE -> this.loadTableSaveOrder();
             case SPECIFIED -> this.getExportSaveOrder();
-            case ORIGINAL -> null;
+            case ORIGINAL -> new SaveOrder();
         };
 
         return getSavePreferences()
                 .withSaveOrder(saveOrder)
-                .withTakeMetadataSaveOrderInAccount(false);
+                .withMetadataSaveOrder(false);
     }
 
     @Override
     public SavePreferences getSavePreferences() {
         return new SavePreferences(
-                null,
+                new SaveOrder(), // ORIGINAL
                 false,
                 SavePreferences.DatabaseSaveType.ALL,
                 true,
