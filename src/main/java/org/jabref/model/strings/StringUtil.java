@@ -761,4 +761,14 @@ public class StringUtil {
     public static boolean containsWhitespace(String s) {
         return s.chars().anyMatch(Character::isWhitespace);
     }
+
+    @ApacheCommonsLang3Allowed("No Guava equivalent existing - see https://stackoverflow.com/a/23825984")
+    public static String removeStringAtTheEnd(String string, String stringToBeRemoved) {
+        return StringUtils.removeEndIgnoreCase(string, stringToBeRemoved);
+    }
+
+    @ApacheCommonsLang3Allowed("No Guava equivalent existing")
+    public static boolean endsWithIgnoreCase(String string, String suffix) {
+        return StringUtils.endsWithIgnoreCase(string, suffix);
+    }
 }
