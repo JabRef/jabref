@@ -14,6 +14,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,6 +30,7 @@ import static org.mockito.Mockito.mock;
  * Tests whole citation key patterns such as <code>[authorsAlpha][year]</code>.
  * The concrete patterns such as <code>authorsAlpha</code> should better be tested at {@link BracketedPatternTest}.
  */
+@Execution(ExecutionMode.CONCURRENT)
 class CitationKeyGeneratorTest {
 
     private static final BibEntry AUTHOR_EMPTY = createABibEntryAuthor("");

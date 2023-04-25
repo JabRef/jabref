@@ -11,8 +11,11 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Tests based on a BibEntry are contained in {@link CitationKeyGeneratorTest}
  */
+@Execution(ExecutionMode.CONCURRENT)
 class BracketedPatternTest {
 
     private BibEntry bibentry;
@@ -260,6 +264,33 @@ class BracketedPatternTest {
     @MethodSource
     void authShort(String expected, AuthorList list) {
         assertEquals(expected, BracketedPattern.authShort(list));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'Newton', '[auth]', 'Isaac Newton'",
+            "'Newton', '[authFirstFull]', 'Isaac Newton'",
+            "'I', '[authForeIni]', 'Isaac Newton'",
+            "'Newton', '[auth.etal]', 'Isaac Newton'",
+            "'Newton', '[authEtAl]', 'Isaac Newton'",
+            "'Newton', '[auth.auth.ea]', 'Isaac Newton'",
+            "'Newton', '[authors]', 'Isaac Newton'",
+            "'Newton', '[authors2]', 'Isaac Newton'",
+            "'Ne', '[authIni2]', 'Isaac Newton'",
+            "'New', '[auth3]', 'Isaac Newton'",
+            "'New', '[auth3_1]', 'Isaac Newton'",
+            "'Newton', '[authshort]', 'Isaac Newton'",
+            "'New', '[authorsAlpha]', 'Isaac Newton'",
+            "'Newton', '[authorLast]', 'Isaac Newton'",
+            "'I', '[authorLastForeIni]', 'Isaac Newton'",
+
+            "'Agency', '[authors]', 'European Union Aviation Safety Agency'",
+            "'EUASA', '[authors]', '{European Union Aviation Safety Agency}'"
+    })
+    void testAuthorFieldMarkers(String expectedCitationKey, String pattern, String author) {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, author);
+        BracketedPattern bracketedPattern = new BracketedPattern(pattern);
+        assertEquals(expectedCitationKey, bracketedPattern.expand(bibEntry));
     }
 
     private static Stream<Arguments> expandBracketsWithFallback() {
