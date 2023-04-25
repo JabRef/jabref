@@ -40,6 +40,7 @@ public class GrobidServiceTest {
         GrobidPreferences grobidPreferences = new GrobidPreferences(
                 true,
                 false,
+                false,
                 "http://grobid.jabref.org:8070");
         grobidService = new GrobidService(grobidPreferences);
     }
@@ -85,6 +86,7 @@ public class GrobidServiceTest {
         GrobidPreferences importSettingsWithGrobidDisabled = new GrobidPreferences(
                 false,
                 false,
+                true,
                 "http://grobid.jabref.org:8070");
         assertThrows(UnsupportedOperationException.class, () -> new GrobidService(importSettingsWithGrobidDisabled));
     }

@@ -13,6 +13,6 @@
                  toggleGroup="$RemoteServicesToggleGroup"/>
     <RadioButton fx:id="gorbidDisabled" text="%Always disable Gorbid"
                  toggleGroup="$RemoteServicesToggleGroup"/>
-    <RadioButton fx:id="gorbidDemanded" text="%Always Ask"
+    <RadioButton fx:id="gorbidDemanded" text="%Always ask"
                  toggleGroup="$RemoteServicesToggleGroup"/>
 </fx:root>

@@ -35,6 +35,7 @@ public class GrobidCitationFetcherTest {
     static GrobidPreferences grobidPreferences = new GrobidPreferences(
             true,
             false,
+            false,
             "http://grobid.jabref.org:8070");
     static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(grobidPreferences, importFormatPreferences);
 
