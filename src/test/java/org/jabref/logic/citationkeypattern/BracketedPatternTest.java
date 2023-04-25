@@ -88,6 +88,35 @@ class BracketedPatternTest {
         assertEquals(expected, BracketedPattern.authorsAlpha(list));
     }
 
+    /**
+     * Tests [authorIni]
+     */
+    static Stream<Arguments> oneAuthorPlusInitials() {
+        return Stream.of(
+                Arguments.of("Aalst", "Wil van der Aalst"),
+                Arguments.of("AalstL", "Wil van der Aalst and Tammo van Lessen"),
+                Arguments.of("Newto", "I. Newton"),
+                Arguments.of("NewtoM", "I. Newton and J. Maxwell"),
+                Arguments.of("NewtoME", "I. Newton and J. Maxwell and A. Einstein"),
+                Arguments.of("NewtoMEB", "I. Newton and J. Maxwell and A. Einstein and N. Bohr"),
+                Arguments.of("NewtoMEBU", "I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown"),
+                Arguments.of("Aache+", "Aachen and others"),
+                Arguments.of("AacheB", "Aachen and Berlin"),
+                Arguments.of("AacheB+", "Aachen and Berlin and others"),
+                Arguments.of("AacheBC", "Aachen and Berlin and Chemnitz"),
+                Arguments.of("AacheBC+", "Aachen and Berlin and Chemnitz and others"),
+                Arguments.of("AacheBCD", "Aachen and Berlin and Chemnitz and Düsseldorf"),
+                Arguments.of("AacheBCD+", "Aachen and Berlin and Chemnitz and Düsseldorf and others"),
+                Arguments.of("AacheBCDE", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("AacheBCDE+", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen and others"));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void oneAuthorPlusInitials(String expected, AuthorList list) {
+        assertEquals(expected, BracketedPattern.oneAuthorPlusInitials(list));
+    }
+
     static Stream<Arguments> authShort() {
         return Stream.of(
                 Arguments.of("Newton", "Isaac Newton"),
