@@ -4,6 +4,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
+
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class RemoteServicesConfigPanel extends VBox {
