@@ -6,7 +6,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -16,6 +16,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
 
@@ -25,9 +26,13 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     @FXML private RadioButton resolveStrings;
     @FXML private TextField resolveStringsForFields;
     @FXML private CheckBox alwaysReformatBib;
+    @FXML private CheckBox createBackup;
+    @FXML private TextField backupDirectory;
 
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
+
+    @Inject private DialogService dialogService;
 
     public FileTab() {
         ViewLoader.view(this)
@@ -36,7 +41,7 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     }
 
     public void initialize() {
-        this.viewModel = new FileTabViewModel(preferencesService.getImportExportPreferences());
+        this.viewModel = new FileTabViewModel(preferencesService.getImportExportPreferences(), preferencesService.getFilePreferences(), dialogService);
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
@@ -49,12 +54,16 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService), autosaveLocalLibrariesHelp);
     }
 
     @Override
     public String getTabName() {
         return Localization.lang("File");
+    }
+
+    public void backupFileDirBrowse() {
+        viewModel.backupFileDirBrowse();
     }
 }

@@ -490,7 +490,7 @@ public class JabRefFrame extends BorderPane {
                 context.clearDBMSSynchronizer();
             }
             AutosaveManager.shutdown(context);
-            BackupManager.shutdown(context);
+            BackupManager.shutdown(context, prefs);
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
 
@@ -1312,7 +1312,7 @@ public class JabRefFrame extends BorderPane {
             removeTab(libraryTab);
         }
         AutosaveManager.shutdown(context);
-        BackupManager.shutdown(context);
+        BackupManager.shutdown(context, prefs);
     }
 
     private void removeTab(LibraryTab libraryTab) {

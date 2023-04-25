@@ -58,7 +58,7 @@ public class BackupManager {
     private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
-
+    private final Path backupPath;
 
     // Contains a list of all backup paths
     // During a write, the less recent backup file is deleted
@@ -70,6 +70,7 @@ public class BackupManager {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
+        this.backupPath = preferences.getFilePreferences().getBackupDirectory();
         this.executor = new ScheduledThreadPoolExecutor(2);
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
@@ -79,15 +80,15 @@ public class BackupManager {
     /**
      * Determines the most recent backup file name
      */
-    static Path getBackupPathForNewBackup(Path originalPath) {
-        return BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalPath, BackupFileType.BACKUP);
+    static Path getBackupPathForNewBackup(Path originalPath, Path backupDir) {
+        return BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalPath, BackupFileType.BACKUP, backupDir);
     }
 
     /**
      * Determines the most recent existing backup file name
      */
-    static Optional<Path> getLatestBackupPath(Path originalPath) {
-        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP);
+    static Optional<Path> getLatestBackupPath(Path originalPath, Path backupDir) {
+        return BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);
     }
 
     /**
@@ -100,7 +101,7 @@ public class BackupManager {
      */
     public static BackupManager start(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         BackupManager backupManager = new BackupManager(bibDatabaseContext, entryTypesManager, preferences);
-        backupManager.startBackupTask();
+        backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
         runningInstances.add(backupManager);
         return backupManager;
     }
@@ -112,7 +113,7 @@ public class BackupManager {
      */
     public static void discardBackup(BibDatabaseContext bibDatabaseContext) {
         runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(
-                BackupManager::discardBackup);
+                                                                                                                BackupManager::discardBackup);
     }
 
     /**
@@ -120,9 +121,12 @@ public class BackupManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static void shutdown(BibDatabaseContext bibDatabaseContext) {
+    public static void shutdown(BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService) {
+
+        Path backupDir = preferencesService.getFilePreferences().getBackupDirectory();
+
         runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(
-                BackupManager::shutdown);
+                                                                                                                manager -> manager.shutdown(backupDir));
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
@@ -138,7 +142,7 @@ public class BackupManager {
      * "default" return value in the good case. In case a discarded file exists, <code>false</code> is returned, too.
      * In the case of an exception <code>true</code> is returned to ensure that the user checks the output.
      */
-    public static boolean backupFileDiffers(Path originalPath) {
+    public static boolean backupFileDiffers(Path originalPath, Path backupDir) {
         Path discardedFile = determineDiscardedFile(originalPath);
         if (Files.exists(discardedFile)) {
             try {
@@ -149,10 +153,10 @@ public class BackupManager {
             }
             return false;
         }
-        return getLatestBackupPath(originalPath).map(latestBackupPath -> {
+        return getLatestBackupPath(originalPath, backupDir).map(latestBackupPath -> {
             FileTime latestBackupFileLastModifiedTime;
             try {
-                 latestBackupFileLastModifiedTime = Files.getLastModifiedTime(latestBackupPath);
+                latestBackupFileLastModifiedTime = Files.getLastModifiedTime(latestBackupPath);
             } catch (IOException e) {
                 LOGGER.debug("Could not get timestamp of backup file {}", latestBackupPath, e);
                 // If we cannot get the timestamp, we do show any warning
@@ -186,8 +190,8 @@ public class BackupManager {
      *
      * @param originalPath Path to the file which should be equalized to the backup file.
      */
-    public static void restoreBackup(Path originalPath) {
-        Optional<Path> backupPath = getLatestBackupPath(originalPath);
+    public static void restoreBackup(Path originalPath, Path backupDir) {
+        Optional<Path> backupPath = getLatestBackupPath(originalPath, backupDir);
         if (backupPath.isEmpty()) {
             LOGGER.error("There is no backup file");
             return;
@@ -199,8 +203,8 @@ public class BackupManager {
         }
     }
 
-    Optional<Path> determineBackupPathForNewBackup() {
-        return bibDatabaseContext.getDatabasePath().map(BackupManager::getBackupPathForNewBackup);
+    Optional<Path> determineBackupPathForNewBackup(Path backupDir) {
+        return bibDatabaseContext.getDatabasePath().map(path -> BackupManager.getBackupPathForNewBackup(path, backupDir));
     }
 
     /**
@@ -237,7 +241,7 @@ public class BackupManager {
         try (Writer writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
             new BibtexDatabaseWriter(bibWriter, generalPreferences, savePreferences, entryTypesManager)
-                    .saveDatabase(bibDatabaseContext);
+                                                                                                       .saveDatabase(bibDatabaseContext);
             backupFilesQueue.add(backupPath);
 
             // We wrote the file successfully
@@ -250,8 +254,7 @@ public class BackupManager {
 
     private static Path determineDiscardedFile(Path file) {
         return BackupFileUtil.getAppDataBackupDir().resolve(
-                BackupFileUtil.getUniqueFilePrefix(file) + "--" + file.getFileName() + "--discarded"
-        );
+                                                            BackupFileUtil.getUniqueFilePrefix(file) + "--" + file.getFileName() + "--discarded");
     }
 
     /**
@@ -289,15 +292,15 @@ public class BackupManager {
         }
     }
 
-    private void startBackupTask() {
+    private void startBackupTask(Path backupDir) {
         fillQueue();
 
         executor.scheduleAtFixedRate(
-                // We need to determine the backup path on each action, because we use the timestamp in the filename
-                () -> determineBackupPathForNewBackup().ifPresent(this::performBackup),
-                DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
-                DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
-                TimeUnit.SECONDS);
+                                     // We need to determine the backup path on each action, because we use the timestamp in the filename
+                                     () -> determineBackupPathForNewBackup(backupDir).ifPresent(path -> this.performBackup(backupDir)),
+                                     DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
+                                     DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
+                                     TimeUnit.SECONDS);
     }
 
     private void fillQueue() {
@@ -323,13 +326,14 @@ public class BackupManager {
     /**
      * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
      * This method should only be used when closing a database/JabRef in a normal way.
+     * @param path
      */
-    private void shutdown() {
+    private void shutdown(Path backupDir) {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
         executor.shutdown();
 
         // Ensure that backup is a recent one
-        determineBackupPathForNewBackup().ifPresent(this::performBackup);
+        determineBackupPathForNewBackup(backupDir).ifPresent(this::performBackup);
     }
 }

@@ -705,7 +705,7 @@ public class LibraryTab extends Tab {
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         AutosaveManager.shutdown(bibDatabaseContext);
-        BackupManager.shutdown(bibDatabaseContext);
+        BackupManager.shutdown(bibDatabaseContext, preferencesService);
     }
 
     /**
