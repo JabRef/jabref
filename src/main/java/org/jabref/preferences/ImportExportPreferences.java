@@ -10,7 +10,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ImportExportPreferences {
-    private final BooleanProperty shouldOpenLastEdited;
     private final BooleanProperty alwaysReformatOnSave;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final StringProperty lastExportExtension;
@@ -18,32 +17,19 @@ public class ImportExportPreferences {
     private final BooleanProperty autoSave;
     private final BooleanProperty warnAboutDuplicatesOnImport;
 
-    public ImportExportPreferences(boolean shouldOpenLastEdited,
+    public ImportExportPreferences(
                                    boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
                                    Path exportWorkingDirectory,
                                    boolean autoSave,
                                    boolean warnAboutDuplicatesOnImport) {
-        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
         this.autoSave = new SimpleBooleanProperty(autoSave);
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
-    }
-
-    public boolean shouldOpenLastEdited() {
-        return shouldOpenLastEdited.get();
-    }
-
-    public BooleanProperty openLastEditedProperty() {
-        return shouldOpenLastEdited;
-    }
-
-    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
-        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
     }
 
     public boolean shouldAlwaysReformatOnSave() {

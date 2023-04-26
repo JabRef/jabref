@@ -31,6 +31,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty memoryStickModeProperty = new SimpleBooleanProperty();
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
+    private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
@@ -57,6 +58,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         confirmDeleteProperty.setValue(generalPreferences.shouldConfirmDelete());
         memoryStickModeProperty.setValue(generalPreferences.isMemoryStickMode());
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
+        openLastStartupProperty.setValue(generalPreferences.shouldOpenLastEdited());
         showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
     }
 
@@ -78,6 +80,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
         generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());
         generalPreferences.setMemoryStickMode(memoryStickModeProperty.getValue());
+        generalPreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
@@ -120,6 +123,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty collectTelemetryProperty() {
         return this.collectTelemetryProperty;
+    }
+
+    public BooleanProperty openLastStartupProperty() {
+        return openLastStartupProperty;
     }
 
     public BooleanProperty showAdvancedHintsProperty() {

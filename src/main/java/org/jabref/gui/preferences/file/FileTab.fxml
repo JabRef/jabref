@@ -27,8 +27,6 @@
 
     <Label styleClass="sectionHeader" text="%Loading"/>
 
-    <CheckBox fx:id="openLastStartup" text="%Open last edited libraries at startup"/>
-
     <Label styleClass="sectionHeader" text="%Saving"/>
 
     <HBox alignment="CENTER_LEFT" spacing="10.0">

@@ -1271,6 +1271,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
                 getBoolean(MEMORY_STICK_MODE),
+                getBoolean(OPEN_LAST_EDITED),
                 getBoolean(SHOW_ADVANCED_HINTS));
 
         EasyBind.listen(generalPreferences.languageProperty(), (obs, oldValue, newValue) -> {
@@ -1284,6 +1285,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
         EasyBind.listen(generalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> putBoolean(MEMORY_STICK_MODE, newValue));
+        EasyBind.listen(generalPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         EasyBind.listen(generalPreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
 
         return generalPreferences;
@@ -2239,7 +2241,6 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         importExportPreferences = new ImportExportPreferences(
-                getBoolean(OPEN_LAST_EDITED),
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
@@ -2247,7 +2248,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(LOCAL_AUTO_SAVE),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION));
 
-        EasyBind.listen(importExportPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         EasyBind.listen(importExportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
