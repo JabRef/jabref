@@ -123,10 +123,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, bibDatabaseMode);
         }
 
-        preferencesService.getImportExportPreferences().setNonWrappableFields(
-                multilineFields.stream()
-                               .map(Field::getDisplayName)
-                               .collect(Collectors.joining(";")));
+        preferencesService.getFieldPreferences().setNonWrappableFields(multilineFields);
         preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
     }
 

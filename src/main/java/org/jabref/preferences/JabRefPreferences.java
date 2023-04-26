@@ -461,6 +461,7 @@ public class JabRefPreferences implements PreferencesService {
     private ColumnPreferences mainTableColumnPreferences;
     private ColumnPreferences searchDialogColumnPreferences;
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private FieldPreferences fieldPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2131,7 +2132,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public FieldPreferences getFieldPreferences() {
-        return new FieldPreferences(
+        if (Objects.nonNull(fieldPreferences)) {
+            return fieldPreferences;
+        }
+
+        fieldPreferences = new FieldPreferences(
                 !getBoolean(DO_NOT_RESOLVE_STRINGS),
                 getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()
                                                          .map(FieldFactory::parseField)
@@ -2139,6 +2144,14 @@ public class JabRefPreferences implements PreferencesService {
                 getStringList(NON_WRAPPABLE_FIELDS).stream()
                                                    .map(FieldFactory::parseField)
                                                    .collect(Collectors.toList()));
+
+        EasyBind.listen(fieldPreferences.resolveStringsProperty(), (obs, oldValue, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
+        fieldPreferences.getResolvableFields().addListener((InvalidationListener) change ->
+                put(RESOLVE_STRINGS_FOR_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getResolvableFields())));
+        fieldPreferences.getNonWrappableFields().addListener((InvalidationListener) change ->
+                put(NON_WRAPPABLE_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getNonWrappableFields())));
+
+        return fieldPreferences;
     }
 
     @Override
@@ -2227,9 +2240,6 @@ public class JabRefPreferences implements PreferencesService {
 
         importExportPreferences = new ImportExportPreferences(
                 getBoolean(OPEN_LAST_EDITED),
-                get(NON_WRAPPABLE_FIELDS),
-                !getBoolean(DO_NOT_RESOLVE_STRINGS),
-                get(RESOLVE_STRINGS_FOR_FIELDS),
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
@@ -2238,9 +2248,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION));
 
         EasyBind.listen(importExportPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
-        EasyBind.listen(importExportPreferences.nonWrappableFieldsProperty(), (obs, oldValue, newValue) -> put(NON_WRAPPABLE_FIELDS, newValue));
-        EasyBind.listen(importExportPreferences.resolveStringsProperty(), (obs, oldValue, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
-        EasyBind.listen(importExportPreferences.resolvableFieldsProperty(), (obs, oldValue, newValue) -> put(RESOLVE_STRINGS_FOR_FIELDS, newValue));
         EasyBind.listen(importExportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
