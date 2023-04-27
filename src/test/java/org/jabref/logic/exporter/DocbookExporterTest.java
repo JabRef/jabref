@@ -16,6 +16,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DocbookExporterTest {
 
@@ -34,10 +36,13 @@ public class DocbookExporterTest {
 
     @BeforeEach
     public void setUp() {
+        SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+
         ExporterFactory exporterFactory = ExporterFactory.create(
                 new ArrayList<>(),
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(SaveConfiguration.class),
+                saveConfiguration,
                 mock(XmpPreferences.class),
                 mock(FieldPreferences.class),
                 BibDatabaseMode.BIBTEX,
