@@ -38,7 +38,6 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.metadata.SaveOrder;
 
 public interface PreferencesService {
 
@@ -71,10 +70,6 @@ public interface PreferencesService {
     ImportFormatPreferences getImportFormatPreferences();
 
     SaveConfiguration getExportConfiguration();
-
-    SaveOrder getExportSaveOrder();
-
-    void storeExportSaveOrder(SaveOrder config);
 
     void clear() throws BackingStoreException;
 

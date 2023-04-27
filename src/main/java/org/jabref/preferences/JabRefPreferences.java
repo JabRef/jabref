@@ -2075,64 +2075,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public SaveOrder getExportSaveOrder() {
-        List<SaveOrder.SortCriterion> sortCriteria = List.of(
-                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
-                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
-                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
-        );
-
-        return new SaveOrder(
-                SaveOrder.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
-                sortCriteria
-        );
-    }
-
-    @Override
-    public void storeExportSaveOrder(SaveOrder saveOrder) {
-        putBoolean(EXPORT_IN_ORIGINAL_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.ORIGINAL);
-        putBoolean(EXPORT_IN_SPECIFIED_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.SPECIFIED);
-
-        put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().get(0).field.getName());
-        put(EXPORT_SECONDARY_SORT_FIELD, saveOrder.getSortCriteria().get(1).field.getName());
-        put(EXPORT_TERTIARY_SORT_FIELD, saveOrder.getSortCriteria().get(2).field.getName());
-        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(0).descending);
-        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(1).descending);
-        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
-    }
-
-    private SaveOrder loadTableSaveOrder() {
-        List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
-        List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
-
-        for (var column : sortOrder) {
-            boolean descending = (column.getSortType() == SortType.DESCENDING);
-            criteria.add(new SaveOrder.SortCriterion(
-                    FieldFactory.parseField(column.getQualifier()),
-                    descending));
-        }
-
-        return new SaveOrder(SaveOrder.OrderType.TABLE, criteria);
-    }
-
-    @Override
-    public SaveConfiguration getExportConfiguration() {
-        SaveOrder.OrderType orderType = SaveOrder.OrderType.fromBooleans(
-                getBoolean(EXPORT_IN_SPECIFIED_ORDER),
-                getBoolean(EXPORT_IN_ORIGINAL_ORDER));
-        SaveOrder saveOrder = switch (orderType) {
-            case TABLE -> this.loadTableSaveOrder();
-            case SPECIFIED -> this.getExportSaveOrder();
-            case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
-        };
-
-        return new SaveConfiguration()
-                .withSaveOrder(saveOrder)
-                .withMetadataSaveOrder(false)
-                .withReformatOnSave(getImportExportPreferences().shouldAlwaysReformatOnSave());
-    }
-
-    @Override
     public FieldPreferences getFieldPreferences() {
         if (Objects.nonNull(fieldPreferences)) {
             return fieldPreferences;
@@ -2245,17 +2187,74 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)),
-                getBoolean(LOCAL_AUTO_SAVE),
-                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION));
+                getExportSaveOrder(),
+                getBoolean(LOCAL_AUTO_SAVE), getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION));
 
         EasyBind.listen(importExportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
         EasyBind.listen(importExportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(importExportPreferences.exportSaveOrderProperty(), (obs, oldValue, newValue) -> storeExportSaveOrder(newValue));
         EasyBind.listen(importExportPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
         EasyBind.listen(importExportPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
 
         return importExportPreferences;
+    }
+
+    public SaveOrder getExportSaveOrder() {
+        List<SaveOrder.SortCriterion> sortCriteria = List.of(
+                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
+                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
+                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
+        );
+
+        return new SaveOrder(
+                SaveOrder.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
+                sortCriteria
+        );
+    }
+
+    public void storeExportSaveOrder(SaveOrder saveOrder) {
+        putBoolean(EXPORT_IN_ORIGINAL_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.ORIGINAL);
+        putBoolean(EXPORT_IN_SPECIFIED_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.SPECIFIED);
+
+        put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().get(0).field.getName());
+        put(EXPORT_SECONDARY_SORT_FIELD, saveOrder.getSortCriteria().get(1).field.getName());
+        put(EXPORT_TERTIARY_SORT_FIELD, saveOrder.getSortCriteria().get(2).field.getName());
+        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(0).descending);
+        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(1).descending);
+        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
+    }
+
+    private SaveOrder loadTableSaveOrder() {
+        List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
+        List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
+
+        for (var column : sortOrder) {
+            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            criteria.add(new SaveOrder.SortCriterion(
+                    FieldFactory.parseField(column.getQualifier()),
+                    descending));
+        }
+
+        return new SaveOrder(SaveOrder.OrderType.TABLE, criteria);
+    }
+
+    @Override
+    public SaveConfiguration getExportConfiguration() {
+        SaveOrder.OrderType orderType = SaveOrder.OrderType.fromBooleans(
+                getBoolean(EXPORT_IN_SPECIFIED_ORDER),
+                getBoolean(EXPORT_IN_ORIGINAL_ORDER));
+        SaveOrder saveOrder = switch (orderType) {
+            case TABLE -> this.loadTableSaveOrder();
+            case SPECIFIED -> this.getExportSaveOrder();
+            case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
+        };
+
+        return new SaveConfiguration()
+                .withSaveOrder(saveOrder)
+                .withMetadataSaveOrder(false)
+                .withReformatOnSave(getImportExportPreferences().shouldAlwaysReformatOnSave());
     }
 
     @Override

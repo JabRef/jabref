@@ -9,11 +9,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.model.metadata.SaveOrder;
+
 public class ImportExportPreferences {
     private final BooleanProperty alwaysReformatOnSave;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final StringProperty lastExportExtension;
     private final ObjectProperty<Path> exportWorkingDirectory;
+    private final ObjectProperty<SaveOrder> exportSaveOrder;
     private final BooleanProperty autoSave;
     private final BooleanProperty warnAboutDuplicatesOnImport;
 
@@ -21,12 +24,14 @@ public class ImportExportPreferences {
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
                                    Path exportWorkingDirectory,
+                                   SaveOrder exportSaveOrder,
                                    boolean autoSave,
                                    boolean warnAboutDuplicatesOnImport) {
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
+        this.exportSaveOrder = new SimpleObjectProperty<>(exportSaveOrder);
         this.autoSave = new SimpleBooleanProperty(autoSave);
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
     }
@@ -77,6 +82,18 @@ public class ImportExportPreferences {
 
     public void setExportWorkingDirectory(Path exportWorkingDirectory) {
         this.exportWorkingDirectory.set(exportWorkingDirectory);
+    }
+
+    public SaveOrder getExportSaveOrder() {
+        return exportSaveOrder.get();
+    }
+
+    public ObjectProperty<SaveOrder> exportSaveOrderProperty() {
+        return exportSaveOrder;
+    }
+
+    public void setExportSaveOrder(SaveOrder exportSaveOrder) {
+        this.exportSaveOrder.set(exportSaveOrder);
     }
 
     public boolean shouldAutoSave() {
