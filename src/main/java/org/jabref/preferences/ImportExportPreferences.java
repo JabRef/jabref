@@ -17,8 +17,7 @@ public class ImportExportPreferences {
     private final BooleanProperty autoSave;
     private final BooleanProperty warnAboutDuplicatesOnImport;
 
-    public ImportExportPreferences(
-                                   boolean alwaysReformatOnSave,
+    public ImportExportPreferences(boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
                                    Path exportWorkingDirectory,

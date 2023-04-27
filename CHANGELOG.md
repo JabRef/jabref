@@ -42,7 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the custom entry types dialog into the preferences dialog. [#9760](https://github.com/JabRef/jabref/pull/9760)
 - We moved the manage content selectors dialog to the library properties. [#9768](https://github.com/JabRef/jabref/pull/9768)
 - We moved the preferences menu command from the options menu to the file menu. [#9768](https://github.com/JabRef/jabref/pull/9768)
-
+- We moved the preferences option to open the last edited files on startup to the 'General' tag.
 
 
 ### Fixed
