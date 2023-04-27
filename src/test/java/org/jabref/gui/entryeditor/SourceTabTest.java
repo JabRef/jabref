@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
 
+import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -51,8 +52,18 @@ class SourceTabTest {
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
 
-        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), mock(FieldPreferences.class), importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
+        sourceTab = new SourceTab(
+                new BibDatabaseContext(),
+                new CountingUndoManager(),
+                fieldPreferences,
+                importFormatPreferences,
+                new DummyFileUpdateMonitor(),
+                mock(DialogService.class),
+                stateManager,
+                keyBindingRepository);
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),
