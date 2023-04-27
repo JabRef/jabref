@@ -25,8 +25,6 @@
     <RadioButton fx:id="doNotResolveStrings" text="%Do not resolve BibTeX strings"
                  toggleGroup="$stringsResolveToggleGroup"/>
 
-    <Label styleClass="sectionHeader" text="%Loading"/>
-
     <Label styleClass="sectionHeader" text="%Saving"/>
 
     <HBox alignment="CENTER_LEFT" spacing="10.0">
