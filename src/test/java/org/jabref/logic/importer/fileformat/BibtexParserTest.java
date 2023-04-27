@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
@@ -1155,8 +1157,8 @@ class BibtexParserTest {
 
     @Test
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
-        when(importFormatPreferences.fieldPreferences().getNonWrappableFields())
-                .thenReturn(List.of(StandardField.FILE));
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(
+                FXCollections.observableArrayList(List.of(StandardField.FILE)));
         BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
         ParserResult result = parser
                 .parse(new StringReader("@article{canh05,file = {ups  sala}}"));
