@@ -43,7 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the manage content selectors dialog to the library properties. [#9768](https://github.com/JabRef/jabref/pull/9768)
 - We moved the preferences menu command from the options menu to the file menu. [#9768](https://github.com/JabRef/jabref/pull/9768)
 - We changed the handling of an "overflow" of authors at `[authIniN]`: JabRef uses `+` to indicate an overflow. Example: `[authIni2]` produces `A+` (instead of `AB`) for `Aachen and Berlin and Chemnitz`. [#9703](https://github.com/JabRef/jabref/pull/9703)
-- We moved the preferences option to open the last edited files on startup to the 'General' tag.
+- We moved the preferences option to open the last edited files on startup to the 'General' tag. [#9808](https://github.com/JabRef/jabref/pull/9808)
 
 
 ### Fixed
