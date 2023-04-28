@@ -56,7 +56,7 @@ public class BackupUIManager {
 
     private static Optional<ParserResult> showReviewBackupDialog(DialogService dialogService, Path originalPath, PreferencesService preferencesService) {
         try {
-            ImportFormatPreferences importFormatPreferences =  preferencesService.getImportFormatPreferences();
+            ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
 
             // The database of the originalParserResult will be modified
             ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, Globals.getFileUpdateMonitor());

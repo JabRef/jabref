@@ -42,7 +42,6 @@ public class BackupFileUtilTest {
 
     @Test
     void getPathOfBackupFileAndCreateDirectoryReturnsSameDirectoryInCaseOfException() {
-
         backupDir = BackupFileUtil.getAppDataBackupDir();
         try (MockedStatic<Files> files = Mockito.mockStatic(Files.class, Answers.RETURNS_DEEP_STUBS)) {
             files.when(() -> Files.createDirectories(BackupFileUtil.getAppDataBackupDir()))

@@ -323,6 +323,7 @@ public class BackupManager {
     /**
      * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
      * This method should only be used when closing a database/JabRef in a normal way.
+     *
      * @param path The backup directory
      */
     private void shutdown(Path backupDir) {
