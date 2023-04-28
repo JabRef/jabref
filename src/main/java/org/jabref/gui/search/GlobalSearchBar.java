@@ -107,7 +107,6 @@ public class GlobalSearchBar extends HBox {
     private final DialogService dialogService;
 
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
-    public static final BooleanProperty searchBoxFocused = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
@@ -212,6 +211,20 @@ public class GlobalSearchBar extends HBox {
 
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
+        /*
+         * Attach a change listener on the focus property of searchField node.
+         * Every time the listener tracks a change on focus property value,
+         * (i.e. from active (user types query) to inactive / lost (user selects
+         * entry / completes search)), ensures the focus is lost
+         * (i.e. newValue : false), checks whether the search query is
+         * empty or not and finally records it into the search history
+         * through addSearchHistory method call.
+         */
+        searchField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+            if (oldValue && !(newValue || searchField.getText().isEmpty())) {
+                this.stateManager.addSearchHistory(searchField.textProperty().get());
+            }
+        });
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
@@ -308,12 +321,6 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
-        searchBoxFocused.bind(searchField.focusedProperty());
-        searchBoxFocused.addListener((observable, oldPropertyValue, newPropertyValue) -> {
-            if (!(newPropertyValue || searchField.textProperty().get().isEmpty())) {
-                this.stateManager.addSearchHistory(searchField.textProperty().get());
-            }
-        });
         stateManager.setSearchQuery(searchQuery);
     }
 
