@@ -82,7 +82,7 @@ class BackupManagerDiscardedTest {
     }
 
     private void makeBackup() {
-        backupManager.determineBackupPathForNewBackup(backupDir).ifPresent(path -> backupManager.performBackup(backupDir));
+        backupManager.determineBackupPathForNewBackup(backupDir).ifPresent(path -> backupManager.performBackup(path));
     }
 
     @Test
@@ -104,7 +104,7 @@ class BackupManagerDiscardedTest {
     public void discardingAChangeLeadsToNewerBackupToBeIgnored() throws Exception {
         databaseModification();
         makeBackup();
-        backupManager.discardBackup();
+        backupManager.discardBackup(backupDir);
         assertFalse(BackupManager.backupFileDiffers(testBib, backupDir));
     }
 }

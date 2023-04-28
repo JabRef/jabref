@@ -58,20 +58,20 @@ public class BackupManager {
     private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
-    private final Path backupPath;
 
     // Contains a list of all backup paths
     // During a write, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
 
-    private boolean needsBackup = false;
+    private boolean needsBackup = true;
+    private final boolean createBackup;
 
     BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.backupPath = preferences.getFilePreferences().getBackupDirectory();
         this.executor = new ScheduledThreadPoolExecutor(2);
+        this.createBackup =  preferences.getFilePreferences().shouldCreateBackup();
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -111,9 +111,8 @@ public class BackupManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static void discardBackup(BibDatabaseContext bibDatabaseContext) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(
-                                                                                                                BackupManager::discardBackup);
+    public static void discardBackup(BibDatabaseContext bibDatabaseContext, Path backupDir) {
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.discardBackup(backupDir));
     }
 
     /**
@@ -121,12 +120,10 @@ public class BackupManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static void shutdown(BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService) {
-
-        Path backupDir = preferencesService.getFilePreferences().getBackupDirectory();
-
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(
-                                                                                                                manager -> manager.shutdown(backupDir));
+    public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
+        if (createBackup) {
+            runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(manager -> manager.shutdown(backupDir));
+        }
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
@@ -143,7 +140,7 @@ public class BackupManager {
      * In the case of an exception <code>true</code> is returned to ensure that the user checks the output.
      */
     public static boolean backupFileDiffers(Path originalPath, Path backupDir) {
-        Path discardedFile = determineDiscardedFile(originalPath);
+        Path discardedFile = determineDiscardedFile(originalPath, backupDir);
         if (Files.exists(discardedFile)) {
             try {
                 Files.delete(discardedFile);
@@ -212,6 +209,7 @@ public class BackupManager {
      *
      * <em>SIDE EFFECT: Deletes oldest backup file</em>
      *
+     *
      * @param backupPath the path where the library should be backed up to
      */
     void performBackup(Path backupPath) {
@@ -252,9 +250,8 @@ public class BackupManager {
         }
     }
 
-    private static Path determineDiscardedFile(Path file) {
-        return BackupFileUtil.getAppDataBackupDir().resolve(
-                                                            BackupFileUtil.getUniqueFilePrefix(file) + "--" + file.getFileName() + "--discarded");
+    private static Path determineDiscardedFile(Path file, Path backupDir) {
+        return backupDir.resolve(BackupFileUtil.getUniqueFilePrefix(file) + "--" + file.getFileName() + "--discarded");
     }
 
     /**
@@ -263,8 +260,8 @@ public class BackupManager {
      * We do not delete any files, because the user might want to recover old backup files.
      * Therefore, we mark discarded backups by a --discarded file.
      */
-    public void discardBackup() {
-        Path path = determineDiscardedFile(bibDatabaseContext.getDatabasePath().get());
+    public void discardBackup(Path backupDir) {
+        Path path = determineDiscardedFile(bibDatabaseContext.getDatabasePath().get(), backupDir);
         try {
             Files.createFile(path);
         } catch (IOException e) {
@@ -297,7 +294,7 @@ public class BackupManager {
 
         executor.scheduleAtFixedRate(
                                      // We need to determine the backup path on each action, because we use the timestamp in the filename
-                                     () -> determineBackupPathForNewBackup(backupDir).ifPresent(path -> this.performBackup(backupDir)),
+                                     () -> determineBackupPathForNewBackup(backupDir).ifPresent(path -> this.performBackup(path)),
                                      DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
                                      DELAY_BETWEEN_BACKUP_ATTEMPTS_IN_SECONDS,
                                      TimeUnit.SECONDS);
@@ -326,14 +323,16 @@ public class BackupManager {
     /**
      * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
      * This method should only be used when closing a database/JabRef in a normal way.
-     * @param path
+     * @param path The backup directory
      */
     private void shutdown(Path backupDir) {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
         executor.shutdown();
 
-        // Ensure that backup is a recent one
-        determineBackupPathForNewBackup(backupDir).ifPresent(this::performBackup);
+        if (createBackup) {
+            // Ensure that backup is a recent one
+            determineBackupPathForNewBackup(backupDir).ifPresent(this::performBackup);
+        }
     }
 }

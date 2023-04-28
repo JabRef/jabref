@@ -54,6 +54,9 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
+        createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
+        backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
+
         ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService), autosaveLocalLibrariesHelp);
     }

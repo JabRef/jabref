@@ -38,7 +38,7 @@ public class BackupUIManager {
     }
 
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService, Path originalPath, PreferencesService preferencesService) {
-        var actionOpt = showBackupResolverDialog(dialogService, originalPath);
+        var actionOpt = showBackupResolverDialog(dialogService, originalPath, preferencesService.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 BackupManager.restoreBackup(originalPath, preferencesService.getFilePreferences().getBackupDirectory());
@@ -50,20 +50,20 @@ public class BackupUIManager {
         });
     }
 
-    private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService, Path originalPath) {
-        return DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath)));
+    private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService, Path originalPath, Path backupDir) {
+        return DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir)));
     }
 
     private static Optional<ParserResult> showReviewBackupDialog(DialogService dialogService, Path originalPath, PreferencesService preferencesService) {
         try {
-            ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
+            ImportFormatPreferences importFormatPreferences =  preferencesService.getImportFormatPreferences();
 
             // The database of the originalParserResult will be modified
             ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, Globals.getFileUpdateMonitor());
             // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
-            Path backupPath = BackupFileUtil.yyyyyyyyyy(originalPath, BackupFileType.BACKUP).orElseThrow();
+            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferencesService.getFilePreferences().getBackupDirectory()).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferencesService.getBibEntryPreferences());

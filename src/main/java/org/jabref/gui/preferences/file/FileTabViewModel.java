@@ -110,6 +110,5 @@ public class FileTabViewModel implements PreferenceTabViewModel {
             new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(backupDirectoryProperty().getValue())).build();
     dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
                  .ifPresent(dir -> backupDirectoryProperty.setValue(dir.toString()));
-
     }
 }
