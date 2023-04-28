@@ -10,6 +10,7 @@ public class RemoteServicesConfigPanelViewModel {
     public BooleanProperty gorbidEnabledProperty() {
         return gorbidEnabledProperty;
     }
+
     public BooleanProperty gorbidDisabledProperty() {
         return gorbidDisabledProperty;
     }
