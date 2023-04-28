@@ -71,7 +71,7 @@ public class BackupManager {
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.executor = new ScheduledThreadPoolExecutor(2);
-        this.createBackup =  preferences.getFilePreferences().shouldCreateBackup();
+        this.createBackup = preferences.getFilePreferences().shouldCreateBackup();
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
