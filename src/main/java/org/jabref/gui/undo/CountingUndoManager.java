@@ -27,16 +27,20 @@ public class CountingUndoManager extends UndoManager {
 
     @Override
     public synchronized void undo() throws CannotUndoException {
-        super.undo();
-        current--;
-        postUndoRedoEvent();
+        if (canUndo()) {
+            super.undo();
+            current--;
+            postUndoRedoEvent();
+        }
     }
 
     @Override
     public synchronized void redo() throws CannotUndoException {
-        super.redo();
-        current++;
-        postUndoRedoEvent();
+        if (canRedo()) {
+            super.redo();
+            current++;
+            postUndoRedoEvent();
+        }
     }
 
     public synchronized void markUnchanged() {
