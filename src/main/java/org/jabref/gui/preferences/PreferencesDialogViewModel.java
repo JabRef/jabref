@@ -33,6 +33,7 @@ import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
 import org.jabref.gui.preferences.network.NetworkTab;
 import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
+import org.jabref.gui.preferences.shareddatabase.SharedDatabaseTab;
 import org.jabref.gui.preferences.table.TableTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -82,7 +83,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new CustomEntryTypesTab(),
                 new XmpPrivacyTab(),
                 new NetworkTab(),
-                new AppearanceTab()
+                new AppearanceTab(),
+                new SharedDatabaseTab()
         );
     }
 
