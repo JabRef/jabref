@@ -268,7 +268,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
     public static final String GROBID_OPT_OUT = "grobidOptOut";
-
     public static final String GROBID_DEMANDED = "grobidDemanded";
     public static final String GROBID_URL = "grobidURL";
 

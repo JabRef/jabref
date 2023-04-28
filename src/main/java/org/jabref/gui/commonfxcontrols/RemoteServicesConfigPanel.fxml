@@ -9,10 +9,8 @@
         <ToggleGroup fx:id="RemoteServicesToggleGroup"/>
     </fx:define>
 
-    <RadioButton fx:id="gorbidEnabled" text="%Always enable Grobid"
+    <RadioButton fx:id="gorbidEnabled" text="%Enable GROBID"
                  toggleGroup="$RemoteServicesToggleGroup"/>
-    <RadioButton fx:id="gorbidDisabled" text="%Always disable Grobid"
-                 toggleGroup="$RemoteServicesToggleGroup"/>
-    <RadioButton fx:id="gorbidDemanded" text="%Always Ask"
+    <RadioButton fx:id="gorbidDisabled" text="%Disable GROBID"
                  toggleGroup="$RemoteServicesToggleGroup"/>
 </fx:root>

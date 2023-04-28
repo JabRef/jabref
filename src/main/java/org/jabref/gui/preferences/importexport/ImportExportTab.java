@@ -62,7 +62,6 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
         exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
         exportOrderPanel.setCriteriaLimit(3);
 
-        RemoteServicesConfigPanel.gorbidDemandedProperty().bindBidirectional(viewModel.grobidDemandedProperty());
         RemoteServicesConfigPanel.gorbidDisabledProperty().bindBidirectional(viewModel.grobidDisabledProperty());
         RemoteServicesConfigPanel.gorbidEnabledProperty().bindBidirectional(viewModel.grobidEnabledProperty());
 

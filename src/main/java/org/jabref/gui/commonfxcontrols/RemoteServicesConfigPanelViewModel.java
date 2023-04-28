@@ -6,16 +6,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 public class RemoteServicesConfigPanelViewModel {
     private final BooleanProperty gorbidEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty gorbidDisabledProperty = new SimpleBooleanProperty();
-    private final BooleanProperty gorbidDemandedProperty = new SimpleBooleanProperty();
 
     public BooleanProperty gorbidEnabledProperty() {
         return gorbidEnabledProperty;
     }
     public BooleanProperty gorbidDisabledProperty() {
         return gorbidDisabledProperty;
-    }
-    public BooleanProperty gorbidDemandedProperty() {
-        return gorbidDemandedProperty;
     }
 
 
