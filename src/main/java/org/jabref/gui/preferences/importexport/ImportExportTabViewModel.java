@@ -109,7 +109,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         grobidDisabledProperty.setValue(grobidPreferences.isGrobidOptOut());
         grobidDemandedProperty.setValue(grobidPreferences.isGrobidDemanded());
 
-
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
         apiKeys.setValue(FXCollections.observableArrayList(preferencesService.getImporterPreferences().getApiKeys()));

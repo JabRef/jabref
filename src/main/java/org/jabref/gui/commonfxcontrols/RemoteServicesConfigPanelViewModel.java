@@ -1,7 +1,7 @@
 package org.jabref.gui.commonfxcontrols;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.BooleanProperty;
 
 public class RemoteServicesConfigPanelViewModel {
     private final BooleanProperty gorbidEnabledProperty = new SimpleBooleanProperty();
@@ -14,6 +14,4 @@ public class RemoteServicesConfigPanelViewModel {
     public BooleanProperty gorbidDisabledProperty() {
         return gorbidDisabledProperty;
     }
-
-
 }

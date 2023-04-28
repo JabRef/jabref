@@ -33,7 +33,4 @@ RemoteServicesConfigPanel extends VBox {
         return viewModel.gorbidDisabledProperty();
     }
 
-
-
-
 }
