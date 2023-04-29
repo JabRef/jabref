@@ -902,7 +902,7 @@ public class BracketedPattern {
      * @param authorList an <{@link AuthorList}
      * @return the surname of all authors/editors
      */
-    private static String oneAuthorPlusInitials(AuthorList authorList) {
+    static String oneAuthorPlusInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }

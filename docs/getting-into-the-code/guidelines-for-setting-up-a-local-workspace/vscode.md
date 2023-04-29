@@ -1,6 +1,7 @@
 ---
-parent: Getting into the code
-nav_order: 3
+parent: Set up a local workspace
+grand_parent: Getting into the code
+nav_order: 91
 ---
 
 # Advanced: VS Code as IDE
