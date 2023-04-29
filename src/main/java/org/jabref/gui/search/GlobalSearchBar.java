@@ -212,15 +212,13 @@ public class GlobalSearchBar extends HBox {
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
         /*
-         * Attach a change listener on the focus property of searchField node.
-         * Every time the listener tracks a change on focus property value,
-         * (i.e. from active (user types query) to inactive / lost (user selects
-         * entry / completes search)), ensures the focus is lost
-         * (i.e. newValue : false), checks whether the search query is
-         * empty or not and finally records it into the search history
-         * through addSearchHistory method call.
+         * The listener tracks a change on the focus property value.
+         * This happens, from active (user types a query) to inactive / focus
+         * lost (e.g., user selects an entry or triggers the search).
+         * The search history should only be filled, if focus is lost.
          */
         searchField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+            // Focus lost can be derived by checking that there is no newValue (or the text is empty)
             if (oldValue && !(newValue || searchField.getText().isEmpty())) {
                 this.stateManager.addSearchHistory(searchField.textProperty().get());
             }
