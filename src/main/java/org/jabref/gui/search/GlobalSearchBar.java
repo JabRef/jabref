@@ -219,7 +219,7 @@ public class GlobalSearchBar extends HBox {
          */
         searchField.focusedProperty().addListener((obs, oldValue, newValue) -> {
             // Focus lost can be derived by checking that there is no newValue (or the text is empty)
-            if (oldValue && !(newValue || searchField.getText().isEmpty())) {
+            if (oldValue && !(newValue || searchField.getText().isBlank())) {
                 this.stateManager.addSearchHistory(searchField.textProperty().get());
             }
         });
