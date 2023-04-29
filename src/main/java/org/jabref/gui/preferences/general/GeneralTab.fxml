@@ -32,7 +32,7 @@
     <CheckBox fx:id="memoryStickMode"
               text="%Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"/>
     <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>
-    <CheckBox fx:id="openLastStartup" text="%Open last edited libraries at startup"/>
+    <CheckBox fx:id="openLastStartup" text="%Open last edited libraries on startup"/>
     <CheckBox fx:id="showAdvancedHints"
               text="%Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"/>
 </fx:root>
