@@ -2,11 +2,11 @@ package org.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -99,12 +99,12 @@ class EmbeddedBibFilePdfExporterTest {
 
         BibDatabaseMode bibDatabaseMode = BibDatabaseMode.BIBTEX;
         BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
-        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(
+        FieldPreferences fieldPreferences = new FieldPreferences(
                 true,
                 List.of(StandardField.MONTH),
-                new FieldContentFormatterPreferences());
+                Collections.emptyList());
 
-        exporter = new EmbeddedBibFilePdfExporter(bibDatabaseMode, bibEntryTypesManager, fieldWriterPreferences);
+        exporter = new EmbeddedBibFilePdfExporter(bibDatabaseMode, bibEntryTypesManager, fieldPreferences);
 
         databaseContext = new BibDatabaseContext();
         dataBase = databaseContext.getDatabase();

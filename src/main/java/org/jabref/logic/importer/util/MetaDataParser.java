@@ -22,7 +22,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -113,7 +113,7 @@ public class MetaDataParser {
             } else if (entry.getKey().equals(MetaData.FILE_DIRECTORY)) {
                 metaData.setDefaultFileDirectory(getSingleItem(value));
             } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
-                metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
+                metaData.setSaveOrderConfig(SaveOrder.parse(value));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
                 metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
             } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
