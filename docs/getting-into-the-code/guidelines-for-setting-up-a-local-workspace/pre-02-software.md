@@ -28,4 +28,4 @@ You can update the IDE after a proper setup to the newest version.
 ## Other Tooling
 
 We collected some other tooling recommendations.
-We invite you to read on at our [tool recommendations](../code-howtos/tools.md).
+We invite you to read on at our [tool recommendations](../../code-howtos/tools.md).

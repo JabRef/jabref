@@ -20,6 +20,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
     @FXML private CheckBox memoryStickMode;
+    @FXML private CheckBox openLastStartup;
     @FXML private CheckBox collectTelemetry;
     @FXML private CheckBox showAdvancedHints;
 
@@ -52,6 +53,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.memoryStickModeProperty());
+        openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
     }

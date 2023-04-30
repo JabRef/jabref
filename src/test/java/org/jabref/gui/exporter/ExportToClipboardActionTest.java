@@ -15,7 +15,7 @@ import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -70,7 +70,7 @@ public class ExportToClipboardActionTest {
 
         taskExecutor = new CurrentThreadTaskExecutor();
         when(preferences.getCustomExportFormats(any())).thenReturn(List.of());
-        when(preferences.getSavePreferencesForExport()).thenReturn(mock(SavePreferences.class));
+        when(preferences.getExportConfiguration()).thenReturn(mock(SaveConfiguration.class));
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);
     }

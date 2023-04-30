@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -82,7 +82,7 @@ public class BibtexParser implements Parser {
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldContentFormatterPreferences());
+        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
         metaDataParser = new MetaDataParser(fileMonitor);
     }
 
@@ -355,8 +355,8 @@ public class BibtexParser implements Parser {
             return purgeEOFCharacters(result);
         } else if (result.contains(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
             return purge(result, BibtexDatabaseWriter.DATABASE_ID_PREFIX);
-        } else if (result.contains(SavePreferences.ENCODING_PREFIX)) {
-            return purge(result, SavePreferences.ENCODING_PREFIX);
+        } else if (result.contains(SaveConfiguration.ENCODING_PREFIX)) {
+            return purge(result, SaveConfiguration.ENCODING_PREFIX);
         } else {
             return result;
         }

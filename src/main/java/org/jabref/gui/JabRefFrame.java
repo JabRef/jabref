@@ -423,7 +423,7 @@ public class JabRefFrame extends BorderPane {
      *                  set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        if (prefs.getImportExportPreferences().shouldOpenLastEdited()) {
+        if (prefs.getGeneralPreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
@@ -908,7 +908,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF, new WriteMetadataToPdfAction(stateManager, Globals.entryTypesManager, prefs.getFieldWriterPreferences(), dialogService, taskExecutor, prefs.getFilePreferences(), prefs.getXmpPreferences())),
+                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF, new WriteMetadataToPdfAction(stateManager, Globals.entryTypesManager, prefs.getFieldPreferences(), dialogService, taskExecutor, prefs.getFilePreferences(), prefs.getXmpPreferences())),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, prefs, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -919,9 +919,9 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 // Systematic Literature Review (SLR)
-                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
+                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager)),
                 factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(this.dialogService, this.stateManager)),
-                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(this, this.getOpenDatabaseAction(), this.getDialogService(), Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
+                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(this, this.getOpenDatabaseAction(), this.getDialogService(), Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager)),
 
                 new SeparatorMenuItem(),
 

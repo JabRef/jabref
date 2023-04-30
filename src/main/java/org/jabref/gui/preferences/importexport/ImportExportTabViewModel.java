@@ -34,7 +34,7 @@ import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -66,7 +66,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final DOIPreferences doiPreferences;
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
-    private final SaveOrderConfig initialExportOrder;
     private final ImportExportPreferences importExportPreferences;
     private final FilePreferences filePreferences;
 
@@ -76,7 +75,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         this.importerPreferences = preferencesService.getImporterPreferences();
         this.grobidPreferences = preferencesService.getGrobidPreferences();
         this.doiPreferences = preferencesService.getDOIPreferences();
-        this.initialExportOrder = preferencesService.getExportSaveOrder();
         this.importExportPreferences = preferencesService.getImportExportPreferences();
         this.filePreferences = preferencesService.getFilePreferences();
     }
@@ -90,19 +88,19 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
 
-        switch (initialExportOrder.getOrderType()) {
+        SaveOrder exportSaveOrder = importExportPreferences.getExportSaveOrder();
+        switch (exportSaveOrder.getOrderType()) {
             case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
             case ORIGINAL -> exportInOriginalProperty.setValue(true);
             case TABLE -> exportInTableOrderProperty.setValue(true);
         }
+        sortCriteriaProperty.addAll(exportSaveOrder.getSortCriteria().stream()
+                                                   .map(SortCriterionViewModel::new)
+                                                   .toList());
 
         List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
         fieldNames.sort(Comparator.comparing(Field::getDisplayName));
-
         sortableFieldsProperty.addAll(fieldNames);
-        sortCriteriaProperty.addAll(initialExportOrder.getSortCriteria().stream()
-                                                      .map(SortCriterionViewModel::new)
-                                                      .toList());
 
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
@@ -122,10 +120,10 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
 
-        SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
-                SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInOriginalProperty.getValue()),
+        SaveOrder newSaveOrder = new SaveOrder(
+                SaveOrder.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInOriginalProperty.getValue()),
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
-        preferencesService.storeExportSaveOrder(newSaveOrderConfig);
+        preferencesService.getImportExportPreferences().setExportSaveOrder(newSaveOrder);
 
         importExportPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
 
