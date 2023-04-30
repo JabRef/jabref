@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
@@ -41,13 +41,13 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
 
     private final BibDatabaseMode bibDatabaseMode;
     private final BibEntryTypesManager bibEntryTypesManager;
-    private final FieldWriterPreferences fieldWriterPreferences;
+    private final FieldPreferences fieldPreferences;
 
-    public EmbeddedBibFilePdfExporter(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager bibEntryTypesManager, FieldWriterPreferences fieldWriterPreferences) {
+    public EmbeddedBibFilePdfExporter(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager bibEntryTypesManager, FieldPreferences fieldPreferences) {
         super("bib", "Embedded BibTeX", StandardFileType.PDF);
         this.bibDatabaseMode = bibDatabaseMode;
         this.bibEntryTypesManager = bibEntryTypesManager;
-        this.fieldWriterPreferences = fieldWriterPreferences;
+        this.fieldPreferences = fieldPreferences;
     }
 
     /**
@@ -136,7 +136,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     private String getBibString(List<BibEntry> entries) throws IOException {
         StringWriter stringWriter = new StringWriter();
         BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, bibEntryTypesManager);
         for (BibEntry entry : entries) {
             bibEntryWriter.write(entry, bibWriter, bibDatabaseMode);

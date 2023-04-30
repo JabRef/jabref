@@ -8,8 +8,8 @@ import javafx.scene.control.TabPane;
 
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -52,7 +52,7 @@ public class PreviewWithSourceTab {
         }
 
         try {
-            codeArea.appendText(getSourceString(entry, bibDatabaseContext.getMode(), preferencesService.getFieldWriterPreferences(), entryTypesManager));
+            codeArea.appendText(getSourceString(entry, bibDatabaseContext.getMode(), preferencesService.getFieldPreferences(), entryTypesManager));
         } catch (IOException e) {
             LOGGER.error("Error getting Bibtex: {}", entry);
         }
@@ -63,10 +63,10 @@ public class PreviewWithSourceTab {
         return tabPanePreviewCode;
     }
 
-    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
+    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
         new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
         return writer.toString();
     }
