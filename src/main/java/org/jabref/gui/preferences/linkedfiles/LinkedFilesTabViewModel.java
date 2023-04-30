@@ -55,7 +55,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
                 mainFileDirectoryProperty,
                 mainDirectoryPath -> {
                     ValidationMessage error = ValidationMessage.error(
-                            Localization.lang("Main file directory %0 not found.\nCheck the preferences (linked files) or the library properties.", mainDirectoryPath)
+                            Localization.lang("Main file directory '%0' not found.\nCheck the tab \"Linked files\".", mainDirectoryPath)
                     );
                     try {
                         Path path = Path.of(mainDirectoryPath);
