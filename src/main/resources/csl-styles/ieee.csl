@@ -45,7 +45,7 @@
     <category field="engineering"/>
     <category field="generic-base"/>
     <summary>IEEE style as per the 2021 guidelines, V 01.29.2021.</summary>
-    <updated>2022-10-11T00:52:46+10:00</updated>
+    <updated>2023-04-18T00:52:46+10:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -174,25 +174,20 @@
   </macro>
   <macro name="event">
     <choose>
+      <!-- Published Conference Paper -->
       <if type="paper-conference speech" match="any">
         <choose>
-          <!-- Published Conference Paper -->
           <if variable="container-title" match="any">
-            <group delimiter=", ">
-              <group delimiter=" ">
-                <text term="in"/>
-                <text variable="container-title" font-style="italic"/>
-              </group>
+            <group delimiter=" ">
+              <text term="in"/>
+              <text variable="container-title" font-style="italic"/>
             </group>
           </if>
           <!-- Unpublished Conference Paper -->
           <else>
-            <group delimiter=", ">
-              <group delimiter=" ">
-                <text term="presented at"/>
-                <text variable="event"/>
-              </group>
-              <text variable="event-place"/>
+            <group delimiter=" ">
+              <text term="presented at"/>
+              <text variable="event"/>
             </group>
           </else>
         </choose>
