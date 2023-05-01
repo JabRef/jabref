@@ -9,8 +9,8 @@
     <link href="https://www.cambridge.org/core/services/aop-file-manager/file/5c94f7029ab84c5f086928bb" rel="documentation"/>
     <author>
       <name>Martin R. Smith</name>
-      <email>martins@gmail.com</email>
-      <uri>https://community.dur.ac.uk/martin.smith/</uri>
+      <email>martin.smith@durham.ac.uk</email>
+      <uri>https://smithlabdurham.github.io/</uri>
     </author>
     <category citation-format="author-date"/>
     <category field="biology"/>
@@ -107,11 +107,19 @@
       <key macro="author-short"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
-      <group delimiter=", ">
-        <text macro="author-short"/>
-        <text macro="year-date"/>
+      <group delimiter=" ">
+        <group delimiter="">
+          <group delimiter=" ">
+            <text macro="author-short"/>
+            <text macro="year-date"/>
+          </group>
+          <text variable="year-suffix"/>
+        </group>
+        <group delimiter=" ">
+          <label variable="locator" form="short"/>
+          <text variable="locator"/>
+        </group>
       </group>
-      <text variable="locator"/>
     </layout>
   </citation>
   <bibliography entry-spacing="0" hanging-indent="true">
