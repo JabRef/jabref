@@ -17,9 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UTF8CheckerTest {
 
-    private final BibEntry entry = new BibEntry();
-
     private static final Charset GBK = Charset.forName("GBK");
+    private final BibEntry entry = new BibEntry();
 
     /**
      * fieldAcceptsUTF8 to check UTF8Checker's result set
