@@ -2122,6 +2122,7 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(WORKING_DIRECTORY)),
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
                 getBoolean(CREATE_BACKUP),
+                // We choose the data directory, because a ".bak" file should survive cache cleanups
                 getPath(BACKUP_DIRECTORY, BackupFileUtil.getAppDataBackupDir()));
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
