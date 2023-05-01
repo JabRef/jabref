@@ -498,6 +498,14 @@ checkstyle {
     sourceSets = []
 }
 
+modernizer {
+    failOnViolations = true
+    includeTestClasses = true
+    exclusions = [
+        'java/util/Optional.get:()Ljava/lang/Object;'
+    ]
+}
+
 // Release tasks
 task deleteInstallerTemp(type: Delete) {
     delete "$buildDir/installer"
