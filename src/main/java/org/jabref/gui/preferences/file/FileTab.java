@@ -20,7 +20,6 @@ import jakarta.inject.Inject;
 
 public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
 
-    @FXML private CheckBox openLastStartup;
     @FXML private TextField noWrapFiles;
     @FXML private RadioButton doNotResolveStrings;
     @FXML private RadioButton resolveStrings;
@@ -41,9 +40,8 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     }
 
     public void initialize() {
-        this.viewModel = new FileTabViewModel(preferencesService.getImportExportPreferences(), preferencesService.getFilePreferences(), dialogService);
+        this.viewModel = new FileTabViewModel(preferencesService.getImportExportPreferences(), preferencesService.getFieldPreferences());
 
-        openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
 
         doNotResolveStrings.selectedProperty().bindBidirectional(viewModel.doNotResolveStringsProperty());

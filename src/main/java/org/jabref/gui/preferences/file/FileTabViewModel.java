@@ -10,12 +10,12 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.ImportExportPreferences;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
-    private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
     private final StringProperty noWrapFilesProperty = new SimpleStringProperty("");
     private final BooleanProperty doNotResolveStringsProperty = new SimpleBooleanProperty();
     private final BooleanProperty resolveStringsProperty = new SimpleBooleanProperty();
@@ -23,14 +23,11 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private final BooleanProperty createBackupProperty = new SimpleBooleanProperty();
-    private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
-
     private final ImportExportPreferences importExportPreferences;
-    private final FilePreferences filePreferences;
+    private final FieldPreferences fieldPreferences;
     private final DialogService dialogService;
 
-    FileTabViewModel(ImportExportPreferences importExportPreferences, FilePreferences filePreferences, DialogService dialogService) {
+    FileTabViewModel(ImportExportPreferences importExportPreferences, FieldPreferences fieldPreferences) {
         this.importExportPreferences = importExportPreferences;
         this.filePreferences = filePreferences;
         this.dialogService = dialogService;
@@ -38,36 +35,28 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        openLastStartupProperty.setValue(importExportPreferences.shouldOpenLastEdited());
-        noWrapFilesProperty.setValue(importExportPreferences.getNonWrappableFields());
+        noWrapFilesProperty.setValue(FieldFactory.serializeFieldsList(fieldPreferences.getNonWrappableFields()));
 
-        doNotResolveStringsProperty.setValue(!importExportPreferences.resolveStrings());
-        resolveStringsProperty.setValue(importExportPreferences.resolveStrings());
-        resolveStringsForFieldsProperty.setValue(importExportPreferences.getResolvableFields());
+        doNotResolveStringsProperty.setValue(!fieldPreferences.shouldResolveStrings());
+        resolveStringsProperty.setValue(fieldPreferences.shouldResolveStrings());
+        resolveStringsForFieldsProperty.setValue(FieldFactory.serializeFieldsList(fieldPreferences.getResolvableFields()));
         alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(importExportPreferences.shouldAutoSave());
 
-        createBackupProperty.setValue(filePreferences.shouldCreateBackup());
-        backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
+        createBackupProperty.setValue(fieldPreferences.shouldCreateBackup());
+        backupDirectoryProperty.setValue(fieldPreferences.getBackupDirectory().toString());
     }
 
     @Override
     public void storeSettings() {
-        importExportPreferences.setOpenLastEdited(openLastStartupProperty.getValue());
-        importExportPreferences.setResolveStrings(!doNotResolveStringsProperty.getValue());
-        importExportPreferences.setNonWrappableFields(noWrapFilesProperty.getValue().trim());
-        importExportPreferences.setResolvableFields(resolveStringsForFieldsProperty.getValue().trim());
+        fieldPreferences.setResolveStrings(!doNotResolveStringsProperty.getValue());
+        fieldPreferences.setNonWrappableFields(FieldFactory.parseFieldList(noWrapFilesProperty.getValue().trim()));
+        fieldPreferences.setResolvableFields(FieldFactory.parseFieldList(resolveStringsForFieldsProperty.getValue().trim()));
         importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         importExportPreferences.setAutoSave(autosaveLocalLibraries.getValue());
 
-        filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
-        filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
-    }
-
-    // General
-
-    public BooleanProperty openLastStartupProperty() {
-        return openLastStartupProperty;
+        fieldPreferences.createBackupProperty().setValue(createBackupProperty.getValue());
+        fieldPreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
     }
 
     // ImportExport

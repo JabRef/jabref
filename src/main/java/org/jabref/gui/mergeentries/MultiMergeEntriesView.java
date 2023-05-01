@@ -252,7 +252,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         if (field.equals(StandardField.DOI)) {
             return false;
         }
-        return FieldFactory.isMultiLineField(field, preferences.getFieldContentParserPreferences().getNonWrappableFields());
+        return FieldFactory.isMultiLineField(field, preferences.getFieldPreferences().getNonWrappableFields());
     }
 
     private class Cell extends HBox {

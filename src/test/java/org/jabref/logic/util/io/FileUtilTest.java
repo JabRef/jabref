@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -21,24 +20,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Answers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 @AllowedToUseLogic("uses OS from logic package")
 class FileUtilTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtilTest.class);
-
     private final Path nonExistingTestPath = Path.of("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
-    private LayoutFormatterPreferences layoutFormatterPreferences;
     private Path rootDir;
 
     @BeforeEach
@@ -54,7 +46,6 @@ class FileUtilTest {
         otherExistingTestFile = subDir.resolve("otherExistingTestFile.txt");
         Files.createFile(otherExistingTestFile);
         Files.write(otherExistingTestFile, "otherExistingTestFile.txt".getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
-        layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test

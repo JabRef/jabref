@@ -15,10 +15,9 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -39,7 +38,6 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.metadata.SaveOrderConfig;
 
 public interface PreferencesService {
 
@@ -55,9 +53,7 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
-    FieldWriterPreferences getFieldWriterPreferences();
-
-    FieldContentFormatterPreferences getFieldContentParserPreferences();
+    FieldPreferences getFieldPreferences();
 
     OpenOfficePreferences getOpenOfficePreferences();
 
@@ -73,13 +69,7 @@ public interface PreferencesService {
 
     ImportFormatPreferences getImportFormatPreferences();
 
-    SavePreferences getSavePreferencesForExport();
-
-    SavePreferences getSavePreferences();
-
-    SaveOrderConfig getExportSaveOrder();
-
-    void storeExportSaveOrder(SaveOrderConfig config);
+    SaveConfiguration getExportConfiguration();
 
     void clear() throws BackingStoreException;
 

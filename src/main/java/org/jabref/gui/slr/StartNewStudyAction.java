@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.crawler.StudyYamlParser;
@@ -36,8 +35,19 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
 
     Study newStudy;
 
-    public StartNewStudyAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor, PreferencesService preferencesService, StateManager stateManager, ThemeManager themeManager) {
-        super(frame, frame.getOpenDatabaseAction(), frame.getDialogService(), fileUpdateMonitor, taskExecutor, preferencesService, stateManager, themeManager, true);
+    public StartNewStudyAction(JabRefFrame frame,
+                               FileUpdateMonitor fileUpdateMonitor,
+                               TaskExecutor taskExecutor,
+                               PreferencesService preferencesService,
+                               StateManager stateManager) {
+        super(frame,
+                frame.getOpenDatabaseAction(),
+                frame.getDialogService(),
+                fileUpdateMonitor,
+                taskExecutor,
+                preferencesService,
+                stateManager,
+                true);
     }
 
     @Override
