@@ -135,7 +135,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
         //   - it is provided (!= null)
         //   - explicitly set in the .bib file OR not equal to UTF_8
         // Otherwise, we do not write anything and return
-        if ((encoding == null) || (!bibDatabaseContext.getMetaData().getEncodingExplicitlySupplied() && (encoding == StandardCharsets.UTF_8))) {
+        if ((encoding == null) || (!bibDatabaseContext.getMetaData().getEncodingExplicitlySupplied() && (encoding.equals(StandardCharsets.UTF_8)))) {
             return;
         }
 
