@@ -40,7 +40,7 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     }
 
     public void initialize() {
-        this.viewModel = new FileTabViewModel(preferencesService.getImportExportPreferences(), preferencesService.getFieldPreferences());
+        this.viewModel = new FileTabViewModel(preferencesService.getImportExportPreferences(), preferencesService.getFieldPreferences(), preferencesService.getFilePreferences(), dialogService);
 
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
 

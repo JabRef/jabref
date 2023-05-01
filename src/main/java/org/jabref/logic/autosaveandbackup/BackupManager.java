@@ -64,12 +64,12 @@ public class BackupManager {
 
     private boolean needsBackup = false;
 
+
     BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.executor = new ScheduledThreadPoolExecutor(2);
-        this.createBackup = preferences.getFilePreferences().shouldCreateBackup();
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -117,10 +117,11 @@ public class BackupManager {
      * Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
+     * @param b
+     * @param path
      */
-    public static void shutdown(BibDatabaseContext bibDatabaseContext) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(
-                BackupManager::shutdown);
+    public static void shutdown(BibDatabaseContext bibDatabaseContext, Path path, boolean createBackup) {
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdown(path, createBackup));
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
@@ -328,8 +329,9 @@ public class BackupManager {
      * This method should only be used when closing a database/JabRef in a normal way.
      *
      * @param path The backup directory
+     * @param createBackup If the backup manager should still perform a backup
      */
-    private void shutdown(Path backupDir) {
+    private void shutdown(Path backupDir, boolean createBackup) {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
         executor.shutdown();
