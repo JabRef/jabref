@@ -31,20 +31,6 @@ import org.testfx.framework.junit5.Start;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * The GlobalSearchBarTest class currently serves the GUI testing regarding
- * search history recording improvement. Designed in TestFX testing framework
- * and using FxRobot utility class, in order to automate the ui testing, by
- * simulating interactions between the user and the GUI (i.e. click on
- * a node, write to a text input control etc.). The tests included verify
- * that neither redundant data are recorded to the search history nor
- * empty search queries are stored.
- *
- * @author dkokkotas
- * @version 1.0
- * @since May 2023
- */
-
 @GUITest
 @ExtendWith(ApplicationExtension.class)
 public class GlobalSearchBarTest {
@@ -55,14 +41,6 @@ public class GlobalSearchBarTest {
     private GlobalSearchBar searchBar;
     private StateManager stateManager;
 
-    /**
-     * The onStart method, accepts the stage of the application and sets
-     * up the basic components of the UI (i.e. scene, layout), that will
-     * be used for our tests. Also interacts with GlobalSearchBar and
-     * StateManager classes, in order to set up the search box.
-     *
-     * @param stage Reference to the Stage class, part of the JavaFX UI toolkit
-     */
     @Start
     public void onStart(Stage stage) {
         SearchPreferences searchPreferences = mock(SearchPreferences.class);
@@ -100,9 +78,8 @@ public class GlobalSearchBarTest {
      *
      * @param robot Reference to the FxRobot class, a TestFx utility class
      */
-
     @Test
-    void recordingSearchQueriesOnFocusLost(FxRobot robot) {
+    void recordingSearchQueriesOnFocusLost(FxRobot robot) throws InterruptedException {
         stateManager.clearSearchHistory();
         String searchQuery = "Smith";
         // track the node, that the search query will be typed into
@@ -112,12 +89,8 @@ public class GlobalSearchBarTest {
         var searchFieldRoboto = robot.clickOn(searchField);
         for (char c : searchQuery.toCharArray()) {
             searchFieldRoboto.write(String.valueOf(c));
-            try {
-                Thread.sleep(401);
-                Assertions.assertTrue(stateManager.getWholeSearchHistory().isEmpty());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Thread.sleep(401);
+            Assertions.assertTrue(stateManager.getWholeSearchHistory().isEmpty());
         }
 
         /*
@@ -137,7 +110,6 @@ public class GlobalSearchBarTest {
      *
      * @param robot Reference to the FxRobot class, a TestFX utility class
      */
-
     @Test
     void avoidRecordingEmptyQuery(FxRobot robot) {
         stateManager.clearSearchHistory();
