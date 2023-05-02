@@ -6,8 +6,8 @@
     <id>http://www.zotero.org/styles/ecosistemas</id>
     <link href="http://www.zotero.org/styles/ecosistemas" rel="self"/>
     <link href="http://www.zotero.org/styles/american-journal-of-botany" rel="template"/>
-    <link href="http://www.revistaecosistemas.net/public/journals/1/docs/Normasparaautores_RevistaEcosistemas.pdf" rel="documentation"/>
-    <link href="http://www.revistaecosistemas.net/index.php/ecosistemas/about/submissions#authorGuidelines" rel="documentation"/>
+    <link href="https://www.revistaecosistemas.net/public/journals/1/docs/Normasparaautores_RevistaEcosistemas.pdf" rel="documentation"/>
+    <link href="https://www.revistaecosistemas.net/index.php/ecosistemas/about/submissions" rel="documentation"/>
     <author>
       <name>Francisco Rodriguez-Sanchez</name>
       <email>f.rodriguez.sanc@gmail.com</email>
@@ -113,7 +113,7 @@
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=" ">
-        <group delimiter=", ">
+        <group delimiter=" ">
           <text macro="author-short"/>
           <text macro="year-date"/>
         </group>

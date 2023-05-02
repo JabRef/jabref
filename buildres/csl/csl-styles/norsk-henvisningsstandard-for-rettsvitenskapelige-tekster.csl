@@ -292,8 +292,8 @@
             <text macro="author-full"/>
             <text prefix=", " macro="title"/>
             <text prefix=" " font-style="italic" variable="container-title"/>
-            <text prefix=" " macro="issued"/>
-            <group delimiter=" " prefix=" ">
+            <text prefix=" " macro="issued-no-parenthesis"/>
+            <group delimiter=" " prefix=", ">
               <text term="page" form="short"/>
               <text variable="page"/>
             </group>

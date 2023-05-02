@@ -3,6 +3,8 @@ src/main/gen/
 src/main/generated/
 src-gen/
 
+structure101-settings.java.hsw
+
 # private data
 /buildres/jabref-cert-2016.p12
 
