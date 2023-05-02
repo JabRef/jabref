@@ -34,6 +34,7 @@ Swing's FileChooser implemented a very decent directory determination algorithm.
 It thereby uses `sun.awt.shell.ShellFolder`.
 
 * Good, because provides best results on most platforms.
+* Good, because also supports localization of the folder name. E.g., `~/Dokumente` in Germany.
 * Bad, because introduces a dependency on Swing and thereby contradicts the second decision driver.
 * Bad, because GraalVM's support Swing is experimental
 

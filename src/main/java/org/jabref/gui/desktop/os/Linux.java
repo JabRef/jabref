@@ -11,6 +11,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.swing.filechooser.FileSystemView;
+
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -173,7 +175,6 @@ public class Linux implements NativeDesktop {
     public Path getDefaultFileChooserDirectory() {
         return Path.of(Objects.requireNonNullElse(
                 System.getenv("XDG_DOCUMENTS_DIR"),
-                System.getProperty("user.home") + "/Documents")
-        );
+                FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
     }
 }

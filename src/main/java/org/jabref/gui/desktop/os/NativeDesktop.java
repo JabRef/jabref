@@ -3,6 +3,8 @@ package org.jabref.gui.desktop.os;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import javax.swing.filechooser.FileSystemView;
+
 import org.jabref.gui.DialogService;
 
 public interface NativeDesktop {
@@ -35,7 +37,9 @@ public interface NativeDesktop {
      *
      * @return The path to the directory
      */
-     Path getDefaultFileChooserDirectory();
+     default Path getDefaultFileChooserDirectory() {
+         return Path.of(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
+     }
 
     /**
      * Returns the path to the system's user directory.
