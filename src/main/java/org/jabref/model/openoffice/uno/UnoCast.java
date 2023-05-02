@@ -6,7 +6,8 @@ import com.sun.star.uno.UnoRuntime;
 
 public class UnoCast {
 
-    private UnoCast() { }
+    private UnoCast() {
+    }
 
     /**
      * cast : short for Optional.ofNullable(UnoRuntime.queryInterface(...))

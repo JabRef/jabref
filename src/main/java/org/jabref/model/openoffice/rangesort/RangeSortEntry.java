@@ -9,7 +9,7 @@ public class RangeSortEntry<T> implements RangeSortable<T> {
 
     private XTextRange range;
     private int indexInPosition;
-    private T content;
+    private final T content;
 
     public RangeSortEntry(XTextRange range, int indexInPosition, T content) {
         this.range = range;

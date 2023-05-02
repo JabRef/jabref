@@ -20,6 +20,7 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 
+import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ProgressDialog;
 
 /**
@@ -162,6 +163,14 @@ public interface DialogService {
                                                     String optOutMessage, Consumer<Boolean> optOutAction);
 
     /**
+     * This will create and display new {@link CustomPasswordField} that doesn't show the text, and two buttons
+     * one cancel and one ok.
+     *
+     * @return the entered password if pressed "OK", null otherwise
+     */
+    Optional<String> showPasswordDialogAndWait(String title, String header, String content);
+
+    /**
      * Shows a custom dialog without returning any results.
      *
      * @param dialog dialog to show
@@ -215,7 +224,7 @@ public interface DialogService {
     <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
 
     /**
-     * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).
+     * Notify the user in a non-blocking way (i.e., in form of toast in a snackbar).
      *
      * @param message the message to show.
      */

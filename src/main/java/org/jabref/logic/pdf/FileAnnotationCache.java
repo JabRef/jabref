@@ -29,7 +29,6 @@ public class FileAnnotationCache {
      * hitting the bug https://github.com/AdamBien/afterburner.fx/issues/71 .
      */
     public FileAnnotationCache() {
-
     }
 
     public FileAnnotationCache(BibDatabaseContext context, FilePreferences filePreferences) {

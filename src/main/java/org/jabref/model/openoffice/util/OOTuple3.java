@@ -1,13 +1,11 @@
 package org.jabref.model.openoffice.util;
 
 /**
- * This class allows three objects to be packed together, and later accessed as fields `a`, `b` and
- * `c`.
- *
+ * This class allows three objects to be packed together, and later accessed as fields `a`, `b` and `c`.
+ * <p>
  * Can be used to avoid creating a new class for just this purpose.
- *
+ * <p>
  * Can be useful if you do not have `Trifunction` at hand but need to pass three objects at a time.
- *
  */
 public class OOTuple3<A, B, C> {
 

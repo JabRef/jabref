@@ -1,8 +1,8 @@
 package org.jabref.gui.push;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -15,7 +15,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PushToApplicationPreferences;
 
 public class PushToApplicationSettings {
@@ -23,13 +23,13 @@ public class PushToApplicationSettings {
     protected final Label commandLabel;
     protected final TextField path;
     protected final GridPane settingsPane;
-    protected final ObjectProperty<PushToApplicationPreferences> preferences;
+    protected final PushToApplicationPreferences preferences;
     protected final AbstractPushToApplication application;
 
     public PushToApplicationSettings(PushToApplication application,
                                      DialogService dialogService,
-                                     PreferencesService preferencesService,
-                                     ObjectProperty<PushToApplicationPreferences> preferences) {
+                                     FilePreferences filePreferences,
+                                     PushToApplicationPreferences preferences) {
         this.application = (AbstractPushToApplication) application;
         this.preferences = preferences;
 
@@ -57,11 +57,11 @@ public class PushToApplicationSettings {
         commandLabel.setText(commandLine.toString());
         settingsPane.add(commandLabel, 0, 0);
 
-        path.setText(preferences.get().getPushToApplicationCommandPaths().get(this.application.getDisplayName()));
+        path.setText(preferences.getCommandPaths().get(this.application.getDisplayName()));
         settingsPane.add(path, 1, 0);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(preferencesService.getWorkingDir()).build();
+                .withInitialDirectory(filePreferences.getWorkingDirectory()).build();
         browse.setOnAction(e -> dialogService.showFileOpenDialog(fileDialogConfiguration)
                                              .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         settingsPane.add(browse, 2, 0);
@@ -80,9 +80,9 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
-        Map<String, String> commandPaths = preferences.get().getPushToApplicationCommandPaths();
+        Map<String, String> commandPaths = new HashMap<>(preferences.getCommandPaths());
         commandPaths.put(application.getDisplayName(), path.getText());
-        preferences.setValue(preferences.get().withPushToApplicationCommandPaths(commandPaths));
+        preferences.setCommandPaths(commandPaths);
     }
 
     public GridPane getSettingsPane() {

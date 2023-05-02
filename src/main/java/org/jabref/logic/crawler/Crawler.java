@@ -5,14 +5,12 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -24,6 +22,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
  * and a StudyFetcher that manages the crawling over the selected E-Libraries.
  */
 public class Crawler {
+    public static final String FILENAME_STUDY_RESULT_BIB = "studyResult.bib";
+
     private final StudyRepository studyRepository;
     private final StudyFetcher studyFetcher;
 
@@ -32,10 +32,24 @@ public class Crawler {
      *
      * @param studyRepositoryRoot The path to the study repository
      */
-    public Crawler(Path studyRepositoryRoot, SlrGitHandler gitHandler, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, TimestampPreferences timestampPreferences, BibEntryTypesManager bibEntryTypesManager, FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException {
-        studyRepository = new StudyRepository(studyRepositoryRoot, gitHandler, importFormatPreferences, fileUpdateMonitor, savePreferences, timestampPreferences, bibEntryTypesManager);
-        StudyDatabaseToFetcherConverter studyDatabaseToFetcherConverter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
-        this.studyFetcher = new StudyFetcher(studyDatabaseToFetcherConverter.getActiveFetchers(), studyRepository.getSearchQueryStrings());
+    public Crawler(Path studyRepositoryRoot,
+                   SlrGitHandler gitHandler,
+                   PreferencesService preferencesService,
+                   BibEntryTypesManager bibEntryTypesManager,
+                   FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException {
+        this.studyRepository = new StudyRepository(
+                studyRepositoryRoot,
+                gitHandler,
+                preferencesService,
+                fileUpdateMonitor,
+                bibEntryTypesManager);
+        StudyDatabaseToFetcherConverter studyDatabaseToFetcherConverter = new StudyDatabaseToFetcherConverter(
+                studyRepository.getActiveLibraryEntries(),
+                preferencesService.getImportFormatPreferences(),
+                preferencesService.getImporterPreferences());
+        this.studyFetcher = new StudyFetcher(
+                studyDatabaseToFetcherConverter.getActiveFetchers(),
+                studyRepository.getSearchQueryStrings());
     }
 
     /**

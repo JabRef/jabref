@@ -5,14 +5,18 @@
     <id>http://www.zotero.org/styles/harvard-newcastle-university</id>
     <link href="http://www.zotero.org/styles/harvard-newcastle-university" rel="self"/>
     <link href="http://libguides.ncl.ac.uk/referencing" rel="documentation"/>
+    <link href="https://libguides.ncl.ac.uk/ld.php?content_id=33783920" rel="documentation"/>
     <author>
       <name>McKenzie Lloyd-Smith</name>
       <uri>http://www.mendeley.com/profiles/mckenzie-lloyd-smith/</uri>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>The Harvard author-date style - adapted for Newcastle University</summary>
-    <updated>2014-04-23T10:20:00</updated>
+    <updated>2021-12-07T09:47:27+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -77,7 +81,7 @@
         <text variable="title" font-style="italic"/>
       </else-if>
       <else>
-        <text variable="title"/>
+        <text variable="title" quotes="true"/>
       </else>
     </choose>
   </macro>
@@ -111,7 +115,8 @@
     </choose>
   </macro>
   <macro name="pages">
-    <group>
+    <group delimiter=" ">
+      <label variable="page" form="short"/>
       <text variable="page"/>
     </group>
   </macro>
@@ -187,20 +192,20 @@
           </group>
         </else-if>
         <else-if type="article-journal article-newspaper broadcast personal_communication thesis webpage" match="any">
-          <group suffix=".">
+          <group suffix=",">
             <text macro="title" prefix=" "/>
             <text macro="editor" prefix=" "/>
           </group>
           <choose>
             <if variable="author" match="any">
-              <text variable="container-title" font-style="italic" prefix=" " suffix="."/>
+              <text variable="container-title" font-style="italic" prefix=" " suffix=","/>
             </if>
           </choose>
           <text macro="online" prefix=" "/>
           <group prefix=" " suffix=".">
             <group>
               <text variable="volume"/>
-              <text variable="issue" prefix=" (" suffix="), "/>
+              <text variable="issue" prefix="(" suffix="), "/>
               <text macro="issued"/>
             </group>
             <group>
@@ -224,7 +229,7 @@
           </group>
         </else-if>
         <else-if type="chapter paper-conference" match="any">
-          <text macro="title" prefix=" '" suffix="', "/>
+          <text macro="title" prefix=" " suffix=", "/>
           <group prefix=" " delimiter=" ">
             <text term="in"/>
             <text macro="editor"/>
@@ -234,7 +239,6 @@
             <text macro="online" suffix="."/>
             <text macro="issued"/>
             <text macro="publisher" suffix="."/>
-            <label variable="page" form="short"/>
             <text macro="pages" suffix="."/>
           </group>
         </else-if>

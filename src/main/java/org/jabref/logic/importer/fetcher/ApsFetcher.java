@@ -41,7 +41,6 @@ public class ApsFetcher implements FulltextFetcher {
         Optional<String> id = getId(doi.get().getDOI());
 
         if (id.isPresent()) {
-
             String pdfRequestUrl = PDF_URL + id.get();
             int code = Unirest.head(pdfRequestUrl).asJson().getStatus();
 

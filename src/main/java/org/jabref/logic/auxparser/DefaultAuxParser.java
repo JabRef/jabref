@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultAuxParser implements AuxParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAuxParser.class);
 
-    private static final Pattern CITE_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
+    private static final Pattern CITE_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)(\\{\\d+\\})?\\{(?<citationkey>.+)\\}");
     private static final Pattern INPUT_PATTERN = Pattern.compile("\\\\@input\\{(.+)\\}");
 
     private final BibDatabase masterDatabase;
@@ -108,7 +108,7 @@ public class DefaultAuxParser implements AuxParser {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
-            String keyString = citeMatch.group(2);
+            String keyString = citeMatch.group("citationkey");
             String[] keys = keyString.split(",");
 
             for (String key : keys) {

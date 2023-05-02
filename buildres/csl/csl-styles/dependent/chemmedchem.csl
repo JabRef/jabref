@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>ChemMedChem</title>
+    <id>http://www.zotero.org/styles/chemmedchem</id>
+    <link href="http://www.zotero.org/styles/chemmedchem" rel="self"/>
+    <link href="http://www.zotero.org/styles/angewandte-chemie" rel="independent-parent"/>
+    <link href="https://chemistry-europe.onlinelibrary.wiley.com/hub/journal/18607187/notice-to-authors" rel="documentation"/>
+    <link href="https://chemistry-europe.onlinelibrary.wiley.com/hub/journal/18607187/notice-to-authors" rel="documentation"/>
+    <category citation-format="numeric"/>
+    <issn>1860-7179</issn>
+    <eissn>1860-7187</eissn>
+    <updated>2021-11-30T19:22:36+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

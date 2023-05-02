@@ -4,23 +4,26 @@
     <title>Emu - Austral Ornithology</title>
     <id>http://www.zotero.org/styles/emu-austral-ornithology</id>
     <link href="http://www.zotero.org/styles/emu-austral-ornithology" rel="self"/>
-    <link href="http://www.tandfonline.com/action/authorSubmission?journalCode=temu20&amp;page=instructions#References" rel="documentation"/>
+    <link href="https://www.publish.csiro.au/wr/forauthors/AuthorInstructions#15" rel="documentation"/>
     <author>
       <name>Eliot Miller</name>
       <email>eliotmiller@umsl.edu</email>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="biology"/>
     <issn>0158-4197</issn>
     <eissn>1448-5540</eissn>
     <summary>Emu - Austral Ornithology</summary>
-    <updated>2017-02-07T21:21:48+00:00</updated>
+    <updated>2021-10-20T07:18:03+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
     <names variable="editor" delimiter=", ">
       <label form="short" text-case="sentence" suffix=" " strip-periods="true"/>
-      <name and="text" initialize-with=". " delimiter=", "/>
+      <name initialize-with="" sort-separator=" "/>
     </names>
   </macro>
   <macro name="anon">
@@ -28,7 +31,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with=". " delimiter-precedes-last="always" delimiter=", "/>
+      <name delimiter-precedes-last="always" initialize-with="" name-as-sort-order="all" sort-separator=" "/>
       <label form="short" text-case="capitalize-first" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
@@ -80,7 +83,7 @@
     </choose>
   </macro>
   <macro name="publisher">
-    <group delimiter=": ">
+    <group delimiter=": " prefix="(" suffix=")">
       <text variable="publisher"/>
       <text variable="publisher-place"/>
     </group>
@@ -145,12 +148,14 @@
       </date>
       <choose>
         <if type="bill book graphic legal_case legislation motion_picture song" match="any">
-          <group prefix=" " delimiter=" " suffix=".">
-            <text macro="title" quotes="true"/>
-            <text macro="edition"/>
-            <text macro="editor"/>
+          <group delimiter=". ">
+            <group delimiter=" " prefix=" ">
+              <text macro="title" quotes="true"/>
+              <text macro="edition"/>
+              <text macro="editor"/>
+            </group>
+            <text macro="publisher"/>
           </group>
-          <text prefix=" (" suffix=".)" macro="publisher"/>
         </if>
         <else-if type="chapter paper-conference" match="any">
           <text macro="title" prefix=" " suffix="."/>
@@ -162,7 +167,7 @@
             <text variable="event" suffix="."/>
             <group delimiter=". ">
               <text macro="pages" prefix=" "/>
-              <text macro="publisher" prefix="(" suffix=".)"/>
+              <text macro="publisher"/>
             </group>
           </group>
         </else-if>

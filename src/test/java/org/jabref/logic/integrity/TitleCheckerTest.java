@@ -220,5 +220,4 @@ public class TitleCheckerTest {
     void bibLaTexAcceptsCapitalLetterNotOnlyAfterSpecialCharacter() {
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("This!is!!A!TitlE??"));
     }
-
 }

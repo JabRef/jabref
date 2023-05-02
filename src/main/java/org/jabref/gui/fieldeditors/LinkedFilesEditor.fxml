@@ -6,40 +6,40 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.LinkedFilesEditor">
-    <ListView fx:id="listView" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="100"/>
-    <Button onAction="#addNewFile"
-            styleClass="icon-button">
-        <graphic>
-            <JabRefIconView glyph="NEW_FILE"/>
-        </graphic>
-        <tooltip>
-            <Tooltip text="%Open"/>
-        </tooltip>
-    </Button>
-    <Button onAction="#fetchFulltext" styleClass="icon-button">
-        <graphic>
-            <StackPane>
-                <JabRefIconView glyph="FETCH_FULLTEXT"
-                                visible="${controller.viewModel.fulltextLookupInProgress == false}"/>
-                <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
-                                   visible="${controller.viewModel.fulltextLookupInProgress}"/>
-            </StackPane>
-        </graphic>
-        <tooltip>
-            <Tooltip text="%Get fulltext"/>
-        </tooltip>
-    </Button>
-    <Button
-            onAction="#addFromURL"
-            styleClass="icon-button">
-        <graphic>
-            <JabRefIconView glyph="DOWNLOAD"/>
-        </graphic>
-        <tooltip>
-            <Tooltip text="%Download from URL"/>
-        </tooltip>
-    </Button>
+    <ListView fx:id="listView" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="100" />
+    <VBox>
+        <Button onAction="#addNewFile" styleClass="icon-button">
+            <graphic>
+                <JabRefIconView glyph="LINKED_FILE_ADD"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Open"/>
+            </tooltip>
+        </Button>
+        <Button onAction="#fetchFulltext" styleClass="icon-button">
+            <graphic>
+                <StackPane>
+                    <JabRefIconView glyph="FETCH_FULLTEXT"
+                                    visible="${controller.viewModel.fulltextLookupInProgress == false}"/>
+                    <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
+                                       visible="${controller.viewModel.fulltextLookupInProgress}"/>
+                </StackPane>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Get fulltext"/>
+            </tooltip>
+        </Button>
+        <Button onAction="#addFromURL" styleClass="icon-button">
+            <graphic>
+                <JabRefIconView glyph="DOWNLOAD"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Download from URL"/>
+            </tooltip>
+        </Button>
+    </VBox>
 </fx:root>

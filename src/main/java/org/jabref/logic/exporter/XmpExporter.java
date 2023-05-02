@@ -1,8 +1,6 @@
 package org.jabref.logic.exporter;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -35,11 +33,10 @@ public class XmpExporter extends Exporter {
     /**
      * @param databaseContext the database to export from
      * @param file            the file to write to. If it contains "split", then the output is split into different files
-     * @param encoding        the encoding to use
      * @param entries         a list containing all entries that should be exported
      */
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(file);
         Objects.requireNonNull(entries);
@@ -58,20 +55,17 @@ public class XmpExporter extends Exporter {
                 if (file.getParent() == null) {
                     entryFile = Path.of(suffix);
                 } else {
-                    entryFile = Path.of(file.getParent().toString() + "/" + suffix);
+                    entryFile = Path.of(file.getParent() + "/" + suffix);
                 }
-                this.writeBibToXmp(entryFile, Collections.singletonList(entry), encoding);
+                this.writeBibToXmp(entryFile, Collections.singletonList(entry));
             }
         } else {
-            this.writeBibToXmp(file, entries, encoding);
+            this.writeBibToXmp(file, entries);
         }
     }
 
-    private void writeBibToXmp(Path file, List<BibEntry> entries, Charset encoding) throws IOException {
-        String xmpContent = XmpUtilWriter.generateXmpStringWithoutXmpDeclaration(entries, this.xmpPreferences);
-        try (BufferedWriter writer = Files.newBufferedWriter(file, encoding)) {
-            writer.write(xmpContent);
-            writer.flush();
-        }
+    private void writeBibToXmp(Path file, List<BibEntry> entries) throws IOException {
+        String xmpContent = new XmpUtilWriter(this.xmpPreferences).generateXmpStringWithoutXmpDeclaration(entries);
+        Files.writeString(file, xmpContent);
     }
 }

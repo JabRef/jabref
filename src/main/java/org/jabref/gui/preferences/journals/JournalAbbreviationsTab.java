@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.journals;
 
-import javax.inject.Inject;
-
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -14,6 +12,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -28,11 +27,13 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
 /**
@@ -43,26 +44,26 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML private Label loadingLabel;
     @FXML private ProgressIndicator progressIndicator;
+
     @FXML private TableView<AbbreviationViewModel> journalAbbreviationsTable;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableShortestUniqueAbbreviationColumn;
+    @FXML private TableColumn<AbbreviationViewModel, String> actionsColumn;
+
     private FilteredList<AbbreviationViewModel> filteredAbbreviations;
     @FXML private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
+
     @FXML private Button addAbbreviationButton;
-    @FXML private Button removeAbbreviationButton;
-    @FXML private Button openAbbreviationListButton;
-    @FXML private Button addAbbreviationListButton;
     @FXML private Button removeAbbreviationListButton;
 
     @FXML private CustomTextField searchBox;
+    @FXML private CheckBox useFJournal;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
 
     private Timeline invalidateSearch;
-    private ObjectProperty<Color> flashingColor;
-    private StringProperty flashingColorStringProperty;
 
     public JournalAbbreviationsTab() {
         ViewLoader.view(this)
@@ -72,25 +73,20 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML
     private void initialize() {
-        viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, abbreviationRepository);
+        viewModel = new JournalAbbreviationsTabViewModel(
+                preferencesService.getJournalAbbreviationPreferences(),
+                dialogService,
+                taskExecutor,
+                abbreviationRepository);
 
         filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
 
-        setButtonStyles();
         setUpTable();
         setBindings();
         setAnimations();
 
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
-    }
-
-    private void setButtonStyles() {
-        addAbbreviationListButton.setGraphic(IconTheme.JabRefIcons.ADD_ABBREVIATION_LIST.getGraphicNode());
-        openAbbreviationListButton.setGraphic(IconTheme.JabRefIcons.OPEN_ABBREVIATION_LIST.getGraphicNode());
-        removeAbbreviationListButton.setGraphic(IconTheme.JabRefIcons.REMOVE_ABBREVIATION_LIST.getGraphicNode());
-        addAbbreviationButton.setGraphic(IconTheme.JabRefIcons.ADD_ABBREVIATION.getGraphicNode());
-        removeAbbreviationButton.setGraphic(IconTheme.JabRefIcons.REMOVE_ABBREVIATION.getGraphicNode());
     }
 
     private void setUpTable() {
@@ -102,6 +98,16 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
         journalTableShortestUniqueAbbreviationColumn.setCellValueFactory(cellData -> cellData.getValue().shortestUniqueAbbreviationProperty());
         journalTableShortestUniqueAbbreviationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        new ValueTableCellFactory<AbbreviationViewModel, String>()
+                .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove journal '%0'", name))
+                .withDisableExpression(item -> viewModel.isEditableAndRemovableProperty().not())
+                .withVisibleExpression(item -> viewModel.isEditableAndRemovableProperty())
+                .withOnMouseClickedEvent(item -> evt ->
+                        viewModel.removeAbbreviation(journalAbbreviationsTable.getFocusModel().getFocusedItem()))
+                .install(actionsColumn);
     }
 
     private void setBindings() {
@@ -121,19 +127,20 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         journalFilesBox.valueProperty().bindBidirectional(viewModel.currentFileProperty());
 
         addAbbreviationButton.disableProperty().bind(viewModel.isEditableAndRemovableProperty().not());
-        removeAbbreviationButton.disableProperty().bind(viewModel.isAbbreviationEditableAndRemovable().not());
 
         loadingLabel.visibleProperty().bind(viewModel.isLoadingProperty());
         progressIndicator.visibleProperty().bind(viewModel.isLoadingProperty());
 
-        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
-            filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() ? true : abbreviation.containsCaseIndependent(searchTerm));
-        });
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) ->
+                filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() || abbreviation.containsCaseIndependent(searchTerm)));
+
+        useFJournal.selectedProperty().bindBidirectional(viewModel.useFJournalProperty());
     }
 
     private void setAnimations() {
-        flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
-        flashingColorStringProperty = createFlashingColorStringProperty(flashingColor);
+        ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
+        StringProperty flashingColorStringProperty = createFlashingColorStringProperty(flashingColor);
+
         searchBox.styleProperty().bind(
                 new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
         );
@@ -141,9 +148,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
-                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> {
-                    addAbbreviationActions();
-                }),
+                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> addAbbreviationActions()),
                 new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
         );
     }
@@ -194,11 +199,6 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         journalAbbreviationsTable.edit(
                 journalAbbreviationsTable.getSelectionModel().getSelectedIndex(),
                 journalTableNameColumn);
-    }
-
-    @FXML
-    private void removeAbbreviation() {
-        viewModel.deleteAbbreviation();
     }
 
     private void selectNewAbbreviation() {

@@ -4,6 +4,5 @@ files:
     languages_mapping:
       two_letters_code:
         pt-BR: pt_BR
-        id: in
         zh-CN: zh_CN
         zh-TW: zh_TW

@@ -1,7 +1,7 @@
 package org.jabref.gui.search.rules.describer;
 
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.model.search.rules.ContainBasedSearchRule;
+import org.jabref.model.search.rules.ContainsBasedSearchRule;
 import org.jabref.model.search.rules.GrammarBasedSearchRule;
 import org.jabref.model.search.rules.RegexBasedSearchRule;
 
@@ -19,7 +19,7 @@ public class SearchDescribers {
     public static SearchDescriber getSearchDescriberFor(SearchQuery searchQuery) {
         if (searchQuery.getRule() instanceof GrammarBasedSearchRule grammarBasedSearchRule) {
             return new GrammarBasedSearchRuleDescriber(grammarBasedSearchRule.getSearchFlags(), grammarBasedSearchRule.getTree());
-        } else if (searchQuery.getRule() instanceof ContainBasedSearchRule containBasedSearchRule) {
+        } else if (searchQuery.getRule() instanceof ContainsBasedSearchRule containBasedSearchRule) {
             return new ContainsAndRegexBasedSearchRuleDescriber(containBasedSearchRule.getSearchFlags(), searchQuery.getQuery());
         } else if (searchQuery.getRule() instanceof RegexBasedSearchRule regexBasedSearchRule) {
             return new ContainsAndRegexBasedSearchRuleDescriber(regexBasedSearchRule.getSearchFlags(), searchQuery.getQuery());

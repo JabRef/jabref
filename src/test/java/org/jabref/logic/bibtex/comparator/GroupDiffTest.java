@@ -56,10 +56,9 @@ public class GroupDiffTest {
 
         Optional<GroupDiff> groupDiff = GroupDiff.compare(originalMetaData, newMetaData);
 
-        Optional<GroupDiff> expectedGroupDiff = Optional.of(new GroupDiff(newMetaData.getGroups().get(), originalMetaData.getGroups().get()));
+        Optional<GroupDiff> expectedGroupDiff = Optional.of(new GroupDiff(originalMetaData.getGroups().get(), newMetaData.getGroups().get()));
 
         assertEquals(expectedGroupDiff.get().getNewGroupRoot(), groupDiff.get().getNewGroupRoot());
         assertEquals(expectedGroupDiff.get().getOriginalGroupRoot(), groupDiff.get().getOriginalGroupRoot());
     }
-
 }

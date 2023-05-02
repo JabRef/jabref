@@ -1,10 +1,12 @@
 package org.jabref.gui.slr;
 
+import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.Property;
@@ -13,9 +15,20 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.DialogService;
+import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.crawler.StudyYamlParser;
+import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
+import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.DBLPFetcher;
+import org.jabref.logic.importer.fetcher.IEEE;
+import org.jabref.logic.importer.fetcher.SpringerFetcher;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
@@ -30,43 +43,74 @@ import org.slf4j.LoggerFactory;
 public class ManageStudyDefinitionViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionViewModel.class);
 
+    private static final Set<String> DEFAULT_SELECTION = Set.of(
+            ACMPortalFetcher.FETCHER_NAME,
+            IEEE.FETCHER_NAME,
+            SpringerFetcher.FETCHER_NAME,
+            DBLPFetcher.FETCHER_NAME);
+
     private final StringProperty title = new SimpleStringProperty();
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
     private final ObservableList<String> queries = FXCollections.observableArrayList();
     private final ObservableList<StudyDatabaseItem> databases = FXCollections.observableArrayList();
-    // Hold the complement of databases for the selector
-    private final ObservableList<StudyDatabaseItem> nonSelectedDatabases = FXCollections.observableArrayList();
-    private final SimpleStringProperty directory = new SimpleStringProperty();
-    private Study study;
 
-    public ManageStudyDefinitionViewModel(Study study, Path studyDirectory, ImportFormatPreferences importFormatPreferences) {
-        if (Objects.isNull(study)) {
-            computeNonSelectedDatabases(importFormatPreferences);
-            return;
-        }
-        this.study = study;
-        title.setValue(study.getTitle());
-        authors.addAll(study.getAuthors());
-        researchQuestions.addAll(study.getResearchQuestions());
-        queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).collect(Collectors.toList()));
-        databases.addAll(study.getDatabases()
-                              .stream()
-                              .map(studyDatabase -> new StudyDatabaseItem(studyDatabase.getName(), studyDatabase.isEnabled()))
-                              .collect(Collectors.toList()));
-        computeNonSelectedDatabases(importFormatPreferences);
-        if (!Objects.isNull(studyDirectory)) {
-            this.directory.set(studyDirectory.toString());
-        }
+    // Hold the complement of databases for the selector
+    private final SimpleStringProperty directory = new SimpleStringProperty();
+
+    private final DialogService dialogService;
+
+    /**
+     * Constructor for a new study
+     */
+    public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
+                                          ImporterPreferences importerPreferences,
+                                          DialogService dialogService) {
+        databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
+                                    .stream()
+                                    .map(SearchBasedFetcher::getName)
+                                    // The user wants to select specific fetchers
+                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
+                                    .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                    .map(name -> {
+                                        boolean enabled = DEFAULT_SELECTION.contains(name);
+                                        return new StudyDatabaseItem(name, enabled);
+                                    })
+                                    .toList());
+        this.dialogService = Objects.requireNonNull(dialogService);
     }
 
-    private void computeNonSelectedDatabases(ImportFormatPreferences importFormatPreferences) {
-        nonSelectedDatabases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences)
-                                               .stream()
-                                               .map(SearchBasedFetcher::getName)
-                                               .map(s -> new StudyDatabaseItem(s, true))
-                                               .filter(studyDatabase -> !databases.contains(studyDatabase))
-                                               .collect(Collectors.toList()));
+    /**
+     * Constructor for an existing study
+     *
+     * @param study          The study to initialize the UI from
+     * @param studyDirectory The path where the study resides
+     */
+    public ManageStudyDefinitionViewModel(Study study,
+                                          Path studyDirectory,
+                                          ImportFormatPreferences importFormatPreferences,
+                                          ImporterPreferences importerPreferences,
+                                          DialogService dialogService) {
+        // copy the content of the study object into the UI fields
+        authors.addAll(Objects.requireNonNull(study).getAuthors());
+        title.setValue(study.getTitle());
+        researchQuestions.addAll(study.getResearchQuestions());
+        queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
+        List<StudyDatabase> studyDatabases = study.getDatabases();
+        databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
+                                    .stream()
+                                    .map(SearchBasedFetcher::getName)
+                                    // The user wants to select specific fetchers
+                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
+                                    .filter(name -> !name.equals(CompositeSearchBasedFetcher.FETCHER_NAME))
+                                    .map(name -> {
+                                        boolean enabled = studyDatabases.contains(new StudyDatabase(name, true));
+                                        return new StudyDatabaseItem(name, enabled);
+                                    })
+                                    .toList());
+
+        this.directory.set(Objects.requireNonNull(studyDirectory).toString());
+        this.dialogService = Objects.requireNonNull(dialogService);
     }
 
     public StringProperty getTitle() {
@@ -93,10 +137,6 @@ public class ManageStudyDefinitionViewModel {
         return databases;
     }
 
-    public ObservableList<StudyDatabaseItem> getNonSelectedDatabases() {
-        return nonSelectedDatabases;
-    }
-
     public void addAuthor(String author) {
         if (author.isBlank()) {
             return;
@@ -118,31 +158,43 @@ public class ManageStudyDefinitionViewModel {
         queries.add(query);
     }
 
-    public void addDatabase(StudyDatabaseItem database) {
-        if (Objects.isNull(database)) {
-            return;
-        }
-        nonSelectedDatabases.remove(database);
-        if (!databases.contains(database)) {
-            databases.add(database);
-        }
-    }
-
     public SlrStudyAndDirectory saveStudy() {
-        if (Objects.isNull(study)) {
-            study = new Study();
-        }
-        study.setTitle(title.getValueSafe());
-        study.setAuthors(authors);
-        study.setResearchQuestions(researchQuestions);
-        study.setQueries(queries.stream().map(StudyQuery::new).collect(Collectors.toList()));
-        study.setDatabases(databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).collect(Collectors.toList()));
-        Path studyDirectory = null;
+        Study study = new Study(
+                authors,
+                title.getValueSafe(),
+                researchQuestions,
+                queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
+                databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).filter(StudyDatabase::isEnabled).collect(Collectors.toList()));
+        Path studyDirectory;
+        final String studyDirectoryAsString = directory.getValueSafe();
         try {
-            studyDirectory = Path.of(directory.getValueSafe());
+            studyDirectory = Path.of(studyDirectoryAsString);
         } catch (InvalidPathException e) {
-            LOGGER.error("Invalid path was provided: {}", directory);
+            LOGGER.error("Invalid path was provided: {}", studyDirectoryAsString);
+            dialogService.notify(Localization.lang("Unable to write to %0.", studyDirectoryAsString));
+            // We do not assume another path - we return that there is an invalid object.
+            return null;
         }
+        Path studyDefinitionFile = studyDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
+        try {
+            new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
+        } catch (IOException e) {
+            LOGGER.error("Could not write study file {}", studyDefinitionFile, e);
+            dialogService.notify(Localization.lang("Please enter a valid file path.") +
+                    ": " + studyDirectoryAsString);
+            // We do not assume another path - we return that there is an invalid object.
+            return null;
+        }
+
+        try {
+            new GitHandler(studyDirectory).createCommitOnCurrentBranch("Update study definition", false);
+        } catch (Exception e) {
+            LOGGER.error("Could not commit study definition file in directory {}", studyDirectory, e);
+            dialogService.notify(Localization.lang("Please enter a valid file path.") +
+                    ": " + studyDirectory);
+            // We continue nevertheless as the directory itself could be valid
+        }
+
         return new SlrStudyAndDirectory(study, studyDirectory);
     }
 
@@ -150,22 +202,8 @@ public class ManageStudyDefinitionViewModel {
         return title;
     }
 
-    public void removeDatabase(String database) {
-        // If a database is added from the combo box it should be enabled by default
-        Optional<StudyDatabaseItem> correspondingDatabase = databases.stream().filter(studyDatabaseItem -> studyDatabaseItem.getName().equals(database)).findFirst();
-        if (correspondingDatabase.isEmpty()) {
-            return;
-        }
-        StudyDatabaseItem databaseToRemove = correspondingDatabase.get();
-        databases.remove(databaseToRemove);
-        databaseToRemove.setEnabled(true);
-        nonSelectedDatabases.add(databaseToRemove);
-        // Resort list
-        nonSelectedDatabases.sort(Comparator.comparing(StudyDatabaseItem::getName));
-    }
-
     public void setStudyDirectory(Optional<Path> studyRepositoryRoot) {
-        getDirectory().setValue(studyRepositoryRoot.isPresent() ? studyRepositoryRoot.get().toString() : getDirectory().getValueSafe());
+        getDirectory().setValue(studyRepositoryRoot.map(Path::toString).orElseGet(() -> getDirectory().getValueSafe()));
     }
 
     public void deleteAuthor(String item) {

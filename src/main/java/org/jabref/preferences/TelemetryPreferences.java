@@ -1,30 +1,48 @@
 package org.jabref.preferences;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class TelemetryPreferences {
-    private boolean collectTelemetry;
-    private boolean askToCollectTelemetry;
+    private final BooleanProperty collectTelemetry;
+    private final BooleanProperty askToCollectTelemetry;
+    private final StringProperty userId;
 
     public TelemetryPreferences(boolean shouldCollectTelemetry,
-                                boolean shouldAskToCollectTelemetry) {
-        this.collectTelemetry = shouldCollectTelemetry;
-        this.askToCollectTelemetry = shouldAskToCollectTelemetry;
+                                boolean shouldAskToCollectTelemetry,
+                                String userId) {
+        this.collectTelemetry = new SimpleBooleanProperty(shouldCollectTelemetry);
+        this.askToCollectTelemetry = new SimpleBooleanProperty(shouldAskToCollectTelemetry);
+        this.userId = new SimpleStringProperty(userId);
     }
 
     public boolean shouldCollectTelemetry() {
+        return collectTelemetry.get();
+    }
+
+    public BooleanProperty collectTelemetryProperty() {
         return collectTelemetry;
     }
 
-    public TelemetryPreferences withCollectTelemetry(boolean shouldCollectTelemetry) {
-        this.collectTelemetry = shouldCollectTelemetry;
-        return this;
+    public void setCollectTelemetry(boolean collectTelemetry) {
+        this.collectTelemetry.set(collectTelemetry);
     }
 
     public boolean shouldAskToCollectTelemetry() {
+        return askToCollectTelemetry.get();
+    }
+
+    public BooleanProperty askToCollectTelemetryProperty() {
         return askToCollectTelemetry;
     }
 
-    public TelemetryPreferences withAskToCollectTelemetry(boolean shouldAskToCollectTelemetry) {
-        this.askToCollectTelemetry = shouldAskToCollectTelemetry;
-        return this;
+    public void setAskToCollectTelemetry(boolean askToCollectTelemetry) {
+        this.askToCollectTelemetry.set(askToCollectTelemetry);
+    }
+
+    public String getUserId() {
+        return userId.get();
     }
 }

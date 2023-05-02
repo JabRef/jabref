@@ -12,12 +12,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
+import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
+import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
+import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -30,6 +38,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.BibField;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
@@ -44,7 +53,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -70,7 +79,7 @@ class BibtexParserTest {
     @BeforeEach
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
@@ -91,7 +100,7 @@ class BibtexParserTest {
         expected.setCitationKey("test");
         expected.setField(StandardField.AUTHOR, "Ed von Test");
 
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
     }
 
     @Test
@@ -114,7 +123,10 @@ class BibtexParserTest {
     @Test
     void singleFromStringRecognizesEntry() throws ParseException {
         Optional<BibEntry> parsed = BibtexParser.singleFromString(
-                "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n",
+                """
+                        @article{canh05,  author = {Crowston, K. and Annabi, H.},
+                          title = {Title A}}
+                        """,
                 importFormatPreferences, fileMonitor);
 
         BibEntry expected = new BibEntry();
@@ -128,9 +140,10 @@ class BibtexParserTest {
 
     @Test
     void singleFromStringRecognizesEntryInMultiple() throws ParseException {
-        Optional<BibEntry> parsed = BibtexParser.singleFromString(
-                "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
-                        + "@inProceedings{foo," + "  author={Norton Bar}}",
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("""
+                        @article{canh05, author = {Crowston, K. and Annabi, H.},
+                            title = {Title A}}
+                        @inProceedings{foo,  author={Norton Bar}}""",
                 importFormatPreferences, fileMonitor);
 
         assertTrue(parsed.get().getCitationKey().equals(Optional.of("canh05"))
@@ -285,8 +298,11 @@ class BibtexParserTest {
 
     @Test
     void parseRecognizesEntryWithBigNumbers() throws IOException {
-        ParserResult result = parser.parse(new StringReader("@article{canh05," + "isbn = 1234567890123456789,\n"
-                + "isbn2 = {1234567890123456789},\n" + "small = 1234,\n" + "}"));
+        ParserResult result = parser.parse(new StringReader("""
+                @article{canh05,isbn = 1234567890123456789,
+                isbn2 = {1234567890123456789},
+                small = 1234,
+                }"""));
 
         Collection<BibEntry> parsed = result.getDatabase().getEntries();
         BibEntry entry = parsed.iterator().next();
@@ -337,14 +353,14 @@ class BibtexParserTest {
         BibEntry expected = new BibEntry(StandardEntryType.Article).withField(InternalField.KEY_FIELD, "test")
                                                                    .withField(StandardField.AUTHOR, "Ed von T@st");
 
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
     }
 
     @Test
     void parseRecognizesEntryPrecedingComment() throws IOException {
         String comment = "@Comment{@article{myarticle,}" + OS.NEWLINE
-                + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}";
-        String entryWithComment = comment + OS.NEWLINE + "@article{test,author={Ed von T@st}}";
+                + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}" + OS.NEWLINE;
+        String entryWithComment = comment + "@article{test,author={Ed von T@st}}";
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(InternalField.KEY_FIELD, "test")
                 .withField(StandardField.AUTHOR, "Ed von T@st");
@@ -353,7 +369,7 @@ class BibtexParserTest {
         ParserResult result = parser.parse(new StringReader(entryWithComment));
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
         assertEquals(expected.getUserComments(), parsed.get(0).getUserComments());
     }
 
@@ -374,8 +390,10 @@ class BibtexParserTest {
         expected.add(secondEntry);
 
         ParserResult result = parser.parse(
-                new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
-                        + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"));
+                new StringReader("""
+                        @article{canh05,  author = {Crowston, K. and Annabi, H.},
+                          title = {Title A}}
+                        @inProceedings{foo,  author={Norton Bar}}"""));
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
         assertEquals(expected, parsed);
@@ -466,13 +484,19 @@ class BibtexParserTest {
 
     @Test
     void parseRecognizesHeaderButIgnoresEncoding() throws IOException {
-        ParserResult result = parser.parse(new StringReader("This file was created with JabRef 2.1 beta 2." + "\n"
-                + "Encoding: Cp1252" + "\n" + "" + "\n" + "@INPROCEEDINGS{CroAnnHow05," + "\n"
-                + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.}," + "\n"
-                + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
-                + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
-                + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29}," + "\n"
-                + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"));
+        ParserResult result = parser.parse(new StringReader("""
+                This file was created with JabRef 2.1 beta 2.
+                Encoding: Cp1252
+
+                @INPROCEEDINGS{CroAnnHow05,
+                  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
+                  title = {Effective work practices for floss development: A model and propositions},
+                  booktitle = {Hawaii International Conference On System Sciences (HICSS)},
+                  year = {2005},
+                  owner = {oezbek},
+                  timestamp = {2006.05.29},
+                  url = {http://james.howison.name/publications.html}
+                }))"""));
 
         Collection<BibEntry> parsed = result.getDatabase().getEntries();
         BibEntry entry = parsed.iterator().next();
@@ -496,12 +520,16 @@ class BibtexParserTest {
     @Test
     void parseRecognizesFormatedEntry() throws IOException {
         ParserResult result = parser.parse(
-                new StringReader("" + "@INPROCEEDINGS{CroAnnHow05," + "\n"
-                        + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.}," + "\n"
-                        + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
-                        + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
-                        + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
-                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"));
+                new StringReader("""
+                        @INPROCEEDINGS{CroAnnHow05,
+                          author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
+                          title = {Effective work practices for floss development: A model and propositions},
+                          booktitle = {Hawaii International Conference On System Sciences (HICSS)},
+                          year = {2005},
+                          owner = {oezbek},
+                          timestamp = {2006.05.29},
+                          url = {http://james.howison.name/publications.html}
+                        }))"""));
 
         Collection<BibEntry> parsed = result.getDatabase().getEntries();
         BibEntry entry = parsed.iterator().next();
@@ -582,6 +610,32 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseRecognizesFinalSlashAsSlash() throws Exception {
+        ParserResult result = parser
+                .parse(new StringReader("""
+        @misc{,
+          test = {wired\\},
+        }
+        """));
+
+        assertEquals(
+                List.of(new BibEntry()
+                .withField(new UnknownField("test"), "wired\\")),
+                result.getDatabase().getEntries()
+        );
+    }
+
+    /**
+     * JabRef's heuristics is not able to parse this special case.
+     */
+    @Test
+    void parseFailsWithFinalSlashAsSlashWhenSingleLine() throws Exception {
+        ParserResult parserResult = parser.parse(new StringReader("@misc{, test = {wired\\}}"));
+        // In case JabRef was more relaxed, `assertFalse` would be provided here.
+        assertTrue(parserResult.hasWarnings());
+    }
+
+    @Test
     void parseRecognizesDateFieldWithConcatenation() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,date = {1-4~} # nov}"));
@@ -599,11 +653,15 @@ class BibtexParserTest {
     @Test
     void parseReturnsEmptyListIfNoEntryRecognized() throws IOException {
         ParserResult result = parser.parse(
-                new StringReader("  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.}," + "\n"
-                        + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
-                        + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
-                        + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
-                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"));
+                new StringReader("""
+                          author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
+                          title = {Effective work practices for floss development: A model and propositions},
+                          booktitle = {Hawaii International Conference On System Sciences (HICSS)},
+                          year = {2005},
+                          owner = {oezbek},
+                          timestamp = {2006.05.29},
+                          url = {http://james.howison.name/publications.html}
+                        }))"""));
 
         Collection<BibEntry> parsed = result.getDatabase().getEntries();
 
@@ -613,7 +671,10 @@ class BibtexParserTest {
     @Test
     void parseReturnsEmptyListIfNoEntryExistent() throws IOException {
         ParserResult result = parser
-                .parse(new StringReader("This was created with JabRef 2.1 beta 2." + "\n" + "Encoding: Cp1252" + "\n"));
+                .parse(new StringReader("""
+                        This was created with JabRef 2.1 beta 2.
+                        Encoding: Cp1252
+                        """));
 
         Collection<BibEntry> parsed = result.getDatabase().getEntries();
 
@@ -631,7 +692,7 @@ class BibtexParserTest {
         Collection<BibEntry> parsed = result.getDatabase().getEntries();
 
         assertFalse(result.hasWarnings());
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
     }
 
     @Test
@@ -1096,8 +1157,8 @@ class BibtexParserTest {
 
     @Test
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
-        when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields())
-                .thenReturn(Collections.singletonList(StandardField.FILE));
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(
+                FXCollections.observableArrayList(List.of(StandardField.FILE)));
         BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
         ParserResult result = parser
                 .parse(new StringReader("@article{canh05,file = {ups  sala}}"));
@@ -1125,7 +1186,7 @@ class BibtexParserTest {
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("ups " + OS.NEWLINE + "sala"), parsedEntry.getField(StandardField.ABSTRACT));
+        assertEquals(Optional.of("ups \nsala"), parsedEntry.getField(StandardField.ABSTRACT));
     }
 
     @Test
@@ -1144,7 +1205,7 @@ class BibtexParserTest {
     }
 
     /**
-     * Test for #669
+     * Test for <a href="https://github.com/JabRef/jabref/issues/669">#669</a>
      */
     @Test
     void parsePreambleAndEntryWithoutNewLine() throws IOException {
@@ -1197,7 +1258,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseSavesNewlinesBeforeEntryInParsedSerialization() throws IOException {
+    void parseSavesAllButOneNewlinesBeforeEntryInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = parser
                 .parse(new StringReader(OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
@@ -1206,20 +1267,23 @@ class BibtexParserTest {
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
         assertEquals(1, parsedEntries.size());
-        assertEquals(OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry, parsedEntry.getParsedSerialization());
+        // The first newline is removed, because JabRef interprets that always as block separator
+        assertEquals(OS.NEWLINE + OS.NEWLINE + testEntry, parsedEntry.getParsedSerialization());
     }
 
     @Test
-    void parseRemovesEncodingLineInParsedSerialization() throws IOException {
+    void parseRemovesEncodingLineAndSeparatorInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = parser.parse(
-                new StringReader(SavePreferences.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
+                new StringReader(SaveConfiguration.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
         assertEquals(1, parsedEntries.size());
-        assertEquals(OS.NEWLINE + OS.NEWLINE + testEntry, parsedEntry.getParsedSerialization());
+        // First two newlines are removed because of removal of "Encoding"
+        // Third newline removed because of block functionality
+        assertEquals(testEntry, parsedEntry.getParsedSerialization());
     }
 
     @Test
@@ -1242,7 +1306,8 @@ class BibtexParserTest {
 
         assertEquals(2, parsedEntries.size());
         assertEquals(testEntryOne + OS.NEWLINE, first.getParsedSerialization());
-        assertEquals(OS.NEWLINE + OS.NEWLINE + testEntryTwo, second.getParsedSerialization());
+        // one newline is removed, because it is written by JabRef's block functionality
+        assertEquals(OS.NEWLINE + testEntryTwo, second.getParsedSerialization());
     }
 
     @Test
@@ -1283,20 +1348,93 @@ class BibtexParserTest {
     @Test
     void parseRecognizesSaveActionsAfterEntry() throws IOException {
         ParserResult parserResult = parser.parse(
+                new StringReader("""
+                        @InProceedings{6055279,
+                          Title                    = {Educational session 1},
+                          Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},
+                          Year                     = {2011},
+                          Month                    = {Sept},
+                          Pages                    = {1-7},
+                          Abstract                 = {Start of the above-titled section of the conference proceedings record.},
+                          DOI                      = {10.1109/CICC.2011.6055279},
+                          ISSN                     = {0886-5930}
+                        }
+
+                        @comment{jabref-meta: saveActions:enabled;title[lower_case]}"""));
+
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+
+        assertTrue(saveActions.isEnabled());
+        assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
+                saveActions.getConfiguredActions());
+    }
+
+    @Test
+    void parserKeepsSaveActions() throws IOException {
+        ParserResult parserResult = parser.parse(
+                new StringReader("""
+                        @InProceedings{6055279,
+                          Title                    = {Educational session 1},
+                          Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},
+                          Year                     = {2011},
+                          Month                    = {Sept},
+                          Pages                    = {1-7},
+                          Abstract                 = {Start of the above-titled section of the conference proceedings record.},
+                          DOI                      = {10.1109/CICC.2011.6055279},
+                          ISSN                     = {0886-5930}
+                        }
+
+                        @Comment{jabref-meta: saveActions:enabled;
+                        month[normalize_month]
+                        pages[normalize_page_numbers]
+                        title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        booktitle[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        publisher[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        journal[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        abstract[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
+                        ;}
+                        """));
+
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+
+        assertTrue(saveActions.isEnabled());
+
+        List<FieldFormatterCleanup> expected = new ArrayList<>(30);
+        expected.add(new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()));
+        expected.add(new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()));
+        for (Field field : List.of(StandardField.TITLE, StandardField.BOOKTITLE, StandardField.PUBLISHER, StandardField.JOURNAL, StandardField.ABSTRACT)) {
+            expected.add(new FieldFormatterCleanup(field, new EscapeAmpersandsFormatter()));
+            expected.add(new FieldFormatterCleanup(field, new EscapeDollarSignFormatter()));
+            expected.add(new FieldFormatterCleanup(field, new EscapeUnderscoresFormatter()));
+            expected.add(new FieldFormatterCleanup(field, new LatexCleanupFormatter()));
+        }
+        assertEquals(expected, saveActions.getConfiguredActions());
+    }
+
+    @Test
+    void parseRecognizesCRLFLineBreak() throws IOException {
+        ParserResult result = parser.parse(
+                new StringReader("@InProceedings{6055279,\r\n" + "  Title                    = {Educational session 1},\r\n"
+                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\r\n"
+                        + "  Year                     = {2011},\r\n" + "  Month                    = {Sept},\r\n"
+                        + "  Pages                    = {1-7},\r\n"
+                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\r\n"
+                        + "  DOI                      = {10.1109/CICC.2011.6055279},\r\n"
+                        + "  ISSN                     = {0886-5930}\r\n" + "}\r\n"));
+        assertEquals("\r\n", result.getDatabase().getNewLineSeparator());
+    }
+
+    @Test
+    void parseRecognizesLFLineBreak() throws IOException {
+        ParserResult result = parser.parse(
                 new StringReader("@InProceedings{6055279,\n" + "  Title                    = {Educational session 1},\n"
                         + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n"
                         + "  Year                     = {2011},\n" + "  Month                    = {Sept},\n"
                         + "  Pages                    = {1-7},\n"
                         + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n"
                         + "  DOI                      = {10.1109/CICC.2011.6055279},\n"
-                        + "  ISSN                     = {0886-5930}\n" + "}\n" + "\n"
-                        + "@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
-
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
-
-        assertTrue(saveActions.isEnabled());
-        assertEquals(Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
-                saveActions.getConfiguredActions());
+                        + "  ISSN                     = {0886-5930}\n" + "}\n"));
+        assertEquals("\n", result.getDatabase().getNewLineSeparator());
     }
 
     @Test
@@ -1307,7 +1445,7 @@ class BibtexParserTest {
         FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
-        assertEquals(Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
+        assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
     }
 
@@ -1337,10 +1475,12 @@ class BibtexParserTest {
                 new StringReader(
                         "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"));
 
-        Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
+        Optional<SaveOrder> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
-        assertEquals(new SaveOrderConfig(false, true, new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                        new SaveOrderConfig.SortCriterion(StandardField.YEAR, true), new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false)),
+        assertEquals(new SaveOrder(SaveOrder.OrderType.SPECIFIED, List.of(
+                new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
+                new SaveOrder.SortCriterion(StandardField.YEAR, true),
+                new SaveOrder.SortCriterion(StandardField.ABSTRACT, false))),
                 saveOrderConfig.get());
     }
 
@@ -1371,11 +1511,13 @@ class BibtexParserTest {
 
     @Test
     void integrationTestGroupTree() throws IOException, ParseException {
-        ParserResult result = parser.parse(new StringReader("@comment{jabref-meta: groupsversion:3;}" + OS.NEWLINE
-                + "@comment{jabref-meta: groupstree:" + OS.NEWLINE + "0 AllEntriesGroup:;" + OS.NEWLINE
-                + "1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;" + OS.NEWLINE
-                + "1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;" + OS.NEWLINE
-                + "1 ExplicitGroup:TestGroup\\;0\\;Key1\\;Key2\\;;" + "}"));
+        ParserResult result = parser.parse(new StringReader("""
+                @comment{jabref-meta: groupsversion:3;}
+                @comment{jabref-meta: groupstree:
+                0 AllEntriesGroup:;
+                1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;
+                1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;
+                1 ExplicitGroup:TestGroup\\;0\\;Key1\\;Key2\\;;}"""));
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
@@ -1443,9 +1585,10 @@ class BibtexParserTest {
 
     @Test
     void parseReallyUnknownType() throws Exception {
-        String bibtexEntry = "@ReallyUnknownType{test," + OS.NEWLINE +
-                " Comment                  = {testentry}" + OS.NEWLINE +
-                "}";
+        String bibtexEntry = """
+                @ReallyUnknownType{test,
+                 Comment                  = {testentry}
+                }""";
 
         Collection<BibEntry> entries = parser.parseEntries(bibtexEntry);
         BibEntry expectedEntry = new BibEntry();
@@ -1453,14 +1596,15 @@ class BibtexParserTest {
         expectedEntry.setCitationKey("test");
         expectedEntry.setField(StandardField.COMMENT, "testentry");
 
-        assertEquals(Collections.singletonList(expectedEntry), entries);
+        assertEquals(List.of(expectedEntry), entries);
     }
 
     @Test
     void parseOtherTypeTest() throws Exception {
-        String bibtexEntry = "@Other{test," + OS.NEWLINE +
-                " Comment                  = {testentry}" + OS.NEWLINE +
-                "}";
+        String bibtexEntry = """
+                @Other{test,
+                 Comment                  = {testentry}
+                }""";
 
         Collection<BibEntry> entries = parser.parseEntries(bibtexEntry);
         BibEntry expectedEntry = new BibEntry();
@@ -1468,7 +1612,7 @@ class BibtexParserTest {
         expectedEntry.setCitationKey("test");
         expectedEntry.setField(StandardField.COMMENT, "testentry");
 
-        assertEquals(Collections.singletonList(expectedEntry), entries);
+        assertEquals(List.of(expectedEntry), entries);
     }
 
     @Test
@@ -1530,22 +1674,24 @@ class BibtexParserTest {
         expected.add(third);
 
         ParserResult result = parser
-                .parse(new StringReader("@article{a}" + OS.NEWLINE + "@article{b}" + OS.NEWLINE + "@inProceedings{c}"));
+                .parse(new StringReader("""
+                        @article{a}
+                        @article{b}
+                        @inProceedings{c}"""));
 
         assertEquals(expected, result.getDatabase().getEntries());
     }
 
     @Test
     void parsePrecedingComment() throws IOException {
-        // @formatter:off
-        String bibtexEntry = "% Some random comment that should stay here" + OS.NEWLINE +
-                "@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "}";
-        // @formatter:on
+        String bibtexEntry = """
+                % Some random comment that should stay here
+                @Article{test,
+                  Author                   = {Foo Bar},
+                  Journal                  = {International Journal of Something},
+                  Note                     = {some note},
+                  Number                   = {1}
+                }""";
 
         // read in bibtex string
         ParserResult result = parser.parse(new StringReader(bibtexEntry));
@@ -1562,14 +1708,13 @@ class BibtexParserTest {
 
     @Test
     void parseCommentAndEntryInOneLine() throws IOException {
-        // @formatter:off
-        String bibtexEntry = "Some random comment that should stay here @Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "}";
-        // @formatter:on
+        String bibtexEntry = """
+                Some random comment that should stay here @Article{test,
+                  Author                   = {Foo Bar},
+                  Journal                  = {International Journal of Something},
+                  Note                     = {some note},
+                  Number                   = {1}
+                }""";
 
         // read in bibtex string
         ParserResult result = parser.parse(new StringReader(bibtexEntry));
@@ -1589,12 +1734,12 @@ class BibtexParserTest {
         BibEntry expected = new BibEntry();
         expected.setType(StandardEntryType.Article);
         expected.setCitationKey("test");
-        expected.setField(StandardField.AUTHOR, SavePreferences.ENCODING_PREFIX);
+        expected.setField(StandardField.AUTHOR, SaveConfiguration.ENCODING_PREFIX);
 
         List<BibEntry> parsed = parser
-                .parseEntries("@article{test,author={" + SavePreferences.ENCODING_PREFIX + "}}");
+                .parseEntries("@article{test,author={" + SaveConfiguration.ENCODING_PREFIX + "}}");
 
-        assertEquals(Collections.singletonList(expected), parsed);
+        assertEquals(List.of(expected), parsed);
     }
 
     @Test
@@ -1608,15 +1753,14 @@ class BibtexParserTest {
 
     @Test
     void parseRegularCommentBeforeEntry() throws IOException {
-        // @formatter:off
-        String bibtexEntry = "@Comment{someComment} " + OS.NEWLINE +
-                "@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "}";
-        // @formatter:on
+        String bibtexEntry = """
+                @Comment{someComment}
+                @Article{test,
+                  Author                   = {Foo Bar},
+                  Journal                  = {International Journal of Something},
+                  Note                     = {some note},
+                  Number                   = {1}
+                }""";
 
         ParserResult result = parser.parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
@@ -1636,15 +1780,14 @@ class BibtexParserTest {
 
     @Test
     void parseCommentWithoutBracketsBeforeEntry() throws IOException {
-        // @formatter:off
-        String bibtexEntry = "@Comment someComment  " + OS.NEWLINE +
-                "@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "}";
-        // @formatter:on
+        String bibtexEntry = """
+                @Comment someComment
+                @Article{test,
+                  Author                   = {Foo Bar},
+                  Journal                  = {International Journal of Something},
+                  Note                     = {some note},
+                  Number                   = {1}
+                }""";
 
         ParserResult result = parser.parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
@@ -1655,17 +1798,16 @@ class BibtexParserTest {
 
     @Test
     void parseCommentContainingEntries() throws IOException {
-        // @formatter:off
-        String bibtexEntry = "@Comment{@article{myarticle,}" + OS.NEWLINE +
-                "@inproceedings{blabla, title={the proceedings of blabla}; }" + OS.NEWLINE +
-                "} " + OS.NEWLINE +
-                "@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "}";
-        // @formatter:on
+        String bibtexEntry = """
+                @Comment{@article{myarticle,}
+                @inproceedings{blabla, title={the proceedings of blabla}; }
+                }
+                @Article{test,
+                  Author                   = {Foo Bar},
+                  Journal                  = {International Journal of Something},
+                  Note                     = {some note},
+                  Number                   = {1}
+                }""";
 
         ParserResult result = parser.parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
@@ -1676,17 +1818,16 @@ class BibtexParserTest {
 
     @Test
     void parseCommentContainingEntriesAndAtSymbols() throws IOException {
-        // @formatter:off
-        String bibtexEntry = "@Comment{@article{myarticle,}" + OS.NEWLINE +
-                "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE +
-                "} " + OS.NEWLINE +
-                "@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo@Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "}";
-        // @formatter:on
+        String bibtexEntry = """
+                @Comment{@article{myarticle,}
+                @inproceedings{blabla, title={the proceedings of bl@bl@}; }
+                }
+                @Article{test,
+                  Author                   = {Foo@Bar},
+                  Journal                  = {International Journal of Something},
+                  Note                     = {some note},
+                  Number                   = {1}
+                }""";
 
         ParserResult result = parser.parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
@@ -1809,5 +1950,40 @@ class BibtexParserTest {
         Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }");
 
         assertEquals(Optional.of("#apr#"), result.get().getField(StandardField.MONTH));
+    }
+
+    @Test
+    void parseDuplicateKeywordsWithOnlyOneEntry() throws ParseException {
+        Optional<BibEntry> result = parser.parseSingleEntry("@Article{,\n"
+            + "Keywords={asdf,asdf,asdf},\n"
+            + "}\n"
+            + "");
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
+
+        assertEquals(Optional.of(expectedEntry), result);
+    }
+
+    @Test
+    void parseDuplicateKeywordsWithTwoEntries() throws Exception {
+        BibEntry expectedEntryFirst = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.KEYWORDS, "bbb")
+            .withCitationKey("Test2017");
+
+        BibEntry expectedEntrySecond = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
+
+        String entries = """
+            @Article{Test2017,
+              keywords = {bbb},
+            }
+
+            @Article{,
+              keywords = {asdf,asdf,asdf},
+            },
+            """;
+        ParserResult result = parser.parse(new StringReader(entries));
+        assertEquals(List.of(expectedEntryFirst, expectedEntrySecond), result.getDatabase().getEntries());
     }
 }

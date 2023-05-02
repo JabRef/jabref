@@ -78,7 +78,8 @@ public class StringManipulator {
 
     /**
      * Utility method to find the next whitespace position in string after text
-     * @param caretPosition The current caret Position
+     *
+     * @param caretPosition The current caret position
      * @param text          The string to search in
      * @param direction     The direction to move through string
      *

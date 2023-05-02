@@ -7,9 +7,10 @@ import com.sun.star.text.XTextRange;
  */
 public interface RangeSortable<T> extends RangeHolder {
 
-    /** The XTextRange
-     *
-     *  For citation marks in footnotes this may be the range of the footnote mark.
+    /**
+     * The XTextRange
+     * <p>
+     * For citation marks in footnotes this may be the range of the footnote mark.
      */
     XTextRange getRange();
 

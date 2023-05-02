@@ -59,6 +59,12 @@ public class HtmlToLatexFormatterTest {
     }
 
     @Test
+    public void keepsSingleLessThan() {
+        String text = "(p < 0.01)";
+        assertEquals(text, formatter.format(text));
+    }
+
+    @Test
     public void formatExample() {
         assertEquals("JabRef", formatter.format(formatter.getExampleInput()));
     }

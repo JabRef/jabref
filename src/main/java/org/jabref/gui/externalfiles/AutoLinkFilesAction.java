@@ -9,7 +9,6 @@ import javafx.concurrent.Task;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -51,8 +50,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
         final AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,
                 preferences.getFilePreferences(),
-                preferences.getAutoLinkPreferences(),
-                ExternalFileTypes.getInstance());
+                preferences.getAutoLinkPreferences());
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {

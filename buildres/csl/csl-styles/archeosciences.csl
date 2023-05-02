@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" delimiter-precedes-et-al="never" delimiter-precedes-last="never" page-range-format="expanded" demote-non-dropping-particle="never" default-locale="fr-FR">
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>ArchéoSciences (Français)</title>
+    <title>ArcheoSciences (Français)</title>
     <id>http://www.zotero.org/styles/archeosciences</id>
     <link href="http://www.zotero.org/styles/archeosciences" rel="self"/>
     <link href="http://www.zotero.org/styles/archeologie-medievale" rel="template"/>
@@ -16,7 +16,7 @@
     <category field="science"/>
     <issn>1960-1360</issn>
     <eissn>2104-3728</eissn>
-    <summary>Style pour ArchéoSciences, revue d'Archéométrie.</summary>
+    <summary>Style pour ArcheoSciences, revue d'Archéométrie.</summary>
     <updated>2021-06-14T14:16:12+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>

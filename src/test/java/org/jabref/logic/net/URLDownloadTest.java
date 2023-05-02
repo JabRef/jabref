@@ -7,16 +7,24 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.support.DisabledOnCIServer;
+import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.UnirestException;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@FetcherTest
 public class URLDownloadTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
 
     @Test
     public void testStringDownloadWithSetEncoding() throws IOException {
@@ -42,7 +50,7 @@ public class URLDownloadTest {
         } finally {
             // cleanup
             if (!destination.delete()) {
-                System.err.println("Cannot delete downloaded file");
+                LOGGER.error("Cannot delete downloaded file");
             }
         }
     }
@@ -64,7 +72,7 @@ public class URLDownloadTest {
 
     @Test
     public void downloadToTemporaryFileKeepsName() throws IOException {
-        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/master/LICENSE.md"));
+        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/main/LICENSE.md"));
 
         String path = google.toTemporaryFile().toString();
         assertTrue(path.contains("LICENSE") && path.endsWith(".md"), path);
@@ -116,5 +124,21 @@ public class URLDownloadTest {
 
         urlDownload.setConnectTimeout(null);
         assertNotNull(urlDownload.getConnectTimeout(), "no null value can be set");
+    }
+
+    @Test
+    public void test503ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+        URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
+
+        Exception exception = assertThrows(IOException.class, () -> urlDownload.asString());
+        assertTrue(exception.getCause() instanceof FetcherServerException);
+    }
+
+    @Test
+    public void test429ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+        URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
+
+        Exception exception = assertThrows(IOException.class, () -> urlDownload.asString());
+        assertTrue(exception.getCause() instanceof FetcherClientException);
     }
 }

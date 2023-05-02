@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import org.jabref.logic.util.StandardFileType;
@@ -45,6 +44,6 @@ public class RISImporterTest {
     @Test
     public void testIfNotRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
-        assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
+        assertFalse(importer.isRecognizedFormat(file));
     }
 }

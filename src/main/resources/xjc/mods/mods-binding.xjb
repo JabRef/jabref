@@ -1,4 +1,4 @@
-<jxb:bindings version="2.0" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<jxb:bindings version="3.0" xmlns:jxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
     <jxb:bindings schemaLocation="mods-3-7.xsd" node="/xsd:schema">
 

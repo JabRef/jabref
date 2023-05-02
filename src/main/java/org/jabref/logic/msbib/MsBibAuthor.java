@@ -31,7 +31,6 @@ public class MsBibAuthor {
     }
 
     public String getFirstName() {
-
         if (!"".equals(firstName)) {
             return firstName;
         }

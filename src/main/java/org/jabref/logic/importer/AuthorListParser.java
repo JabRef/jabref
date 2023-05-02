@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
+import org.jabref.model.strings.StringUtil;
 
 public class AuthorListParser {
 
@@ -96,6 +97,18 @@ public class AuthorListParser {
     public AuthorList parse(String listOfNames) {
         Objects.requireNonNull(listOfNames);
 
+        // Handling of "and others"
+        // Remove it from the list; it will be added at the very end of this method as special Author.OTHERS
+        listOfNames = listOfNames.trim();
+        final String andOthersSuffix = " and others";
+        final boolean andOthersPresent;
+        if (StringUtil.endsWithIgnoreCase(listOfNames, andOthersSuffix)) {
+            andOthersPresent = true;
+            listOfNames = StringUtil.removeStringAtTheEnd(listOfNames, " and others");
+        } else {
+            andOthersPresent = false;
+        }
+
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
         final boolean authorsContainAND = listOfNames.toUpperCase(Locale.ENGLISH).contains(" AND ");
@@ -150,6 +163,11 @@ public class AuthorListParser {
         while (tokenStart < original.length()) {
             getAuthor().ifPresent(authors::add);
         }
+
+        if (andOthersPresent) {
+            authors.add(Author.OTHERS);
+        }
+
         return AuthorList.of(authors);
     }
 
@@ -447,7 +465,7 @@ public class AuthorListParser {
             if (c == '\\') {
                 currentBackslash = tokenEnd;
             }
-            if ((bracesLevel == 0) && ((",;~-".indexOf(c) != -1) || Character.isWhitespace(c))) {
+            if ((bracesLevel == 0) && ((",;-".indexOf(c) != -1) || Character.isWhitespace(c))) {
                 break;
             }
             tokenEnd++;

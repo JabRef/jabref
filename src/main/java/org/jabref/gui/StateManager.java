@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -8,15 +9,21 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
+import javafx.util.Pair;
 
+import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -28,6 +35,8 @@ import org.jabref.model.util.OptionalUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class manages the GUI-state of JabRef, including:
@@ -43,6 +52,7 @@ import com.tobiasdiez.easybind.EasyBinding;
  */
 public class StateManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StateManager.class);
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
@@ -52,13 +62,23 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[]{task.progressProperty(), task.runningProperty()});
-    private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
-    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
+    private final ObservableList<Pair<BackgroundTask, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
+    private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
+    private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
+    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
+    private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
+
+    private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
+
+    private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
 
     public StateManager() {
-        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
+        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
+    }
+
+    public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
+        return visibleSidePanes;
     }
 
     public CustomLocalDragboard getLocalDragboard() {
@@ -115,6 +135,15 @@ public class StateManager {
         return activeDatabase.get();
     }
 
+    public void setActiveDatabase(BibDatabaseContext database) {
+        if (database == null) {
+            LOGGER.info("No open database detected");
+            activeDatabaseProperty().set(Optional.empty());
+        } else {
+            activeDatabaseProperty().set(Optional.of(database));
+        }
+    }
+
     public List<BibEntry> getEntriesInCurrentDatabase() {
         return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
                            .collect(Collectors.toList());
@@ -137,15 +166,19 @@ public class StateManager {
     }
 
     public ObservableList<Task<?>> getBackgroundTasks() {
-        return backgroundTasks;
+        return EasyBind.map(backgroundTasks, Pair::getValue);
     }
 
-    public void addBackgroundTask(Task<?> backgroundTask) {
-        this.backgroundTasks.add(0, backgroundTask);
+    public void addBackgroundTask(BackgroundTask backgroundTask, Task<?> task) {
+        this.backgroundTasks.add(0, new Pair<>(backgroundTask, task));
     }
 
     public EasyBinding<Boolean> getAnyTaskRunning() {
         return anyTaskRunning;
+    }
+
+    public EasyBinding<Boolean> getAnyTasksThatWillNotBeRecoveredRunning() {
+        return anyTasksThatWillNotBeRecoveredRunning;
     }
 
     public EasyBinding<Double> getTasksProgress() {
@@ -158,5 +191,48 @@ public class StateManager {
 
     public void setDialogWindowState(String className, DialogWindowState state) {
         dialogWindowStates.put(className, state);
+    }
+
+    public ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEditProperty() {
+        return lastAutomaticFieldEditorEdit;
+    }
+
+    public LastAutomaticFieldEditorEdit getLastAutomaticFieldEditorEdit() {
+        return lastAutomaticFieldEditorEditProperty().get();
+    }
+
+    public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
+        lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
+    }
+
+    public List<String> collectAllDatabasePaths() {
+        List<String> list = new ArrayList<>();
+        getOpenDatabases().stream()
+                          .map(BibDatabaseContext::getDatabasePath)
+                          .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                  path -> list.add(path.toAbsolutePath().toString()),
+                                  () -> list.add("")));
+        return list;
+    }
+
+    public void addSearchHistory(String search) {
+        searchHistory.remove(search);
+        searchHistory.add(search);
+    }
+
+    public ObservableList<String> getWholeSearchHistory() {
+        return searchHistory;
+    }
+
+    public List<String> getLastSearchHistory(int size) {
+        int sizeSearches = searchHistory.size();
+        if (size < sizeSearches) {
+            return searchHistory.subList(sizeSearches - size, sizeSearches);
+        }
+        return searchHistory;
+    }
+
+    public void clearSearchHistory() {
+        searchHistory.clear();
     }
 }

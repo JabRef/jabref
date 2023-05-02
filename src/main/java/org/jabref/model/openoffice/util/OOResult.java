@@ -91,12 +91,16 @@ public class OOResult<R, E> {
         }
     }
 
-    /** Throw away the error part. */
+    /**
+     * Throw away the error part.
+     */
     public Optional<R> getOptional() {
         return result;
     }
 
-    /** Throw away the result part. */
+    /**
+     * Throw away the result part.
+     */
     public OOVoidResult<E> asVoidResult() {
         if (isError()) {
             return OOVoidResult.error(getError());
@@ -104,6 +108,5 @@ public class OOResult<R, E> {
             return OOVoidResult.ok();
         }
     }
-
 }
 

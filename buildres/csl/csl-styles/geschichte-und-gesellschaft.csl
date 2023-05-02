@@ -61,7 +61,7 @@
       <term name="close-quote">«</term>
       <term name="open-inner-quote">›</term>
       <term name="close-inner-quote">‹</term>
-      <term name="zoology" form="short">o. O.</term>
+      <term name="no-place" form="short">o. O.</term>
       <term name="at">hier</term>
       <term name="internet">Eintrag im Blog</term>
       <term name="issue" form="short">H.</term>
@@ -108,7 +108,7 @@
       <term name="close-quote">«</term>
       <term name="open-inner-quote">›</term>
       <term name="close-inner-quote">‹</term>
-      <term name="zoology" form="short">n.pl.</term>
+      <term name="no-place" form="short">n.pl.</term>
       <term name="at">here</term>
       <term name="internet">post at</term>
       <term name="issue" form="short">no.</term>
@@ -515,7 +515,7 @@
         <text variable="publisher-place"/>
       </if>
       <else>
-        <text term="zoology" form="short"/>
+        <text term="no-place" form="short"/>
       </else>
     </choose>
   </macro>

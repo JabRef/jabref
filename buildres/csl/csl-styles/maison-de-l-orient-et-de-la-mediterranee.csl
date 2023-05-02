@@ -32,7 +32,7 @@
       <term name="editor" form="short">dir.</term>
       <term name="edition" form="short">éd.</term>
       <term name="no date" form="short">s.d.</term>
-      <term name="sub verbo" form="short">s.v.</term>
+      <term name="sub-verbo" form="short">s.v.</term>
     </terms>
   </locale>
   <macro name="author">

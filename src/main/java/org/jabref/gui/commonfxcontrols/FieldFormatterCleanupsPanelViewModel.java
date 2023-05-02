@@ -14,9 +14,10 @@ import javafx.scene.control.SelectionModel;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.util.NoSelectionModel;
-import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatters;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
@@ -27,7 +28,7 @@ public class FieldFormatterCleanupsPanelViewModel {
     private final ObjectProperty<SelectionModel<FieldFormatterCleanup>> selectedCleanupProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(FieldFactory.getCommonFields()), Comparator.comparing(Field::getDisplayName)));
     private final ObjectProperty<Field> selectedFieldProperty = new SimpleObjectProperty<>();
-    private final ListProperty<Formatter> availableFormattersProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(Cleanups.getBuiltInFormatters()), Comparator.comparing(Formatter::getName)));
+    private final ListProperty<Formatter> availableFormattersProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(Formatters.getAll()), Comparator.comparing(Formatter::getName)));
     private final ObjectProperty<Formatter> selectedFormatterProperty = new SimpleObjectProperty<>();
 
     public FieldFormatterCleanupsPanelViewModel() {
@@ -36,9 +37,9 @@ public class FieldFormatterCleanupsPanelViewModel {
     public void resetToRecommended() {
         Globals.stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             if (databaseContext.isBiblatexMode()) {
-                cleanupsListProperty.setAll(Cleanups.RECOMMEND_BIBLATEX_ACTIONS.getConfiguredActions());
+                cleanupsListProperty.setAll(FieldFormatterCleanups.RECOMMEND_BIBLATEX_ACTIONS);
             } else {
-                cleanupsListProperty.setAll(Cleanups.RECOMMEND_BIBTEX_ACTIONS.getConfiguredActions());
+                cleanupsListProperty.setAll(FieldFormatterCleanups.RECOMMEND_BIBTEX_ACTIONS);
             }
         });
     }

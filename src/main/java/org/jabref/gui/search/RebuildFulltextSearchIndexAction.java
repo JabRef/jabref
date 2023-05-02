@@ -68,7 +68,8 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             return;
         }
         try {
-            currentLibraryTab.get().getIndexingTaskManager().createIndex(PdfIndexer.of(databaseContext, filePreferences), databaseContext.getDatabase(), databaseContext);
+            currentLibraryTab.get().getIndexingTaskManager().createIndex(PdfIndexer.of(databaseContext, filePreferences));
+            currentLibraryTab.get().getIndexingTaskManager().updateIndex(PdfIndexer.of(databaseContext, filePreferences), databaseContext);
         } catch (IOException e) {
             dialogService.notify(Localization.lang("Failed to access fulltext search index"));
             LOGGER.error("Failed to access fulltext search index", e);

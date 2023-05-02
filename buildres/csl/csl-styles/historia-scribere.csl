@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" delimiter-precedes-et-al="never" delimiter-precedes-last="always" default-locale="de-AT">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>historia.scribere (Deutsch)</title>
+    <title>historia-scribere (Deutsch)</title>
     <id>http://www.zotero.org/styles/historia-scribere</id>
     <link href="http://www.zotero.org/styles/historia-scribere" rel="self"/>
     <link href="http://www.zotero.org/styles/metropol-verlag" rel="template"/>
@@ -13,7 +14,7 @@
     <category citation-format="note"/>
     <category field="history"/>
     <eissn>2073-8927</eissn>
-    <updated>2020-09-22T10:52:29+00:00</updated>
+    <updated>2021-11-26T10:19:37+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -48,7 +49,7 @@
   </macro>
   <macro name="creator">
     <names variable="author">
-      <name et-al-min="4" et-al-use-first="3"/>
+      <name delimiter="/" et-al-min="4" et-al-use-first="3"/>
       <label form="short" text-case="capitalize-first" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
@@ -59,7 +60,7 @@
   </macro>
   <macro name="creator-bib">
     <names variable="author">
-      <name et-al-min="4" et-al-use-first="3" name-as-sort-order="all"/>
+      <name delimiter="/" et-al-min="4" et-al-use-first="3" name-as-sort-order="all"/>
       <label form="short" text-case="capitalize-first" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
@@ -131,7 +132,7 @@
   </macro>
   <macro name="container-information">
     <choose>
-      <if type="chapter paper-conference entry-encyclopedia entry-dictionary article-journal" match="any">
+      <if type="chapter paper-conference entry-encyclopedia entry-dictionary" match="any">
         <text variable="container-title" font-style="normal"/>
       </if>
       <else-if type="report song broadcast motion_picture webpage post post-weblog" match="any">
@@ -141,7 +142,7 @@
           <text variable="container-title"/>
         </group>
       </else-if>
-      <else-if type="article-newspaper article-magazine" match="any">
+      <else-if type="article-newspaper article-magazine article-journal" match="any">
         <text variable="container-title" font-style="italic"/>
       </else-if>
     </choose>
@@ -332,7 +333,7 @@
   </macro>
   <macro name="url">
     <group delimiter=", ">
-      <text variable="URL" prefix="[" suffix="]"/>
+      <text variable="URL"/>
       <group delimiter=" ">
         <text term="accessed"/>
         <date variable="accessed">
@@ -345,12 +346,6 @@
   </macro>
   <macro name="edition">
     <number vertical-align="sup" variable="edition" form="ordinal"/>
-  </macro>
-  <macro name="locator-newspaper">
-    <group delimiter=" ">
-      <label text-case="capitalize-first" variable="edition" form="short"/>
-      <text variable="edition"/>
-    </group>
   </macro>
   <citation>
     <layout delimiter="; " suffix=".">
@@ -399,7 +394,6 @@
                   <text macro="place"/>
                   <group delimiter=", ">
                     <text macro="date"/>
-                    <text macro="locator-newspaper"/>
                   </group>
                   <date variable="original-date" form="text" prefix="[" suffix="]"/>
                   <text macro="book-series"/>

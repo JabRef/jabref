@@ -14,29 +14,25 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
 /**
  * Tools for automatically detecting OpenOffice or LibreOffice installations.
  */
 public class DetectOpenOfficeInstallation {
 
-    private final OpenOfficePreferences ooPrefs;
+    private final OpenOfficePreferences openOfficePreferences;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
 
-    public DetectOpenOfficeInstallation(PreferencesService preferencesService, DialogService dialogService) {
-        this.preferencesService = preferencesService;
+    public DetectOpenOfficeInstallation(OpenOfficePreferences openOfficePreferences, DialogService dialogService) {
         this.dialogService = dialogService;
-        this.ooPrefs = preferencesService.getOpenOfficePreferences();
+        this.openOfficePreferences = openOfficePreferences;
     }
 
     public boolean isExecutablePathDefined() {
-        return checkAutoDetectedPaths(ooPrefs);
+        return checkAutoDetectedPaths(openOfficePreferences);
     }
 
     public Optional<Path> selectInstallationPath() {
-
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
         dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
@@ -71,8 +67,7 @@ public class DetectOpenOfficeInstallation {
         }
 
         if (execPath.isPresent()) {
-            ooPrefs.setExecutablePath(execPath.get().toString());
-            preferencesService.setOpenOfficePreferences(ooPrefs);
+            openOfficePreferences.setExecutablePath(execPath.get().toString());
             return true;
         }
 
@@ -88,12 +83,11 @@ public class DetectOpenOfficeInstallation {
             return Optional.of(installDirs.get(0).toAbsolutePath());
         }
 
-        String content = Localization.lang("Found more than one OpenOffice/LibreOffice executable.")
-                + "\n" + Localization.lang("Please choose which one to connect to:");
-
-        Optional<Path> selectedPath = dialogService.showChoiceDialogAndWait(Localization.lang("Choose OpenOffice/LibreOffice executable"),
-                content, Localization.lang("Use selected instance"), installDirs);
-
-        return selectedPath;
+        return dialogService.showChoiceDialogAndWait(
+                Localization.lang("Choose OpenOffice/LibreOffice executable"),
+                Localization.lang("Found more than one OpenOffice/LibreOffice executable.") + "\n"
+                        + Localization.lang("Please choose which one to connect to:"),
+                Localization.lang("Use selected instance"),
+                installDirs);
     }
 }

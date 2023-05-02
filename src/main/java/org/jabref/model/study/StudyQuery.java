@@ -11,7 +11,6 @@ public class StudyQuery {
      * Used for Jackson deserialization
      */
     public StudyQuery() {
-
     }
 
     public String getQuery() {

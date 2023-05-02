@@ -8,12 +8,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -22,6 +26,7 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class YamlExporterTest {
 
@@ -31,11 +36,17 @@ public class YamlExporterTest {
 
     @BeforeAll
     static void setUp() {
-        List<TemplateExporter> customFormats = new ArrayList<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        SavePreferences savePreferences = mock(SavePreferences.class);
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
+        SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+
+        ExporterFactory exporterFactory = ExporterFactory.create(
+                new ArrayList<>(),
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                saveConfiguration,
+                mock(XmpPreferences.class),
+                mock(FieldPreferences.class),
+                BibDatabaseMode.BIBTEX,
+                mock(BibEntryTypesManager.class));
 
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
@@ -46,7 +57,7 @@ public class YamlExporterTest {
     public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, tempFile, charset, Collections.emptyList());
+        yamlExporter.export(databaseContext, tempFile, Collections.emptyList());
         assertEquals(Collections.emptyList(), Files.readAllLines(file));
     }
 
@@ -61,7 +72,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, charset, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -89,7 +100,7 @@ public class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, charset, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -103,6 +114,61 @@ public class YamlExporterTest {
                 "  url: http://example.com",
                 "---");
 
+        assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
+    void passesModifiedCharset(@TempDir Path tempFile) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+            .withCitationKey("test")
+            .withField(StandardField.AUTHOR, "谷崎 潤一郎")
+            .withField(StandardField.TITLE, "細雪")
+            .withField(StandardField.URL, "http://example.com")
+            .withField(StandardField.DATE, "2020-10-14");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+
+        List<String> expected = List.of(
+                "---",
+                "references:",
+                "- id: test",
+                "  type: article",
+                "  author:",
+                "  - literal: \"谷崎 潤一郎\"",
+                "  title: \"細雪\"",
+                "  issued: 2020-10-14",
+                "  url: http://example.com",
+                "---");
+
+        assertEquals(expected, Files.readAllLines(file));
+    }
+
+    @Test
+    void passesModifiedCharsetNull(@TempDir Path tempFile) throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+            .withCitationKey("test")
+            .withField(StandardField.AUTHOR, "谷崎 潤一郎")
+            .withField(StandardField.TITLE, "細雪")
+            .withField(StandardField.URL, "http://example.com")
+            .withField(StandardField.DATE, "2020-10-14");
+
+        Path file = tempFile.resolve("RandomFileName");
+        Files.createFile(file);
+        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+
+        List<String> expected = List.of(
+                "---",
+                "references:",
+                "- id: test",
+                "  type: article",
+                "  author:",
+                "  - literal: \"谷崎 潤一郎\"",
+                "  title: \"細雪\"",
+                "  issued: 2020-10-14",
+                "  url: http://example.com",
+                "---");
         assertEquals(expected, Files.readAllLines(file));
     }
 }

@@ -145,14 +145,14 @@
             </else>
           </choose>
           <choose>
-              <!-- "S." as a locator is ommited. Many books however are instead cited by § plus margin number. The § has to appear. -->
-              <if locator="page">
-                  <text variable="locator" prefix=", "/>
-              </if>
-              <else>
-                  <label variable="locator" form="symbol" prefix=", "/>
-                  <text variable="locator" prefix=" "/>
-              </else>
+            <!-- "S." as a locator is ommited. Many books however are instead cited by § plus margin number. The § has to appear. -->
+            <if locator="page">
+              <text variable="locator" prefix=", "/>
+            </if>
+            <else>
+              <label variable="locator" form="symbol" prefix=", "/>
+              <text variable="locator" prefix=" "/>
+            </else>
           </choose>
         </else-if>
         <!-- Legal commentary or handbook should be of publication type "entry-encyclopedia"

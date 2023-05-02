@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,12 +13,13 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
 import org.jabref.logic.importer.util.FileFieldParser;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -33,6 +35,7 @@ import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 
 public class BibEntryTableViewModel {
+
     private final BibEntry entry;
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
@@ -40,16 +43,16 @@ public class BibEntryTableViewModel {
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
-    private final BibDatabase bibDatabase;
+    private final BibDatabaseContext bibDatabaseContext;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
-        this.bibDatabase = bibDatabaseContext.getDatabase();
 
-        this.linkedFiles = getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
+        this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
+        this.bibDatabaseContext = bibDatabaseContext;
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -101,13 +104,24 @@ public class BibEntryTableViewModel {
 
     public ObservableValue<Optional<SpecialFieldValueViewModel>> getSpecialField(SpecialField field) {
         OptionalBinding<SpecialFieldValueViewModel> value = specialFieldValues.get(field);
+        // Fetch possibly updated value from BibEntry entry
+        Optional<String> currentValue = this.entry.getField(field);
         if (value != null) {
-            return value;
+            if (currentValue.isEmpty() && value.getValue().isEmpty()) {
+                var zeroValue = getField(field).flatMapOpt(fieldValue -> field.parseValue("CLEAR_RANK").map(SpecialFieldValueViewModel::new));
+                specialFieldValues.put(field, zeroValue);
+                return zeroValue;
+            } else if (value.getValue().isEmpty() || !value.getValue().get().getValue().getFieldValue().equals(currentValue)) {
+                // specialFieldValues value and BibEntry value differ => Set specialFieldValues value to BibEntry value
+                value = getField(field).flatMapOpt(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
+                specialFieldValues.put(field, value);
+                return value;
+            }
         } else {
-            value = getField(field).flatMap(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
+            value = getField(field).flatMapOpt(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
             specialFieldValues.put(field, value);
-            return value;
         }
+        return value;
     }
 
     public ObservableValue<String> getFields(OrFields fields) {
@@ -117,7 +131,7 @@ public class BibEntryTableViewModel {
         }
 
         ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
-        Optional<BibEntry> referenced = bibDatabase.getReferencedEntry(entry);
+        Optional<BibEntry> referenced = bibDatabaseContext.getDatabase().getReferencedEntry(entry);
         referenced.ifPresent(bibEntry -> observables.addAll(List.of(bibEntry.getObservables())));
         observables.add(fieldValueFormatter);
 
@@ -126,5 +140,9 @@ public class BibEntryTableViewModel {
                 observables.toArray(Observable[]::new));
         fieldValues.put(fields, value);
         return value;
+    }
+
+    public StringProperty bibDatabaseContextProperty() {
+        return new ReadOnlyStringWrapper(bibDatabaseContext.getDatabasePath().map(Path::toString).orElse(""));
     }
 }

@@ -55,5 +55,4 @@ public class ISSNCheckerTest {
                 Arguments.of("0020~72109")
         );
     }
-
 }

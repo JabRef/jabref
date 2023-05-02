@@ -6,6 +6,7 @@ import org.jabref.model.entry.BibEntry;
 
 /**
  * Searches web resources for bibliographic information based on an identifier.
+ * Examples are ISBN numbers and DOIs.
  */
 public interface IdBasedFetcher extends WebFetcher {
 

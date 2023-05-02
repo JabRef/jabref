@@ -11,7 +11,6 @@ public class CreateDocBook5Authors implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-
         StringBuilder sb = new StringBuilder(100);
         AuthorList al = AuthorList.parse(fieldText);
 

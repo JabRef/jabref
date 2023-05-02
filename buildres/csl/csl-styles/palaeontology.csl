@@ -12,8 +12,8 @@
     </author>
     <contributor>
       <name>Martin R. Smith</name>
-      <email>martins@gmail.com</email>
-      <uri>https://community.dur.ac.uk/martin.smith/</uri>
+      <email>martin.smith@durham.ac.uk</email>
+      <uri>https://smithlabdurham.github.io/</uri>
     </contributor>
     <category citation-format="author-date"/>
     <category field="biology"/>
@@ -80,11 +80,18 @@
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=" ">
-        <text macro="author-short"/>
-        <text macro="year-date"/>
+        <group delimiter="">
+          <group delimiter=" ">
+            <text macro="author-short"/>
+            <text macro="year-date"/>
+          </group>
+          <text variable="year-suffix" font-style="italic"/>
+        </group>
+        <group delimiter=" ">
+          <label variable="locator" form="short"/>
+          <text variable="locator"/>
+        </group>
       </group>
-      <text variable="locator"/>
-      <text variable="year-suffix" font-style="italic"/>
     </layout>
   </citation>
   <bibliography entry-spacing="0" hanging-indent="true" subsequent-author-substitute-rule="partial-each" subsequent-author-substitute="&#8212;&#8212;&#8212;">

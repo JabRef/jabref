@@ -15,6 +15,9 @@ import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransf
 /**
  * Searches web resources for bibliographic information based on a free-text query.
  * May return multiple search hits.
+ * <p>
+ *    This interface is used for web resources which directly return BibTeX data ({@link BibEntry})
+ * </p>
  */
 public interface SearchBasedFetcher extends WebFetcher {
 

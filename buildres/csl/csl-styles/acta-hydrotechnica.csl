@@ -75,7 +75,7 @@
   <macro name="access">
     <choose>
       <if variable="DOI">
-        <text variable="DOI" prefix="https://doi.org/" text-decoration="underline" />
+        <text variable="DOI" prefix="https://doi.org/" text-decoration="underline"/>
       </if>
       <else-if type="webpage post-weblog" match="any">
         <group delimiter=" ">

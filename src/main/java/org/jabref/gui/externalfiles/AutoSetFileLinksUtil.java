@@ -23,7 +23,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
@@ -55,16 +54,16 @@ public class AutoSetFileLinksUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);
     private final List<Path> directories;
     private final AutoLinkPreferences autoLinkPreferences;
-    private final ExternalFileTypes externalFileTypes;
+    private final FilePreferences filePreferences;
 
-    public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
-        this(databaseContext.getFileDirectories(filePreferences), autoLinkPreferences, externalFileTypes);
+    public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences) {
+        this(databaseContext.getFileDirectories(filePreferences), filePreferences, autoLinkPreferences);
     }
 
-    private AutoSetFileLinksUtil(List<Path> directories, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
+    private AutoSetFileLinksUtil(List<Path> directories, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences) {
         this.directories = directories;
         this.autoLinkPreferences = autoLinkPreferences;
-        this.externalFileTypes = externalFileTypes;
+        this.filePreferences = filePreferences;
     }
 
     public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) {
@@ -107,7 +106,7 @@ public class AutoSetFileLinksUtil {
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> linkedFiles = new ArrayList<>();
 
-        List<String> extensions = externalFileTypes.getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+        List<String> extensions = filePreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
 
         // Run the search operation
         FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
@@ -127,8 +126,8 @@ public class AutoSetFileLinksUtil {
                                              });
 
             if (!fileAlreadyLinked) {
-                Optional<ExternalFileType> type = FileHelper.getFileExtension(foundFile)
-                                                            .map(externalFileTypes::getExternalFileTypeByExt)
+                Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
+                                                            .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, filePreferences))
                                                             .orElse(Optional.of(new UnknownExternalFileType("")));
 
                 String strType = type.isPresent() ? type.get().getName() : "";

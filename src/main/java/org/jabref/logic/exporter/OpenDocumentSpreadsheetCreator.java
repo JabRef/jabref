@@ -11,7 +11,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +49,6 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
     private static void storeOpenDocumentSpreadsheetFile(Path file, InputStream source) throws IOException {
 
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
-
             // addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");
             String mime = "application/vnd.oasis.opendocument.spreadsheet";
@@ -101,7 +99,7 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
 
     @Override
     public void export(final BibDatabaseContext databaseContext, final Path file,
-                       final Charset encoding, List<BibEntry> entries) throws IOException {
+                       List<BibEntry> entries) throws IOException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (!entries.isEmpty()) { // Only export if entries exists
@@ -113,7 +111,6 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, entries);
 
         try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
-
             DOMSource source = new DOMSource(od.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);
             Transformer trans = TransformerFactory.newInstance().newTransformer();

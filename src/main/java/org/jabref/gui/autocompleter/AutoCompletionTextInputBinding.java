@@ -38,11 +38,9 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 /**
- * Represents a binding between a text input control and a auto-completion popup
+ * Represents a binding between a text input control and an auto-completion popup
  * This class is a slightly modified version of {@link impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding}
  * that works with general text input controls instead of just text fields.
- * @param <T>
- *
  */
 public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> {
 

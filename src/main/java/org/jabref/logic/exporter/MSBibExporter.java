@@ -1,7 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
@@ -31,7 +30,7 @@ class MSBibExporter extends Exporter {
 
     @Override
     public void export(final BibDatabaseContext databaseContext, final Path file,
-                       final Charset encoding, List<BibEntry> entries) throws SaveException {
+                       List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 

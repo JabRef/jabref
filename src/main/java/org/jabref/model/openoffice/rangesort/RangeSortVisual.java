@@ -14,25 +14,21 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Sort XTextRange values visually (top-down,left-to-right).
- *
+ * <p>
  * Requires functional XTextViewCursor.
- *
- * Problem: for multicolumn layout and when viewing pages side-by-side in LO, the
- *          (top-down,left-to-right) order interpreted as-on-the-screen: an XTextRange at the top of
- *          the second column or second page is sorted before an XTextRange at the bottom of the
- *          first column of the first page.
+ * <p>
+ * Problem: for multicolumn layout and when viewing pages side-by-side in LO, the (top-down,left-to-right) order interpreted as-on-the-screen: an XTextRange at the top of the second column or second page is sorted before an XTextRange at the bottom of the first column of the first page.
  */
 public class RangeSortVisual {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RangeSortVisual.class);
 
     private RangeSortVisual() {
-        /**/
     }
 
     /**
      * Sort the input {@code inputs} visually.
-     *
+     * <p>
      * Requires a functional {@code XTextViewCursor}.
      *
      * @return The input, sorted by the elements XTextRange and getIndexInPosition.
@@ -63,8 +59,8 @@ public class RangeSortVisual {
         for (int i = 0; i < inputSize; i++) {
             RangeSortable<T> input = inputs.get(i);
             comparableMarks.add(new ComparableMark<>(positions.get(i),
-                                         input.getIndexInPosition(),
-                                         input));
+                    input.getIndexInPosition(),
+                    input));
         }
         comparableMarks.sort(RangeSortVisual::compareTopToBottomLeftToRight);
 
@@ -82,22 +78,16 @@ public class RangeSortVisual {
     }
 
     /**
-     *  Given a location, return its position: coordinates relative to the top left position of the
-     *  first page of the document.
-     *
-     * Note: for text layouts with two or more columns, this gives the wrong order:
-     *       top-down/left-to-right does not match reading order.
-     *
-     * Note: The "relative to the top left position of the first page" is meant "as it appears on
-     *       the screen".
-     *
-     *       In particular: when viewing pages side-by-side, the top half of the right page is
-     *       higher than the lower half of the left page. Again, top-down/left-to-right does not
-     *       match reading order.
+     * Given a location, return its position: coordinates relative to the top left position of the first page of the document.
+     * <p>
+     * Note: for text layouts with two or more columns, this gives the wrong order: top-down/left-to-right does not match reading order.
+     * <p>
+     * Note: The "relative to the top left position of the first page" is meant "as it appears on the screen".
+     * <p>
+     * In particular: when viewing pages side-by-side, the top half of the right page is higher than the lower half of the left page. Again, top-down/left-to-right does not match reading order.
      *
      * @param range  Location.
-     * @param cursor To get the position, we need az XTextViewCursor.
-     *               It will be moved to the range.
+     * @param cursor To get the position, we need az XTextViewCursor. It will be moved to the range.
      */
     private static Point findPositionOfTextRange(XTextRange range, XTextViewCursor cursor) {
         cursor.gotoRange(range, false);
@@ -105,7 +95,6 @@ public class RangeSortVisual {
     }
 
     private static <T> int compareTopToBottomLeftToRight(ComparableMark<T> a, ComparableMark<T> b) {
-
         if (a.position.Y != b.position.Y) {
             return a.position.Y - b.position.Y;
         }
@@ -117,10 +106,9 @@ public class RangeSortVisual {
 
     /**
      * A reference mark name paired with its visual position.
-     *
-     * Comparison is based on (Y,X,indexInPosition): vertical compared first, horizontal second,
-     * indexInPosition third.
-     *
+     * <p>
+     * Comparison is based on (Y,X,indexInPosition): vertical compared first, horizontal second, indexInPosition third.
+     * <p>
      * Used for sorting reference marks by their visual positions.
      */
     private static class ComparableMark<T> {
@@ -138,7 +126,5 @@ public class RangeSortVisual {
         public T getContent() {
             return content;
         }
-
     }
-
 }

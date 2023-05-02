@@ -111,7 +111,6 @@ public class EndnoteImporter extends Importer {
             boolean isEditedBook = false;
             String[] fields = entry.trim().substring(1).split("\n%");
             for (String field : fields) {
-
                 if (field.length() < 3) {
                     continue;
                 }
@@ -271,6 +270,7 @@ public class EndnoteImporter extends Importer {
      * separated by " and ". This is the correct behaviour.
      * One source lists the names separated by comma, with a comma at the end. We can detect
      * this format and fix it.
+     *
      * @param s The author string
      * @return The fixed author string
      */

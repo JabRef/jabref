@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+  <info>
+    <title>Physiotherapy Theory and Practice</title>
+    <id>http://www.zotero.org/styles/physiotherapy-theory-and-practice</id>
+    <link href="http://www.zotero.org/styles/physiotherapy-theory-and-practice" rel="self"/>
+    <link href="http://www.zotero.org/styles/mycologia" rel="template"/>
+    <link href="https://www.tandfonline.com/action/authorSubmission?show=instructions&amp;journalCode=iptp20" rel="documentation"/>
+    <link href="https://files.taylorandfrancis.com/ref_iptp.pdf" rel="documentation"/>
+    <author>
+      <name>Patrick O'Brien</name>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="biology"/>
+    <issn>0959-3985</issn>
+    <eissn>1532-5040</eissn>
+    <updated>2022-09-05T16:08:42+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="et-al">et al</term>
+    </terms>
+  </locale>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" and="text"/>
+      <substitute>
+        <names variable="editor"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name delimiter-precedes-last="always" initialize-with="" name-as-sort-order="all" sort-separator=" "/>
+      <label form="short" prefix=", "/>
+      <substitute>
+        <names variable="editor"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="issued">
+    <date variable="issued">
+      <date-part name="year"/>
+    </date>
+  </macro>
+  <macro name="publisher">
+    <group delimiter=": ">
+      <text variable="publisher-place"/>
+      <text variable="publisher"/>
+    </group>
+  </macro>
+  <macro name="editor">
+    <names variable="editor">
+      <name and="text" delimiter-precedes-last="always" initialize-with="" name-as-sort-order="all" sort-separator=" "/>
+      <label form="short" text-case="capitalize-first" strip-periods="true" prefix=" (" suffix=")"/>
+    </names>
+  </macro>
+  <macro name="access">
+    <text variable="URL"/>
+  </macro>
+  <citation et-al-min="5" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
+    <sort>
+      <key macro="author"/>
+      <key macro="issued"/>
+    </sort>
+    <layout delimiter="; " prefix="(" suffix=")">
+      <group delimiter=", ">
+        <text macro="author-short"/>
+        <text macro="issued"/>
+      </group>
+    </layout>
+  </citation>
+  <bibliography et-al-min="11" et-al-use-first="10">
+    <sort>
+      <key macro="author"/>
+      <key macro="issued"/>
+      <key variable="title"/>
+    </sort>
+    <layout suffix=".">
+      <group delimiter=". ">
+        <group delimiter=" ">
+          <text macro="author"/>
+          <text macro="issued"/>
+          <text variable="title"/>
+        </group>
+        <choose>
+          <if type="article article-magazine article-newspaper article-journal review review-book" match="any">
+            <group delimiter=" ">
+              <text variable="container-title" text-case="title" strip-periods="true"/>
+              <group delimiter=": ">
+                <text variable="volume"/>
+                <text variable="page"/>
+              </group>
+            </group>
+          </if>
+          <else-if type="chapter paper-conference" match="any">
+            <group delimiter=". ">
+              <group delimiter=", ">
+                <group delimiter=" ">
+                  <group delimiter=": ">
+                    <text term="in" text-case="capitalize-first"/>
+                    <text macro="editor"/>
+                  </group>
+                  <text variable="container-title" text-case="title" strip-periods="true"/>
+                </group>
+                <group delimiter=" ">
+                  <label strip-periods="false" variable="page" form="short"/>
+                  <text variable="page"/>
+                </group>
+              </group>
+              <text macro="publisher"/>
+            </group>
+          </else-if>
+          <else-if type="thesis">
+            <group delimiter=", ">
+              <text variable="genre"/>
+              <text variable="publisher"/>
+            </group>
+          </else-if>
+          <else>
+            <group delimiter=". ">
+              <text variable="container-title"/>
+              <text macro="publisher"/>
+              <text macro="access"/>
+            </group>
+          </else>
+        </choose>
+      </group>
+    </layout>
+  </bibliography>
+</style>

@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,17 +95,8 @@ public class ParserResult {
         return Optional.ofNullable(file);
     }
 
-    /**
-     * @return the file object of the database file
-     * @deprecated use {@link #getPath()}} instead
-     */
-    @Deprecated
-    public Optional<File> getFile() {
-        return Optional.ofNullable(file).map(Path::toFile);
-    }
-
-    public void setFile(File f) {
-        file = f.toPath();
+    public void setPath(Path path) {
+        file = path;
     }
 
     /**

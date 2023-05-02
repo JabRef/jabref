@@ -9,7 +9,6 @@ public class AuthorAndsCommaReplacer implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-
         String[] authors = fieldText.split(" and ");
         String s;
 

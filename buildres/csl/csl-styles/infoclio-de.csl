@@ -40,7 +40,7 @@
     </terms>
   </locale>
   <citation>
-    <layout suffix="." delimiter="&#160;; ">
+    <layout suffix="." delimiter="; ">
       <choose>
         <if position="ibid-with-locator">
           <group delimiter=", ">

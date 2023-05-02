@@ -1,10 +1,6 @@
 package org.jabref.logic.bibtex;
 
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,27 +10,30 @@ import org.slf4j.LoggerFactory;
  */
 public class FieldWriter {
 
+    // See also ADR-0024
+    public static final char BIBTEX_STRING_START_END_SYMBOL = '#';
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldWriter.class);
 
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
 
     private final boolean neverFailOnHashes;
-    private final FieldWriterPreferences preferences;
+    private final FieldPreferences preferences;
     private final FieldContentFormatter formatter;
 
-    public FieldWriter(FieldWriterPreferences preferences) {
+    public FieldWriter(FieldPreferences preferences) {
         this(true, preferences);
     }
 
-    private FieldWriter(boolean neverFailOnHashes, FieldWriterPreferences preferences) {
+    private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {
         this.neverFailOnHashes = neverFailOnHashes;
         this.preferences = preferences;
 
-        formatter = new FieldContentFormatter(preferences.getFieldContentFormatterPreferences());
+        formatter = new FieldContentFormatter(preferences);
     }
 
-    public static FieldWriter buildIgnoreHashes(FieldWriterPreferences prefs) {
+    public static FieldWriter buildIgnoreHashes(FieldPreferences prefs) {
         return new FieldWriter(true, prefs);
     }
 
@@ -86,7 +85,6 @@ public class FieldWriter {
             return FIELD_START + String.valueOf(FIELD_END);
         }
 
-        // If the field is non-standard, we will just append braces, wrap and write.
         if (!shouldResolveStrings(field)) {
             return formatWithoutResolvingStrings(content, field);
         }
@@ -113,7 +111,7 @@ public class FieldWriter {
             int goFrom = pivot;
             int pos1 = pivot;
             while (goFrom == pos1) {
-                pos1 = content.indexOf('#', goFrom);
+                pos1 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, goFrom);
                 if ((pos1 > 0) && (content.charAt(pos1 - 1) == '\\')) {
                     goFrom = pos1 + 1;
                     pos1++;
@@ -127,16 +125,19 @@ public class FieldWriter {
                 pos1 = content.length(); // No more occurrences found.
                 pos2 = -1;
             } else {
-                pos2 = content.indexOf('#', pos1 + 1);
+                pos2 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);
                 if (pos2 == -1) {
                     if (neverFailOnHashes) {
                         pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     } else {
-                        LOGGER.error("The # character is not allowed in BibTeX strings unless escaped as in '\\#'. "
+                        LOGGER.error("The character {} is not allowed in BibTeX strings unless escaped as in '\\{}'. "
                                 + "In JabRef, use pairs of # characters to indicate a string. "
-                                + "Note that the entry causing the problem has been selected. Field value: {}", content);
+                                + "Note that the entry causing the problem has been selected. Field value: {}",
+                                BIBTEX_STRING_START_END_SYMBOL,
+                                BIBTEX_STRING_START_END_SYMBOL,
+                                content);
                         throw new InvalidFieldValueException(
-                                "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
+                                "The character " + BIBTEX_STRING_START_END_SYMBOL + " is not allowed in BibTeX strings unless escaped as in '\\" + BIBTEX_STRING_START_END_SYMBOL + "'.\n"
                                         + "In JabRef, use pairs of # characters to indicate a string.\n"
                                         + "Note that the entry causing the problem has been selected. Field value: " + content);
                     }
@@ -165,13 +166,11 @@ public class FieldWriter {
     }
 
     private boolean shouldResolveStrings(Field field) {
-        if (preferences.isResolveStringsAllFields()) {
-            // Resolve strings for all fields except some:
-            return !preferences.getDoNotResolveStringsFor().contains(field);
-        } else {
-            // Default operation - we only resolve strings for standard fields:
-            return field instanceof StandardField || InternalField.BIBTEX_STRING.equals(field);
+        if (preferences.shouldResolveStrings()) {
+            // Resolve strings for the list of fields only
+            return preferences.getResolvableFields().contains(field);
         }
+        return false;
     }
 
     private String formatWithoutResolvingStrings(String content, Field field) throws InvalidFieldValueException {
@@ -203,7 +202,6 @@ public class FieldWriter {
      */
     private void writeStringLabel(StringBuilder stringBuilder, String text, int startPos, int endPos, boolean isFirst, boolean isLast) {
         String line = (isFirst ? "" : " # ") + text.substring(startPos, endPos) + (isLast ? "" : " # ");
-        String wrappedLine = StringUtil.wrap(line, preferences.getLineLength(), OS.NEWLINE);
-        stringBuilder.append(wrappedLine);
+        stringBuilder.append(line);
     }
 }

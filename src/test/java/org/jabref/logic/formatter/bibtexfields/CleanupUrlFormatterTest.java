@@ -51,4 +51,12 @@ class CleanupUrlFormatterTest {
                         "gesundheit/ratgeber/herz/test/lebenserwartung-werden-sie-100-jahre-alt_aid_363828.html",
                 formatter.format(formatter.getExampleInput()));
     }
+
+    @Test
+    void shouldNotReplacePlusOperatorAsASignInURL() {
+        assertEquals(
+                "https://www.chicago.gov/content/dam/city/depts/cdot/Red Light Cameras/2022/Sutton+Tilahun_Chicago-Camera-Ticket_Exec Summary-Final-Jan10.pdf",
+                formatter.format("https://www.chicago.gov/content/dam/city/depts/cdot/Red Light Cameras/2022/Sutton+Tilahun_Chicago-Camera-Ticket_Exec Summary-Final-Jan10.pdf")
+        );
+    }
 }

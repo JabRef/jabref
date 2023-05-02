@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="minimal">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" initialize-with-hyphen="false" page-range-format="minimal">
   <info>
     <title>Vancouver (author-date)</title>
     <id>http://www.zotero.org/styles/vancouver-author-date</id>
@@ -7,6 +7,7 @@
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
     <link href="http://www.zotero.org/styles/cell" rel="template"/>
     <link href="http://www.nlm.nih.gov/bsd/uniform_requirements.html" rel="documentation"/>
+    <link href="https://www.icmje.org/recommendations/browse/manuscript-preparation/preparing-for-submission.html#g" rel="documentation"/>
     <author>
       <name>Charles Parnot</name>
       <email>charles.parnot@gmail.com</email>
@@ -15,7 +16,7 @@
     <category citation-format="author-date"/>
     <category field="medicine"/>
     <summary>Vancouver style as outlined by International Committee of Medical Journal Editors Uniform Requirements for Manuscripts Submitted to Biomedical Journals: Sample References</summary>
-    <updated>2012-11-09T12:00:00+00:00</updated>
+    <updated>2022-07-18T16:49:43+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -47,6 +48,16 @@
       <label form="long" prefix=", "/>
       <substitute>
         <names variable="editor"/>
+        <text variable="title" form="short"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" and="text"/>
+      <substitute>
+        <names variable="editor"/>
+        <text variable="title" form="short"/>
       </substitute>
     </names>
   </macro>
@@ -253,15 +264,16 @@
       </if>
     </choose>
   </macro>
-  <macro name="author-short">
-    <names variable="author">
-      <name form="short" and="text"/>
-    </names>
-  </macro>
   <macro name="issued">
     <date variable="issued">
       <date-part name="year"/>
     </date>
+  </macro>
+  <macro name="point-locators">
+    <group delimiter=" ">
+      <label plural="never" variable="locator" form="short"/>
+      <text variable="locator"/>
+    </group>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
     <sort>
@@ -269,9 +281,12 @@
       <key macro="author-short"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
-      <group delimiter=" ">
-        <text macro="author-short"/>
-        <text macro="issued"/>
+      <group delimiter=", ">
+        <group delimiter=" ">
+          <text macro="author-short"/>
+          <text macro="issued"/>
+        </group>
+        <text macro="point-locators"/>
       </group>
     </layout>
   </citation>

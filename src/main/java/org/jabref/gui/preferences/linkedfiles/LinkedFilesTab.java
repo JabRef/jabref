@@ -24,14 +24,16 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
 
     @FXML private TextField mainFileDirectory;
-    @FXML private CheckBox useBibLocationAsPrimary;
+    @FXML private RadioButton useMainFileDirectory;
+    @FXML private RadioButton useBibLocationAsPrimary;
+    @FXML private Button browseDirectory;
     @FXML private Button autolinkRegexHelp;
     @FXML private RadioButton autolinkFileStartsBibtex;
     @FXML private RadioButton autolinkFileExactBibtex;
     @FXML private RadioButton autolinkUseRegex;
     @FXML private TextField autolinkRegexKey;
-    @FXML private CheckBox searchFilesOnOpen;
-    @FXML private CheckBox openBrowseOnCreate;
+
+    @FXML private CheckBox fulltextIndex;
 
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirectoryPattern;
@@ -53,20 +55,23 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         this.viewModel = new LinkedFilesTabViewModel(dialogService, preferencesService);
 
         mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());
+        mainFileDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
+        browseDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
+        useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());
+
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
         autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
         autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
         autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
-        searchFilesOnOpen.selectedProperty().bindBidirectional(viewModel.searchFilesOnOpenProperty());
-        openBrowseOnCreate.selectedProperty().bindBidirectional(viewModel.openBrowseOnCreateProperty());
+        fulltextIndex.selectedProperty().bindBidirectional(viewModel.fulltextIndexProperty());
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH), autolinkRegexHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService), autolinkRegexHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDirectory));

@@ -46,5 +46,4 @@ class JsonReaderTest {
         JSONObject result = JsonReader.toJsonObject(new ByteArrayInputStream(input.getBytes()));
         assertEquals(input, result.toString());
     }
-
 }

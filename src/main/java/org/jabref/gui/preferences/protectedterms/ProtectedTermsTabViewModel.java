@@ -1,8 +1,7 @@
 package org.jabref.gui.preferences.protectedterms;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +9,10 @@ import java.util.Optional;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -33,9 +36,10 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsTabViewModel.class);
 
     private final ProtectedTermsLoader termsLoader;
-    private final ListProperty<ProtectedTermsList> termsFilesProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ProtectedTermsListItemModel> termsFilesProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final PreferencesService preferences;
     private final DialogService dialogService;
+    private final ProtectedTermsPreferences protectedTermsPreferences;
 
     public ProtectedTermsTabViewModel(ProtectedTermsLoader termsLoader,
                                       DialogService dialogService,
@@ -43,20 +47,24 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.protectedTermsPreferences = preferences.getProtectedTermsPreferences();
     }
 
     @Override
     public void setValues() {
-        termsFilesProperty.setValue(FXCollections.observableArrayList(termsLoader.getProtectedTermsLists()));
+        termsFilesProperty.clear();
+        termsFilesProperty.addAll(termsLoader.getProtectedTermsLists().stream().map(ProtectedTermsListItemModel::new).toList());
     }
 
+    @Override
     public void storeSettings() {
         List<String> enabledExternalList = new ArrayList<>();
         List<String> disabledExternalList = new ArrayList<>();
         List<String> enabledInternalList = new ArrayList<>();
         List<String> disabledInternalList = new ArrayList<>();
 
-        for (ProtectedTermsList list : termsFilesProperty.getValue()) {
+        for (ProtectedTermsList list : termsFilesProperty.getValue().stream()
+                                                         .map(ProtectedTermsListItemModel::getTermsList).toList()) {
             if (list.isInternalList()) {
                 if (list.isEnabled()) {
                     enabledInternalList.add(list.getLocation());
@@ -72,87 +80,87 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
             }
         }
 
-        ProtectedTermsPreferences newPreferences = new ProtectedTermsPreferences(
-                enabledInternalList,
-                enabledExternalList,
-                disabledInternalList,
-                disabledExternalList);
+        protectedTermsPreferences.setEnabledInternalTermLists(enabledInternalList);
+        protectedTermsPreferences.setEnabledExternalTermLists(enabledExternalList);
+        protectedTermsPreferences.setDisabledInternalTermLists(disabledInternalList);
+        protectedTermsPreferences.setDisabledExternalTermLists(disabledExternalList);
 
-        preferences.storeProtectedTermsPreferences(newPreferences);
-        termsLoader.update(newPreferences);
+        termsLoader.update(protectedTermsPreferences);
     }
 
     public void addFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
                 .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
-                .withInitialDirectory(preferences.getWorkingDir())
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> {
-                         String fileName = file.toAbsolutePath().toString();
-                         try {
-                             termsFilesProperty.add(ProtectedTermsLoader.readProtectedTermsListFromFile(new File(fileName), true));
-                         } catch (FileNotFoundException e) {
-                             LOGGER.warn("Cannot find protected terms file " + fileName, e);
-                         }
+                         Path fileName = file.toAbsolutePath();
+                         termsFilesProperty.add(new ProtectedTermsListItemModel(ProtectedTermsLoader.readProtectedTermsListFromFile(fileName, true)));
                      });
     }
 
-    public void removeFile(ProtectedTermsList list) {
+    public void removeList(ProtectedTermsListItemModel itemModel) {
+        ProtectedTermsList list = itemModel.getTermsList();
         if (!list.isInternalList() && dialogService.showConfirmationDialogAndWait(Localization.lang("Remove protected terms file"),
                 Localization.lang("Are you sure you want to remove the protected terms file?"),
                 Localization.lang("Remove protected terms file"),
                 Localization.lang("Cancel"))) {
-
-            list.setEnabled(false);
-            if (!termsFilesProperty.remove(list)) {
+            itemModel.enabledProperty().setValue(false);
+            if (!termsFilesProperty.remove(itemModel)) {
                 LOGGER.info("Problem removing protected terms file");
             }
         }
     }
 
     public void createNewFile() {
-        dialogService.showCustomDialogAndWait(new NewProtectedTermsFileDialog(termsFilesProperty, dialogService));
+        dialogService.showCustomDialogAndWait(new NewProtectedTermsFileDialog(termsFilesProperty, dialogService, preferences.getFilePreferences()));
     }
 
-    public void edit(ProtectedTermsList file) {
+    public void edit(ProtectedTermsListItemModel file) {
         Optional<ExternalFileType> termsFileType = OptionalUtil.<ExternalFileType>orElse(
-                ExternalFileTypes.getInstance().getExternalFileTypeByExt("terms"),
-                ExternalFileTypes.getInstance().getExternalFileTypeByExt("txt")
+                ExternalFileTypes.getExternalFileTypeByExt("terms", preferences.getFilePreferences()),
+                ExternalFileTypes.getExternalFileTypeByExt("txt", preferences.getFilePreferences())
         );
 
-        String fileName = file.getLocation();
+        String fileName = file.getTermsList().getLocation();
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, termsFileType);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferences, fileName, termsFileType);
         } catch (IOException e) {
             LOGGER.warn("Problem open protected terms file editor", e);
         }
     }
 
-    public void displayContent(ProtectedTermsList list) {
-        dialogService.showInformationDialogAndWait(
-                list.getDescription() + " - " + list.getLocation(),
-                list.getTermListing()
-        );
+    public void displayContent(ProtectedTermsListItemModel itemModel) {
+        ProtectedTermsList list = itemModel.getTermsList();
+        TextArea listingView = new TextArea(list.getTermListing());
+        listingView.setEditable(false);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setContent(listingView);
+
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.setContent(scrollPane);
+
+        dialogService.showCustomDialogAndWait(list.getDescription() + " - " + list.getLocation(), dialogPane, ButtonType.OK);
     }
 
-    public void reloadFile(ProtectedTermsList oldList) {
-        try {
-            ProtectedTermsList newList = ProtectedTermsLoader.readProtectedTermsListFromFile(new File(oldList.getLocation()), oldList.isEnabled());
-            int index = termsFilesProperty.indexOf(oldList);
-            if (index >= 0) {
-                termsFilesProperty.set(index, newList);
-            } else {
-                LOGGER.warn("Problem reloading protected terms file {}.", oldList.getLocation());
-            }
-        } catch (IOException e) {
-            LOGGER.warn("Problem reloading protected terms file {}.", oldList.getLocation(), e);
+    public void reloadList(ProtectedTermsListItemModel oldItemModel) {
+        ProtectedTermsList oldList = oldItemModel.getTermsList();
+        ProtectedTermsList newList = ProtectedTermsLoader.readProtectedTermsListFromFile(Path.of(oldList.getLocation()), oldList.isEnabled());
+        int index = termsFilesProperty.indexOf(oldItemModel);
+        if (index >= 0) {
+            termsFilesProperty.set(index, new ProtectedTermsListItemModel(newList));
+        } else {
+            LOGGER.warn("Problem reloading protected terms file {}.", oldList.getLocation());
         }
     }
 
-    public ListProperty<ProtectedTermsList> termsFilesProperty() {
+    public ListProperty<ProtectedTermsListItemModel> termsFilesProperty() {
         return termsFilesProperty;
     }
 }

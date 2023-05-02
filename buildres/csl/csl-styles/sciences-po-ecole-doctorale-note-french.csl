@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="fr-FR">
   <info>
-    <title>Sciences Po - École doctorale (note, Français)</title>
+    <title>Sciences Po - École de la recherche (note, Français)</title>
     <id>http://www.zotero.org/styles/sciences-po-ecole-doctorale-note-french</id>
     <link href="http://www.zotero.org/styles/sciences-po-ecole-doctorale-note-french" rel="self"/>
     <link href="https://sciencespo.libguides.com/zotero/styles" rel="documentation"/>
@@ -58,11 +58,16 @@
   </macro>
   <macro name="archive">
     <choose>
-      <if variable="archive archive_location" match="any">
-        <group delimiter=". ">
-          <text variable="archive_location" text-case="capitalize-first"/>
-          <text variable="archive"/>
-          <text variable="archive-place"/>
+      <if type="manuscript" match="any">
+        <group delimiter="">
+          <text variable="publisher-place" suffix=".&#160;"/>
+          <text variable="archive" suffix=",&#160;"/>
+          <text variable="archive_location"/>
+          <choose>
+            <if variable="call-number" match="any">
+              <text variable="call-number" prefix="&#160;/&#160;"/>
+            </if>
+          </choose>
         </group>
       </if>
     </choose>
@@ -123,7 +128,7 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="article bill book broadcast graphic legal_case legislation map manuscript motion_picture patent personal_communication report song webpage" match="any">
+      <if type="article bill book broadcast graphic legal_case legislation map motion_picture patent personal_communication report song webpage" match="any">
         <text variable="title" font-style="italic"/>
       </if>
       <else-if type="article-journal article-newspaper article-magazine" match="any">
@@ -145,9 +150,9 @@
         </group>
       </else-if>
       <else-if type="manuscript" match="any">
-        <group delimiter=",">
-          <text variable="title" quotes="true"/>
-          <text variable="genre" prefix=" "/>
+        <group delimiter=". ">
+          <text variable="title" font-style="italic"/>
+          <text variable="genre"/>
         </group>
       </else-if>
       <else-if type="chapter entry-dictionary entry-encyclopedia" match="any">
@@ -164,7 +169,7 @@
   </macro>
   <macro name="pub-place">
     <choose>
-      <if type="bill book chapter entry-dictionary entry-encyclopedia thesis legal_case manuscript map paper-conference song" match="any">
+      <if type="bill book chapter entry-dictionary entry-encyclopedia thesis legal_case map paper-conference song" match="any">
         <choose>
           <if variable="publisher-place" match="any">
             <text variable="publisher-place"/>
@@ -178,7 +183,7 @@
   </macro>
   <macro name="publisher">
     <choose>
-      <if type="bill book chapter entry-dictionary entry-encyclopedia thesis legal_case manuscript map paper-conference report song" match="any">
+      <if type="bill book chapter entry-dictionary entry-encyclopedia thesis legal_case map paper-conference report song" match="any">
         <choose>
           <if variable="publisher" match="any">
             <text variable="publisher"/>
@@ -192,7 +197,7 @@
   </macro>
   <macro name="yearpage">
     <choose>
-      <if type="article bill book graphic legal_case map motion_picture paper-conference manuscript report song thesis" match="any">
+      <if type="article bill book graphic legal_case map motion_picture paper-conference report song thesis" match="any">
         <group delimiter=". ">
           <date variable="issued">
             <date-part name="year"/>
@@ -269,6 +274,26 @@
                 <text variable="locator"/>
               </group>
             </if>
+          </choose>
+        </group>
+      </else-if>
+      <else-if type="manuscript" match="any">
+        <group delimiter=". ">
+          <date variable="issued">
+            <date-part name="day" suffix=" "/>
+            <date-part name="month" suffix=" "/>
+            <date-part name="year" suffix=""/>
+          </date>
+          <choose>
+            <if variable="locator" match="any">
+              <group delimiter="&#8239;">
+                <label variable="locator" form="short"/>
+                <text variable="locator"/>
+              </group>
+            </if>
+            <else-if variable="locator" match="none">
+              <text variable="number-of-pages" suffix="&#160;p"/>
+            </else-if>
           </choose>
         </group>
       </else-if>
@@ -349,11 +374,9 @@
     <layout delimiter="&#160;; ">
       <choose>
         <if position="ibid-with-locator">
-          <group delimiter=". ">
-            <text term="ibid" text-case="capitalize-first" font-style="italic"/>
-            <label variable="locator" form="short" suffix="&#160;"/>
-            <text variable="locator"/>
-          </group>
+          <text term="ibid" text-case="capitalize-first" font-style="italic"/>
+          <label variable="locator" form="short" suffix="&#160;"/>
+          <text variable="locator"/>
         </if>
         <else-if position="ibid">
           <text term="ibid" text-case="capitalize-first" font-style="italic"/>
@@ -390,6 +413,7 @@
           <text macro="medium" suffix=". "/>
           <text macro="dimensions" suffix=". "/>
           <text macro="access" suffix="]. "/>
+          <text macro="archive"/>
         </else>
       </choose>
     </layout>

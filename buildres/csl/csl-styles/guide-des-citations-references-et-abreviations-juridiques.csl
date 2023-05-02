@@ -14,7 +14,7 @@
     </author>
     <category citation-format="note"/>
     <category field="law"/>
-    <updated>2020-12-04T23:56:21+00:00</updated>
+    <updated>2023-03-11T23:01:32+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -57,7 +57,8 @@
   </macro>
   <macro name="translator">
     <names variable="translator">
-      <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal" prefix=" traduit par ">
+      <label form="verb-short" suffix=" "/>
+      <name font-style="normal" and="text" delimiter-precedes-last="never" sort-separator=" ">
         <name-part name="family" font-variant="small-caps"/>
       </name>
     </names>
@@ -315,18 +316,16 @@
       </else-if>
     </choose>
   </macro>
-  <citation>
+  <citation near-note-distance="1">
     <layout delimiter="&#160;; ">
       <choose>
-        <if position="ibid-with-locator subsequent">
+        <if position="ibid near-note" match="all">
           <group delimiter=", ">
-            <text term="ibid" text-case="capitalize-first" font-style="italic" suffix="."/>
+            <text macro="author"/>
+            <text term="ibid" font-style="italic" suffix="."/>
             <text variable="locator" prefix="p.&#160;"/>
           </group>
         </if>
-        <else-if position="ibid">
-          <text term="ibid" text-case="capitalize-first" font-style="italic"/>
-        </else-if>
         <else-if position="subsequent">
           <group delimiter=", ">
             <text macro="author"/>
@@ -352,7 +351,14 @@
               <else-if type="article-journal" match="any">
                 <text term="cited" font-style="italic" suffix="."/>
                 <text variable="container-title" form="short" font-style="italic"/>
-                <date date-parts="year-month" form="text" variable="issued"/>
+                <choose>
+                  <if match="any" variable="volume">
+                    <text variable="volume"/>
+                  </if>
+                  <else>
+                    <date date-parts="year-month" form="text" variable="issued"/>
+                  </else>
+                </choose>
               </else-if>
               <else-if type="entry-encyclopedia" match="any">
                 <text variable="title" quotes="true"/>

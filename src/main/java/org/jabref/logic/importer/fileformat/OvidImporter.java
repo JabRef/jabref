@@ -67,11 +67,9 @@ public class OvidImporter extends Importer {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < MAX_ITEMS)) {
-
             if (OvidImporter.OVID_PATTERN.matcher(str).find()) {
                 return true;
             }
-
             i++;
         }
         return false;
@@ -111,7 +109,6 @@ public class OvidImporter extends Importer {
                     content = content.substring(0, content.length() - 1);
                 }
                 if (isAuthor) {
-
                     h.put(StandardField.AUTHOR, content);
                 } else if (fieldName.startsWith("Title")) {
                     content = content.replaceAll("\\[.+\\]", "").trim();
@@ -135,7 +132,6 @@ public class OvidImporter extends Importer {
                         h.put(StandardField.PAGES, matcher.group(3));
                         h.put(StandardField.YEAR, matcher.group(4));
                     } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_2.matcher(content)).find()) {
-
                         h.put(StandardField.JOURNAL, matcher.group(1));
                         h.put(StandardField.VOLUME, matcher.group(2));
                         h.put(StandardField.ISSUE, matcher.group(3));

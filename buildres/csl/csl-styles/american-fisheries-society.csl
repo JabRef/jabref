@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" default-locale="en-US" version="1.0" demote-non-dropping-particle="sort-only">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
     <title>American Fisheries Society</title>
     <id>http://www.zotero.org/styles/american-fisheries-society</id>
@@ -91,13 +91,13 @@
           <text variable="publisher-place"/>
         </group>
       </else-if>
-      <else>
+      <else-if type="article-journal article-magazine article-newspaper" match="none">
         <group delimiter=", ">
           <text variable="genre"/>
           <text variable="publisher"/>
           <text variable="publisher-place"/>
         </group>
-      </else>
+      </else-if>
     </choose>
   </macro>
   <macro name="issued">

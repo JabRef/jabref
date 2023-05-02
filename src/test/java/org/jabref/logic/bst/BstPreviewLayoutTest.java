@@ -3,6 +3,7 @@ package org.jabref.logic.bst;
 import java.nio.file.Path;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -14,7 +15,7 @@ import static org.mockito.Mockito.mock;
 
 class BstPreviewLayoutTest {
 
-    private final BibDatabase bibDatabase = mock(BibDatabase.class);
+    private final BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
 
     @Test
     public void generatePreviewForSimpleEntryUsingAbbr() throws Exception {
@@ -22,7 +23,7 @@ class BstPreviewLayoutTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development");
         BibDatabase bibDatabase = mock(BibDatabase.class);
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabase);
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
         assertEquals("O. Kopp. Thoughts on development.", preview);
     }
 
@@ -33,21 +34,21 @@ class BstPreviewLayoutTest {
                                        .withField(StandardField.TITLE, "Thoughts on Development")
                                        .withField(StandardField.MONTH, "#May#");
         BibDatabase bibDatabase = mock(BibDatabase.class);
-        String preview = bstPreviewLayout.generatePreview(entry, bibDatabase);
+        String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
         assertEquals("O. Kopp. Thoughts on development, May.", preview);
     }
 
     @Test
     public void generatePreviewForSliceTheoremPaperUsingAbbr() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
-        String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabase);
+        String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
         assertEquals("T. Diez. Slice theorem for fréchet group actions and covariant symplectic field theory. May 2014.", preview);
     }
 
     @Test
     public void generatePreviewForSliceTheoremPaperUsingIEEE() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(ClassLoader.getSystemResource("bst/IEEEtran.bst").toURI()));
-        String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabase);
+        String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
         assertEquals("T. Diez, \"Slice theorem for fréchet group actions and covariant symplectic field theory\" May 2014.", preview);
     }
 

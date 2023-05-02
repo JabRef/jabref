@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
@@ -24,21 +26,21 @@ public class CitationStyleGenerator {
     }
 
     /**
-     * Generates a Citation based on the given entry and style
+     * Generates a Citation based on the given entry and style with a default {@link BibDatabaseContext}
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(BibEntry entry, CitationStyle style) {
-        return generateCitation(entry, style.getSource(), CitationStyleOutputFormat.HTML);
+    protected static String generateCitation(BibEntry entry, CitationStyle style, BibEntryTypesManager entryTypesManager) {
+        return generateCitation(entry, style.getSource(), entryTypesManager);
     }
 
     /**
-     * Generates a Citation based on the given entry and style
+     * Generates a Citation based on the given entry and style with a default {@link BibDatabaseContext}
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(BibEntry entry, String style) {
-        return generateCitation(entry, style, CitationStyleOutputFormat.HTML);
+    protected static String generateCitation(BibEntry entry, String style, BibEntryTypesManager entryTypesManager) {
+        return generateCitation(entry, style, CitationStyleOutputFormat.HTML, new BibDatabaseContext(), entryTypesManager);
     }
 
     /**
@@ -46,8 +48,8 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
-        return generateCitations(Collections.singletonList(entry), style, outputFormat).stream().findFirst().orElse("");
+    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+        return generateCitations(Collections.singletonList(entry), style, outputFormat, databaseContext, entryTypesManager).stream().findFirst().orElse("");
     }
 
     /**
@@ -55,11 +57,11 @@ public class CitationStyleGenerator {
      *
      * @implNote The citations are generated using JavaScript which may take some time, better call it from outside the main thread.
      */
-    public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat) {
+    public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
         try {
-            return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat);
-        } catch (IllegalArgumentException ignored) {
-            LOGGER.error("Could not generate BibEntry citation. The CSL engine could not create a preview for your item.", ignored);
+            return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Could not generate BibEntry citation. The CSL engine could not create a preview for your item.", e);
             return Collections.singletonList(Localization.lang("Cannot generate preview based on selected citation style."));
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry citation", e);

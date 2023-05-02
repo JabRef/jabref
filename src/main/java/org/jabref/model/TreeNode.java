@@ -590,6 +590,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
      *  - addChild (new parent)
      *  - removeChild (old parent)
      *  - move (old parent and new parent)
+     *
      * @param subscriber function to be invoked upon a change
      */
     public void subscribeToDescendantChanged(Consumer<T> subscriber) {

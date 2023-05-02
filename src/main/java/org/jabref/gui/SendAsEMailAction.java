@@ -15,7 +15,9 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -72,15 +74,16 @@ public class SendAsEMailAction extends SimpleCommand {
         }
 
         StringWriter rawEntries = new StringWriter();
+        BibWriter bibWriter = new BibWriter(rawEntries, OS.NEWLINE);
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
-        // write the entries using sw, which is used later to form the email content
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldWriterPreferences()), Globals.entryTypesManager);
+        // write the entries via this writer to "rawEntries" (being a StringWriter), which  used later to form the email content
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), Globals.entryTypesManager);
 
         for (BibEntry entry : entries) {
             try {
-                bibtexEntryWriter.write(entry, rawEntries, databaseContext.getMode());
+                bibtexEntryWriter.write(entry, bibWriter, databaseContext.getMode());
             } catch (IOException e) {
                 LOGGER.warn("Problem creating BibTeX file for mailing.", e);
             }
@@ -97,14 +100,14 @@ public class SendAsEMailAction extends SimpleCommand {
             attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(path.toAbsolutePath());
+                    JabRefDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferencesService, dialogService);
                 } catch (IOException e) {
                     LOGGER.debug("Cannot open file", e);
                 }
             }
         }
 
-        String mailTo = "?Body=".concat(rawEntries.getBuffer().toString());
+        String mailTo = "?Body=".concat(rawEntries.toString());
         mailTo = mailTo.concat("&Subject=");
         mailTo = mailTo.concat(preferencesService.getExternalApplicationsPreferences().getEmailSubject());
         for (String path : attachments) {

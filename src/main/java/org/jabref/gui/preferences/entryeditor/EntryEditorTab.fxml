@@ -28,6 +28,7 @@
     </CheckBox>
     <CheckBox fx:id="enableLatexCitationsTab" text="%Show 'LaTeX Citations' tab"/>
     <CheckBox fx:id="enableValidation" text="%Show validation messages"/>
+    <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
 
     <Label styleClass="sectionHeader" text="%Autocompletion"/>
     <CheckBox fx:id="enableAutoComplete" text="%Use autocompletion"/>

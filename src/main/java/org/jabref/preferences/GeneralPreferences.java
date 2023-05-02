@@ -1,64 +1,119 @@
 package org.jabref.preferences;
 
-import java.nio.charset.Charset;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.logic.l10n.Language;
 import org.jabref.model.database.BibDatabaseMode;
 
 public class GeneralPreferences {
-    private final Charset defaultEncoding;
-    private final BibDatabaseMode defaultBibDatabaseMode;
-    private final boolean warnAboutDuplicatesInInspection;
-    private boolean confirmDelete;
-    private final boolean allowIntegerEditionBibtex;
-    private final boolean memoryStickMode;
-    private final boolean showAdvancedHints;
+    private final ObjectProperty<Language> language;
+    private final ObjectProperty<BibDatabaseMode> defaultBibDatabaseMode;
+    private final BooleanProperty warnAboutDuplicatesInInspection;
+    private final BooleanProperty confirmDelete;
+    private final BooleanProperty memoryStickMode;
+    private final BooleanProperty shouldOpenLastEdited;
+    private final BooleanProperty showAdvancedHints;
 
-    public GeneralPreferences(Charset defaultEncoding,
+    public GeneralPreferences(Language language,
                               BibDatabaseMode defaultBibDatabaseMode,
                               boolean warnAboutDuplicatesInInspection,
                               boolean confirmDelete,
-                              boolean allowIntegerEditionBibtex,
                               boolean memoryStickMode,
+                              boolean shouldOpenLastEdited,
                               boolean showAdvancedHints) {
-        this.defaultEncoding = defaultEncoding;
-        this.defaultBibDatabaseMode = defaultBibDatabaseMode;
-        this.warnAboutDuplicatesInInspection = warnAboutDuplicatesInInspection;
-        this.confirmDelete = confirmDelete;
-        this.allowIntegerEditionBibtex = allowIntegerEditionBibtex;
-        this.memoryStickMode = memoryStickMode;
-        this.showAdvancedHints = showAdvancedHints;
+        this.language = new SimpleObjectProperty<>(language);
+        this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
+        this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
+        this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
+        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
+        this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
+        this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
     }
 
-    public Charset getDefaultEncoding() {
-        return defaultEncoding;
+    public Language getLanguage() {
+        return language.get();
+    }
+
+    public ObjectProperty<Language> languageProperty() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language.set(language);
     }
 
     public BibDatabaseMode getDefaultBibDatabaseMode() {
+        return defaultBibDatabaseMode.get();
+    }
+
+    public ObjectProperty<BibDatabaseMode> defaultBibDatabaseModeProperty() {
         return defaultBibDatabaseMode;
     }
 
-    public boolean isWarnAboutDuplicatesInInspection() {
+    public void setDefaultBibDatabaseMode(BibDatabaseMode defaultBibDatabaseMode) {
+        this.defaultBibDatabaseMode.set(defaultBibDatabaseMode);
+    }
+
+    public boolean warnAboutDuplicatesInInspection() {
+        return warnAboutDuplicatesInInspection.get();
+    }
+
+    public BooleanProperty isWarnAboutDuplicatesInInspectionProperty() {
         return warnAboutDuplicatesInInspection;
     }
 
+    public void setWarnAboutDuplicatesInInspection(boolean warnAboutDuplicatesInInspection) {
+        this.warnAboutDuplicatesInInspection.set(warnAboutDuplicatesInInspection);
+    }
+
     public boolean shouldConfirmDelete() {
+        return confirmDelete.get();
+    }
+
+    public BooleanProperty confirmDeleteProperty() {
         return confirmDelete;
     }
 
-    public GeneralPreferences withConfirmDelete(boolean confirmDelete) {
-        this.confirmDelete = confirmDelete;
-        return this;
-    }
-
-    public boolean shouldAllowIntegerEditionBibtex() {
-        return allowIntegerEditionBibtex;
+    public void setConfirmDelete(boolean confirmDelete) {
+        this.confirmDelete.set(confirmDelete);
     }
 
     public boolean isMemoryStickMode() {
+        return memoryStickMode.get();
+    }
+
+    public BooleanProperty memoryStickModeProperty() {
         return memoryStickMode;
     }
 
+    public void setMemoryStickMode(boolean memoryStickMode) {
+        this.memoryStickMode.set(memoryStickMode);
+    }
+
+    public boolean shouldOpenLastEdited() {
+        return shouldOpenLastEdited.get();
+    }
+
+    public BooleanProperty openLastEditedProperty() {
+        return shouldOpenLastEdited;
+    }
+
+    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
+        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
+    }
+
     public boolean shouldShowAdvancedHints() {
+        return showAdvancedHints.get();
+    }
+
+    public BooleanProperty showAdvancedHintsProperty() {
         return showAdvancedHints;
+    }
+
+    public void setShowAdvancedHints(boolean showAdvancedHints) {
+        this.showAdvancedHints.set(showAdvancedHints);
     }
 }

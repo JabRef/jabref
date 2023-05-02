@@ -14,16 +14,18 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.preferences.appearance.AppearanceTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
-import org.jabref.gui.preferences.customization.CustomizationTab;
+import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
+import org.jabref.gui.preferences.customexporter.CustomExporterTab;
+import org.jabref.gui.preferences.customimporter.CustomImporterTab;
+import org.jabref.gui.preferences.entry.EntryTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
-import org.jabref.gui.preferences.exporter.ExportCustomizationTab;
 import org.jabref.gui.preferences.external.ExternalTab;
+import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
 import org.jabref.gui.preferences.file.FileTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
-import org.jabref.gui.preferences.importer.ImportCustomizationTab;
-import org.jabref.gui.preferences.importer.ImportSettingsTab;
+import org.jabref.gui.preferences.importexport.ImportExportTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
@@ -33,18 +35,10 @@ import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
-import org.jabref.gui.push.PushToApplicationsManager;
-import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.PreferencesFilter;
 import org.jabref.preferences.PreferencesService;
 
@@ -69,21 +63,23 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new FileTab(),
+                new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
                 new ProtectedTermsTab(),
-                new ExternalTab(frame.getPushToApplicationsManager()),
+                new ExternalTab(),
+                new ExternalFileTypesTab(),
                 new JournalAbbreviationsTab(),
                 new GroupsTab(),
                 new EntryEditorTab(),
-                new CustomizationTab(),
+                new ImportExportTab(),
                 new CustomEditorFieldsTab(),
                 new CitationKeyPatternTab(),
                 new LinkedFilesTab(),
                 new NameFormatterTab(),
-                new ImportSettingsTab(),
-                new ImportCustomizationTab(),
-                new ExportCustomizationTab(),
+                new CustomImporterTab(),
+                new CustomExporterTab(),
+                new CustomEntryTypesTab(),
                 new XmpPrivacyTab(),
                 new NetworkTab(),
                 new AppearanceTab()
@@ -98,7 +94,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(preferences.getLastPreferencesExportPath()).build();
+                .withInitialDirectory(preferences.getInternalPreferences().getLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> {
@@ -119,7 +115,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(preferences.getLastPreferencesExportPath())
+                .withInitialDirectory(preferences.getInternalPreferences().getLastPreferencesExportPath())
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
@@ -127,7 +123,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                          try {
                              storeAllSettings();
                              preferences.exportPreferences(exportFile);
-                             preferences.storeLastPreferencesExportPath(exportFile);
+                             preferences.getInternalPreferences().setLastPreferencesExportPath(exportFile);
                          } catch (JabRefException ex) {
                              LOGGER.warn(ex.getMessage(), ex);
                              dialogService.showErrorDialogAndWait(Localization.lang("Export preferences"), ex);
@@ -164,23 +160,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      * Reloads the preferences into the UI
      */
     private void updateAfterPreferenceChanges() {
-        // Reload internal preferences cache
-        preferences.updateEntryEditorTabList();
-        preferences.updateGlobalCitationKeyPattern();
-        preferences.updateMainTableColumns();
-
         setValues();
-
-        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
-        SavePreferences savePreferences = preferences.getSavePreferencesForExport();
-        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
-        Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
-
-        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
-        PushToApplicationsManager manager = frame.getPushToApplicationsManager();
-        manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName())
-                                               .orElse(new PushToEmacs(dialogService, preferences)));
 
         frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
@@ -221,13 +201,14 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         frame.setupAllTables();
         frame.getGlobalSearchBar().updateHintVisibility();
+        Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         dialogService.notify(Localization.lang("Preferences recorded."));
 
         updateAfterPreferenceChanges();
     }
 
     /**
-     * Inserts the preference values into the the Properties of the ViewModel
+     * Inserts the preference values into the Properties of the ViewModel
      */
     public void setValues() {
         for (PreferencesTab preferencesTab : preferenceTabs) {

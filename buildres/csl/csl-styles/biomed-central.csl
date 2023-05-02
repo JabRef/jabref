@@ -12,10 +12,13 @@
     <contributor>
       <name>Sebastian Karcher</name>
     </contributor>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <category field="biology"/>
-    <updated>2017-03-15T17:11:28+00:00</updated>
+    <updated>2021-11-02T17:11:28+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -87,22 +90,22 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL">
+      <if type="article-journal">
         <choose>
-          <if variable="DOI">
-            <text variable="DOI" prefix="doi:"/>
+          <if match="none" variable="page volume">
+            <text variable="DOI" prefix="https://doi.org/"/>
           </if>
-          <else>
-            <group delimiter=". ">
-              <text variable="URL"/>
-              <group delimiter=" ">
-                <text term="accessed" text-case="capitalize-first"/>
-                <date variable="accessed" form="text"/>
-              </group>
-            </group>
-          </else>
         </choose>
       </if>
+      <else-if type="webpage post-weblog post" match="any">
+        <group delimiter=". ">
+          <text variable="URL"/>
+          <group delimiter=" ">
+            <text term="accessed" text-case="capitalize-first"/>
+            <date variable="accessed" form="text"/>
+          </group>
+        </group>
+      </else-if>
     </choose>
   </macro>
   <citation collapse="citation-number">

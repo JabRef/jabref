@@ -33,16 +33,15 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name delimiter-precedes-last="never" and="symbol" initialize-with=". " name-as-sort-order="all"/>
+      <name delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
       <label form="short" prefix=", "/>
-      <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>
       </substitute>
     </names>
   </macro>
   <macro name="access">
-    <text variable="DOI" prefix="DOI: "/>
+    <text variable="DOI" prefix="https://doi.org/"/>
   </macro>
   <macro name="issuance">
     <choose>
@@ -71,11 +70,11 @@
   </macro>
   <macro name="container-title">
     <choose>
-      <if type="article-journal">
-        <text variable="container-title" form="short" font-style="italic"/>
+      <if type="article-journal article-magazine article" match="any">
+        <text variable="container-title" form="short" text-case="title"/>
       </if>
       <else>
-        <text variable="container-title" font-style="italic"/>
+        <text variable="container-title"/>
       </else>
     </choose>
   </macro>
@@ -84,15 +83,14 @@
       <if type="chapter paper-conference" match="any">
         <names variable="editor" prefix="(" suffix=")">
           <label form="short" suffix=" "/>
-          <name delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all" and="symbol"/>
-          <et-al font-style="italic"/>
+          <name delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
         </names>
       </if>
     </choose>
   </macro>
   <macro name="volume">
     <choose>
-      <if type="article-journal" match="any">
+      <if type="article-journal article-magazine article" match="any">
         <text variable="volume" suffix=","/>
       </if>
       <else>
@@ -105,13 +103,13 @@
   </macro>
   <macro name="pages">
     <choose>
-      <if type="article-journal article-magazine" match="any">
-        <text variable="page"/>
+      <if type="article-journal article-magazine article" match="any">
+        <text variable="page" form="short"/>
       </if>
       <else>
         <group delimiter=" ">
-          <label variable="page" form="short"/>
-          <text variable="page"/>
+          <label plural="always" variable="page" form="short"/>
+          <text variable="page" form="short"/>
         </group>
       </else>
     </choose>
@@ -137,7 +135,7 @@
         </choose>
         <text macro="container-title"/>
         <text macro="editor"/>
-        <text macro="volume"/>
+        <text macro="volume" suffix=","/>
         <text macro="pages"/>
         <text macro="issuance"/>
         <text macro="access"/>

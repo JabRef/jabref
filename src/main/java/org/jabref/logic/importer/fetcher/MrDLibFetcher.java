@@ -19,7 +19,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.MrDlibPreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -39,12 +38,12 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private String heading;
     private String description;
     private String recommendationSetId;
-    private final PreferencesService preferencesService;
+    private final MrDlibPreferences preferences;
 
-    public MrDLibFetcher(String language, Version version, PreferencesService preferencesService) {
+    public MrDLibFetcher(String language, Version version, MrDlibPreferences preferences) {
         LANGUAGE = language;
         VERSION = version;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
     }
 
     @Override
@@ -99,7 +98,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private String makeServerRequest(String queryByTitle) throws FetcherException {
         try {
             URLDownload urlDownload = new URLDownload(constructQuery(queryByTitle));
-            URLDownload.bypassSSLVerification();
             String response = urlDownload.asString();
 
             // Conversion of < and >
@@ -118,8 +116,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @return the string used to make the query at mdl server
      */
     private String constructQuery(String queryWithTitle) {
-        MrDlibPreferences preferences = preferencesService.getMrDlibPreferences();
-
         // The encoding does not work for / so we convert them by our own
         queryWithTitle = queryWithTitle.replaceAll("/", " ");
         URIBuilder builder = new URIBuilder();

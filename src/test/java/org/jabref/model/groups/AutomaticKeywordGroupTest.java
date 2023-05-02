@@ -39,5 +39,4 @@ class AutomaticKeywordGroupTest {
 
         return expectedKeywordsSubgroup;
     }
-
 }

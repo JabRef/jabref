@@ -23,10 +23,10 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.FileColumn;
+import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
@@ -53,7 +53,6 @@ public class MainTableColumnFactory {
 
     private final PreferencesService preferencesService;
     private final ColumnPreferences columnPreferences;
-    private final ExternalFileTypes externalFileTypes;
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
@@ -62,61 +61,68 @@ public class MainTableColumnFactory {
 
     public MainTableColumnFactory(BibDatabaseContext database,
                                   PreferencesService preferencesService,
-                                  ExternalFileTypes externalFileTypes,
+                                  ColumnPreferences abstractColumnPrefs,
                                   UndoManager undoManager,
                                   DialogService dialogService,
                                   StateManager stateManager) {
         this.database = Objects.requireNonNull(database);
         this.preferencesService = Objects.requireNonNull(preferencesService);
-        this.columnPreferences = preferencesService.getColumnPreferences();
-        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
+        this.columnPreferences = abstractColumnPrefs;
         this.dialogService = dialogService;
-        this.cellFactory = new CellFactory(externalFileTypes, preferencesService, undoManager);
+        this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
+    }
+
+    public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
+        TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
+        switch (column.getType()) {
+            case INDEX:
+                returnColumn = createIndexColumn(column);
+                break;
+            case GROUPS:
+                returnColumn = createGroupColumn(column);
+                break;
+            case FILES:
+                returnColumn = createFilesColumn(column);
+                break;
+            case LINKED_IDENTIFIER:
+                returnColumn = createIdentifierColumn(column);
+                break;
+            case LIBRARY_NAME:
+                returnColumn = createLibraryColumn(column);
+                break;
+            case EXTRAFILE:
+                if (!column.getQualifier().isBlank()) {
+                    returnColumn = createExtraFileColumn(column);
+                }
+                break;
+            case SPECIALFIELD:
+                if (!column.getQualifier().isBlank()) {
+                    Field field = FieldFactory.parseField(column.getQualifier());
+                    if (field instanceof SpecialField) {
+                        returnColumn = createSpecialFieldColumn(column);
+                    } else {
+                        LOGGER.warn("Special field type '{}' is unknown. Using normal column type.", column.getQualifier());
+                        returnColumn = createFieldColumn(column);
+                    }
+                }
+                break;
+            default:
+            case NORMALFIELD:
+                if (!column.getQualifier().isBlank()) {
+                    returnColumn = createFieldColumn(column);
+                }
+                break;
+        }
+        return returnColumn;
     }
 
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columnPreferences.getColumns().forEach(column -> {
-
-            switch (column.getType()) {
-                case INDEX:
-                    columns.add(createIndexColumn(column));
-                    break;
-                case GROUPS:
-                    columns.add(createGroupColumn(column));
-                    break;
-                case FILES:
-                    columns.add(createFilesColumn(column));
-                    break;
-                case LINKED_IDENTIFIER:
-                    columns.add(createIdentifierColumn(column));
-                    break;
-                case EXTRAFILE:
-                    if (!column.getQualifier().isBlank()) {
-                        columns.add(createExtraFileColumn(column));
-                    }
-                    break;
-                case SPECIALFIELD:
-                    if (!column.getQualifier().isBlank()) {
-                        Field field = FieldFactory.parseField(column.getQualifier());
-                        if (field instanceof SpecialField) {
-                            columns.add(createSpecialFieldColumn(column));
-                        } else {
-                            LOGGER.warn(Localization.lang("Special field type %0 is unknown. Using normal column type.", column.getQualifier()));
-                            columns.add(createFieldColumn(column));
-                        }
-                    }
-                    break;
-                default:
-                case NORMALFIELD:
-                    if (!column.getQualifier().isBlank()) {
-                        columns.add(createFieldColumn(column));
-                    }
-                    break;
-            }
+            columns.add(createColumn(column));
         });
 
         return columns;
@@ -228,7 +234,6 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,
-                externalFileTypes,
                 dialogService,
                 preferencesService);
     }
@@ -239,9 +244,15 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createExtraFileColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,
-                externalFileTypes,
                 dialogService,
                 preferencesService,
                 columnModel.getQualifier());
+    }
+
+    /**
+     * Create library column containing the Filename of the library's bib file
+     */
+    private TableColumn<BibEntryTableViewModel, String> createLibraryColumn(MainTableColumnModel columnModel) {
+        return new LibraryColumn(columnModel);
     }
 }

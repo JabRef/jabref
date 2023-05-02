@@ -11,17 +11,18 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
+import org.jabref.preferences.FilePreferences;
 
 public class FileExtensionViewModel {
 
     private final String description;
     private final List<String> extensions;
-    private final ExternalFileTypes externalFileTypes;
+    private final FilePreferences filePreferences;
 
-    FileExtensionViewModel(FileType fileType, ExternalFileTypes externalFileTypes) {
+    FileExtensionViewModel(FileType fileType, FilePreferences filePreferences) {
         this.description = Localization.lang("%0 file", fileType.getName());
-        this.extensions = fileType.getExtensionsWithDot();
-        this.externalFileTypes = externalFileTypes;
+        this.extensions = fileType.getExtensionsWithAsteriskAndDot();
+        this.filePreferences = filePreferences;
     }
 
     public String getDescription() {
@@ -29,7 +30,7 @@ public class FileExtensionViewModel {
     }
 
     public JabRefIcon getIcon() {
-        return externalFileTypes.getExternalFileTypeByExt(extensions.get(0))
+        return ExternalFileTypes.getExternalFileTypeByExt(extensions.get(0), filePreferences)
                                 .map(ExternalFileType::getIcon)
                                 .orElse(null);
     }

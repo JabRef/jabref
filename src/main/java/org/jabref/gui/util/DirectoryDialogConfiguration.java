@@ -25,17 +25,17 @@ public class DirectoryDialogConfiguration {
         }
 
         public Builder withInitialDirectory(Path directory) {
-
             directory = directory.toAbsolutePath();
+
             // Dir must be a folder, not a file
             if (!Files.isDirectory(directory)) {
                 directory = directory.getParent();
             }
+
             // The lines above work also if the dir does not exist at all!
-            // NULL is accepted by the filechooser as no inital path
+            // NULL is accepted by the filechooser as no initial path
 
             if (!Files.exists(directory)) {
-
                 directory = null;
             }
             initialDirectory = directory;

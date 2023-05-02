@@ -18,7 +18,6 @@ public class EprintCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-
         List<FieldChange> changes = new ArrayList<>();
 
         for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE)) {

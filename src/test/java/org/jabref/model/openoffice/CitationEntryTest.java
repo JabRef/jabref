@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CitationEntryTest {
 
     @Test
-    void testCitationEntryInitalPageInfo() {
+    void testCitationEntryInitialPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
         assertTrue(citationEntry.getPageInfo().isPresent());
         assertEquals("Info", citationEntry.getPageInfo().get());
@@ -20,7 +20,7 @@ class CitationEntryTest {
     }
 
     @Test
-    void testCitationEntryOptionalInitalPageInfo() {
+    void testCitationEntryOptionalInitialPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", Optional.of("Info"));
 
         assertEquals(Optional.of("Info"), citationEntry.getPageInfo());
@@ -35,7 +35,7 @@ class CitationEntryTest {
     }
 
     @Test
-    void testCitationEntryNoInitalPageInfo() {
+    void testCitationEntryNoInitialPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context");
         assertEquals(Optional.empty(), citationEntry.getPageInfo());
     }

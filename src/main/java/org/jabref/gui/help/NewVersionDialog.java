@@ -7,16 +7,15 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
-import org.jabref.preferences.VersionPreferences;
 
-public class NewVersionDialog extends BaseDialog<Void> {
+public class NewVersionDialog extends BaseDialog<Boolean> {
 
-    public NewVersionDialog(Version currentVersion, Version latestVersion) {
+    public NewVersionDialog(Version currentVersion, Version latestVersion, DialogService dialogService) {
         this.setTitle(Localization.lang("New version available"));
 
         ButtonType btnIgnoreUpdate = new ButtonType(Localization.lang("Ignore this update"), ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -25,18 +24,18 @@ public class NewVersionDialog extends BaseDialog<Void> {
         this.getDialogPane().getButtonTypes().addAll(btnIgnoreUpdate, btnDownloadUpdate, btnRemindMeLater);
         this.setResultConverter(button -> {
             if (button == btnIgnoreUpdate) {
-                Globals.prefs.storeVersionPreferences(new VersionPreferences(latestVersion));
+                return false;
             } else if (button == btnDownloadUpdate) {
-                JabRefDesktop.openBrowserShowPopup(Version.JABREF_DOWNLOAD_URL);
+                JabRefDesktop.openBrowserShowPopup(Version.JABREF_DOWNLOAD_URL, dialogService);
             }
-            return null;
+            return true;
         });
         Button defaultButton = (Button) this.getDialogPane().lookupButton(btnDownloadUpdate);
         defaultButton.setDefaultButton(true);
 
         Hyperlink lblMoreInformation = new Hyperlink(Localization.lang("To see what is new view the changelog."));
         lblMoreInformation.setOnAction(event ->
-                JabRefDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl())
+                JabRefDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl(), dialogService)
         );
 
         VBox container = new VBox(

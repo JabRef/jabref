@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -35,14 +36,13 @@ public class PdfAnnotationImporter implements AnnotationImporter {
      */
     @Override
     public List<FileAnnotation> importAnnotations(final Path path) {
-
         if (!validatePath(path)) {
             // Path could not be validated, return default result
             return Collections.emptyList();
         }
 
         List<FileAnnotation> annotationsList = new LinkedList<>();
-        try (PDDocument document = PDDocument.load(path.toFile())) {
+        try (PDDocument document = Loader.loadPDF(path.toFile())) {
             PDPageTree pdfPages = document.getDocumentCatalog().getPages();
             for (int pageIndex = 0; pageIndex < pdfPages.getCount(); pageIndex++) {
                 PDPage page = pdfPages.get(pageIndex);

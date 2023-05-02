@@ -9,11 +9,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
 public class NameFormatterTabViewModel implements PreferenceTabViewModel {
 
@@ -21,21 +19,17 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
     private final StringProperty addFormatterNameProperty = new SimpleStringProperty();
     private final StringProperty addFormatterStringProperty = new SimpleStringProperty();
 
-    private final DialogService dialogService;
-    private final PreferencesService preferences;
-    private final NameFormatterPreferences initialNameFormatterPreferences;
+    private final NameFormatterPreferences nameFormatterPreferences;
 
-    NameFormatterTabViewModel(DialogService dialogService, PreferencesService preferences) {
-        this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.initialNameFormatterPreferences = preferences.getNameFormatterPreferences();
+    NameFormatterTabViewModel(NameFormatterPreferences preferences) {
+        this.nameFormatterPreferences = preferences;
     }
 
     @Override
     public void setValues() {
         formatterListProperty.clear();
-        List<String> names = initialNameFormatterPreferences.getNameFormatterKey();
-        List<String> formats = initialNameFormatterPreferences.getNameFormatterValue();
+        List<String> names = nameFormatterPreferences.getNameFormatterKey();
+        List<String> formats = nameFormatterPreferences.getNameFormatterValue();
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {
@@ -57,16 +51,13 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
             formats.add(formatterListItem.getFormat());
         }
 
-        NameFormatterPreferences newNameFormatterPreferences = new NameFormatterPreferences(
-                names,
-                formats);
-        preferences.storeNameFormatterPreferences(newNameFormatterPreferences);
+        nameFormatterPreferences.setNameFormatterKey(names);
+        nameFormatterPreferences.setNameFormatterValue(formats);
     }
 
     public void addFormatter() {
         if (!StringUtil.isNullOrEmpty(addFormatterNameProperty.getValue()) &&
                 !StringUtil.isNullOrEmpty(addFormatterStringProperty.getValue())) {
-
             formatterListProperty.add(new NameFormatterItemModel(
                     addFormatterNameProperty.getValue(), addFormatterStringProperty.getValue()));
 

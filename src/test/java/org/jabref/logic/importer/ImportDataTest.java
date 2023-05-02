@@ -22,7 +22,6 @@ public class ImportDataTest {
      */
     @Test
     void testTestingEnvironment() {
-
         assertTrue(Files.exists(ImportDataTest.EXISTING_FOLDER), "EXISTING_FOLDER does not exist");
         assertTrue(Files.isDirectory(ImportDataTest.EXISTING_FOLDER), "EXISTING_FOLDER is not a directory");
 

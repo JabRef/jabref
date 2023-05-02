@@ -6,6 +6,7 @@
     <id>http://www.zotero.org/styles/monographs-of-the-palaeontographical-society</id>
     <link href="http://www.zotero.org/styles/monographs-of-the-palaeontographical-society" rel="self"/>
     <link href="http://www.zotero.org/styles/palaeontology" rel="template"/>
+    <link href="https://www.palaeosoc.org/site/page/for-authors/notes/" rel="documentation"/>
     <link href="https://www.tandfonline.com/action/authorSubmission?show=instructions&amp;journalCode=tmps20" rel="documentation"/>
     <author>
       <name>Benjamin Moon</name>
@@ -17,7 +18,7 @@
     <issn>0269-3445</issn>
     <eissn>2576-1900</eissn>
     <summary>Some bibliography entries may need plate numbers added or indications of translated titles. Separate formatting for Monographs can be achieved from Zotero by adding 'Publisher Place: London' into the Extra field; this is used as the key to identify these. Similarly 'Number Of Pages' may be added in the Extra field too.</summary>
-    <updated>2021-06-21T13:18:47</updated>
+    <updated>2021-12-16T16:15:06</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -48,14 +49,6 @@
       </substitute>
     </names>
   </macro>
-  <macro name="author-count">
-    <names variable="author">
-      <name form="count"/>
-      <substitute>
-        <names variable="editor"/>
-      </substitute>
-    </names>
-  </macro>
   <macro name="year-date">
     <choose>
       <if variable="issued">
@@ -81,10 +74,10 @@
       <label variable="number-of-pages" form="short" plural="always"/>
     </group>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="false" disambiguate-add-givenname="false" collapse="year-suffix-ranged" year-suffix-delimiter=", ">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="false" disambiguate-add-givenname="false" collapse="year-suffix" cite-group-delimiter=", " year-suffix-delimiter=", ">
     <sort>
-      <key macro="year-date"/>
-      <key macro="author-short"/>
+      <key macro="author"/>
+      <key variable="issued"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group>
@@ -99,9 +92,8 @@
   </citation>
   <bibliography entry-spacing="0" hanging-indent="true" subsequent-author-substitute-rule="partial-each" subsequent-author-substitute="&#8212;&#8212;&#8212;">
     <sort>
-      <key macro="author" names-min="1" names-use-first="1"/>
-      <key macro="author-count"/>
-      <key macro="year-date"/>
+      <key macro="author"/>
+      <key variable="issued"/>
     </sort>
     <layout>
       <choose>
@@ -203,6 +195,7 @@
           </group>
         </else>
       </choose>
+      <text variable="DOI" prefix=" doi: "/>
     </layout>
   </bibliography>
 </style>

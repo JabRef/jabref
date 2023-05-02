@@ -24,6 +24,13 @@ public class EntryComparator implements Comparator<BibEntry> {
     private final boolean binary;
     private final Comparator<BibEntry> next;
 
+    /**
+     *
+     * @param binary true: the presence of fields is checked; false: the content of the fields is compared
+     * @param descending true: if the most different entry should get the highest score
+     * @param field the field to sort on
+     * @param next the next comparator to use (if the current comparator results in equality)
+     */
     public EntryComparator(boolean binary, boolean descending, Field field, Comparator<BibEntry> next) {
         this.binary = binary;
         this.sortField = field;
@@ -42,7 +49,7 @@ public class EntryComparator implements Comparator<BibEntry> {
     public int compare(BibEntry e1, BibEntry e2) {
         // default equals
         // TODO: with the new default equals this does not only return 0 for identical objects,
-        // but for all objects that have the same id and same fields
+        //       but for all objects that have the same id and same fields
         if (Objects.equals(e1, e2)) {
             return 0;
         }
@@ -59,7 +66,7 @@ public class EntryComparator implements Comparator<BibEntry> {
             }
         }
 
-        // If the field is author or editor, we rearrange names so they are
+        // If the field is author or editor, we rearrange names to achieve that they are
         // sorted according to last name.
         if (sortField.getProperties().contains(FieldProperty.PERSON_NAMES)) {
             if (f1 != null) {
@@ -103,21 +110,21 @@ public class EntryComparator implements Comparator<BibEntry> {
         int result;
 
         if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
-            result = -((Integer) f1).compareTo((Integer) f2);
+            result = ((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
             Integer f1AsInteger = Integer.valueOf(f1.toString());
-            result = -f1AsInteger.compareTo((Integer) f2);
+            result = f1AsInteger.compareTo((Integer) f2);
         } else if (f1 instanceof Integer) {
             Integer f2AsInteger = Integer.valueOf(f2.toString());
-            result = -((Integer) f1).compareTo(f2AsInteger);
+            result = ((Integer) f1).compareTo(f2AsInteger);
         } else {
             String ours = ((String) f1).toLowerCase(Locale.ROOT);
             String theirs = ((String) f2).toLowerCase(Locale.ROOT);
             int comp = ours.compareTo(theirs);
-            result = -comp;
+            result = comp;
         }
         if (result != 0) {
-            return descending ? result : -result; // Primary sort.
+            return descending ? -result : result; // Primary sort.
         }
         if (next == null) {
             return idCompare(e1, e2); // If still equal, we use the unique IDs.

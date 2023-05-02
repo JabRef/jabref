@@ -147,7 +147,7 @@
   <macro name="producers">
     <names variable="author">
       <name form="long" sort-separator=", "/>
-      <et-al term="et-al" prefix=" " font-style="italic"/>
+      <et-al term="et-al" font-style="italic"/>
       <substitute>
         <text macro="container-producers"/>
       </substitute>
@@ -156,7 +156,7 @@
   <macro name="producers-short">
     <names variable="author">
       <name form="short"/>
-      <et-al term="et-al" prefix=" " suffix="." font-style="italic"/>
+      <et-al term="et-al" font-style="italic"/>
       <substitute>
         <text macro="container-producers-short"/>
       </substitute>
@@ -168,7 +168,7 @@
       <name form="long" name-as-sort-order="all" sort-separator=", ">
         <name-part name="family" text-case="uppercase"/>
       </name>
-      <et-al term="et-al" prefix=" " font-style="italic"/>
+      <et-al term="et-al" font-style="italic"/>
       <substitute>
         <text macro="container-producers-surname"/>
       </substitute>
@@ -178,7 +178,7 @@
   <macro name="container-producers">
     <names variable="editor">
       <name form="long" sort-separator=", "/>
-      <et-al term="et-al" prefix=" " font-style="italic"/>
+      <et-al term="et-al" font-style="italic"/>
       <label form="short" prefix=" (" suffix=")" text-case="lowercase"/>
       <substitute>
         <names variable="container-author"/>
@@ -188,7 +188,7 @@
   <macro name="container-producers-short">
     <names variable="editor">
       <name form="short"/>
-      <et-al term="et-al" prefix=" " font-style="italic"/>
+      <et-al term="et-al" font-style="italic"/>
       <label form="short" prefix=" (" suffix=")" text-case="lowercase"/>
       <substitute>
         <names variable="container-author"/>
@@ -201,7 +201,7 @@
       <name form="long" name-as-sort-order="all" sort-separator=", ">
         <name-part name="family" text-case="uppercase"/>
       </name>
-      <et-al term="et-al" prefix=" " font-style="italic"/>
+      <et-al term="et-al" font-style="italic"/>
       <label form="short" prefix=" (" suffix=")" text-case="capitalize-first"/>
       <substitute>
         <names variable="container-author"/>

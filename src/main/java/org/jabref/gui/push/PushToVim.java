@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javafx.beans.property.ObjectProperty;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
@@ -19,9 +17,9 @@ import org.jabref.preferences.PushToApplicationPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PushToVim extends AbstractPushToApplication implements PushToApplication {
+public class PushToVim extends AbstractPushToApplication {
 
-    public static final String NAME = "Vim";
+    public static final String NAME = PushToApplications.VIM;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
@@ -35,13 +33,13 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public JabRefIcon getIcon() {
+    public JabRefIcon getApplicationIcon() {
         return IconTheme.JabRefIcons.APPLICATION_VIM;
     }
 
     @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
-        return new PushToVimSettings(application, dialogService, preferencesService, preferences);
+    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
+        return new PushToVimSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
 
     @Override
@@ -50,7 +48,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getPushToApplicationCommandPaths().get(this.getDisplayName());
+        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
@@ -92,7 +90,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void operationCompleted() {
+    public void onOperationCompleted() {
         if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to Vim server. Make sure that Vim is running with correct server name."));
@@ -100,7 +98,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not run the 'vim' program."));
         } else {
-            super.operationCompleted();
+            super.onOperationCompleted();
         }
     }
 }

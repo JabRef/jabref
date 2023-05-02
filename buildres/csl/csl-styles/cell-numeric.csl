@@ -37,18 +37,12 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL">
-        <text value="Available at:" suffix=" "/>
-        <text variable="URL"/>
-        <group prefix=" [" suffix="]">
-          <text term="accessed" text-case="capitalize-first" suffix=" "/>
-          <date variable="accessed">
-            <date-part name="month" suffix=" "/>
-            <date-part name="day" suffix=", "/>
-            <date-part name="year"/>
-          </date>
-        </group>
+      <if variable="DOI">
+        <text variable="DOI"/>
       </if>
+      <else-if match="any" type="webpage dataset entry-dictionary entry-encyclopedia post post-weblog">
+        <text variable="URL"/>
+      </else-if>
     </choose>
   </macro>
   <macro name="title">

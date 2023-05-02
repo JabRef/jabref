@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
@@ -26,6 +26,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -104,13 +105,13 @@ public class ImporterTest {
         // all classes implementing {@link Importer}
         // sorted alphabetically
 
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         // @formatter:off
         return Stream.of(
                 new BiblioscapeImporter(),
                 new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()),
-                new BibTeXMLImporter(),
                 new CopacImporter(),
                 new EndnoteImporter(importFormatPreferences),
                 new InspecImporter(),
@@ -124,7 +125,8 @@ public class ImporterTest {
                 new PdfXmpImporter(xmpPreferences),
                 new RepecNepImporter(importFormatPreferences),
                 new RisImporter(),
-                new SilverPlatterImporter()
+                new SilverPlatterImporter(),
+                new CitaviXmlImporter()
         );
         // @formatter:on
     }

@@ -13,49 +13,39 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Haaga-Helia University of Applied Sciences referencing style (Finnish and English)</summary>
-    <updated>2021-02-21T03:51:30Z</updated>
+    <updated>2021-11-14T07:02:42+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <citation et-al-min="6" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true">
-    <layout prefix="(" suffix=")" delimiter="; ">
-      <group delimiter=" ">
-        <text macro="author-citation"/>
-        <text macro="issued"/>
-        <!-- note needed when cite must include Creative Commons license information in relevant graphic/figure -->
-        <text macro="note"/>
-      </group>
-      <text macro="locator"/>
-    </layout>
-  </citation>
-  <bibliography>
-    <sort>
-      <key macro="author-bibliography"/>
-    </sort>
-    <layout>
-      <choose>
-        <if type="legislation">
-          <text macro="author-bibliography" suffix=". "/>
-          <text macro="publisher"/>
-          <text macro="container"/>
-          <text macro="access"/>
-        </if>
-        <else>
-          <text macro="author-bibliography"/>
-          <text macro="issued" prefix=" " suffix="."/>
-          <group delimiter=". " prefix=" " suffix=".">
-            <!-- author's job title is needed in case of personal communication / presentation references. CSL does not support job titles, so work-around is to add job title to the actual title -->
-            <text macro="title"/>
-            <text macro="genre"/>
-            <text macro="publisher"/>
-            <text macro="container"/>
-            <text macro="source"/>
-            <text macro="event"/>
-            <text macro="access"/>
-          </group>
-        </else>
-      </choose>
-    </layout>
-  </bibliography>
+  <locale xml:lang="fi">
+    <date form="text">
+      <date-part name="day" suffix="."/>
+      <date-part name="month" suffix="." form="numeric"/>
+      <date-part name="year"/>
+    </date>
+    <terms>
+      <term name="no date">s.a.</term>
+      <term name="and">&amp;</term>
+      <term name="et-al">ym.</term>
+      <!-- In FI references, depending on reference material, the localization would be "Luettavissa" / "Nähtävissä" / "Kuunneltavissa". According to Thesis instructors, using "URL" in FI localization is allowed. -->
+      <term name="available at">URL</term>
+      <term name="accessed">Luettu</term>
+      <term name="page">s.</term>
+    </terms>
+  </locale>
+  <locale xml:lang="en">
+    <date form="text">
+      <date-part name="day" suffix=" "/>
+      <date-part name="month" suffix=" "/>
+      <date-part name="year"/>
+    </date>
+    <terms>
+      <term name="no date">s.a.</term>
+      <term name="and">&amp;</term>
+      <term name="et-al">&amp; al.</term>
+      <term name="available at">URL</term>
+      <term name="page">pp.</term>
+    </terms>
+  </locale>
   <macro name="access">
     <choose>
       <if variable="DOI" match="all">
@@ -162,11 +152,14 @@
           </if>
           <else>
             <date variable="issued" form="text" date-parts="year"/>
+            <text variable="year-suffix"/>
           </else>
         </choose>
       </else-if>
       <else>
         <text term="no date"/>
+        <!-- no date cites need to be unique -->
+        <text variable="year-suffix"/>
       </else>
     </choose>
   </macro>
@@ -212,34 +205,44 @@
   <macro name="title">
     <text variable="title"/>
   </macro>
-  <locale xml:lang="fi">
-    <date form="text">
-      <date-part name="day" suffix="."/>
-      <date-part name="month" suffix="." form="numeric"/>
-      <date-part name="year"/>
-    </date>
-    <terms>
-      <term name="no date">s.a.</term>
-      <term name="and">&amp;</term>
-      <term name="et-al">ym.</term>
-      <!-- In FI references, depending on reference material, the localization would be "Luettavissa" / "Nähtävissä" / "Kuunneltavissa". According to Thesis instructors, using "URL" in FI localization is allowed. -->
-      <term name="available at">URL</term>
-      <term name="accessed">Luettu</term>
-      <term name="page">s.</term>
-    </terms>
-  </locale>
-  <locale xml:lang="en">
-    <date form="text">
-      <date-part name="day" suffix=" "/>
-      <date-part name="month" suffix=" "/>
-      <date-part name="year"/>
-    </date>
-    <terms>
-      <term name="no date">s.a.</term>
-      <term name="and">&amp;</term>
-      <term name="et-al">&amp; al.</term>
-      <term name="available at">URL</term>
-      <term name="page">pp.</term>
-    </terms>
-  </locale>
+  <citation et-al-min="6" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true">
+    <layout prefix="(" suffix=")" delimiter="; ">
+      <group delimiter=" ">
+        <text macro="author-citation"/>
+        <text macro="issued"/>
+        <!-- note needed when cite must include Creative Commons license information in relevant graphic/figure -->
+        <text macro="note"/>
+      </group>
+      <text macro="locator"/>
+    </layout>
+  </citation>
+  <bibliography>
+    <sort>
+      <key macro="author-bibliography"/>
+    </sort>
+    <layout>
+      <choose>
+        <if type="legislation">
+          <text macro="author-bibliography" suffix=". "/>
+          <text macro="publisher"/>
+          <text macro="container"/>
+          <text macro="access"/>
+        </if>
+        <else>
+          <text macro="author-bibliography"/>
+          <text macro="issued" prefix=" " suffix="."/>
+          <group delimiter=". " prefix=" " suffix=".">
+            <!-- author's job title is needed in case of personal communication / presentation references. CSL does not support job titles, so work-around is to add job title to the actual title -->
+            <text macro="title"/>
+            <text macro="genre"/>
+            <text macro="publisher"/>
+            <text macro="container"/>
+            <text macro="source"/>
+            <text macro="event"/>
+            <text macro="access"/>
+          </group>
+        </else>
+      </choose>
+    </layout>
+  </bibliography>
 </style>

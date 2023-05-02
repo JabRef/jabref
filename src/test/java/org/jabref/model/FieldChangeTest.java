@@ -38,6 +38,24 @@ class FieldChangeTest {
     }
 
     @Test
+    void selfEqualsFieldchangeSameParameters() {
+        FieldChange fcBlankNewValue = new FieldChange(entry, StandardField.DOI, "foo", "bar");
+        assertEquals(fc, fcBlankNewValue);
+    }
+
+    @Test
+    void selfEqualsFieldchangeDifferentOldValue() {
+        FieldChange fcBlankNewValue = new FieldChange(entry, StandardField.DOI, null, "bar");
+        assertNotEquals(fc, fcBlankNewValue);
+    }
+
+    @Test
+    void selfEqualsFieldchangeDifferentEntry() {
+        FieldChange fcBlankNewValue = new FieldChange(entryOther, StandardField.DOI, "foo", "bar");
+        assertNotEquals(fc, fcBlankNewValue);
+    }
+
+    @Test
     void fieldChangeDoesNotEqualString() {
         assertNotEquals(fc, "foo");
     }

@@ -98,15 +98,19 @@
     </choose>
   </macro>
   <macro name="publisher">
-    <group delimiter=", ">
-      <group delimiter=" ">
-        <text variable="collection-title"/>
-        <text variable="collection-number"/>
-      </group>
-      <text variable="genre"/>
-      <text variable="publisher"/>
-      <text variable="publisher-place"/>
-    </group>
+    <choose>
+      <if type="article-journal article-magazine article-newspaper" match="none">
+        <group delimiter=", ">
+          <group delimiter=" ">
+            <text variable="collection-title"/>
+            <text variable="collection-number"/>
+          </group>
+          <text variable="genre"/>
+          <text variable="publisher"/>
+          <text variable="publisher-place"/>
+        </group>
+      </if>
+    </choose>
   </macro>
   <macro name="edition">
     <choose>
@@ -139,7 +143,7 @@
     <choose>
       <if variable="URL">
         <group delimiter=". ">
-          <text variable="URL" prefix="&lt;" suffix="&gt;"/>
+          <text variable="URL" prefix="&lt;" suffix=">"/>
           <group delimiter=" ">
             <text term="accessed" text-case="capitalize-first"/>
             <date variable="accessed" delimiter=" ">

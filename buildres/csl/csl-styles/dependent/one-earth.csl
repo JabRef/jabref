@@ -5,11 +5,11 @@
     <title>One Earth</title>
     <id>http://www.zotero.org/styles/one-earth</id>
     <link href="http://www.zotero.org/styles/one-earth" rel="self"/>
-    <link href="http://www.zotero.org/styles/cell-numeric-superscript" rel="independent-parent"/>
+    <link href="http://www.zotero.org/styles/cell" rel="independent-parent"/>
     <link href="https://www.cell.com/one-earth/author" rel="documentation"/>
     <category citation-format="numeric"/>
     <category field="science"/>
-    <issn>2590-3322</issn>
+    <eissn>2590-3322</eissn>
     <updated>2017-10-20T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>

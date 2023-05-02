@@ -39,7 +39,6 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
     @Override
     public TextFieldTableCell<S, T> call(TableColumn<S, T> param) {
         return new TextFieldTableCell<>(stringConverter) {
-
             final List<Subscription> subscriptions = new ArrayList<>();
 
             @Override

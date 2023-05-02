@@ -13,12 +13,25 @@ import org.jabref.model.entry.BibEntry;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
- * Provides a convenient interface for search-based fetcher, which follow the usual three-step procedure:
+ * Provides a convenient interface for search-based fetcher, which follows the usual three-step procedure:
  * <ol>
  *     <li>Open a URL based on the search query</li>
  *     <li>Parse the response to get a list of {@link BibEntry}</li>
  *     <li>Post-process fetched entries</li>
  * </ol>
+ * <p>
+ *     This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry}.
+ *     JabRef's infrastructure to convert arbitrary input data to BibTeX is {@link Parser}.
+ * </p>
+ * <p>
+ *     This interface inherits {@link SearchBasedFetcher}, because the methods <code>performSearch</code> have to be provided by both.
+ *     As non-BibTeX web fetcher one could do "magic" stuff without this helper interface and directly use {@link WebFetcher}, but this is more work.
+ * </p>
+ * <p>
+ *     Note that this interface "should" be an abstract class.
+ *     However, Java does not support multi inheritance with classes (but with interfaces).
+ *     We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher}), complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
+ * </p>
  */
 public interface SearchBasedParserFetcher extends SearchBasedFetcher {
 

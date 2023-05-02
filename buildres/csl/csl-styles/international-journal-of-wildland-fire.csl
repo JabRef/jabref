@@ -110,7 +110,7 @@
     <group>
       <choose>
         <if type="article-journal">
-          <text variable="container-title" strip-periods="true"/>
+          <text variable="container-title" text-case="title" strip-periods="true"/>
         </if>
         <else>
           <text variable="container-title" form="short"/>

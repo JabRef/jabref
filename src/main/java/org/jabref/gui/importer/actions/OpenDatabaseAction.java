@@ -1,12 +1,10 @@
 package org.jabref.gui.importer.actions;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,10 +15,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
+import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
@@ -38,10 +40,11 @@ import org.slf4j.LoggerFactory;
 // The action concerned with opening an existing database.
 public class OpenDatabaseAction extends SimpleCommand {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
+
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = Arrays.asList(
+    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = List.of(
             // Migrations:
             // Warning for migrating the Review into the Comment field
             new MergeReviewIntoCommentAction(),
@@ -50,12 +53,20 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     private final JabRefFrame frame;
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
+    private final ThemeManager themeManager;
     private final DialogService dialogService;
 
-    public OpenDatabaseAction(JabRefFrame frame, PreferencesService preferencesService, DialogService dialogService) {
+    public OpenDatabaseAction(JabRefFrame frame,
+                              PreferencesService preferencesService,
+                              DialogService dialogService,
+                              StateManager stateManager,
+                              ThemeManager themeManager) {
         this.frame = frame;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
+        this.themeManager = themeManager;
     }
 
     /**
@@ -82,7 +93,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 .build();
 
         List<Path> filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
-        openFiles(filesToOpen, true);
+        openFiles(filesToOpen);
     }
 
     /**
@@ -90,28 +101,30 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (frame.getBasePanelCount() == 0) {
-            return Globals.prefs.getWorkingDir();
+            return preferencesService.getFilePreferences().getWorkingDirectory();
         } else {
             Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(Globals.prefs.getWorkingDir());
+            return databasePath.map(Path::getParent).orElse(preferencesService.getFilePreferences().getWorkingDirectory());
         }
     }
 
     /**
-     * Opens the given file. If null or 404, nothing happens
+     * Opens the given file. If null or 404, nothing happens.
+     * In case the file is already opened, that panel is raised.
      *
      * @param file the file, may be null or not existing
      */
-    public void openFile(Path file, boolean raisePanel) {
-        openFiles(new ArrayList<>(List.of(file)), raisePanel);
+    public void openFile(Path file) {
+        openFiles(new ArrayList<>(List.of(file)));
     }
 
     /**
-     * Opens the given files. If one of it is null or 404, nothing happens
+     * Opens the given files. If one of it is null or 404, nothing happens.
+     * In case the file is already opened, that panel is raised.
      *
      * @param filesToOpen the filesToOpen, may be null or not existing
      */
-    public void openFiles(List<Path> filesToOpen, boolean raisePanel) {
+    public void openFiles(List<Path> filesToOpen) {
         LibraryTab toRaise = null;
         int initialCount = filesToOpen.size();
         int removed = 0;
@@ -139,16 +152,12 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
-            final List<Path> theFiles = Collections.unmodifiableList(filesToOpen);
-
-            for (Path theFile : theFiles) {
+            FileHistoryMenu fileHistory = frame.getFileHistory();
+            filesToOpen.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
-                openTheFile(theFile, raisePanel);
-            }
-
-            for (Path theFile : theFiles) {
-                frame.getFileHistory().newFile(theFile);
-            }
+                openTheFile(theFile);
+                fileHistory.newFile(theFile);
+            });
         } else if (toRaise != null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
@@ -157,55 +166,78 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     /**
-     * @param file the file, may be null or not existing
+     * This is the real file opening. Should be called via {@link #openFile(Path)}
+     *
+     * @param file the file, may be NOT null, but may not be existing
      */
-    private void openTheFile(Path file, boolean raisePanel) {
+    private void openTheFile(Path file) {
         Objects.requireNonNull(file);
         if (!Files.exists(file)) {
             return;
         }
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
-        LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
-        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, file, backgroundTask);
-
+        // The backgroundTask is executed within the method createLibraryTab
+        LibraryTab newTab = LibraryTab.createLibraryTab(backgroundTask, file, preferencesService, stateManager, frame, themeManager);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 
+    /**
+     * This method is similar to {@link org.jabref.gui.JabRefGUI#openLastEditedDatabases()}.
+     * This method also has the capability to open remote shared databases
+     */
     private ParserResult loadDatabase(Path file) throws Exception {
         Path fileToLoad = file.toAbsolutePath();
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        Globals.prefs.setWorkingDirectory(fileToLoad.getParent());
+        preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
 
+        ParserResult parserResult = null;
         if (BackupManager.backupFileDiffers(fileToLoad)) {
-            BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
+            // In case the backup differs, ask the user what to do.
+            // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService).orElse(null);
         }
 
-        ParserResult result = OpenDatabase.loadDatabase(fileToLoad.toString(),
-                Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
+        try {
+            if (parserResult == null) {
+                // No backup was restored, do the "normal" loading
+                parserResult = OpenDatabase.loadDatabase(fileToLoad,
+                        preferencesService.getImportFormatPreferences(),
+                        Globals.getFileUpdateMonitor());
+            }
 
-        if (result.getDatabase().isShared()) {
+            if (parserResult.hasWarnings()) {
+                String content = Localization.lang("Please check your library file for wrong syntax.")
+                        + "\n\n" + parserResult.getErrorMessage();
+                DefaultTaskExecutor.runInJavaFXThread(() ->
+                        dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
+            }
+        } catch (IOException e) {
+            parserResult = ParserResult.fromError(e);
+            LOGGER.error("Error opening file '{}'", fileToLoad, e);
+        }
+
+        if (parserResult.getDatabase().isShared()) {
             try {
-                new SharedDatabaseUIManager(frame).openSharedDatabaseFromParserResult(result);
+                new SharedDatabaseUIManager(frame, preferencesService).openSharedDatabaseFromParserResult(parserResult);
             } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                     NotASharedDatabaseException e) {
-                result.getDatabaseContext().clearDatabasePath(); // do not open the original file
-                result.getDatabase().clearSharedDatabaseID();
+                parserResult.getDatabaseContext().clearDatabasePath(); // do not open the original file
+                parserResult.getDatabase().clearSharedDatabaseID();
                 LOGGER.error("Connection error", e);
 
                 throw e;
             }
         }
-        return result;
+        return parserResult;
     }
 
     private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Map<String, String> properties = new HashMap<>();
-        Map<String, Double> measurements = new HashMap<>();
-        measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
-
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(
+                "OpenNewDatabase",
+                Map.of(),
+                Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
     }
 }

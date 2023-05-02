@@ -192,8 +192,11 @@ public class IconTheme {
         DELETE_ENTRY(MaterialDesignD.DELETE),
         SEARCH(MaterialDesignM.MAGNIFY),
         FILE_SEARCH(MaterialDesignF.FILE_FIND),
+        PDF_METADATA_READ(MaterialDesignF.FORMAT_ALIGN_TOP),
+        PDF_METADATA_WRITE(MaterialDesignF.FORMAT_ALIGN_BOTTOM),
         ADVANCED_SEARCH(Color.CYAN, MaterialDesignM.MAGNIFY),
-        PREFERENCES(MaterialDesignS.STAR_SETTINGS),
+        PREFERENCES(MaterialDesignC.COG),
+        SELECTORS(MaterialDesignS.STAR_SETTINGS),
         HELP(MaterialDesignH.HELP_CIRCLE),
         UP(MaterialDesignA.ARROW_UP),
         DOWN(MaterialDesignA.ARROW_DOWN),
@@ -234,6 +237,7 @@ public class IconTheme {
         QUALITY_ASSURED(MaterialDesignC.CERTIFICATE),
         QUALITY(MaterialDesignC.CERTIFICATE),
         OPEN(MaterialDesignF.FOLDER_OUTLINE),
+        OPEN_LIST(MaterialDesignF.FOLDER_OPEN_OUTLINE),
         ADD_ROW(MaterialDesignS.SERVER_PLUS),
         REMOVE_ROW(MaterialDesignS.SERVER_MINUS),
         PICTURE(MaterialDesignF.FILE_IMAGE),
@@ -264,6 +268,7 @@ public class IconTheme {
         FILE_TEXT(MaterialDesignF.FILE_DOCUMENT),
         FILE_MULTIPLE(MaterialDesignF.FILE_MULTIPLE),
         FILE_OPENOFFICE(JabRefMaterialDesignIcon.OPEN_OFFICE),
+        APPLICATION_GENERIC(MaterialDesignA.APPLICATION),
         APPLICATION_EMACS(JabRefMaterialDesignIcon.EMACS),
         APPLICATION_LYX(JabRefMaterialDesignIcon.LYX),
         APPLICATION_TEXSTUDIO(JabRefMaterialDesignIcon.TEX_STUDIO),
@@ -307,6 +312,7 @@ public class IconTheme {
         NEW_GROUP(MaterialDesignP.PLUS),
         OPEN_LINK(MaterialDesignO.OPEN_IN_NEW),
         LOOKUP_IDENTIFIER(MaterialDesignS.SEARCH_WEB),
+        LINKED_FILE_ADD(MaterialDesignP.PLUS),
         FETCH_FULLTEXT(MaterialDesignS.SEARCH_WEB),
         FETCH_BY_IDENTIFIER(MaterialDesignC.CLIPBOARD_ARROW_DOWN),
         TOGGLE_ABBREVIATION(MaterialDesignF.FORMAT_ALIGN_CENTER),
@@ -322,9 +328,9 @@ public class IconTheme {
         LATEX_COMMENT(MaterialDesignC.COMMENT_TEXT_OUTLINE),
         LATEX_LINE(MaterialDesignF.FORMAT_LINE_SPACING),
         PASSWORD_REVEALED(MaterialDesignE.EYE),
-        ADD_ABBREVIATION_LIST(MaterialDesignF.FOLDER_PLUS),
+        ADD_ABBREVIATION_LIST(MaterialDesignP.PLUS),
         OPEN_ABBREVIATION_LIST(MaterialDesignF.FOLDER_OUTLINE),
-        REMOVE_ABBREVIATION_LIST(MaterialDesignF.FOLDER_REMOVE),
+        REMOVE_ABBREVIATION_LIST(MaterialDesignM.MINUS),
         ADD_ABBREVIATION(MaterialDesignP.PLAYLIST_PLUS),
         REMOVE_ABBREVIATION(MaterialDesignP.PLAYLIST_MINUS),
         NEW_ENTRY_FROM_PLAIN_TEXT(MaterialDesignP.PLUS_BOX),
@@ -332,7 +338,18 @@ public class IconTheme {
         HOME(MaterialDesignH.HOME),
         LINK(MaterialDesignL.LINK),
         LINK_VARIANT(MaterialDesignL.LINK_VARIANT),
-        PROTECT_STRING(MaterialDesignC.CODE_BRACES);
+        PROTECT_STRING(MaterialDesignC.CODE_BRACES),
+        SELECT_ICONS(MaterialDesignA.APPS),
+        KEEP_SEARCH_STRING(MaterialDesignE.EARTH),
+        KEEP_ON_TOP(MaterialDesignP.PIN),
+        KEEP_ON_TOP_OFF(MaterialDesignP.PIN_OFF_OUTLINE),
+        OPEN_GLOBAL_SEARCH(MaterialDesignO.OPEN_IN_NEW),
+
+        ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
+
+        ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
+
+        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE);
 
         private final JabRefIcon icon;
 

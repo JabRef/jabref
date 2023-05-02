@@ -15,7 +15,7 @@
     <category field="biology"/>
     <issn>0736-0258</issn>
     <eissn>1537-1603</eissn>
-    <updated>2017-06-25T12:04:18+00:00</updated>
+    <updated>2022-01-18T12:04:18+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -48,14 +48,11 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout delimiter="," prefix="(" suffix=")">
+    <layout delimiter="," vertical-align="sup">
       <text variable="citation-number"/>
     </layout>
   </citation>
   <bibliography second-field-align="flush">
-    <sort>
-      <key macro="author"/>
-    </sort>
     <layout suffix=".">
       <text variable="citation-number" suffix=". "/>
       <text macro="author"/>

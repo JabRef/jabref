@@ -6,7 +6,7 @@
     <id>http://www.zotero.org/styles/technische-universitat-dresden-linguistik</id>
     <link href="http://www.zotero.org/styles/technische-universitat-dresden-linguistik" rel="self"/>
     <link href="http://www.zotero.org/styles/deutsche-sprache" rel="template"/>
-    <link xml:lang="de" href="https://tu-dresden.de/gsw/slk/germanistik/al/ressourcen/dateien/studium/200424_Stylesheet_ALI.pdf" rel="documentation"/>
+    <link href="https://tu-dresden.de/gsw/slk/germanistik/al/ressourcen/dateien/studium/200424_Stylesheet_ALI.pdf" rel="documentation"/>
     <author>
       <name>Simon Meier-Vieracker</name>
       <uri>https://tu-dresden.de/gsw/slk/germanistik/al</uri>
@@ -16,7 +16,7 @@
     <category field="linguistics"/>
     <category field="literature"/>
     <summary>Zitierstil entsprechend den Vorgaben der linguistischen Professuren am Institut für Germanistik der Technischen Universität Dresden. Der Stil orientiert sich an den Richtlinien von 'Deutsche Sprache: Zeitschrift für Theorie Praxis Dokumentation', hg. vom IDS Mannheim</summary>
-    <updated>2020-04-24T11:56:46+00:00</updated>
+    <updated>2022-06-23T08:36:06+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -27,6 +27,11 @@
     </terms>
   </locale>
   <macro name="creator-year-long">
+    <choose>
+      <if match="none" variable="author editor">
+        <text value="o. A." suffix=" "/>
+      </if>
+    </choose>
     <group delimiter=" ">
       <names variable="author">
         <name delimiter="/" name-as-sort-order="all"/>
@@ -46,14 +51,14 @@
           <name delimiter="/" name-as-sort-order="all"/>
           <label form="short" prefix=" (" suffix=")"/>
         </names>
-        <text variable="container-title"/>
+        <text macro="container-title"/>
       </group>
     </group>
   </macro>
   <macro name="publication-place-publisher">
     <group delimiter=": ">
       <text variable="publisher-place"/>
-      <text variable="publisher"/>
+      <text variable="publisher" quotes="false" font-variant="normal" font-weight="normal" vertical-align="baseline"/>
     </group>
   </macro>
   <macro name="creator-year-short">
@@ -76,25 +81,25 @@
     </choose>
   </macro>
   <macro name="collection-title-number">
-    <group delimiter=" " prefix="(= " suffix=")">
+    <group delimiter=" " prefix=" (= " suffix=")">
       <text variable="collection-title"/>
       <text variable="collection-number"/>
     </group>
   </macro>
   <macro name="page-range">
-    <group delimiter=" ">
+    <group delimiter=" " suffix=".">
       <text term="page" form="short"/>
       <text variable="page"/>
     </group>
   </macro>
   <macro name="online-url">
-    <group delimiter=": ">
-      <text term="online" text-case="capitalize-first"/>
+    <group delimiter=" ">
       <text variable="URL"/>
+      <date form="numeric" variable="accessed" prefix="(letzter Zugriff " suffix=")"/>
     </group>
   </macro>
   <macro name="container-title-volume">
-    <group delimiter=" ">
+    <group delimiter=" " suffix=",">
       <text variable="container-title"/>
       <text variable="volume"/>
       <text variable="issue" prefix="(" suffix=")"/>
@@ -107,6 +112,28 @@
         <names variable="editor"/>
       </substitute>
     </names>
+  </macro>
+  <macro name="doi">
+    <text variable="DOI" prefix="https://doi.org/"/>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="book" match="any">
+        <text variable="title"/>
+        <text macro="collection-title-number" prefix=" "/>
+      </if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="container-title">
+    <choose>
+      <if type="chapter" match="any">
+        <text variable="container-title"/>
+        <text macro="collection-title-number"/>
+      </if>
+    </choose>
   </macro>
   <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year-suffix">
     <layout delimiter="; " prefix="(" suffix=")">
@@ -126,25 +153,25 @@
     </sort>
     <layout>
       <group delimiter=". " suffix=".">
-        <group delimiter=": ">
-          <text macro="creator-year-long"/>
-          <text variable="title"/>
+        <group delimiter=" ">
+          <text macro="creator-year-long" suffix=":"/>
+          <text macro="title"/>
         </group>
         <choose>
           <if type="book" match="any">
             <group delimiter=". ">
               <text macro="edition"/>
               <text macro="publication-place-publisher"/>
-              <text macro="collection-title-number"/>
             </group>
           </if>
           <else-if type="article-journal article-magazine article-newspaper" match="any">
-            <group delimiter=", ">
+            <group delimiter=" ">
               <group delimiter=": ">
                 <text term="in" text-case="capitalize-first"/>
                 <text macro="container-title-volume"/>
               </group>
               <text macro="page-range"/>
+              <text macro="doi" strip-periods="false"/>
             </group>
           </else-if>
           <else-if type="chapter" match="any">
@@ -153,9 +180,10 @@
               <text macro="edition"/>
               <text macro="publication-place-publisher"/>
               <text macro="page-range"/>
-              <text macro="collection-title-number"/>
+              <text macro="doi"/>
             </group>
           </else-if>
+          <else-if type="dataset" match="any"/>
           <else>
             <group delimiter=". ">
               <choose>

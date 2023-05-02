@@ -323,7 +323,6 @@ class MSBibEntry {
             corporate.setTextContent(person.getFirstLast());
             authorTop.appendChild(corporate);
         } else {
-
             Element nameList = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "NameList");
             for (MsBibAuthor name : authorsLst) {
                 Element person = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Person");

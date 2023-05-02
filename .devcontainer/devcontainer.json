@@ -1,0 +1,39 @@
+{
+    "name": "Java",
+    "image": "mcr.microsoft.com/vscode/devcontainers/base:bullseye",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-pack",
+                "vscjava.vscode-gradle",
+                "shengchen.vscode-checkstyle",
+                "DavidAnson.vscode-markdownlint"
+            ]
+        }
+    },
+
+    // Source code generation needs to be done before hand-over to VS Code.
+    // Otherwise, the Java extension will go mad.
+    "onCreateCommand": "./gradlew testClasses --no-daemon",
+
+    // Forward the vncPort and noVNC port.
+    // They are provided by desktop-lite:
+    // https://github.com/devcontainers/features/tree/main/src/desktop-lite#options
+    "forwardPorts": [5901, 6080],
+
+    // Need to connect as root otherwise we run into issues with gradle.
+    // default option is "vscode". More info: https://aka.ms/vscode-remote/containers/non-root.
+    "remoteUser": "root",
+    "features": {
+        // Adds a lightweight desktop that can be accessed using a VNC viewer or the web
+        "ghcr.io/devcontainers/features/desktop-lite:1": {},
+
+        // Install java.
+        // See https://github.com/devcontainers/features/tree/main/src/java#options for details.
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "19.0.2-tem",
+            "installGradle": false,
+            "jdkDistro": "tem"
+        }
+    }
+}

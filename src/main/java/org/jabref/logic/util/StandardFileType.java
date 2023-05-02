@@ -10,7 +10,6 @@ import org.jabref.model.util.OptionalUtil;
  */
 public enum StandardFileType implements FileType {
 
-    BIBTEXML("BibTeXML", "bibx", "xml"),
     ENDNOTE("Endnote", "ref", "enw"),
     ISI("Isi", "isi", "txt"),
     MEDLINE("Medline", "nbib", "xml"),
@@ -42,7 +41,14 @@ public enum StandardFileType implements FileType {
     ZIP("Zip Archive", "zip"),
     CSS("CSS Styleshet", "css"),
     YAML("YAML Markup", "yaml"),
-    ANY_FILE("Any", "*");
+    CFF("CFF", "cff"),
+    ANY_FILE("Any", "*"),
+    CER("SSL Certificate", "cer"),
+    CITAVI("Citavi", "ctv6bak", "ctv5bak"),
+    MARKDOWN("Markdown", "md");
+
+
+
 
     private final List<String> extensions;
     private final String name;

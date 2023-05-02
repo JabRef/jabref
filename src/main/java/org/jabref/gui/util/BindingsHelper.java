@@ -43,7 +43,6 @@ public class BindingsHelper {
 
     public static <T, U> ObservableList<U> map(ObservableValue<T> source, Function<T, List<U>> mapper) {
         PreboundBinding<List<U>> binding = new PreboundBinding<>(source) {
-
             @Override
             protected List<U> computeValue() {
                 return mapper.apply(source.getValue());
@@ -134,7 +133,6 @@ public class BindingsHelper {
 
     public static <T> ObservableValue<T> constantOf(T value) {
         return new ObjectBinding<>() {
-
             @Override
             protected T computeValue() {
                 return value;
@@ -144,7 +142,6 @@ public class BindingsHelper {
 
     public static ObservableValue<Boolean> constantOf(boolean value) {
         return new BooleanBinding() {
-
             @Override
             protected boolean computeValue() {
                 return value;
@@ -154,7 +151,6 @@ public class BindingsHelper {
 
     public static ObservableValue<? extends String> emptyString() {
         return new StringBinding() {
-
             @Override
             protected String computeValue() {
                 return "";

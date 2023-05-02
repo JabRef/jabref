@@ -32,21 +32,21 @@ import org.jabref.preferences.PreferencesService;
 public class StyleSelectDialogViewModel {
 
     private final DialogService dialogService;
-    private final StyleLoader loader;
-    private final OpenOfficePreferences preferences;
+    private final StyleLoader styleLoader;
+    private final OpenOfficePreferences openOfficePreferences;
     private final PreferencesService preferencesService;
     private final ListProperty<StyleSelectItemViewModel> styles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
 
-    public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader loader, PreferencesService preferencesService) {
+    public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService) {
         this.dialogService = dialogService;
-        this.preferences = preferencesService.getOpenOfficePreferences();
-        this.loader = loader;
         this.preferencesService = preferencesService;
+        this.openOfficePreferences = preferencesService.getOpenOfficePreferences();
+        this.styleLoader = styleLoader;
 
         styles.addAll(loadStyles());
 
-        String currentStyle = preferences.getCurrentStyle();
+        String currentStyle = openOfficePreferences.getCurrentStyle();
         selectedItem.setValue(getStyleOrDefault(currentStyle));
     }
 
@@ -62,12 +62,12 @@ public class StyleSelectDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
                 .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                .withInitialDirectory(preferencesService.getWorkingDir())
+                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
-            if (loader.addStyleIfValid(stylePath)) {
-                preferences.setCurrentStyle(stylePath);
+            if (styleLoader.addStyleIfValid(stylePath)) {
+                openOfficePreferences.setCurrentStyle(stylePath);
                 styles.setAll(loadStyles());
                 selectedItem.setValue(getStyleOrDefault(stylePath));
             } else {
@@ -77,7 +77,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public List<StyleSelectItemViewModel> loadStyles() {
-        return loader.getStyles().stream().map(this::fromOOBibStyle).collect(Collectors.toList());
+        return styleLoader.getStyles().stream().map(this::fromOOBibStyle).collect(Collectors.toList());
     }
 
     public ListProperty<StyleSelectItemViewModel> stylesProperty() {
@@ -85,18 +85,17 @@ public class StyleSelectDialogViewModel {
     }
 
     public void deleteStyle() {
-
         OOBibStyle style = selectedItem.getValue().getStyle();
-        if (loader.removeStyle(style)) {
+        if (styleLoader.removeStyle(style)) {
             styles.remove(selectedItem.get());
         }
     }
 
     public void editStyle() {
         OOBibStyle style = selectedItem.getValue().getStyle();
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", preferencesService.getFilePreferences());
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath(), type);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferencesService, style.getPath(), type);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(e);
         }
@@ -118,10 +117,13 @@ public class StyleSelectDialogViewModel {
     }
 
     public void storePrefs() {
-        List<String> externalStyles = styles.stream().map(this::toOOBibStyle).filter(style -> !style.isInternalStyle()).map(OOBibStyle::getPath).collect(Collectors.toList());
-        preferences.setExternalStyles(externalStyles);
-        preferences.setCurrentStyle(selectedItem.getValue().getStylePath());
-        preferencesService.setOpenOfficePreferences(preferences);
+        List<String> externalStyles = styles.stream()
+                                            .map(this::toOOBibStyle)
+                                            .filter(style -> !style.isInternalStyle())
+                                            .map(OOBibStyle::getPath)
+                                            .collect(Collectors.toList());
+        openOfficePreferences.setExternalStyles(externalStyles);
+        openOfficePreferences.setCurrentStyle(selectedItem.getValue().getStylePath());
     }
 
     private StyleSelectItemViewModel getStyleOrDefault(String stylePath) {

@@ -8,7 +8,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -17,23 +16,23 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 
 public class AttachFileAction extends SimpleCommand {
 
     private final LibraryTab libraryTab;
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final FilePreferences filePreferences;
 
     public AttachFileAction(LibraryTab libraryTab,
                             DialogService dialogService,
                             StateManager stateManager,
-                            PreferencesService preferencesService) {
+                            FilePreferences filePreferences) {
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.filePreferences = filePreferences;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
@@ -54,17 +53,18 @@ public class AttachFileAction extends SimpleCommand {
 
         BibEntry entry = stateManager.getSelectedEntries().get(0);
 
-        Path workingDirectory = databaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences())
-                                               .orElse(preferencesService.getWorkingDir());
+        Path workingDirectory = databaseContext.getFirstExistingFileDir(filePreferences)
+                                               .orElse(filePreferences.getWorkingDirectory());
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(workingDirectory)
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
-            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile,
-                    databaseContext.getFileDirectories(preferencesService.getFilePreferences()),
-                    ExternalFileTypes.getInstance());
+            LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(
+                    newFile,
+                    databaseContext.getFileDirectories(filePreferences),
+                    filePreferences);
 
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 

@@ -28,7 +28,7 @@
         <names variable="translator" delimiter="/" prefix="[" suffix="]">
           <label form="short" suffix=" "/>
           <name delimiter=" / " delimiter-precedes-last="always"/>
-          <et-al prefix=" (" suffix=") " font-style="italic"/>
+          <et-al font-style="italic"/>
         </names>
       </if>
     </choose>
@@ -38,7 +38,7 @@
       <if type="chapter article-journal paper-conference" match="any">
         <names variable="editor" delimiter=" / " suffix=":">
           <name delimiter=" / " delimiter-precedes-last="always" name-as-sort-order="all"/>
-          <et-al prefix=" (" suffix=") " font-style="italic"/>
+          <et-al font-style="italic"/>
           <label form="short" prefix=" (" suffix=")"/>
         </names>
       </if>

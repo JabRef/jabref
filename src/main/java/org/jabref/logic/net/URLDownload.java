@@ -40,11 +40,14 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.util.FileHelper;
 
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import kong.unirest.apache.ApacheClient;
+import org.apache.http.client.config.RequestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,12 +61,13 @@ import org.slf4j.LoggerFactory;
  * dl.toFile(Path); // available in FILE
  * String contentType = dl.getMimeType();
  * </code>
- *
- * Each call to a public method creates a new HTTP connection. Nothing is cached.
+ * <br/><br/>
+ * Almost each call to a public method creates a new HTTP connection (except for {@link #asString(Charset, URLConnection) asString},
+ * which uses an already opened connection). Nothing is cached.
  */
 public class URLDownload {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
 
@@ -98,13 +102,15 @@ public class URLDownload {
      * security-relevant information this is kind of OK (no, actually it is not...).
      * <p>
      * Taken from http://stackoverflow.com/a/6055903/873661 and https://stackoverflow.com/a/19542614/873661
+     *
+     * @deprecated
      */
+    @Deprecated
     public static void bypassSSLVerification() {
         LOGGER.warn("Fix SSL exceptions by accepting ALL certificates");
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = {new X509TrustManager() {
-
             @Override
             public void checkClientTrusted(X509Certificate[] chain, String authType) {
             }
@@ -197,10 +203,17 @@ public class URLDownload {
      * @return the status code of the response
      */
     public boolean canBeReached() throws UnirestException {
-        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+
+        // Set a custom Apache Client Builder to be able to allow circular redirects, otherwise downloads from springer might not work
+        Unirest.config().httpClient(new ApacheClient.Builder()
+                                    .withRequestConfig((c, r) -> RequestConfig.custom()
+                                                       .setCircularRedirectsAllowed(true)
+                                                       .build()));
+
+        Unirest.config().setDefaultHeader("User-Agent", USER_AGENT);
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
-        return statusCode >= 200 && statusCode < 300;
+        return (statusCode >= 200) && (statusCode < 300);
     }
 
     public boolean isMimeType(String type) {
@@ -228,26 +241,48 @@ public class URLDownload {
     }
 
     /**
+     * Downloads the web resource to a String. Uses UTF-8 as encoding.
+     *
+     * @return the downloaded string
+     */
+    public String asString() throws IOException {
+        return asString(StandardCharsets.UTF_8, this.openConnection());
+    }
+
+    /**
      * Downloads the web resource to a String.
      *
      * @param encoding the desired String encoding
      * @return the downloaded string
      */
     public String asString(Charset encoding) throws IOException {
-        try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream());
+        return asString(encoding, this.openConnection());
+    }
+
+    /**
+     * Downloads the web resource to a String from an existing connection. Uses UTF-8 as encoding.
+     *
+     * @param existingConnection an existing connection
+     * @return the downloaded string
+     */
+    public static String asString(URLConnection existingConnection) throws IOException {
+        return asString(StandardCharsets.UTF_8, existingConnection);
+    }
+
+    /**
+     * Downloads the web resource to a String.
+     *
+     * @param encoding the desired String encoding
+     * @param connection an existing connection
+     * @return the downloaded string
+     */
+    public static String asString(Charset encoding, URLConnection connection) throws IOException {
+
+        try (InputStream input = new BufferedInputStream(connection.getInputStream());
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
             return output.toString();
         }
-    }
-
-    /**
-     * Downloads the web resource to a String. Uses UTF-8 as encoding.
-     *
-     * @return the downloaded string
-     */
-    public String asString() throws IOException {
-        return asString(StandardCharsets.UTF_8);
     }
 
     public List<HttpCookie> getCookieFromUrl() throws IOException {
@@ -306,7 +341,7 @@ public class URLDownload {
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
         String fileName = "jabref-" + FileUtil.getBaseName(fileNameWithExtension);
-        String extension = "." + FileHelper.getFileExtension(fileNameWithExtension).orElse("tmp");
+        String extension = "." + FileUtil.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
@@ -321,10 +356,9 @@ public class URLDownload {
         return "URLDownload{" + "source=" + this.source + '}';
     }
 
-    private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
+    private static void copy(InputStream in, Writer out, Charset encoding) throws IOException {
         Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
-
             String line;
             while ((line = read.readLine()) != null) {
                 out.write(line);
@@ -333,7 +367,13 @@ public class URLDownload {
         }
     }
 
-    private URLConnection openConnection() throws IOException {
+    /**
+     * Open a connection to this object's URL (with specified settings). If accessing an HTTP URL, don't forget
+     * to close the resulting connection after usage.
+     *
+     * @return an open connection
+     */
+    public URLConnection openConnection() throws IOException {
         URLConnection connection = this.source.openConnection();
         connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
@@ -349,21 +389,23 @@ public class URLDownload {
         if (connection instanceof HttpURLConnection) {
             // normally, 3xx is redirect
             int status = ((HttpURLConnection) connection).getResponseCode();
-            if (status != HttpURLConnection.HTTP_OK) {
-                if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                        || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                        || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
-                    // get redirect url from "location" header field
-                    String newUrl = connection.getHeaderField("location");
-                    // open the new connnection again
-                    connection = new URLDownload(newUrl).openConnection();
-                }
+
+            if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
+                || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                // get redirect url from "location" header field
+                String newUrl = connection.getHeaderField("location");
+                // open the new connection again
+                connection = new URLDownload(newUrl).openConnection();
+            }
+            if ((status >= 400) && (status < 500)) {
+                throw new IOException(new FetcherClientException("Encountered HTTP Status code " + status));
+            }
+            if (status >= 500) {
+                throw new IOException(new FetcherServerException("Encountered HTTP Status Code " + status));
             }
         }
-
         // this does network i/o: GET + read returned headers
-        connection.connect();
-
         return connection;
     }
 

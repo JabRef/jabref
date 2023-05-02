@@ -118,6 +118,13 @@ public class DOITest {
                 Arguments.of("https://doi.org/10.1109/VLHCC.2004.20", DOI.parse("https : / / doi.org / 10 .1109 /V LHCC.20 04.20").get().getURIAsASCIIString()),
                 // parse short DOI with whitespace
                 Arguments.of("https://doi.org/10/gf4gqc", DOI.parse("https : / / doi.org / 10 / gf4gqc").get().getURIAsASCIIString()),
+                // parse DOI with non-ASCII characters and whitespace
+                Arguments.of("https://doi.org/10/gf4gqc", DOI.parse("�https : \n  ␛ / / doi.org / \t 10 / \r gf4gqc�␛").get().getURIAsASCIIString()),
+                Arguments.of("10/gf4gqc", DOI.parse("�https : \n  ␛ / / doi.org / \t 10 / \r gf4gqc�␛").get().getDOI()),
+                Arguments.of("10/gf4gqc", DOI.parse(" 10 / gf4gqc ").get().getDOI()),
+                Arguments.of("10.3218/3846-0", DOI.parse(" �10.3218\n/384␛6-0�").get().getDOI()),
+                // parse already-cleaned DOI
+                Arguments.of("10.3218/3846-0", DOI.parse("10.3218/3846-0").get().getDOI()),
 
                 // correctlyEncodeDOIs
                 // See http://www.doi.org/doi_handbook/2_Numbering.html#2.5.2.4

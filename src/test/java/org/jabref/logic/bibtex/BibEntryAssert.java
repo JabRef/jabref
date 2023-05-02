@@ -85,7 +85,8 @@ public class BibEntryAssert {
         assertNotNull(expectedInputStream);
         assertNotNull(actualEntries);
         // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
-        Assertions.assertEquals(getListFromInputStream(expectedInputStream), actualEntries);
+        List<BibEntry> expectedEntries = getListFromInputStream(expectedInputStream);
+        Assertions.assertEquals(expectedEntries, actualEntries);
     }
 
     public static void assertEquals(List<BibEntry> expectedEntries, InputStream actualInputStream)
@@ -138,7 +139,7 @@ public class BibEntryAssert {
      */
     public static void assertEquals(List<BibEntry> expected, Path fileToImport, Importer importer)
             throws IOException {
-        List<BibEntry> actualEntries = importer.importDatabase(fileToImport, StandardCharsets.UTF_8)
+        List<BibEntry> actualEntries = importer.importDatabase(fileToImport)
                                                .getDatabase().getEntries();
         // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
         Assertions.assertEquals(expected, actualEntries);

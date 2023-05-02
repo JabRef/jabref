@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This thread wrapper is required to be able to interrupt the remote listener while listening on a port.
+ * This thread wrapper is required to be able to interrupt the remote listener server, e.g. when JabRef is closing down the server should shutdown as well.
  */
 public class RemoteListenerServerThread extends Thread {
 
@@ -14,17 +14,16 @@ public class RemoteListenerServerThread extends Thread {
 
     private final RemoteListenerServer server;
 
-    public RemoteListenerServerThread(MessageHandler messageHandler, int port) throws IOException {
+    public RemoteListenerServerThread(RemoteMessageHandler messageHandler, int port) throws IOException {
         this.server = new RemoteListenerServer(messageHandler, port);
         this.setName("JabRef - Remote Listener Server on port " + port);
     }
 
     @Override
     public void interrupt() {
-        super.interrupt();
-
         LOGGER.debug("Interrupting " + this.getName());
         this.server.closeServerSocket();
+        super.interrupt();
     }
 
     @Override

@@ -3,7 +3,7 @@
 IntelliJ IDEA comes with a powerful code formatter that helps you to keep the formatting consistent with the style JabRef uses.
 Style-checks are done for each pull request and installing this code style configuration helps you to ensure that this test passes. To install it, you need to do the following steps:
 
-1. Go to *Preferences* or press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd> (<kbd>Cmd</kbd> + <kbd>,</kbd> on Mac OS X)
+1. Go to *Preferences* or press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd> (<kbd>Cmd</kbd> + <kbd>,</kbd> on macOS)
 2. Go to "Editor > Code Style"
 3. Click the gear (right of "Scheme: ...")
 4. Click "Import Scheme >"

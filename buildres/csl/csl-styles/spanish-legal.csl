@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="es-ES" version="1.0" demote-non-dropping-particle="sort-only">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" default-locale="es-ES">
   <info>
     <title>Spanish Legal (Español)</title>
     <id>http://www.zotero.org/styles/spanish-legal</id>
@@ -111,7 +111,7 @@
         <text variable="title" text-case="capitalize-first" font-style="italic"/>
       </if>
       <else>
-        <text variable="title" text-case="capitalize-first" prefix="“" suffix="”"/>
+        <text variable="title" text-case="capitalize-first" quotes="true"/>
       </else>
     </choose>
   </macro>
@@ -121,7 +121,7 @@
         <text variable="title" text-case="capitalize-first" font-style="italic" suffix=", cit." form="short"/>
       </if>
       <else>
-        <text variable="title" text-case="capitalize-first" prefix="“" suffix="”, cit." form="short"/>
+        <text variable="title" text-case="capitalize-first" quotes="true" suffix=", cit." form="short"/>
       </else>
     </choose>
   </macro>

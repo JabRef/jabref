@@ -18,11 +18,11 @@
 }
 
 .numberColumn > .hits {
-    -fx-font-size: 85%;
+    -fx-font-size: 0.75em;
     -fx-background-color: -jr-group-hits-bg;
     -fx-padding: 0.4em 0.4em 0.4em 0.4em;
     -fx-background-insets: 0;
-    -fx-background-radius: 0.8em;
+    -fx-background-radius: 0.7em;
 }
 
 .numberColumn > .hits .text {
@@ -100,20 +100,6 @@
 
 .tree-table-row-cell > .tree-table-cell > .icon {
     -fx-translate-x: -0.4em;
-}
-
-#addNewGroup:active {
-    -fx-border-width: 0px;
-    -fx-background-color: -jr-theme;
-    -fx-padding: 0.5em;
-    -fx-text-fill: -jr-white;
-}
-
-#addNewGroup:inactive {
-    -fx-border-width: 0px;
-    -fx-background-color: -jr-icon-background-active;
-    -fx-padding: 0.5em;
-    -fx-text-fill:-jr-black;
 }
 
 #groupFilterBar {

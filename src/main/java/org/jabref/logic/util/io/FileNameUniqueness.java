@@ -22,7 +22,6 @@ public class FileNameUniqueness {
      * @return a file name such that it does not match any existing files in targetDirectory
      */
     public static String getNonOverWritingFileName(Path targetDirectory, String fileName) {
-
         Optional<String> extensionOptional = FileUtil.getFileExtension(fileName);
 
         // the suffix include the '.' , if extension is present Eg: ".pdf"

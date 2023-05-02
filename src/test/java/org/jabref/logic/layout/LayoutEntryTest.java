@@ -69,7 +69,6 @@ public class LayoutEntryTest {
 
     @Test
     public void testParseMethodCalls() {
-
         assertEquals(1, LayoutEntry.parseMethodsCalls("bla").size());
         assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla").get(0)).get(0));
 

@@ -5,7 +5,7 @@
     <id>http://www.zotero.org/styles/biological-reviews</id>
     <link href="http://www.zotero.org/styles/biological-reviews" rel="self"/>
     <link href="http://www.zotero.org/styles/oryx" rel="template"/>
-    <link href="http://onlinelibrary.wiley.com/journal/10.1111/%28ISSN%291469-185X/homepage/ForAuthors.html" rel="documentation"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/1469185x/homepage/ForAuthors.html" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
     </author>
@@ -17,7 +17,7 @@
     <eissn>1469-185X</eissn>
     <issnl>0006-3231</issnl>
     <summary>Style for Biological Reviews, aka Biological reviews of the Cambridge Philosophical Society</summary>
-    <updated>2017-09-18T10:11:09+00:00</updated>
+    <updated>2022-06-29T10:11:09+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -60,7 +60,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="symbol" delimiter=", " initialize-with=". "/>
+      <name form="short" and="symbol" delimiter=", " initialize-with=". " delimiter-precedes-last="never"/>
       <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>

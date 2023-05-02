@@ -49,5 +49,4 @@ public class ASCIICharacterCheckerTest {
         entry.setField(StandardField.TITLE, field);
         assertEquals(List.of(new IntegrityMessage("Non-ASCII encoded character found", entry, StandardField.TITLE)), checker.check(entry));
     }
-
 }

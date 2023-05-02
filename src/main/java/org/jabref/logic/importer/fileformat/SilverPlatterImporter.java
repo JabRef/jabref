@@ -50,7 +50,6 @@ public class SilverPlatterImporter extends Importer {
         // accepting the Inspec format. Then we look for the title entry.
         String str;
         while ((str = reader.readLine()) != null) {
-
             if (START_PATTERN.matcher(str).find()) {
                 return false; // This is an Inspec file, so return false.
             }

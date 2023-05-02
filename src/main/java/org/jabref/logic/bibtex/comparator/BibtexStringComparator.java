@@ -20,7 +20,6 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
     @Override
     public int compare(BibtexString s1, BibtexString s2) {
-
         int res;
 
         // First check their names:
@@ -36,7 +35,6 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
         // Then, if we are supposed to, see if the ordering needs
         // to be changed because of one string referring to the other.x
         if (considerRefs) {
-
             // First order them:
             BibtexString pre;
             BibtexString post;

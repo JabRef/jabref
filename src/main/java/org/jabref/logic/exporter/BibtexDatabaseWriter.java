@@ -3,12 +3,14 @@ package org.jabref.logic.exporter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -19,117 +21,140 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 
+/**
+ * Writes a .bib file following the BibTeX / BibLaTeX format using the provided {@link BibWriter}
+ */
 public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
     public static final String DATABASE_ID_PREFIX = "DBID:";
-    private static final String STRING_PREFIX = "@String";
+
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
+    private static final String STRING_PREFIX = "@String";
 
-    public BibtexDatabaseWriter(Writer writer, SavePreferences preferences, BibEntryTypesManager entryTypesManager) {
-        super(writer, preferences, entryTypesManager);
+    private final FieldPreferences fieldPreferences;
+
+    public BibtexDatabaseWriter(BibWriter bibWriter,
+                                SaveConfiguration saveConfiguration,
+                                FieldPreferences fieldPreferences,
+                                CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                BibEntryTypesManager entryTypesManager) {
+        super(bibWriter,
+                saveConfiguration,
+                citationKeyPatternPreferences,
+                entryTypesManager);
+
+        this.fieldPreferences = fieldPreferences;
+    }
+
+    public BibtexDatabaseWriter(Writer writer,
+                                String newline,
+                                SaveConfiguration saveConfiguration,
+                                FieldPreferences fieldPreferences,
+                                CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                BibEntryTypesManager entryTypesManager) {
+        super(new BibWriter(writer, newline),
+                saveConfiguration,
+                citationKeyPatternPreferences,
+                entryTypesManager);
+
+        this.fieldPreferences = fieldPreferences;
     }
 
     @Override
     protected void writeEpilogue(String epilogue) throws IOException {
         if (!StringUtil.isNullOrEmpty(epilogue)) {
-            writer.write(OS.NEWLINE);
-            writer.write(epilogue);
-            writer.write(OS.NEWLINE);
+            bibWriter.write(epilogue);
+            bibWriter.finishBlock();
         }
     }
 
     @Override
     protected void writeMetaDataItem(Map.Entry<String, String> metaItem) throws IOException {
-        writer.write(OS.NEWLINE);
-        writer.write(COMMENT_PREFIX + "{");
-        writer.write(MetaData.META_FLAG);
-        writer.write(metaItem.getKey());
-        writer.write(":");
-        writer.write(metaItem.getValue());
-        writer.write("}");
-        writer.write(OS.NEWLINE);
+        bibWriter.write(COMMENT_PREFIX + "{");
+        bibWriter.write(MetaData.META_FLAG);
+        bibWriter.write(metaItem.getKey());
+        bibWriter.write(":");
+        bibWriter.write(metaItem.getValue());
+        bibWriter.write("}");
+        bibWriter.finishBlock();
     }
 
     @Override
     protected void writePreamble(String preamble) throws IOException {
         if (!StringUtil.isNullOrEmpty(preamble)) {
-            writer.write(OS.NEWLINE);
-            writer.write(PREAMBLE_PREFIX + "{");
-            writer.write(preamble);
-            writer.write('}' + OS.NEWLINE);
+            bibWriter.write(PREAMBLE_PREFIX + "{");
+            bibWriter.write(preamble);
+            bibWriter.writeLine("}");
+            bibWriter.finishBlock();
         }
     }
 
     @Override
-    protected void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength) throws IOException {
+    protected void writeString(BibtexString bibtexString, int maxKeyLength) throws IOException {
         // If the string has not been modified, write it back as it was
-        if (!preferences.shouldReformatFile() && !bibtexString.hasChanged()) {
-            writer.write(bibtexString.getParsedSerialization());
+        if (!saveConfiguration.shouldReformatFile() && !bibtexString.hasChanged()) {
+            bibWriter.write(bibtexString.getParsedSerialization());
             return;
         }
 
         // Write user comments
         String userComments = bibtexString.getUserComments();
         if (!userComments.isEmpty()) {
-            writer.write(userComments + OS.NEWLINE);
+            bibWriter.writeLine(userComments);
         }
 
-        if (isFirstString) {
-            writer.write(OS.NEWLINE);
-        }
-
-        writer.write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
+        bibWriter.write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
                 .repeatSpaces(maxKeyLength - bibtexString.getName().length()) + " = ");
         if (bibtexString.getContent().isEmpty()) {
-            writer.write("{}");
+            bibWriter.write("{}");
         } else {
             try {
-                String formatted = new FieldWriter(preferences.getFieldWriterPreferences())
-                        .write(InternalField.BIBTEX_STRING, bibtexString.getContent()
-                        );
-                writer.write(formatted);
+                String formatted = new FieldWriter(fieldPreferences)
+                        .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
+                bibWriter.write(formatted);
             } catch (InvalidFieldValueException ex) {
                 throw new IOException(ex);
             }
         }
 
-        writer.write("}" + OS.NEWLINE);
+        bibWriter.writeLine("}");
     }
 
     @Override
     protected void writeEntryTypeDefinition(BibEntryType customType) throws IOException {
-        writer.write(OS.NEWLINE);
-        writer.write(COMMENT_PREFIX + "{");
-        writer.write(BibEntryTypesManager.serialize(customType));
-        writer.write("}");
-        writer.write(OS.NEWLINE);
+        bibWriter.write(COMMENT_PREFIX + "{");
+        bibWriter.write(MetaDataSerializer.serializeCustomEntryTypes(customType));
+        bibWriter.writeLine("}");
+        bibWriter.finishBlock();
     }
 
     @Override
-    protected void writePrelogue(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException {
-        if (encoding == null) {
+    protected void writeProlog(BibDatabaseContext bibDatabaseContext, Charset encoding) throws IOException {
+        // We write the encoding if
+        //   - it is provided (!= null)
+        //   - explicitly set in the .bib file OR not equal to UTF_8
+        // Otherwise, we do not write anything and return
+        if ((encoding == null) || (!bibDatabaseContext.getMetaData().getEncodingExplicitlySupplied() && (encoding.equals(StandardCharsets.UTF_8)))) {
             return;
         }
 
         // Writes the file encoding information.
-        writer.write("% ");
-        writer.write(SavePreferences.ENCODING_PREFIX + encoding);
-        writer.write(OS.NEWLINE);
+        bibWriter.write("% ");
+        bibWriter.writeLine(SaveConfiguration.ENCODING_PREFIX + encoding);
     }
 
     @Override
     protected void writeDatabaseID(String sharedDatabaseID) throws IOException {
-        writer.write("% " +
-                DATABASE_ID_PREFIX +
-                " " +
-                sharedDatabaseID +
-                OS.NEWLINE);
+        bibWriter.write("% ");
+        bibWriter.write(DATABASE_ID_PREFIX);
+        bibWriter.write(" ");
+        bibWriter.writeLine(sharedDatabaseID);
     }
 
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferences.getFieldWriterPreferences()), entryTypesManager);
-        bibtexEntryWriter.write(entry, writer, mode, preferences.shouldReformatFile());
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
+        bibtexEntryWriter.write(entry, bibWriter, mode, saveConfiguration.shouldReformatFile());
     }
 }

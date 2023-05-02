@@ -13,7 +13,6 @@ public class AuthorAndsCommaReplacerTest {
      */
     @Test
     public void testFormat() {
-
         LayoutFormatter a = new AuthorAndsCommaReplacer();
 
         // Empty case

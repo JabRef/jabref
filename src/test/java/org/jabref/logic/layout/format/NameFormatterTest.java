@@ -8,7 +8,6 @@ public class NameFormatterTest {
 
     @Test
     public void testFormatStringStringBibtexEntry() {
-
         NameFormatter l = new NameFormatter();
 
         assertEquals("Doe", l.format("Joe Doe", "1@*@{ll}"));
@@ -32,7 +31,6 @@ public class NameFormatterTest {
 
     @Test
     public void testFormat() {
-
         NameFormatter a = new NameFormatter();
 
         // Empty case

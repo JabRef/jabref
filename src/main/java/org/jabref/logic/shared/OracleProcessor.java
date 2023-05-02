@@ -6,12 +6,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.listener.OracleNotificationListener;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.metadata.MetaData;
 
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OracleStatement;
@@ -27,6 +29,9 @@ public class OracleProcessor extends DBMSProcessor {
     private OracleNotificationListener listener;
 
     private DatabaseChangeRegistration databaseChangeRegistration;
+
+    private Integer VERSION_DB_STRUCT_DEFAULT = -1;
+    private Integer CURRENT_VERSION_DB_STRUCT = 0;
 
     public OracleProcessor(DatabaseConnection connection) {
         super(connection);
@@ -63,6 +68,24 @@ public class OracleProcessor extends DBMSProcessor {
                 "CREATE TABLE \"METADATA\" (" +
                         "\"KEY\"  VARCHAR2(255) NULL," +
                         "\"VALUE\"  CLOB NOT NULL)");
+
+        Map<String, String> metadata = getSharedMetaData();
+
+        if (metadata.get(MetaData.VERSION_DB_STRUCT) != null) {
+            try {
+                VERSION_DB_STRUCT_DEFAULT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
+            } catch (Exception e) {
+                LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Integer!");
+            }
+        } else {
+            LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Exist!");
+        }
+
+        if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
+            // We can to migrate from old table in new table
+            metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
+            setSharedMetaData(metadata);
+        }
     }
 
     @Override
@@ -71,8 +94,17 @@ public class OracleProcessor extends DBMSProcessor {
     }
 
     @Override
-    public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
+    String escape_Table(String expression) {
+        return escape(expression);
+    }
 
+    @Override
+    Integer getCURRENT_VERSION_DB_STRUCT() {
+        return CURRENT_VERSION_DB_STRUCT;
+    }
+
+    @Override
+    public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
         this.listener = new OracleNotificationListener(dbmsSynchronizer);
 
         try {
@@ -89,14 +121,14 @@ public class OracleProcessor extends DBMSProcessor {
                 ((OracleStatement) statement).setDatabaseChangeRegistration(databaseChangeRegistration);
                 StringBuilder selectQuery = new StringBuilder()
                         .append("SELECT 1 FROM ")
-                        .append(escape("ENTRY"))
+                        .append(escape_Table("ENTRY"))
                         .append(", ")
-                        .append(escape("METADATA"));
+                        .append(escape_Table("METADATA"));
                 // this execution registers all tables mentioned in selectQuery
                 statement.executeQuery(selectQuery.toString());
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during starting the notification listener", e);
         }
     }
 
@@ -106,7 +138,7 @@ public class OracleProcessor extends DBMSProcessor {
             for (BibEntry entry : entries) {
                 String insertIntoEntryQuery =
                         "INSERT INTO " +
-                                escape("ENTRY") +
+                                escape_Table("ENTRY") +
                                 "(" +
                                 escape("TYPE") +
                                 ") VALUES(?)";
@@ -125,7 +157,7 @@ public class OracleProcessor extends DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during entry insertion", e);
         }
     }
 
@@ -144,7 +176,7 @@ public class OracleProcessor extends DBMSProcessor {
             }
             for (int i = 0; i < numFields; i++) {
                 insertFieldQuery.append(" INTO ")
-                                .append(escape("FIELD"))
+                                .append(escape_Table("FIELD"))
                                 .append(" (")
                                 .append(escape("ENTRY_SHARED_ID"))
                                 .append(", ")
@@ -168,7 +200,7 @@ public class OracleProcessor extends DBMSProcessor {
                 preparedFieldStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during field insertion", e);
         }
     }
 
@@ -178,7 +210,7 @@ public class OracleProcessor extends DBMSProcessor {
             oracleConnection.unregisterDatabaseChangeNotification(databaseChangeRegistration);
             oracleConnection.close();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during stopping the notification listener", e);
         }
     }
 

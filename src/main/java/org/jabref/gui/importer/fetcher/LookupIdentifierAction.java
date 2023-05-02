@@ -63,7 +63,6 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     public Action getAction() {
         return new Action() {
-
             @Override
             public Optional<JabRefIcon> getIcon() {
                 return Optional.empty();

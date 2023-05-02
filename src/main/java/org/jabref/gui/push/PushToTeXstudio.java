@@ -5,9 +5,9 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.preferences.PreferencesService;
 
-public class PushToTeXstudio extends AbstractPushToApplication implements PushToApplication {
+public class PushToTeXstudio extends AbstractPushToApplication {
 
-    public static final String NAME = "TeXstudio";
+    public static final String NAME = PushToApplications.TEXSTUDIO;
 
     public PushToTeXstudio(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
@@ -19,7 +19,7 @@ public class PushToTeXstudio extends AbstractPushToApplication implements PushTo
     }
 
     @Override
-    public JabRefIcon getIcon() {
+    public JabRefIcon getApplicationIcon() {
         return IconTheme.JabRefIcons.APPLICATION_TEXSTUDIO;
     }
 

@@ -14,14 +14,19 @@
     <category field="biology"/>
     <issn>1330-0520</issn>
     <eissn>1848-7386</eissn>
-    <updated>2021-03-17T12:29:20+00:00</updated>
+    <updated>2021-12-17T16:20:35+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
-    <names variable="author" suffix=".">
+    <names variable="author">
       <name and="symbol" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all">
         <name-part name="family" font-variant="small-caps"/>
       </name>
+      <label form="short" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor translator"/>
+        <text variable="title"/>
+      </substitute>
     </names>
   </macro>
   <macro name="editor">
@@ -34,7 +39,9 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" font-variant="small-caps" and="symbol" delimiter-precedes-last="never" initialize-with=". "/>
+      <name form="short" and="symbol" delimiter-precedes-last="never" initialize-with=". ">
+        <name-part name="family" font-variant="small-caps"/>
+      </name>
       <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>
@@ -75,42 +82,37 @@
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
-        <group delimiter=" ">
-          <text macro="author-short"/>
-          <text macro="year-date"/>
-        </group>
+        <text macro="author-short"/>
         <group>
-          <text variable="locator"/>
-          <text variable="year-suffix" font-style="italic"/>
+          <text macro="year-date"/>
+          <text variable="year-suffix" font-style="normal"/>
         </group>
+        <text variable="locator"/>
       </group>
     </layout>
   </citation>
-  <bibliography entry-spacing="0" hanging-indent="true" subsequent-author-substitute-rule="partial-each" subsequent-author-substitute="&#8212;&#8212;&#8212;">
+  <bibliography subsequent-author-substitute-rule="partial-each" entry-spacing="0" hanging-indent="true">
     <sort>
       <key macro="author" names-min="1" names-use-first="1"/>
       <key macro="author-count"/>
       <key macro="year-date"/>
     </sort>
     <layout suffix=".">
-      <group>
-        <group delimiter=": ">
-          <group delimiter=", ">
-            <text macro="author"/>
-            <group>
-              <date variable="issued">
-                <date-part name="year"/>
-              </date>
-              <text variable="year-suffix" font-style="italic"/>
-            </group>
+      <group delimiter=": ">
+        <group delimiter=", ">
+          <text macro="author"/>
+          <group>
+            <date variable="issued">
+              <date-part name="year"/>
+            </date>
+            <text variable="year-suffix" font-style="normal"/>
           </group>
-          <text variable="title" suffix=". "/>
         </group>
         <choose>
           <if type="bill book graphic legal_case motion_picture report song" match="any">
             <group suffix=".">
               <group>
-                <text variable="title" font-style="italic" text-case="capitalize-first" suffix=". "/>
+                <text variable="title" text-case="capitalize-first" font-style="normal" suffix=". "/>
                 <group delimiter=" " suffix=" ">
                   <text term="in" text-case="capitalize-first" font-style="italic"/>
                   <text macro="editor"/>
@@ -147,13 +149,14 @@
           </else-if>
           <else-if type="chapter" match="any">
             <group delimiter=". ">
+              <text variable="title"/>
               <group prefix=" " delimiter=", ">
                 <group delimiter=": ">
-                  <text term="in" text-case="capitalize-first" font-style="italic"/>
+                  <text term="in" text-case="capitalize-first"/>
                   <text macro="editor"/>
                 </group>
                 <group>
-                  <text variable="container-title" text-case="title" font-style="italic"/>
+                  <text variable="container-title" text-case="title" font-style="normal"/>
                   <choose>
                     <if is-numeric="volume">
                       <group delimiter=" " suffix=".">
@@ -191,7 +194,7 @@
             <group delimiter=" ">
               <group delimiter=". ">
                 <text variable="title"/>
-                <text variable="container-title" text-case="capitalize-first" font-style="normal"/>
+                <text variable="container-title" text-case="capitalize-first"/>
               </group>
               <group delimiter=", ">
                 <group>

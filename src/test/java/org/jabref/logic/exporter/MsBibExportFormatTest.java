@@ -1,8 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -20,13 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MsBibExportFormatTest {
 
     public BibDatabaseContext databaseContext;
-    public Charset charset;
     public MSBibExporter msBibExportFormat;
 
     @BeforeEach
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
-        charset = StandardCharsets.UTF_8;
         msBibExportFormat = new MSBibExporter();
     }
 
@@ -35,7 +31,7 @@ public class MsBibExportFormatTest {
         Path path = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(path);
         List<BibEntry> entries = Collections.emptyList();
-        msBibExportFormat.export(databaseContext, path, charset, entries);
+        msBibExportFormat.export(databaseContext, path, entries);
         assertEquals(Collections.emptyList(), Files.readAllLines(path));
     }
 }

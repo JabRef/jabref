@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" default-locale="de-DE">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0">
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Universität Bern - Institut für Musikwissenschaft (note, Deutsch)</title>
@@ -22,7 +22,7 @@
       <term name="editor" form="verb-short">hrsg. v.</term>
       <term name="anonymous" form="short">o.A.</term>
       <term name="number-of-volumes" form="short">Bde.</term>
-      <term name="sub verbo" form="short">Art.</term>
+      <term name="sub-verbo" form="short">Art.</term>
       <term name="issue" form="short">H.</term>
       <term name="and">u.</term>
     </terms>
@@ -124,7 +124,7 @@
         <text variable="title" text-case="title" font-style="italic"/>
       </if>
       <else-if type="entry-encyclopedia" match="any">
-        <text term="sub verbo" form="short" quotes="false"/>
+        <text term="sub-verbo" form="short" quotes="false"/>
         <text variable="title" text-case="title" quotes="true" prefix=" "/>
       </else-if>
       <else-if type="interview" match="any">
@@ -141,7 +141,7 @@
         <text variable="title" form="short" text-case="title" font-style="italic"/>
       </if>
       <else-if type="entry-encyclopedia" match="any">
-        <text term="sub verbo" form="short" quotes="false"/>
+        <text term="sub-verbo" form="short" quotes="false"/>
         <text variable="title" form="short" text-case="title" quotes="true" prefix=" "/>
       </else-if>
       <else-if type="interview" match="any">

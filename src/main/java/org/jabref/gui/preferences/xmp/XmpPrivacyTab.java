@@ -47,7 +47,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
     }
 
     public void initialize() {
-        this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferencesService);
+        this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferencesService.getXmpPreferences());
 
         enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());
         filterList.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
@@ -86,7 +86,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
                 .install(addFieldName);
         addFieldName.itemsProperty().bind(viewModel.availableFieldsProperty());
         addFieldName.valueProperty().bindBidirectional(viewModel.addFieldNameProperty());
-        addFieldName.setConverter(FieldsUtil.fieldStringConverter);
+        addFieldName.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);
         addFieldName.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 viewModel.addField();

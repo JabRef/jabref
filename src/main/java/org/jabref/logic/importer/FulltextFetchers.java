@@ -48,8 +48,8 @@ public class FulltextFetchers {
         return false;
     };
 
-    public FulltextFetchers(ImportFormatPreferences importFormatPreferences) {
-        this(WebFetchers.getFullTextFetchers(importFormatPreferences));
+    public FulltextFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        this(WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences));
     }
 
     FulltextFetchers(Set<FulltextFetcher> fetcher) {

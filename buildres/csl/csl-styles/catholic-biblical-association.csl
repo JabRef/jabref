@@ -393,7 +393,7 @@
         <!-- Adds sub verbo to an initial citation where it had previously been left out. -->
         <choose>
           <if locator="sub-verbo" match="any">
-            <text term="sub verbo" form="short" prefix=" "/>
+            <text term="sub-verbo" form="short" prefix=" "/>
           </if>
         </choose>
         <text variable="locator" prefix=" "/>
@@ -447,7 +447,7 @@
       <text variable="annote"/>
       <choose>
         <if locator="sub-verbo" match="any">
-          <text term="sub verbo" form="short" prefix=" "/>
+          <text term="sub-verbo" form="short" prefix=" "/>
           <text variable="locator" prefix=" "/>
         </if>
         <else>

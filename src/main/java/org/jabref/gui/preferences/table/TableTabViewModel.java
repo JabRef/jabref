@@ -1,8 +1,6 @@
 package org.jabref.gui.preferences.table;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -16,11 +14,12 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences;
+import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
+import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.NoSelectionModel;
@@ -35,9 +34,6 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-
-import static org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
-import static org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 
 public class TableTabViewModel implements PreferenceTabViewModel {
 
@@ -62,8 +58,6 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<MainTableColumnModel> availableColumnsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MainTableColumnModel> addColumnProperty = new SimpleObjectProperty<>();
     private final BooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
-    private final BooleanProperty specialFieldsSyncKeywordsProperty = new SimpleBooleanProperty();
-    private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
     private final BooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoResizeColumnsProperty = new SimpleBooleanProperty();
 
@@ -77,17 +71,20 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     private final Validator columnsNotEmptyValidator;
 
-    private final List<String> restartWarnings = new ArrayList<>();
-
     private final DialogService dialogService;
     private final PreferencesService preferences;
 
     private ColumnPreferences initialColumnPreferences;
-    private SpecialFieldsPreferences initialSpecialFieldsPreferences;
+    private final SpecialFieldsPreferences specialFieldsPreferences;
+    private final NameDisplayPreferences nameDisplayPreferences;
+    private final MainTablePreferences mainTablePreferences;
 
     public TableTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
+        this.nameDisplayPreferences = preferences.getNameDisplayPreferences();
+        this.mainTablePreferences = preferences.getMainTablePreferences();
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -116,16 +113,11 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        MainTablePreferences initialMainTablePreferences = preferences.getMainTablePreferences();
-        initialColumnPreferences = initialMainTablePreferences.getColumnPreferences();
-        initialSpecialFieldsPreferences = preferences.getSpecialFieldsPreferences();
-        MainTableNameFormatPreferences initialNameFormatPreferences = preferences.getMainTableNameFormatPreferences();
+        initialColumnPreferences = mainTablePreferences.getColumnPreferences();
 
-        specialFieldsEnabledProperty.setValue(initialSpecialFieldsPreferences.isSpecialFieldsEnabled());
-        specialFieldsSyncKeywordsProperty.setValue(initialSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords());
-        specialFieldsSerializeProperty.setValue(initialSpecialFieldsPreferences.shouldSerializeSpecialFields());
-        extraFileColumnsEnabledProperty.setValue(initialMainTablePreferences.getExtraFileColumnsEnabled());
-        autoResizeColumnsProperty.setValue(initialMainTablePreferences.getResizeColumnsToFit());
+        specialFieldsEnabledProperty.setValue(specialFieldsPreferences.isSpecialFieldsEnabled());
+        extraFileColumnsEnabledProperty.setValue(mainTablePreferences.getExtraFileColumnsEnabled());
+        autoResizeColumnsProperty.setValue(mainTablePreferences.getResizeColumnsToFit());
 
         fillColumnList();
 
@@ -151,18 +143,18 @@ public class TableTabViewModel implements PreferenceTabViewModel {
             insertSpecialFieldColumns();
         }
 
-        if (extraFileColumnsEnabledProperty.getValue()) {
+        if (mainTablePreferences.getExtraFileColumnsEnabled()) {
             insertExtraFileColumns();
         }
 
-        switch (initialNameFormatPreferences.getDisplayStyle()) {
+        switch (nameDisplayPreferences.getDisplayStyle()) {
             case NATBIB -> namesNatbibProperty.setValue(true);
             case AS_IS -> nameAsIsProperty.setValue(true);
             case FIRSTNAME_LASTNAME -> nameFirstLastProperty.setValue(true);
             case LASTNAME_FIRSTNAME -> nameLastFirstProperty.setValue(true);
         }
 
-        switch (initialNameFormatPreferences.getAbbreviationStyle()) {
+        switch (nameDisplayPreferences.getAbbreviationStyle()) {
             case FULL -> abbreviationEnabledProperty.setValue(true);
             case LASTNAME_ONLY -> abbreviationLastNameOnlyProperty.setValue(true);
             case NONE -> abbreviationDisabledProperty.setValue(true);
@@ -189,10 +181,10 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     private void insertExtraFileColumns() {
-        ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream()
-                         .map(ExternalFileType::getName)
-                         .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
-                         .forEach(item -> availableColumnsProperty.getValue().add(item));
+        preferences.getFilePreferences().getExternalFileTypes().stream()
+                   .map(ExternalFileType::getName)
+                   .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
+                   .forEach(item -> availableColumnsProperty.getValue().add(item));
     }
 
     private void removeExtraFileColumns() {
@@ -218,7 +210,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     public void moveColumnUp() {
         MainTableColumnModel selectedColumn = selectedColumnModelProperty.getValue().getSelectedItem();
         int row = columnsListProperty.getValue().indexOf(selectedColumn);
-        if (selectedColumn == null || row < 1) {
+        if ((selectedColumn == null) || (row < 1)) {
             return;
         }
 
@@ -230,7 +222,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     public void moveColumnDown() {
         MainTableColumnModel selectedColumn = selectedColumnModelProperty.getValue().getSelectedItem();
         int row = columnsListProperty.getValue().indexOf(selectedColumn);
-        if (selectedColumn == null || row > columnsListProperty.getValue().size() - 2) {
+        if ((selectedColumn == null) || (row > (columnsListProperty.getValue().size() - 2))) {
             return;
         }
 
@@ -241,47 +233,29 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        MainTablePreferences newMainTablePreferences = preferences.getMainTablePreferences();
-        preferences.storeMainTablePreferences(new MainTablePreferences(
-                new ColumnPreferences(
-                        columnsListProperty.getValue(),
-                        newMainTablePreferences.getColumnPreferences().getColumnSortOrder()),
-                autoResizeColumnsProperty.getValue(),
-                extraFileColumnsEnabledProperty.getValue()
-        ));
+        mainTablePreferences.getColumnPreferences().setColumns(columnsListProperty.getValue());
+        mainTablePreferences.setResizeColumnsToFit(autoResizeColumnsProperty.getValue());
+        mainTablePreferences.setExtraFileColumnsEnabled(extraFileColumnsEnabledProperty.getValue());
 
-        SpecialFieldsPreferences newSpecialFieldsPreferences = new SpecialFieldsPreferences(
-                specialFieldsEnabledProperty.getValue(),
-                specialFieldsSyncKeywordsProperty.getValue(),
-                specialFieldsSerializeProperty.getValue());
+        specialFieldsPreferences.setSpecialFieldsEnabled(specialFieldsEnabledProperty.getValue());
 
-        if (initialSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords() != newSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords()) {
-            restartWarnings.add(Localization.lang("Synchronize special fields to keywords"));
-        }
-
-        if (initialSpecialFieldsPreferences.shouldSerializeSpecialFields() != newSpecialFieldsPreferences.shouldSerializeSpecialFields()) {
-            restartWarnings.add(Localization.lang("Serialize special fields"));
-        }
-
-        preferences.storeSpecialFieldsPreferences(newSpecialFieldsPreferences);
-
-        DisplayStyle displayStyle = DisplayStyle.LASTNAME_FIRSTNAME;
-        if (namesNatbibProperty.getValue()) {
-            displayStyle = DisplayStyle.NATBIB;
+        if (nameLastFirstProperty.getValue()) {
+            nameDisplayPreferences.setDisplayStyle(DisplayStyle.LASTNAME_FIRSTNAME);
+        } else if (namesNatbibProperty.getValue()) {
+            nameDisplayPreferences.setDisplayStyle(DisplayStyle.NATBIB);
         } else if (nameAsIsProperty.getValue()) {
-            displayStyle = DisplayStyle.AS_IS;
+            nameDisplayPreferences.setDisplayStyle(DisplayStyle.AS_IS);
         } else if (nameFirstLastProperty.getValue()) {
-            displayStyle = DisplayStyle.FIRSTNAME_LASTNAME;
+            nameDisplayPreferences.setDisplayStyle(DisplayStyle.FIRSTNAME_LASTNAME);
         }
 
-        AbbreviationStyle abbreviationStyle = AbbreviationStyle.NONE;
-        if (abbreviationEnabledProperty.getValue()) {
-            abbreviationStyle = AbbreviationStyle.FULL;
+        if (abbreviationDisabledProperty.getValue()) {
+            nameDisplayPreferences.setAbbreviationStyle(AbbreviationStyle.NONE);
+        } else if (abbreviationEnabledProperty.getValue()) {
+            nameDisplayPreferences.setAbbreviationStyle(AbbreviationStyle.FULL);
         } else if (abbreviationLastNameOnlyProperty.getValue()) {
-            abbreviationStyle = AbbreviationStyle.LASTNAME_ONLY;
+            nameDisplayPreferences.setAbbreviationStyle(AbbreviationStyle.LASTNAME_ONLY);
         }
-
-        preferences.storeMainTableNameFormatPreferences(new MainTableNameFormatPreferences(displayStyle, abbreviationStyle));
     }
 
     ValidationStatus columnsListValidationStatus() {
@@ -317,14 +291,6 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty specialFieldsEnabledProperty() {
         return this.specialFieldsEnabledProperty;
-    }
-
-    public BooleanProperty specialFieldsSyncKeywordsProperty() {
-        return this.specialFieldsSyncKeywordsProperty;
-    }
-
-    public BooleanProperty specialFieldsSerializeProperty() {
-        return this.specialFieldsSerializeProperty;
     }
 
     public BooleanProperty extraFileColumnsEnabledProperty() {

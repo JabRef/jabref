@@ -552,7 +552,7 @@
         </else-if>
         <else>
           <text macro="author" suffix=". "/>
-          <text macro="title"/>
+          <text macro="title" suffix=". "/>
           <text macro="container-contributors"/>
           <text macro="secondary-contributors"/>
           <text macro="container-title"/>

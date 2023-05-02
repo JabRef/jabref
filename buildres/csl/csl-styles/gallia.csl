@@ -14,9 +14,8 @@
     <category field="anthropology"/>
     <issn>0016-4119</issn>
     <eissn>2109-9588</eissn>
-    <summary>Author-date style for Gallia - Archéologie des Gaules. Extra fields needed for exhibition catalogues: genre, event place, event date; place is to be empty replaced by publisher place in extra field.
-    Voir si maintien de verbe conjugué pour éd/trad. textes anciens. Solution possible via IFAO</summary>
-    <updated>2020-08-20T01:59:23+00:00</updated>
+    <summary>Author-date style for Gallia - Archéologie des Gaules. Extra fields needed for exhibition catalogues: genre, event place, event date; place is to be empty replaced by publisher place in extra field. Ancient sources need to be inserted manually</summary>
+    <updated>2021-09-06T04:59:23+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr-FR">
@@ -41,18 +40,9 @@
       </if>
     </choose>
   </macro>
-  <macro name="translator">
-    <names variable="translator" delimiter=", ">
-      <label form="verb-short" suffix=" "/>
-      <name name-as-sort-order="all" sort-separator=" " initialize-with="." delimiter=", "/>
-    </names>
-  </macro>
-  <macro name="author">
-    <names variable="author" delimiter=", ">
-      <name name-as-sort-order="all" sort-separator=" " initialize-with="." delimiter=", "/>
-      <substitute>
-        <text macro="editor"/>
-      </substitute>
+  <macro name="editor-encyclopedia">
+    <names variable="editor">
+      <name sort-separator=" " initialize-with=".&#160;" delimiter=", "/>
     </names>
   </macro>
   <macro name="editor">
@@ -60,20 +50,17 @@
       <if variable="container-author">
         <text macro="container-author"/>
       </if>
-      <else-if variable="editor">
+      <else>
         <names variable="editor">
-          <name name-as-sort-order="all" sort-separator=" " initialize-with="." delimiter=", "/>
+          <name name-as-sort-order="all" sort-separator=" " initialize-with=".&#160;" delimiter=", "/>
           <label form="short" text-case="lowercase" prefix=" (" suffix=")"/>
         </names>
-      </else-if>
-      <else>
-        <text value="Collectif"/>
       </else>
     </choose>
   </macro>
   <macro name="container-author">
     <names variable="container-author" delimiter=", ">
-      <name name-as-sort-order="all" sort-separator=" " initialize-with="." delimiter=", "/>
+      <name name-as-sort-order="all" sort-separator=" " initialize-with=".&#160;" delimiter=", "/>
       <et-al font-style="italic" font-variant="normal"/>
     </names>
   </macro>
@@ -98,6 +85,27 @@
           <name form="short" delimiter=", "/>
           <label form="short" text-case="lowercase" prefix=" "/>
           <et-al font-variant="normal" font-style="italic"/>
+        </names>
+      </if>
+      <else>
+        <text value="Collectif"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="author-short-call">
+    <names variable="author" delimiter=", ">
+      <name name-as-sort-order="all" sort-separator=" " initialize-with=".&#160;" delimiter=", "/>
+      <substitute>
+        <text macro="editor-short-call"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="editor-short-call">
+    <choose>
+      <if variable="editor">
+        <names variable="editor">
+          <name name-as-sort-order="all" sort-separator=" " initialize-with=".&#160;" delimiter=", "/>
+          <label form="short" text-case="lowercase" prefix=" (" suffix=")"/>
         </names>
       </if>
       <else>
@@ -176,7 +184,7 @@
       <if is-numeric="edition">
         <group delimiter=" ">
           <number variable="edition" form="ordinal"/>
-          <text term="edition" form="short" suffix=", " text-case="lowercase"/>
+          <text term="edition" form="short" text-case="lowercase"/>
         </group>
       </if>
       <else>
@@ -189,25 +197,14 @@
       <key variable="issued"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="&#160;; ">
-      <choose>
-        <if variable="translator">
-          <text macro="author-short" suffix=", "/>
-          <text variable="title" form="short" font-style="italic"/>
-        </if>
-        <else>
-          <text macro="author-short" suffix=", "/>
-          <text macro="year-date"/>
-        </else>
-      </choose>
+      <text macro="author-short" suffix=" "/>
+      <text macro="year-date"/>
       <group prefix=", ">
         <choose>
           <if locator="paragraph issue" match="any">
             <label variable="locator" form="short" suffix="&#160;"/>
             <text variable="locator"/>
           </if>
-          <else-if locator="page">
-            <text variable="locator"/>
-          </else-if>
           <else>
             <label variable="locator" form="short" suffix=".&#160;"/>
             <text variable="locator"/>
@@ -218,40 +215,50 @@
   </citation>
   <bibliography>
     <sort>
-      <key macro="author"/>
+      <key macro="author-short-call"/>
       <key variable="issued"/>
       <key variable="page-first"/>
       <key variable="title"/>
     </sort>
     <layout suffix=".">
-      <group delimiter=" " font-weight="bold">
-        <choose>
-          <if variable="translator">
-            <text macro="author"/>
-          </if>
-          <else>
-            <text macro="author"/>
-            <text macro="year-date" suffix="&#160;"/>
-          </else>
-        </choose>
+      <group delimiter=" " font-weight="bold" suffix="&#160;">
+        <text macro="author-short-call"/>
+        <text macro="year-date"/>
+        <group font-weight="normal">
+          <group prefix="(" suffix=")" delimiter=" ">
+            <choose>
+              <if variable="original-date" match="all">
+                <group>
+                  <text value="1"/>
+                  <text value="ère" vertical-align="sup"/>
+                </group>
+                <text term="edition" form="short"/>
+                <date variable="original-date">
+                  <date-part name="year"/>
+                </date>
+              </if>
+              <else-if is-numeric="edition">
+                <text macro="edition"/>
+              </else-if>
+            </choose>
+          </group>
+        </group>
       </group>
       <group prefix=": ">
         <choose>
           <if type="thesis report">
-            <group delimiter=", " suffix=".">
+            <group delimiter=", ">
               <text macro="title" font-style="italic"/>
               <text variable="genre"/>
               <text variable="publisher"/>
-              <group>
-                <choose>
-                  <if variable="number-of-pages" match="any">
-                    <text variable="number-of-pages" suffix=" p."/>
-                  </if>
-                  <else>
-                    <text variable="page" suffix=" p."/>
-                  </else>
-                </choose>
-              </group>
+              <choose>
+                <if variable="number-of-pages" match="any">
+                  <text variable="number-of-pages" suffix=" p."/>
+                </if>
+                <else>
+                  <text variable="page" suffix=" p."/>
+                </else>
+              </choose>
             </group>
           </if>
           <else-if type="webpage">
@@ -264,16 +271,16 @@
             <group delimiter=", " suffix=".">
               <text macro="title"/>
               <text macro="container-title"/>
-              <text variable="volume"/>
-              <text variable="issue"/>
+              <group delimiter="&#8209;">
+                <text variable="volume"/>
+                <text variable="issue"/>
+              </group>
               <text macro="pages"/>
             </group>
           </else-if>
           <else-if type="book graphic" match="any">
             <group suffix=".">
               <text macro="title" suffix=", "/>
-              <text macro="translator" suffix=", "/>
-              <text macro="edition"/>
               <text macro="publisher"/>
               <text macro="collection"/>
               <group>
@@ -281,11 +288,33 @@
               </group>
             </group>
           </else-if>
-          <else-if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
+          <else-if type="entry-dictionary entry-encyclopedia" match="any">
+            <group delimiter=", ">
+              <text macro="container-title"/>
+              <text macro="editor-encyclopedia" prefix="éd. "/>
+              <group delimiter=" ">
+                <text macro="publisher"/>
+                <text macro="collection"/>
+              </group>
+              <group delimiter=" ">
+                <text term="sub-verbo" form="short" font-style="italic"/>
+                <text macro="title"/>
+              </group>
+              <text macro="pages"/>
+            </group>
+          </else-if>
+          <else-if type="chapter paper-conference" match="any">
             <text macro="title" suffix=", "/>
             <group>
-              <text value="in" suffix=" "/>
-              <text macro="editor" suffix=", "/>
+              <choose>
+                <if variable="container-author editor" match="none">
+                  <text term="in" suffix=" "/>
+                </if>
+                <else>
+                  <text term="in" suffix=" " font-style="italic"/>
+                  <text macro="editor" suffix=", "/>
+                </else>
+              </choose>
               <text macro="container-title"/>
               <text macro="publisher" prefix=", "/>
               <text macro="collection"/>
@@ -293,13 +322,13 @@
             </group>
           </else-if>
           <else>
-            <group suffix=".">
-              <text macro="title" suffix=", "/>
+            <group delimiter=", ">
+              <text macro="title"/>
               <text macro="edition"/>
               <text macro="publisher"/>
               <text macro="collection"/>
               <group>
-                <text variable="number-of-pages" prefix=", " suffix=" p."/>
+                <text variable="number-of-pages" suffix=" p."/>
               </group>
             </group>
           </else>

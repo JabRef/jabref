@@ -3,8 +3,8 @@ package org.jabref.logic.remote;
 import java.io.IOException;
 
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.remote.server.MessageHandler;
-import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
+import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.AfterEach;
@@ -23,15 +23,15 @@ import static org.mockito.Mockito.verify;
 class RemoteCommunicationTest {
 
     private RemoteClient client;
-    private RemoteListenerServerLifecycle serverLifeCycle;
-    private MessageHandler server;
+    private RemoteListenerServerManager serverLifeCycle;
+    private RemoteMessageHandler server;
 
     @BeforeEach
     void setUp() {
         final int port = 34567;
 
-        server = mock(MessageHandler.class);
-        serverLifeCycle = new RemoteListenerServerLifecycle();
+        server = mock(RemoteMessageHandler.class);
+        serverLifeCycle = new RemoteListenerServerManager();
         serverLifeCycle.openAndStart(server, port);
 
         client = new RemoteClient(port);

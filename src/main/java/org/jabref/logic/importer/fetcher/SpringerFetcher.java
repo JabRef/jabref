@@ -12,9 +12,11 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
+import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -36,15 +38,25 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote see <a href="https://dev.springernature.com/">API documentation</a> for more details
  */
-public class SpringerFetcher implements PagedSearchBasedParserFetcher {
+public class SpringerFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
+
+    public static final String FETCHER_NAME = "Springer";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
-    private static final String API_URL = "http://api.springernature.com/meta/v1/json";
+    private static final String API_URL = "https://api.springernature.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
+    // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
+    private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
+
+    private final ImporterPreferences importerPreferences;
+
+    public SpringerFetcher(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
 
     /**
-     * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry
+     * Convert a JSONObject obtained from <a href="http://api.springer.com/metadata/json">http://api.springer.com/metadata/json</a> to a BibEntry
      *
      * @param springerJsonEntry the JSONObject from search results
      * @return the converted BibEntry
@@ -152,7 +164,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
     @Override
     public String getName() {
-        return "Springer";
+        return FETCHER_NAME;
     }
 
     @Override
@@ -160,11 +172,34 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_SPRINGER);
     }
 
+    private String getApiKey() {
+        return importerPreferences.getApiKeys()
+                                  .stream()
+                                  .filter(key -> key.getName().equalsIgnoreCase(FETCHER_NAME))
+                                  .filter(FetcherApiKey::shouldUse)
+                                  .findFirst()
+                                  .map(FetcherApiKey::getKey)
+                                  .orElse(API_KEY);
+    }
+
+    @Override
+    public String getTestUrl() {
+        return TEST_URL_WITHOUT_API_KEY;
+    }
+
+    /**
+     * Gets the query URL
+     *
+     * @param luceneQuery the search query
+     * @param pageNumber  the number of the page indexed from 0
+     * @return URL
+     */
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new SpringerQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Search query
-        uriBuilder.addParameter("api_key", API_KEY); // API key
+        uriBuilder.addParameter("api_key", getApiKey()); // API key
         uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
         uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
         return uriBuilder.build().toURL();
@@ -176,7 +211,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
         complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("title:" + title));
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("journal:" + journal));
         // Since Springer API does not support year range search, we ignore formYear and toYear and use "singleYear" only
-        complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add("date:" + year.toString() + "*"));
+        complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add("date:" + year + "*"));
         searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
         return String.join(" AND ", searchTerms);
     }

@@ -24,12 +24,12 @@
       </term>
       <term name="and others"/>
       <term name="letter" form="short">lettera</term>
+      <term name="et-al">[et al.]</term>
     </terms>
   </locale>
   <macro name="responsibility">
     <names variable="author">
       <name delimiter-precedes-last="never" et-al-min="4" et-al-use-first="3"/>
-      <et-al prefix=" [" suffix="]"/>
       <label form="short" text-case="lowercase" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
@@ -41,7 +41,7 @@
   <macro name="author-citation">
     <names variable="author">
       <name form="short" delimiter=" - " et-al-min="2" et-al-use-first="1"/>
-      <et-al term="and others" prefix=" [" suffix="]"/>
+      <et-al term="and others"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>

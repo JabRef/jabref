@@ -1,32 +1,27 @@
 package org.jabref.gui.specialfields;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 public class SpecialFieldsPreferences {
 
     public static final int COLUMN_RANKING_WIDTH = 5 * 16; // Width of Ranking Icon Column
 
-    private final boolean specialFieldsEnabled;
-    private final boolean autoSyncSpecialFieldsToKeyWords;
-    private final boolean serializeSpecialFields;
+    private final BooleanProperty specialFieldsEnabled;
 
-    public SpecialFieldsPreferences(boolean specialFieldsEnabled, boolean autoSyncSpecialFieldsToKeyWords, boolean serializeSpecialFields) {
-        this.specialFieldsEnabled = specialFieldsEnabled;
-        this.autoSyncSpecialFieldsToKeyWords = autoSyncSpecialFieldsToKeyWords;
-        this.serializeSpecialFields = serializeSpecialFields;
+    public SpecialFieldsPreferences(boolean specialFieldsEnabled) {
+        this.specialFieldsEnabled = new SimpleBooleanProperty(specialFieldsEnabled);
     }
 
     public boolean isSpecialFieldsEnabled() {
+        return specialFieldsEnabled.getValue();
+    }
+
+    public BooleanProperty specialFieldsEnabledProperty() {
         return specialFieldsEnabled;
     }
 
-    public boolean shouldAutoSyncSpecialFieldsToKeyWords() {
-        return autoSyncSpecialFieldsToKeyWords;
-    }
-
-    public boolean shouldSerializeSpecialFields() {
-        return serializeSpecialFields;
-    }
-
-    public boolean isKeywordSyncEnabled() {
-        return specialFieldsEnabled && autoSyncSpecialFieldsToKeyWords;
+    public void setSpecialFieldsEnabled(boolean specialFieldsEnabled) {
+        this.specialFieldsEnabled.set(specialFieldsEnabled);
     }
 }

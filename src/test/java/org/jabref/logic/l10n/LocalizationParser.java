@@ -182,7 +182,6 @@ public class LocalizationParser {
 
         // Record which keys are requested; we pretend that we have all keys
         ResourceBundle registerUsageResourceBundle = new ResourceBundle() {
-
             @Override
             protected Object handleGetObject(String key) {
                 result.add(key);

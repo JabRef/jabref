@@ -10,12 +10,16 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.LibraryTab;
+import org.jabref.logic.crawler.Crawler;
+import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.model.study.Study;
 import org.jabref.preferences.FilePreferences;
 
 import net.harawata.appdirs.AppDirsFactory;
@@ -23,13 +27,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
+ * Represents everything related to a BIB file.
+ *
+ * <p> The entries are stored in BibDatabase, the other data in MetaData
  * and the options relevant for this file in Defaults.
+ * </p>
+ * <p>
+ *     To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+ * </p>
  */
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
-
-    public static final String SEARCH_INDEX_BASE_PATH = "JabRef";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
@@ -39,7 +47,7 @@ public class BibDatabaseContext {
     /**
      * The path where this database was last saved to.
      */
-    private Optional<Path> path;
+    private Path path;
 
     private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
@@ -57,7 +65,6 @@ public class BibDatabaseContext {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
-        this.path = Optional.empty();
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
@@ -67,7 +74,7 @@ public class BibDatabaseContext {
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
         this(database, metaData);
         Objects.requireNonNull(location);
-        this.path = Optional.ofNullable(path);
+        this.path = path;
 
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
@@ -83,7 +90,7 @@ public class BibDatabaseContext {
     }
 
     public void setDatabasePath(Path file) {
-        this.path = Optional.ofNullable(file);
+        this.path = file;
     }
 
     /**
@@ -92,11 +99,11 @@ public class BibDatabaseContext {
      * @return Optional of the relevant Path, or Optional.empty() if none is defined.
      */
     public Optional<Path> getDatabasePath() {
-        return path;
+        return Optional.ofNullable(path);
     }
 
     public void clearDatabasePath() {
-        this.path = Optional.empty();
+        this.path = null;
     }
 
     public BibDatabase getDatabase() {
@@ -116,16 +123,31 @@ public class BibDatabaseContext {
     }
 
     /**
+     * Returns whether this .bib file belongs to a {@link Study}
+     */
+    public boolean isStudy() {
+        return this.getDatabasePath()
+                .map(path -> path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
+                        Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME)))
+                .orElse(false);
+    }
+
+    /**
      * Look up the directories set up for this database.
-     * There can be up to three directory definitions for these files: the database's
-     * metadata can specify a general directory and/or a user-specific directory, or the preferences can specify one.
+     * There can be up to four directories definitions for these files:
+     * <ol>
+     * <li>next to the .bib file.</li>
+     * <li>the preferences can specify a default one.</li>
+     * <li>the database's metadata can specify a general directory.</li>
+     * <li>the database's metadata can specify a user-specific directory.</li>
+     * </ol>
      * <p>
      * The settings are prioritized in the following order, and the first defined setting is used:
      * <ol>
      *     <li>user-specific metadata directory</li>
      *     <li>general metadata directory</li>
-     *     <li>preferences directory</li>
-     *     <li>BIB file directory</li>
+     *     <li>BIB file directory (if configured in the preferences AND none of the two above directories are configured)</li>
+     *     <li>preferences directory (if .bib file directory should not be used according to the preferences)</li>
      * </ol>
      *
      * @param preferences The fileDirectory preferences
@@ -141,19 +163,21 @@ public class BibDatabaseContext {
         metaData.getDefaultFileDirectory()
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
-        // 3. Preferences directory
-        preferences.getFileDirectory().ifPresent(fileDirs::add);
-
-        // 4. BIB file directory
-        if (preferences.shouldStoreFilesRelativeToBib()) {
+        // 3. BIB file directory or Main file directory
+        // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
+        // (in the metadata of the bib file)
+        if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
                     parentPath = Path.of(System.getProperty("user.dir"));
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-                fileDirs.add(0, parentPath);
+                fileDirs.add(parentPath);
             });
+        } else {
+            // Main file directory
+            preferences.getMainFileDirectory().ifPresent(fileDirs::add);
         }
 
         return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
@@ -162,11 +186,12 @@ public class BibDatabaseContext {
     /**
      * Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}
      *
-     * @param preferences The FilePreferences
-     * @return Optional of Path
+     * @return the path - or an empty optional, if none of the directories exists
      */
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
-        return getFileDirectories(preferences).stream().filter(Files::exists).findFirst();
+        return getFileDirectories(preferences).stream()
+                                              .filter(Files::exists)
+                                              .findFirst();
     }
 
     private Path getFileDirectoryPath(String directoryName) {
@@ -214,17 +239,32 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
+    /**
+     * check if the database has any empty entries
+     *
+     * @return true if the database has any empty entries; otherwise false
+     */
+    public boolean hasEmptyEntries() {
+        return this.getEntries().stream().anyMatch(entry -> entry.getFields().isEmpty());
+    }
+
     public static Path getFulltextIndexBasePath() {
-        return Path.of(AppDirsFactory.getInstance().getUserDataDir(SEARCH_INDEX_BASE_PATH, SearchFieldConstants.VERSION, "org.jabref"));
+        return Path.of(AppDirsFactory.getInstance().getUserDataDir(OS.APP_DIR_APP_NAME, SearchFieldConstants.VERSION, OS.APP_DIR_APP_AUTHOR));
     }
 
     public Path getFulltextIndexPath() {
         Path appData = getFulltextIndexBasePath();
-        LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData.toString());
+        Path indexPath;
+
         if (getDatabasePath().isPresent()) {
-            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
+            return indexPath;
         }
-        return appData.resolve("unsaved");
+
+        indexPath = appData.resolve("unsaved");
+        LOGGER.debug("Using index for unsaved database: {}", indexPath);
+        return indexPath;
     }
 
     @Override

@@ -3,7 +3,10 @@ package org.jabref.gui.desktop.os;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import org.jabref.gui.DialogService;
+
 public interface NativeDesktop {
+
     void openFile(String filePath, String fileType) throws IOException;
 
     /**
@@ -11,13 +14,12 @@ public interface NativeDesktop {
      *
      * @param filePath    The filename.
      * @param application Link to the app that opens the file.
-     * @throws IOException
      */
     void openFileWithApplication(String filePath, String application) throws IOException;
 
     void openFolderAndSelectFile(Path file) throws IOException;
 
-    void openConsole(String absolutePath) throws IOException;
+    void openConsole(String absolutePath, DialogService dialogService) throws IOException;
 
     String detectProgramPath(String programName, String directoryName);
 
@@ -27,6 +29,13 @@ public interface NativeDesktop {
      * @return the path to the applications folder.
      */
     Path getApplicationDirectory();
+
+    /**
+     * Get the user's default file chooser directory
+     *
+     * @return The path to the directory
+     */
+     Path getDefaultFileChooserDirectory();
 
     /**
      * Returns the path to the system's user directory.

@@ -3,33 +3,30 @@ package org.jabref.model.openoffice.uno;
 import java.util.Optional;
 
 import com.sun.star.text.XFootnote;
+import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
 
 public class UnoTextRange {
 
-    private UnoTextRange() { }
-
-    /**
-     *  If original is in a footnote, return a range containing
-     *  the corresponding footnote marker.
-     *
-     *  Returns Optional.empty if not in a footnote.
-     */
-    public static Optional<XTextRange> getFootnoteMarkRange(XTextRange original) {
-        Optional<XFootnote> footer = UnoCast.cast(XFootnote.class, original.getText());
-        if (footer.isPresent()) {
-            // If we are inside a footnote,
-            // find the linking footnote marker:
-            // The footnote's anchor gives the correct position in the text:
-            return Optional.ofNullable(footer.get().getAnchor());
-        }
-        return Optional.empty();
+    private UnoTextRange() {
     }
 
     /**
-     * Test if two XTextRange values are comparable (i.e. they share
-     * the same getText()).
+     * If original is in a footnote, return a range containing the corresponding footnote marker.
+     * <p>
+     * Returns Optional.empty if not in a footnote.
+     */
+    public static Optional<XTextRange> getFootnoteMarkRange(XTextRange original) {
+        Optional<XFootnote> footer = UnoCast.cast(XFootnote.class, original.getText());
+        // If we are inside a footnote,
+        // find the linking footnote marker:
+        // The footnote's anchor gives the correct position in the text:
+        return footer.map(XTextContent::getAnchor);
+    }
+
+    /**
+     * Test if two XTextRange values are comparable (i.e. they share the same getText()).
      */
     public static boolean comparables(XTextRange a, XTextRange b) {
         return a.getText() == b.getText();
@@ -37,7 +34,6 @@ public class UnoTextRange {
 
     /**
      * @return follows java conventions
-     *
      * 1 if  (a &gt; b); (-1) if (a &lt; b)
      */
     public static int compareStartsUnsafe(XTextRangeCompare compare, XTextRange a, XTextRange b) {
@@ -54,7 +50,6 @@ public class UnoTextRange {
 
     /**
      * @return follows java conventions
-     *
      * 1 if  (a &gt; b); (-1) if (a &lt; b)
      */
     public static int compareEnds(XTextRange a, XTextRange b) {

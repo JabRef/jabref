@@ -5,9 +5,9 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.preferences.PreferencesService;
 
-public class PushToWinEdt extends AbstractPushToApplication implements PushToApplication {
+public class PushToWinEdt extends AbstractPushToApplication {
 
-    public static final String NAME = "WinEdt";
+    public static final String NAME = PushToApplications.WIN_EDT;
 
     public PushToWinEdt(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
@@ -19,7 +19,7 @@ public class PushToWinEdt extends AbstractPushToApplication implements PushToApp
     }
 
     @Override
-    public JabRefIcon getIcon() {
+    public JabRefIcon getApplicationIcon() {
         return IconTheme.JabRefIcons.APPLICATION_WINEDT;
     }
 

@@ -255,7 +255,7 @@
             <else-if type="article-journal" match="any">
               <group delimiter=", " prefix=" ">
                 <text variable="title"/>
-                <text variable="container-title-short"/>
+                <text variable="container-title" form="short"/>
                 <text variable="volume"/>
                 <text variable="page"/>
                 <text macro="doi"/>

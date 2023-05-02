@@ -7,8 +7,8 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.remote.server.MessageHandler;
-import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
+import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.logic.util.OS;
 import org.jabref.support.DisabledOnCIServer;
 
@@ -23,17 +23,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-/**
- * Tests where the remote client and server setup is wrong.
- */
 @DisabledOnCIServer("Tests fails sporadically on CI server")
 class RemoteSetupTest {
 
-    private MessageHandler messageHandler;
+    private RemoteMessageHandler messageHandler;
 
     @BeforeEach
     void setUp() {
-        messageHandler = mock(MessageHandler.class);
+        messageHandler = mock(RemoteMessageHandler.class);
     }
 
     @Test
@@ -41,7 +38,7 @@ class RemoteSetupTest {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
-        try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+        try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
             server.openAndStart(messageHandler, port);
             assertTrue(server.isOpen());
@@ -57,7 +54,7 @@ class RemoteSetupTest {
         final int port = 34567;
         final String[] message = new String[]{"MYMESSAGE"};
 
-        try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+        try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
             assertTrue(server.isNotStartedBefore());
             server.stop();
@@ -87,7 +84,7 @@ class RemoteSetupTest {
         try (ServerSocket socket = new ServerSocket(port)) {
             assertTrue(socket.isBound());
 
-            try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+            try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
                 assertFalse(server.isOpen());
                 server.openAndStart(messageHandler, port);
                 assertFalse(server.isOpen());
@@ -134,7 +131,7 @@ class RemoteSetupTest {
     void pingReturnsTrueWhenServerIsRunning() {
         final int port = 34567;
 
-        try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
+        try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             server.openAndStart(messageHandler, port);
 
             assertTrue(new RemoteClient(port).ping());

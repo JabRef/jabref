@@ -97,5 +97,4 @@ public class ConvertToBiblatexCleanupTest {
         assertEquals(Optional.empty(), entry.getField(StandardField.JOURNAL));
         assertEquals(Optional.of("Best of JabRef"), entry.getField(StandardField.JOURNALTITLE));
     }
-
 }

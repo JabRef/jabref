@@ -11,7 +11,7 @@ import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ public class BstPreviewLayout implements PreviewLayout {
 
     private final String name;
 
-    private VM vm;
+    private BstVM bstVM;
     private String error;
 
     public BstPreviewLayout(Path path) {
@@ -34,7 +34,7 @@ public class BstPreviewLayout implements PreviewLayout {
             return;
         }
         try {
-            vm = new VM(path.toFile());
+            bstVM = new BstVM(path);
         } catch (Exception e) {
             LOGGER.error("Could not read {}.", path.toAbsolutePath(), e);
             error = Localization.lang("Error opening file '%0'.", path.toString());
@@ -42,14 +42,14 @@ public class BstPreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String generatePreview(BibEntry originalEntry, BibDatabase database) {
+    public String generatePreview(BibEntry originalEntry, BibDatabaseContext databaseContext) {
         if (error != null) {
             return error;
         }
         // ensure that the entry is of BibTeX format (and do not modify the original entry)
         BibEntry entry = (BibEntry) originalEntry.clone();
         new ConvertToBibtexCleanup().cleanup(entry);
-        String result = vm.run(List.of(entry));
+        String result = bstVM.render(List.of(entry));
         // Remove all comments
         result = result.replaceAll("%.*", "");
         // Remove all LaTeX comments

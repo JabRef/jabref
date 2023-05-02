@@ -17,7 +17,8 @@ public class UnoSelection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnoSelection.class);
 
-    private UnoSelection() { }
+    private UnoSelection() {
+    }
 
     private static Optional<XSelectionSupplier> getSelectionSupplier(XTextDocument doc) {
         if (doc == null) {
@@ -39,46 +40,21 @@ public class UnoSelection {
 
     /**
      * @return may be Optional.empty(), or some type supporting XServiceInfo
-     *
-     *
-     * So far it seems the first thing we have to do
-     * with a selection is to decide what do we have.
-     *
+     * So far it seems the first thing we have to do with a selection is to decide what do we have.
+     * <p>
      * One way to do that is accessing its XServiceInfo interface.
-     *
-     * Experiments using printServiceInfo with cursor in various
-     * positions in the document:
-     *
-     * With cursor within the frame, in text:
-     * *** xserviceinfo.getImplementationName: "SwXTextRanges"
-     *      "com.sun.star.text.TextRanges"
-     *
-     * With cursor somewhere else in text:
-     * *** xserviceinfo.getImplementationName: "SwXTextRanges"
-     *      "com.sun.star.text.TextRanges"
-     *
-     * With cursor in comment (also known as "annotation"):
-     * *** XSelectionSupplier is OK
-     * *** Object initialSelection is null
-     * *** xserviceinfo is null
-     *
-     * With frame selected:
-     * *** xserviceinfo.getImplementationName: "SwXTextFrame"
-     *     "com.sun.star.text.BaseFrame"
-     *     "com.sun.star.text.TextContent"
-     *     "com.sun.star.document.LinkTarget"
-     *     "com.sun.star.text.TextFrame"
-     *     "com.sun.star.text.Text"
-     *
-     * With cursor selecting an inserted image:
-     * *** XSelectionSupplier is OK
-     * *** Object initialSelection is OK
-     * *** xserviceinfo is OK
-     * *** xserviceinfo.getImplementationName: "SwXTextGraphicObject"
-     *      "com.sun.star.text.BaseFrame"
-     *      "com.sun.star.text.TextContent"
-     *      "com.sun.star.document.LinkTarget"
-     *      "com.sun.star.text.TextGraphicObject"
+     * <p>
+     * Experiments using printServiceInfo with cursor in various positions in the document:
+     * <p>
+     * With cursor within the frame, in text: *** xserviceinfo.getImplementationName: "SwXTextRanges" "com.sun.star.text.TextRanges"
+     * <p>
+     * With cursor somewhere else in text: *** xserviceinfo.getImplementationName: "SwXTextRanges" "com.sun.star.text.TextRanges"
+     * <p>
+     * With cursor in comment (also known as "annotation"): *** XSelectionSupplier is OK *** Object initialSelection is null *** xserviceinfo is null
+     * <p>
+     * With frame selected: *** xserviceinfo.getImplementationName: "SwXTextFrame" "com.sun.star.text.BaseFrame" "com.sun.star.text.TextContent" "com.sun.star.document.LinkTarget" "com.sun.star.text.TextFrame" "com.sun.star.text.Text"
+     * <p>
+     * With cursor selecting an inserted image: *** XSelectionSupplier is OK *** Object initialSelection is OK *** xserviceinfo is OK *** xserviceinfo.getImplementationName: "SwXTextGraphicObject" "com.sun.star.text.BaseFrame" "com.sun.star.text.TextContent" "com.sun.star.document.LinkTarget" "com.sun.star.text.TextGraphicObject"
      */
     public static Optional<XServiceInfo> getSelectionAsXServiceInfo(XTextDocument doc) {
         Objects.requireNonNull(doc);
@@ -100,13 +76,9 @@ public class UnoSelection {
     }
 
     /**
-     * Select the object represented by {@code newSelection} if it is
-     * known and selectable in this {@code XSelectionSupplier} object.
-     *
-     * Presumably result from {@code XSelectionSupplier.getSelection()} is
-     * usually OK. It also accepted
-     * {@code XTextRange newSelection = doc.getText().getStart();}
-     *
+     * Select the object represented by {@code newSelection} if it is known and selectable in this {@code XSelectionSupplier} object.
+     * <p>
+     * Presumably result from {@code XSelectionSupplier.getSelection()} is usually OK. It also accepted {@code XTextRange newSelection = doc.getText().getStart();}
      */
     public static void select(XTextDocument doc, Object newSelection) {
         Objects.requireNonNull(doc);

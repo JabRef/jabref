@@ -5,7 +5,7 @@
     <title-short>JOPR</title-short>
     <id>http://www.zotero.org/styles/journal-of-oil-palm-research</id>
     <link href="http://www.zotero.org/styles/journal-of-oil-palm-research" rel="self"/>
-    <link href="http://www.zotero.org/styles/cellular-reprogramming" rel="template"/>
+    <link href="http://www.zotero.org/styles/mary-ann-liebert-harvard" rel="template"/>
     <link href="http://jopr.mpob.gov.my/guide-t/" rel="documentation"/>
     <link href="http://jopr.mpob.gov.my/wp-content/uploads/2021/03/JOPR-Vol-331-March-2021-dragged-16.pdf" rel="documentation"/>
     <author>
@@ -14,13 +14,23 @@
     <category citation-format="author-date"/>
     <category field="biology"/>
     <issn>1511-2780</issn>
-    <updated>2021-04-28T08:36:46+00:00</updated>
+    <updated>2021-11-03T09:33:07+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="accessed">accessed on</term>
+    </terms>
+  </locale>
   <macro name="author-short">
     <names variable="author">
       <name form="short" and="text"/>
       <et-al font-style="italic"/>
+      <label form="short" prefix=", "/>
+      <substitute>
+        <names variable="editor translator"/>
+        <text variable="title"/>
+      </substitute>
     </names>
   </macro>
   <macro name="author-count">
@@ -32,6 +42,11 @@
     <names variable="author">
       <name delimiter="; " and="text" delimiter-precedes-last="never" initialize-with=" " name-as-sort-order="all"/>
       <et-al font-style="italic"/>
+      <label form="short" prefix=", "/>
+      <substitute>
+        <names variable="editor translator"/>
+        <text variable="title"/>
+      </substitute>
     </names>
   </macro>
   <macro name="issued">
@@ -41,8 +56,8 @@
   </macro>
   <macro name="publisher">
     <group delimiter=", ">
-      <text variable="publisher-place"/>
       <text variable="publisher"/>
+      <text variable="publisher-place"/>
     </group>
   </macro>
   <macro name="editor">
@@ -50,6 +65,12 @@
       <name and="text" delimiter-precedes-last="always" initialize-with=" "/>
       <label form="short" prefix=", "/>
     </names>
+  </macro>
+  <macro name="pages">
+    <group delimiter=" ">
+      <label plural="never" variable="page" form="short"/>
+      <text variable="page"/>
+    </group>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
     <sort>
@@ -93,13 +114,12 @@
               </group>
             </group>
           </if>
-          <else-if type="chapter paper-conference" match="any">
+          <else-if type="chapter" match="any">
             <text variable="title" suffix="."/>
             <text variable="container-title" prefix="In " suffix="," text-case="title"/>
             <text macro="editor"/>
             <text macro="publisher" suffix=","/>
-            <label variable="page" form="short"/>
-            <text variable="page"/>
+            <text macro="pages"/>
           </else-if>
           <else-if type="thesis">
             <text variable="title" suffix="."/>
@@ -123,6 +143,29 @@
               <group delimiter=" ">
                 <text variable="number-of-pages"/>
                 <label variable="number-of-pages" form="short"/>
+              </group>
+            </group>
+          </else-if>
+          <else-if type="paper-conference" match="any">
+            <group delimiter=". ">
+              <text variable="title"/>
+              <text variable="container-title" font-style="italic"/>
+              <group delimiter=", ">
+                <text macro="publisher"/>
+                <text macro="pages"/>
+              </group>
+            </group>
+          </else-if>
+          <else-if type="webpage post post-weblog" match="any">
+            <group delimiter=". ">
+              <text variable="title"/>
+              <text variable="container-title"/>
+              <group delimiter=", ">
+                <text variable="URL"/>
+                <group delimiter=" ">
+                  <text term="accessed"/>
+                  <date form="text" variable="accessed"/>
+                </group>
               </group>
             </group>
           </else-if>

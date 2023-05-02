@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
+  <info>
+    <title>Laser &amp; Photonics Reviews</title>
+    <id>http://www.zotero.org/styles/laser-and-photonics-reviews</id>
+    <link href="http://www.zotero.org/styles/laser-and-photonics-reviews" rel="self"/>
+    <link href="http://www.zotero.org/styles/advanced-materials" rel="independent-parent"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/18638899/homepage/author-guidelines" rel="documentation"/>
+    <author>
+      <name>Patrick O'Brien</name>
+      <email>obrienpat86@gmail.com</email>
+    </author>
+    <category citation-format="numeric"/>
+    <category field="physics"/>
+    <issn>1863-8880</issn>
+    <eissn>1863-8899</eissn>
+    <updated>2022-08-02T12:29:00+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>

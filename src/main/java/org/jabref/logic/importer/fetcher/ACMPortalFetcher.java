@@ -19,6 +19,8 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class ACMPortalFetcher implements SearchBasedParserFetcher {
 
+    public static final String FETCHER_NAME = "ACM Portal";
+
     private static final String SEARCH_URL = "https://dl.acm.org/action/doSearch";
 
     public ACMPortalFetcher() {
@@ -28,7 +30,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
 
     @Override
     public String getName() {
-        return "ACM Portal";
+        return FETCHER_NAME;
     }
 
     @Override
@@ -62,5 +64,4 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     public Parser getParser() {
         return new ACMPortalParser();
     }
-
 }

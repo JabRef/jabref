@@ -12,6 +12,9 @@
       <name>Manuel Meister</name>
       <email>manuel@meister.id</email>
     </author>
+    <contributor>
+      <name>Denis Maier</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="anthropology"/>
     <summary>Citation style for Social Anthropology of the University of Berne</summary>
@@ -309,7 +312,6 @@
     </choose>
   </macro>
   <macro name="issued">
-    <text variable="abstract"/>
     <choose>
       <if type="bill legal_case legislation" match="none">
         <choose>

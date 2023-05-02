@@ -90,6 +90,10 @@ public class TextInputKeyBindings {
                         focusedTextField.positionCaret(res.caretPosition);
                         event.consume();
                     }
+                    case CLOSE -> {
+                        focusedTextField.clear();
+                        event.consume();
+                    }
                 }
             });
         }

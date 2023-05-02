@@ -130,7 +130,6 @@ class RTFCharsTest {
         assertEquals("\\u182P", formatter.format("{\\P}")); // ¶
         assertEquals("\\u169?", formatter.format("{\\copyright}")); // ©
         assertEquals("\\u163?", formatter.format("{\\pounds}")); // £
-
     }
 
     @ParameterizedTest(name = "specialChar={0}, formattedStr={1}")

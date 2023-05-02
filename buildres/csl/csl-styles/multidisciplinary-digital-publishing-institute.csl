@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-US">
   <info>
     <title>Multidisciplinary Digital Publishing Institute</title>
     <title-short>MDPI</title-short>
@@ -12,6 +12,9 @@
     </author>
     <contributor>
       <name>Patrick O'Brien</name>
+    </contributor>  
+    <contributor>  
+      <name>Johan van der Molen Moris</name>
     </contributor>
     <category citation-format="numeric"/>
     <category field="science"/>
@@ -23,6 +26,7 @@
     <terms>
       <term name="available at">available online</term>
       <term name="accessed">accessed on</term>
+      <term name="presented at">presented at the</term>
     </terms>
   </locale>
   <macro name="editor">
@@ -59,7 +63,7 @@
   </macro>
   <macro name="book-container">
     <group delimiter=" ">
-      <text variable="title" suffix="."/>
+      <text variable="title" text-case="title" suffix="."/>
       <text term="in" text-case="capitalize-first"/>
       <text variable="container-title" font-style="italic"/>
     </group>
@@ -195,6 +199,19 @@
                 <date-part name="month"/>
                 <date-part name="year"/>
               </date>
+            </group>
+          </group>
+        </else-if>
+        <else-if type="speech">
+          <group delimiter=" ">
+            <text variable="title" text-case="title" suffix="."/>
+             <group delimiter=", ">
+              <group delimiter=" ">
+                <text term="presented at" text-case="capitalize-first"/>
+                <text variable="event"/>
+              </group>
+              <text variable="event-place"/>
+              <text macro="issued"/>
             </group>
           </group>
         </else-if>

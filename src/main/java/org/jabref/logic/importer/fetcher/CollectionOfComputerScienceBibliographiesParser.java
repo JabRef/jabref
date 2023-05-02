@@ -53,7 +53,7 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
     }
 
     private List<String> parseBibtexStringsFromLinks(List<String> links) throws IOException {
-        List<String> bibtexStringsFromAllLinks = new ArrayList();
+        List<String> bibtexStringsFromAllLinks = new ArrayList<>();
         for (String link : links) {
             try (InputStream inputStream = new URLDownload(link).asInputStream()) {
                 List<String> bibtexStringsFromLink = matchRegexFromInputStreamHtml(inputStream, REGEX_FOR_BIBTEX);

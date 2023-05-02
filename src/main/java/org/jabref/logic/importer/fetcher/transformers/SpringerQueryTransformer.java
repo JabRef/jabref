@@ -35,7 +35,6 @@ public class SpringerQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected String handleJournal(String journalTitle) {
         return createKeyValuePair("journal", journalTitle);
-
     }
 
     @Override

@@ -26,10 +26,11 @@ public class SpecialFieldMenuItemFactory {
                                                      UndoManager undoManager,
                                                      StateManager stateManager) {
         SpecialFieldValueViewModel specialField = new SpecialFieldValueViewModel(field.getValues().get(0));
-
-        return factory.createMenuItem(specialField.getAction(),
+        MenuItem menuItem = factory.createMenuItem(specialField.getAction(),
                 new SpecialFieldViewModel(field, preferencesService, undoManager)
                         .getSpecialFieldAction(field.getValues().get(0), frame, dialogService, stateManager));
+        menuItem.visibleProperty().bind(preferencesService.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
+        return menuItem;
     }
 
     public static Menu createSpecialFieldMenu(SpecialField field,
@@ -57,6 +58,8 @@ public class SpecialFieldMenuItemFactory {
             SpecialFieldValueViewModel valueViewModel = new SpecialFieldValueViewModel(Value);
             menu.getItems().add(factory.createMenuItem(valueViewModel.getAction(), commandFactory.apply(valueViewModel)));
         }
+
+        menu.visibleProperty().bind(preferencesService.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
         return menu;
     }
 }

@@ -71,6 +71,6 @@ public class ImportCommand extends SimpleCommand {
         ImportAction importMenu = new ImportAction(frame, openInNew, format.orElse(null), preferences);
         importMenu.automatedImport(Collections.singletonList(file.toString()));
         // Set last working dir for import
-        preferences.storeImportExportPreferences(preferences.getImportExportPreferences().withImportWorkingDirectory(file.getParent()));
+        preferences.getImportExportPreferences().setImportWorkingDirectory(file.getParent());
     }
 }

@@ -15,7 +15,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.BibEntryPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -23,12 +23,12 @@ public class ManageKeywordsViewModel {
 
     private final List<BibEntry> entries;
     private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
-    private final PreferencesService preferences;
+    private final BibEntryPreferences bibEntryPreferences;
     private final ObjectProperty<ManageKeywordsDisplayType> displayType = new SimpleObjectProperty<>(ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES);
     private final ObservableList<String> keywords;
 
-    public ManageKeywordsViewModel(PreferencesService preferences, List<BibEntry> entries) {
-        this.preferences = preferences;
+    public ManageKeywordsViewModel(BibEntryPreferences bibEntryPreferences, List<BibEntry> entries) {
+        this.bibEntryPreferences = bibEntryPreferences;
         this.entries = entries;
         this.keywords = FXCollections.observableArrayList();
 
@@ -46,23 +46,23 @@ public class ManageKeywordsViewModel {
     private void fillKeywordsList(ManageKeywordsDisplayType type) {
         keywords.clear();
         sortedKeywordsOfAllEntriesBeforeUpdateByUser.clear();
+        Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
         if (type == ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES) {
             for (BibEntry entry : entries) {
-                KeywordList separatedKeywords = entry.getKeywords(preferences.getKeywordDelimiter());
+                KeywordList separatedKeywords = entry.getKeywords(keywordSeparator);
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else if (type == ManageKeywordsDisplayType.CONTAINED_IN_ANY_ENTRY) {
-
             // all keywords from first entry have to be added
             BibEntry firstEntry = entries.get(0);
-            KeywordList separatedKeywords = firstEntry.getKeywords(preferences.getKeywordDelimiter());
+            KeywordList separatedKeywords = firstEntry.getKeywords(keywordSeparator);
             sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
 
             // for the remaining entries, intersection has to be used
             // this approach ensures that one empty keyword list leads to an empty set of common keywords
             for (BibEntry entry : entries) {
-                separatedKeywords = entry.getKeywords(preferences.getKeywordDelimiter());
+                separatedKeywords = entry.getKeywords(keywordSeparator);
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
             }
         } else {
@@ -110,16 +110,18 @@ public class ManageKeywordsViewModel {
 
     private NamedCompound updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
                                          KeywordList keywordsToRemove) {
+        Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
+
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibEntry entry : entries) {
-            KeywordList keywords = entry.getKeywords(preferences.getKeywordDelimiter());
+            KeywordList keywords = entry.getKeywords(keywordSeparator);
 
             // update keywords
             keywords.removeAll(keywordsToRemove);
             keywords.addAll(keywordsToAdd);
 
             // put keywords back
-            Optional<FieldChange> change = entry.putKeywords(keywords, preferences.getKeywordDelimiter());
+            Optional<FieldChange> change = entry.putKeywords(keywords, keywordSeparator);
             change.ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
         }
         ce.end();

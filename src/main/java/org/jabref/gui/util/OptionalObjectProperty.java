@@ -25,8 +25,8 @@ public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>>
      * Returns a new ObservableValue that holds the value held by this
      * ObservableValue, or {@code other} when this ObservableValue is empty.
      */
-    public ObjectBinding<T> orElse(T other) {
-        return new PreboundBinding<T>(this) {
+    public ObjectBinding<T> orElseOpt(T other) {
+        return new PreboundBinding<>(this) {
             @Override
             protected T computeValue() {
                 return OptionalObjectProperty.this.getValue().orElse(other);
