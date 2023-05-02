@@ -5,8 +5,10 @@ import java.nio.file.Path;
 
 import javax.swing.filechooser.FileSystemView;
 
+import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.DialogService;
 
+@AllowedToUseSwing("Uses getFileSystemView to get the default documents directory")
 public interface NativeDesktop {
 
     void openFile(String filePath, String fileType) throws IOException;

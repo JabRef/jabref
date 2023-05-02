@@ -14,6 +14,7 @@ import java.util.Optional;
 import javax.swing.filechooser.FileSystemView;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
+@AllowedToUseSwing("Uses getFileSystemView to get the default documents directory")
 public class Linux implements NativeDesktop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
