@@ -1,9 +1,9 @@
 package org.jabref.gui.search;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
@@ -20,7 +20,6 @@ import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 import org.jabref.testutils.category.GUITest;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -28,6 +27,8 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,16 +71,8 @@ public class GlobalSearchBarTest {
         stage.show();
     }
 
-    /**
-     * The recordingSearchQueriesOnFocusLost method, accepts a robot reference
-     * to the FxRobot class and verifies that unnecessary prefixes of the
-     * search query are not recorded. Essentially, the query is recorded
-     * only when the searchField node loses focus.
-     *
-     * @param robot Reference to the FxRobot class, a TestFx utility class
-     */
     @Test
-    void recordingSearchQueriesOnFocusLost(FxRobot robot) throws InterruptedException {
+    void recordingSearchQueriesOnFocusLostOnly(FxRobot robot) throws InterruptedException {
         stateManager.clearSearchHistory();
         String searchQuery = "Smith";
         // track the node, that the search query will be typed into
@@ -90,28 +83,18 @@ public class GlobalSearchBarTest {
         for (char c : searchQuery.toCharArray()) {
             searchFieldRoboto.write(String.valueOf(c));
             Thread.sleep(401);
-            Assertions.assertTrue(stateManager.getWholeSearchHistory().isEmpty());
+            assertTrue(stateManager.getWholeSearchHistory().isEmpty());
         }
 
-        /*
-         * Set the focus to another node to trigger the listener and finally
-         * record the query.
-         */
+        // Set the focus to another node to trigger the listener and finally record the query.
         DefaultTaskExecutor.runInJavaFXThread(() -> hBox.requestFocus());
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory();
-        List<String> expected = List.of("Smith");
 
-        Assertions.assertEquals(expected, lastSearchHistory);
+        assertEquals(FXCollections.observableArrayList("Smith"), lastSearchHistory);
     }
 
-    /**
-     * The avoidRecordingEmptyQuery method, accepts a robot reference to the
-     * FxRobot class and verifies that no empty search queries are recorded.
-     *
-     * @param robot Reference to the FxRobot class, a TestFX utility class
-     */
     @Test
-    void avoidRecordingEmptyQuery(FxRobot robot) {
+    void emptyQueryIsNotRecorded(FxRobot robot) {
         stateManager.clearSearchHistory();
         String searchQuery = "";
         TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
@@ -121,8 +104,7 @@ public class GlobalSearchBarTest {
 
         DefaultTaskExecutor.runInJavaFXThread(() -> hBox.requestFocus());
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory();
-        List<String> expected = Collections.emptyList();
 
-        Assertions.assertEquals(expected, lastSearchHistory);
+        assertEquals(FXCollections.emptyObservableList(), lastSearchHistory);
     }
 }
