@@ -89,8 +89,9 @@ public class GlobalSearchBarTest {
         // Set the focus to another node to trigger the listener and finally record the query.
         DefaultTaskExecutor.runInJavaFXThread(() -> hBox.requestFocus());
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory();
+        List<String> expected = List.of("Smith");
 
-        assertEquals(FXCollections.observableArrayList("Smith"), lastSearchHistory);
+        assertEquals(FXCollections.observableList(expected), FXCollections.observableList(lastSearchHistory));
     }
 
     @Test
