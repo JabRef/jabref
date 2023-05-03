@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
@@ -29,6 +28,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,10 +51,10 @@ public class GlobalSearchBarTest {
         when(prefs.getSearchPreferences()).thenReturn(searchPreferences);
 
         stateManager = new StateManager();
-        // need for active database, otherwise the searchField will be disabled
+        // Need for active database, otherwise the searchField will be disabled
         stateManager.setActiveDatabase(new BibDatabaseContext());
 
-        // instantiate GlobalSearchBar class, so the change listener is registered
+        // Instantiate GlobalSearchBar class, so the change listener is registered
         searchBar = new GlobalSearchBar(
                 mock(JabRefFrame.class),
                 stateManager,
@@ -76,10 +76,10 @@ public class GlobalSearchBarTest {
     void recordingSearchQueriesOnFocusLostOnly(FxRobot robot) throws InterruptedException {
         stateManager.clearSearchHistory();
         String searchQuery = "Smith";
-        // track the node, that the search query will be typed into
+        // Track the node, that the search query will be typed into
         TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
 
-        // the focus is on searchField node, as we click on the search box
+        // The focus is on searchField node, as we click on the search box
         var searchFieldRoboto = robot.clickOn(searchField);
         for (char c : searchQuery.toCharArray()) {
             searchFieldRoboto.write(String.valueOf(c));
@@ -88,11 +88,11 @@ public class GlobalSearchBarTest {
         }
 
         // Set the focus to another node to trigger the listener and finally record the query.
-        DefaultTaskExecutor.runInJavaFXThread(() -> hBox.requestFocus());
-        ObservableList<String> lastSearchHistory = stateManager.getWholeSearchHistory();
-        ObservableList<String> expected = FXCollections.observableArrayList("Smith");
+        DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> hBox.requestFocus());
+        List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
-        assertEquals(FXCollections.observableList(expected), FXCollections.observableList(lastSearchHistory));
+        assertFalse(lastSearchHistory.isEmpty());
+        assertEquals(FXCollections.observableArrayList("Smith"), lastSearchHistory);
     }
 
     @Test
@@ -104,9 +104,9 @@ public class GlobalSearchBarTest {
         var searchFieldRoboto = robot.clickOn(searchField);
         searchFieldRoboto.write(searchQuery);
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> hBox.requestFocus());
-        List<String> lastSearchHistory = stateManager.getWholeSearchHistory();
+        DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> hBox.requestFocus());
+        List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
-        assertEquals(FXCollections.emptyObservableList(), lastSearchHistory);
+        assertTrue(lastSearchHistory.isEmpty());
     }
 }
