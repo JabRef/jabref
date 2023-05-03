@@ -17,8 +17,8 @@ public class LibraryPropertiesViewModel {
         propertiesTabs = List.of(
                 new GeneralPropertiesView(databaseContext),
                 new SavingPropertiesView(databaseContext),
-                new ConstantsPropertiesView(databaseContext),
                 new KeyPatternPropertiesView(databaseContext),
+                new ConstantsPropertiesView(databaseContext),
                 new ContentSelectorView(databaseContext)
         );
     }
