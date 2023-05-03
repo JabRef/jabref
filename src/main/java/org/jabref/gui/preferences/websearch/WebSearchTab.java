@@ -7,7 +7,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -19,21 +18,19 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox generateNewKeyOnImport;
+    @FXML private CheckBox warnAboutDuplicatesOnImport;
+    @FXML private CheckBox downloadLinkedOnlineFiles;
+
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
 
-    @FXML private SaveOrderConfigPanel exportOrderPanel;
+    @FXML private CheckBox grobidEnabled;
+    @FXML private TextField grobidURL;
 
     @FXML private ComboBox<FetcherApiKey> apiKeySelector;
     @FXML private TextField customApiKey;
     @FXML private CheckBox useCustomApiKey;
     @FXML private Button testCustomApiKey;
-
-    @FXML private CheckBox grobidEnabled;
-    @FXML private TextField grobidURL;
-
-    @FXML private CheckBox warnAboutDuplicatesOnImport;
-    @FXML private CheckBox downloadLinkedOnlineFiles;
 
     public WebSearchTab() {
         ViewLoader.view(this)
@@ -49,24 +46,17 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     public void initialize() {
         this.viewModel = new WebSearchTabViewModel(preferencesService, dialogService);
 
-        useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
-        useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
-        useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
-
         generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
-
-        exportOrderPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
-        exportOrderPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
-        exportOrderPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
-        exportOrderPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
-        exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
-        exportOrderPanel.setCriteriaLimit(3);
+        warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
+        downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
 
         grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
         grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
 
-        downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
+        useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
+        useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
+        useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
 
         new ViewModelListCellFactory<FetcherApiKey>()
                 .withText(FetcherApiKey::getName)
@@ -90,8 +80,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
         // Content is set later
         viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> apiKeySelector.getSelectionModel().selectFirst());
-
-        warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
     }
 
     private void updateFetcherApiKey(FetcherApiKey apiKey) {
