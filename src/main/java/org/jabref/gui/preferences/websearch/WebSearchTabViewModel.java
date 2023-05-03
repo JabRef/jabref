@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.importexport;
+package org.jabref.gui.preferences.websearch;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -39,7 +39,7 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.PreferencesService;
 
-public class ImportExportTabViewModel implements PreferenceTabViewModel {
+public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<FetcherApiKey> apiKeys = new SimpleListProperty<>();
     private final ObjectProperty<FetcherApiKey> selectedApiKeyProperty = new SimpleObjectProperty<>();
@@ -69,7 +69,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final ImportExportPreferences importExportPreferences;
     private final FilePreferences filePreferences;
 
-    public ImportExportTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
+    public WebSearchTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.importerPreferences = preferencesService.getImporterPreferences();

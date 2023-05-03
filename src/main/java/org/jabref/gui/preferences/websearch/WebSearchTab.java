@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.importexport;
+package org.jabref.gui.preferences.websearch;
 
 import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
@@ -16,7 +16,7 @@ import org.jabref.logic.preferences.FetcherApiKey;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabViewModel> implements PreferencesTab {
+public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox useCustomDOI;
@@ -35,7 +35,7 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
 
-    public ImportExportTab() {
+    public WebSearchTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -43,11 +43,11 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
 
     @Override
     public String getTabName() {
-        return Localization.lang("Import and Export");
+        return Localization.lang("Web search");
     }
 
     public void initialize() {
-        this.viewModel = new ImportExportTabViewModel(preferencesService, dialogService);
+        this.viewModel = new WebSearchTabViewModel(preferencesService, dialogService);
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
