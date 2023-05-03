@@ -15,7 +15,7 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.ImportExportPreferences;
+import org.jabref.preferences.ExportPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class ExportTabViewModel implements PreferenceTabViewModel {
@@ -28,16 +28,16 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
     private final PreferencesService preferencesService;
-    private final ImportExportPreferences importExportPreferences;
+    private final ExportPreferences exportPreferences;
 
     public ExportTabViewModel(PreferencesService preferencesService) {
         this.preferencesService = preferencesService;
-        this.importExportPreferences = preferencesService.getImportExportPreferences();
+        this.exportPreferences = preferencesService.getImportExportPreferences();
     }
 
     @Override
     public void setValues() {
-        SaveOrder exportSaveOrder = importExportPreferences.getExportSaveOrder();
+        SaveOrder exportSaveOrder = exportPreferences.getExportSaveOrder();
         switch (exportSaveOrder.getOrderType()) {
             case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
             case ORIGINAL -> exportInOriginalProperty.setValue(true);

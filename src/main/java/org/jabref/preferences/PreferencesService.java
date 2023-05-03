@@ -171,7 +171,7 @@ public interface PreferencesService {
     // Import/Export preferences
     //*************************************************************************************************************
 
-    ImportExportPreferences getImportExportPreferences();
+    ExportPreferences getImportExportPreferences();
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 

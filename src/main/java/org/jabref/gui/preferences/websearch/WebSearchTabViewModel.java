@@ -29,7 +29,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
@@ -51,7 +50,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final DOIPreferences doiPreferences;
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
-    private final ImportExportPreferences importExportPreferences;
     private final FilePreferences filePreferences;
 
     public WebSearchTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
@@ -60,14 +58,13 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         this.importerPreferences = preferencesService.getImporterPreferences();
         this.grobidPreferences = preferencesService.getGrobidPreferences();
         this.doiPreferences = preferencesService.getDOIPreferences();
-        this.importExportPreferences = preferencesService.getImportExportPreferences();
         this.filePreferences = preferencesService.getFilePreferences();
     }
 
     @Override
     public void setValues() {
         generateKeyOnImportProperty.setValue(importerPreferences.isGenerateNewKeyOnImport());
-        warnAboutDuplicatesOnImportProperty.setValue(importExportPreferences.shouldWarnAboutDuplicatesOnImport());
+        warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
 
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
@@ -82,7 +79,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
-        importExportPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
+        importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
 
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());

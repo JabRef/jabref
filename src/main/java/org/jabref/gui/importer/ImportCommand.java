@@ -54,7 +54,7 @@ public class ImportCommand extends SimpleCommand {
                 .addExtensionFilter(FileFilterConverter.ANY_FILE)
                 .addExtensionFilter(FileFilterConverter.forAllImporters(importers))
                 .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
-                .withInitialDirectory(preferences.getImportExportPreferences().getImportWorkingDirectory())
+                .withInitialDirectory(preferences.getImporterPreferences().getImportWorkingDirectory())
                 .build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(path -> doImport(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
@@ -71,6 +71,6 @@ public class ImportCommand extends SimpleCommand {
         ImportAction importMenu = new ImportAction(frame, openInNew, format.orElse(null), preferences);
         importMenu.automatedImport(Collections.singletonList(file.toString()));
         // Set last working dir for import
-        preferences.getImportExportPreferences().setImportWorkingDirectory(file.getParent());
+        preferences.getImporterPreferences().setImportWorkingDirectory(file.getParent());
     }
 }

@@ -8,7 +8,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.ImportExportPreferences;
+import org.jabref.preferences.ExportPreferences;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
@@ -19,11 +19,11 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private final ImportExportPreferences importExportPreferences;
+    private final ExportPreferences exportPreferences;
     private final FieldPreferences fieldPreferences;
 
-    FileTabViewModel(ImportExportPreferences importExportPreferences, FieldPreferences fieldPreferences) {
-        this.importExportPreferences = importExportPreferences;
+    FileTabViewModel(ExportPreferences exportPreferences, FieldPreferences fieldPreferences) {
+        this.exportPreferences = exportPreferences;
         this.fieldPreferences = fieldPreferences;
     }
 
@@ -34,8 +34,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         doNotResolveStringsProperty.setValue(!fieldPreferences.shouldResolveStrings());
         resolveStringsProperty.setValue(fieldPreferences.shouldResolveStrings());
         resolveStringsForFieldsProperty.setValue(FieldFactory.serializeFieldsList(fieldPreferences.getResolvableFields()));
-        alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
-        autosaveLocalLibraries.setValue(importExportPreferences.shouldAutoSave());
+        alwaysReformatBibProperty.setValue(exportPreferences.shouldAlwaysReformatOnSave());
+        autosaveLocalLibraries.setValue(exportPreferences.shouldAutoSave());
     }
 
     @Override
@@ -43,8 +43,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         fieldPreferences.setResolveStrings(!doNotResolveStringsProperty.getValue());
         fieldPreferences.setNonWrappableFields(FieldFactory.parseFieldList(noWrapFilesProperty.getValue().trim()));
         fieldPreferences.setResolvableFields(FieldFactory.parseFieldList(resolveStringsForFieldsProperty.getValue().trim()));
-        importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
-        importExportPreferences.setAutoSave(autosaveLocalLibraries.getValue());
+        exportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
+        exportPreferences.setAutoSave(autosaveLocalLibraries.getValue());
     }
 
     // ImportExport
