@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
@@ -88,8 +89,8 @@ public class GlobalSearchBarTest {
 
         // Set the focus to another node to trigger the listener and finally record the query.
         DefaultTaskExecutor.runInJavaFXThread(() -> hBox.requestFocus());
-        List<String> lastSearchHistory = stateManager.getWholeSearchHistory();
-        List<String> expected = List.of("Smith");
+        ObservableList<String> lastSearchHistory = stateManager.getWholeSearchHistory();
+        ObservableList<String> expected = FXCollections.observableArrayList("Smith");
 
         assertEquals(FXCollections.observableList(expected), FXCollections.observableList(lastSearchHistory));
     }
