@@ -43,6 +43,8 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfContentImporter;
@@ -473,9 +475,31 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
             downloadTask.showToUser(true);
             downloadTask.onFailure(ex -> {
-                LOGGER.error("Error downloading", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Error downloading"), ex);
+            	LOGGER.error("Error downloading from URL: " +urlDownload, ex);
+                if (ex instanceof FetcherClientException) {
+                    FetcherClientException clientException = (FetcherClientException) ex;
+                    int statusCode = clientException.getStatusCode();
+                    if (statusCode == 401 || statusCode == 403) {
+                        dialogService.showErrorDialogAndWait(Localization.lang("Error downloading from URL"),
+                                "HTTP Error " + statusCode + ": Forbidden. This may be due to authentication issues or the server blocking your request. Please check your credentials or contact the server administrator.\nURL: " + urlDownload + "\nPlease check the URL and try again.");
+                    } else if (statusCode == 404) {
+                        dialogService.showErrorDialogAndWait(Localization.lang("Error downloading from URL"),
+                                "HTTP Error " + statusCode + ": Not Found. The requested resource could not be found.\nURL: " + urlDownload + "\nPlease check the URL and try again.");
+                    } else {
+                        dialogService.showErrorDialogAndWait(Localization.lang("Error downloading from URL"),
+                                "HTTP Error " + statusCode + ": " + clientException.getMessage() + "\nURL: " + urlDownload + "\nPlease check the URL and try again.");
+                    }
+                } else if (ex instanceof FetcherServerException) {
+                    FetcherServerException serverException = (FetcherServerException) ex;
+                    int statusCode = serverException.getStatusCode();
+                    dialogService.showErrorDialogAndWait(Localization.lang("Error downloading from URL"),
+                            "HTTP Error " + statusCode + ": " + serverException.getMessage() + "\nURL: " + urlDownload + "\nPlease try again later or contact the server administrator.");
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Error downloading from URL"),
+                            "Error message: " + ex.getMessage() + "\nURL: " + urlDownload + "\nPlease check the URL and try again.");
+                }
             });
+
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);

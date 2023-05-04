@@ -3,6 +3,12 @@ package org.jabref.logic.importer;
  *  Should be thrown when you encounter a http status code error >= 500
  */
 public class FetcherServerException extends FetcherException {
+	private  int statusCode;
+	
+    public FetcherServerException(String errorMessage, String localizedMessage, Throwable cause, int statusCode) {
+        super(errorMessage, localizedMessage, cause);
+        this.statusCode = statusCode;
+    }
 
     public FetcherServerException(String errorMessage, Throwable cause) {
         super(errorMessage, cause);
@@ -14,5 +20,10 @@ public class FetcherServerException extends FetcherException {
 
     public FetcherServerException(String errorMessage, String localizedMessage, Throwable cause) {
         super(errorMessage, localizedMessage, cause);
+    }
+
+
+    public int getStatusCode() {
+        return statusCode;
     }
 }

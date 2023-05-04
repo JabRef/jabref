@@ -5,15 +5,25 @@ package org.jabref.logic.importer;
  */
 public class FetcherClientException extends FetcherException {
 
-    public FetcherClientException(String errorMessage, Throwable cause) {
+    private  int statusCode;
+
+    public FetcherClientException(String errorMessage, Throwable cause, int statusCode) {
         super(errorMessage, cause);
+        this.statusCode = statusCode;
     }
 
-    public FetcherClientException(String errorMessage) {
+    public FetcherClientException(String errorMessage, int statusCode) {
         super(errorMessage);
+        this.statusCode = statusCode;
     }
 
-    public FetcherClientException(String errorMessage, String localizedMessage, Throwable cause) {
+    public FetcherClientException(String errorMessage, String localizedMessage, Throwable cause, int statusCode) {
         super(errorMessage, localizedMessage, cause);
+        this.statusCode = statusCode;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
     }
 }
+
