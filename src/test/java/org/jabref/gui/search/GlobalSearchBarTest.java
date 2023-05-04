@@ -91,7 +91,6 @@ public class GlobalSearchBarTest {
         DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> hBox.requestFocus());
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
-        assertFalse(lastSearchHistory.isEmpty());
         assertEquals(List.of("Smith"), lastSearchHistory);
     }
 
