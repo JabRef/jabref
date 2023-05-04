@@ -19,7 +19,7 @@ import org.jabref.gui.preferences.customexporter.CustomExporterTab;
 import org.jabref.gui.preferences.customimporter.CustomImporterTab;
 import org.jabref.gui.preferences.entry.EntryTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
-import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
+import org.jabref.gui.preferences.entryeditortabs.EntryEditorTabsTab;
 import org.jabref.gui.preferences.export.ExportTab;
 import org.jabref.gui.preferences.external.ExternalTab;
 import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
@@ -75,7 +75,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new EntryEditorTab(),
                 new WebSearchTab(),
                 new ExportTab(),
-                new CustomEditorFieldsTab(),
+                new EntryEditorTabsTab(),
                 new CitationKeyPatternTab(),
                 new LinkedFilesTab(),
                 new NameFormatterTab(),

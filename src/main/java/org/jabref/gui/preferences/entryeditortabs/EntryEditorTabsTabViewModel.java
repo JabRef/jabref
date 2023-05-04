@@ -16,7 +16,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.PreferencesService;
 
-public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
+public class EntryEditorTabsTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
@@ -24,7 +24,7 @@ public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
     private final PreferencesService preferences;
     private final EntryEditorPreferences entryEditorPreferences;
 
-    public CustomEditorFieldsTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public EntryEditorTabsTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
