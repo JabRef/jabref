@@ -92,7 +92,7 @@ public class GlobalSearchBarTest {
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
         assertFalse(lastSearchHistory.isEmpty());
-        assertEquals(FXCollections.observableArrayList("Smith"), lastSearchHistory);
+        assertEquals(List.of("Smith"), lastSearchHistory);
     }
 
     @Test
@@ -107,6 +107,6 @@ public class GlobalSearchBarTest {
         DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> hBox.requestFocus());
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
-        assertTrue(lastSearchHistory.isEmpty());
+        assertEquals(List.of(), lastSearchHistory);
     }
 }
