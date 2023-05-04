@@ -23,7 +23,6 @@ import org.jabref.gui.preferences.entryeditortabs.EntryEditorTabsTab;
 import org.jabref.gui.preferences.export.ExportTab;
 import org.jabref.gui.preferences.external.ExternalTab;
 import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
-import org.jabref.gui.preferences.file.FileTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
@@ -63,7 +62,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
-                new FileTab(),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
