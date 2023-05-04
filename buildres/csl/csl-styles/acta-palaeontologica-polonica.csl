@@ -8,7 +8,8 @@
     <link href="http://www.app.pan.pl/instruction.html" rel="documentation"/>
     <author>
       <name>Martin R. Smith</name>
-      <email>martins@gmail.com</email>
+      <email>martin.smith@durham.ac.uk</email>
+      <uri>https://smithlabdurham.github.io/</uri>
     </author>
     <contributor>
       <name>Benjamin C. Moon</name>
@@ -84,7 +85,8 @@
         <text macro="year-date"/>
       </group>
       <text variable="year-suffix" font-style="italic"/>
-      <group prefix=": ">
+      <group prefix=": " delimiter=" ">
+        <label variable="locator" form="short"/>
         <text variable="locator"/>
       </group>
     </layout>

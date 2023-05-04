@@ -9,86 +9,31 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.model.metadata.SaveOrder;
+
 public class ImportExportPreferences {
-    private final BooleanProperty shouldOpenLastEdited;
-    private final StringProperty nonWrappableFields;
-    private final BooleanProperty resolveStrings;
-    private final StringProperty resolvableFields;
     private final BooleanProperty alwaysReformatOnSave;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final StringProperty lastExportExtension;
     private final ObjectProperty<Path> exportWorkingDirectory;
+    private final ObjectProperty<SaveOrder> exportSaveOrder;
     private final BooleanProperty autoSave;
     private final BooleanProperty warnAboutDuplicatesOnImport;
 
-    public ImportExportPreferences(boolean shouldOpenLastEdited,
-                                   String nonWrappableFields,
-                                   boolean resolveStrings,
-                                   String resolvableFields,
-                                   boolean alwaysReformatOnSave,
+    public ImportExportPreferences(boolean alwaysReformatOnSave,
                                    Path importWorkingDirectory,
                                    String lastExportExtension,
                                    Path exportWorkingDirectory,
+                                   SaveOrder exportSaveOrder,
                                    boolean autoSave,
                                    boolean warnAboutDuplicatesOnImport) {
-        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
-        this.nonWrappableFields = new SimpleStringProperty(nonWrappableFields);
-        this.resolveStrings = new SimpleBooleanProperty(resolveStrings);
-        this.resolvableFields = new SimpleStringProperty(resolvableFields);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
+        this.exportSaveOrder = new SimpleObjectProperty<>(exportSaveOrder);
         this.autoSave = new SimpleBooleanProperty(autoSave);
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
-    }
-
-    public boolean shouldOpenLastEdited() {
-        return shouldOpenLastEdited.get();
-    }
-
-    public BooleanProperty openLastEditedProperty() {
-        return shouldOpenLastEdited;
-    }
-
-    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
-        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
-    }
-
-    public String getNonWrappableFields() {
-        return nonWrappableFields.get();
-    }
-
-    public StringProperty nonWrappableFieldsProperty() {
-        return nonWrappableFields;
-    }
-
-    public void setNonWrappableFields(String nonWrappableFields) {
-        this.nonWrappableFields.set(nonWrappableFields);
-    }
-
-    public boolean resolveStrings() {
-        return resolveStrings.get();
-    }
-
-    public BooleanProperty resolveStringsProperty() {
-        return resolveStrings;
-    }
-
-    public void setResolveStrings(boolean resolveStrings) {
-        this.resolveStrings.set(resolveStrings);
-    }
-
-    public String getResolvableFields() {
-        return resolvableFields.get();
-    }
-
-    public StringProperty resolvableFieldsProperty() {
-        return resolvableFields;
-    }
-
-    public void setResolvableFields(String resolvableFields) {
-        this.resolvableFields.set(resolvableFields);
     }
 
     public boolean shouldAlwaysReformatOnSave() {
@@ -137,6 +82,18 @@ public class ImportExportPreferences {
 
     public void setExportWorkingDirectory(Path exportWorkingDirectory) {
         this.exportWorkingDirectory.set(exportWorkingDirectory);
+    }
+
+    public SaveOrder getExportSaveOrder() {
+        return exportSaveOrder.get();
+    }
+
+    public ObjectProperty<SaveOrder> exportSaveOrderProperty() {
+        return exportSaveOrder;
+    }
+
+    public void setExportSaveOrder(SaveOrder exportSaveOrder) {
+        this.exportSaveOrder.set(exportSaveOrder);
     }
 
     public boolean shouldAutoSave() {
