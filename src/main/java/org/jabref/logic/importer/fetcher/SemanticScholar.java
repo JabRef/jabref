@@ -102,7 +102,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             metaLinks = html.getElementsByClass("flex-paper-actions__button--primary");
             link = metaLinks.select("a").attr("href");
         }
-        LOGGER.info("Fulltext PDF found @ SemanticScholar.");
+        if (link.isBlank()) {
+            return Optional.empty();
+        }
+        LOGGER.info("Fulltext PDF found @ SemanticScholar. Link: {}", link);
         return Optional.of(new URL(link));
     }
 

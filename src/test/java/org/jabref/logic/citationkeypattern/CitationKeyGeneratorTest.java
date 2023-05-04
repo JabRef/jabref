@@ -1,6 +1,7 @@
 package org.jabref.logic.citationkeypattern;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -13,6 +14,11 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
@@ -20,15 +26,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
+/**
+ * Tests whole citation key patterns such as <code>[authorsAlpha][year]</code>.
+ * The concrete patterns such as <code>authorsAlpha</code> should better be tested at {@link BracketedPatternTest}.
+ */
+@Execution(ExecutionMode.CONCURRENT)
 class CitationKeyGeneratorTest {
 
     private static final BibEntry AUTHOR_EMPTY = createABibEntryAuthor("");
 
     private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = "Isaac Newton";
-    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = createABibEntryAuthor("Isaac Newton");
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = createABibEntryAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
+
     private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2 = createABibEntryAuthor("Isaac Newton and James Maxwell");
+
     private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3 = "Isaac Newton and James Maxwell and Albert Einstein";
-    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3 = createABibEntryAuthor("Isaac Newton and James Maxwell and Albert Einstein");
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3 = createABibEntryAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3);
+
+    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3 = "Isaac Newton and James Maxwell and others";
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3 = createABibEntryAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3);
 
     private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1 = createABibEntryAuthor("Wil van der Aalst");
     private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2 = createABibEntryAuthor("Wil van der Aalst and Tammo van Lessen");
@@ -486,12 +502,12 @@ class CitationKeyGeneratorTest {
 
     @Test
     void testAuthIniN() {
-        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[authIni4]"));
-        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "[authIni4]"));
-        assertEquals("NeME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authIni4]"));
-        assertEquals("NeMa", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authIni4]"));
-        assertEquals("Newt", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni4]"));
         assertEquals("", generateKey(AUTHOR_EMPTY, "[authIni4]"));
+        assertEquals("Newt", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni4]"));
+        assertEquals("NeMa", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authIni4]"));
+        assertEquals("NeME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authIni4]"));
+        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "[authIni4]"));
+        assertEquals("NME+", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[authIni4]"));
 
         assertEquals("N", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni1]"));
         assertEquals("", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni0]"));
@@ -542,7 +558,7 @@ class CitationKeyGeneratorTest {
     @Test
     void testAuthShort() {
         // tests taken from the comments
-        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHSHORT));
+        assertEquals("NME+", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHSHORT));
         assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHSHORT));
         assertEquals("NM", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHSHORT));
         assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHSHORT));
@@ -606,19 +622,23 @@ class CitationKeyGeneratorTest {
         assertEquals("NewtonMaxwellEinstein", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORS));
     }
 
-    /**
-     * Tests [authorsAlpha]
-     */
-    @Test
-    void authorsAlpha() {
-        assertEquals("New", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHA));
-        assertEquals("NM", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHA));
-        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORSALPHA));
-        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORSALPHA));
-        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORSALPHA));
+    static Stream<Arguments> testAuthorsAlpha() {
+        return Stream.of(
+                Arguments.of("New", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHA),
+                Arguments.of("NM", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHA),
+                Arguments.of("NME", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORSALPHA),
+                Arguments.of("NMEB", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORSALPHA),
+                Arguments.of("NME+", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORSALPHA),
+                Arguments.of("vdAal", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORSALPHA),
+                Arguments.of("vdAvL", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORSALPHA),
+                Arguments.of("NM+", AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_AND_OTHERS_COUNT_3, AUTHORSALPHA)
+        );
+    }
 
-        assertEquals("vdAal", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORSALPHA));
-        assertEquals("vdAvL", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORSALPHA));
+    @ParameterizedTest
+    @MethodSource
+    void testAuthorsAlpha(String expected, BibEntry entry, String pattern) {
+        assertEquals(expected, generateKey(entry, pattern));
     }
 
     /**
@@ -1149,5 +1169,12 @@ class CitationKeyGeneratorTest {
         BibEntry entry = createABibEntryAuthor("Michiel van den Brekel");
         entry.setField(StandardField.YEAR, "2021");
         assertEquals("Brekel2021", generateKey(entry, "[auth][year]"));
+    }
+
+    @Test
+    void generateKeyCorrectKeyWithAndOthersAtTheEnd() {
+        BibEntry entry = createABibEntryAuthor("Alexander Artemenko and others");
+        entry.setField(StandardField.YEAR, "2019");
+        assertEquals("Artemenko2019", generateKey(entry, "[auth][year]"));
     }
 }

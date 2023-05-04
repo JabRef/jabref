@@ -9,7 +9,8 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -57,11 +58,15 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         // Used during DOI fetch process
-        when(importFormatPreferences.fieldContentFormatterPreferences()).thenReturn(
-                new FieldContentFormatterPreferences(
-                        Arrays.stream("pdf;ps;url;doi;file;isbn;issn".split(";"))
-                              .map(fieldName -> StandardField.fromName(fieldName).isPresent() ? StandardField.fromName(fieldName).get() : new UnknownField(fieldName))
-                              .collect(Collectors.toList())));
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(
+                FXCollections.observableArrayList(List.of(
+                        StandardField.PDF,
+                        StandardField.PS,
+                        StandardField.URL,
+                        StandardField.DOI,
+                        StandardField.FILE,
+                        StandardField.ISBN,
+                        StandardField.ISSN)));
     }
 
     @BeforeEach
