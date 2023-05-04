@@ -61,9 +61,7 @@ public class BackupManager {
     // Contains a list of all backup paths
     // During a write, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
-
     private boolean needsBackup = false;
-
 
     BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -117,11 +115,11 @@ public class BackupManager {
      * Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
-     * @param b
-     * @param path
+     * @param createBackup True, if a backup should be created
+     * @param backupDir The path to the backup directory
      */
-    public static void shutdown(BibDatabaseContext bibDatabaseContext, Path path, boolean createBackup) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdown(path, createBackup));
+    public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdown(backupDir, createBackup));
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
@@ -328,7 +326,7 @@ public class BackupManager {
      * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext}.
      * This method should only be used when closing a database/JabRef in a normal way.
      *
-     * @param path The backup directory
+     * @param backupDir The backup directory
      * @param createBackup If the backup manager should still perform a backup
      */
     private void shutdown(Path backupDir, boolean createBackup) {
