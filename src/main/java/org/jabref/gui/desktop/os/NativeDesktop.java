@@ -3,12 +3,8 @@ package org.jabref.gui.desktop.os;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import javax.swing.filechooser.FileSystemView;
-
-import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.DialogService;
 
-@AllowedToUseSwing("Uses getFileSystemView to get the default documents directory")
 public interface NativeDesktop {
 
     void openFile(String filePath, String fileType) throws IOException;
@@ -40,7 +36,7 @@ public interface NativeDesktop {
      * @return The path to the directory
      */
      default Path getDefaultFileChooserDirectory() {
-         return Path.of(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
+         return Path.of(System.getProperty("user.home"), "Documents");
      }
 
     /**

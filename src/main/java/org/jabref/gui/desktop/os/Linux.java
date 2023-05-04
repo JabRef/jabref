@@ -11,10 +11,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.filechooser.FileSystemView;
-
 import org.jabref.architecture.AllowedToUseAwt;
-import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
@@ -27,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
-@AllowedToUseSwing("Uses getFileSystemView to get the default documents directory")
 public class Linux implements NativeDesktop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
@@ -177,6 +173,7 @@ public class Linux implements NativeDesktop {
     public Path getDefaultFileChooserDirectory() {
         return Path.of(Objects.requireNonNullElse(
                 System.getenv("XDG_DOCUMENTS_DIR"),
-                FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
+                // TODO: Execute "xdg-user-dir DOCUMENTS"
+                System.getProperty("user.home")));
     }
 }
