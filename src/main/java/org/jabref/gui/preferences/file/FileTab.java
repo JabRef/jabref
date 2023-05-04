@@ -25,8 +25,6 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     @FXML private RadioButton resolveStrings;
     @FXML private TextField resolveStringsForFields;
     @FXML private CheckBox alwaysReformatBib;
-    @FXML private CheckBox createBackup;
-    @FXML private TextField backupDirectory;
 
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
@@ -52,9 +50,6 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
-        createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
-        backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
-
         ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService), autosaveLocalLibrariesHelp);
     }
@@ -62,9 +57,5 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     @Override
     public String getTabName() {
         return Localization.lang("File");
-    }
-
-    public void backupFileDirBrowse() {
-        viewModel.backupFileDirBrowse();
     }
 }

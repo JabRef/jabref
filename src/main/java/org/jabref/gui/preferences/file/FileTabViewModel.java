@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.file;
 
-import java.nio.file.Path;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -9,7 +7,6 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.FilePreferences;
@@ -23,9 +20,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final StringProperty resolveStringsForFieldsProperty = new SimpleStringProperty("");
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
-
-    private final BooleanProperty createBackupProperty = new SimpleBooleanProperty();
-    private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
 
     private final ImportExportPreferences importExportPreferences;
     private final FieldPreferences fieldPreferences;
@@ -48,9 +42,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         resolveStringsForFieldsProperty.setValue(FieldFactory.serializeFieldsList(fieldPreferences.getResolvableFields()));
         alwaysReformatBibProperty.setValue(importExportPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(importExportPreferences.shouldAutoSave());
-
-        createBackupProperty.setValue(filePreferences.shouldCreateBackup());
-        backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
     }
 
     @Override
@@ -60,9 +51,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         fieldPreferences.setResolvableFields(FieldFactory.parseFieldList(resolveStringsForFieldsProperty.getValue().trim()));
         importExportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         importExportPreferences.setAutoSave(autosaveLocalLibraries.getValue());
-
-        filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
-        filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
     }
 
     // ImportExport
@@ -90,20 +78,5 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     // Autosave
     public BooleanProperty autosaveLocalLibrariesProperty() {
         return autosaveLocalLibraries;
-    }
-
-    public BooleanProperty createBackupProperty() {
-        return this.createBackupProperty;
-    }
-
-    public StringProperty backupDirectoryProperty() {
-        return this.backupDirectoryProperty;
-    }
-
-    public void backupFileDirBrowse() {
-        DirectoryDialogConfiguration dirDialogConfiguration =
-            new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(backupDirectoryProperty().getValue())).build();
-    dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
-                 .ifPresent(dir -> backupDirectoryProperty.setValue(dir.toString()));
     }
 }
