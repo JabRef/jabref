@@ -3,7 +3,6 @@ package org.jabref.gui.search;
 import java.util.EnumSet;
 import java.util.List;
 
-import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
