@@ -2081,7 +2081,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         fieldPreferences = new FieldPreferences(
-                !getBoolean(DO_NOT_RESOLVE_STRINGS),
+                !getBoolean(DO_NOT_RESOLVE_STRINGS), // mind the !
                 getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()
                                                          .map(FieldFactory::parseField)
                                                          .collect(Collectors.toList()),

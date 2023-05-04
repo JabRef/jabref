@@ -10,7 +10,6 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.field.FieldFactory;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
-    private final BooleanProperty doNotResolveStringsProperty = new SimpleBooleanProperty();
     private final BooleanProperty resolveStringsProperty = new SimpleBooleanProperty();
     private final StringProperty resolveStringsForFieldsProperty = new SimpleStringProperty("");
     private final StringProperty nonWrappableFieldsProperty = new SimpleStringProperty("");
@@ -23,7 +22,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        doNotResolveStringsProperty.setValue(!fieldPreferences.shouldResolveStrings());
         resolveStringsProperty.setValue(fieldPreferences.shouldResolveStrings());
         resolveStringsForFieldsProperty.setValue(FieldFactory.serializeFieldsList(fieldPreferences.getResolvableFields()));
         nonWrappableFieldsProperty.setValue(FieldFactory.serializeFieldsList(fieldPreferences.getNonWrappableFields()));
@@ -31,13 +29,9 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        fieldPreferences.setResolveStrings(!doNotResolveStringsProperty.getValue());
+        fieldPreferences.setResolveStrings(resolveStringsProperty.getValue());
         fieldPreferences.setResolvableFields(FieldFactory.parseFieldList(resolveStringsForFieldsProperty.getValue().trim()));
         fieldPreferences.setNonWrappableFields(FieldFactory.parseFieldList(nonWrappableFieldsProperty.getValue().trim()));
-    }
-
-    public BooleanProperty doNotResolveStringsProperty() {
-        return doNotResolveStringsProperty;
     }
 
     public BooleanProperty resolveStringsProperty() {
