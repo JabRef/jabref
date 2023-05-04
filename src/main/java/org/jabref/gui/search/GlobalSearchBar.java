@@ -42,7 +42,6 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
@@ -127,7 +126,7 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
-        KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+        KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
@@ -211,6 +210,18 @@ public class GlobalSearchBar extends HBox {
 
         this.stateManager.activeSearchQueryProperty().addListener((obs, oldvalue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
         this.stateManager.activeDatabaseProperty().addListener((obs, oldValue, newValue) -> stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery));
+        /*
+         * The listener tracks a change on the focus property value.
+         * This happens, from active (user types a query) to inactive / focus
+         * lost (e.g., user selects an entry or triggers the search).
+         * The search history should only be filled, if focus is lost.
+         */
+        searchField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+            // Focus lost can be derived by checking that there is no newValue (or the text is empty)
+            if (oldValue && !(newValue || searchField.getText().isBlank())) {
+                this.stateManager.addSearchHistory(searchField.textProperty().get());
+            }
+        });
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
@@ -307,7 +318,6 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
-        this.stateManager.addSearchHistory(searchField.textProperty().get());
         stateManager.setSearchQuery(searchQuery);
     }
 
