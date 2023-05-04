@@ -63,7 +63,7 @@ class SaveDatabaseActionTest {
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
-        when(preferences.getImportExportPreferences()).thenReturn(mock(ExportPreferences.class));
+        when(preferences.getExportPreferences()).thenReturn(mock(ExportPreferences.class));
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
         saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class)));
     }

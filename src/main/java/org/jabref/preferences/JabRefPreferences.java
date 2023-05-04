@@ -2177,7 +2177,7 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public ExportPreferences getImportExportPreferences() {
+    public ExportPreferences getExportPreferences() {
         if (Objects.nonNull(exportPreferences)) {
             return exportPreferences;
         }
@@ -2251,7 +2251,7 @@ public class JabRefPreferences implements PreferencesService {
         return new SaveConfiguration()
                 .withSaveOrder(saveOrder)
                 .withMetadataSaveOrder(false)
-                .withReformatOnSave(getImportExportPreferences().shouldAlwaysReformatOnSave());
+                .withReformatOnSave(getExportPreferences().shouldAlwaysReformatOnSave());
     }
 
     @Override

@@ -297,7 +297,7 @@ public class LibraryTab extends Tab {
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED)
                 || ((context.getLocation() == DatabaseLocation.LOCAL)
-                && preferencesService.getImportExportPreferences().shouldAutoSave()))
+                && preferencesService.getExportPreferences().shouldAutoSave()))
                 && context.getDatabasePath().isPresent();
     }
 
@@ -313,7 +313,7 @@ public class LibraryTab extends Tab {
      * Example: *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
-        boolean isAutosaveEnabled = preferencesService.getImportExportPreferences().shouldAutoSave();
+        boolean isAutosaveEnabled = preferencesService.getExportPreferences().shouldAutoSave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
         Optional<Path> file = bibDatabaseContext.getDatabasePath();

@@ -92,7 +92,7 @@ public class ExportToClipboardActionTest {
         };
 
         when(importExportPrefs.getLastExportExtension()).thenReturn("HTML");
-        when(preferences.getImportExportPreferences()).thenReturn(importExportPrefs);
+        when(preferences.getExportPreferences()).thenReturn(importExportPrefs);
         GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
