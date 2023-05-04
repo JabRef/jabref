@@ -68,36 +68,36 @@ public class BackupFileUtil {
     }
 
     public static Optional<Path> getPathOfLatestExistingBackupFile(Path targetFile, BackupFileType fileType, Path backupDir) {
-            // The code is similar to "getPathForNewBackupFileAndCreateDirectory"
+        // The code is similar to "getPathForNewBackupFileAndCreateDirectory"
 
-            String extension = "." + fileType.getExtensions().get(0);
+        String extension = "." + fileType.getExtensions().get(0);
 
-            Path directory = backupDir;
-            if (Files.notExists(directory)) {
-                // In case there is no app directory, we search in the directory of the bib file
-                Path result = FileUtil.addExtension(targetFile, extension);
-                if (Files.exists(result)) {
-                    return Optional.of(result);
-                } else {
-                    return Optional.empty();
-                }
-            }
-
-            // Search the directory for the latest file
-            final String prefix = getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName();
-            Optional<Path> mostRecentFile;
-            try {
-                mostRecentFile = Files.list(directory)
-                                             // just list the .sav belonging to the given targetFile
-                                             .filter(p -> p.getFileName().toString().startsWith(prefix))
-                                             .sorted()
-                                             .reduce((first, second) -> second);
-            } catch (IOException e) {
-                LOGGER.error("Could not determine most recent file", e);
+        Path directory = backupDir;
+        if (Files.notExists(directory)) {
+            // In case there is no app directory, we search in the directory of the bib file
+            Path result = FileUtil.addExtension(targetFile, extension);
+            if (Files.exists(result)) {
+                return Optional.of(result);
+            } else {
                 return Optional.empty();
             }
-            return mostRecentFile;
         }
+
+        // Search the directory for the latest file
+        final String prefix = getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName();
+        Optional<Path> mostRecentFile;
+        try {
+            mostRecentFile = Files.list(directory)
+                                  // just list the .sav belonging to the given targetFile
+                                  .filter(p -> p.getFileName().toString().startsWith(prefix))
+                                  .sorted()
+                                  .reduce((first, second) -> second);
+        } catch (IOException e) {
+            LOGGER.error("Could not determine most recent file", e);
+            return Optional.empty();
+        }
+        return mostRecentFile;
+    }
 
     /**
      * <p>
