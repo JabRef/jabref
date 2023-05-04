@@ -104,7 +104,7 @@ javafx {
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.10"
 }
 
 dependencies {
@@ -496,6 +496,14 @@ jacocoTestReport {
 checkstyle {
     // will only run when called explicitly from the command line
     sourceSets = []
+}
+
+modernizer {
+    failOnViolations = false
+    includeTestClasses = true
+    exclusions = [
+        'java/util/Optional.get:()Ljava/lang/Object;'
+    ]
 }
 
 // Release tasks
