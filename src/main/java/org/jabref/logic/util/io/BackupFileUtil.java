@@ -72,8 +72,7 @@ public class BackupFileUtil {
 
         String extension = "." + fileType.getExtensions().get(0);
 
-        Path directory = backupDir;
-        if (Files.notExists(directory)) {
+        if (Files.notExists(backupDir)) {
             // In case there is no app directory, we search in the directory of the bib file
             Path result = FileUtil.addExtension(targetFile, extension);
             if (Files.exists(result)) {
@@ -87,7 +86,7 @@ public class BackupFileUtil {
         final String prefix = getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName();
         Optional<Path> mostRecentFile;
         try {
-            mostRecentFile = Files.list(directory)
+            mostRecentFile = Files.list(backupDir)
                                   // just list the .sav belonging to the given targetFile
                                   .filter(p -> p.getFileName().toString().startsWith(prefix))
                                   .sorted()
