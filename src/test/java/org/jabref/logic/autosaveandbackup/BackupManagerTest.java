@@ -4,17 +4,32 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.groups.event.GroupUpdatedEvent;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
+import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BackupManagerTest {
 
@@ -110,5 +125,58 @@ public class BackupManagerTest {
         Files.setLastModifiedTime(target, FileTime.fromMillis(0));
 
         assertFalse(BackupManager.backupFileDiffers(changesBib, backupDir));
+    }
+
+    @Test
+    public void shouldNotCreateABackup(@TempDir Path customDir) throws Exception {
+        Path backupDir = customDir.resolve("subBackupDir");
+        Files.createDirectories(backupDir);
+
+        var database = new BibDatabaseContext(new BibDatabase());
+        database.setDatabasePath(customDir.resolve("Bibfile.bib"));
+
+        var preferences = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        var filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
+
+        BackupManager manager = BackupManager.start(database, mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS), preferences);
+        manager.listen(new MetaDataChangedEvent(new MetaData()));
+
+        BackupManager.shutdown(database, backupDir, false);
+
+        List<Path> files = Files.list(backupDir).toList();
+        assertEquals(Collections.emptyList(), files);
+    }
+
+    @Test
+    public void shouldCreateABackup(@TempDir Path customDir) throws Exception {
+        Path backupDir = customDir.resolve("subBackupDir");
+        Files.createDirectories(backupDir);
+
+        var database = new BibDatabaseContext(new BibDatabase());
+        database.setDatabasePath(customDir.resolve("Bibfile.bib"));
+
+        var preferences = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        var filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
+        when(filePreferences.shouldCreateBackup()).thenReturn(true);
+
+        BackupManager manager = BackupManager.start(database, mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS), preferences);
+        manager.listen(new MetaDataChangedEvent(new MetaData()));
+
+        Optional<Path> fullBackupPath = manager.determineBackupPathForNewBackup(backupDir);
+        fullBackupPath.ifPresent(manager::performBackup);
+        manager.listen(new GroupUpdatedEvent(new MetaData()));
+        // We have to wait a bit so that the backup time differs and the path is different
+        Thread.sleep(600);
+
+        BackupManager.shutdown(database, backupDir, true);
+
+        List<Path> files = Files.list(backupDir).sorted().toList();
+        assertEquals(2, files.size());
+        // we only know the first backup path because the second one is created on shutdown
+        assertEquals(fullBackupPath.get(), files.get(0));
     }
 }

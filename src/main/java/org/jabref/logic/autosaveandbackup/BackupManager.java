@@ -206,7 +206,7 @@ public class BackupManager {
      * <em>SIDE EFFECT: Deletes oldest backup file</em>
      *
      *
-     * @param backupPath the path where the library should be backed up to
+     * @param backupPath the full path to the file where the library should be backed up to
      */
     void performBackup(Path backupPath) {
         if (!needsBackup) {
