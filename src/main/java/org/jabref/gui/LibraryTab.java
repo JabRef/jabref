@@ -578,6 +578,7 @@ public class LibraryTab extends Tab {
     public void showAndEdit(BibEntry entry) {
         showBottomPane(BasePanelMode.SHOWING_EDITOR);
 
+        // We use != instead of equals because of performance reasons
         if (entry != getShowing()) {
             entryEditor.setEntry(entry);
             showing = entry;
