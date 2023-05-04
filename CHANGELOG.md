@@ -45,7 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We reorganized the order of tabs in library properties and the order of sections in the tab general. [#9836](https://github.com/JabRef/jabref/pull/9836)
 - We changed the handling of an "overflow" of authors at `[authIniN]`: JabRef uses `+` to indicate an overflow. Example: `[authIni2]` produces `A+` (instead of `AB`) for `Aachen and Berlin and Chemnitz`. [#9703](https://github.com/JabRef/jabref/pull/9703)
 - We moved the preferences option to open the last edited files on startup to the 'General' tab. [#9808](https://github.com/JabRef/jabref/pull/9808)
-
+- We exchange the locations of Library mode and Library enconding in general tab in the Library properties
 
 ### Fixed
 
