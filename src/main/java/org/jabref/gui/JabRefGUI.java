@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
@@ -21,9 +22,11 @@ import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -140,10 +143,33 @@ public class JabRefGUI {
         }
     }
 
+    private void connectToSharedDatabases() {
+        ObservableList<String> lastConnectedSharedDBs = preferencesService.getExternalApplicationsPreferences().getLastConnectedSharedDatabases();
+
+        if (lastConnectedSharedDBs.isEmpty()) {
+            return;
+        }
+        SharedDatabaseUIManager sharedDatabaseUIManager = new SharedDatabaseUIManager(mainFrame, preferencesService);
+        for (String sharedDBId : lastConnectedSharedDBs) {
+            SharedDatabasePreferences preferences = new SharedDatabasePreferences(sharedDBId);
+            DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties(preferences);
+
+            try {
+                sharedDatabaseUIManager.openNewSharedDatabaseTab(connectionProperties);
+            } catch (SQLException | InvalidDBMSConnectionPropertiesException | DatabaseNotSupportedException e) {
+                getMainFrame().getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), e);
+            }
+        }
+    }
+
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
         if (!isBlank && preferencesService.getImportExportPreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
+        }
+
+        if (!isBlank && preferencesService.getExternalApplicationsPreferences().shouldAutoConnectToLastSharedDatabases()) {
+            connectToSharedDatabases();
         }
 
         // From here on, the libraries provided by command line arguments are treated

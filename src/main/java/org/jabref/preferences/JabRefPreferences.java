@@ -256,7 +256,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
     public static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
-    public static final String CONNECT_LAST_SHARED_DB = "connectLastSharedDB";
+    public static final String CONNECT_LAST_SHARED_DATABASES = "connectLastSharedDatabases";
+    public static final String LAST_CONNECTED = "lastConnected";
 
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
@@ -483,7 +484,8 @@ public class JabRefPreferences implements PreferencesService {
         // like the SearchDisplayMode will never be translated.
         Localization.setLanguage(getLanguage());
 
-        defaults.put(CONNECT_LAST_SHARED_DB, Boolean.FALSE);
+        defaults.put(CONNECT_LAST_SHARED_DATABASES, Boolean.FALSE);
+        defaults.put(LAST_CONNECTED, "");
 
         defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
@@ -1780,8 +1782,8 @@ public class JabRefPreferences implements PreferencesService {
                 get(CONSOLE_COMMAND),
                 !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION), // mind the !
                 get(FILE_BROWSER_COMMAND),
-                getBoolean(CONNECT_LAST_SHARED_DB)
-        );
+                getBoolean(CONNECT_LAST_SHARED_DATABASES),
+                getStringList(LAST_CONNECTED));
 
         EasyBind.listen(externalApplicationsPreferences.eMailSubjectProperty(),
                 (obs, oldValue, newValue) -> put(EMAIL_SUBJECT, newValue));
@@ -1797,8 +1799,15 @@ public class JabRefPreferences implements PreferencesService {
                 (obs, oldValue, newValue) -> putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !newValue)); // mind the !
         EasyBind.listen(externalApplicationsPreferences.customFileBrowserCommandProperty(),
                 (obs, oldValue, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
-        EasyBind.listen(externalApplicationsPreferences.autoConnectToLastSharedDatabase(),
-                (obs, oldValue, newValue) -> putBoolean(CONNECT_LAST_SHARED_DB, newValue));
+        EasyBind.listen(externalApplicationsPreferences.autoConnectToLastSharedDatabases(),
+                (obs, oldValue, newValue) -> putBoolean(CONNECT_LAST_SHARED_DATABASES, newValue));
+        externalApplicationsPreferences.getLastConnectedSharedDatabases().addListener((ListChangeListener<String>) change -> {
+            if (change.getList().isEmpty()) {
+                prefs.remove(LAST_CONNECTED);
+            } else {
+                putStringList(LAST_CONNECTED, externalApplicationsPreferences.getLastConnectedSharedDatabases());
+            }
+        });
 
         return externalApplicationsPreferences;
     }
