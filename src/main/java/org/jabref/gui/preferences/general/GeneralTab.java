@@ -63,6 +63,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
         backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
+        backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
     }
 
     public void backupFileDirBrowse() {
