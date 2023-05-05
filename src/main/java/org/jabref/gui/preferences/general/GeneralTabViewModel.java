@@ -58,6 +58,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = preferencesService.getFilePreferences();
     }
 
+    @Override
     public void setValues() {
         languagesListProperty.setValue(new SortedList<>(FXCollections.observableArrayList(Language.values()), Comparator.comparing(Language::getDisplayName)));
         selectedLanguageProperty.setValue(generalPreferences.getLanguage());
@@ -76,6 +77,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
     }
 
+    @Override
     public void storeSettings() {
         Language newLanguage = selectedLanguageProperty.getValue();
         if (newLanguage != generalPreferences.getLanguage()) {

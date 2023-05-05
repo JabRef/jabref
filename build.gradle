@@ -27,6 +27,8 @@ plugins {
     id 'project-report'
 
     id 'idea'
+
+    id("org.openrewrite.rewrite") version("5.40.4")
 }
 
 // Enable following for debugging
@@ -217,6 +219,9 @@ dependencies {
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
+
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:1.18.0"))
+    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
 }
 
 clean {
@@ -496,6 +501,27 @@ jacocoTestReport {
 checkstyle {
     // will only run when called explicitly from the command line
     sourceSets = []
+}
+
+rewrite {
+    activeRecipe(
+        'org.jabref.config.rewrite.cleanup',
+        'org.openrewrite.java.logging.slf4j.ParameterizedLogging',
+        'org.openrewrite.java.logging.slf4j.Slf4jLogShouldBeConstant'
+    )
+    exclusion (
+        "build.gradle",
+        "buildSrc/build.gradle",
+        "eclipse.gradle",
+        "settings.gradle",
+        "src-gen/**",
+        "src/main/resources/**",
+        "src/test/resources/**",
+        "**/module-info.java",
+        "**/*.py",
+        "**/*.xml",
+        "**/*.yml"
+    )
 }
 
 modernizer {

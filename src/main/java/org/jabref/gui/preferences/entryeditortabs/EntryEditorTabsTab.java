@@ -15,12 +15,12 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CustomEditorFieldsTab extends AbstractPreferenceTabView<CustomEditorFieldsTabViewModel> implements PreferencesTab {
+public class EntryEditorTabsTab extends AbstractPreferenceTabView<EntryEditorTabsTabViewModel> implements PreferencesTab {
 
     @FXML private Button generalFieldsHelp;
     @FXML private TextArea fieldsTextArea;
 
-    public CustomEditorFieldsTab() {
+    public EntryEditorTabsTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -32,7 +32,7 @@ public class CustomEditorFieldsTab extends AbstractPreferenceTabView<CustomEdito
     }
 
     public void initialize() {
-        viewModel = new CustomEditorFieldsTabViewModel(dialogService, preferencesService);
+        viewModel = new EntryEditorTabsTabViewModel(dialogService, preferencesService);
 
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 
