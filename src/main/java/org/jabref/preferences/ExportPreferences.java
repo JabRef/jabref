@@ -11,29 +11,23 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.model.metadata.SaveOrder;
 
-public class ImportExportPreferences {
+public class ExportPreferences {
     private final BooleanProperty alwaysReformatOnSave;
-    private final ObjectProperty<Path> importWorkingDirectory;
     private final StringProperty lastExportExtension;
     private final ObjectProperty<Path> exportWorkingDirectory;
     private final ObjectProperty<SaveOrder> exportSaveOrder;
     private final BooleanProperty autoSave;
-    private final BooleanProperty warnAboutDuplicatesOnImport;
 
-    public ImportExportPreferences(boolean alwaysReformatOnSave,
-                                   Path importWorkingDirectory,
-                                   String lastExportExtension,
-                                   Path exportWorkingDirectory,
-                                   SaveOrder exportSaveOrder,
-                                   boolean autoSave,
-                                   boolean warnAboutDuplicatesOnImport) {
+    public ExportPreferences(boolean alwaysReformatOnSave,
+                             String lastExportExtension,
+                             Path exportWorkingDirectory,
+                             SaveOrder exportSaveOrder,
+                             boolean autoSave) {
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
-        this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
         this.exportSaveOrder = new SimpleObjectProperty<>(exportSaveOrder);
         this.autoSave = new SimpleBooleanProperty(autoSave);
-        this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
     }
 
     public boolean shouldAlwaysReformatOnSave() {
@@ -46,18 +40,6 @@ public class ImportExportPreferences {
 
     public void setAlwaysReformatOnSave(boolean alwaysReformatOnSave) {
         this.alwaysReformatOnSave.set(alwaysReformatOnSave);
-    }
-
-    public Path getImportWorkingDirectory() {
-        return importWorkingDirectory.get();
-    }
-
-    public ObjectProperty<Path> importWorkingDirectoryProperty() {
-        return importWorkingDirectory;
-    }
-
-    public void setImportWorkingDirectory(Path importWorkingDirectory) {
-        this.importWorkingDirectory.set(importWorkingDirectory);
     }
 
     public String getLastExportExtension() {
@@ -106,17 +88,5 @@ public class ImportExportPreferences {
 
     public void setAutoSave(boolean shouldAutoSave) {
         this.autoSave.set(shouldAutoSave);
-    }
-
-    public boolean shouldWarnAboutDuplicatesOnImport() {
-        return warnAboutDuplicatesOnImport.get();
-    }
-
-    public BooleanProperty warnAboutDuplicatesOnImportProperty() {
-        return warnAboutDuplicatesOnImport;
-    }
-
-    public void setWarnAboutDuplicatesOnImport(boolean warnAboutDuplicatesOnImport) {
-        this.warnAboutDuplicatesOnImport.set(warnAboutDuplicatesOnImport);
     }
 }

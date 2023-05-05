@@ -24,9 +24,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.ExportPreferences;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.GeneralPreferences;
-import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +49,7 @@ public class ExportToClipboardActionTest {
     private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final PreferencesService preferences = mock(PreferencesService.class);
-    private final ImportExportPreferences importExportPrefs = mock(ImportExportPreferences.class);
+    private final ExportPreferences importExportPrefs = mock(ExportPreferences.class);
     private final StateManager stateManager = mock(StateManager.class);
 
     private ExporterFactory exporterFactory;
@@ -92,7 +92,7 @@ public class ExportToClipboardActionTest {
         };
 
         when(importExportPrefs.getLastExportExtension()).thenReturn("HTML");
-        when(preferences.getImportExportPreferences()).thenReturn(importExportPrefs);
+        when(preferences.getExportPreferences()).thenReturn(importExportPrefs);
         GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);

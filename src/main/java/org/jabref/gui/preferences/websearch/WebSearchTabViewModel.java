@@ -1,10 +1,7 @@
-package org.jabref.gui.preferences.importexport;
+package org.jabref.gui.preferences.websearch;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 
 import javax.net.ssl.HostnameVerifier;
@@ -22,7 +19,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.WebFetchers;
@@ -32,75 +28,47 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.PreferencesService;
 
-public class ImportExportTabViewModel implements PreferenceTabViewModel {
-
-    private final ListProperty<FetcherApiKey> apiKeys = new SimpleListProperty<>();
-    private final ObjectProperty<FetcherApiKey> selectedApiKeyProperty = new SimpleObjectProperty<>();
-
+public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
+    private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
+    private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
 
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
-    // SaveOrderConfigPanel
-    private final BooleanProperty exportInOriginalProperty = new SimpleBooleanProperty();
-    private final BooleanProperty exportInTableOrderProperty = new SimpleBooleanProperty();
-    private final BooleanProperty exportInSpecifiedOrderProperty = new SimpleBooleanProperty();
-    private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
-
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
-    private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
-    private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
+
+    private final ListProperty<FetcherApiKey> apiKeys = new SimpleListProperty<>();
+    private final ObjectProperty<FetcherApiKey> selectedApiKeyProperty = new SimpleObjectProperty<>();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final DOIPreferences doiPreferences;
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
-    private final ImportExportPreferences importExportPreferences;
     private final FilePreferences filePreferences;
 
-    public ImportExportTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
+    public WebSearchTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.importerPreferences = preferencesService.getImporterPreferences();
         this.grobidPreferences = preferencesService.getGrobidPreferences();
         this.doiPreferences = preferencesService.getDOIPreferences();
-        this.importExportPreferences = preferencesService.getImportExportPreferences();
         this.filePreferences = preferencesService.getFilePreferences();
     }
 
     @Override
     public void setValues() {
         generateKeyOnImportProperty.setValue(importerPreferences.isGenerateNewKeyOnImport());
-        useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
-        useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
-        warnAboutDuplicatesOnImportProperty.setValue(importExportPreferences.shouldWarnAboutDuplicatesOnImport());
-
+        warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
 
-        SaveOrder exportSaveOrder = importExportPreferences.getExportSaveOrder();
-        switch (exportSaveOrder.getOrderType()) {
-            case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
-            case ORIGINAL -> exportInOriginalProperty.setValue(true);
-            case TABLE -> exportInTableOrderProperty.setValue(true);
-        }
-        sortCriteriaProperty.addAll(exportSaveOrder.getSortCriteria().stream()
-                                                   .map(SortCriterionViewModel::new)
-                                                   .toList());
-
-        List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
-        fieldNames.sort(Comparator.comparing(Field::getDisplayName));
-        sortableFieldsProperty.addAll(fieldNames);
+        useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
+        useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
 
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
@@ -111,23 +79,16 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
+        importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
+        filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
+
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
         grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
 
-        filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
-
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
 
-        SaveOrder newSaveOrder = new SaveOrder(
-                SaveOrder.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInOriginalProperty.getValue()),
-                sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
-        preferencesService.getImportExportPreferences().setExportSaveOrder(newSaveOrder);
-
-        importExportPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
-
-        // API keys
         preferencesService.getImporterPreferences().getApiKeys().clear();
         preferencesService.getImporterPreferences().getApiKeys().addAll(apiKeys);
     }
@@ -142,28 +103,6 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty useCustomDOINameProperty() {
         return this.useCustomDOINameProperty;
-    }
-
-    // SaveOrderConfigPanel
-
-    public BooleanProperty saveInOriginalProperty() {
-        return exportInOriginalProperty;
-    }
-
-    public BooleanProperty saveInTableOrderProperty() {
-        return exportInTableOrderProperty;
-    }
-
-    public BooleanProperty saveInSpecifiedOrderProperty() {
-        return exportInSpecifiedOrderProperty;
-    }
-
-    public ListProperty<Field> sortableFieldsProperty() {
-        return sortableFieldsProperty;
-    }
-
-    public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
-        return sortCriteriaProperty;
     }
 
     public BooleanProperty grobidEnabledProperty() {
