@@ -94,7 +94,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         Optional<String> eprint = entry.getField(StandardField.EPRINT);
         String url;
 
-        if (archiveprefix.get() == "arXiv" && !eprint.isEmpty()) {
+        if ("arXiv".equals(archiveprefix.get()) && !eprint.isEmpty()) {
             url = INSPIRE_ARXIV_HOST + eprint.get();
         } else if (!doi.isEmpty()) {
             url = INSPIRE_DOI_HOST + doi.get();
