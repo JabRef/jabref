@@ -292,7 +292,7 @@ public class BackupManager {
     }
 
     private void startBackupTask(Path backupDir) {
-        fillQueue();
+        fillQueue(backupDir);
 
         executor.scheduleAtFixedRate(
                                      // We need to determine the backup path on each action, because we use the timestamp in the filename
@@ -302,8 +302,7 @@ public class BackupManager {
                                      TimeUnit.SECONDS);
     }
 
-    private void fillQueue() {
-        Path backupDir = BackupFileUtil.getAppDataBackupDir();
+    private void fillQueue(Path backupDir) {
         if (!Files.exists(backupDir)) {
             return;
         }
