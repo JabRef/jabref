@@ -74,8 +74,16 @@ public class EditAction extends SimpleCommand {
                     case CUT -> frame.getCurrentLibraryTab().cut();
                     case PASTE -> frame.getCurrentLibraryTab().paste();
                     case DELETE_ENTRY -> frame.getCurrentLibraryTab().delete(false);
-                    case REDO -> frame.getUndoManager().redo();
-                    case UNDO -> frame.getUndoManager().undo();
+                    case REDO -> {
+                        if (frame.getUndoManager().canRedo()) {
+                            frame.getUndoManager().redo();
+                        }
+                    }
+                    case UNDO -> {
+                        if (frame.getUndoManager().canUndo()) {
+                            frame.getUndoManager().undo();
+                        }
+                    }
                     default -> LOGGER.debug("Only cut/copy/paste supported but got: {} and focus owner {}", action, focusOwner);
                     // default -> throw new IllegalStateException("Only cut/copy/paste supported but got " + action);
                 }
