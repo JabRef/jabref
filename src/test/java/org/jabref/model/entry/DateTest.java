@@ -57,15 +57,15 @@ class DateTest {
         assertEquals(Optional.of(new Date(expected)), Date.parse(provided));
     }
 
-
     private static Stream<Arguments> validDateRanges() {
         return Stream.of(
-               Arguments.of(Year.of(2014), Year.of(2017), "2014/2017"),
-               Arguments.of(YearMonth.of(2015, Month.JANUARY), YearMonth.of(2015, Month.FEBRUARY), "2015-01/2015-02"),
-               Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "2015-01-15/2015-02-25"),
-               Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "2015-01-15 / 2015-02-25"),
-               Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "15 January 2015/25 February 2015"),
-               Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "15 January 2015 / 25 February 2015")               );
+             Arguments.of(Year.of(2014), Year.of(2017), "2014/2017"),
+             Arguments.of(YearMonth.of(2015, Month.JANUARY), YearMonth.of(2015, Month.FEBRUARY), "2015-01/2015-02"),
+             Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "2015-01-15/2015-02-25"),
+             Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "2015-01-15 / 2015-02-25"),
+             Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "15 January 2015/25 February 2015"),
+             Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "15 January 2015 / 25 February 2015")
+         );
     }
 
     @ParameterizedTest
