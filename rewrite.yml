@@ -94,11 +94,11 @@ recipeList:
   # States that it gains performance, but the code is more unreable
   #  - org.openrewrite.java.cleanup.UseForEachRemoveInsteadOfSetRemoveAll
 
-#  - org.openrewrite.java.cleanup.AtomicPrimitiveEqualsUsesGet
-#  - org.openrewrite.java.cleanup.BigDecimalRoundingConstantsToEnums
-#  - org.openrewrite.java.cleanup.CaseInsensitiveComparisonsDoNotChangeCase
-#  - org.openrewrite.java.cleanup.CatchClauseOnlyRethrows
+  - org.openrewrite.java.cleanup.AtomicPrimitiveEqualsUsesGet
+  - org.openrewrite.java.cleanup.BigDecimalRoundingConstantsToEnums
   - org.openrewrite.java.cleanup.BooleanChecksNotInverted
+  - org.openrewrite.java.cleanup.CaseInsensitiveComparisonsDoNotChangeCase
+  - org.openrewrite.java.cleanup.CatchClauseOnlyRethrows
 #  - org.openrewrite.java.cleanup.ChainStringBuilderAppendCalls
 #  - org.openrewrite.java.cleanup.CompareEnumsWithEqualityOperator
 #  - org.openrewrite.java.cleanup.ControlFlowIndentation
