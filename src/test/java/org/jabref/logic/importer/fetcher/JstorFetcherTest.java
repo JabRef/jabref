@@ -64,8 +64,10 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     @Test
     void searchById() throws Exception {
-        bibEntry.setField(StandardField.URLDATE, LocalDate.now().format(DateTimeFormatter.ISO_DATE));
-        assertEquals(Optional.of(bibEntry), fetcher.performSearchById("90002164"));
+        Optional<BibEntry> actual = fetcher.performSearchById("90002164");
+        // The URL date is always the current date in the US. No need to properly check it.
+        actual.ifPresent(entry -> entry.clearField(StandardField.URLDATE));
+        assertEquals(Optional.of(bibEntry), actual);
     }
 
     @Test

@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -86,7 +87,7 @@ public class PushToLyx extends AbstractPushToApplication {
         final File lyxpipe = lp;
 
         JabRefExecutorService.INSTANCE.executeAndWait(() -> {
-            try (FileWriter fw = new FileWriter(lyxpipe); BufferedWriter lyxOut = new BufferedWriter(fw)) {
+            try (FileWriter fw = new FileWriter(lyxpipe, StandardCharsets.UTF_8); BufferedWriter lyxOut = new BufferedWriter(fw)) {
                 String citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
                 lyxOut.write(citeStr + "\n");
             } catch (IOException excep) {

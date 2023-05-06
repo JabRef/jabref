@@ -21,6 +21,10 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
     @FXML private TextField keywordSeparator;
 
+    @FXML private CheckBox resolveStrings;
+    @FXML private TextField resolveStringsForFields;
+    @FXML private TextField nonWrappableFields;
+
     @FXML private CheckBox markOwner;
     @FXML private TextField markOwnerName;
     @FXML private CheckBox markOwnerOverwrite;
@@ -38,12 +42,13 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     }
 
     public void initialize() {
-        this.viewModel = new EntryTabViewModel(
-                preferencesService.getBibEntryPreferences(),
-                preferencesService.getOwnerPreferences(),
-                preferencesService.getTimestampPreferences());
+        this.viewModel = new EntryTabViewModel(preferencesService);
 
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
+
+        resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
+        resolveStringsForFields.textProperty().bindBidirectional(viewModel.resolveStringsForFieldsProperty());
+        nonWrappableFields.textProperty().bindBidirectional(viewModel.nonWrappableFieldsProperty());
 
         markOwner.selectedProperty().bindBidirectional(viewModel.markOwnerProperty());
         markOwnerName.textProperty().bindBidirectional(viewModel.markOwnerNameProperty());

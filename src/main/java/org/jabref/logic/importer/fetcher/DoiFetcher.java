@@ -92,7 +92,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 } // mEDRA does not explicit an API rating
 
                 LOGGER.trace(String.format("Thread %s, searching for DOI '%s', waited %.2fs because of API rate limiter",
-                        Thread.currentThread().getId(), identifier, waitingTime));
+                        Thread.currentThread().threadId(), identifier, waitingTime));
             }
         } catch (IOException e) {
             LOGGER.warn("Could not limit DOI API access rate", e);

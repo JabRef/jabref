@@ -46,7 +46,7 @@ public class TemplateExporter extends Exporter {
     private final String lfFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
-    private final SavePreferences savePreferences;
+    private final SaveConfiguration saveConfiguration;
     private boolean customExport;
     private BlankLineBehaviour blankLineBehaviour;
 
@@ -70,11 +70,11 @@ public class TemplateExporter extends Exporter {
      * @param lfFileName        Name of the main layout file.
      * @param extension         May or may not contain the . (for instance .txt).
      * @param layoutPreferences Preferences for the layout
-     * @param savePreferences   Preferences for saving
+     * @param saveConfiguration   Preferences for saving
      */
     public TemplateExporter(String name, String lfFileName, String extension, LayoutFormatterPreferences layoutPreferences,
-                            SavePreferences savePreferences) {
-        this(name, name, lfFileName, null, StandardFileType.fromExtensions(extension), layoutPreferences, savePreferences);
+                            SaveConfiguration saveConfiguration) {
+        this(name, name, lfFileName, null, StandardFileType.fromExtensions(extension), layoutPreferences, saveConfiguration);
     }
 
     /**
@@ -86,10 +86,10 @@ public class TemplateExporter extends Exporter {
      * @param directory         Directory in which to find the layout file.
      * @param extension         Should contain the . (for instance .txt).
      * @param layoutPreferences Preferences for layout
-     * @param savePreferences   Preferences for saving
+     * @param saveConfiguration   Preferences for saving
      */
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
-                            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+                            LayoutFormatterPreferences layoutPreferences, SaveConfiguration saveConfiguration) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
             this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
@@ -98,7 +98,7 @@ public class TemplateExporter extends Exporter {
         }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
-        this.savePreferences = savePreferences;
+        this.saveConfiguration = saveConfiguration;
     }
 
     /**
@@ -110,11 +110,11 @@ public class TemplateExporter extends Exporter {
      * @param directory         Directory in which to find the layout file.
      * @param extension         Should contain the . (for instance .txt).
      * @param layoutPreferences Preferences for layout
-     * @param savePreferences   Preferences for saving
+     * @param saveConfiguration   Preferences for saving
      * @param blankLineBehaviour how to behave regarding blank lines.
      */
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
-                            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences,
+                            LayoutFormatterPreferences layoutPreferences, SaveConfiguration saveConfiguration,
                             BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
@@ -124,7 +124,7 @@ public class TemplateExporter extends Exporter {
         }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
-        this.savePreferences = savePreferences;
+        this.saveConfiguration = saveConfiguration;
         this.blankLineBehaviour = blankLineBehaviour;
     }
 
@@ -225,7 +225,7 @@ public class TemplateExporter extends Exporter {
              * be non-null, and be used to choose entries. Otherwise, it will be
              * null, and be ignored.
              */
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, savePreferences);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, saveConfiguration);
 
             // Load default layout
             Layout defLayout;

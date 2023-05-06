@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -49,12 +50,14 @@ public class OpenOfficeDocumentCreatorTest {
     void setUp() throws URISyntaxException {
         xmlFile = Path.of(OpenOfficeDocumentCreatorTest.class.getResource("OldOpenOfficeCalcExportFormatContentSingleEntry.xml").toURI());
 
-        List<TemplateExporter> customFormats = new ArrayList<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        SavePreferences savePreferences = mock(SavePreferences.class);
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
+        ExporterFactory exporterFactory = ExporterFactory.create(
+                new ArrayList<>(),
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(SaveConfiguration.class),
+                mock(XmpPreferences.class),
+                mock(FieldPreferences.class),
+                BibDatabaseMode.BIBTEX,
+                mock(BibEntryTypesManager.class));
 
         exporter = exporterFactory.getExporterByName(OPEN_OFFICE_EXPORTER_ID).get();
 

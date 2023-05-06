@@ -8,7 +8,7 @@
     <link href="https://documentation-style-csl-ed-droit-ubx.readthedocs.io" rel="documentation"/>
     <author>
       <name>Pierre Gravier</name>
-      <email>pierre.gravier@u-bordeaux.fr</email>
+      <email>pierre.gravier@free.fr</email>
     </author>
     <author>
       <name>Frédérique Flamerie</name>
@@ -16,7 +16,7 @@
     </author>
     <category citation-format="note"/>
     <category field="law"/>
-    <updated>2019-11-07T04:39:48+00:00</updated>
+    <updated>2022-05-09T18:35:05+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -25,7 +25,6 @@
       <term name="ordinal-99">e</term>
       <term name="ordinal-01" gender-form="feminine">re</term>
       <term name="ordinal-01" gender-form="masculine">er</term>
-      <term name="cited">op.&#160;cit.</term>
       <term name="page" form="short">p.</term>
       <term name="online">en&#160;ligne</term>
       <term name="editorial-director" form="short">préf.</term>
@@ -131,17 +130,29 @@
   </macro>
   <!-- Mise en forme des préfaciers-->
   <macro name="preface-author">
-    <names variable="editorial-director">
-      <name and="text" delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" "/>
-      <label form="short" prefix=" (" suffix=".)"/>
-    </names>
+    <choose>
+      <if type="book chapter" match="any">
+        <group delimiter=" ">
+          <names variable="contributor">
+            <name and="text" delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" "/>
+          </names>
+          <text term="editorial-director" form="short" prefix=" (" suffix=")"/>
+        </group>
+      </if>
+    </choose>
   </macro>
   <!-- Mise en forme des directeurs de thèse-->
   <macro name="thesis-director">
-    <names variable="director">
-      <name and="text" delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" "/>
-      <label form="short" prefix=" (" suffix=".)"/>
-    </names>
+    <choose>
+      <if type="thesis" match="any">
+        <group delimiter=" ">
+          <names variable="contributor">
+            <name and="text" delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" "/>
+          </names>
+          <text term="director" form="short" prefix=" (" suffix=")"/>
+        </group>
+      </if>
+    </choose>
   </macro>
   <!--Mise en forme des titres dans la bibliographie - pour les entretiens oraux inclut l'interviewer et les autres informations concernant l'entretien -->
   <macro name="title">
@@ -678,7 +689,7 @@
             <else>
               <group delimiter=", ">
                 <text macro="author"/>
-                <text term="cited" font-style="italic"/>
+                <text term="op-cit" font-style="italic"/>
                 <text macro="locator"/>
               </group>
             </else>
