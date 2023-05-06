@@ -42,6 +42,7 @@ class DateTest {
                 Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "15.1.2015"),
                 Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "2015.1.15"),
                 Arguments.of(Year.of(2015), "2015"),
+                Arguments.of(Year.of(2015), "2015?"),
                 Arguments.of(YearMonth.of(2020, Month.JANUARY), "Jan, 2020"),
                 Arguments.of(LocalDate.of(2015, Month.OCTOBER, 15), "2015.10.15"),
                 Arguments.of(LocalDate.of(-10000, Month.OCTOBER, 15), "-10000-10-15"),
@@ -54,6 +55,23 @@ class DateTest {
     @MethodSource("validDates")
     void parseByDatePattern(Temporal expected, String provided) {
         assertEquals(Optional.of(new Date(expected)), Date.parse(provided));
+    }
+
+
+    private static Stream<Arguments> validDateRanges() {
+        return Stream.of(
+               Arguments.of(Year.of(2014), Year.of(2017), "2014/2017"),
+               Arguments.of(YearMonth.of(2015, Month.JANUARY), YearMonth.of(2015, Month.FEBRUARY), "2015-01/2015-02"),
+               Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "2015-01-15/2015-02-25"),
+               Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "2015-01-15 / 2015-02-25"),
+               Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "15 January 2015/25 February 2015"),
+               Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "15 January 2015 / 25 February 2015")               );
+    }
+
+    @ParameterizedTest
+    @MethodSource("validDateRanges")
+    void parseByDatePatternRange(Temporal expectedRangeStart, Temporal expectedRangeEnd, String provided) {
+        assertEquals(Optional.of(new Date(expectedRangeStart, expectedRangeEnd)), Date.parse(provided));
     }
 
     private static Stream<Arguments> invalidCornerCases() {
@@ -70,36 +88,6 @@ class DateTest {
     @MethodSource("invalidCornerCases")
     void nonExistentDates(String invalidDate, String errorMessage) {
         assertEquals(Optional.empty(), Date.parse(invalidDate), errorMessage);
-    }
-
-    @Test
-    void parseYearRange() {
-        Date expectedDataRange = new Date(Year.of(2014), Year.of(2017));
-        assertEquals(Optional.of(expectedDataRange), Date.parse("2014/2017"));
-    }
-
-    @Test
-    void parseYearMonthRange() {
-        Date expectedDataRange = new Date(YearMonth.of(2015, Month.JANUARY), YearMonth.of(2015, Month.FEBRUARY));
-        assertEquals(Optional.of(expectedDataRange), Date.parse("2015-01/2015-02"));
-    }
-
-    @Test
-    void parseYearMonthDayRange() {
-        Date expectedDataRange = new Date(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25));
-        assertEquals(Optional.of(expectedDataRange), Date.parse("2015-01-15/2015-02-25"));
-    }
-
-    @Test
-    void parseYearMonthDayRange2() {
-        Date expectedDataRange = new Date(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25));
-        assertEquals(Optional.of(expectedDataRange), Date.parse("15 January 2015 / 25 February 2015"));
-    }
-
-    @Test
-    void parseYearMonthDayRange3() {
-        Date expectedDataRange = new Date(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25));
-        assertEquals(Optional.of(expectedDataRange), Date.parse("15 January 2015/25 February 2015"));
     }
 
     @Test

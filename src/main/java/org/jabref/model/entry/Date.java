@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.text.ParsePosition;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
@@ -45,17 +46,19 @@ public class Date {
                 "uuuu",                                 // covers 2015
                 "MMM, uuuu",                            // covers Jan, 2020
                 "uuuu.MM.d",                            // covers 2015.10.15
-                "y-",                                   // covers 2015-
-                "-y",                                   // covers -2015
-                "d MMMM y/d MMMM y",                    // covers 20 January 2015/20 February 2015
-                "y G",                                  // covers 1 BC
-                "y G / y G",                            // covers 30 BC / 5 AD
-                "yyyy G / yyyy G",                      // covers 0030 BC / 0005 AD
-                "yyyy-MM G / yyyy-MM G",                // covers 0030-01 BC / 0005-02 AD
-                "y?",                                    // covers 2023?
-                "d MMMM y",                                    // covers 20 January 2015
-                "d MMMM y / d MMMM y"
+                "u'-'",                                 // covers 2015-
+                "d MMMM u/d MMMM u",                    // covers 20 January 2015/20 February 2015
+                "u'?'",                                 // covers 2023?
+                "d MMMM u",                             // covers 20 January 2015
+                "d MMMM u / d MMMM u"
                 );
+
+        /* TODO: The following date formats do not yet work and need to be created with tests
+         *      "u G",                                  // covers 1 BC
+                "u G / u G",                            // covers 30 BC / 5 AD
+                "uuuu G / uuuu G",                      // covers 0030 BC / 0005 AD
+                "uuuu-MM G / uuuu-MM G",                // covers 0030-01 BC / 0005-02 AD
+         */
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
                                            .map(DateTimeFormatter::ofPattern)
@@ -128,7 +131,7 @@ public class Date {
                 TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
-                LOGGER.debug("Invalid Date format", e);
+                LOGGER.debug("Invalid Date format for range", e);
                 return Optional.empty();
             }
         } else if (dateString.matches(
@@ -149,7 +152,7 @@ public class Date {
                 TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
-                LOGGER.debug("Invalid Date format", e);
+                LOGGER.debug("Invalid Date format range", e);
                 return Optional.empty();
             }
         }
@@ -157,8 +160,14 @@ public class Date {
             TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
             return Optional.of(new Date(parsedDate));
         } catch (DateTimeParseException e) {
-            LOGGER.debug("Invalid Date format", e);
-            return Optional.empty();
+            try {
+                // if after the date junk strings follow we ignore it and take the first parsed date
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString, new ParsePosition(0));
+                return Optional.of(new Date(parsedDate));
+            } catch (DateTimeParseException ex) {
+                LOGGER.debug("Invalid Date format after taking only the first parsed date found", ex);
+                return Optional.empty();
+            }
         }
     }
 
@@ -244,13 +253,14 @@ public class Date {
 
     @Override
     public String toString() {
-        String formattedDate;
+        String formattedDate = date.toString();
         if (date.isSupported(ChronoField.OFFSET_SECONDS)) {
             formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date);
         } else if (date.isSupported(ChronoField.HOUR_OF_DAY)) {
             formattedDate = DateTimeFormatter.ISO_DATE_TIME.format(date);
-        } else {
+        } else if( date.isSupported(ChronoField.MONTH_OF_YEAR) && date.isSupported(ChronoField.DAY_OF_MONTH)) {
             formattedDate = DateTimeFormatter.ISO_DATE.format(date);
+
         }
         return "Date{" +
                 "date=" + formattedDate +
@@ -259,6 +269,6 @@ public class Date {
 
     @Override
     public int hashCode() {
-        return Objects.hash(date);
+        return Objects.hash(getYear(), getMonth(), getDay(), get(ChronoField.HOUR_OF_DAY),get(ChronoField.MINUTE_OF_HOUR),get(ChronoField.OFFSET_SECONDS));
     }
 }
