@@ -34,7 +34,7 @@
     <CheckBox fx:id="enableAutoComplete" text="%Use autocompletion"/>
     <VBox spacing="10.0">
         <HBox spacing="4.0">
-            <Label text="%Affected fields:" disable="${!enableAutoComplete.selected}"/>
+            <Label text="%Affected fields" disable="${!enableAutoComplete.selected}"/>
             <TextField fx:id="autoCompleteFields" HBox.hgrow="ALWAYS" disable="${!enableAutoComplete.selected}">
                 <HBox.margin>
                     <Insets top="-4.0"/>
