@@ -21,7 +21,6 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
 
-import com.microsoft.applicationinsights.core.dependencies.apachecommons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,7 +181,8 @@ public class Linux implements NativeDesktop {
         // See https://www.freedesktop.org/wiki/Software/xdg-user-dirs/ for details
         try {
             Process process = new ProcessBuilder("xdg-user-dirs", "DOCUMENTS").start();
-            List<String> strings = IOUtils.readLines(process.getInputStream(), StandardCharsets.UTF_8);
+            List<String> strings = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))
+                    .lines().toList();
             String documentsPath = strings.get(0);
             LOGGER.debug("Got documents path {}", documentsPath);
             return Path.of(documentsPath);
