@@ -89,9 +89,9 @@ public class JabRefDesktop {
         } else if (StandardField.EPRINT.equals(field)) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
             link = identifierParser.parse(StandardField.EPRINT)
-                    .flatMap(Identifier::getExternalURI)
-                    .map(URI::toASCIIString)
-                    .orElse(link);
+                                   .flatMap(Identifier::getExternalURI)
+                                   .map(URI::toASCIIString)
+                                   .orElse(link);
 
             if (Objects.equals(link, initialLink)) {
                 Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
@@ -130,15 +130,15 @@ public class JabRefDesktop {
     }
 
     public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
-            DOI.parse(link)
-                        .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
-                        .ifPresent(uri -> {
-                            try {
-                                JabRefDesktop.openBrowser(uri);
-                            } catch (IOException e) {
-                                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
-                            }
-                        });
+        DOI.parse(link)
+           .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
+           .ifPresent(uri -> {
+               try {
+                   JabRefDesktop.openBrowser(uri);
+               } catch (IOException e) {
+                   dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+               }
+           });
     }
 
     /**
@@ -263,7 +263,6 @@ public class JabRefDesktop {
      * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
-     * @param dialogService
      */
     public static void openConsole(File file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (file == null) {
@@ -292,8 +291,7 @@ public class JabRefDesktop {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
                     LOGGER.error("Open console", exception);
-
-                   dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
+                    dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
                 }
             }
         }
