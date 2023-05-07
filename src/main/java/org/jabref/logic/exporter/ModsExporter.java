@@ -1,8 +1,11 @@
 package org.jabref.logic.exporter;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,6 +18,12 @@ import java.util.TreeMap;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -24,7 +33,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 
-import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * TemplateExporter for exporting in MODS XML format.
@@ -35,6 +46,8 @@ class ModsExporter extends Exporter {
     private static final String MINUS = "-";
     private static final String DOUBLE_MINUS = "--";
     private static final String MODS_SCHEMA_LOCATION = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModsExporter.class);
 
     public ModsExporter() {
         super("mods", "MODS", StandardFileType.XML);
@@ -48,17 +61,17 @@ class ModsExporter extends Exporter {
             return;
         }
 
+        XMLStreamWriter writer = null;
         try {
-            // create writer
-            IndentingXMLStreamWriter writer = createWriter(file);
+            StringWriter sw = new StringWriter();
+            // writer is not an auto closable!
+            writer = createWriter(sw);
 
             for (BibEntry bibEntry : entries) {
-                if (!bibEntry.getCitationKey().isEmpty()) {
+                if (bibEntry.getCitationKey().isPresent()) {
                     String citekey = bibEntry.getCitationKey().get();
                     addIdentifier(writer, new UnknownField("citekey"), citekey);
-                }
-
-                if (!bibEntry.getCitationKey().isPresent()) {
+                } else {
                     writer.writeStartElement("mods", "mods", MODS_NAMESPACE_URI);
                 }
 
@@ -110,28 +123,32 @@ class ModsExporter extends Exporter {
                     }
                     trackOriginInformation(originItems, field, value);
                 }
-
                 writeOriginInformation(writer, originItems, fieldMap);
-
                 // Write related items
                 writeRelatedInformation(writer, parts, fieldMap);
                 writer.writeEndElement(); // end mods
             }
+            writer.writeEndDocument();
+            writerFormatted(file, sw);
 
-            // end element and close
-            closeWriter(writer);
-        } catch (
-                XMLStreamException |
-                FileNotFoundException ex) {
+        } catch (XMLStreamException | IOException | TransformerException ex) {
             throw new SaveException(ex);
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.flush();
+                    writer.close();
+                }
+            } catch (XMLStreamException e) {
+                LOGGER.error("Error closing XML writer", e);
+            }
         }
     }
 
-    private IndentingXMLStreamWriter createWriter(final Path file) throws XMLStreamException, FileNotFoundException {
+    private XMLStreamWriter createWriter(StringWriter sw) throws XMLStreamException {
         XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
-        FileOutputStream fOutputStream = new FileOutputStream(file.toFile());
-        IndentingXMLStreamWriter writer = new IndentingXMLStreamWriter(outputFactory.createXMLStreamWriter(fOutputStream));
-        writer.setIndentStep("    ");
+
+        XMLStreamWriter writer =  outputFactory.createXMLStreamWriter(new StreamResult(sw));
         writer.writeDTD("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
 
         writer.writeStartElement("mods", "modsCollection", MODS_NAMESPACE_URI);
@@ -142,11 +159,15 @@ class ModsExporter extends Exporter {
         return writer;
     }
 
-    private void closeWriter(XMLStreamWriter writer) throws XMLStreamException {
-        writer.writeCharacters("\n");
-        writer.writeEndDocument();
-        writer.flush();
-        writer.close();
+    private void writerFormatted(Path file, StringWriter sw) throws TransformerException, IOException {
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+        try (OutputStream outputStream = Files.newOutputStream(file)) {
+            transformer.transform(new StreamSource(new StringReader(sw.toString())), new StreamResult(outputStream));
+        }
     }
 
     private void writeOriginInformation(XMLStreamWriter writer, List<String> originItems, Map<Field, String> fieldMap) throws XMLStreamException {
