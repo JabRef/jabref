@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import java.text.ParsePosition;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
@@ -46,18 +45,18 @@ public class Date {
                 "uuuu",                                 // covers 2015
                 "MMM, uuuu",                            // covers Jan, 2020
                 "uuuu.MM.d",                            // covers 2015.10.15
-                "u'-'",                                 // covers 2015-
                 "d MMMM u/d MMMM u",                    // covers 20 January 2015/20 February 2015
-                "u'?'",                                 // covers 2023?
                 "d MMMM u",                             // covers 20 January 2015
                 "d MMMM u / d MMMM u"
                 );
 
         /* TODO: The following date formats do not yet work and need to be created with tests
          *      "u G",                                  // covers 1 BC
-         *       "u G / u G",                            // covers 30 BC / 5 AD
+         *       "u G / u G",                           // covers 30 BC / 5 AD
          *      "uuuu G / uuuu G",                      // covers 0030 BC / 0005 AD
          *      "uuuu-MM G / uuuu-MM G",                // covers 0030-01 BC / 0005-02 AD
+         *      "u'-'",                                 // covers 2015-
+         *      "u'?'",                                 // covers 2023?
          */
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
@@ -160,14 +159,8 @@ public class Date {
             TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
             return Optional.of(new Date(parsedDate));
         } catch (DateTimeParseException e) {
-            try {
-                // if after the date junk strings follow we ignore it and take the first parsed date
-                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString, new ParsePosition(0));
-                return Optional.of(new Date(parsedDate));
-            } catch (DateTimeParseException ex) {
-                LOGGER.debug("Invalid Date format after taking only the first parsed date found", ex);
-                return Optional.empty();
-            }
+            LOGGER.debug("Invalid Date format", e);
+            return Optional.empty();
         }
     }
 
