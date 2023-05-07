@@ -130,7 +130,7 @@ public class GlobalSearchBar extends HBox {
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
-                if (keyBinding.get().equals(KeyBinding.CLOSE)) {
+                if (keyBinding.get() == KeyBinding.CLOSE) {
                     // Clear search and select first entry, if available
                     searchField.setText("");
                     frame.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();

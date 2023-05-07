@@ -171,11 +171,11 @@ public class DuplicateCheck {
 
         if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return compareAuthorField(stringOne, stringTwo);
-        } else if (StandardField.PAGES.equals(field)) {
+        } else if (StandardField.PAGES == field) {
             return comparePagesField(stringOne, stringTwo);
-        } else if (StandardField.JOURNAL.equals(field)) {
+        } else if (StandardField.JOURNAL == field) {
             return compareJournalField(stringOne, stringTwo);
-        } else if (StandardField.CHAPTER.equals(field)) {
+        } else if (StandardField.CHAPTER == field) {
             return compareChapterField(stringOne, stringTwo);
         }
 

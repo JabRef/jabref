@@ -61,7 +61,7 @@ public class JabRefDesktop {
             throws IOException {
         String link = initialLink;
         Field field = initialField;
-        if (StandardField.PS.equals(field) || StandardField.PDF.equals(field)) {
+        if (StandardField.PS == field || StandardField.PDF == field) {
             // Find the default directory for this field type:
             List<Path> directories = databaseContext.getFileDirectories(preferencesService.getFilePreferences());
 
@@ -83,10 +83,10 @@ public class JabRefDesktop {
                     field = StandardField.PS;
                 }
             }
-        } else if (StandardField.DOI.equals(field)) {
+        } else if (StandardField.DOI == field) {
             openDoi(link);
             return;
-        } else if (StandardField.EPRINT.equals(field)) {
+        } else if (StandardField.EPRINT == field) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
             link = identifierParser.parse(StandardField.EPRINT)
                     .flatMap(Identifier::getExternalURI)
@@ -105,15 +105,15 @@ public class JabRefDesktop {
             field = StandardField.URL;
         }
 
-        if (StandardField.URL.equals(field)) {
+        if (StandardField.URL == field) {
             openBrowser(link);
-        } else if (StandardField.PS.equals(field)) {
+        } else if (StandardField.PS == field) {
             try {
                 NATIVE_DESKTOP.openFile(link, StandardField.PS.getName());
             } catch (IOException e) {
                 LOGGER.error("An error occurred on the command: " + link, e);
             }
-        } else if (StandardField.PDF.equals(field)) {
+        } else if (StandardField.PDF == field) {
             try {
                 NATIVE_DESKTOP.openFile(link, StandardField.PDF.getName());
             } catch (IOException e) {

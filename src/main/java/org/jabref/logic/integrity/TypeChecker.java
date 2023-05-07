@@ -18,7 +18,7 @@ public class TypeChecker implements EntryChecker {
             return Collections.emptyList();
         }
 
-        if (StandardEntryType.Proceedings.equals(entry.getType())) {
+        if (StandardEntryType.Proceedings == entry.getType()) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("wrong entry type as proceedings has page numbers"), entry, StandardField.PAGES));
         }
