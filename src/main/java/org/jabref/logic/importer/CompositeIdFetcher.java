@@ -43,7 +43,7 @@ public class CompositeIdFetcher {
 
         return Optional.empty();
     }
-    // Package private
+
     public String filterForDOITag(String candidate) {
         return candidate.contains("?doi=") ? DOI.findInText(candidate).get().getDOI() : candidate;
     }
