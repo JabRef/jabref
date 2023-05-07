@@ -54,16 +54,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirectoryProperty,
                 mainDirectoryPath -> {
-                    ValidationMessage error = ValidationMessage.error(String.format(
-                            "%s%n%s%n%n%s%n%n%s > %s > %s",
-                            Localization.lang("Main directory not found"),
-                            mainDirectoryPath,
-                            Localization.lang("Please select a valid main directory under"),
-                            Localization.lang("Linked files"),
-                            Localization.lang("File directory"),
-                            Localization.lang("Main file directory")
-                    ));
-
+                    ValidationMessage error = ValidationMessage.error(
+                            Localization.lang("Main file directory '%0' not found.\nCheck the tab \"Linked files\".", mainDirectoryPath)
+                    );
                     try {
                         Path path = Path.of(mainDirectoryPath);
                         if (!(Files.exists(path) && Files.isDirectory(path))) {

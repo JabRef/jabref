@@ -29,9 +29,9 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        if (InternalField.INTERNAL_ALL_FIELD.equals(field)) {
+        if (InternalField.INTERNAL_ALL_FIELD == field) {
             return cleanupAllFields(entry);
-        } else if (InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD.equals(field)) {
+        } else if (InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD == field) {
             return cleanupAllTextFields(entry);
         } else {
             return cleanupSingleField(field, entry);

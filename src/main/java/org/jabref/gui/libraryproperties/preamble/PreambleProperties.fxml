@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<fx:root spacing="10.0" type="VBox"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="org.jabref.gui.libraryproperties.preamble.PreamblePropertiesView">
+    <Label styleClass="sectionHeader" text="%Preamble"/>
+    <TextArea fx:id="preamble" minHeight="100" prefHeight="180" VBox.vgrow="ALWAYS"/>
+</fx:root>

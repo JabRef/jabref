@@ -58,7 +58,7 @@ public class UndoableUnabbreviator {
     }
 
     public boolean restoreFromFJournal(BibEntry entry, Field field, CompoundEdit ce) {
-        if ((!StandardField.JOURNAL.equals(field) && !StandardField.JOURNALTITLE.equals(field)) || !entry.hasField(AMSField.FJOURNAL)) {
+        if ((StandardField.JOURNAL != field && StandardField.JOURNALTITLE != field) || !entry.hasField(AMSField.FJOURNAL)) {
             return false;
         }
 

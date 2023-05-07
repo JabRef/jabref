@@ -13,8 +13,8 @@ public class GeneralPreferences {
     private final ObjectProperty<BibDatabaseMode> defaultBibDatabaseMode;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
-
     private final BooleanProperty memoryStickMode;
+    private final BooleanProperty shouldOpenLastEdited;
     private final BooleanProperty showAdvancedHints;
 
     public GeneralPreferences(Language language,
@@ -22,12 +22,13 @@ public class GeneralPreferences {
                               boolean warnAboutDuplicatesInInspection,
                               boolean confirmDelete,
                               boolean memoryStickMode,
+                              boolean shouldOpenLastEdited,
                               boolean showAdvancedHints) {
         this.language = new SimpleObjectProperty<>(language);
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
-
+        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
     }
@@ -90,6 +91,18 @@ public class GeneralPreferences {
 
     public void setMemoryStickMode(boolean memoryStickMode) {
         this.memoryStickMode.set(memoryStickMode);
+    }
+
+    public boolean shouldOpenLastEdited() {
+        return shouldOpenLastEdited.get();
+    }
+
+    public BooleanProperty openLastEditedProperty() {
+        return shouldOpenLastEdited;
+    }
+
+    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
+        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
     }
 
     public boolean shouldShowAdvancedHints() {

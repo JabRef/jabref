@@ -79,7 +79,7 @@ public class SendAsEMailAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         // write the entries via this writer to "rawEntries" (being a StringWriter), which  used later to form the email content
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldWriterPreferences()), Globals.entryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), Globals.entryTypesManager);
 
         for (BibEntry entry : entries) {
             try {

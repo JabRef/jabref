@@ -16,7 +16,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -25,7 +25,7 @@ import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.XmpPdfExporter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
@@ -54,7 +54,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
@@ -237,7 +236,7 @@ public class ArgumentProcessor {
                         preferencesService.getFilePreferences(),
                         preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
                         Globals.entryTypesManager,
-                        preferencesService.getFieldWriterPreferences(),
+                        preferencesService.getFieldPreferences(),
                         cli.isWriteXMPtoPdf() || cli.isWriteMetadatatoPdf(),
                         cli.isEmbeddBibfileInPdf() || cli.isWriteMetadatatoPdf());
             }
@@ -267,7 +266,7 @@ public class ArgumentProcessor {
         return loaded;
     }
 
-    private void writeMetadatatoPdf(List<ParserResult> loaded, String filesAndCitekeys, XmpPreferences xmpPreferences, FilePreferences filePreferences, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, boolean writeXMP, boolean embeddBibfile) {
+    private void writeMetadatatoPdf(List<ParserResult> loaded, String filesAndCitekeys, XmpPreferences xmpPreferences, FilePreferences filePreferences, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldPreferences fieldPreferences, boolean writeXMP, boolean embeddBibfile) {
         if (loaded.isEmpty()) {
             LOGGER.error("The write xmp option depends on a valid import option.");
             return;
@@ -277,7 +276,7 @@ public class ArgumentProcessor {
         BibDatabase dataBase = pr.getDatabase();
 
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
-        EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldWriterPreferences);
+        EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldPreferences);
 
         if ("all".equals(filesAndCitekeys)) {
             for (BibEntry entry : dataBase.getEntries()) {
@@ -531,16 +530,17 @@ public class ArgumentProcessor {
     private void saveDatabase(BibDatabase newBase, String subName) {
         try {
             System.out.println(Localization.lang("Saving") + ": " + subName);
-            GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
-            SavePreferences savePreferences = preferencesService.getSavePreferences();
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+                SaveConfiguration saveConfiguration = new SaveConfiguration()
+                        .withReformatOnSave(preferencesService.getExportPreferences().shouldAlwaysReformatOnSave());
 
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
-                                                                            bibWriter,
-                                                                            generalPreferences,
-                                                                            savePreferences,
-                                                                            Globals.entryTypesManager);
+                        bibWriter,
+                        saveConfiguration,
+                        preferencesService.getFieldPreferences(),
+                        preferencesService.getCitationKeyPatternPreferences(),
+                        Globals.entryTypesManager);
                 databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
                 // Show just a warning message if encoding did not work for all characters:
