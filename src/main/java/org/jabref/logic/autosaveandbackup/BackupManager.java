@@ -227,7 +227,7 @@ public class BackupManager {
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
         SaveConfiguration saveConfiguration = new SaveConfiguration()
                 .withMakeBackup(false)
-                .withReformatOnSave(preferences.getImportExportPreferences().shouldAlwaysReformatOnSave());
+                .withReformatOnSave(preferences.getExportPreferences().shouldAlwaysReformatOnSave());
 
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         // We want to have successful backups only

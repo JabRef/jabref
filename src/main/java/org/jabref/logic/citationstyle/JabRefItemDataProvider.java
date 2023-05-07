@@ -155,7 +155,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
                     .map(removeNewlinesFormatter::format)
                     .map(LatexToUnicodeAdapter::format)
                     .ifPresent(value -> {
-                        if (StandardField.MONTH.equals(key)) {
+                        if (StandardField.MONTH == key) {
                             // Change month from #mon# to mon because CSL does not support the former format
                             value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                         }

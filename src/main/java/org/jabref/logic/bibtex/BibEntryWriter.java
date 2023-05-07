@@ -173,7 +173,7 @@ public class BibEntryWriter {
     }
 
     static int getLengthOfLongestFieldName(BibEntry entry) {
-        Predicate<Field> isNotCitationKey = field -> !InternalField.KEY_FIELD.equals(field);
+        Predicate<Field> isNotCitationKey = field -> InternalField.KEY_FIELD != field;
         return entry.getFields()
                     .stream()
                     .filter(isNotCitationKey)

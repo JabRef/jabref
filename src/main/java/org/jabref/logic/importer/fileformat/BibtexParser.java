@@ -617,7 +617,7 @@ public class BibtexParser implements Parser {
                 // for users if JabRef did not accept it.
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
-                } else if (StandardField.KEYWORDS.equals(field)) {
+                } else if (StandardField.KEYWORDS == field) {
                     // multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }

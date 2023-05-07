@@ -59,13 +59,13 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private FieldType determineFieldType() {
-        if (InternalField.TYPE_HEADER.equals(this.fields.getPrimary())) {
+        if (InternalField.TYPE_HEADER == this.fields.getPrimary()) {
             return FieldType.TYPE;
         } else if (this.fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if (StandardField.YEAR.equals(this.fields.getPrimary())) {
+        } else if (StandardField.YEAR == this.fields.getPrimary()) {
             return FieldType.YEAR;
-        } else if (StandardField.MONTH.equals(this.fields.getPrimary())) {
+        } else if (StandardField.MONTH == this.fields.getPrimary()) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;

@@ -52,9 +52,9 @@ public enum Language {
         String[] languageParts = language.getId().split("_");
         Locale locale;
         if (languageParts.length == 1) {
-            locale = new Locale(languageParts[0]);
+            locale = Locale.of(languageParts[0]);
         } else if (languageParts.length == 2) {
-            locale = new Locale(languageParts[0], languageParts[1]);
+            locale = Locale.of(languageParts[0], languageParts[1]);
         } else {
             locale = Locale.ENGLISH;
         }
