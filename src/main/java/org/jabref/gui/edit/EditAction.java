@@ -84,8 +84,7 @@ public class EditAction extends SimpleCommand {
                             frame.getUndoManager().undo();
                         }
                     }
-                    default -> LOGGER.debug("Only cut/copy/paste supported but got: {} and focus owner {}", action, focusOwner);
-                    // default -> throw new IllegalStateException("Only cut/copy/paste supported but got " + action);
+                    default -> LOGGER.debug("Only cut/copy/paste/delete supported but got: {} and focus owner {}", action, focusOwner);
                 }
             }
         });
