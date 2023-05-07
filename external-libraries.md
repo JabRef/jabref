@@ -511,7 +511,7 @@ License: Apache-2.0
 ```yaml
 Id:      org.yaml:snakeyaml
 Project: SnakeYAML
-URL:     https://bitbucket.org/asomov/snakeyaml-engine/src/master/
+URL:     https://bitbucket.org/snakeyaml/snakeyaml-engine/src/master/
 License: Apache-2.0
 ```
 

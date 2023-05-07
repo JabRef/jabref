@@ -65,7 +65,7 @@ Then, each weak do `choco upgrade all` to ensure all tooling is kept updated.
 
 #### Other bundles
 
-* [Cmder](http://cmder.net) - bundles ConEmu plus clink
+* [Cmder](https://cmder.app/) - bundles ConEmu plus clink
 
 ### Tools for working with XMP
 
