@@ -182,9 +182,9 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
         Assertions.assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
-                                                  .filter(bibEntry -> bibEntry.getField(StandardField.JOURNAL)
-                                                                              .orElse("")
-                                                                              .equals("Computer Supported Cooperative Work (CSCW)"))
+                                                  .filter(bibEntry -> "Computer Supported Cooperative Work (CSCW)"
+                                                                              .equals(bibEntry.getField(StandardField.JOURNAL)
+                                                                              .orElse("")))
                                                   .toList();
         allEntriesFromCSCW.stream()
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))

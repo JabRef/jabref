@@ -117,7 +117,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink())));
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
-        isOfflinePdf.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
+        isOfflinePdf.setValue(!linkedFile.isOnlineLink() && "pdf".equalsIgnoreCase(linkedFile.getFileType()));
     }
 
     public BooleanProperty isOfflinePdfProperty() {

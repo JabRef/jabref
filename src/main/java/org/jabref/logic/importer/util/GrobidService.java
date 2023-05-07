@@ -67,7 +67,7 @@ public class GrobidService {
                 .execute();
         String httpResponse = response.body();
 
-        if (httpResponse == null || httpResponse.equals("@misc{-1,\n  author = {}\n}\n") || httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")) { // This filters empty BibTeX entries
+        if (httpResponse == null || "@misc{-1,\n  author = {}\n}\n".equals(httpResponse) || httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");
         }
 
@@ -85,7 +85,7 @@ public class GrobidService {
 
         String httpResponse = response.body();
 
-        if (httpResponse == null || httpResponse.equals("@misc{-1,\n  author = {}\n}\n")) { // This filters empty BibTeX entries
+        if (httpResponse == null || "@misc{-1,\n  author = {}\n}\n".equals(httpResponse)) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");
         }
 

@@ -155,7 +155,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     private void proxyPasswordMask(MouseEvent event) {
-        if (!proxyPasswordText.equals("")) {
+        if (!"".equals(proxyPasswordText)) {
             proxyPassword.setText(proxyPasswordText);
             proxyPassword.positionCaret(proxyPasswordCaretPosition);
             proxyPassword.setPromptText("");

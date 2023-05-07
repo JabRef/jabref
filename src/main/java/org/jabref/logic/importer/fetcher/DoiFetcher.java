@@ -85,9 +85,9 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             Optional<String> agency;
             if (doi.isPresent() && (agency = getAgency(doi.get())).isPresent()) {
                 double waitingTime = 0.0;
-                if (agency.get().equalsIgnoreCase("datacite")) {
+                if ("datacite".equalsIgnoreCase(agency.get())) {
                     waitingTime = DATA_CITE_DCN_RATE_LIMITER.acquire();
-                } else if (agency.get().equalsIgnoreCase("crossref")) {
+                } else if ("crossref".equalsIgnoreCase(agency.get())) {
                     waitingTime = CROSSREF_DCN_RATE_LIMITER.acquire();
                 } // mEDRA does not explicit an API rating
 
@@ -147,7 +147,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
                 // Crossref has a dynamic API rate limit
-                if (agency.isPresent() && agency.get().equalsIgnoreCase("crossref")) {
+                if (agency.isPresent() && "crossref".equalsIgnoreCase(agency.get())) {
                     updateCrossrefAPIRate(openConnection);
                 }
 

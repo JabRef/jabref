@@ -78,7 +78,7 @@ public class Medra implements IdBasedParserFetcher {
     }
 
     private EntryType convertType(String type) {
-        return type.equals("article-journal") ? StandardEntryType.Article : StandardEntryType.Misc;
+        return "article-journal".equals(type) ? StandardEntryType.Article : StandardEntryType.Misc;
     }
 
     private String toAuthors(JSONArray authors) {
