@@ -183,9 +183,18 @@ public class Linux implements NativeDesktop {
             Process process = new ProcessBuilder("xdg-user-dirs", "DOCUMENTS").start();
             List<String> strings = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))
                     .lines().toList();
-            String documentsPath = strings.get(0);
+            if (strings.isEmpty()) {
+                LOGGER.error("xdg-user-dirs returned nothing");
+                return getUserDirectory();
+            }
+            String documentsDirectory = strings.get(0);
+            Path documentsPath = Path.of(documentsDirectory);
+            if (!Files.exists(documentsPath)) {
+                LOGGER.error("xdg-user-dirs returned non-existant directory {}", documentsDirectory);
+                return getUserDirectory();
+            }
             LOGGER.debug("Got documents path {}", documentsPath);
-            return Path.of(documentsPath);
+            return documentsPath;
         } catch (IOException e) {
             LOGGER.error("Error while executing xdg-user-dirs", e);
         }
