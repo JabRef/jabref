@@ -20,7 +20,7 @@ public class CompositeIdFetcher {
     }
 
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        Optional<DOI> doi = DOI.parse(filterForDOITag(identifier));
+        Optional<DOI> doi = DOI.findInText(identifier);
         if (doi.isPresent()) {
             return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getNormalized());
         }
@@ -42,10 +42,6 @@ public class CompositeIdFetcher {
         }*/
 
         return Optional.empty();
-    }
-
-    public String filterForDOITag(String candidate) {
-        return candidate.contains("?doi=") ? DOI.findInText(candidate).get().getDOI() : candidate;
     }
 
     public String getName() {

@@ -121,16 +121,4 @@ class CompositeIdFetcherTest {
     void performSearchByIdReturnsCorrectEntryForIdentifier(String name, BibEntry bibEntry, String identifier) throws FetcherException {
         assertEquals(Optional.of(bibEntry), compositeIdFetcher.performSearchById(identifier));
     }
-
-    @ParameterizedTest
-    @ValueSource(strings = "https://www.scitepress.org/Link.aspx?doi=10.5220/0010404301780189")
-    void filterForDOITagReturnsDOI(String DOIString) throws FetcherException {
-        assertEquals("10.5220/0010404301780189", compositeIdFetcher.filterForDOITag(DOIString));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = "10.5220/0010404301780189")
-    void filterForDOITagReturnsOriginalString(String nonDOIString) {
-        assertEquals("10.5220/0010404301780189", compositeIdFetcher.filterForDOITag(nonDOIString));
-    }
 }
