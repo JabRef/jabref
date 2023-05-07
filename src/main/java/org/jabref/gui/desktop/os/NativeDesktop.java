@@ -1,6 +1,7 @@
 package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
@@ -36,7 +37,12 @@ public interface NativeDesktop {
      * @return The path to the directory
      */
      default Path getDefaultFileChooserDirectory() {
-         return Path.of(System.getProperty("user.home"), "Documents");
+         Path userDirectory = getUserDirectory();
+         Path documents = userDirectory.resolve("Documents");
+         if (!Files.exists(documents)) {
+             return userDirectory;
+         }
+         return documents;
      }
 
     /**
