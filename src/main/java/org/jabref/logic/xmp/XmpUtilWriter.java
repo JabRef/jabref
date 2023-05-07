@@ -237,13 +237,13 @@ public class XmpUtilWriter {
         for (Field field : resolvedEntry.getFields()) {
             if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
                 // erase field instead of adding it
-                if (StandardField.AUTHOR.equals(field)) {
+                if (StandardField.AUTHOR == field) {
                     di.setAuthor(null);
-                } else if (StandardField.TITLE.equals(field)) {
+                } else if (StandardField.TITLE == field) {
                     di.setTitle(null);
-                } else if (StandardField.KEYWORDS.equals(field)) {
+                } else if (StandardField.KEYWORDS == field) {
                     di.setKeywords(null);
-                } else if (StandardField.ABSTRACT.equals(field)) {
+                } else if (StandardField.ABSTRACT == field) {
                     di.setSubject(null);
                 } else {
                     di.setCustomMetadataValue("bibtex/" + field, null);
@@ -254,13 +254,13 @@ public class XmpUtilWriter {
             // LaTeX content is removed from the string for "standard" fields in the PDF
             String value = unprotectTermsFormatter.format(resolvedEntry.getField(field).get());
 
-            if (StandardField.AUTHOR.equals(field)) {
+            if (StandardField.AUTHOR == field) {
                 di.setAuthor(value);
-            } else if (StandardField.TITLE.equals(field)) {
+            } else if (StandardField.TITLE == field) {
                 di.setTitle(value);
-            } else if (StandardField.KEYWORDS.equals(field)) {
+            } else if (StandardField.KEYWORDS == field) {
                 di.setKeywords(value);
-            } else if (StandardField.ABSTRACT.equals(field)) {
+            } else if (StandardField.ABSTRACT == field) {
                 di.setSubject(value);
             } else {
                 // We hit the case of an PDF-unsupported field --> write it directly

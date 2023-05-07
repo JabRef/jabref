@@ -93,41 +93,41 @@ class ModsExporter extends Exporter {
                     Field field = entry.getKey();
                     String value = entry.getValue();
 
-                    if (StandardField.AUTHOR.equals(field)) {
+                    if (StandardField.AUTHOR == field) {
                         handleAuthors(mods, value);
                     } else if (new UnknownField("affiliation").equals(field)) {
                         addAffiliation(mods, value);
-                    } else if (StandardField.ABSTRACT.equals(field)) {
+                    } else if (StandardField.ABSTRACT == field) {
                         addAbstract(mods, value);
-                    } else if (StandardField.TITLE.equals(field)) {
+                    } else if (StandardField.TITLE == field) {
                         addTitle(mods, value);
-                    } else if (StandardField.LANGUAGE.equals(field)) {
+                    } else if (StandardField.LANGUAGE == field) {
                         addLanguage(mods, value);
-                    } else if (StandardField.LOCATION.equals(field)) {
+                    } else if (StandardField.LOCATION == field) {
                         addLocation(mods, value);
-                    } else if (StandardField.URL.equals(field)) {
+                    } else if (StandardField.URL == field) {
                         addUrl(mods, value);
-                    } else if (StandardField.NOTE.equals(field)) {
+                    } else if (StandardField.NOTE == field) {
                         addNote(mods, value);
-                    } else if (StandardField.KEYWORDS.equals(field)) {
+                    } else if (StandardField.KEYWORDS == field) {
                         addKeyWords(mods, value);
-                    } else if (StandardField.VOLUME.equals(field)) {
+                    } else if (StandardField.VOLUME == field) {
                         addDetail(StandardField.VOLUME, value, partDefinition);
-                    } else if (StandardField.ISSUE.equals(field)) {
+                    } else if (StandardField.ISSUE == field) {
                         addDetail(StandardField.ISSUE, value, partDefinition);
-                    } else if (StandardField.PAGES.equals(field)) {
+                    } else if (StandardField.PAGES == field) {
                         addPages(partDefinition, value);
-                    } else if (StandardField.URI.equals(field)) {
+                    } else if (StandardField.URI == field) {
                         addIdentifier(StandardField.URI, value, mods);
-                    } else if (StandardField.ISBN.equals(field)) {
+                    } else if (StandardField.ISBN == field) {
                         addIdentifier(StandardField.ISBN, value, mods);
-                    } else if (StandardField.ISSN.equals(field)) {
+                    } else if (StandardField.ISSN == field) {
                         addIdentifier(StandardField.ISSN, value, mods);
-                    } else if (StandardField.DOI.equals(field)) {
+                    } else if (StandardField.DOI == field) {
                         addIdentifier(StandardField.DOI, value, mods);
-                    } else if (StandardField.PMID.equals(field)) {
+                    } else if (StandardField.PMID == field) {
                         addIdentifier(StandardField.PMID, value, mods);
-                    } else if (StandardField.JOURNAL.equals(field)) {
+                    } else if (StandardField.JOURNAL == field) {
                         addJournal(value, relatedItem);
                     }
 
@@ -377,7 +377,7 @@ class ModsExporter extends Exporter {
             addDate("dateModified", value, originInfo);
         } else if (field.equals(StandardField.CREATIONDATE)) {
             addDate("dateCaptured", value, originInfo);
-        } else if (StandardField.PUBLISHER.equals(field)) {
+        } else if (StandardField.PUBLISHER == field) {
             StringPlusLanguagePlusSupplied publisher = new StringPlusLanguagePlusSupplied();
             publisher.setValue(value);
             JAXBElement<StringPlusLanguagePlusSupplied> element = new JAXBElement<>(
