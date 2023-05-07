@@ -5,10 +5,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -20,6 +21,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
 
+import com.microsoft.applicationinsights.core.dependencies.apachecommons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,9 +173,24 @@ public class Linux implements NativeDesktop {
 
     @Override
     public Path getDefaultFileChooserDirectory() {
-        return Path.of(Objects.requireNonNullElse(
-                System.getenv("XDG_DOCUMENTS_DIR"),
-                // TODO: Execute "xdg-user-dir DOCUMENTS"
-                System.getProperty("user.home")));
+        String xdgDocumentsDir = System.getenv("XDG_DOCUMENTS_DIR");
+        if (xdgDocumentsDir != null) {
+            return Path.of(xdgDocumentsDir);
+        }
+
+        // Make use of xdg-user-dirs
+        // See https://www.freedesktop.org/wiki/Software/xdg-user-dirs/ for details
+        try {
+            Process process = new ProcessBuilder("xdg-user-dirs", "DOCUMENTS").start();
+            List<String> strings = IOUtils.readLines(process.getInputStream(), StandardCharsets.UTF_8);
+            String documentsPath = strings.get(0);
+            LOGGER.debug("Got documents path {}", documentsPath);
+            return Path.of(documentsPath);
+        } catch (IOException e) {
+            LOGGER.error("Error while executing xdg-user-dirs", e);
+        }
+
+        // Fallback
+        return getUserDirectory();
     }
 }
