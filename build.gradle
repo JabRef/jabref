@@ -262,7 +262,6 @@ processResources {
 task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateSearchGrammarSource",
                                 "generateEndnoteSource",
-                                "generateModsSource",
                                 "generateCitaviSource"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
@@ -306,17 +305,6 @@ task generateCitaviSource(type: XjcTask) {
     schemaFile = "src/main/resources/xjc/citavi/citavi.xsd"
     outputDirectory = "src-gen/main/java/"
     javaPackage = "org.jabref.logic.importer.fileformat.citavi"
-}
-
-task generateModsSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the mods importer."
-
-    schemaFile = "src/main/resources/xjc/mods/mods-3-7.xsd"
-    bindingFile = "src/main/resources/xjc/mods/mods-binding.xjb"
-    outputDirectory = "src-gen/main/java"
-    javaPackage = "org.jabref.logic.importer.fileformat.mods"
-    arguments = '-npa'
 }
 
 task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
