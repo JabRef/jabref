@@ -2350,7 +2350,7 @@ public class JabRefPreferences implements PreferencesService {
                     .map(layout -> {
                         if (CitationStyle.isCitationStyleFile(layout)) {
                             return CitationStyle.createCitationStyleFromFile(layout)
-                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, Globals.entryTypesManager))
+                                                .map(PreviewLayout.class::cast)
                                                 .orElse(null);
                         } else {
                             return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationRepository));

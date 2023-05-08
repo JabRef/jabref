@@ -28,7 +28,7 @@ public class TreeNodeTest {
 
     @Test
     public void constructorChecksThatClassImplementsCorrectInterface() {
-        assertThrows(UnsupportedOperationException.class, () -> new WrongTreeNodeImplementation());
+        assertThrows(UnsupportedOperationException.class, WrongTreeNodeImplementation::new);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class TreeNodeTest {
     @Test
     public void getPositionInParentForRootThrowsException() {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
-        assertThrows(UnsupportedOperationException.class, () -> root.getPositionInParent());
+        assertThrows(UnsupportedOperationException.class, root::getPositionInParent);
     }
 
     @Test

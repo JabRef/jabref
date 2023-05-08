@@ -86,12 +86,12 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void fetchInformationByIdentifier() {
-        entry.ifPresent(bibEntry -> viewModel.fetchBibliographyInformation(bibEntry));
+        entry.ifPresent(viewModel::fetchBibliographyInformation);
     }
 
     @FXML
     private void lookupIdentifier() {
-        entry.ifPresent(bibEntry -> viewModel.lookupIdentifier(bibEntry));
+        entry.ifPresent(viewModel::lookupIdentifier);
     }
 
     @FXML

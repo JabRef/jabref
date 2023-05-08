@@ -658,7 +658,7 @@ public class JabRefFrame extends BorderPane {
 
         // Bind global state
         FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
-        filteredTabs.setPredicate(tab -> tab instanceof LibraryTab);
+        filteredTabs.setPredicate(LibraryTab.class::isInstance);
 
         // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
         openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());

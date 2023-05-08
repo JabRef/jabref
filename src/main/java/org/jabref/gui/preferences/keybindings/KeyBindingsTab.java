@@ -54,7 +54,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
                         .mapObservable(SelectionModel::selectedItemProperty)
                         .mapObservable(TreeItem::valueProperty)
         );
-        keyBindingsTable.setOnKeyPressed(evt -> viewModel.setNewBindingForCurrent(evt));
+        keyBindingsTable.setOnKeyPressed(viewModel::setNewBindingForCurrent);
         keyBindingsTable.rootProperty().bind(
                 EasyBind.map(viewModel.rootKeyBindingProperty(),
                         keybinding -> new RecursiveTreeItem<>(keybinding, KeyBindingViewModel::getChildren))
