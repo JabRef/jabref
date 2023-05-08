@@ -36,7 +36,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * TemplateExporter for exporting in MODS XML format.
  */
@@ -130,7 +129,6 @@ class ModsExporter extends Exporter {
             }
             writer.writeEndDocument();
             writerFormatted(file, sw);
-
         } catch (XMLStreamException | IOException | TransformerException ex) {
             throw new SaveException(ex);
         } finally {
@@ -148,9 +146,8 @@ class ModsExporter extends Exporter {
     private XMLStreamWriter createWriter(StringWriter sw) throws XMLStreamException {
         XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
 
-        XMLStreamWriter writer =  outputFactory.createXMLStreamWriter(new StreamResult(sw));
+        XMLStreamWriter writer = outputFactory.createXMLStreamWriter(new StreamResult(sw));
         writer.writeDTD("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
-
         writer.writeStartElement("mods", "modsCollection", MODS_NAMESPACE_URI);
         writer.writeNamespace("mods", MODS_NAMESPACE_URI);
         writer.writeNamespace("ns2", "http://www.w3.org/1999/xlink");
