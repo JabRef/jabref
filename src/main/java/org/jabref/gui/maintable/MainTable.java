@@ -118,7 +118,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         dialogService,
                         stateManager).createColumns());
 
-        this.getColumns().removeIf(col -> col instanceof LibraryColumn);
+        this.getColumns().removeIf(LibraryColumn.class::isInstance);
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {

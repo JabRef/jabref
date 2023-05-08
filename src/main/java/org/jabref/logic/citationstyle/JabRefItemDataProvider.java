@@ -191,7 +191,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         return entries.stream()
                 .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
                 .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
-                .map(item -> (String) item)
+                .map(String.class::cast)
                 .collect(Collectors.joining(",", "[", "]"));
     }
 

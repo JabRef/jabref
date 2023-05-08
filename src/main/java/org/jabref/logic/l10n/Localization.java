@@ -130,7 +130,7 @@ public class Localization {
                 Collectors.toMap(
                         // not required to unescape content, because that is already done by the ResourceBundle itself
                         key -> key,
-                        key -> baseBundle.getString(key))
+                        baseBundle::getString)
         ));
     }
 
