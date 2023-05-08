@@ -82,9 +82,7 @@ class MSBibEntry {
     }
 
     /**
-     * Createa new {@link MsBibEntry} to import from an xml element
-     *
-     * @param entry
+     * Create a new {@link MsBibEntry} to import from an xml element
      */
     public MSBibEntry(Element entry) {
         populateFromXml(entry);

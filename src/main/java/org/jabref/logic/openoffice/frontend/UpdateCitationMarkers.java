@@ -34,7 +34,6 @@ public class UpdateCitationMarkers {
      * <p>
      * After each fillCitationMarkInCursor call check if we lost the BIB_SECTION_NAME bookmark and recreate it if we did.
      *
-     * @param frontend
      * @param style    Bibliography style to use.
      */
     public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend frontend, OOBibStyle style)
@@ -92,11 +91,8 @@ public class UpdateCitationMarkers {
      * Inserts a citation group in the document: creates and fills it.
      *
      * @param citationKeys     BibTeX keys of
-     * @param pageInfos
-     * @param citationType
      * @param citationText     Text for the citation. A citation mark or placeholder if not yet available.
      * @param position         Location to insert at.
-     * @param style
      * @param insertSpaceAfter A space inserted after the reference mark makes it easier to separate from the text coming after. But is not wanted when we recreate a reference mark.
      */
     public static void createAndFillCitationGroup(OOFrontend frontend,
