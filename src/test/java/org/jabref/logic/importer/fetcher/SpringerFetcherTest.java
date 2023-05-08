@@ -184,7 +184,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
         List<BibEntry> allEntriesFromCSCW = result.stream()
                                                   .filter(bibEntry -> "Computer Supported Cooperative Work (CSCW)"
                                                                               .equals(bibEntry.getField(StandardField.JOURNAL)
-                                                                              .orElse("")))
+                                                                                              .orElse("")))
                                                   .toList();
         allEntriesFromCSCW.stream()
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))
