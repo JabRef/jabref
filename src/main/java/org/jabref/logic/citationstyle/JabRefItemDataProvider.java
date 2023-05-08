@@ -185,16 +185,6 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         this.pagesChecker = new PagesChecker(ctx);
     }
 
-    public String toJson() {
-        List<BibEntry> entries = bibDatabaseContext.getEntries();
-        this.setData(entries, bibDatabaseContext, entryTypesManager);
-        return entries.stream()
-                .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
-                .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
-                .map(String.class::cast)
-                .collect(Collectors.joining(",", "[", "]"));
-    }
-
     @Override
     public CSLItemData retrieveItem(String id) {
         return data.stream()
