@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-// relevant StAX imports
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -402,7 +401,6 @@ class ModsExporter extends Exporter {
         writer.writeEndElement(); // end identifier
     }
 
-    // THIS NEEDS TO CHANGE
     private void addStartAndEndPage(XMLStreamWriter writer, String value, String minus) throws XMLStreamException {
         int minusIndex = value.indexOf(minus);
         String startPage = value.substring(0, minusIndex);
