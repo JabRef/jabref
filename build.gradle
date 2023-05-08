@@ -198,7 +198,7 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.64.2'
+    implementation 'com.vladsch.flexmark:flexmark:0.64.4'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
