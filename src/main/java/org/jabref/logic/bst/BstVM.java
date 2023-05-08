@@ -29,7 +29,7 @@ public class BstVM {
     protected final ParseTree tree;
     protected BstVMContext latestContext; // for testing
 
-    private Path path = null;
+    private Path path;
 
     public BstVM(Path path) throws RecognitionException, IOException {
         this(CharStreams.fromPath(path));

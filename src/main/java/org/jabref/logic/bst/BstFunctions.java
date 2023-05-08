@@ -33,7 +33,7 @@ public class BstFunctions {
     private final Stack<Object> stack;
     private final StringBuilder bbl;
 
-    private int bstWarning = 0;
+    private int bstWarning;
 
     @FunctionalInterface
     public interface BstFunction {

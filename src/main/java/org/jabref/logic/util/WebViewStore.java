@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class WebViewStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebViewStore.class);
     private final static Queue<WebView> WEB_VIEWS = new ArrayDeque<>();
-    private static boolean isInitialized = false;
+    private static boolean isInitialized;
     private static Configuration config;
 
     /**

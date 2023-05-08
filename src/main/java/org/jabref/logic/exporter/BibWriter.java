@@ -13,9 +13,9 @@ public class BibWriter {
     private final String newLineSeparator;
     private final Writer writer;
 
-    private boolean precedingNewLineRequired = false;
-    private boolean somethingWasWritten = false;
-    private boolean lastWriteWasNewline = false;
+    private boolean precedingNewLineRequired;
+    private boolean somethingWasWritten;
+    private boolean lastWriteWasNewline;
 
     /**
      * @param newLineSeparator the string used for a line break

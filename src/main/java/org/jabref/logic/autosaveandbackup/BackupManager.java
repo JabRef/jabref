@@ -61,7 +61,7 @@ public class BackupManager {
     // Contains a list of all backup paths
     // During a write, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
-    private boolean needsBackup = false;
+    private boolean needsBackup;
 
     BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;

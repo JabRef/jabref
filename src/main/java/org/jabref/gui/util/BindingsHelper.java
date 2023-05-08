@@ -194,7 +194,7 @@ public class BindingsHelper {
         private final ObservableValue<A> propertyA;
         private final Consumer<B> updateA;
         private final Consumer<A> updateB;
-        private boolean updating = false;
+        private boolean updating;
 
         public BidirectionalBinding(ObservableValue<A> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<A> updateB) {
             this.propertyA = propertyA;
@@ -236,7 +236,7 @@ public class BindingsHelper {
         private final ObservableValue<B> property;
         private final Consumer<B> updateA;
         private final Consumer<List<A>> updateB;
-        private boolean updating = false;
+        private boolean updating;
 
         public BidirectionalListBinding(ObservableList<A> listProperty, ObservableValue<B> property, Consumer<B> updateA, Consumer<List<A>> updateB) {
             this.listProperty = listProperty;
@@ -276,7 +276,7 @@ public class BindingsHelper {
         private final ObservableValue<B> property;
         private final Consumer<B> updateA;
         private final Consumer<Map<A, V>> updateB;
-        private boolean updating = false;
+        private boolean updating;
 
         public BidirectionalMapBinding(ObservableMap<A, V> mapProperty, ObservableValue<B> property, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
             this.mapProperty = mapProperty;

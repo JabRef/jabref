@@ -111,7 +111,7 @@ recipeList:
   - org.openrewrite.java.cleanup.EqualsAvoidsNull
   # Needs manual intervention
 #  - org.openrewrite.java.cleanup.ExplicitCharsetOnStringGetBytes
-#  - org.openrewrite.java.cleanup.ExplicitInitialization
+  - org.openrewrite.java.cleanup.ExplicitInitialization
 #  - org.openrewrite.java.cleanup.ExternalizableHasNoArgsConstructor
 #  - org.openrewrite.java.cleanup.FallThrough
 #  - org.openrewrite.java.cleanup.ForLoopControlVariablePostfixOperators

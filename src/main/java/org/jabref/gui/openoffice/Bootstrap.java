@@ -71,7 +71,7 @@ import com.sun.star.uno.XComponentContext;
 public class Bootstrap {
 
     private static final Random RANDOM_PIPE_NAME = new Random();
-    private static boolean M_LOADED_JUH = false;
+    private static boolean M_LOADED_JUH;
 
     private static void insertBasicFactories(XSet xSet, XImplementationLoader xImpLoader) throws Exception {
         // insert the factory of the loader

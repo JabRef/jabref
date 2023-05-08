@@ -73,7 +73,7 @@ public class Globals {
     public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
 
-    private static ClipBoardManager clipBoardManager = null;
+    private static ClipBoardManager clipBoardManager;
     private static KeyBindingRepository keyBindingRepository;
     private static ThemeManager themeManager;
 

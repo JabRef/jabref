@@ -212,7 +212,7 @@ public class DuplicateSearch extends SimpleCommand {
         private final Map<Integer, BibEntry> toRemove = new HashMap<>();
         private final List<BibEntry> toAdd = new ArrayList<>();
 
-        private int duplicates = 0;
+        private int duplicates;
 
         public synchronized List<BibEntry> getToRemove() {
             return new ArrayList<>(toRemove.values());

@@ -20,11 +20,11 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     private final Queue<Runnable> taskQueue = new ConcurrentLinkedQueue<>();
     private TaskExecutor taskExecutor;
-    private int numOfIndexedFiles = 0;
+    private int numOfIndexedFiles;
 
     private final Object lock = new Object();
-    private boolean isRunning = false;
-    private boolean isBlockingNewTasks = false;
+    private boolean isRunning;
+    private boolean isBlockingNewTasks;
 
     public IndexingTaskManager(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;

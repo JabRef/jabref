@@ -62,7 +62,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
 
 
     private String proxyPasswordText = "";
-    private int proxyPasswordCaretPosition = 0;
+    private int proxyPasswordCaretPosition;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 

@@ -104,7 +104,7 @@ public class DOI implements Identifier {
     // DOI
     private final String doi;
     // Short DOI
-    private boolean isShortDoi = false;
+    private boolean isShortDoi;
 
     /**
      * Creates a DOI from various schemes including URL, URN, and plain DOIs/Short DOIs.

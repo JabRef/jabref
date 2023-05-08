@@ -25,7 +25,7 @@ public class ParserResult {
     private Path file;
     private boolean invalid;
     private boolean toOpenTab;
-    private boolean changedOnMigration = false;
+    private boolean changedOnMigration;
 
     public ParserResult() {
         this(Collections.emptyList());

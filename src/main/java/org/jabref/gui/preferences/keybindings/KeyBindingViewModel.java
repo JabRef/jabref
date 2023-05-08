@@ -26,7 +26,7 @@ import com.google.common.base.CaseFormat;
  */
 public class KeyBindingViewModel {
 
-    private KeyBinding keyBinding = null;
+    private KeyBinding keyBinding;
     private String realBinding = "";
     private final ObservableList<KeyBindingViewModel> children = FXCollections.observableArrayList();
     private final KeyBindingRepository keyBindingRepository;

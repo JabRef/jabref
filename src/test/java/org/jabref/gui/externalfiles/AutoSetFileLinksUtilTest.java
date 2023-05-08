@@ -35,7 +35,7 @@ public class AutoSetFileLinksUtilTest {
             ';');
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);
-    private Path path = null;
+    private Path path;
 
     @BeforeEach
     public void setUp(@TempDir Path folder) throws Exception {

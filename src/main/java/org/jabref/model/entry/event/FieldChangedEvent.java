@@ -12,7 +12,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
     private final Field field;
     private final String newValue;
     private final String oldValue;
-    private int majorCharacterChange = 0;
+    private int majorCharacterChange;
 
     /**
      * @param bibEntry Affected BibEntry object

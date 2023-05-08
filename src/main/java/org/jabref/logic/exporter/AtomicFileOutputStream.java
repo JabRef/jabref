@@ -70,7 +70,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private final boolean keepBackup;
 
-    private boolean errorDuringWrite = false;
+    private boolean errorDuringWrite;
 
     /**
      * Creates a new output stream to write to or replace the file at the specified path.

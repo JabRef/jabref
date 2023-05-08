@@ -33,7 +33,7 @@ public class AutosaveManager {
     private final EventBus eventBus;
     private final CoarseChangeFilter changeFilter;
     private final ScheduledThreadPoolExecutor executor;
-    private boolean needsSave = false;
+    private boolean needsSave;
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;

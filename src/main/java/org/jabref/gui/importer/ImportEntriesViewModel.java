@@ -46,7 +46,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private ParserResult parserResult = null;
+    private ParserResult parserResult;
     private final ObservableList<BibEntry> entries;
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;

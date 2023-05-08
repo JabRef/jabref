@@ -126,7 +126,7 @@ public class EntryTypeViewModel {
     }
 
     private class FetcherWorker extends Task<Optional<BibEntry>> {
-        private IdBasedFetcher fetcher = null;
+        private IdBasedFetcher fetcher;
         private String searchID = "";
 
         @Override
