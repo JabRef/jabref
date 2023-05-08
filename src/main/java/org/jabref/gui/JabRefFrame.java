@@ -490,7 +490,7 @@ public class JabRefFrame extends BorderPane {
                 context.clearDBMSSynchronizer();
             }
             AutosaveManager.shutdown(context);
-            BackupManager.shutdown(context);
+            BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
 
@@ -1235,7 +1235,7 @@ public class JabRefFrame extends BorderPane {
         }
 
         if (buttonType.equals(discardChanges)) {
-            BackupManager.discardBackup(libraryTab.getBibDatabaseContext());
+            BackupManager.discardBackup(libraryTab.getBibDatabaseContext(), prefs.getFilePreferences().getBackupDirectory());
             return true;
         }
 
@@ -1312,7 +1312,7 @@ public class JabRefFrame extends BorderPane {
             removeTab(libraryTab);
         }
         AutosaveManager.shutdown(context);
-        BackupManager.shutdown(context);
+        BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
     }
 
     private void removeTab(LibraryTab libraryTab) {

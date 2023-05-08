@@ -26,13 +26,13 @@ public class BackupResolverDialog extends FXDialog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupResolverDialog.class);
 
-    public BackupResolverDialog(Path originalPath) {
+    public BackupResolverDialog(Path originalPath, Path backupDir) {
         super(AlertType.CONFIRMATION, Localization.lang("Backup found"), true);
         setHeaderText(null);
         getDialogPane().setMinHeight(180);
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
 
-        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP);
+        Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);
         String backupFilename = backupPathOpt.map(Path::getFileName).map(Path::toString).orElse(Localization.lang("File not found"));
         String content = new StringBuilder()
                 .append(Localization.lang("A backup file for '%0' was found at [%1]",

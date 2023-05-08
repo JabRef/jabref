@@ -289,7 +289,7 @@ public class LibraryTab extends Tab {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
             autosaveManager.registerListener(new AutosaveUiManager(this));
         }
-        if (isDatabaseReadyForBackup(bibDatabaseContext)) {
+        if (isDatabaseReadyForBackup(bibDatabaseContext) && preferencesService.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(bibDatabaseContext, Globals.entryTypesManager, preferencesService);
         }
     }
@@ -706,7 +706,7 @@ public class LibraryTab extends Tab {
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         AutosaveManager.shutdown(bibDatabaseContext);
-        BackupManager.shutdown(bibDatabaseContext);
+        BackupManager.shutdown(bibDatabaseContext, preferencesService.getFilePreferences().getBackupDirectory(), preferencesService.getFilePreferences().shouldCreateBackup());
     }
 
     /**
