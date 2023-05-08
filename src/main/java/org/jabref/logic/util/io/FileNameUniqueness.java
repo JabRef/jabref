@@ -67,7 +67,7 @@ public class FileNameUniqueness {
         Objects.requireNonNull(dialogService);
 
         String extensionSuffix = FileUtil.getFileExtension(fileName).orElse("");
-        extensionSuffix = extensionSuffix.equals("") ? extensionSuffix : "." + extensionSuffix;
+        extensionSuffix = "".equals(extensionSuffix) ? extensionSuffix : "." + extensionSuffix;
         String newFilename = FileUtil.getBaseName(fileName) + extensionSuffix;
 
         String fileNameWithoutDuplicated = eraseDuplicateMarks(FileUtil.getBaseName(fileName));

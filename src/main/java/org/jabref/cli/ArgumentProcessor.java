@@ -396,7 +396,7 @@ public class ArgumentProcessor {
                 }
             }
 
-            if (formatName.equals("bib")) {
+            if ("bib".equals(formatName)) {
                 // output a bib file as default or if
                 // provided exportFormat is "bib"
                 saveDatabase(new BibDatabase(matches), data[1]);
