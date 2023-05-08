@@ -91,7 +91,7 @@ class ModsExporter extends Exporter {
                     } else if (StandardField.ABSTRACT.equals(field)) {
                         addAbstract(writer, value);
                     } else if (StandardField.TITLE.equals(field)) {
-                        addTitle(writer, value); // this might have to be called within that second for loop.... i think this goes inside of relateditem lol
+                        addTitle(writer, value);
                     } else if (StandardField.LANGUAGE.equals(field)) {
                         addLanguage(writer, value);
                     } else if (StandardField.LOCATION.equals(field)) {
@@ -208,8 +208,8 @@ class ModsExporter extends Exporter {
             for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
                 Field field = entry.getKey();
                 String value = entry.getValue();
-                if (StandardField.PAGES.equals(field)) { // are these all parts?
-                    addPages(writer, value); // STILL NEED TO CHANGE
+                if (StandardField.PAGES.equals(field)) {
+                    addPages(writer, value);
                 } else if (StandardField.VOLUME.equals(field)) {
                     addDetail(writer, StandardField.VOLUME, value);
                 } else if (StandardField.ISSUE.equals(field)) {
@@ -221,7 +221,7 @@ class ModsExporter extends Exporter {
     }
 
     private void trackOriginInformation(List<String> originItems, Field field, String value) {
-        if (field.equals(StandardField.YEAR)) { // change later
+        if (field.equals(StandardField.YEAR)) {
             originItems.add(value);
         } else if (field.equals(new UnknownField("created"))) {
             originItems.add(value);
