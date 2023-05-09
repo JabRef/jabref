@@ -48,14 +48,8 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: >
-              GitHub has automatic checks in place.
-              One of them is checking for the formatting of the code.
-              Consistent formatting ensures more easy reading of the code.
-              Thus, we pay attention that JabRef's code follows the same code style.
-
-
               Your code currently does not meet JabRef's code guidelines.
-              The tool [reviewdog](https://github.com/reviewdog/reviewdog#readme) already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
+              The tool reviewdog already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
               Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
               Afterwards, please run checkstyle locally and fix the issues.
 
