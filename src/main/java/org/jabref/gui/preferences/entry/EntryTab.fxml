@@ -15,8 +15,10 @@
 
     <Label styleClass="sectionHeader" text="%Field"/>
 
-    <Label text="%Keyword separator"/>
-    <TextField fx:id="keywordSeparator" minWidth="30.0" maxWidth="30.0" alignment="CENTER"/>
+    <HBox spacing="4.0" alignment="BASELINE_LEFT">
+        <Label text="%Keyword separator"/>
+        <TextField fx:id="keywordSeparator" minWidth="30.0" maxWidth="30.0" alignment="CENTER"/>
+    </HBox>
 
     <CheckBox fx:id="resolveStrings" text="%Resolve BibTeX strings"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
