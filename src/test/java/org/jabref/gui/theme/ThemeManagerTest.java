@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,7 +53,7 @@ class ThemeManagerTest {
     public void themeManagerUsesProvidedTheme() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
-        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class);
+        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(appearancePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
         ThemeManager themeManager = new ThemeManager(appearancePreferences, new DummyFileUpdateMonitor(), Runnable::run);
@@ -72,7 +73,7 @@ class ThemeManagerTest {
          validation (at the moment) but by making a valid CSS block we don't preclude adding validation later */
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
-        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class);
+        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(appearancePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
         // ActiveTheme should provide the additionalStylesheet that was created before
@@ -131,7 +132,7 @@ class ThemeManagerTest {
             Files.writeString(largeCssTestFile, testString, StandardOpenOption.APPEND);
         }
         Files.writeString(largeCssTestFile, " */", StandardOpenOption.APPEND);
-        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class);
+        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(appearancePreferences.getTheme()).thenReturn(new Theme(largeCssTestFile.toString()));
 
         // ActiveTheme should provide the large additionalStylesheet that was created before
@@ -164,7 +165,7 @@ class ThemeManagerTest {
 
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
-        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class);
+        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(appearancePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
         ThemeManager themeManager = new ThemeManager(appearancePreferences, new DummyFileUpdateMonitor(), Runnable::run);
@@ -179,7 +180,7 @@ class ThemeManagerTest {
     public void installThemeOnWebEngine() throws IOException {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
-        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class);
+        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(appearancePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
         ThemeManager themeManager = new ThemeManager(appearancePreferences, new DummyFileUpdateMonitor(), Runnable::run);
@@ -208,7 +209,7 @@ class ThemeManagerTest {
     public void liveReloadCssDataUrl() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
-        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class);
+        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(appearancePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
         final ThemeManager themeManager;
