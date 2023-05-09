@@ -45,7 +45,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We reorganized the order of tabs and settings in the library properties. [#9836](https://github.com/JabRef/jabref/pull/9836)
 - We changed the handling of an "overflow" of authors at `[authIniN]`: JabRef uses `+` to indicate an overflow. Example: `[authIni2]` produces `A+` (instead of `AB`) for `Aachen and Berlin and Chemnitz`. [#9703](https://github.com/JabRef/jabref/pull/9703)
 - We moved the preferences option to open the last edited files on startup to the 'General' tab. [#9808](https://github.com/JabRef/jabref/pull/9808)
-- We split the 'Import and Export' tab into 'Web Search' and 'Export'. [#9839](https://github.com/JabRef/jabref/pull/9839)
+- We split the 'Import and Export' tab in the preferences into 'Web Search' and 'Export'. [#9839](https://github.com/JabRef/jabref/pull/9839)
+- We split the 'General' tab in the preferences into 'Libraries' and 'Appearance'. [#9866](https://github.com/JabRef/jabref/pull/9866)
+- We moved the option to run JabRef in memory stick mode into the preferences dialog toolbar. [#9866](https://github.com/JabRef/jabref/pull/9866)
 
 ### Fixed
 
