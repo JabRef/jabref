@@ -23,7 +23,7 @@ public class LibraryTab extends AbstractPreferenceTabView<LibraryTabViewModel> i
 
     @Override
     public String getTabName() {
-        return Localization.lang("Library");
+        return Localization.lang("Libraries");
     }
 
     public void initialize() {

@@ -8,8 +8,10 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.theme.Theme;
+import org.jabref.logic.l10n.Language;
 
 public class AppearancePreferences {
+    private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
     private final IntegerProperty defaultFontSize;
@@ -19,7 +21,8 @@ public class AppearancePreferences {
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
 
-    public AppearancePreferences(boolean shouldOverrideDefaultFontSize,
+    public AppearancePreferences(Language language,
+                                 boolean shouldOverrideDefaultFontSize,
                                  int mainFontSize,
                                  int defaultFontSize,
                                  Theme theme,
@@ -27,6 +30,7 @@ public class AppearancePreferences {
                                  boolean showAdvancedHints,
                                  boolean warnAboutDuplicatesInInspection,
                                  boolean confirmDelete) {
+        this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
         this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
@@ -35,6 +39,18 @@ public class AppearancePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
+    }
+
+    public Language getLanguage() {
+        return language.get();
+    }
+
+    public ObjectProperty<Language> languageProperty() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language.set(language);
     }
 
     public boolean shouldOverrideDefaultFontSize() {

@@ -23,7 +23,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AppearancePreferences;
-import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
@@ -75,7 +74,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final AppearancePreferences appearancePreferences;
-    private final GeneralPreferences generalPreferences;
     private final TelemetryPreferences telemetryPreferences;
 
     private final Validator fontSizeValidator;
@@ -87,7 +85,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.appearancePreferences = preferences.getAppearancePreferences();
-        this.generalPreferences = preferences.getGeneralPreferences();
         this.telemetryPreferences = preferences.getTelemetryPreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
@@ -115,7 +112,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        selectedLanguageProperty.setValue(generalPreferences.getLanguage());
+        selectedLanguageProperty.setValue(appearancePreferences.getLanguage());
 
         // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
@@ -142,8 +139,8 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         Language newLanguage = selectedLanguageProperty.getValue();
-        if (newLanguage != generalPreferences.getLanguage()) {
-            generalPreferences.setLanguage(newLanguage);
+        if (newLanguage != appearancePreferences.getLanguage()) {
+            appearancePreferences.setLanguage(newLanguage);
             Localization.setLanguage(newLanguage);
             restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
         }
