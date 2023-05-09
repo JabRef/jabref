@@ -77,7 +77,6 @@ public class LibraryTabViewModel implements PreferenceTabViewModel {
         return autosaveLocalLibraries;
     }
 
-
     public BooleanProperty createBackupProperty() {
         return this.createBackupProperty;
     }
