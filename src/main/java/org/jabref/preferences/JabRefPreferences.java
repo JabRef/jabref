@@ -1267,8 +1267,7 @@ public class JabRefPreferences implements PreferencesService {
 
         generalPreferences = new GeneralPreferences(
                 getLanguage(),
-                getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
-                getBoolean(MEMORY_STICK_MODE));
+                getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX);
 
         EasyBind.listen(generalPreferences.languageProperty(), (obs, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -1278,16 +1277,6 @@ public class JabRefPreferences implements PreferencesService {
             }
         });
         EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
-        EasyBind.listen(generalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> {
-            putBoolean(MEMORY_STICK_MODE, newValue);
-            if (!newValue) {
-                try {
-                    Files.deleteIfExists(Path.of("jabref.xml"));
-                } catch (IOException e) {
-                    LOGGER.warn("Error accessing filesystem");
-                }
-            }
-        });
 
         return generalPreferences;
     }
@@ -2010,14 +1999,24 @@ public class JabRefPreferences implements PreferencesService {
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getPath(PREFS_EXPORT_PATH, JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory()),
-                getUser()
-        );
+                getUser(),
+                getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
                 (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
         EasyBind.listen(internalPreferences.lastPreferencesExportPathProperty(),
                 (obs, oldValue, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()));
         // user is a static value, should only be changed for debugging
+        EasyBind.listen(internalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(MEMORY_STICK_MODE, newValue);
+            if (!newValue) {
+                try {
+                    Files.deleteIfExists(Path.of("jabref.xml"));
+                } catch (IOException e) {
+                    LOGGER.warn("Error accessing filesystem");
+                }
+            }
+        });
 
         return internalPreferences;
     }

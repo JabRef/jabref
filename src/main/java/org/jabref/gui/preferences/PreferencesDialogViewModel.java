@@ -190,7 +190,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         }
 
         // Store settings
-        preferences.getGeneralPreferences().setMemoryStickMode(memoryStickProperty.get());
+        preferences.getInternalPreferences().setMemoryStickMode(memoryStickProperty.get());
 
         for (PreferencesTab tab : preferenceTabs) {
             tab.storeSettings();
@@ -217,7 +217,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      * Inserts the preference values into the Properties of the ViewModel
      */
     public void setValues() {
-        memoryStickProperty.setValue(preferences.getGeneralPreferences().isMemoryStickMode());
+        memoryStickProperty.setValue(preferences.getInternalPreferences().isMemoryStickMode());
 
         for (PreferencesTab preferencesTab : preferenceTabs) {
             preferencesTab.setValues();
