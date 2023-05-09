@@ -319,19 +319,19 @@ public class ImportHandler {
     }
 
     private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
-        dialogService.notify("Found DOI in clipboard");
+        LOGGER.info(Localization.lang("Found %0 identifier in clipboard. Importing...", "DOI"));
         Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
         return OptionalUtil.toList(entry);
     }
 
     private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) throws FetcherException {
-        dialogService.notify("Found arxiv identifier in clipboard");
+        LOGGER.info(Localization.lang("Found %0 identifier in clipboard. Importing...", "arxiv"));
         Optional<BibEntry> entry = new ArXivFetcher(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
         return OptionalUtil.toList(entry);
     }
 
     private List<BibEntry> fetchByISN(ISBN isbn) throws FetcherException {
-        dialogService.notify("Found ISBN identifier in clipboard");
+        LOGGER.info(Localization.lang("Found %0 identifier in clipboard. Importing...", "ISBN"));
         Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
     }
