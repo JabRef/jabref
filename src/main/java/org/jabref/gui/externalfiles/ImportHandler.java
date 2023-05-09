@@ -33,6 +33,7 @@ import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
@@ -44,6 +45,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -289,13 +291,18 @@ public class ImportHandler {
             return Collections.emptyList();
         }
 
-        Optional<DOI> doi = DOI.parse(data);
+        Optional<DOI> doi = DOI.findInText(data);
         if (doi.isPresent()) {
             return fetchByDOI(doi.get());
         }
         Optional<ArXivIdentifier> arXiv = ArXivIdentifier.parse(data);
         if (arXiv.isPresent()) {
             return fetchByArXiv(arXiv.get());
+        }
+
+        Optional<ISBN> isbn = ISBN.parse(data);
+        if (isbn.isPresent()) {
+            return fetchByISN(isbn.get());
         }
 
         return tryImportFormats(data);
@@ -312,14 +319,20 @@ public class ImportHandler {
     }
 
     private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
-        LOGGER.info("Found DOI in clipboard");
+        dialogService.notify("Found DOI in clipboard");
         Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
         return OptionalUtil.toList(entry);
     }
 
     private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) throws FetcherException {
-        LOGGER.info("Found arxiv identifier in clipboard");
+        dialogService.notify("Found arxiv identifier in clipboard");
         Optional<BibEntry> entry = new ArXivFetcher(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
+        return OptionalUtil.toList(entry);
+    }
+
+    private List<BibEntry> fetchByISN(ISBN isbn) throws FetcherException {
+        dialogService.notify("Found ISBN identifier in clipboard");
+        Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
     }
 }
