@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -23,10 +25,10 @@ import org.jabref.gui.preferences.entryeditortabs.EntryEditorTabsTab;
 import org.jabref.gui.preferences.export.ExportTab;
 import org.jabref.gui.preferences.external.ExternalTab;
 import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
-import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
+import org.jabref.gui.preferences.library.LibraryTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
 import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
 import org.jabref.gui.preferences.network.NetworkTab;
@@ -49,6 +51,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialogViewModel.class);
 
+    private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();
+
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
@@ -60,7 +64,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
-                new GeneralTab(),
+                new AppearanceTab(),
+                new LibraryTab(),
                 new KeyBindingsTab(),
                 new EntryTab(),
                 new TableTab(),
@@ -81,8 +86,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new CustomExporterTab(),
                 new CustomEntryTypesTab(),
                 new XmpPrivacyTab(),
-                new NetworkTab(),
-                new AppearanceTab()
+                new NetworkTab()
         );
     }
 
@@ -186,6 +190,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         }
 
         // Store settings
+        preferences.getGeneralPreferences().setMemoryStickMode(memoryStickProperty.get());
+
         for (PreferencesTab tab : preferenceTabs) {
             tab.storeSettings();
             restartWarnings.addAll(tab.getRestartWarnings());
@@ -211,8 +217,14 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      * Inserts the preference values into the Properties of the ViewModel
      */
     public void setValues() {
+        memoryStickProperty.setValue(preferences.getGeneralPreferences().isMemoryStickMode());
+
         for (PreferencesTab preferencesTab : preferenceTabs) {
             preferencesTab.setValues();
         }
+    }
+
+    public BooleanProperty getMemoryStickProperty() {
+        return memoryStickProperty;
     }
 }

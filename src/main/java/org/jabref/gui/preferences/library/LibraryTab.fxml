@@ -25,8 +25,6 @@
         <Label text="%Default library mode" GridPane.rowIndex="2"/>
         <ComboBox fx:id="biblatexMode" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
     </GridPane>
-    <CheckBox fx:id="memoryStickMode"
-              text="%Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"/>
     <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>
 
 </fx:root>

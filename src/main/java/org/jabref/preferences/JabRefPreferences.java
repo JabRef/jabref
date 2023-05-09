@@ -1284,7 +1284,16 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
         EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-        EasyBind.listen(generalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> putBoolean(MEMORY_STICK_MODE, newValue));
+        EasyBind.listen(generalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(MEMORY_STICK_MODE, newValue);
+            if (!newValue) {
+                try {
+                    Files.deleteIfExists(Path.of("jabref.xml"));
+                } catch (IOException e) {
+                    LOGGER.warn("Error accessing filesystem");
+                }
+            }
+        });
         EasyBind.listen(generalPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
         EasyBind.listen(generalPreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
 

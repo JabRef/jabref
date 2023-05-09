@@ -15,7 +15,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class LibraryTab extends AbstractPreferenceTabView<LibraryTabViewModel> implements PreferencesTab {
 
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
-    @FXML private CheckBox memoryStickMode;
     @FXML private CheckBox collectTelemetry;
 
     public LibraryTab() {
@@ -38,7 +37,6 @@ public class LibraryTab extends AbstractPreferenceTabView<LibraryTabViewModel> i
         biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
         biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
 
-        memoryStickMode.selectedProperty().bindBidirectional(viewModel.memoryStickModeProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
     }
 }
