@@ -36,6 +36,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     @FXML private CheckBox showAdvancedHints;
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
+    @FXML private CheckBox collectTelemetry;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -96,6 +97,8 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
+
+        collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
 
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);

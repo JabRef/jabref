@@ -25,6 +25,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.TelemetryPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -69,10 +70,13 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
 
+    private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
+
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final AppearancePreferences appearancePreferences;
     private final GeneralPreferences generalPreferences;
+    private final TelemetryPreferences telemetryPreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -84,6 +88,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         this.preferences = preferences;
         this.appearancePreferences = preferences.getAppearancePreferences();
         this.generalPreferences = preferences.getGeneralPreferences();
+        this.telemetryPreferences = preferences.getTelemetryPreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -130,6 +135,8 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
         inspectionWarningDuplicateProperty.setValue(generalPreferences.warnAboutDuplicatesInInspection());
         confirmDeleteProperty.setValue(generalPreferences.shouldConfirmDelete());
+
+        collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
     }
 
     @Override
@@ -154,6 +161,8 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
         generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
         generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());
+
+        telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
     }
 
     public ValidationStatus fontSizeValidationStatus() {
@@ -242,5 +251,9 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty confirmDeleteProperty() {
         return this.confirmDeleteProperty;
+    }
+
+    public BooleanProperty collectTelemetryProperty() {
+        return this.collectTelemetryProperty;
     }
 }
