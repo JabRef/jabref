@@ -54,7 +54,7 @@ jobs:
               Thus, we pay attention that JabRef's code follows the same code style.
 
 
-              Your code currently fails to meet JabRef's code guidelines.
+              Your code currently does not meet JabRef's code guidelines.
               The tool [reviewdog](https://github.com/reviewdog/reviewdog#readme) already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
               Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
               Afterwards, please run checkstyle locally and fix the issues.
