@@ -295,6 +295,7 @@ public class ImportHandler {
         if (doi.isPresent()) {
             return fetchByDOI(doi.get());
         }
+
         Optional<ArXivIdentifier> arXiv = ArXivIdentifier.parse(data);
         if (arXiv.isPresent()) {
             return fetchByArXiv(arXiv.get());
@@ -319,19 +320,19 @@ public class ImportHandler {
     }
 
     private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
-        LOGGER.info(Localization.lang("Found %0 identifier in clipboard. Importing...", "DOI"));
+        LOGGER.info("Found DOI identifer in clipboard");
         Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
         return OptionalUtil.toList(entry);
     }
 
     private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) throws FetcherException {
-        LOGGER.info(Localization.lang("Found %0 identifier in clipboard. Importing...", "arxiv"));
+        LOGGER.info("Found arxiv identifier in clipboard");
         Optional<BibEntry> entry = new ArXivFetcher(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
         return OptionalUtil.toList(entry);
     }
 
     private List<BibEntry> fetchByISN(ISBN isbn) throws FetcherException {
-        LOGGER.info(Localization.lang("Found %0 identifier in clipboard. Importing...", "ISBN"));
+        LOGGER.info("Found ISBN identifier in clipboard");
         Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
     }
