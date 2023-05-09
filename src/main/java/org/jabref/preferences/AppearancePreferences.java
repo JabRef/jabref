@@ -14,12 +14,27 @@ public class AppearancePreferences {
     private final IntegerProperty mainFontSize;
     private final IntegerProperty defaultFontSize;
     private final ObjectProperty<Theme> theme;
+    private final BooleanProperty shouldOpenLastEdited;
+    private final BooleanProperty showAdvancedHints;
+    private final BooleanProperty warnAboutDuplicatesInInspection;
+    private final BooleanProperty confirmDelete;
 
-    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, int defaultFontSize, Theme theme) {
+    public AppearancePreferences(boolean shouldOverrideDefaultFontSize,
+                                 int mainFontSize,
+                                 int defaultFontSize,
+                                 Theme theme,
+                                 boolean shouldOpenLastEdited,
+                                 boolean showAdvancedHints,
+                                 boolean warnAboutDuplicatesInInspection,
+                                 boolean confirmDelete) {
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
         this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
+        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
+        this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
+        this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
+        this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
     }
 
     public boolean shouldOverrideDefaultFontSize() {
@@ -60,5 +75,53 @@ public class AppearancePreferences {
 
     public ObjectProperty<Theme> themeProperty() {
         return theme;
+    }
+
+    public boolean shouldOpenLastEdited() {
+        return shouldOpenLastEdited.get();
+    }
+
+    public BooleanProperty openLastEditedProperty() {
+        return shouldOpenLastEdited;
+    }
+
+    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
+        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
+    }
+
+    public boolean shouldShowAdvancedHints() {
+        return showAdvancedHints.get();
+    }
+
+    public BooleanProperty showAdvancedHintsProperty() {
+        return showAdvancedHints;
+    }
+
+    public void setShowAdvancedHints(boolean showAdvancedHints) {
+        this.showAdvancedHints.set(showAdvancedHints);
+    }
+
+    public boolean shouldWarnAboutDuplicatesInInspection() {
+        return warnAboutDuplicatesInInspection.get();
+    }
+
+    public BooleanProperty warnAboutDuplicatesInInspectionProperty() {
+        return warnAboutDuplicatesInInspection;
+    }
+
+    public void setWarnAboutDuplicatesInInspection(boolean warnAboutDuplicatesInInspection) {
+        this.warnAboutDuplicatesInInspection.set(warnAboutDuplicatesInInspection);
+    }
+
+    public boolean shouldConfirmDelete() {
+        return confirmDelete.get();
+    }
+
+    public BooleanProperty confirmDeleteProperty() {
+        return confirmDelete;
+    }
+
+    public void setConfirmDelete(boolean confirmDelete) {
+        this.confirmDelete.set(confirmDelete);
     }
 }

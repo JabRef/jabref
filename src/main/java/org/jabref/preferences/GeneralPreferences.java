@@ -11,26 +11,15 @@ import org.jabref.model.database.BibDatabaseMode;
 public class GeneralPreferences {
     private final ObjectProperty<Language> language;
     private final ObjectProperty<BibDatabaseMode> defaultBibDatabaseMode;
-    private final BooleanProperty warnAboutDuplicatesInInspection;
-    private final BooleanProperty confirmDelete;
     private final BooleanProperty memoryStickMode;
-    private final BooleanProperty shouldOpenLastEdited;
-    private final BooleanProperty showAdvancedHints;
 
     public GeneralPreferences(Language language,
                               BibDatabaseMode defaultBibDatabaseMode,
-                              boolean warnAboutDuplicatesInInspection,
-                              boolean confirmDelete,
-                              boolean memoryStickMode,
-                              boolean shouldOpenLastEdited,
-                              boolean showAdvancedHints) {
+                              boolean memoryStickMode) {
         this.language = new SimpleObjectProperty<>(language);
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
-        this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
-        this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
-        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
+
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
-        this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
     }
 
     public Language getLanguage() {
@@ -57,30 +46,6 @@ public class GeneralPreferences {
         this.defaultBibDatabaseMode.set(defaultBibDatabaseMode);
     }
 
-    public boolean warnAboutDuplicatesInInspection() {
-        return warnAboutDuplicatesInInspection.get();
-    }
-
-    public BooleanProperty isWarnAboutDuplicatesInInspectionProperty() {
-        return warnAboutDuplicatesInInspection;
-    }
-
-    public void setWarnAboutDuplicatesInInspection(boolean warnAboutDuplicatesInInspection) {
-        this.warnAboutDuplicatesInInspection.set(warnAboutDuplicatesInInspection);
-    }
-
-    public boolean shouldConfirmDelete() {
-        return confirmDelete.get();
-    }
-
-    public BooleanProperty confirmDeleteProperty() {
-        return confirmDelete;
-    }
-
-    public void setConfirmDelete(boolean confirmDelete) {
-        this.confirmDelete.set(confirmDelete);
-    }
-
     public boolean isMemoryStickMode() {
         return memoryStickMode.get();
     }
@@ -91,29 +56,5 @@ public class GeneralPreferences {
 
     public void setMemoryStickMode(boolean memoryStickMode) {
         this.memoryStickMode.set(memoryStickMode);
-    }
-
-    public boolean shouldOpenLastEdited() {
-        return shouldOpenLastEdited.get();
-    }
-
-    public BooleanProperty openLastEditedProperty() {
-        return shouldOpenLastEdited;
-    }
-
-    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
-        this.shouldOpenLastEdited.set(shouldOpenLastEdited);
-    }
-
-    public boolean shouldShowAdvancedHints() {
-        return showAdvancedHints.get();
-    }
-
-    public BooleanProperty showAdvancedHintsProperty() {
-        return showAdvancedHints;
-    }
-
-    public void setShowAdvancedHints(boolean showAdvancedHints) {
-        this.showAdvancedHints.set(showAdvancedHints);
     }
 }

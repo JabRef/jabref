@@ -1268,11 +1268,7 @@ public class JabRefPreferences implements PreferencesService {
         generalPreferences = new GeneralPreferences(
                 getLanguage(),
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
-                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
-                getBoolean(CONFIRM_DELETE),
-                getBoolean(MEMORY_STICK_MODE),
-                getBoolean(OPEN_LAST_EDITED),
-                getBoolean(SHOW_ADVANCED_HINTS));
+                getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(generalPreferences.languageProperty(), (obs, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -1282,8 +1278,6 @@ public class JabRefPreferences implements PreferencesService {
             }
         });
         EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
-        EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
-        EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
         EasyBind.listen(generalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> {
             putBoolean(MEMORY_STICK_MODE, newValue);
             if (!newValue) {
@@ -1294,8 +1288,6 @@ public class JabRefPreferences implements PreferencesService {
                 }
             }
         });
-        EasyBind.listen(generalPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
-        EasyBind.listen(generalPreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
 
         return generalPreferences;
     }
@@ -2058,12 +2050,19 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
                 (Integer) defaults.get(MAIN_FONT_SIZE),
-                new Theme(get(FX_THEME))
-        );
+                new Theme(get(FX_THEME)),
+                getBoolean(OPEN_LAST_EDITED),
+                getBoolean(SHOW_ADVANCED_HINTS),
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
+                getBoolean(CONFIRM_DELETE));
 
         EasyBind.listen(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
         EasyBind.listen(appearancePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
         EasyBind.listen(appearancePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
+        EasyBind.listen(appearancePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
+        EasyBind.listen(appearancePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        EasyBind.listen(appearancePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(appearancePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
 
         return appearancePreferences;
     }

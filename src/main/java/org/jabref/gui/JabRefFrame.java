@@ -423,7 +423,7 @@ public class JabRefFrame extends BorderPane {
      *                  set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        if (prefs.getGeneralPreferences().shouldOpenLastEdited()) {
+        if (prefs.getAppearancePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {

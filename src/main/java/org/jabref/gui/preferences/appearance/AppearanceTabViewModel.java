@@ -131,10 +131,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
 
-        openLastStartupProperty.setValue(generalPreferences.shouldOpenLastEdited());
-        showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
-        inspectionWarningDuplicateProperty.setValue(generalPreferences.warnAboutDuplicatesInInspection());
-        confirmDeleteProperty.setValue(generalPreferences.shouldConfirmDelete());
+        openLastStartupProperty.setValue(appearancePreferences.shouldOpenLastEdited());
+        showAdvancedHintsProperty.setValue(appearancePreferences.shouldShowAdvancedHints());
+        inspectionWarningDuplicateProperty.setValue(appearancePreferences.shouldWarnAboutDuplicatesInInspection());
+        confirmDeleteProperty.setValue(appearancePreferences.shouldConfirmDelete());
 
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
     }
@@ -157,10 +157,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             case CUSTOM -> appearancePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
         }
 
-        generalPreferences.setOpenLastEdited(openLastStartupProperty.getValue());
-        generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
-        generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
-        generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());
+        appearancePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
+        appearancePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
+        appearancePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
+        appearancePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
     }
