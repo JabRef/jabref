@@ -27,11 +27,15 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
 
     @FXML private ComboBox<Language> language;
-    @FXML private CheckBox fontOverride;
-    @FXML private Spinner<Integer> fontSize;
     @FXML private ComboBox<AppearanceTabViewModel.ThemeTypes> theme;
     @FXML private TextField customThemePath;
     @FXML private Button customThemeBrowse;
+    @FXML private CheckBox fontOverride;
+    @FXML private Spinner<Integer> fontSize;
+    @FXML private CheckBox openLastStartup;
+    @FXML private CheckBox showAdvancedHints;
+    @FXML private CheckBox inspectionWarningDuplicate;
+    @FXML private CheckBox confirmDelete;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -87,6 +91,11 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
         });
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
+
+        openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
+        showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
+        inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
+        confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
 
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);

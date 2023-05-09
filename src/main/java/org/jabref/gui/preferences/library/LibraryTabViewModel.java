@@ -19,12 +19,8 @@ public class LibraryTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
     private final ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty = new SimpleObjectProperty<>();
 
-    private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
-    private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty memoryStickModeProperty = new SimpleBooleanProperty();
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
-    private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
-    private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final GeneralPreferences generalPreferences;
@@ -41,12 +37,8 @@ public class LibraryTabViewModel implements PreferenceTabViewModel {
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(generalPreferences.getDefaultBibDatabaseMode());
 
-        inspectionWarningDuplicateProperty.setValue(generalPreferences.warnAboutDuplicatesInInspection());
-        confirmDeleteProperty.setValue(generalPreferences.shouldConfirmDelete());
         memoryStickModeProperty.setValue(generalPreferences.isMemoryStickMode());
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
-        openLastStartupProperty.setValue(generalPreferences.shouldOpenLastEdited());
-        showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
     }
 
     public void storeSettings() {
@@ -57,12 +49,7 @@ public class LibraryTabViewModel implements PreferenceTabViewModel {
         }
 
         generalPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
-        generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
-        generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());
         generalPreferences.setMemoryStickMode(memoryStickModeProperty.getValue());
-        generalPreferences.setOpenLastEdited(openLastStartupProperty.getValue());
-        generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
-
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
     }
 
@@ -74,27 +61,11 @@ public class LibraryTabViewModel implements PreferenceTabViewModel {
         return this.selectedBiblatexModeProperty;
     }
 
-    public BooleanProperty inspectionWarningDuplicateProperty() {
-        return this.inspectionWarningDuplicateProperty;
-    }
-
-    public BooleanProperty confirmDeleteProperty() {
-        return this.confirmDeleteProperty;
-    }
-
     public BooleanProperty memoryStickModeProperty() {
         return this.memoryStickModeProperty;
     }
 
     public BooleanProperty collectTelemetryProperty() {
         return this.collectTelemetryProperty;
-    }
-
-    public BooleanProperty openLastStartupProperty() {
-        return openLastStartupProperty;
-    }
-
-    public BooleanProperty showAdvancedHintsProperty() {
-        return this.showAdvancedHintsProperty;
     }
 }

@@ -15,12 +15,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class LibraryTab extends AbstractPreferenceTabView<LibraryTabViewModel> implements PreferencesTab {
 
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
-    @FXML private CheckBox inspectionWarningDuplicate;
-    @FXML private CheckBox confirmDelete;
     @FXML private CheckBox memoryStickMode;
-    @FXML private CheckBox openLastStartup;
     @FXML private CheckBox collectTelemetry;
-    @FXML private CheckBox showAdvancedHints;
 
     public LibraryTab() {
         ViewLoader.view(this)
@@ -42,11 +38,7 @@ public class LibraryTab extends AbstractPreferenceTabView<LibraryTabViewModel> i
         biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
         biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
 
-        inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
-        confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.memoryStickModeProperty());
-        openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
-        showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
     }
 }

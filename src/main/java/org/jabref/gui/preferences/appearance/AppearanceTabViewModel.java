@@ -55,13 +55,19 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final ReadOnlyListProperty<Language> languagesListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.values()));;
     private final ObjectProperty<Language> selectedLanguageProperty = new SimpleObjectProperty<>();
-    private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
-    private final StringProperty fontSizeProperty = new SimpleStringProperty();
 
     private final ReadOnlyListProperty<ThemeTypes> themesListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));;
     private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
+
+    private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
+    private final StringProperty fontSizeProperty = new SimpleStringProperty();
+
+    private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
+    private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
+    private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
+    private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
@@ -105,8 +111,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         selectedLanguageProperty.setValue(generalPreferences.getLanguage());
-        fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
-        fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
 
         // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
@@ -118,6 +122,14 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 customPathToThemeProperty.setValue(appearancePreferences.getTheme().getName());
             }
         }
+
+        fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
+        fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
+
+        openLastStartupProperty.setValue(generalPreferences.shouldOpenLastEdited());
+        showAdvancedHintsProperty.setValue(generalPreferences.shouldShowAdvancedHints());
+        inspectionWarningDuplicateProperty.setValue(generalPreferences.warnAboutDuplicatesInInspection());
+        confirmDeleteProperty.setValue(generalPreferences.shouldConfirmDelete());
     }
 
     @Override
@@ -137,6 +149,11 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             case DARK -> appearancePreferences.setTheme(Theme.dark());
             case CUSTOM -> appearancePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
         }
+
+        generalPreferences.setOpenLastEdited(openLastStartupProperty.getValue());
+        generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
+        generalPreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
+        generalPreferences.setConfirmDelete(confirmDeleteProperty.getValue());
     }
 
     public ValidationStatus fontSizeValidationStatus() {
@@ -181,24 +198,16 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         return this.selectedLanguageProperty;
     }
 
-    public BooleanProperty fontOverrideProperty() {
-        return fontOverrideProperty;
-    }
-
-    public StringProperty fontSizeProperty() {
-        return fontSizeProperty;
-    }
-
     public ReadOnlyListProperty<ThemeTypes> themesListProperty() {
         return this.themesListProperty;
     }
 
-    public StringProperty customPathToThemeProperty() {
-        return customPathToThemeProperty;
-    }
-
     public ObjectProperty<ThemeTypes> selectedThemeProperty() {
         return this.selectedThemeProperty;
+    }
+
+    public StringProperty customPathToThemeProperty() {
+        return customPathToThemeProperty;
     }
 
     public void importCSSFile() {
@@ -209,5 +218,29 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file ->
                 customPathToThemeProperty.setValue(file.toAbsolutePath().toString()));
+    }
+
+    public BooleanProperty fontOverrideProperty() {
+        return fontOverrideProperty;
+    }
+
+    public StringProperty fontSizeProperty() {
+        return fontSizeProperty;
+    }
+
+    public BooleanProperty openLastStartupProperty() {
+        return openLastStartupProperty;
+    }
+
+    public BooleanProperty showAdvancedHintsProperty() {
+        return this.showAdvancedHintsProperty;
+    }
+
+    public BooleanProperty inspectionWarningDuplicateProperty() {
+        return this.inspectionWarningDuplicateProperty;
+    }
+
+    public BooleanProperty confirmDeleteProperty() {
+        return this.confirmDeleteProperty;
     }
 }
