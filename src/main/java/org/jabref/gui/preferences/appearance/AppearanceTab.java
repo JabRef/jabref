@@ -5,9 +5,9 @@ import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
@@ -21,6 +21,7 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
@@ -28,10 +29,9 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     @FXML private ComboBox<Language> language;
     @FXML private CheckBox fontOverride;
     @FXML private Spinner<Integer> fontSize;
-    @FXML private RadioButton themeLight;
-    @FXML private RadioButton themeDark;
-    @FXML private RadioButton customTheme;
+    @FXML private ComboBox<AppearanceTabViewModel.ThemeTypes> theme;
     @FXML private TextField customThemePath;
+    @FXML private Button customThemeBrowse;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -74,12 +74,20 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
-        themeLight.selectedProperty().bindBidirectional(viewModel.themeLightProperty());
-        themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
-        customTheme.selectedProperty().bindBidirectional(viewModel.customThemeProperty());
+        new ViewModelListCellFactory<AppearanceTabViewModel.ThemeTypes>()
+                .withText(AppearanceTabViewModel.ThemeTypes::getDisplayName)
+                .install(theme);
+        theme.itemsProperty().bind(viewModel.themesListProperty());
+        theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
+        EasyBind.subscribe(viewModel.selectedThemeProperty(), theme -> {
+            boolean isCustomTheme = theme == AppearanceTabViewModel.ThemeTypes.CUSTOM;
+            customThemePath.disableProperty().set(!isCustomTheme);
+            customThemeBrowse.disableProperty().set(!isCustomTheme);
+        });
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
+
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
             validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);

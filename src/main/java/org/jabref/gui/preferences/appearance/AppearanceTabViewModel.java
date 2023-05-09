@@ -1,19 +1,17 @@
 package org.jabref.gui.preferences.appearance;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.transformation.SortedList;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
@@ -35,16 +33,34 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AppearanceTabViewModel implements PreferenceTabViewModel {
+    protected enum ThemeTypes {
+        LIGHT(Localization.lang("Light")),
+        DARK(Localization.lang("Dark")),
+        CUSTOM(Localization.lang("Custom..."));
+
+        private final String displayName;
+
+        ThemeTypes(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
     protected static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
 
-    private final ListProperty<Language> languagesListProperty = new SimpleListProperty<>();
+    private final ReadOnlyListProperty<Language> languagesListProperty =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.values()));;
     private final ObjectProperty<Language> selectedLanguageProperty = new SimpleObjectProperty<>();
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
-    private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
-    private final BooleanProperty themeDarkProperty = new SimpleBooleanProperty();
-    private final BooleanProperty themeCustomProperty = new SimpleBooleanProperty();
+
+    private final ReadOnlyListProperty<ThemeTypes> themesListProperty =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));;
+    private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
@@ -88,27 +104,19 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        languagesListProperty.setValue(new SortedList<>(FXCollections.observableArrayList(Language.values()), Comparator.comparing(Language::getDisplayName)));
         selectedLanguageProperty.setValue(generalPreferences.getLanguage());
         fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
 
         // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
-        Theme currentTheme = appearancePreferences.getTheme();
-        if (currentTheme.getType() == Theme.Type.DEFAULT) {
-            themeLightProperty.setValue(true);
-            themeDarkProperty.setValue(false);
-            themeCustomProperty.setValue(false);
-        } else if (currentTheme.getType() == Theme.Type.EMBEDDED) {
-            themeLightProperty.setValue(false);
-            themeDarkProperty.setValue(true);
-            themeCustomProperty.setValue(false);
-        } else {
-            themeLightProperty.setValue(false);
-            themeDarkProperty.setValue(false);
-            themeCustomProperty.setValue(true);
-            customPathToThemeProperty.setValue(currentTheme.getName());
+        switch (appearancePreferences.getTheme().getType()) {
+            case DEFAULT -> selectedThemeProperty.setValue(ThemeTypes.LIGHT);
+            case EMBEDDED -> selectedThemeProperty.setValue(ThemeTypes.DARK);
+            case CUSTOM -> {
+                selectedThemeProperty.setValue(ThemeTypes.CUSTOM);
+                customPathToThemeProperty.setValue(appearancePreferences.getTheme().getName());
+            }
         }
     }
 
@@ -124,12 +132,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         appearancePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
         appearancePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
 
-        if (themeLightProperty.getValue()) {
-            appearancePreferences.setTheme(Theme.light());
-        } else if (themeDarkProperty.getValue()) {
-            appearancePreferences.setTheme(Theme.dark());
-        } else if (themeCustomProperty.getValue()) {
-            appearancePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
+        switch (selectedThemeProperty.get()) {
+            case LIGHT -> appearancePreferences.setTheme(Theme.light());
+            case DARK -> appearancePreferences.setTheme(Theme.dark());
+            case CUSTOM -> appearancePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
         }
     }
 
@@ -149,7 +155,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             validator.addValidators(fontSizeValidator);
         }
 
-        if (themeCustomProperty.getValue()) {
+        if (selectedThemeProperty.getValue() == ThemeTypes.CUSTOM) {
             validator.addValidators(customPathToThemeValidator);
         }
 
@@ -167,7 +173,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         return restartWarning;
     }
 
-    public ListProperty<Language> languagesListProperty() {
+    public ReadOnlyListProperty<Language> languagesListProperty() {
         return this.languagesListProperty;
     }
 
@@ -183,20 +189,16 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         return fontSizeProperty;
     }
 
-    public BooleanProperty themeLightProperty() {
-        return themeLightProperty;
-    }
-
-    public BooleanProperty themeDarkProperty() {
-        return themeDarkProperty;
-    }
-
-    public BooleanProperty customThemeProperty() {
-        return themeCustomProperty;
+    public ReadOnlyListProperty<ThemeTypes> themesListProperty() {
+        return this.themesListProperty;
     }
 
     public StringProperty customPathToThemeProperty() {
         return customPathToThemeProperty;
+    }
+
+    public ObjectProperty<ThemeTypes> selectedThemeProperty() {
+        return this.selectedThemeProperty;
     }
 
     public void importCSSFile() {
