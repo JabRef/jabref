@@ -511,6 +511,7 @@ rewrite {
         "**/*.yml"
     )
     plainTextMask("**/*.md")
+    failOnDryRunResults = true
 }
 
 modernizer {
