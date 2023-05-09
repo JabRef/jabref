@@ -59,7 +59,6 @@ public class ProtectedTermsParser {
     /**
      * Parse the description that starts after the # but don't include it in the terms
      *
-     * @param line
      * @return line or null if the line contains the description
      */
     private String setDescription(String line) {
