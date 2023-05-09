@@ -197,7 +197,6 @@ public class OOFrontend {
      *
      * @param citationKeys     In storage order
      * @param pageInfos        In storage order
-     * @param citationType
      * @param position         Collapsed to its end.
      * @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of characters from the original position.
      */

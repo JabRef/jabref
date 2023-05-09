@@ -37,7 +37,7 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
             Path gitIgnore = currentPath.resolve(".gitignore");
             try {
                 Set<PathMatcher> plainGitIgnorePatternsFromGitIgnoreFile = Files.readAllLines(gitIgnore).stream()
-                                                                                .map(line -> line.trim())
+                                                                                .map(String::trim)
                                                                                 .filter(not(String::isEmpty))
                                                                                 .filter(line -> !line.startsWith("#"))
                                                                                 // convert to Java syntax for Glob patterns

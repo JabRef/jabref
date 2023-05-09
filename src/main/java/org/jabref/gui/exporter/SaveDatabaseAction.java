@@ -116,7 +116,7 @@ public class SaveDatabaseAction {
             final Path oldFile = databasePath.get();
             context.setDatabasePath(oldFile);
             AutosaveManager.shutdown(context);
-            BackupManager.shutdown(context);
+            BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
         }
 
         // Set new location

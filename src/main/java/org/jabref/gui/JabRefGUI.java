@@ -279,7 +279,7 @@ public class JabRefGUI {
             return;
         }
 
-        List<Path> filesToOpen = lastFiles.stream().map(file -> Path.of(file)).collect(Collectors.toList());
+        List<Path> filesToOpen = lastFiles.stream().map(Path::of).collect(Collectors.toList());
         getMainFrame().getOpenDatabaseAction().openFiles(filesToOpen);
     }
 

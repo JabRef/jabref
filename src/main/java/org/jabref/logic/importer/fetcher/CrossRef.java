@@ -162,7 +162,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     private EntryType convertType(String type) {
-        return type.equals("journal-article") ? StandardEntryType.Article : StandardEntryType.Misc;
+        return "journal-article".equals(type) ? StandardEntryType.Article : StandardEntryType.Misc;
     }
 
     @Override

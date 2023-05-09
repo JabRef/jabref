@@ -70,8 +70,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Inserts a new {@link BibEntry} into shared database.
-     *
-     * @param event {@link EntriesAddedEvent} object
      */
     @Subscribe
     public void listen(EntriesAddedEvent event) {
@@ -89,8 +87,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Updates an existing shared {@link BibEntry}.
-     *
-     * @param event {@link FieldChangedEvent} object
      */
     @Subscribe
     public void listen(FieldChangedEvent event) {
@@ -110,10 +106,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Deletes the given list of {@link BibEntry} from shared database.
-     *
-     * @param event {@link EntriesRemovedEvent} object
      */
-
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
@@ -128,8 +121,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Synchronizes the shared {@link MetaData} and applies them locally.
-     *
-     * @param event
      */
     @Subscribe
     public void listen(MetaDataChangedEvent event) {

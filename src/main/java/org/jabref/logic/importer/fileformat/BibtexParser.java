@@ -91,8 +91,6 @@ public class BibtexParser implements Parser {
      * <p>
      * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
      *
-     * @param bibtexString
-     * @param fileMonitor
      * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
      * @throws ParseException
      */
@@ -773,8 +771,6 @@ public class BibtexParser implements Parser {
     /**
      * returns a new <code>StringBuilder</code> which corresponds to <code>toRemove</code> without whitespaces
      *
-     * @param toRemove
-     * @return
      */
     private StringBuilder removeWhitespaces(StringBuilder toRemove) {
         StringBuilder result = new StringBuilder();
@@ -791,7 +787,6 @@ public class BibtexParser implements Parser {
     /**
      * pushes buffer back into input
      *
-     * @param stringBuilder
      * @throws IOException can be thrown if buffer is bigger than LOOKAHEAD
      */
     private void unreadBuffer(StringBuilder stringBuilder) throws IOException {

@@ -48,12 +48,13 @@ public class BackupFileUtil {
      *     (and configured in the preferences as "make backups")
      * </p>
      */
-    public static Path getPathForNewBackupFileAndCreateDirectory(Path targetFile, BackupFileType fileType) {
+
+    public static Path getPathForNewBackupFileAndCreateDirectory(Path targetFile, BackupFileType fileType, Path backupDir) {
         String extension = "." + fileType.getExtensions().get(0);
         String timeSuffix = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd--HH.mm.ss"));
 
         // We choose the data directory, because a ".bak" file should survive cache cleanups
-        Path directory = getAppDataBackupDir();
+        Path directory = backupDir;
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -66,18 +67,12 @@ public class BackupFileUtil {
         return directory.resolve(fileName);
     }
 
-    /**
-     * Finds the latest backup (.sav). If it does not exist, an empty optional is returned
-     *
-     * @param targetFile the full path of the file to backup
-     */
-    public static Optional<Path> getPathOfLatestExistingBackupFile(Path targetFile, BackupFileType fileType) {
+    public static Optional<Path> getPathOfLatestExistingBackupFile(Path targetFile, BackupFileType fileType, Path backupDir) {
         // The code is similar to "getPathForNewBackupFileAndCreateDirectory"
 
         String extension = "." + fileType.getExtensions().get(0);
 
-        Path directory = getAppDataBackupDir();
-        if (Files.notExists(directory)) {
+        if (Files.notExists(backupDir)) {
             // In case there is no app directory, we search in the directory of the bib file
             Path result = FileUtil.addExtension(targetFile, extension);
             if (Files.exists(result)) {
@@ -91,11 +86,11 @@ public class BackupFileUtil {
         final String prefix = getUniqueFilePrefix(targetFile) + "--" + targetFile.getFileName();
         Optional<Path> mostRecentFile;
         try {
-            mostRecentFile = Files.list(directory)
-                                         // just list the .sav belonging to the given targetFile
-                                         .filter(p -> p.getFileName().toString().startsWith(prefix))
-                                         .sorted()
-                                         .reduce((first, second) -> second);
+            mostRecentFile = Files.list(backupDir)
+                                  // just list the .sav belonging to the given targetFile
+                                  .filter(p -> p.getFileName().toString().startsWith(prefix))
+                                  .sorted()
+                                  .reduce((first, second) -> second);
         } catch (IOException e) {
             LOGGER.error("Could not determine most recent file", e);
             return Optional.empty();

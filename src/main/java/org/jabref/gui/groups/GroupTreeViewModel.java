@@ -371,9 +371,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
                 // }
 
-                oldGroup.getParent().ifPresent(parent -> {
-                    sortAlphabeticallyRecursive(parent);
-                });
+                oldGroup.getParent().ifPresent(this::sortAlphabeticallyRecursive);
 
                 dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
