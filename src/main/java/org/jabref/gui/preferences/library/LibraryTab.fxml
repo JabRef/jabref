@@ -21,8 +21,7 @@
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
         </rowConstraints>
-        <Label text="%Language"/>
-        <ComboBox fx:id="language" prefWidth="200.0" GridPane.columnIndex="1"/>
+
         <Label text="%Default library mode" GridPane.rowIndex="2"/>
         <ComboBox fx:id="biblatexMode" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
     </GridPane>

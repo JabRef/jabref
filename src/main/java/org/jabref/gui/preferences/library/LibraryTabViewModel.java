@@ -1,9 +1,5 @@
 package org.jabref.gui.preferences.library;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -11,19 +7,15 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.transformation.SortedList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.TelemetryPreferences;
 
 public class LibraryTabViewModel implements PreferenceTabViewModel {
-    private final ListProperty<Language> languagesListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<Language> selectedLanguageProperty = new SimpleObjectProperty<>();
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
     private final ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty = new SimpleObjectProperty<>();
 
@@ -38,8 +30,6 @@ public class LibraryTabViewModel implements PreferenceTabViewModel {
     private final GeneralPreferences generalPreferences;
     private final TelemetryPreferences telemetryPreferences;
 
-    private final List<String> restartWarning = new ArrayList<>();
-
     @SuppressWarnings("ReturnValueIgnored")
     public LibraryTabViewModel(DialogService dialogService, GeneralPreferences generalPreferences, TelemetryPreferences telemetryPreferences) {
         this.dialogService = dialogService;
@@ -48,9 +38,6 @@ public class LibraryTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        languagesListProperty.setValue(new SortedList<>(FXCollections.observableArrayList(Language.values()), Comparator.comparing(Language::getDisplayName)));
-        selectedLanguageProperty.setValue(generalPreferences.getLanguage());
-
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(generalPreferences.getDefaultBibDatabaseMode());
 
@@ -63,13 +50,6 @@ public class LibraryTabViewModel implements PreferenceTabViewModel {
     }
 
     public void storeSettings() {
-        Language newLanguage = selectedLanguageProperty.getValue();
-        if (newLanguage != generalPreferences.getLanguage()) {
-            generalPreferences.setLanguage(newLanguage);
-            Localization.setLanguage(newLanguage);
-            restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
-        }
-
         if (generalPreferences.isMemoryStickMode() && !memoryStickModeProperty.getValue()) {
             dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
                     Localization.lang("To disable the memory stick mode"
@@ -84,21 +64,6 @@ public class LibraryTabViewModel implements PreferenceTabViewModel {
         generalPreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return restartWarning;
-    }
-
-    // General
-
-    public ListProperty<Language> languagesListProperty() {
-        return this.languagesListProperty;
-    }
-
-    public ObjectProperty<Language> selectedLanguageProperty() {
-        return this.selectedLanguageProperty;
     }
 
     public ListProperty<BibDatabaseMode> biblatexModeListProperty() {

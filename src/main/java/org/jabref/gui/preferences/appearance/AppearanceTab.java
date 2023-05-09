@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
@@ -15,6 +16,8 @@ import javafx.util.converter.IntegerStringConverter;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -22,6 +25,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
 
+    @FXML private ComboBox<Language> language;
     @FXML private CheckBox fontOverride;
     @FXML private Spinner<Integer> fontSize;
     @FXML private RadioButton themeLight;
@@ -54,6 +58,12 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
 
     public void initialize() {
         this.viewModel = new AppearanceTabViewModel(dialogService, preferencesService);
+
+        new ViewModelListCellFactory<Language>()
+                .withText(Language::getDisplayName)
+                .install(language);
+        language.itemsProperty().bind(viewModel.languagesListProperty());
+        language.valueProperty().bindBidirectional(viewModel.selectedLanguageProperty());
 
         fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());
 
