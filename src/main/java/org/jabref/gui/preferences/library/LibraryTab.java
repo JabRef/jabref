@@ -41,7 +41,7 @@ public class LibraryTab extends AbstractPreferenceTabView<LibraryTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new LibraryTabViewModel(dialogService, preferencesService.getGeneralPreferences(), preferencesService.getFilePreferences());
+        this.viewModel = new LibraryTabViewModel(dialogService, preferencesService.getLibraryPreferences(), preferencesService.getFilePreferences());
 
         new ViewModelListCellFactory<BibDatabaseMode>()
                 .withText(BibDatabaseMode::getFormattedName)

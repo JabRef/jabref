@@ -96,7 +96,7 @@ public class ExportToClipboardActionTest {
         LibraryPreferences libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
-        when(preferences.getGeneralPreferences()).thenReturn(libraryPreferences);
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         // noinspection ConstantConditions since databaseContext is mocked

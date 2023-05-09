@@ -426,7 +426,7 @@ public class StudyRepository {
     private void writeResultToFile(Path pathToFile, BibDatabase entries) throws SaveException {
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {
             SaveConfiguration saveConfiguration = new SaveConfiguration()
-                    .withReformatOnSave(preferencesService.getGeneralPreferences().shouldAlwaysReformatOnSave());
+                    .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                     bibWriter,

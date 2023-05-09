@@ -136,7 +136,7 @@ public class SharedDatabaseUIManager {
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
-        bibDatabaseContext.setMode(preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode());
+        bibDatabaseContext.setMode(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(
                 bibDatabaseContext,
                 preferencesService.getBibEntryPreferences().getKeywordSeparator(),
@@ -165,7 +165,7 @@ public class SharedDatabaseUIManager {
         DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseID));
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
-        bibDatabaseContext.setMode(preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode());
+        bibDatabaseContext.setMode(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(
                 bibDatabaseContext,
                 preferencesService.getBibEntryPreferences().getKeywordSeparator(),

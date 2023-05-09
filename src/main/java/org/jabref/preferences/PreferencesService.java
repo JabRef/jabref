@@ -85,11 +85,7 @@ public interface PreferencesService {
 
     CleanupPreferences getDefaultCleanupPreset();
 
-    //*************************************************************************************************************
-    // GeneralPreferences
-    //*************************************************************************************************************
-
-    LibraryPreferences getGeneralPreferences();
+    LibraryPreferences getLibraryPreferences();
 
     TelemetryPreferences getTelemetryPreferences();
 

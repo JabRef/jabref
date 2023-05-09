@@ -174,7 +174,7 @@ public class PreferencesMigrations {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
-                CustomEntryTypePreferenceMigration.upgradeStoredBibEntryTypes(prefs.getGeneralPreferences().getDefaultBibDatabaseMode());
+                CustomEntryTypePreferenceMigration.upgradeStoredBibEntryTypes(prefs.getLibraryPreferences().getDefaultBibDatabaseMode());
             }
         } catch (BackingStoreException ex) {
             LOGGER.error("Migrating old custom entry types failed.", ex);

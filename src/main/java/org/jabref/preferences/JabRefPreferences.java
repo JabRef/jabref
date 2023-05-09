@@ -1262,12 +1262,8 @@ public class JabRefPreferences implements PreferencesService {
         return openOfficePreferences;
     }
 
-    //*************************************************************************************************************
-    // GeneralPreferences
-    //*************************************************************************************************************
-
     @Override
-    public LibraryPreferences getGeneralPreferences() {
+    public LibraryPreferences getLibraryPreferences() {
         if (Objects.nonNull(libraryPreferences)) {
             return libraryPreferences;
         }
@@ -2269,7 +2265,7 @@ public class JabRefPreferences implements PreferencesService {
         return new SaveConfiguration()
                 .withSaveOrder(saveOrder)
                 .withMetadataSaveOrder(false)
-                .withReformatOnSave(getGeneralPreferences().shouldAlwaysReformatOnSave());
+                .withReformatOnSave(getLibraryPreferences().shouldAlwaysReformatOnSave());
     }
 
     @Override
