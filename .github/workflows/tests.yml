@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   checkstyle:
-    name: Style checks
+    name: Code style check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -34,14 +34,14 @@ jobs:
           java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
-      - name: Run check style reporter
+      - name: Run checkstyle reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
           checkstyle_version: '10.3'
-      - name: Run checkstyle gradle
+      - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Add comment on pull request
         if: ${{ failure() }}
