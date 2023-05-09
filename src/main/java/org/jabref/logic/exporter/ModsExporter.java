@@ -84,39 +84,39 @@ class ModsExporter extends Exporter {
                     Field field = entry.getKey();
                     String value = entry.getValue();
 
-                    if (StandardField.AUTHOR.equals(field)) {
+                    if (StandardField.AUTHOR == field) {
                         handleAuthors(writer, value);
                     } else if (new UnknownField("affiliation").equals(field)) {
                         addAffiliation(writer, value);
-                    } else if (StandardField.ABSTRACT.equals(field)) {
+                    } else if (StandardField.ABSTRACT == field) {
                         addAbstract(writer, value);
-                    } else if (StandardField.TITLE.equals(field)) {
+                    } else if (StandardField.TITLE == field) {
                         addTitle(writer, value);
-                    } else if (StandardField.LANGUAGE.equals(field)) {
+                    } else if (StandardField.LANGUAGE == field) {
                         addLanguage(writer, value);
-                    } else if (StandardField.LOCATION.equals(field)) {
+                    } else if (StandardField.LOCATION == field) {
                         addLocation(writer, value);
-                    } else if (StandardField.URL.equals(field)) {
+                    } else if (StandardField.URL == field) {
                         addUrl(writer, value);
-                    } else if (StandardField.NOTE.equals(field)) {
+                    } else if (StandardField.NOTE == field) {
                         addNote(writer, value);
-                    } else if (StandardField.KEYWORDS.equals(field)) {
+                    } else if (StandardField.KEYWORDS == field) {
                         addKeyWords(writer, value);
-                    } else if (StandardField.URI.equals(field)) {
+                    } else if (StandardField.URI == field) {
                         addIdentifier(writer, StandardField.URI, value);
-                    } else if (StandardField.ISBN.equals(field)) {
+                    } else if (StandardField.ISBN == field) {
                         addIdentifier(writer, StandardField.ISBN, value);
-                    } else if (StandardField.ISSN.equals(field)) {
+                    } else if (StandardField.ISSN == field) {
                         addIdentifier(writer, StandardField.ISSN, value);
-                    } else if (StandardField.DOI.equals(field)) {
+                    } else if (StandardField.DOI == field) {
                         addIdentifier(writer, StandardField.DOI, value);
-                    } else if (StandardField.PMID.equals(field)) {
+                    } else if (StandardField.PMID == field) {
                         addIdentifier(writer, StandardField.PMID, value);
-                    } else if (StandardField.PAGES.equals(field)) {
+                    } else if (StandardField.PAGES == field) {
                         addPart(parts, value);
-                    } else if (StandardField.VOLUME.equals(field)) {
+                    } else if (StandardField.VOLUME == field) {
                         addPart(parts, value);
-                    } else if (StandardField.ISSUE.equals(field)) {
+                    } else if (StandardField.ISSUE == field) {
                         addPart(parts, value);
                     }
                     trackOriginInformation(originItems, field, value);
@@ -187,7 +187,7 @@ class ModsExporter extends Exporter {
         for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
             Field field = entry.getKey();
             String value = entry.getValue();
-            if (StandardField.JOURNAL.equals(field)) {
+            if (StandardField.JOURNAL == field) {
                 addJournal(writer, value);
             }
         }
@@ -208,11 +208,11 @@ class ModsExporter extends Exporter {
             for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
                 Field field = entry.getKey();
                 String value = entry.getValue();
-                if (StandardField.PAGES.equals(field)) {
+                if (StandardField.PAGES == field) {
                     addPages(writer, value);
-                } else if (StandardField.VOLUME.equals(field)) {
+                } else if (StandardField.VOLUME == field) {
                     addDetail(writer, StandardField.VOLUME, value);
-                } else if (StandardField.ISSUE.equals(field)) {
+                } else if (StandardField.ISSUE == field) {
                     addDetail(writer, StandardField.ISSUE, value);
                 }
             }
@@ -229,7 +229,7 @@ class ModsExporter extends Exporter {
             originItems.add(value);
         } else if (field.equals(StandardField.CREATIONDATE)) {
             originItems.add(value);
-        } else if (StandardField.PUBLISHER.equals(field)) {
+        } else if (StandardField.PUBLISHER == field) {
             originItems.add(value);
         } else if (field.equals(new UnknownField("issuance"))) {
             originItems.add(value);
@@ -440,7 +440,7 @@ class ModsExporter extends Exporter {
             addDate(writer, "dateModified", value);
         } else if (field.equals(StandardField.CREATIONDATE)) {
             addDate(writer, "dateCaptured", value);
-        } else if (StandardField.PUBLISHER.equals(field)) {
+        } else if (StandardField.PUBLISHER == field) {
             writer.writeStartElement("mods", "publisher", MODS_NAMESPACE_URI);
             writer.writeAttribute("xsi", MODS_NAMESPACE_URI, "type", "mods:stringPlusLanguagePlusSupplied");
             writer.writeCharacters(value);
