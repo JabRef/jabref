@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.entry;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -12,17 +11,15 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseMode;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
 
-    @FXML private ComboBox<BibDatabaseMode> biblatexMode;
+
 
     @FXML private TextField keywordSeparator;
 
@@ -48,12 +45,6 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
     public void initialize() {
         this.viewModel = new EntryTabViewModel(preferencesService);
-
-        new ViewModelListCellFactory<BibDatabaseMode>()
-                .withText(BibDatabaseMode::getFormattedName)
-                .install(biblatexMode);
-        biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
-        biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
 
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
 
