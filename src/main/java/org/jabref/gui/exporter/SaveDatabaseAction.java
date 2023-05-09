@@ -233,7 +233,7 @@ public class SaveDatabaseAction {
 
         SaveConfiguration saveConfiguration = new SaveConfiguration()
                 .withSaveType(saveType)
-                .withReformatOnSave(preferences.getExportPreferences().shouldAlwaysReformatOnSave());
+                .withReformatOnSave(preferences.getGeneralPreferences().shouldAlwaysReformatOnSave());
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {

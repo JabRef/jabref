@@ -89,7 +89,7 @@ public interface PreferencesService {
     // GeneralPreferences
     //*************************************************************************************************************
 
-    GeneralPreferences getGeneralPreferences();
+    LibraryPreferences getGeneralPreferences();
 
     TelemetryPreferences getTelemetryPreferences();
 

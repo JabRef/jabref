@@ -423,7 +423,7 @@ public class JabRefPreferences implements PreferencesService {
     private Map<String, Set<Field>> entryEditorTabList;
     private String userName;
 
-    private GeneralPreferences generalPreferences;
+    private LibraryPreferences libraryPreferences;
     private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
     private OwnerPreferences ownerPreferences;
@@ -1260,17 +1260,21 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public GeneralPreferences getGeneralPreferences() {
-        if (Objects.nonNull(generalPreferences)) {
-            return generalPreferences;
+    public LibraryPreferences getGeneralPreferences() {
+        if (Objects.nonNull(libraryPreferences)) {
+            return libraryPreferences;
         }
 
-        generalPreferences = new GeneralPreferences(
-                getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX);
+        libraryPreferences = new LibraryPreferences(
+                getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
+                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                getBoolean(LOCAL_AUTO_SAVE));
 
-        EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
+        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
+        EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
+        EasyBind.listen(libraryPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
-        return generalPreferences;
+        return libraryPreferences;
     }
 
     private Language getLanguage() {
@@ -2190,17 +2194,13 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         exportPreferences = new ExportPreferences(
-                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)),
-                getExportSaveOrder(),
-                getBoolean(LOCAL_AUTO_SAVE));
+                getExportSaveOrder());
 
-        EasyBind.listen(exportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
         EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(exportPreferences.exportSaveOrderProperty(), (obs, oldValue, newValue) -> storeExportSaveOrder(newValue));
-        EasyBind.listen(exportPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
         return exportPreferences;
     }
@@ -2258,7 +2258,7 @@ public class JabRefPreferences implements PreferencesService {
         return new SaveConfiguration()
                 .withSaveOrder(saveOrder)
                 .withMetadataSaveOrder(false)
-                .withReformatOnSave(getExportPreferences().shouldAlwaysReformatOnSave());
+                .withReformatOnSave(getGeneralPreferences().shouldAlwaysReformatOnSave());
     }
 
     @Override
