@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
@@ -25,6 +26,9 @@ public class LibraryTab extends AbstractPreferenceTabView<LibraryTabViewModel> i
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
+    @FXML private CheckBox createBackup;
+    @FXML private TextField backupDirectory;
+
     public LibraryTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -37,7 +41,7 @@ public class LibraryTab extends AbstractPreferenceTabView<LibraryTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new LibraryTabViewModel(dialogService, preferencesService.getGeneralPreferences(), preferencesService.getTelemetryPreferences());
+        this.viewModel = new LibraryTabViewModel(dialogService, preferencesService.getGeneralPreferences(), preferencesService.getFilePreferences());
 
         new ViewModelListCellFactory<BibDatabaseMode>()
                 .withText(BibDatabaseMode::getFormattedName)
@@ -49,5 +53,13 @@ public class LibraryTab extends AbstractPreferenceTabView<LibraryTabViewModel> i
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService), autosaveLocalLibrariesHelp);
+
+        createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
+        backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
+        backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
+    }
+
+    public void backupFileDirBrowse() {
+        viewModel.backupFileDirBrowse();
     }
 }
