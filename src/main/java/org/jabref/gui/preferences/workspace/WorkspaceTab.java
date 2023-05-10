@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.appearance;
+package org.jabref.gui.preferences.workspace;
 
 import java.util.regex.Pattern;
 
@@ -13,12 +13,18 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseMode;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -37,6 +43,12 @@ public class WorkspaceTab extends AbstractPreferenceTabView<WorkspaceTabViewMode
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
     @FXML private CheckBox collectTelemetry;
+    @FXML private ComboBox<BibDatabaseMode> biblatexMode;
+    @FXML private CheckBox alwaysReformatBib;
+    @FXML private CheckBox autosaveLocalLibraries;
+    @FXML private Button autosaveLocalLibrariesHelp;
+    @FXML private CheckBox createBackup;
+    @FXML private TextField backupDirectory;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -100,6 +112,21 @@ public class WorkspaceTab extends AbstractPreferenceTabView<WorkspaceTabViewMode
 
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
 
+        new ViewModelListCellFactory<BibDatabaseMode>()
+                .withText(BibDatabaseMode::getFormattedName)
+                .install(biblatexMode);
+        biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
+        biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
+
+        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
+        autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
+        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService), autosaveLocalLibrariesHelp);
+
+        createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
+        backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
+        backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
+
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
             validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
@@ -109,5 +136,9 @@ public class WorkspaceTab extends AbstractPreferenceTabView<WorkspaceTabViewMode
     @FXML
     void importTheme() {
         viewModel.importCSSFile();
+    }
+
+    public void backupFileDirBrowse() {
+        viewModel.backupFileDirBrowse();
     }
 }

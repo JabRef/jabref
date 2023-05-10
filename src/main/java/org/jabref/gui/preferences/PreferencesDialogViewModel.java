@@ -14,7 +14,6 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.preferences.appearance.WorkspaceTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
 import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
 import org.jabref.gui.preferences.customexporter.CustomExporterTab;
@@ -28,7 +27,6 @@ import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
-import org.jabref.gui.preferences.library.LibraryTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
 import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
 import org.jabref.gui.preferences.network.NetworkTab;
@@ -36,6 +34,7 @@ import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
 import org.jabref.gui.preferences.websearch.WebSearchTab;
+import org.jabref.gui.preferences.workspace.WorkspaceTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
@@ -65,7 +64,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         preferenceTabs = FXCollections.observableArrayList(
                 new WorkspaceTab(),
-                new LibraryTab(),
                 new KeyBindingsTab(),
                 new EntryTab(),
                 new TableTab(),
