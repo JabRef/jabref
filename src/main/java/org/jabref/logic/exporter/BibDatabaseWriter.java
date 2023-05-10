@@ -146,22 +146,21 @@ public abstract class BibDatabaseWriter {
         return sorted;
     }
 
-    private static Optional<SaveOrder> getSaveOrder(MetaData metaData, SaveConfiguration preferences) {
-        /* three options:
-         * 1. original order
-         * 2. order specified in metaData
-         * 3. order specified in preferences
+    private static Optional<SaveOrder> getSaveOrder(MetaData metaData, SaveConfiguration saveConfiguration) {
+        /* two options:
+         * 1. order specified in metaData
+         * 2. original order
          */
 
-        if (preferences.getSaveOrder().getOrderType() == SaveOrder.OrderType.ORIGINAL) {
-            return Optional.empty();
-        }
-
-        if (preferences.useMetadataSaveOrder()) {
+        if (saveConfiguration.useMetadataSaveOrder()) {
             return metaData.getSaveOrderConfig();
         }
 
-        return Optional.ofNullable(preferences.getSaveOrder());
+        if (saveConfiguration.getSaveOrder().getOrderType() == SaveOrder.OrderType.ORIGINAL) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(saveConfiguration.getSaveOrder());
     }
 
     public List<FieldChange> getSaveActionsFieldChanges() {

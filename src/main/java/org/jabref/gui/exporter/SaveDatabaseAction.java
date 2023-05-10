@@ -233,6 +233,7 @@ public class SaveDatabaseAction {
 
         SaveConfiguration saveConfiguration = new SaveConfiguration()
                 .withSaveType(saveType)
+                .withMetadataSaveOrder(true)
                 .withReformatOnSave(preferences.getExportPreferences().shouldAlwaysReformatOnSave());
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
         synchronized (bibDatabaseContext) {

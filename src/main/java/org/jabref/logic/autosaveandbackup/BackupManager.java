@@ -205,7 +205,6 @@ public class BackupManager {
      *
      * <em>SIDE EFFECT: Deletes oldest backup file</em>
      *
-     *
      * @param backupPath the full path to the file where the library should be backed up to
      */
     void performBackup(Path backupPath) {
@@ -226,6 +225,7 @@ public class BackupManager {
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
         SaveConfiguration saveConfiguration = new SaveConfiguration()
                 .withMakeBackup(false)
+                .withMetadataSaveOrder(true)
                 .withReformatOnSave(preferences.getExportPreferences().shouldAlwaysReformatOnSave());
 
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
