@@ -763,6 +763,9 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -fx-control-inner-background;
     -fx-background-insets: 0;
     -fx-effect: null;
+    -fx-border-width: 1;
+    -fx-border-color: -fx-outer-border;
+    -fx-padding: 0;
 }
 
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
