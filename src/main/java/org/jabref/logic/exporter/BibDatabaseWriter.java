@@ -108,7 +108,7 @@ public abstract class BibDatabaseWriter {
         // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
         comparators.add(new CrossRefEntryComparator());
 
-        if (saveOrder.isEmpty()) {
+        if (saveOrder.isEmpty() || saveOrder.get().getOrderType() == SaveOrder.OrderType.ORIGINAL) {
             // entries will be sorted based on their internal IDs
             comparators.add(new IdComparator());
         } else {
