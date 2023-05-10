@@ -14,13 +14,13 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.preferences.autocompletion.AutoCompletionTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
 import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
 import org.jabref.gui.preferences.customexporter.CustomExporterTab;
 import org.jabref.gui.preferences.customimporter.CustomImporterTab;
 import org.jabref.gui.preferences.entry.EntryTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
-import org.jabref.gui.preferences.entryeditortabs.EntryEditorTabsTab;
 import org.jabref.gui.preferences.export.ExportTab;
 import org.jabref.gui.preferences.external.ExternalTab;
 import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
@@ -65,25 +65,25 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         preferenceTabs = FXCollections.observableArrayList(
                 new WorkspaceTab(),
                 new KeyBindingsTab(),
+                new GroupsTab(),
+                new WebSearchTab(),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
+                new EntryEditorTab(),
+                new CustomEntryTypesTab(),
+                new CitationKeyPatternTab(),
+                new LinkedFilesTab(),
+                new ExportTab(),
+                new AutoCompletionTab(),
                 new ProtectedTermsTab(),
                 new ExternalTab(),
                 new ExternalFileTypesTab(),
                 new JournalAbbreviationsTab(),
-                new GroupsTab(),
-                new EntryEditorTab(),
-                new WebSearchTab(),
-                new ExportTab(),
-                new EntryEditorTabsTab(),
-                new CitationKeyPatternTab(),
-                new LinkedFilesTab(),
                 new NameFormatterTab(),
+                new XmpPrivacyTab(),
                 new CustomImporterTab(),
                 new CustomExporterTab(),
-                new CustomEntryTypesTab(),
-                new XmpPrivacyTab(),
                 new NetworkTab()
         );
     }
