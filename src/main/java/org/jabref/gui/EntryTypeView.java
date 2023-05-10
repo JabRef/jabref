@@ -89,7 +89,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
         Button btnGenerate = (Button) this.getDialogPane().lookupButton(generateButton);
 
-        btnGenerate.textProperty().bind(EasyBind.map(viewModel.searchingProperty(), searching -> (searching) ? Localization.lang("Searching...") : Localization.lang("Generate")));
+        btnGenerate.textProperty().bind(EasyBind.map(viewModel.searchingProperty(), searching -> searching ? Localization.lang("Searching...") : Localization.lang("Generate")));
         btnGenerate.disableProperty().bind(viewModel.idFieldValidationStatus().validProperty().not().or(viewModel.searchingProperty()));
 
         EasyBind.subscribe(viewModel.searchSuccesfulProperty(), value -> {

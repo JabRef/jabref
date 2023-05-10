@@ -109,7 +109,7 @@ public class Linux implements NativeDesktop {
                 cmd = new String[] {"nemo", absoluteFilePath}; // Although nemo is based on nautilus it does not support --select, it directly highlights the file
             }
         }
-        ProcessBuilder processBuilder = new ProcessBuilder((cmd));
+        ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         Process process = processBuilder.start();
 
         StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);

@@ -141,7 +141,7 @@ class OOProcessAuthorYearMarkers {
         setIsFirstAppearanceOfSourceInCitations(citationGroups);
 
         for (CitationGroup group : citationGroups.getCitationGroupsInGlobalOrder()) {
-            final boolean inParenthesis = (group.citationType == CitationType.AUTHORYEAR_PAR);
+            final boolean inParenthesis = group.citationType == CitationType.AUTHORYEAR_PAR;
             final NonUniqueCitationMarker strictlyUnique = NonUniqueCitationMarker.THROWS;
 
             List<Citation> cits = group.getCitationsInLocalOrder();

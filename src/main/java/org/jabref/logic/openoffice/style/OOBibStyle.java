@@ -918,8 +918,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         OOBibStyle style = this;
         OOText title = style.getReferenceHeaderText();
         String parStyle = style.getReferenceHeaderParagraphFormat();
-        return (parStyle == null
+        return parStyle == null
                 ? OOFormat.paragraph(title)
-                : OOFormat.paragraph(title, parStyle));
+                : OOFormat.paragraph(title, parStyle);
     }
 }

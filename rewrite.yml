@@ -164,7 +164,7 @@ recipeList:
 #  - org.openrewrite.java.cleanup.StaticMethodNotFinal
   - org.openrewrite.java.cleanup.StringLiteralEquality
   - org.openrewrite.java.cleanup.TypecastParenPad
-#  - org.openrewrite.java.cleanup.UnnecessaryParentheses
+  - org.openrewrite.java.cleanup.UnnecessaryParentheses
   - org.openrewrite.java.cleanup.UnwrapRepeatableAnnotations
   - org.openrewrite.java.cleanup.UpperCaseLiteralSuffixes
 #  - org.openrewrite.java.cleanup.UseJavaStyleArrayDeclarations

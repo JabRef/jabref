@@ -155,9 +155,9 @@ public class OpenOfficePanel {
                 style.ensureUpToDate();
             } catch (IOException ex) {
                 LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", ex);
-                String msg = (Localization.lang("Unable to reload style file")
+                String msg = Localization.lang("Unable to reload style file")
                         + "'" + style.getPath() + "'"
-                        + "\n" + ex.getMessage());
+                        + "\n" + ex.getMessage();
                 new OOError(title, msg, ex).showErrorDialog(dialogService);
                 return FAIL;
             }
@@ -330,7 +330,7 @@ public class OpenOfficePanel {
     }
 
     private void updateButtonAvailability() {
-        boolean isConnected = (ooBase != null);
+        boolean isConnected = ooBase != null;
         boolean isConnectedToDocument = isConnected && !ooBase.isDocumentConnectionMissing();
 
         // For these, we need to watch something
@@ -338,7 +338,7 @@ public class OpenOfficePanel {
         boolean hasDatabase = true; // !getBaseList().isEmpty();
         boolean hasSelectedBibEntry = true;
 
-        selectDocument.setDisable(!(isConnected));
+        selectDocument.setDisable(!isConnected);
         pushEntries.setDisable(!(isConnectedToDocument && hasStyle && hasDatabase));
 
         boolean canCite = isConnectedToDocument && hasStyle && hasSelectedBibEntry;
@@ -418,9 +418,9 @@ public class OpenOfficePanel {
         if (!withText) {
             return CitationType.INVISIBLE_CIT;
         }
-        return (inParenthesis
+        return inParenthesis
                 ? CitationType.AUTHORYEAR_PAR
-                : CitationType.AUTHORYEAR_INTEXT);
+                : CitationType.AUTHORYEAR_INTEXT;
     }
 
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
@@ -477,9 +477,9 @@ public class OpenOfficePanel {
         }
 
         Optional<Update.SyncOptions> syncOptions =
-                (preferencesService.getOpenOfficePreferences().getSyncWhenCiting()
+                preferencesService.getOpenOfficePreferences().getSyncWhenCiting()
                         ? Optional.of(new Update.SyncOptions(getBaseList()))
-                        : Optional.empty());
+                        : Optional.empty();
 
         ooBase.guiActionInsertEntry(entries,
                 database,
