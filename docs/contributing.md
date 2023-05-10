@@ -13,7 +13,7 @@ nav_order: 2
 
 We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below. If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://guides.github.com/introduction/flow/index.html) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
-1. Get the JabRef code on your local machine. Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](getting-into-the-code/guidelines-for-setting-up-a-local-workspace.md).
+1. Get the JabRef code on your local machine. Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](getting-into-the-code/guidelines-for-setting-up-a-local-workspace/).
    1. Fork the JabRef into your GitHub account.
    2. Clone your forked repository on your local machine.
 2. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
