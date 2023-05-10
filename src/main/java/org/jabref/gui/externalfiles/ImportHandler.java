@@ -303,7 +303,7 @@ public class ImportHandler {
 
         Optional<ISBN> isbn = ISBN.parse(data);
         if (isbn.isPresent()) {
-            return fetchByISN(isbn.get());
+            return fetchByISBN(isbn.get());
         }
 
         return tryImportFormats(data);
@@ -331,7 +331,7 @@ public class ImportHandler {
         return OptionalUtil.toList(entry);
     }
 
-    private List<BibEntry> fetchByISN(ISBN isbn) throws FetcherException {
+    private List<BibEntry> fetchByISBN(ISBN isbn) throws FetcherException {
         LOGGER.info("Found ISBN identifier in clipboard");
         Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
