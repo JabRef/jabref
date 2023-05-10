@@ -24,10 +24,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
+public class WorkspaceTab extends AbstractPreferenceTabView<WorkspaceTabViewModel> implements PreferencesTab {
 
     @FXML private ComboBox<Language> language;
-    @FXML private ComboBox<AppearanceTabViewModel.ThemeTypes> theme;
+    @FXML private ComboBox<WorkspaceTabViewModel.ThemeTypes> theme;
     @FXML private TextField customThemePath;
     @FXML private Button customThemeBrowse;
     @FXML private CheckBox fontOverride;
@@ -50,7 +50,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
                 return c;
             });
 
-    public AppearanceTab() {
+    public WorkspaceTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -58,11 +58,11 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
 
     @Override
     public String getTabName() {
-        return Localization.lang("Appearance");
+        return Localization.lang("Workspace");
     }
 
     public void initialize() {
-        this.viewModel = new AppearanceTabViewModel(dialogService, preferencesService);
+        this.viewModel = new WorkspaceTabViewModel(dialogService, preferencesService);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)
@@ -75,18 +75,18 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
         // Spinner does neither support alignment nor disableProperty in FXML
         fontSize.disableProperty().bind(fontOverride.selectedProperty().not());
         fontSize.getEditor().setAlignment(Pos.CENTER_RIGHT);
-        fontSize.setValueFactory(AppearanceTabViewModel.fontSizeValueFactory);
+        fontSize.setValueFactory(WorkspaceTabViewModel.fontSizeValueFactory);
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
-        new ViewModelListCellFactory<AppearanceTabViewModel.ThemeTypes>()
-                .withText(AppearanceTabViewModel.ThemeTypes::getDisplayName)
+        new ViewModelListCellFactory<WorkspaceTabViewModel.ThemeTypes>()
+                .withText(WorkspaceTabViewModel.ThemeTypes::getDisplayName)
                 .install(theme);
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
         EasyBind.subscribe(viewModel.selectedThemeProperty(), theme -> {
-            boolean isCustomTheme = theme == AppearanceTabViewModel.ThemeTypes.CUSTOM;
+            boolean isCustomTheme = theme == WorkspaceTabViewModel.ThemeTypes.CUSTOM;
             customThemePath.disableProperty().set(!isCustomTheme);
             customThemeBrowse.disableProperty().set(!isCustomTheme);
         });

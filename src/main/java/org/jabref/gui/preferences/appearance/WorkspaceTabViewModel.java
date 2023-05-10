@@ -32,7 +32,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
-public class AppearanceTabViewModel implements PreferenceTabViewModel {
+public class WorkspaceTabViewModel implements PreferenceTabViewModel {
     protected enum ThemeTypes {
         LIGHT(Localization.lang("Light")),
         DARK(Localization.lang("Dark")),
@@ -81,7 +81,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public WorkspaceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.appearancePreferences = preferences.getAppearancePreferences();
@@ -97,7 +97,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                     }
                 },
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Appearance"),
+                        Localization.lang("Workspace"),
                         Localization.lang("Font settings"),
                         Localization.lang("You must enter an integer value higher than 8."))));
 
@@ -105,7 +105,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 customPathToThemeProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Appearance"),
+                        Localization.lang("Workspace"),
                         Localization.lang("Visual theme"),
                         Localization.lang("Please specify a css theme file."))));
     }

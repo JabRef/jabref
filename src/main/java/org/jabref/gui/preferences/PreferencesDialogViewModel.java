@@ -14,7 +14,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.preferences.appearance.AppearanceTab;
+import org.jabref.gui.preferences.appearance.WorkspaceTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
 import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
 import org.jabref.gui.preferences.customexporter.CustomExporterTab;
@@ -64,7 +64,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
-                new AppearanceTab(),
+                new WorkspaceTab(),
                 new LibraryTab(),
                 new KeyBindingsTab(),
                 new EntryTab(),
