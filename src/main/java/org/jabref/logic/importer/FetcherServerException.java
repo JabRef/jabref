@@ -6,7 +6,7 @@ package org.jabref.logic.importer;
 public class FetcherServerException extends FetcherException {
       private int statusCode;
 
-	public FetcherServerException(String errorMessage, String localizedMessage, Throwable cause, int statusCode) {
+    public FetcherServerException(String errorMessage, String localizedMessage, Throwable cause, int statusCode) {
 		super(errorMessage, localizedMessage, cause);
 		this.statusCode = statusCode;
 	}
