@@ -475,7 +475,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
             downloadTask.showToUser(true);
             downloadTask.onFailure(ex -> {
-            	LOGGER.error("Error downloading from URL {}" +urlDownload, ex);
+            	LOGGER.error("Error downloading from URL {}" + urlDownload, ex);
                 if (ex instanceof FetcherClientException) {
                     FetcherClientException clientException = (FetcherClientException) ex;
                     int statusCode = clientException.getStatusCode();

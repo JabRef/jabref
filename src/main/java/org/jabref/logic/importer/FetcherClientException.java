@@ -5,7 +5,7 @@ package org.jabref.logic.importer;
  */
 public class FetcherClientException extends FetcherException {
 
-    private  int statusCode;
+    private int statusCode;
 
     public FetcherClientException(String errorMessage, Throwable cause, int statusCode) {
         super(errorMessage, cause);
