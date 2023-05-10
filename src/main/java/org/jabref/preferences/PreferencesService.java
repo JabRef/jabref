@@ -155,7 +155,7 @@ public interface PreferencesService {
     // AppearancePreferences
     //*************************************************************************************************************
 
-    AppearancePreferences getAppearancePreferences();
+    WorkspacePreferences getWorkspacePreferences();
 
     //*************************************************************************************************************
     // File preferences

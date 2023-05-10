@@ -10,7 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.l10n.Language;
 
-public class AppearancePreferences {
+public class WorkspacePreferences {
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
@@ -21,15 +21,15 @@ public class AppearancePreferences {
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
 
-    public AppearancePreferences(Language language,
-                                 boolean shouldOverrideDefaultFontSize,
-                                 int mainFontSize,
-                                 int defaultFontSize,
-                                 Theme theme,
-                                 boolean shouldOpenLastEdited,
-                                 boolean showAdvancedHints,
-                                 boolean warnAboutDuplicatesInInspection,
-                                 boolean confirmDelete) {
+    public WorkspacePreferences(Language language,
+                                boolean shouldOverrideDefaultFontSize,
+                                int mainFontSize,
+                                int defaultFontSize,
+                                Theme theme,
+                                boolean shouldOpenLastEdited,
+                                boolean showAdvancedHints,
+                                boolean warnAboutDuplicatesInInspection,
+                                boolean confirmDelete) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);

@@ -22,9 +22,9 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
+import org.jabref.preferences.WorkspacePreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -73,7 +73,7 @@ public class WorkspaceTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final AppearancePreferences appearancePreferences;
+    private final WorkspacePreferences workspacePreferences;
     private final TelemetryPreferences telemetryPreferences;
 
     private final Validator fontSizeValidator;
@@ -84,7 +84,7 @@ public class WorkspaceTabViewModel implements PreferenceTabViewModel {
     public WorkspaceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.appearancePreferences = preferences.getAppearancePreferences();
+        this.workspacePreferences = preferences.getWorkspacePreferences();
         this.telemetryPreferences = preferences.getTelemetryPreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
@@ -112,26 +112,26 @@ public class WorkspaceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        selectedLanguageProperty.setValue(appearancePreferences.getLanguage());
+        selectedLanguageProperty.setValue(workspacePreferences.getLanguage());
 
         // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
-        switch (appearancePreferences.getTheme().getType()) {
+        switch (workspacePreferences.getTheme().getType()) {
             case DEFAULT -> selectedThemeProperty.setValue(ThemeTypes.LIGHT);
             case EMBEDDED -> selectedThemeProperty.setValue(ThemeTypes.DARK);
             case CUSTOM -> {
                 selectedThemeProperty.setValue(ThemeTypes.CUSTOM);
-                customPathToThemeProperty.setValue(appearancePreferences.getTheme().getName());
+                customPathToThemeProperty.setValue(workspacePreferences.getTheme().getName());
             }
         }
 
-        fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
-        fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
+        fontOverrideProperty.setValue(workspacePreferences.shouldOverrideDefaultFontSize());
+        fontSizeProperty.setValue(String.valueOf(workspacePreferences.getMainFontSize()));
 
-        openLastStartupProperty.setValue(appearancePreferences.shouldOpenLastEdited());
-        showAdvancedHintsProperty.setValue(appearancePreferences.shouldShowAdvancedHints());
-        inspectionWarningDuplicateProperty.setValue(appearancePreferences.shouldWarnAboutDuplicatesInInspection());
-        confirmDeleteProperty.setValue(appearancePreferences.shouldConfirmDelete());
+        openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());
+        showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
+        inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
+        confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
 
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
     }
@@ -139,25 +139,25 @@ public class WorkspaceTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         Language newLanguage = selectedLanguageProperty.getValue();
-        if (newLanguage != appearancePreferences.getLanguage()) {
-            appearancePreferences.setLanguage(newLanguage);
+        if (newLanguage != workspacePreferences.getLanguage()) {
+            workspacePreferences.setLanguage(newLanguage);
             Localization.setLanguage(newLanguage);
             restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
         }
 
-        appearancePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
-        appearancePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
+        workspacePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
+        workspacePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
 
         switch (selectedThemeProperty.get()) {
-            case LIGHT -> appearancePreferences.setTheme(Theme.light());
-            case DARK -> appearancePreferences.setTheme(Theme.dark());
-            case CUSTOM -> appearancePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
+            case LIGHT -> workspacePreferences.setTheme(Theme.light());
+            case DARK -> workspacePreferences.setTheme(Theme.dark());
+            case CUSTOM -> workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
         }
 
-        appearancePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
-        appearancePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
-        appearancePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
-        appearancePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
+        workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
+        workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
+        workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
+        workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
     }

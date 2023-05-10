@@ -668,7 +668,7 @@ public class LibraryTab extends Tab {
     }
 
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
-        if (preferencesService.getAppearancePreferences().shouldConfirmDelete()) {
+        if (preferencesService.getWorkspacePreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
             String message = Localization.lang("Really delete the selected entry?");
             String okButton = Localization.lang("Delete entry");
@@ -685,7 +685,7 @@ public class LibraryTab extends Tab {
                     okButton,
                     cancelButton,
                     Localization.lang("Do not ask again"),
-                    optOut -> preferencesService.getAppearancePreferences().setConfirmDelete(!optOut));
+                    optOut -> preferencesService.getWorkspacePreferences().setConfirmDelete(!optOut));
         } else {
             return true;
         }

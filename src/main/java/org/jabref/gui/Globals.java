@@ -101,7 +101,7 @@ public class Globals {
     public static synchronized ThemeManager getThemeManager() {
         if (themeManager == null) {
             themeManager = new ThemeManager(
-                    prefs.getAppearancePreferences(),
+                    prefs.getWorkspacePreferences(),
                     getFileUpdateMonitor(),
                     Runnable::run);
         }

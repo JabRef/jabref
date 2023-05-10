@@ -435,7 +435,7 @@ public class JabRefPreferences implements PreferencesService {
     private PreviewPreferences previewPreferences;
     private OpenOfficePreferences openOfficePreferences;
     private SidePanePreferences sidePanePreferences;
-    private AppearancePreferences appearancePreferences;
+    private WorkspacePreferences workspacePreferences;
     private ImporterPreferences importerPreferences;
     private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
@@ -2039,12 +2039,12 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public AppearancePreferences getAppearancePreferences() {
-        if (appearancePreferences != null) {
-            return appearancePreferences;
+    public WorkspacePreferences getWorkspacePreferences() {
+        if (workspacePreferences != null) {
+            return workspacePreferences;
         }
 
-        appearancePreferences = new AppearancePreferences(
+        workspacePreferences = new WorkspacePreferences(
                 getLanguage(),
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
@@ -2055,22 +2055,22 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE));
 
-        EasyBind.listen(appearancePreferences.languageProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
             if (oldValue != newValue) {
                 setLanguageDependentDefaultValues();
                 Localization.setLanguage(newValue);
             }
         });
-        EasyBind.listen(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
-        EasyBind.listen(appearancePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
-        EasyBind.listen(appearancePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
-        EasyBind.listen(appearancePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
-        EasyBind.listen(appearancePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
-        EasyBind.listen(appearancePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
-        EasyBind.listen(appearancePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
+        EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
+        EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
 
-        return appearancePreferences;
+        return workspacePreferences;
     }
 
     //*************************************************************************************************************
