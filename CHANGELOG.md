@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We enabled scrolling in the groups list when dragging a group on another group. [#2869](https://github.com/JabRef/jabref/pull/2869)
 - We added the option to automatically download online files when a new entry is created from an existing ID (e.g. DOI). The option can be disabled in the preferences under "Import and Export" [#9756](https://github.com/JabRef/jabref/issues/9756)
 - We added a new Integrity check for unscaped ampersands. [koppor#585](https://github.com/koppor/jabref/issues/585)
+- We added the possibility to automatically fetch entries when an IBSN is pasted on the main table [#9864](https://github.com/JabRef/jabref/issues/9864)
 
 ### Changed
 
@@ -45,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We reorganized the order of tabs and settings in the library properties. [#9836](https://github.com/JabRef/jabref/pull/9836)
 - We changed the handling of an "overflow" of authors at `[authIniN]`: JabRef uses `+` to indicate an overflow. Example: `[authIni2]` produces `A+` (instead of `AB`) for `Aachen and Berlin and Chemnitz`. [#9703](https://github.com/JabRef/jabref/pull/9703)
 - We moved the preferences option to open the last edited files on startup to the 'General' tab. [#9808](https://github.com/JabRef/jabref/pull/9808)
+- We improved the recognition of DOIs when pasting a link containing a DOI on the maintable [#9864](https://github.com/JabRef/jabref/issues/9864s)
 - We split the 'Import and Export' tab in the preferences into 'Web Search' and 'Export'. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We split the 'General' tab in the preferences into 'Libraries' and 'Appearance'. [#9866](https://github.com/JabRef/jabref/pull/9866)
 - We moved the option to run JabRef in memory stick mode into the preferences dialog toolbar. [#9866](https://github.com/JabRef/jabref/pull/9866)
