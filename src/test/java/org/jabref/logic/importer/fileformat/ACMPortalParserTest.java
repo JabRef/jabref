@@ -58,6 +58,7 @@ public class ACMPortalParserTest {
                         .withField(StandardField.PAGES, "152–158"),
                 new BibEntry(StandardEntryType.Book)
                         .withField(StandardField.YEAR, "2016")
+                        .withField(StandardField.MONTH, "10")
                         .withField(StandardField.TITLE, "Proceedings of the 2016 24th ACM SIGSOFT International Symposium on Foundations of Software Engineering")
                         .withField(StandardField.LOCATION, "Seattle, WA, USA")
                         .withField(StandardField.ISBN, "9781450342186")

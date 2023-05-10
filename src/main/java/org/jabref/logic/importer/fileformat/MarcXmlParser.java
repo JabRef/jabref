@@ -95,27 +95,27 @@ public class MarcXmlParser implements Parser {
             String tag = datafield.getAttribute("tag");
             LOGGER.debug("tag: " + tag);
 
-            if (tag.equals("020")) {
+            if ("020".equals(tag)) {
                 putIsbn(bibEntry, datafield);
-            } else if (tag.equals("100") || tag.equals("700") || tag.equals("710")) {
+            } else if ("100".equals(tag) || "700".equals(tag) || "710".equals(tag)) {
                 putPersonalName(bibEntry, datafield); // Author, Editor, Publisher
-            } else if (tag.equals("245")) {
+            } else if ("245".equals(tag)) {
                 putTitle(bibEntry, datafield);
-            } else if (tag.equals("250")) {
+            } else if ("250".equals(tag)) {
                 putEdition(bibEntry, datafield);
-            } else if (tag.equals("264")) {
+            } else if ("264".equals(tag)) {
                 putPublication(bibEntry, datafield);
-            } else if (tag.equals("300")) {
+            } else if ("300".equals(tag)) {
                 putPhysicalDescription(bibEntry, datafield);
-            } else if (tag.equals("490") || tag.equals("830")) {
+            } else if ("490".equals(tag) || "830".equals(tag)) {
                 putSeries(bibEntry, datafield);
-            } else if (tag.equals("520")) {
+            } else if ("520".equals(tag)) {
                 putSummary(bibEntry, datafield);
-            } else if (tag.equals("653")) {
+            } else if ("653".equals(tag)) {
                 putKeywords(bibEntry, datafield);
-            } else if (tag.equals("856")) {
+            } else if ("856".equals(tag)) {
                 putElectronicLocation(bibEntry, datafield);
-            } else if (tag.equals("966")) {
+            } else if ("966".equals(tag)) {
                 putDoi(bibEntry, datafield);
             } else if (Integer.parseInt(tag) >= 546 && Integer.parseInt(tag) <= 599) {
                 // Notes
@@ -184,7 +184,7 @@ public class MarcXmlParser implements Parser {
             if (field.isPresent()) {
                 String ind1 = datafield.getAttribute("ind1");
                 String brackedName;
-                if (field.get() == StandardField.PUBLISHER && StringUtil.isNotBlank(ind1) && ind1.equals("2")) {
+                if (field.get() == StandardField.PUBLISHER && StringUtil.isNotBlank(ind1) && "2".equals(ind1)) {
                     // ind == 2 -> Corporate publisher
                     brackedName = "{" + name.getAsFirstLastNamesWithAnd() + "}";
                 } else {
@@ -245,7 +245,7 @@ public class MarcXmlParser implements Parser {
 
     private void putPublication(BibEntry bibEntry, Element datafield) {
         String ind2 = datafield.getAttribute("ind2");
-        if (StringUtil.isNotBlank(ind2) && ind2.equals("1")) { // Publisher
+        if (StringUtil.isNotBlank(ind2) && "1".equals(ind2)) { // Publisher
             String place = getSubfield("a", datafield);
             String name = getSubfield("b", datafield);
             String date = getSubfield("c", datafield);
@@ -305,7 +305,7 @@ public class MarcXmlParser implements Parser {
         String summary = getSubfield("a", datafield);
 
         String ind1 = datafield.getAttribute("ind1");
-        if (StringUtil.isNotBlank(summary) && StringUtil.isNotBlank(ind1) && ind1.equals("3")) { // Abstract
+        if (StringUtil.isNotBlank(summary) && StringUtil.isNotBlank(ind1) && "3".equals(ind1)) { // Abstract
             if (bibEntry.getField(StandardField.ABSTRACT).isPresent()) {
                 bibEntry.setField(StandardField.ABSTRACT, bibEntry.getField(StandardField.ABSTRACT).get().concat(summary));
             } else {

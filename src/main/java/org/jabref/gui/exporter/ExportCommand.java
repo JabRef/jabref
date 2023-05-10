@@ -78,8 +78,8 @@ public class ExportCommand extends SimpleCommand {
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
-                .withDefaultExtension(preferences.getImportExportPreferences().getLastExportExtension())
-                .withInitialDirectory(preferences.getImportExportPreferences().getExportWorkingDirectory())
+                .withDefaultExtension(preferences.getExportPreferences().getLastExportExtension())
+                .withInitialDirectory(preferences.getExportPreferences().getExportWorkingDirectory())
                 .build();
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), exporters));
@@ -110,8 +110,8 @@ public class ExportCommand extends SimpleCommand {
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
-        preferences.getImportExportPreferences().setLastExportExtension(format.getName());
-        preferences.getImportExportPreferences().setExportWorkingDirectory(file.getParent());
+        preferences.getExportPreferences().setLastExportExtension(format.getName());
+        preferences.getExportPreferences().setExportWorkingDirectory(file.getParent());
 
         final List<BibEntry> finEntries = entries;
 

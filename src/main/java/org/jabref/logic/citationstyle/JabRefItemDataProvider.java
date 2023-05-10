@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.integrity.PagesChecker;
@@ -155,7 +154,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
                     .map(removeNewlinesFormatter::format)
                     .map(LatexToUnicodeAdapter::format)
                     .ifPresent(value -> {
-                        if (StandardField.MONTH.equals(key)) {
+                        if (StandardField.MONTH == key) {
                             // Change month from #mon# to mon because CSL does not support the former format
                             value = bibEntry.getMonth().map(Month::getShortName).orElse(value);
                         }
@@ -183,16 +182,6 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         BibDatabaseContext ctx = new BibDatabaseContext();
         ctx.setMode(BibDatabaseMode.BIBLATEX);
         this.pagesChecker = new PagesChecker(ctx);
-    }
-
-    public String toJson() {
-        List<BibEntry> entries = bibDatabaseContext.getEntries();
-        this.setData(entries, bibDatabaseContext, entryTypesManager);
-        return entries.stream()
-                .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
-                .map(item -> item.toJson(stringJsonBuilderFactory.createJsonBuilder()))
-                .map(item -> (String) item)
-                .collect(Collectors.joining(",", "[", "]"));
     }
 
     @Override

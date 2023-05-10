@@ -57,7 +57,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager);
 
-        resultsTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
+        resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
         resultsTable.getSelectionModel().selectFirst();
 
         if (resultsTable.getSelectionModel().getSelectedItem() != null) {

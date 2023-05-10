@@ -33,7 +33,7 @@ public class EntryAnnotationImporter {
      */
     private List<LinkedFile> getFilteredFileList() {
         return entry.getFiles().stream()
-                    .filter(parsedFileField -> parsedFileField.getFileType().equalsIgnoreCase("pdf"))
+                    .filter(parsedFileField -> "pdf".equalsIgnoreCase(parsedFileField.getFileType()))
                     .filter(parsedFileField -> !parsedFileField.isOnlineLink()).collect(Collectors.toList());
     }
 

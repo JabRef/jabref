@@ -724,7 +724,7 @@ class OOBibStyleGetCitationMarker {
                                                                && !uniqueLettersDiffer);
 
                 if (uniqueLetterDoesNotMakeUnique &&
-                    nonUniqueCitationMarkerHandling.equals(NonUniqueCitationMarker.THROWS)) {
+                        nonUniqueCitationMarkerHandling == NonUniqueCitationMarker.THROWS) {
                     throw new IllegalArgumentException("different citation keys,"
                                                        + " but same normalizedMarker and uniqueLetter");
                 }

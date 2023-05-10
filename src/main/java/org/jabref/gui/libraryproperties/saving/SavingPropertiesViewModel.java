@@ -50,7 +50,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         this.preferencesService = preferencesService;
         this.initialMetaData = databaseContext.getMetaData();
         this.exportSaveOrder = initialMetaData.getSaveOrderConfig()
-                                              .orElseGet(() -> preferencesService.getImportExportPreferences().getExportSaveOrder());
+                                              .orElseGet(() -> preferencesService.getExportPreferences().getExportSaveOrder());
     }
 
     @Override
