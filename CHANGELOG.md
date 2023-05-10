@@ -47,8 +47,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the handling of an "overflow" of authors at `[authIniN]`: JabRef uses `+` to indicate an overflow. Example: `[authIni2]` produces `A+` (instead of `AB`) for `Aachen and Berlin and Chemnitz`. [#9703](https://github.com/JabRef/jabref/pull/9703)
 - We moved the preferences option to open the last edited files on startup to the 'General' tab. [#9808](https://github.com/JabRef/jabref/pull/9808)
 - We improved the recognition of DOIs when pasting a link containing a DOI on the maintable [#9864](https://github.com/JabRef/jabref/issues/9864s)
-- We split the 'Import and Export' tab in the preferences into 'Web Search' and 'Export'. [#9839](https://github.com/JabRef/jabref/pull/9839)
-- We split the 'General' tab in the preferences into 'Libraries' and 'Appearance'. [#9866](https://github.com/JabRef/jabref/pull/9866)
+- We reordered the preferences dialog. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We moved the option to run JabRef in memory stick mode into the preferences dialog toolbar. [#9866](https://github.com/JabRef/jabref/pull/9866)
 
 ### Fixed
