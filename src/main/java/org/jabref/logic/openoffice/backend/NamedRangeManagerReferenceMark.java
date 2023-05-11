@@ -38,9 +38,9 @@ public class NamedRangeManagerReferenceMark implements NamedRangeManager {
             throws
             NoDocumentException,
             WrappedTargetException {
-        return (NamedRangeReferenceMark
+        return NamedRangeReferenceMark
                 .getFromDocument(doc, refMarkName)
-                .map(x -> x));
+                .map(x -> x);
     }
 }
 

@@ -82,7 +82,7 @@ public class BibtexExtractorViewModel {
         GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getGrobidPreferences(), preferencesService.getImportFormatPreferences());
         BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
-                      .onFailure((e) -> {
+                      .onFailure(e -> {
                           if (e instanceof FetcherException) {
                               String msg = Localization.lang("There are connection issues with a JabRef server. Detailed information: %0",
                                       e.getMessage());
