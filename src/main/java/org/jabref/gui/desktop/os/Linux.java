@@ -180,23 +180,23 @@ public class Linux implements NativeDesktop {
         // Make use of xdg-user-dirs
         // See https://www.freedesktop.org/wiki/Software/xdg-user-dirs/ for details
         try {
-            Process process = new ProcessBuilder("xdg-user-dirs", "DOCUMENTS").start();
+            Process process = new ProcessBuilder("xdg-user-dir", "DOCUMENTS").start(); // Package name with 's', command without
             List<String> strings = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))
                     .lines().toList();
             if (strings.isEmpty()) {
-                LOGGER.error("xdg-user-dirs returned nothing");
+                LOGGER.error("xdg-user-dir returned nothing");
                 return getUserDirectory();
             }
             String documentsDirectory = strings.get(0);
             Path documentsPath = Path.of(documentsDirectory);
             if (!Files.exists(documentsPath)) {
-                LOGGER.error("xdg-user-dirs returned non-existant directory {}", documentsDirectory);
+                LOGGER.error("xdg-user-dir returned non-existant directory {}", documentsDirectory);
                 return getUserDirectory();
             }
             LOGGER.debug("Got documents path {}", documentsPath);
             return documentsPath;
         } catch (IOException e) {
-            LOGGER.error("Error while executing xdg-user-dirs", e);
+            LOGGER.error("Error while executing xdg-user-dir", e);
         }
 
         // Fallback
