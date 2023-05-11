@@ -623,7 +623,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         } else if (group instanceof SearchGroup) {
             return true;
         } else if (group instanceof AutomaticKeywordGroup) {
-            return false;
+            return true;
         } else if (group instanceof AutomaticPersonsGroup) {
             return false;
         } else if (group instanceof TexGroup) {
@@ -659,7 +659,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         } else if (group instanceof SearchGroup) {
             return false;
         } else if (group instanceof AutomaticKeywordGroup) {
-            return false;
+            return true;
         } else if (group instanceof AutomaticPersonsGroup) {
             return false;
         } else if (group instanceof TexGroup) {
