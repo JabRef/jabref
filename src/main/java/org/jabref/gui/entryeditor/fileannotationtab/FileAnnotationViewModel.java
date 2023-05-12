@@ -31,7 +31,7 @@ public class FileAnnotationViewModel {
             this.content.set(annotation.getLinkedFileAnnotation().getContent());
             String annotationContent = annotation.getContent();
             String illegibleTextMessage = Localization.lang("The marked area does not contain any legible text!");
-            String markingContent = (annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
+            String markingContent = annotationContent.isEmpty() ? illegibleTextMessage : annotationContent;
             this.marking.set(removePunctuationMark(markingContent));
         } else {
             String content = annotation.getContent();

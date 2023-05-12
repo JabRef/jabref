@@ -54,7 +54,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     @Override
     public void setValues() {
-        boolean isShared = (databaseContext.getLocation() == DatabaseLocation.SHARED);
+        boolean isShared = databaseContext.getLocation() == DatabaseLocation.SHARED;
         encodingDisableProperty.setValue(isShared); // the encoding of shared database is always UTF-8
 
         selectedEncodingProperty.setValue(metaData.getEncoding().orElse(StandardCharsets.UTF_8));

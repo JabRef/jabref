@@ -47,7 +47,7 @@ public class BackupResolverDialog extends FXDialog {
 
         HyperlinkLabel contentLabel = new HyperlinkLabel(content);
         contentLabel.setPrefWidth(360);
-        contentLabel.setOnAction((e) -> {
+        contentLabel.setOnAction(e -> {
             if (backupPathOpt.isPresent()) {
                 if (!(e.getSource() instanceof Hyperlink)) {
                     return;

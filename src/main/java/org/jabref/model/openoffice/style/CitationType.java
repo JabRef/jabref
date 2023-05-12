@@ -17,7 +17,7 @@ public enum CitationType {
     }
 
     public boolean withText() {
-        return (this != INVISIBLE_CIT);
+        return this != INVISIBLE_CIT;
     }
 }
 

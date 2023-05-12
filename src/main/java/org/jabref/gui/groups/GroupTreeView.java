@@ -175,7 +175,7 @@ public class GroupTreeView extends BorderPane {
                 BindingsHelper.bindContentBidirectional(
                         groupTree.getSelectionModel().getSelectedItems(),
                         viewModel.selectedGroupsProperty(),
-                        (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode),
+                        newSelectedGroups -> newSelectedGroups.forEach(this::selectNode),
                         this::updateSelection
                 ));
 
@@ -275,7 +275,7 @@ public class GroupTreeView extends BorderPane {
         }
         Text text = new Text();
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
-                (newValue) -> {
+                newValue -> {
                     if (text.textProperty().isBound()) {
                         text.textProperty().unbind();
                         text.setText("");
@@ -442,11 +442,11 @@ public class GroupTreeView extends BorderPane {
                     scrollBar.setValue(newValue);
                 }));
 
-        groupTree.setOnScroll((event) -> scrollTimer.stop());
-        groupTree.setOnDragDone((event) -> scrollTimer.stop());
-        groupTree.setOnDragEntered((event) -> scrollTimer.stop());
-        groupTree.setOnDragDropped((event) -> scrollTimer.stop());
-        groupTree.setOnDragExited((event) -> {
+        groupTree.setOnScroll(event -> scrollTimer.stop());
+        groupTree.setOnDragDone(event -> scrollTimer.stop());
+        groupTree.setOnDragEntered(event -> scrollTimer.stop());
+        groupTree.setOnDragDropped(event -> scrollTimer.stop());
+        groupTree.setOnDragExited(event -> {
             if (event.getY() > 0) {
                 scrollVelocity = 1.0 / SCROLL_SPEED;
             } else {

@@ -72,7 +72,7 @@ class XmpUtilWriterTest {
             .withField(StandardField.LANGUAGE, "English, Japanese")
             .withDate(new Date(2000, 5))
             .withField(new UnknownField(DC_COVERAGE), "coverageField")
-            .withField(new UnknownField((DC_SOURCE)), "JabRef")
+            .withField(new UnknownField(DC_SOURCE), "JabRef")
             .withField(new UnknownField(DC_RIGHTS), "Right To X");
     private XmpPreferences xmpPreferences;
 

@@ -162,7 +162,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
         // input: list of { "Name": "Author name,"}
         return IntStream.range(0, authors.length())
                         .mapToObj(authors::getJSONObject)
-                        .map((author) -> new Author(
+                        .map(author -> new Author(
                                 author.optString("Name", ""), "", "", "", ""))
                         .collect(AuthorList.collect())
                         .getAsFirstLastNamesWithAnd();

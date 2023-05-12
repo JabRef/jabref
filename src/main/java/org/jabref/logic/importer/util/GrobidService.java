@@ -91,7 +91,7 @@ public class GrobidService {
 
         BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
         List<BibEntry> result = parser.parseEntries(httpResponse);
-        result.forEach((entry) -> entry.setCitationKey(""));
+        result.forEach(entry -> entry.setCitationKey(""));
         return result;
     }
 }

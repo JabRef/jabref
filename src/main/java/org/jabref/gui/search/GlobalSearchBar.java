@@ -444,12 +444,12 @@ public class GlobalSearchBar extends HBox {
         }
 
         private void registerEventListener() {
-            this.suggestionList.setOnMouseClicked((me) -> {
+            this.suggestionList.setOnMouseClicked(me -> {
                 if (me.getButton() == MouseButton.PRIMARY) {
                     this.onSuggestionChosen(this.suggestionList.getSelectionModel().getSelectedItem());
                 }
             });
-            this.suggestionList.setOnKeyPressed((ke) -> {
+            this.suggestionList.setOnKeyPressed(ke -> {
                 switch (ke.getCode()) {
                     case TAB:
                     case ENTER:

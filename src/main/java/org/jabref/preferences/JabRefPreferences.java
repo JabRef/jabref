@@ -2242,7 +2242,7 @@ public class JabRefPreferences implements PreferencesService {
         List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
 
         for (var column : sortOrder) {
-            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            boolean descending = column.getSortType() == SortType.DESCENDING;
             criteria.add(new SaveOrder.SortCriterion(
                     FieldFactory.parseField(column.getQualifier()),
                     descending));

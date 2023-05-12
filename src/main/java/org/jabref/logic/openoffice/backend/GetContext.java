@@ -66,9 +66,9 @@ public class GetContext {
 
         String result = cursor.getString();
         if (htmlMarkup) {
-            result = (result.substring(0, addedBefore)
+            result = result.substring(0, addedBefore)
                     + "<b>" + citPart + "</b>"
-                    + result.substring(lengthWithBefore));
+                    + result.substring(lengthWithBefore);
         }
         return result.trim();
     }

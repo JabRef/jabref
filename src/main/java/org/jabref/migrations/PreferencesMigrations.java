@@ -274,7 +274,7 @@ public class PreferencesMigrations {
     }
 
     private static void upgradeKeyBindingsToJavaFX(JabRefPreferences prefs) {
-        UnaryOperator<String> replaceKeys = (str) -> {
+        UnaryOperator<String> replaceKeys = str -> {
             String result = str.replace("ctrl ", "ctrl+");
             result = result.replace("shift ", "shift+");
             result = result.replace("alt ", "alt+");

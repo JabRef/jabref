@@ -50,9 +50,9 @@ public class StringUtil {
         for (int i = 0; i < toQuote.length(); ++i) {
             c = toQuote.charAt(i);
 
-            isSpecial = (c == quoteChar);
+            isSpecial = c == quoteChar;
             // If non-null specials performs logic-or with specials.indexOf(c) >= 0
-            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
+            isSpecial |= (specials != null) && (specials.indexOf(c) >= 0);
 
             if (isSpecial) {
                 result.append(quoteChar);
@@ -604,7 +604,7 @@ public class StringUtil {
     }
 
     public static boolean isNullOrEmpty(String toTest) {
-        return ((toTest == null) || toTest.isEmpty());
+        return (toTest == null) || toTest.isEmpty();
     }
 
     public static boolean isBlank(String string) {
