@@ -373,7 +373,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     public boolean isEventSourceAccepted(EntriesEvent event) {
         EntriesEventSource eventSource = event.getEntriesEventSource();
-        return ((eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO));
+        return (eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO);
     }
 
     @Override

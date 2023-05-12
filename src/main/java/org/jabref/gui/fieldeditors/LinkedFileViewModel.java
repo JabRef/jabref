@@ -305,7 +305,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
-        if ((file.isPresent())) {
+        if (file.isPresent()) {
             // Found the linked file, so move it
             try {
                 linkedFileHandler.moveToDefaultDirectory();

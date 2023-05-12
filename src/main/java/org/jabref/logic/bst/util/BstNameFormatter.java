@@ -95,7 +95,7 @@ public class BstNameFormatter {
                     continue;
                 }
 
-                if ((control.length() > 2)) {
+                if (control.length() > 2) {
                     LOGGER.warn("Format string in format.name$ may only be one or two character long on brace level 1 in group {}: {}", group, format);
                 }
 
@@ -216,7 +216,7 @@ public class BstNameFormatter {
             }
             i++;
         }
-        if ((braceLevel != 0)) {
+        if (braceLevel != 0) {
             LOGGER.warn("Unbalanced brace in format string for nameFormat: {}", format);
         }
 

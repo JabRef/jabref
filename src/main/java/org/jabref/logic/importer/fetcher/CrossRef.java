@@ -154,7 +154,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         // input: list of {"given":"A.","family":"Riel","affiliation":[]}
         return IntStream.range(0, authors.length())
                         .mapToObj(authors::getJSONObject)
-                        .map((author) -> new Author(
+                        .map(author -> new Author(
                                 author.optString("given", ""), "", "",
                                 author.optString("family", ""), ""))
                         .collect(AuthorList.collect())

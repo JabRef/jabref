@@ -75,7 +75,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
 
     private MenuItem createMenuItem(KeyBindingPreset preset) {
         MenuItem item = new MenuItem(preset.getName());
-        item.setOnAction((event) -> viewModel.loadPreset(preset));
+        item.setOnAction(event -> viewModel.loadPreset(preset));
         return item;
     }
 

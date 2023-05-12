@@ -403,7 +403,7 @@ public class MarcXmlParser implements Parser {
 
         for (Element subfield : subfields) {
             if (subfield.getAttribute("code").equals(a)) {
-                return (subfield.getTextContent());
+                return subfield.getTextContent();
             }
         }
         return null;

@@ -57,7 +57,7 @@ public class CopyFilesAction extends SimpleCommand {
                     Localization.lang("Copy linked files to folder..."),
                     exportTask);
             Globals.TASK_EXECUTOR.execute(exportTask);
-            exportTask.setOnSucceeded((e) -> showDialog(exportTask.getValue()));
+            exportTask.setOnSucceeded(e -> showDialog(exportTask.getValue()));
         });
     }
 }

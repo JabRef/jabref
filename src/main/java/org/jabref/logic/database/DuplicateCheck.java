@@ -264,8 +264,8 @@ public class DuplicateCheck {
         if (stringOne.isEmpty() || stringTwo.isEmpty()) {
             return false;
         }
-        return (StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
-                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE)));
+        return StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
+                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE));
     }
 
     /**

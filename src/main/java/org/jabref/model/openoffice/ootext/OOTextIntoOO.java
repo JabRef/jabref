@@ -688,13 +688,13 @@ public class OOTextIntoOO {
                                                                   boolean relative,
                                                                   MyPropertyStack formatStack) {
         List<OOPair<String, Object>> settings = new ArrayList<>();
-        Optional<Short> oldValue = (formatStack
+        Optional<Short> oldValue = formatStack
                 .getPropertyValue(CHAR_ESCAPEMENT)
-                .map(e -> (short) e));
+                .map(e -> (short) e);
 
-        Optional<Byte> oldHeight = (formatStack
+        Optional<Byte> oldHeight = formatStack
                 .getPropertyValue(CHAR_ESCAPEMENT_HEIGHT)
-                .map(e -> (byte) e));
+                .map(e -> (byte) e);
 
         if (relative && (value.isPresent() || height.isPresent())) {
             double oldHeightFloat = oldHeight.orElse(CHAR_ESCAPEMENT_HEIGHT_DEFAULT) * 0.01;
