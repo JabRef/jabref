@@ -48,6 +48,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the preferences option to open the last edited files on startup to the 'General' tab. [#9808](https://github.com/JabRef/jabref/pull/9808)
 - We improved the recognition of DOIs when pasting a link containing a DOI on the maintable [#9864](https://github.com/JabRef/jabref/issues/9864s)
 - We reordered the preferences dialog. [#9839](https://github.com/JabRef/jabref/pull/9839)
+- We split the 'Import and Export' tab into 'Web Search' and 'Export'. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We moved the option to run JabRef in memory stick mode into the preferences dialog toolbar. [#9866](https://github.com/JabRef/jabref/pull/9866)
 
 ### Fixed
