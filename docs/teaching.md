@@ -106,7 +106,7 @@ Course [10915-01: Software Engineering](https://dmi.unibas.ch/de/studium/compute
 
 #### University of Stuttgart, Germany
 
-Course "Softwarepraktikum" as part of the [BSc Informatik](https://www.f05.uni-stuttgart.de/informatik/interessierte/bachelor/informatik/)
+Course "Softwarepraktikum" as part of the [BSc Informatik](https://www.uni-stuttgart.de/studium/bachelor/informatik-b.sc./)
 
 * Summary: A group of three students experienced the full software engineering process within one semester. They worked part-time for the project.
 * Successfully run in 2012

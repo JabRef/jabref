@@ -56,7 +56,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         backgroundTask.titleProperty().set(Localization.lang("Import by ID"));
         backgroundTask.showToUser(true);
         backgroundTask.onRunning(() -> dialogService.notify("%s".formatted(backgroundTask.messageProperty().get())));
-        backgroundTask.onFailure((exception) -> {
+        backgroundTask.onFailure(exception -> {
             String fetcherExceptionMessage = exception.getMessage();
 
             String msg;
@@ -76,7 +76,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                                    preferencesService, stateManager).execute();
             }
         });
-        backgroundTask.onSuccess((bibEntry) -> {
+        backgroundTask.onSuccess(bibEntry -> {
             Optional<BibEntry> result = bibEntry;
             if (result.isPresent()) {
                 final BibEntry entry = result.get();

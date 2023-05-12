@@ -113,7 +113,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 })
                 .withTooltip((type, name) -> {
                     if (type instanceof CustomEntryTypeViewModel) {
-                        return (Localization.lang("Remove entry type") + " " + name);
+                        return Localization.lang("Remove entry type") + " " + name;
                     } else {
                         return null;
                     }

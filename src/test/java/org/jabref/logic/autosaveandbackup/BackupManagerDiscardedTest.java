@@ -40,10 +40,11 @@ class BackupManagerDiscardedTest {
     private SaveConfiguration saveConfiguration;
     private PreferencesService preferencesService;
     private BibEntryTypesManager bibEntryTypesManager;
+    private Path backupDir;
 
     @BeforeEach
     public void setup(@TempDir Path tempDir) throws Exception {
-        Path backupDir = tempDir.resolve("backups");
+        this.backupDir = tempDir.resolve("backups");
         Files.createDirectories(backupDir);
 
         testBib = tempDir.resolve("test.bib");
@@ -84,14 +85,14 @@ class BackupManagerDiscardedTest {
     }
 
     private void makeBackup() {
-        backupManager.determineBackupPathForNewBackup().ifPresent(backupManager::performBackup);
+        backupManager.determineBackupPathForNewBackup(backupDir).ifPresent(path -> backupManager.performBackup(path));
     }
 
     @Test
     public void noDiscardingAChangeLeadsToNewerBackupBeReported() throws Exception {
         databaseModification();
         makeBackup();
-        assertTrue(BackupManager.backupFileDiffers(testBib));
+        assertTrue(BackupManager.backupFileDiffers(testBib, backupDir));
     }
 
     @Test
@@ -99,14 +100,14 @@ class BackupManagerDiscardedTest {
         databaseModification();
         makeBackup();
         saveDatabase();
-        assertFalse(BackupManager.backupFileDiffers(testBib));
+        assertFalse(BackupManager.backupFileDiffers(testBib, backupDir));
     }
 
     @Test
     public void discardingAChangeLeadsToNewerBackupToBeIgnored() throws Exception {
         databaseModification();
         makeBackup();
-        backupManager.discardBackup();
-        assertFalse(BackupManager.backupFileDiffers(testBib));
+        backupManager.discardBackup(backupDir);
+        assertFalse(BackupManager.backupFileDiffers(testBib, backupDir));
     }
 }

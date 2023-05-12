@@ -396,7 +396,7 @@ public class ArgumentProcessor {
                 }
             }
 
-            if (formatName.equals("bib")) {
+            if ("bib".equals(formatName)) {
                 // output a bib file as default or if
                 // provided exportFormat is "bib"
                 saveDatabase(new BibDatabase(matches), data[1]);
@@ -533,6 +533,7 @@ public class ArgumentProcessor {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SaveConfiguration saveConfiguration = new SaveConfiguration()
+                        .withMetadataSaveOrder(true)
                         .withReformatOnSave(preferencesService.getExportPreferences().shouldAlwaysReformatOnSave());
 
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(

@@ -423,7 +423,7 @@ public class DublinCoreExtractor {
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
-        SortedSet<Field> fields = new TreeSet<>(Comparator.comparing(field -> field.getName()));
+        SortedSet<Field> fields = new TreeSet<>(Comparator.comparing(Field::getName));
         fields.addAll(bibEntry.getFields());
         for (Field field : fields) {
             if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {

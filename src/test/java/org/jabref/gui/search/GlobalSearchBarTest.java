@@ -86,7 +86,7 @@ public class GlobalSearchBarTest {
         }
 
         // Set the focus to another node to trigger the listener and finally record the query.
-        DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> hBox.requestFocus());
+        DefaultTaskExecutor.runAndWaitInJavaFXThread(hBox::requestFocus);
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
         assertEquals(List.of("Smith"), lastSearchHistory);
@@ -101,7 +101,7 @@ public class GlobalSearchBarTest {
         var searchFieldRoboto = robot.clickOn(searchField);
         searchFieldRoboto.write(searchQuery);
 
-        DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> hBox.requestFocus());
+        DefaultTaskExecutor.runAndWaitInJavaFXThread(hBox::requestFocus);
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
         assertEquals(List.of(), lastSearchHistory);

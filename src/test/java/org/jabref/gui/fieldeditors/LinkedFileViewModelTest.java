@@ -259,7 +259,7 @@ class LinkedFileViewModelTest {
         List<LinkedFile> linkedFiles = entry.getFiles();
 
         for (LinkedFile file: linkedFiles) {
-            if (file.getLink().equalsIgnoreCase("Misc/asdf.html")) {
+            if ("Misc/asdf.html".equalsIgnoreCase(file.getLink())) {
                 assertEquals("URL", file.getFileType());
                 return;
             }
@@ -345,7 +345,7 @@ class LinkedFileViewModelTest {
         // Loop through downloaded files to check for filetype='pdf'
         List<LinkedFile> linkedFiles = entry.getFiles();
         for (LinkedFile files : linkedFiles) {
-            if (files.getLink().equalsIgnoreCase("Misc/asdf.pdf")) {
+            if ("Misc/asdf.pdf".equalsIgnoreCase(files.getLink())) {
                 assertEquals("pdf", files.getFileType().toLowerCase());
                 return;
             }

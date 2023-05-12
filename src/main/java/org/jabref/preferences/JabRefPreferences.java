@@ -100,6 +100,7 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
@@ -192,6 +193,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SIZE_X = "mainWindowSizeX";
     public static final String POS_Y = "mainWindowPosY";
     public static final String POS_X = "mainWindowPosX";
+
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
@@ -200,6 +202,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String WORKING_DIRECTORY = "workingDirectory";
+    public static final String BACKUP_DIRECTORY = "backupDirectory";
+    public static final String CREATE_BACKUP = "createBackup";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
@@ -587,6 +591,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put(WORKING_DIRECTORY, USER_HOME);
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
+
+        defaults.put(CREATE_BACKUP, Boolean.TRUE);
+
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(PREFS_EXPORT_PATH, USER_HOME);
@@ -2113,8 +2120,10 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(DOWNLOAD_LINKED_FILES),
                 getBoolean(FULLTEXT_INDEX_LINKED_FILES),
                 Path.of(get(WORKING_DIRECTORY)),
-                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES))
-        );
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
+                getBoolean(CREATE_BACKUP),
+                // We choose the data directory, because a ".bak" file should survive cache cleanups
+                getPath(BACKUP_DIRECTORY, BackupFileUtil.getAppDataBackupDir()));
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
@@ -2125,6 +2134,8 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
         filePreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
                 put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(filePreferences.getExternalFileTypes())));
+        EasyBind.listen(filePreferences.createBackupProperty(), (obs, oldValue, newValue) -> putBoolean(CREATE_BACKUP, newValue));
+        EasyBind.listen(filePreferences.backupDirectoryProperty(), (obs, oldValue, newValue) -> put(BACKUP_DIRECTORY, newValue.toString()));
 
         return filePreferences;
     }
@@ -2228,7 +2239,7 @@ public class JabRefPreferences implements PreferencesService {
         List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
 
         for (var column : sortOrder) {
-            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            boolean descending = column.getSortType() == SortType.DESCENDING;
             criteria.add(new SaveOrder.SortCriterion(
                     FieldFactory.parseField(column.getQualifier()),
                     descending));

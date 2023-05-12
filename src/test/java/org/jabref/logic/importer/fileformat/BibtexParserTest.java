@@ -975,7 +975,7 @@ class BibtexParserTest {
         BibtexString first = iterator.next();
         BibtexString second = iterator.next();
         // Sort them because we can't be sure about the order
-        if (first.getName().equals("adieu")) {
+        if ("adieu".equals(first.getName())) {
             BibtexString tmp = first;
             first = second;
             second = tmp;

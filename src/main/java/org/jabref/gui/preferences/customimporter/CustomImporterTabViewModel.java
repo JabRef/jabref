@@ -90,7 +90,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
         if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
             boolean isArchive = FileUtil.getFileExtension(selectedFile.get())
-                                        .filter(extension -> extension.equalsIgnoreCase("jar") || extension.equalsIgnoreCase("zip"))
+                                        .filter(extension -> "jar".equalsIgnoreCase(extension) || "zip".equalsIgnoreCase(extension))
                                         .isPresent();
 
             if (isArchive) {

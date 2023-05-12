@@ -243,7 +243,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
     private BufferedReader getInputStream(String urlString) {
         try {
-            URL url = new URL((urlString));
+            URL url = new URL(urlString);
             return new BufferedReader(new InputStreamReader(url.openStream()));
         } catch (IOException e) {
             LOGGER.debug("Wrong URL:", e);
