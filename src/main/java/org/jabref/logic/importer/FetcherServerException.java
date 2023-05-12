@@ -8,7 +8,7 @@ public class FetcherServerException extends FetcherException {
 
     public FetcherServerException(String errorMessage, String localizedMessage, Throwable cause, int statusCode) {
         super(errorMessage, localizedMessage, cause);
-		this.statusCode = statusCode;
+        this.statusCode = statusCode;
 	}
 
 	public FetcherServerException(String errorMessage, Throwable cause) {
