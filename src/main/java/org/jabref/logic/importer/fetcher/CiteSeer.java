@@ -1,15 +1,14 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -18,10 +17,12 @@ import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
-import org.jabref.logic.importer.fileformat.CoinsParser;
+import org.jabref.logic.importer.fileformat.CiteSeerParser;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -31,6 +32,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class CiteSeer implements SearchBasedParserFetcher {
+
+    private static final String API_URL = "https://citeseerx.ist.psu.edu/api/search";
 
     public CiteSeer() {
     }
@@ -46,31 +49,108 @@ public class CiteSeer implements SearchBasedParserFetcher {
     }
 
     @Override
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+        // ADR-0014
+        URL urlForQuery;
+        try {
+            urlForQuery = getURLForQuery(luceneQuery);
+        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
+            throw new FetcherException("Search URI crafted from complex search query is malformed", e);
+        }
+
+        String payload = getPayloadString(new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        return getBibEntries(urlForQuery, payload);
+    }
+
+    private List<BibEntry> getBibEntries(URL urlForQuery, String payload) throws FetcherException {
+        try {
+            HttpURLConnection httpConn = (HttpURLConnection) urlForQuery.openConnection();
+            httpConn.setRequestProperty("authority", "citeseerx.ist.psu.edu");
+            httpConn.setRequestProperty("accept", "application/json, text/plain, */*");
+            httpConn.setRequestProperty("content-type", "application/json;charset=UTF-8");
+            httpConn.setRequestProperty("origin", "https://citeseerx.ist.psu.edu");
+            httpConn.setDoOutput(true);
+
+            OutputStreamWriter writer = new OutputStreamWriter(httpConn.getOutputStream());
+            writer.write(payload);
+            writer.flush();
+            writer.close();
+
+            httpConn.getOutputStream().close();
+            InputStream stream = httpConn.getInputStream();
+
+//            printStream(stream);
+            List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
+//            fetchedEntries.forEach(this::doPostCleanup);
+            return fetchedEntries;
+        } catch (IOException ex) {
+            throw new FetcherException("A network error occurred while fetching CiteSeer response, ", ex);
+        } catch (ParseException ex) {
+            throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries, ", ex);
+        }
+    }
+
+//    private void printStream(InputStream stream) {
+//      Scanner s = new Scanner(stream).useDelimiter("\\A");
+//      String response = s.hasNext() ? s.next() : "";
+//      System.out.println(response);
+//    }
+
+    // attempted implementation with URLDownload class, running into issues with POST request
+//    private List<BibEntry> getBibEntries(URL urlForQuery, String payload) throws FetcherException {
+//        try {
+//            URLDownload urlDownload = new URLDownload(urlForQuery);
+//            urlDownload.addHeader("authority", "citeseerx.ist.psu.edu");
+//            urlDownload.addHeader("accept", "application/json, text/plain, */*");
+//            urlDownload.addHeader("content-type", "application/json;charset=UTF-8");
+//            urlDownload.addHeader("origin", "https://citeseerx.ist.psu.edu");
+//            urlDownload.setPostData(payload);
+//
+//            HttpURLConnection httpConn = (HttpURLConnection) urlDownload.openConnection();
+//
+////            OutputStreamWriter writer = new OutputStreamWriter(httpConn.getOutputStream());
+////            writer.write(payload);
+////            writer.flush();
+////            writer.close();
+//
+//            httpConn.getOutputStream().close();
+//            InputStream stream = httpConn.getInputStream();
+//
+//            List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
+//            fetchedEntries.forEach(this::doPostCleanup);
+//            return fetchedEntries;
+//        } catch (IOException ex) {
+//            throw new FetcherException("A network error occurred while fetching CiteSeer response, ", ex);
+//        } catch (ParseException ex) {
+//            throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries, ", ex);
+//        }
+//    }
+
+    @Override
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://citeseer.ist.psu.edu/search");
-        uriBuilder.addParameter("sort", "rlv"); // Sort by relevance
-        uriBuilder.addParameter("q", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Query
-        uriBuilder.addParameter("t", "doc"); // Type: documents
-        // uriBuilder.addParameter("start", "0"); // Start index (not supported at the moment)
-        return uriBuilder.build().toURL();
+        return new URIBuilder(API_URL).build().toURL();
+    }
+
+    private String getPayloadString(String queryString) {
+        String payload = """
+            '{'
+                  \"queryString\":\"{0}\",
+                  \"page\":1,
+                  \"pageSize\":20,
+                   \"sortBy\":\"relevance\",
+                  \"must_have_pdf\":\"true\",
+                  \"yearStart\":1913,
+                  \"yearEnd\":2023,
+                  \"author\":[],
+                  \"publisher\":[]
+            '}'
+            """;
+        return MessageFormat.format(payload, queryString);
     }
 
     @Override
     public Parser getParser() {
-        // MathSciNet returns COinS result embedded in HTML
-        // So we extract the data string from the <span class="Z3988" title="<data>"></span> tags and pass the content to the COinS parser
-        return inputStream -> {
-            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
-            List<BibEntry> entries = new ArrayList<>();
-            CoinsParser parser = new CoinsParser();
-            Pattern pattern = Pattern.compile("<span class=\"Z3988\" title=\"(.*)\"></span>");
-            Matcher matcher = pattern.matcher(response);
-            while (matcher.find()) {
-                String encodedDataString = matcher.group(1);
-                entries.addAll(parser.parseEntries(encodedDataString));
-            }
-            return entries;
-        };
+      return new CiteSeerParser();
     }
 
     @Override
