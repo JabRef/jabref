@@ -38,7 +38,6 @@ import com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Importer for the Endnote XML format.
  * <p>
@@ -53,9 +52,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     public EndnoteXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
     }
+
     private static String join(List<String> list, String string) {
         return Joiner.on(string).join(list);
     }
+
     @Override
     public String getName() {
         return "EndNote XML";
@@ -114,203 +115,82 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 reader.next();
                 if (isStartXMLEvent(reader)){
                     String elementName = reader.getName().getLocalPart();
-                    System.out.println(elementName);
                     if (elementName.equals("record")){
-                        parseRecord(reader,bibItems,elementName);
+                         parseRecord(reader,bibItems,elementName);
                     }
                 }
             }
-//            return ParserResult.fromErrorMessage("testing");
-//            if (unmarshalledObject instanceof Xml) {
-//                // Check whether we have an article set, an article, a book article or a book article set
-//                Xml root = (Xml) unmarshalledObject;
-//                List<BibEntry> bibEntries = root
-//                        .getRecords().getRecord()
-//                        .stream()
-//                        .map(this::parseRecord)
-//                        .collect(Collectors.toList());
-//
-//                return new ParserResult(bibEntries);
-//            } else {
-//                return ParserResult.fromErrorMessage("File does not start with xml tag.");
-//            }
+
         } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
     }
-
     private void parseRecord(XMLStreamReader reader, List<BibEntry> bibItems, String startElement)
-            throws XMLStreamException{
+        throws XMLStreamException{
+
         Map<Field, String> fields = new HashMap<>();
         EntryType entryType = StandardEntryType.Article;
+
+        List<String> keywords = new ArrayList<>();
 
         while (reader.hasNext()){
             reader.next();
             if (isStartXMLEvent(reader)){
+
                 String elementName = reader.getName().getLocalPart();
+                System.out.println(elementName);
                 switch(elementName){
                     case "ref-type" -> {
                         String type = reader.getAttributeValue(null,"name");
                         entryType = convertRefNameToType(type);
                     }
                     case "contributors" -> {
-                        //parseContributors
-                        handleAuthorList(reader,fields,startElement);
+                        handleAuthorList(reader,fields,elementName);
                     }
                     case "titles" -> {
                         //parseTitles
+                        handleTitles(reader, fields,elementName);
                     }
-
                     case "pages" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isStartXMLEvent(reader)) {
-                                String tag = reader.getName().getLocalPart();
-                                if (tag.equals("style")){
-                                    reader.next();
-                                    if (isCharacterXMLEvent(reader)) {
-                                        putIfValueNotNull(fields,StandardField.PAGES,reader.getText());
-                                    }
-                                }
-                            }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("pages")) {
-                                break;
-                            }
-                        }
+                        parseStyleContent(reader, fields,StandardField.PAGES, elementName);
                     }
                     case "volume" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isStartXMLEvent(reader)) {
-                                String tag = reader.getName().getLocalPart();
-                                if (tag.equals("style")){
-                                    reader.next();
-                                    if (isCharacterXMLEvent(reader)) {
-                                        putIfValueNotNull(fields,StandardField.VOLUME,reader.getText());
-                                    }
-                                }
-                            }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("volume")) {
-                                break;
-                            }
-                        }
+                        parseStyleContent(reader, fields,StandardField.VOLUME, elementName);
                     }
                     case "number" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isStartXMLEvent(reader)) {
-                                String tag = reader.getName().getLocalPart();
-                                if (tag.equals("style")){
-                                    reader.next();
-                                    if (isCharacterXMLEvent(reader)) {
-                                        putIfValueNotNull(fields,StandardField.NUMBER,reader.getText());
-                                    }
-                                }
-                            }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("number")) {
-                                break;
-                            }
-                        }
+                        parseStyleContent(reader, fields,StandardField.NUMBER, elementName);
                     }
                     case "dates" -> {
-                        // parseDate
+                        parseYear(reader, fields);
                     }
-
                     case "notes" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isStartXMLEvent(reader)) {
-                                String tag = reader.getName().getLocalPart();
-                                if (tag.equals("style")){
-                                    reader.next();
-                                    if (isCharacterXMLEvent(reader)) {
-                                        putIfValueNotNull(fields,StandardField.NOTE,reader.getText().trim());
-                                    }
-                                }
-                            }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("notes")) {
-                                break;
-                            }
-                        }
+                        parseStyleContent(reader, fields,StandardField.NOTE, elementName);
                     }
                     case "urls" -> {
-                        handleUrlList(reader, fields, startElement);
-                        System.out.println("urls");
+                        //parseUrls
+
+                    }
+                    case "keywords" -> {
+                        handleKeywordsList(reader,keywords,elementName);
                     }
                     case "abstract" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isStartXMLEvent(reader)) {
-                                String tag = reader.getName().getLocalPart();
-                                if (tag.equals("style")){
-                                    reader.next();
-                                    if (isCharacterXMLEvent(reader)) {
-                                        putIfValueNotNull(fields,StandardField.ABSTRACT,reader.getText().trim());
-                                    }
-                                }
-                            }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("abstract")) {
-                                break;
-                            }
-                        }
+                        parseStyleContent(reader, fields,StandardField.ABSTRACT, elementName);
                     }
                     case "isbn" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isStartXMLEvent(reader)) {
-                                String tag = reader.getName().getLocalPart();
-                                if (tag.equals("style")){
-                                    reader.next();
-                                    if (isCharacterXMLEvent(reader)) {
-                                        putIfValueNotNull(fields,StandardField.ISBN,clean(reader.getText()));
-                                    }
-                                }
-                            }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("isbn")) {
-                                break;
-                            }
-                        }
+                        parseStyleContent(reader, fields,StandardField.ISBN, elementName);
                     }
                     case "electronic-resource-num" -> {
-                        //parse DOI
+                        parseStyleContent(reader, fields,StandardField.DOI, elementName);
                     }
                     case "publisher" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isStartXMLEvent(reader)) {
-                                String tag = reader.getName().getLocalPart();
-                                if (tag.equals("style")){
-                                    reader.next();
-                                    if (isCharacterXMLEvent(reader)) {
-                                        putIfValueNotNull(fields,StandardField.PUBLISHER,reader.getText());
-                                    }
-                                }
-                            }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("publisher")) {
-                                break;
-                            }
-                        }
+                        parseStyleContent(reader, fields,StandardField.PUBLISHER, elementName);
+
                     }
                     case "label" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isStartXMLEvent(reader)) {
-                                String tag = reader.getName().getLocalPart();
-                                if (tag.equals("style")){
-                                    reader.next();
-                                    if (isCharacterXMLEvent(reader)) {
-                                        putIfValueNotNull(fields,new UnknownField("endnote-label"),reader.getText());
-                                    }
-                                }
-                            }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("label")) {
-                                break;
-                            }
-                        }
+                        parseStyleContent(reader, fields, new UnknownField("endnote-label"), elementName);
                     }
-
                 }
             }
             if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
@@ -319,61 +199,14 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         }
 
         BibEntry entry = new BibEntry(entryType);
+        entry.putKeywords(keywords, preferences.bibEntryPreferences().getKeywordSeparator());
+
         entry.setField(fields);
         for (Map.Entry<Field,String> f: fields.entrySet()){
             System.out.println(f.getKey().getName() + " : " + f.getValue());
         }
         bibItems.add(entry);
 
-    }
-    private void handleUrlList(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "related-urls" -> {
-                        parseRelatedUrls(reader, fields);
-                        System.out.println("related-urls");
-                    }
-                    case "pdf-urls" -> {
-                        reader.next();
-                        if(isCharacterXMLEvent(reader)) {
-                            fields.put(StandardField.FILE, reader.getText());
-                            System.out.println("pdf-urls");
-                        }
-                    }
-                }
-            }
-
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
-                break;
-            }
-        }
-
-    }
-    private void parseRelatedUrls(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
-
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                System.out.println("elementName" + elementName);
-                if (elementName.equals("style")) {
-                    reader.next();
-//                    if ("style".equals(reader.getName().getLocalPart())) {
-//                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            fields.put(StandardField.URL, reader.getText());
-                        }
-//                    }
-                }
-            }
-
-            if (isEndXMLEvent(reader) && "related-urls".equals(reader.getName().getLocalPart())) {
-                break;
-            }
-        }
     }
 
     private static EntryType convertRefNameToType(String refName) {
@@ -398,25 +231,26 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 switch (elementName) {
                     case "author" -> {
                         parseAuthor(reader, authorNames);
-                        System.out.println("test");
                     }
+
                 }
             }
 
             if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                System.out.println("contributors end");
                 break;
             }
         }
 
         fields.put(StandardField.AUTHOR, join(authorNames, " and "));
     }
+
     private void parseAuthor(XMLStreamReader reader, List<String> authorNames) throws XMLStreamException {
 
         while (reader.hasNext()) {
             reader.next();
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
-                System.out.println(elementName + " Tst");
                 switch (elementName) {
                     case "style" -> {
                         reader.next();
@@ -428,6 +262,137 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             }
 
             if (isEndXMLEvent(reader) && "author".equals(reader.getName().getLocalPart())) {
+                break;
+            }
+        }
+    }
+
+    private void parseStyleContent (XMLStreamReader reader, Map<Field,String> fields, Field field, String elementName) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String tag = reader.getName().getLocalPart();
+                if (tag.equals("style")){
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
+                        if (elementName.equals("abstract")||elementName.equals("electronic-resource-num")||elementName.equals("note")){
+                            putIfValueNotNull(fields, field, reader.getText().trim());
+                        }else if (elementName.equals("isbn")  || elementName.equals("secondary-title")){
+                            putIfValueNotNull(fields, field, clean(reader.getText()));
+                        }else{
+                            putIfValueNotNull(fields, field, reader.getText());
+                        }
+                    }
+                }
+            }
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(elementName)) {
+                break;
+            }
+        }
+    }
+
+    private void parseYear(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        System.out.println( " Tst");
+        while (reader.hasNext()) {
+            reader.next();
+//            System.out.println( " Tst");
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                System.out.println(elementName + " Tst");
+                switch (elementName) {
+                    case "style" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            putIfValueNotNull(fields, StandardField.YEAR, reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && "year".equals(reader.getName().getLocalPart())) {
+                break;
+            }
+        }
+    }
+    private void handleKeywordsList(XMLStreamReader reader, List<String> keywords, String startElement) throws XMLStreamException {
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "keyword" -> {
+                        parseKeyword(reader, keywords);
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                System.out.println("keywords end");
+                break;
+            }
+        }
+    }
+    private void parseKeyword(XMLStreamReader reader, List<String> keywords) throws XMLStreamException {
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "style" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            if (reader.getText() != null){
+                                keywords.add(reader.getText());
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && "keyword".equals(reader.getName().getLocalPart())) {
+                break;
+            }
+        }
+    }
+    private void handleTitles(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "title" -> {
+//                        parseKeyword(reader, keywords);
+                        List<String> titleStyleContent = new ArrayList<>();
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isStartXMLEvent(reader)) {
+                                String tag = reader.getName().getLocalPart();
+                                if (tag.equals("style")){
+                                    reader.next();
+                                    if (isCharacterXMLEvent(reader)) {
+                                        if (reader.getText() != null){
+                                            titleStyleContent.add(reader.getText());
+                                        }
+                                    }
+                                }
+                            }
+                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(elementName)) {
+                                break;
+                            }
+                        }
+                        putIfValueNotNull(fields, StandardField.TITLE, join(titleStyleContent, ""));
+                    }
+                    case "secondary-title" ->{
+                        parseStyleContent(reader, fields, StandardField.JOURNAL,elementName);
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                System.out.println("titles end");
                 break;
             }
         }
@@ -457,7 +422,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         return reader.getEventType() == XMLEvent.END_ELEMENT;
     }
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) {
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
             return importDatabase(
                     new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
