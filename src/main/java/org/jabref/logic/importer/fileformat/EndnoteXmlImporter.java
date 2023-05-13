@@ -47,7 +47,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EndnoteXmlImporter.class);
     private final ImportFormatPreferences preferences;
-//    private Unmarshaller unmarshaller;
 
     public EndnoteXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
@@ -98,7 +97,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-//            Object unmarshalledObject = unmarshallRoot(input);
             XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
             // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
@@ -111,7 +109,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
 
             while (reader.hasNext()){
-//                System.out.println(reader);
                 reader.next();
                 if (isStartXMLEvent(reader)){
                     String elementName = reader.getName().getLocalPart();
@@ -131,16 +128,14 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         throws XMLStreamException{
 
         Map<Field, String> fields = new HashMap<>();
-        EntryType entryType = StandardEntryType.Article;
+        EntryType entryType = StandardEntryType.Article; //default value
 
         List<String> keywords = new ArrayList<>();
 
         while (reader.hasNext()){
             reader.next();
             if (isStartXMLEvent(reader)){
-
                 String elementName = reader.getName().getLocalPart();
-                System.out.println(elementName);
                 switch(elementName){
                     case "ref-type" -> {
                         String type = reader.getAttributeValue(null,"name");
@@ -150,7 +145,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                         handleAuthorList(reader,fields,elementName);
                     }
                     case "titles" -> {
-                        //parseTitles
                         handleTitles(reader, fields,elementName);
                     }
                     case "pages" -> {
@@ -169,7 +163,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                         parseStyleContent(reader, fields,StandardField.NOTE, elementName);
                     }
                     case "urls" -> {
-                        //parseUrls
 
                     }
                     case "keywords" -> {
@@ -206,7 +199,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             System.out.println(f.getKey().getName() + " : " + f.getValue());
         }
         bibItems.add(entry);
-
     }
 
     private static EntryType convertRefNameToType(String refName) {
@@ -244,7 +236,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
         fields.put(StandardField.AUTHOR, join(authorNames, " and "));
     }
-
     private void parseAuthor(XMLStreamReader reader, List<String> authorNames) throws XMLStreamException {
 
         while (reader.hasNext()) {
@@ -266,7 +257,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             }
         }
     }
-
     private void parseStyleContent (XMLStreamReader reader, Map<Field,String> fields, Field field, String elementName) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
@@ -275,7 +265,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 if (tag.equals("style")){
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
-                        if (elementName.equals("abstract")||elementName.equals("electronic-resource-num")||elementName.equals("note")){
+                        if (elementName.equals("abstract")||elementName.equals("electronic-resource-num")||elementName.equals("notes")){
                             putIfValueNotNull(fields, field, reader.getText().trim());
                         }else if (elementName.equals("isbn")  || elementName.equals("secondary-title")){
                             putIfValueNotNull(fields, field, clean(reader.getText()));
@@ -290,15 +280,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             }
         }
     }
-
     private void parseYear(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
-        System.out.println( " Tst");
         while (reader.hasNext()) {
             reader.next();
-//            System.out.println( " Tst");
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
-                System.out.println(elementName + " Tst");
                 switch (elementName) {
                     case "style" -> {
                         reader.next();
@@ -364,7 +350,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
                     case "title" -> {
-//                        parseKeyword(reader, keywords);
                         List<String> titleStyleContent = new ArrayList<>();
                         while (reader.hasNext()) {
                             reader.next();
@@ -374,7 +359,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                     reader.next();
                                     if (isCharacterXMLEvent(reader)) {
                                         if (reader.getText() != null){
-                                            titleStyleContent.add(reader.getText());
+                                            titleStyleContent.add((reader.getText()));
                                         }
                                     }
                                 }
@@ -383,7 +368,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                 break;
                             }
                         }
-                        putIfValueNotNull(fields, StandardField.TITLE, join(titleStyleContent, ""));
+                        putIfValueNotNull(fields, StandardField.TITLE, clean(join(titleStyleContent, "")));
                     }
                     case "secondary-title" ->{
                         parseStyleContent(reader, fields, StandardField.JOURNAL,elementName);
