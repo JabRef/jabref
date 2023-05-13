@@ -169,7 +169,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
     }
 
     private Author toAuthor(String author) {
-        return AuthorList.parse((author)).getAuthor(0);
+        return AuthorList.parse(author).getAuthor(0);
     }
 
     private String namePreprocessing(String name) {

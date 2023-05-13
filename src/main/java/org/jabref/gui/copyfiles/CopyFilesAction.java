@@ -47,7 +47,7 @@ public class CopyFilesAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(preferencesService.getImportExportPreferences().getExportWorkingDirectory())
+                .withInitialDirectory(preferencesService.getExportPreferences().getExportWorkingDirectory())
                 .build();
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
         exportPath.ifPresent(path -> {
@@ -57,7 +57,7 @@ public class CopyFilesAction extends SimpleCommand {
                     Localization.lang("Copy linked files to folder..."),
                     exportTask);
             Globals.TASK_EXECUTOR.execute(exportTask);
-            exportTask.setOnSucceeded((e) -> showDialog(exportTask.getValue()));
+            exportTask.setOnSucceeded(e -> showDialog(exportTask.getValue()));
         });
     }
 }

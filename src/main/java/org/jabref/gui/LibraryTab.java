@@ -289,7 +289,7 @@ public class LibraryTab extends Tab {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
             autosaveManager.registerListener(new AutosaveUiManager(this));
         }
-        if (isDatabaseReadyForBackup(bibDatabaseContext)) {
+        if (isDatabaseReadyForBackup(bibDatabaseContext) && preferencesService.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(bibDatabaseContext, Globals.entryTypesManager, preferencesService);
         }
     }
@@ -297,7 +297,7 @@ public class LibraryTab extends Tab {
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED)
                 || ((context.getLocation() == DatabaseLocation.LOCAL)
-                && preferencesService.getImportExportPreferences().shouldAutoSave()))
+                && preferencesService.getExportPreferences().shouldAutoSave()))
                 && context.getDatabasePath().isPresent();
     }
 
@@ -313,7 +313,7 @@ public class LibraryTab extends Tab {
      * Example: *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
-        boolean isAutosaveEnabled = preferencesService.getImportExportPreferences().shouldAutoSave();
+        boolean isAutosaveEnabled = preferencesService.getExportPreferences().shouldAutoSave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -578,6 +578,7 @@ public class LibraryTab extends Tab {
     public void showAndEdit(BibEntry entry) {
         showBottomPane(BasePanelMode.SHOWING_EDITOR);
 
+        // We use != instead of equals because of performance reasons
         if (entry != getShowing()) {
             entryEditor.setEntry(entry);
             showing = entry;
@@ -705,7 +706,7 @@ public class LibraryTab extends Tab {
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         AutosaveManager.shutdown(bibDatabaseContext);
-        BackupManager.shutdown(bibDatabaseContext);
+        BackupManager.shutdown(bibDatabaseContext, preferencesService.getFilePreferences().getBackupDirectory(), preferencesService.getFilePreferences().shouldCreateBackup());
     }
 
     /**

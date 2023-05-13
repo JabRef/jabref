@@ -39,11 +39,11 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                             SuggestionProvider<?> suggestionProvider,
                             FieldCheckers fieldCheckers,
                             PreferencesService preferences) {
-        if (StandardField.DOI.equals(field)) {
+        if (StandardField.DOI == field) {
             this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
-        } else if (StandardField.ISBN.equals(field)) {
+        } else if (StandardField.ISBN == field) {
             this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
-        } else if (StandardField.EPRINT.equals(field)) {
+        } else if (StandardField.EPRINT == field) {
             this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         } else {
             throw new IllegalStateException(String.format("Unable to instantiate a view model for identifier field editor '%s'", field.getDisplayName()));
@@ -86,12 +86,12 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void fetchInformationByIdentifier() {
-        entry.ifPresent(bibEntry -> viewModel.fetchBibliographyInformation(bibEntry));
+        entry.ifPresent(viewModel::fetchBibliographyInformation);
     }
 
     @FXML
     private void lookupIdentifier() {
-        entry.ifPresent(bibEntry -> viewModel.lookupIdentifier(bibEntry));
+        entry.ifPresent(viewModel::lookupIdentifier);
     }
 
     @FXML

@@ -24,7 +24,7 @@ public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewMod
     // https://en.wikipedia.org/wiki/Lapsed_listener_problem
     private MapChangeListener<Field, String> eprintTypeFieldListener = change -> {
         Field changedField = change.getKey();
-        if (StandardField.EPRINTTYPE.equals(changedField)) {
+        if (StandardField.EPRINTTYPE == changedField) {
             updateIdentifier();
         }
     };

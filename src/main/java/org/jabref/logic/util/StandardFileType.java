@@ -10,7 +10,6 @@ import org.jabref.model.util.OptionalUtil;
  */
 public enum StandardFileType implements FileType {
 
-    BIBTEXML("BibTeXML", "bibx", "xml"),
     ENDNOTE("Endnote", "ref", "enw"),
     ISI("Isi", "isi", "txt"),
     MEDLINE("Medline", "nbib", "xml"),
@@ -73,7 +72,7 @@ public enum StandardFileType implements FileType {
         var exts = Arrays.asList(extensions);
 
         return OptionalUtil.orElse(Arrays.stream(StandardFileType.values())
-                                         .filter(field -> field.getExtensions().stream().anyMatch(elem -> exts.contains(elem)))
+                                         .filter(field -> field.getExtensions().stream().anyMatch(exts::contains))
                                          .findAny(),
                                    new UnknownFileType(extensions));
     }

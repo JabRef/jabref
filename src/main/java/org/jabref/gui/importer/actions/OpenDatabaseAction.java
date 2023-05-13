@@ -192,9 +192,10 @@ public class OpenDatabaseAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
         preferencesService.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
+        Path backupDir = preferencesService.getFilePreferences().getBackupDirectory();
 
         ParserResult parserResult = null;
-        if (BackupManager.backupFileDiffers(fileToLoad)) {
+        if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
             parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService).orElse(null);

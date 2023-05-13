@@ -142,7 +142,7 @@ public class JabRefGUI {
 
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && preferencesService.getImportExportPreferences().shouldOpenLastEdited()) {
+        if (!isBlank && preferencesService.getGeneralPreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
 
@@ -279,7 +279,7 @@ public class JabRefGUI {
             return;
         }
 
-        List<Path> filesToOpen = lastFiles.stream().map(file -> Path.of(file)).collect(Collectors.toList());
+        List<Path> filesToOpen = lastFiles.stream().map(Path::of).collect(Collectors.toList());
         getMainFrame().getOpenDatabaseAction().openFiles(filesToOpen);
     }
 

@@ -76,14 +76,14 @@ public class RangeOverlapBetween {
                 }
 
                 boolean equal = UnoTextRange.compareStartsThenEndsUnsafe(cmp, aRange, bRange) == 0;
-                boolean touching = (abEndToStart == 0 || baEndToStart == 0);
+                boolean touching = abEndToStart == 0 || baEndToStart == 0;
 
                 // In case of two equal collapsed ranges there is an ambiguity : TOUCH or EQUAL_RANGE ?
                 //
                 // We return EQUAL_RANGE
-                RangeOverlapKind kind = (equal ? RangeOverlapKind.EQUAL_RANGE
+                RangeOverlapKind kind = equal ? RangeOverlapKind.EQUAL_RANGE
                         : (touching ? RangeOverlapKind.TOUCH
-                        : RangeOverlapKind.OVERLAP));
+                        : RangeOverlapKind.OVERLAP);
 
                 List<V> valuesForOverlappingRanges = new ArrayList<>();
                 valuesForOverlappingRanges.add(aHolder);

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
@@ -82,7 +82,7 @@ public class BibtexParser implements Parser {
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldContentFormatterPreferences());
+        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
         metaDataParser = new MetaDataParser(fileMonitor);
     }
 
@@ -91,8 +91,6 @@ public class BibtexParser implements Parser {
      * <p>
      * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
      *
-     * @param bibtexString
-     * @param fileMonitor
      * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
      * @throws ParseException
      */
@@ -355,8 +353,8 @@ public class BibtexParser implements Parser {
             return purgeEOFCharacters(result);
         } else if (result.contains(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
             return purge(result, BibtexDatabaseWriter.DATABASE_ID_PREFIX);
-        } else if (result.contains(SavePreferences.ENCODING_PREFIX)) {
-            return purge(result, SavePreferences.ENCODING_PREFIX);
+        } else if (result.contains(SaveConfiguration.ENCODING_PREFIX)) {
+            return purge(result, SaveConfiguration.ENCODING_PREFIX);
         } else {
             return result;
         }
@@ -617,7 +615,7 @@ public class BibtexParser implements Parser {
                 // for users if JabRef did not accept it.
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
-                } else if (StandardField.KEYWORDS.equals(field)) {
+                } else if (StandardField.KEYWORDS == field) {
                     // multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
@@ -773,8 +771,6 @@ public class BibtexParser implements Parser {
     /**
      * returns a new <code>StringBuilder</code> which corresponds to <code>toRemove</code> without whitespaces
      *
-     * @param toRemove
-     * @return
      */
     private StringBuilder removeWhitespaces(StringBuilder toRemove) {
         StringBuilder result = new StringBuilder();
@@ -791,7 +787,6 @@ public class BibtexParser implements Parser {
     /**
      * pushes buffer back into input
      *
-     * @param stringBuilder
      * @throws IOException can be thrown if buffer is bigger than LOOKAHEAD
      */
     private void unreadBuffer(StringBuilder stringBuilder) throws IOException {

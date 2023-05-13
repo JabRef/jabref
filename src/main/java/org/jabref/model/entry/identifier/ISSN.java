@@ -17,12 +17,12 @@ public class ISSN {
 
     public boolean isValidFormat() {
         Matcher issnMatcher = ISSN_PATTERN.matcher(issnString);
-        return (issnMatcher.matches());
+        return issnMatcher.matches();
     }
 
     public boolean isCanBeCleaned() {
         Matcher issnNoDashMatcher = ISSN_PATTERN_NODASH.matcher(issnString);
-        return (issnNoDashMatcher.matches());
+        return issnNoDashMatcher.matches();
     }
 
     public String getCleanedISSN() {
@@ -46,6 +46,6 @@ public class ISSN {
         if ((control == 'x') || (control == 'X')) {
             control = '9' + 1;
         }
-        return (((((sum % 11) + control) - '0') == 11) || ((sum % 11) == 0));
+        return ((((sum % 11) + control) - '0') == 11) || ((sum % 11) == 0);
     }
 }

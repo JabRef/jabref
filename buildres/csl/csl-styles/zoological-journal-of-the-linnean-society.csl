@@ -9,8 +9,8 @@
     <link href="https://academic.oup.com/zoolinnean/pages/General_Instructions" rel="documentation"/>
     <author>
       <name>Martin R. Smith</name>
-      <email>martins@gmail.com</email>
-      <uri>http://sn.im/martin-smith</uri>
+      <email>martin.smith@durham.ac.uk</email>
+      <uri>https://smithlabdurham.github.io/</uri>
     </author>
     <category citation-format="author-date"/>
     <category field="biology"/>
@@ -83,9 +83,9 @@
         <date variable="issued">
           <date-part name="year"/>
         </date>
-        <group>
+        <group delimiter=" ">
           <label variable="locator" form="short"/>
-          <text variable="locator" prefix=" "/>
+          <text variable="locator"/>
         </group>
       </group>
     </layout>

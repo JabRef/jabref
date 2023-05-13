@@ -179,7 +179,7 @@ public class OOFormatBibliography {
         filteredList.sort((a, b) -> {
                 Integer aa = a.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
                 Integer bb = b.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
-                return (aa.compareTo(bb));
+                return aa.compareTo(bb);
             });
 
         int index = 0;

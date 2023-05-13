@@ -86,7 +86,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void createIndex(PdfIndexer indexer) {
-        enqueueTask(() -> indexer.createIndex());
+        enqueueTask(indexer::createIndex);
     }
 
     public void updateIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {

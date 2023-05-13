@@ -57,7 +57,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final Validator fieldValidator;
     private final Set<Field> multiLineFields = new HashSet<>();
 
-    Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
+    Predicate<Field> isMultiline = field -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
 
     public CustomEntryTypesTabViewModel(BibDatabaseMode mode,
                                         BibEntryTypesManager entryTypesManager,
@@ -68,7 +68,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.bibDatabaseMode = mode;
 
-        this.multiLineFields.addAll(preferencesService.getFieldContentParserPreferences().getNonWrappableFields());
+        this.multiLineFields.addAll(preferencesService.getFieldPreferences().getNonWrappableFields());
 
         entryTypeValidator = new FunctionBasedValidator<>(
                 entryTypeToAdd,
@@ -123,10 +123,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, bibDatabaseMode);
         }
 
-        preferencesService.getImportExportPreferences().setNonWrappableFields(
-                multilineFields.stream()
-                               .map(Field::getDisplayName)
-                               .collect(Collectors.joining(";")));
+        preferencesService.getFieldPreferences().setNonWrappableFields(multilineFields);
         preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
     }
 
