@@ -100,6 +100,7 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
@@ -128,7 +129,7 @@ import org.slf4j.LoggerFactory;
  * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap
  * with all the default values.
  * <p>
- * There are still some similar preferences classes (OpenOfficePreferences and SharedDatabasePreferences) which also use
+ * There are still some similar preferences classes ({@link org.jabref.logic.openoffice.OpenOfficePreferences} and {@link org.jabref.logic.shared.prefs.SharedDatabasePreferences}) which also use
  * the {@code java.util.prefs} API.
  */
 public class JabRefPreferences implements PreferencesService {
@@ -192,6 +193,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SIZE_X = "mainWindowSizeX";
     public static final String POS_Y = "mainWindowPosY";
     public static final String POS_X = "mainWindowPosX";
+
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
@@ -200,6 +202,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String WORKING_DIRECTORY = "workingDirectory";
+    public static final String BACKUP_DIRECTORY = "backupDirectory";
+    public static final String CREATE_BACKUP = "createBackup";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
@@ -444,7 +448,7 @@ public class JabRefPreferences implements PreferencesService {
     private SSLPreferences sslPreferences;
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
-    private ImportExportPreferences importExportPreferences;
+    private ExportPreferences exportPreferences;
     private NameFormatterPreferences nameFormatterPreferences;
     private BibEntryPreferences bibEntryPreferences;
     private InternalPreferences internalPreferences;
@@ -587,6 +591,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put(WORKING_DIRECTORY, USER_HOME);
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
+
+        defaults.put(CREATE_BACKUP, Boolean.TRUE);
+
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(PREFS_EXPORT_PATH, USER_HOME);
@@ -2081,7 +2088,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         fieldPreferences = new FieldPreferences(
-                !getBoolean(DO_NOT_RESOLVE_STRINGS),
+                !getBoolean(DO_NOT_RESOLVE_STRINGS), // mind the !
                 getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()
                                                          .map(FieldFactory::parseField)
                                                          .collect(Collectors.toList()),
@@ -2113,8 +2120,10 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(DOWNLOAD_LINKED_FILES),
                 getBoolean(FULLTEXT_INDEX_LINKED_FILES),
                 Path.of(get(WORKING_DIRECTORY)),
-                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES))
-        );
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
+                getBoolean(CREATE_BACKUP),
+                // We choose the data directory, because a ".bak" file should survive cache cleanups
+                getPath(BACKUP_DIRECTORY, BackupFileUtil.getAppDataBackupDir()));
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
@@ -2125,6 +2134,8 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
         filePreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
                 put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(filePreferences.getExternalFileTypes())));
+        EasyBind.listen(filePreferences.createBackupProperty(), (obs, oldValue, newValue) -> putBoolean(CREATE_BACKUP, newValue));
+        EasyBind.listen(filePreferences.backupDirectoryProperty(), (obs, oldValue, newValue) -> put(BACKUP_DIRECTORY, newValue.toString()));
 
         return filePreferences;
     }
@@ -2177,28 +2188,25 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public ImportExportPreferences getImportExportPreferences() {
-        if (Objects.nonNull(importExportPreferences)) {
-            return importExportPreferences;
+    public ExportPreferences getExportPreferences() {
+        if (Objects.nonNull(exportPreferences)) {
+            return exportPreferences;
         }
 
-        importExportPreferences = new ImportExportPreferences(
+        exportPreferences = new ExportPreferences(
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)),
                 getExportSaveOrder(),
-                getBoolean(LOCAL_AUTO_SAVE), getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION));
+                getBoolean(LOCAL_AUTO_SAVE));
 
-        EasyBind.listen(importExportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
-        EasyBind.listen(importExportPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(importExportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
-        EasyBind.listen(importExportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(importExportPreferences.exportSaveOrderProperty(), (obs, oldValue, newValue) -> storeExportSaveOrder(newValue));
-        EasyBind.listen(importExportPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
-        EasyBind.listen(importExportPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(exportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
+        EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
+        EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(exportPreferences.exportSaveOrderProperty(), (obs, oldValue, newValue) -> storeExportSaveOrder(newValue));
+        EasyBind.listen(exportPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
-        return importExportPreferences;
+        return exportPreferences;
     }
 
     public SaveOrder getExportSaveOrder() {
@@ -2231,7 +2239,7 @@ public class JabRefPreferences implements PreferencesService {
         List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
 
         for (var column : sortOrder) {
-            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            boolean descending = column.getSortType() == SortType.DESCENDING;
             criteria.add(new SaveOrder.SortCriterion(
                     FieldFactory.parseField(column.getQualifier()),
                     descending));
@@ -2254,7 +2262,7 @@ public class JabRefPreferences implements PreferencesService {
         return new SaveConfiguration()
                 .withSaveOrder(saveOrder)
                 .withMetadataSaveOrder(false)
-                .withReformatOnSave(getImportExportPreferences().shouldAlwaysReformatOnSave());
+                .withReformatOnSave(getExportPreferences().shouldAlwaysReformatOnSave());
     }
 
     @Override
@@ -2757,11 +2765,15 @@ public class JabRefPreferences implements PreferencesService {
 
         importerPreferences = new ImporterPreferences(
                 getBoolean(GENERATE_KEY_ON_IMPORT),
+                Path.of(get(IMPORT_WORKING_DIRECTORY)),
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getCustomImportFormats(),
                 getFetcherKeys()
         );
 
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
+        EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImportList().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImportList()));
 

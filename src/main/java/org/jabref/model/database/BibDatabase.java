@@ -633,8 +633,6 @@ public class BibDatabase {
 
     /**
      * Set the newline separator.
-     *
-     * @param newLineSeparator
      */
     public void setNewLineSeparator(String newLineSeparator) {
         this.newLineSeparator = newLineSeparator;

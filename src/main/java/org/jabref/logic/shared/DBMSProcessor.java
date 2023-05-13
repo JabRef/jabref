@@ -224,7 +224,7 @@ public abstract class DBMSProcessor {
         List<Integer> localIds = bibEntries.stream()
                                            .map(BibEntry::getSharedBibEntryData)
                                            .map(SharedBibEntryData::getSharedID)
-                                           .filter((id) -> id != -1)
+                                           .filter(id -> id != -1)
                                            .collect(Collectors.toList());
         if (localIds.isEmpty()) {
             return bibEntries;
@@ -243,7 +243,7 @@ public abstract class DBMSProcessor {
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
-        return bibEntries.stream().filter((entry) ->
+        return bibEntries.stream().filter(entry ->
                 !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
                          .collect(Collectors.toList());
     }

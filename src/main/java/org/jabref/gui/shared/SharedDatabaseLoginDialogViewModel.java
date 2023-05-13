@@ -263,8 +263,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         return panels.parallelStream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
 
-            return ((context.getLocation() == DatabaseLocation.SHARED) &&
-                    connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties()));
+            return (context.getLocation() == DatabaseLocation.SHARED) &&
+                    connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties());
         });
     }
 

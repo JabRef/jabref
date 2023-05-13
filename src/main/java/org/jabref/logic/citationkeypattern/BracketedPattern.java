@@ -521,7 +521,7 @@ public class BracketedPattern {
      */
     private static AuthorList createAuthorList(String unparsedAuthors) {
         return AuthorList.parse(unparsedAuthors).getAuthors().stream()
-                         .map((author) -> {
+                         .map(author -> {
                              // If the author is an institution, use an institution key instead of the full name
                              String lastName = author.getLast()
                                                      .map(lastPart -> isInstitution(author) ?
@@ -1264,7 +1264,7 @@ public class BracketedPattern {
                     // If there are more than 3 parts, only keep the first character of each word
                     final int[] codePoints = tokenParts.stream()
                                                        .filter(Predicate.not(String::isBlank))
-                                                       .mapToInt((s) -> s.codePointAt(0))
+                                                       .mapToInt(s -> s.codePointAt(0))
                                                        .toArray();
                     rest = new String(codePoints, 0, codePoints.length);
                 } else {

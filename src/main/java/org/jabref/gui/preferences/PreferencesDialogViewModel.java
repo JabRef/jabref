@@ -19,13 +19,12 @@ import org.jabref.gui.preferences.customexporter.CustomExporterTab;
 import org.jabref.gui.preferences.customimporter.CustomImporterTab;
 import org.jabref.gui.preferences.entry.EntryTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
-import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
+import org.jabref.gui.preferences.entryeditortabs.EntryEditorTabsTab;
+import org.jabref.gui.preferences.export.ExportTab;
 import org.jabref.gui.preferences.external.ExternalTab;
 import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
-import org.jabref.gui.preferences.file.FileTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
-import org.jabref.gui.preferences.importexport.ImportExportTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
@@ -34,6 +33,7 @@ import org.jabref.gui.preferences.network.NetworkTab;
 import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
+import org.jabref.gui.preferences.websearch.WebSearchTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
@@ -62,7 +62,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
-                new FileTab(),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
@@ -72,8 +71,9 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new JournalAbbreviationsTab(),
                 new GroupsTab(),
                 new EntryEditorTab(),
-                new ImportExportTab(),
-                new CustomEditorFieldsTab(),
+                new WebSearchTab(),
+                new ExportTab(),
+                new EntryEditorTabsTab(),
                 new CitationKeyPatternTab(),
                 new LinkedFilesTab(),
                 new NameFormatterTab(),

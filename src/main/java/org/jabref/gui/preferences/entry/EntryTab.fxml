@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
@@ -12,9 +13,29 @@
          fx:controller="org.jabref.gui.preferences.entry.EntryTab">
     <Label styleClass="titleHeader" text="%Entry"/>
 
+    <Label styleClass="sectionHeader" text="%Field"/>
     <HBox spacing="4" alignment="CENTER_LEFT">
         <Label text="%Keyword separator"/>
-        <TextField fx:id="keywordSeparator" minWidth="30.0" maxWidth="30.0"/>
+        <TextField fx:id="keywordSeparator" minWidth="30.0" maxWidth="30.0" alignment="CENTER"/>
+    </HBox>
+
+    <CheckBox fx:id="resolveStrings" text="%Resolve BibTeX strings"/>
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="%Affected fields"/>
+        <TextField fx:id="resolveStringsForFields" HBox.hgrow="ALWAYS"
+                   disable="${!resolveStrings.selected}">
+            <HBox.margin>
+                <Insets top="-4.0"/>
+            </HBox.margin>
+        </TextField>
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="%Do not wrap when saving"/>
+        <TextField fx:id="nonWrappableFields" HBox.hgrow="ALWAYS"/>
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Entry owner"/>

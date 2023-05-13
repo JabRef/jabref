@@ -29,7 +29,7 @@ public class EntryTypeViewModel {
                                    bibField.priority(),
                                    isMultiline.test(bibField.field())))
                                                  .collect(Collectors.toList());
-        fields = FXCollections.observableArrayList((allFieldsForType));
+        fields = FXCollections.observableArrayList(allFieldsForType);
     }
 
     @Override

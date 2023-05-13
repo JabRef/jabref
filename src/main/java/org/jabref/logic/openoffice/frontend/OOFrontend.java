@@ -107,9 +107,9 @@ public class OOFrontend {
 
         List<RangeSortEntry<CitationGroup>> sortables = new ArrayList<>();
         for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
-            XTextRange range = (this
+            XTextRange range = this
                     .getMarkRange(doc, group)
-                    .orElseThrow(IllegalStateException::new));
+                    .orElseThrow(IllegalStateException::new);
             sortables.add(new RangeSortEntry<>(range, 0, group));
         }
 
@@ -167,9 +167,9 @@ public class OOFrontend {
 
         List<RangeSortable<CitationGroup>> sorted = RangeSortVisual.visualSort(sortables, doc, fcursor);
 
-        return (sorted.stream()
+        return sorted.stream()
                       .map(RangeSortable::getContent)
-                      .collect(Collectors.toList()));
+                      .collect(Collectors.toList());
     }
 
     /**
@@ -187,7 +187,7 @@ public class OOFrontend {
         List<RangeSortable<CitationGroup>> sortables =
                 createVisualSortInput(doc, mapFootnotesToFootnoteMarks);
 
-        return (sortables.stream().map(RangeSortable::getContent).collect(Collectors.toList()));
+        return sortables.stream().map(RangeSortable::getContent).collect(Collectors.toList());
     }
 
     /**
@@ -197,7 +197,6 @@ public class OOFrontend {
      *
      * @param citationKeys     In storage order
      * @param pageInfos        In storage order
-     * @param citationType
      * @param position         Collapsed to its end.
      * @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of characters from the original position.
      */
@@ -384,9 +383,9 @@ public class OOFrontend {
 
         StringBuilder msg = new StringBuilder();
         for (RangeOverlap<RangeForOverlapCheck<CitationGroupId>> overlap : overlaps) {
-            String listOfRanges = (overlap.valuesForOverlappingRanges.stream()
+            String listOfRanges = overlap.valuesForOverlappingRanges.stream()
                                                                      .map(v -> String.format("'%s'", v.format()))
-                                                                     .collect(Collectors.joining(", ")));
+                                                                     .collect(Collectors.joining(", "));
             msg.append(
                     switch (overlap.kind) {
                         case EQUAL_RANGE -> Localization.lang("Found identical ranges");

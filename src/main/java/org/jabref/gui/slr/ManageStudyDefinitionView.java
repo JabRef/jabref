@@ -124,7 +124,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     private void setupSaveSurveyButton(boolean isEdit) {
-        Button saveSurveyButton = ((Button) this.getDialogPane().lookupButton(saveSurveyButtonType));
+        Button saveSurveyButton = (Button) this.getDialogPane().lookupButton(saveSurveyButtonType);
 
         if (!isEdit) {
             saveSurveyButton.setText(Localization.lang("Start survey"));

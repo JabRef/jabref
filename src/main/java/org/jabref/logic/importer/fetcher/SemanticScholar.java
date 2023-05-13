@@ -188,7 +188,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             entry.setField(StandardField.AUTHOR,
                     IntStream.range(0, item.optJSONArray("authors").length())
                              .mapToObj(item.optJSONArray("authors")::getJSONObject)
-                             .map((author) -> author.has("name") ? author.getString("name") : "")
+                             .map(author -> author.has("name") ? author.getString("name") : "")
                              .collect(Collectors.joining(" and ")));
 
             JSONObject externalIds = item.optJSONObject("externalIds");

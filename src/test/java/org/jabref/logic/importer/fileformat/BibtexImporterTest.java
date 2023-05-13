@@ -61,7 +61,7 @@ public class BibtexImporterTest {
         assertEquals(4, bibEntries.size());
 
         for (BibEntry entry : bibEntries) {
-            if (entry.getCitationKey().get().equals("aksin")) {
+            if ("aksin".equals(entry.getCitationKey().get())) {
                 assertEquals(
                         Optional.of(
                                 "Aks{\\i}n, {\\\"O}zge and T{\\\"u}rkmen, Hayati and Artok, Levent and {\\c{C}}etinkaya, "
@@ -78,7 +78,7 @@ public class BibtexImporterTest {
                                         + "carbenes in {Mizoroki-Heck} reactions"),
                         entry.getField(StandardField.TITLE));
                 assertEquals(Optional.of("691"), entry.getField(StandardField.VOLUME));
-            } else if (entry.getCitationKey().get().equals("stdmodel")) {
+            } else if ("stdmodel".equals(entry.getCitationKey().get())) {
                 assertEquals(Optional
                                 .of("A \\texttt{set} with three members discussing the standard model of particle physics. "
                                         + "The \\texttt{crossref} field in the \\texttt{@set} entry and the \\texttt{entryset} field in "
@@ -86,7 +86,7 @@ public class BibtexImporterTest {
                         entry.getField(StandardField.ANNOTATION));
                 assertEquals(Optional.of("stdmodel"), entry.getCitationKey());
                 assertEquals(Optional.of("glashow,weinberg,salam"), entry.getField(StandardField.ENTRYSET));
-            } else if (entry.getCitationKey().get().equals("set")) {
+            } else if ("set".equals(entry.getCitationKey().get())) {
                 assertEquals(Optional
                                 .of("A \\texttt{set} with three members. The \\texttt{crossref} field in the \\texttt{@set} "
                                         + "entry and the \\texttt{entryset} field in each set member entry is needed only when using "
@@ -94,7 +94,7 @@ public class BibtexImporterTest {
                         entry.getField(StandardField.ANNOTATION));
                 assertEquals(Optional.of("set"), entry.getCitationKey());
                 assertEquals(Optional.of("herrmann,aksin,yoon"), entry.getField(StandardField.ENTRYSET));
-            } else if (entry.getCitationKey().get().equals("Preissel2016")) {
+            } else if ("Preissel2016".equals(entry.getCitationKey().get())) {
                 assertEquals(Optional.of("Heidelberg"), entry.getField(StandardField.ADDRESS));
                 assertEquals(Optional.of("Preißel, René"), entry.getField(StandardField.AUTHOR));
                 assertEquals(Optional.of("Preissel2016"), entry.getCitationKey());

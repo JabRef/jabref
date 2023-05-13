@@ -29,13 +29,13 @@ public class IdentifierParser {
             return Optional.empty();
         }
 
-        if (StandardField.DOI.equals(field)) {
+        if (StandardField.DOI == field) {
             return DOI.parse(fieldValue);
-        } else if (StandardField.ISBN.equals(field)) {
+        } else if (StandardField.ISBN == field) {
             return ISBN.parse(fieldValue);
-        } else if (StandardField.EPRINT.equals(field)) {
+        } else if (StandardField.EPRINT == field) {
             return parseEprint(fieldValue);
-        } else if (StandardField.MR_NUMBER.equals(field)) {
+        } else if (StandardField.MR_NUMBER == field) {
             return MathSciNetId.parse(fieldValue);
         }
 

@@ -78,9 +78,9 @@ public class UnoTextDocument {
     }
 
     static Optional<XDocumentProperties> getDocumentProperties(XTextDocument doc) {
-        return (Optional.ofNullable(doc)
+        return Optional.ofNullable(doc)
                         .flatMap(e -> UnoCast.cast(XDocumentPropertiesSupplier.class, e))
-                        .map(XDocumentPropertiesSupplier::getDocumentProperties));
+                        .map(XDocumentPropertiesSupplier::getDocumentProperties);
     }
 }
 

@@ -29,9 +29,6 @@ public class BibsonomyScraper {
 
     /**
      * Return a BibEntry by looking up the given url from the BibSonomy scraper.
-     *
-     * @param entryUrl
-     * @return
      */
     public static Optional<BibEntry> getEntry(String entryUrl, ImportFormatPreferences importFormatPreferences) {
         try {

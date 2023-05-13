@@ -116,7 +116,7 @@ public class SaveDatabaseAction {
             final Path oldFile = databasePath.get();
             context.setDatabasePath(oldFile);
             AutosaveManager.shutdown(context);
-            BackupManager.shutdown(context);
+            BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
         }
 
         // Set new location
@@ -233,7 +233,8 @@ public class SaveDatabaseAction {
 
         SaveConfiguration saveConfiguration = new SaveConfiguration()
                 .withSaveType(saveType)
-                .withReformatOnSave(preferences.getImportExportPreferences().shouldAlwaysReformatOnSave());
+                .withMetadataSaveOrder(true)
+                .withReformatOnSave(preferences.getExportPreferences().shouldAlwaysReformatOnSave());
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {

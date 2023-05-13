@@ -50,7 +50,7 @@ public class CompositeSearchBasedFetcherTest {
 
         List<BibEntry> result = fetcher.performSearch("quantum");
 
-        Assertions.assertEquals(result, Collections.EMPTY_LIST);
+        Assertions.assertEquals(result, Collections.emptyList());
     }
 
     @ParameterizedTest(name = "Perform Search on empty query.")
@@ -60,7 +60,7 @@ public class CompositeSearchBasedFetcherTest {
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
-        Assertions.assertEquals(queryResult, Collections.EMPTY_LIST);
+        Assertions.assertEquals(queryResult, Collections.emptyList());
     }
 
     @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +

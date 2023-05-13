@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.general;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -24,6 +25,9 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox collectTelemetry;
     @FXML private CheckBox showAdvancedHints;
 
+    @FXML private CheckBox createBackup;
+    @FXML private TextField backupDirectory;
+
     public GeneralTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -36,7 +40,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService.getGeneralPreferences(), preferencesService.getTelemetryPreferences());
+        this.viewModel = new GeneralTabViewModel(preferencesService, dialogService);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)
@@ -56,5 +60,13 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
+
+        createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
+        backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
+        backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
+    }
+
+    public void backupFileDirBrowse() {
+        viewModel.backupFileDirBrowse();
     }
 }
