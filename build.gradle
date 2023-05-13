@@ -261,7 +261,6 @@ processResources {
 
 task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateSearchGrammarSource",
-                                "generateEndnoteSource",
                                 "generateCitaviSource"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
@@ -289,14 +288,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
-task generateEndnoteSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the endnote importer."
 
-    schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
-    outputDirectory = "src-gen/main/java/"
-    javaPackage = "org.jabref.logic.importer.fileformat.endnote"
-}
 
 task generateCitaviSource(type: XjcTask) {
     group = 'JabRef'

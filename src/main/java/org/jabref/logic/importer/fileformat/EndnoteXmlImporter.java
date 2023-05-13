@@ -428,7 +428,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 if (value.length() > 0){
                     putIfValueNotNull(fields,StandardField.URL, clean(value));
                 }
-
             }
 
             if (isEndXMLEvent(reader) && "related-urls".equals(reader.getName().getLocalPart())) {
