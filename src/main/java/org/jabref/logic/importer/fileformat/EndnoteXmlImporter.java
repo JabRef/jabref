@@ -163,7 +163,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                         parseStyleContent(reader, fields,StandardField.NOTE, elementName);
                     }
                     case "urls" -> {
-
+                       handleUrlList(reader, fields);
                     }
                     case "keywords" -> {
                         handleKeywordsList(reader,keywords,elementName);
@@ -199,6 +199,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             System.out.println(f.getKey().getName() + " : " + f.getValue());
         }
         bibItems.add(entry);
+
     }
 
     private static EntryType convertRefNameToType(String refName) {
@@ -236,6 +237,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
         fields.put(StandardField.AUTHOR, join(authorNames, " and "));
     }
+
     private void parseAuthor(XMLStreamReader reader, List<String> authorNames) throws XMLStreamException {
 
         while (reader.hasNext()) {
@@ -416,4 +418,102 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         }
         return Collections.emptyList();
     }
-}
+    private void handleUrlList(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "related-urls" -> {
+                        parseRelatedUrls(reader, fields);
+                    }
+                    case "pdf-urls" -> {
+                        parsePdfUrls(reader, fields);
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("urls")) {
+                break;
+            }
+        }
+
+    }
+
+
+
+    private void parseRelatedUrls(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                if (elementName.equals("style")) {
+                    reader.next();
+                    if (isCharacterXMLEvent(reader)) {
+                        fields.put(StandardField.URL, reader.getText());
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && "related-urls".equals(reader.getName().getLocalPart())) {
+                break;
+            }
+        }
+    }
+
+    private void parsePdfUrls(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                if(elementName.equals("url")) {
+                    System.out.println(" in url");
+                    reader.next();
+                    int x = reader.getEventType();
+                    if (isStartXMLEvent(reader)){
+                        // style
+                        System.out.println("test");
+                        String tagName = reader.getName().getLocalPart();
+                        if (tagName.equals("style")) {
+                            reader.next();
+                            if (isCharacterXMLEvent(reader)) {
+                                putIfValueNotNull(fields, StandardField.FILE, reader.getText());
+                            }
+                        }
+
+                            }
+                        }
+                    }
+                    if (isCharacterXMLEvent(reader)) {
+                        System.out.println(" without style");
+                        String y = reader.getText();
+                        putIfValueNotNull(fields, StandardField.FILE, reader.getText());
+                    }
+//                    else if (reader.getName().getLocalPart().equals("style")) {
+//
+//                        putIfValueNotNull(fields, StandardField.FILE, reader.getText());
+//                    }
+            if (isEndXMLEvent(reader) && "pdf-urls".equals(reader.getName().getLocalPart())) {
+                break;
+            }
+                }
+
+//                    case "style" -> {
+//                        reader.next();
+//                        if (isCharacterXMLEvent(reader)) {
+//                            fields.put(StandardField.URL, reader.getText());
+//                        }
+//                    }
+
+
+            }
+
+
+        }
+
+
+
+
+
