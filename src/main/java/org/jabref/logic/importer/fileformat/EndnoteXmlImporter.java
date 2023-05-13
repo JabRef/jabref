@@ -21,15 +21,23 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
+import com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Importer for the Endnote XML format.
@@ -45,7 +53,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     public EndnoteXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
     }
-
+    private static String join(List<String> list, String string) {
+        return Joiner.on(string).join(list);
+    }
     @Override
     public String getName() {
         return "EndNote XML";
@@ -106,11 +116,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     String elementName = reader.getName().getLocalPart();
                     System.out.println(elementName);
                     if (elementName.equals("record")){
-                        // parseRecord;
+                        parseRecord(reader,bibItems,elementName);
                     }
                 }
             }
-            return ParserResult.fromErrorMessage("testing");
+//            return ParserResult.fromErrorMessage("testing");
 //            if (unmarshalledObject instanceof Xml) {
 //                // Check whether we have an article set, an article, a book article or a book article set
 //                Xml root = (Xml) unmarshalledObject;
@@ -128,12 +138,13 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
-
-//        return new ParseResult(bibItems);
+        return new ParserResult(bibItems);
     }
+
     private void parseRecord(XMLStreamReader reader, List<BibEntry> bibItems, String startElement)
-        throws XMLStreamException{
+            throws XMLStreamException{
         Map<Field, String> fields = new HashMap<>();
+        EntryType entryType = StandardEntryType.Article;
 
         while (reader.hasNext()){
             reader.next();
@@ -141,243 +152,286 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 String elementName = reader.getName().getLocalPart();
                 switch(elementName){
                     case "ref-type" -> {
-                        reader.getAttributeValue(null,"name");
-//                        putIfValueNotNull(fields, StandardField.);
+                        String type = reader.getAttributeValue(null,"name");
+                        entryType = convertRefNameToType(type);
                     }
                     case "contributors" -> {
                         //parseContributors
+                        handleAuthorList(reader,fields,startElement);
                     }
                     case "titles" -> {
                         //parseTitles
                     }
 
                     case "pages" -> {
-
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isStartXMLEvent(reader)) {
+                                String tag = reader.getName().getLocalPart();
+                                if (tag.equals("style")){
+                                    reader.next();
+                                    if (isCharacterXMLEvent(reader)) {
+                                        putIfValueNotNull(fields,StandardField.PAGES,reader.getText());
+                                    }
+                                }
+                            }
+                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("pages")) {
+                                break;
+                            }
+                        }
                     }
                     case "volume" -> {
-
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isStartXMLEvent(reader)) {
+                                String tag = reader.getName().getLocalPart();
+                                if (tag.equals("style")){
+                                    reader.next();
+                                    if (isCharacterXMLEvent(reader)) {
+                                        putIfValueNotNull(fields,StandardField.VOLUME,reader.getText());
+                                    }
+                                }
+                            }
+                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("volume")) {
+                                break;
+                            }
+                        }
                     }
                     case "number" -> {
-
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isStartXMLEvent(reader)) {
+                                String tag = reader.getName().getLocalPart();
+                                if (tag.equals("style")){
+                                    reader.next();
+                                    if (isCharacterXMLEvent(reader)) {
+                                        putIfValueNotNull(fields,StandardField.NUMBER,reader.getText());
+                                    }
+                                }
+                            }
+                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("number")) {
+                                break;
+                            }
+                        }
                     }
                     case "dates" -> {
                         // parseDate
                     }
-                    case "notes" -> {
 
+                    case "notes" -> {
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isStartXMLEvent(reader)) {
+                                String tag = reader.getName().getLocalPart();
+                                if (tag.equals("style")){
+                                    reader.next();
+                                    if (isCharacterXMLEvent(reader)) {
+                                        putIfValueNotNull(fields,StandardField.NOTE,reader.getText().trim());
+                                    }
+                                }
+                            }
+                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("notes")) {
+                                break;
+                            }
+                        }
                     }
                     case "urls" -> {
-                        //parseUrls
-
+                        handleUrlList(reader, fields, startElement);
+                        System.out.println("urls");
                     }
                     case "abstract" -> {
-
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isStartXMLEvent(reader)) {
+                                String tag = reader.getName().getLocalPart();
+                                if (tag.equals("style")){
+                                    reader.next();
+                                    if (isCharacterXMLEvent(reader)) {
+                                        putIfValueNotNull(fields,StandardField.ABSTRACT,reader.getText().trim());
+                                    }
+                                }
+                            }
+                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("abstract")) {
+                                break;
+                            }
+                        }
                     }
                     case "isbn" -> {
-
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isStartXMLEvent(reader)) {
+                                String tag = reader.getName().getLocalPart();
+                                if (tag.equals("style")){
+                                    reader.next();
+                                    if (isCharacterXMLEvent(reader)) {
+                                        putIfValueNotNull(fields,StandardField.ISBN,clean(reader.getText()));
+                                    }
+                                }
+                            }
+                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("isbn")) {
+                                break;
+                            }
+                        }
                     }
                     case "electronic-resource-num" -> {
                         //parse DOI
                     }
                     case "publisher" -> {
-
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isStartXMLEvent(reader)) {
+                                String tag = reader.getName().getLocalPart();
+                                if (tag.equals("style")){
+                                    reader.next();
+                                    if (isCharacterXMLEvent(reader)) {
+                                        putIfValueNotNull(fields,StandardField.PUBLISHER,reader.getText());
+                                    }
+                                }
+                            }
+                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("publisher")) {
+                                break;
+                            }
+                        }
                     }
                     case "label" -> {
-
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isStartXMLEvent(reader)) {
+                                String tag = reader.getName().getLocalPart();
+                                if (tag.equals("style")){
+                                    reader.next();
+                                    if (isCharacterXMLEvent(reader)) {
+                                        putIfValueNotNull(fields,new UnknownField("endnote-label"),reader.getText());
+                                    }
+                                }
+                            }
+                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("label")) {
+                                break;
+                            }
+                        }
                     }
 
                 }
             }
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
+        }
+
+        BibEntry entry = new BibEntry(entryType);
+        entry.setField(fields);
+        for (Map.Entry<Field,String> f: fields.entrySet()){
+            System.out.println(f.getKey().getName() + " : " + f.getValue());
+        }
+        bibItems.add(entry);
+
+    }
+    private void handleUrlList(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "related-urls" -> {
+                        parseRelatedUrls(reader, fields);
+                        System.out.println("related-urls");
+                    }
+                    case "pdf-urls" -> {
+                        reader.next();
+                        if(isCharacterXMLEvent(reader)) {
+                            fields.put(StandardField.FILE, reader.getText());
+                            System.out.println("pdf-urls");
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
         }
 
     }
-//
-//    private Object unmarshallRoot(BufferedReader reader) throws XMLStreamException, JAXBException {
-//        initUnmarshaller();
-//
-//        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-//        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
-//
-//        // Go to the root element
-//        while (!xmlStreamReader.isStartElement()) {
-//            xmlStreamReader.next();
-//        }
-//
-//        return unmarshaller.unmarshal(xmlStreamReader);
-//    }
-//
-//    private void initUnmarshaller() throws JAXBException {
-//        if (unmarshaller == null) {
-//            // Lazy init because this is expensive
-//            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.endnote");
-//            unmarshaller = context.createUnmarshaller();
-//        }
-//    }
-//
-//    private static EntryType convertRefNameToType(String refName) {
-//        return switch (refName.toLowerCase().trim()) {
-//            case "artwork", "generic" -> StandardEntryType.Misc;
-//            case "electronic article" -> IEEETranEntryType.Electronic;
-//            case "book section" -> StandardEntryType.InBook;
-//            case "book" -> StandardEntryType.Book;
-//            case "report" -> StandardEntryType.Report;
-//            // case "journal article" -> StandardEntryType.Article;
-//            default -> StandardEntryType.Article;
-//        };
-//    }
-//
-//    private BibEntry parseRecord(Record endNoteRecord) {
-//        BibEntry entry = new BibEntry();
-//
-//        entry.setType(getType(endNoteRecord));
-//        Optional.ofNullable(getAuthors(endNoteRecord))
-//                .ifPresent(value -> entry.setField(StandardField.AUTHOR, value));
-//        Optional.ofNullable(endNoteRecord.getTitles())
-//                .map(Titles::getTitle)
-//                .map(Title::getStyle)
-//                .map(this::mergeStyleContents)
-//                .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
-//        Optional.ofNullable(endNoteRecord.getTitles())
-//                .map(Titles::getSecondaryTitle)
-//                .map(SecondaryTitle::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(StandardField.JOURNAL, clean(value)));
-//        Optional.ofNullable(endNoteRecord.getPages())
-//                .map(Pages::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(StandardField.PAGES, value));
-//        Optional.ofNullable(endNoteRecord.getNumber())
-//                .map(Number::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(StandardField.NUMBER, value));
-//        Optional.ofNullable(endNoteRecord.getVolume())
-//                .map(Volume::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(StandardField.VOLUME, value));
-//        Optional.ofNullable(endNoteRecord.getDates())
-//                .map(Dates::getYear)
-//                .map(Year::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(StandardField.YEAR, value));
-//        Optional.ofNullable(endNoteRecord.getNotes())
-//                .map(Notes::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(StandardField.NOTE, value.trim()));
-//        getUrl(endNoteRecord)
-//                .ifPresent(value -> entry.setField(StandardField.URL, value));
-//        entry.putKeywords(getKeywords(endNoteRecord), preferences.bibEntryPreferences().getKeywordSeparator());
-//        Optional.ofNullable(endNoteRecord.getAbstract())
-//                .map(Abstract::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(StandardField.ABSTRACT, value.trim()));
-//        entry.setFiles(getLinkedFiles(endNoteRecord));
-//        Optional.ofNullable(endNoteRecord.getIsbn())
-//                .map(Isbn::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(StandardField.ISBN, clean(value)));
-//        Optional.ofNullable(endNoteRecord.getElectronicResourceNum())
-//                .map(ElectronicResourceNum::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(doi -> entry.setField(StandardField.DOI, doi.trim()));
-//        Optional.ofNullable(endNoteRecord.getPublisher())
-//                .map(Publisher::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(StandardField.PUBLISHER, value));
-//        Optional.ofNullable(endNoteRecord.getLabel())
-//                .map(Label::getStyle)
-//                .map(Style::getContent)
-//                .ifPresent(value -> entry.setField(new UnknownField("endnote-label"), value));
-//
-//        return entry;
-//    }
-//
-//    private EntryType getType(Record endNoteRecord) {
-//        return Optional.ofNullable(endNoteRecord.getRefType())
-//                       .map(RefType::getName)
-//                       .map(EndnoteXmlImporter::convertRefNameToType)
-//                       .orElse(StandardEntryType.Article);
-//    }
-//
-//    private List<LinkedFile> getLinkedFiles(Record endNoteRecord) {
-//        Optional<PdfUrls> urls = Optional.ofNullable(endNoteRecord.getUrls())
-//                                         .map(Urls::getPdfUrls);
-//        return OptionalUtil.toStream(urls)
-//                           .flatMap(pdfUrls -> pdfUrls.getUrl().stream())
-//                           .flatMap(url -> OptionalUtil.toStream(getUrlValue(url)))
-//                           .map(url -> {
-//                               try {
-//                                   return new LinkedFile(new URL(url), "PDF");
-//                               } catch (
-//                                       MalformedURLException e) {
-//                                   LOGGER.info("Unable to parse {}", url);
-//                                   return null;
-//                               }
-//                           })
-//                           .collect(Collectors.toList());
-//    }
-//
-//    private Optional<String> getUrl(Record endNoteRecord) {
-//        Optional<RelatedUrls> urls = Optional.ofNullable(endNoteRecord.getUrls())
-//                                             .map(Urls::getRelatedUrls);
-//        return OptionalUtil.toStream(urls)
-//                           .flatMap(url -> url.getUrl().stream())
-//                           .flatMap(url -> OptionalUtil.toStream(getUrlValue(url)))
-//                           .findFirst();
-//    }
-//
-//    private String mergeStyleContents(List<Style> styles) {
-//        return styles.stream().map(Style::getContent).collect(Collectors.joining());
-//    }
-//
-//    private Optional<String> getUrlValue(Url url) {
-//        Optional<List<Object>> urlContent = Optional.ofNullable(url).map(Url::getContent);
-//        List<Object> list = urlContent.orElse(Collections.emptyList());
-//        Optional<String> ret;
-//        if (list.size() == 0) {
-//            return Optional.empty();
-//        } else {
-//            boolean isStyleExist = false;
-//            int style_index = -1;
-//            for (int i = 0; i < list.size(); i++) {
-//                if (list.get(i) instanceof Style) {
-//                    isStyleExist = true;
-//                    style_index = i;
-//                }
-//            }
-//            if (!isStyleExist) {
-//                ret = Optional.ofNullable((String) list.get(0))
-//                        .map(this::clean);
-//            } else {
-//                ret = Optional.ofNullable((Style) list.get(style_index))
-//                        .map(Style::getContent)
-//                        .map(this::clean);
-//            }
-//        }
-//        return ret;
-//    }
-//
-//    private List<String> getKeywords(Record endNoteRecord) {
-//        Keywords keywords = endNoteRecord.getKeywords();
-//        if (keywords != null) {
-//            return keywords.getKeyword()
-//                           .stream()
-//                           .map(Keyword::getStyle)
-//                           .filter(Objects::nonNull)
-//                           .map(Style::getContent)
-//                           .collect(Collectors.toList());
-//        } else {
-//            return Collections.emptyList();
-//        }
-//    }
-//
-//    private String getAuthors(Record endNoteRecord) {
-//        Optional<Authors> authors = Optional.ofNullable(endNoteRecord.getContributors())
-//                                            .map(Contributors::getAuthors);
-//        return OptionalUtil.toStream(authors)
-//                           .flatMap(value -> value.getAuthor().stream())
-//                           .map(author -> author.getStyle().getContent())
-//                           .collect(Collectors.joining(" and "));
-//    }
+    private void parseRelatedUrls(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                System.out.println("elementName" + elementName);
+                if (elementName.equals("style")) {
+                    reader.next();
+//                    if ("style".equals(reader.getName().getLocalPart())) {
+//                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            fields.put(StandardField.URL, reader.getText());
+                        }
+//                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && "related-urls".equals(reader.getName().getLocalPart())) {
+                break;
+            }
+        }
+    }
+
+    private static EntryType convertRefNameToType(String refName) {
+        return switch (refName.toLowerCase().trim()) {
+            case "artwork", "generic" -> StandardEntryType.Misc;
+            case "electronic article" -> IEEETranEntryType.Electronic;
+            case "book section" -> StandardEntryType.InBook;
+            case "book" -> StandardEntryType.Book;
+            case "report" -> StandardEntryType.Report;
+            // case "journal article" -> StandardEntryType.Article;
+            default -> StandardEntryType.Article;
+        };
+    }
+
+    private void handleAuthorList(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
+        List<String> authorNames = new ArrayList<>();
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "author" -> {
+                        parseAuthor(reader, authorNames);
+                        System.out.println("test");
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
+                break;
+            }
+        }
+
+        fields.put(StandardField.AUTHOR, join(authorNames, " and "));
+    }
+    private void parseAuthor(XMLStreamReader reader, List<String> authorNames) throws XMLStreamException {
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (isStartXMLEvent(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                System.out.println(elementName + " Tst");
+                switch (elementName) {
+                    case "style" -> {
+                        reader.next();
+                        if (isCharacterXMLEvent(reader)) {
+                            authorNames.add(reader.getText());
+                        }
+                    }
+                }
+            }
+
+            if (isEndXMLEvent(reader) && "author".equals(reader.getName().getLocalPart())) {
+                break;
+            }
+        }
+    }
 
     private String clean(String input) {
         return StringUtil.unifyLineBreaks(input, " ")
