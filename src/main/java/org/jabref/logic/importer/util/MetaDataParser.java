@@ -29,6 +29,9 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Writing is done at {@link org.jabref.logic.exporter.MetaDataSerializer}.
+ */
 public class MetaDataParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);

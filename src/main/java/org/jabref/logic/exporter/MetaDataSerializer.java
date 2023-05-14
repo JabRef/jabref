@@ -22,6 +22,9 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 
+/**
+ * Reading is done at {@link org.jabref.logic.importer.util.MetaDataParser}
+ */
 public class MetaDataSerializer {
 
     private MetaDataSerializer() {
