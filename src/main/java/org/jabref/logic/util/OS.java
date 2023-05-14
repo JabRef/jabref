@@ -11,9 +11,6 @@ public class OS {
     public static final String APP_DIR_APP_NAME = "jabref";
     public static final String APP_DIR_APP_AUTHOR = "org.jabref";
 
-    // File separator obtained from system
-    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
-
     // https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/SystemUtils.html
     private static final String OS_NAME = System.getProperty("os.name", "unknown").toLowerCase(Locale.ROOT);
     public static final boolean LINUX = OS_NAME.startsWith("linux");
