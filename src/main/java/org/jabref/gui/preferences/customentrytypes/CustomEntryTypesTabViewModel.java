@@ -166,6 +166,18 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         selectedEntryType.getValue().removeField(focusedItem);
     }
 
+    public void editFieldName(FieldViewModel focusedItem){
+        Field field = newFieldToAdd.getValue();
+        ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
+        StringProperty prevFieldName = focusedItem.nameProperty();
+        BooleanProperty prevRequired = focusedItem.requiredProperty();
+        FieldPriority prevPriority = focusedItem.getPriority();
+        BooleanProperty prevMultiline = focusedItem.multilineProperty();
+
+        removeField(focusedItem);
+        addNewField();
+    }
+
     public void resetAllCustomEntryTypes() {
         entryTypesManager.clearAllCustomEntryTypes(bibDatabaseMode);
         preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
