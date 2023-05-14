@@ -145,7 +145,7 @@ recipeList:
   - org.openrewrite.java.cleanup.RedundantFileCreation
   - org.openrewrite.java.cleanup.RemoveCallsToObjectFinalize
   - org.openrewrite.java.cleanup.RemoveEmptyJavaDocParameters
-#  - org.openrewrite.java.cleanup.RemoveExtraSemicolons
+  - org.openrewrite.java.cleanup.RemoveExtraSemicolons
 #  - org.openrewrite.java.cleanup.RemoveJavaDocAuthorTag
   - org.openrewrite.java.cleanup.RemoveRedundantTypeCast
   - org.openrewrite.java.cleanup.RemoveUnneededAssertion
