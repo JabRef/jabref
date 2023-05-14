@@ -177,7 +177,14 @@ public class MetaDataParser {
         StringBuilder res = new StringBuilder();
         while ((c = reader.read()) != -1) {
             if (escape) {
-                res.append((char) c);
+                // at org.jabref.logic.exporter.MetaDataSerializer.serializeMetaData, only MetaData.SEPARATOR_CHARACTER, MetaData.ESCAPE_CHARACTER are quoted
+                // That means ; and \\
+                char character = (char) c;
+                if (character != MetaData.SEPARATOR_CHARACTER && character != MetaData.ESCAPE_CHARACTER) {
+                    // Keep the escape character
+                    res.append("\\");
+                }
+                res.append(character);
                 escape = false;
             } else if (c == MetaData.ESCAPE_CHARACTER) {
                 escape = true;

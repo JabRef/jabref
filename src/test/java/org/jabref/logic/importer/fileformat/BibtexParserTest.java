@@ -60,6 +60,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -129,11 +131,10 @@ class BibtexParserTest {
                         """,
                 importFormatPreferences, fileMonitor);
 
-        BibEntry expected = new BibEntry();
-        expected.setType(StandardEntryType.Article);
-        expected.setCitationKey("canh05");
-        expected.setField(StandardField.AUTHOR, "Crowston, K. and Annabi, H.");
-        expected.setField(StandardField.TITLE, "Title A");
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("canh05")
+                .withField(StandardField.AUTHOR, "Crowston, K. and Annabi, H.")
+                .withField(StandardField.TITLE, "Title A");
 
         assertEquals(Optional.of(expected), parsed);
     }
@@ -1653,6 +1654,24 @@ class BibtexParserTest {
         assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
         assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());
         assertEquals("D:\\Latex", result.getMetaData().getLatexFileDirectory("defaultOwner-user").get().toString());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            // single backsslash kept
+            "C:\\temp\\test",
+            "."})
+    void fileDirectoriesUnmodified(String directory) throws IOException {
+        ParserResult result = parser.parse(
+                new StringReader("@comment{jabref-meta: fileDirectory:" + directory + "}"));
+        assertEquals(directory, result.getMetaData().getDefaultFileDirectory().get());
+    }
+
+    @Test
+    void fileDirectoryWithDoubleEscapeIsRead() throws IOException {
+        ParserResult result = parser.parse(
+                new StringReader("@comment{jabref-meta: fileDirectory: C:\\\\temp\\\\test}"));
+        assertEquals("C:\\temp\\test", result.getMetaData().getDefaultFileDirectory().get());
     }
 
     @Test

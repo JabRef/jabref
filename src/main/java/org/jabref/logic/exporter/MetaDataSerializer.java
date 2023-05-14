@@ -75,7 +75,8 @@ public class MetaDataSerializer {
         // finally add all unknown meta data items to the serialization map
         Map<String, List<String>> unknownMetaData = metaData.getUnknownMetaData();
         for (Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()) {
-            StringJoiner value = new StringJoiner(MetaData.SEPARATOR_STRING + OS.NEWLINE, OS.NEWLINE, OS.NEWLINE);
+            // The last "MetaData.SEPARATOR_STRING" adds compatibility to JabRef v5.9 and earlier
+            StringJoiner value = new StringJoiner(MetaData.SEPARATOR_STRING + OS.NEWLINE, OS.NEWLINE, MetaData.SEPARATOR_STRING + OS.NEWLINE);
             for (String line : entry.getValue()) {
                 value.add(line.replace(MetaData.SEPARATOR_STRING, "\\" + MetaData.SEPARATOR_STRING));
             }
@@ -88,25 +89,33 @@ public class MetaDataSerializer {
     private static Map<String, String> serializeMetaData(Map<String, List<String>> stringyMetaData) {
         Map<String, String> serializedMetaData = new TreeMap<>();
         for (Map.Entry<String, List<String>> metaItem : stringyMetaData.entrySet()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (String dataItem : metaItem.getValue()) {
-                if (!metaItem.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
-                    stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER)).append(MetaData.SEPARATOR_STRING);
-                } else {
-                    stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER));
-                }
-
-                // in case of save actions, add an additional newline after the enabled flag
-                if (metaItem.getKey().equals(MetaData.SAVE_ACTIONS)
-                        && (FieldFormatterCleanups.ENABLED.equals(dataItem)
-                        || FieldFormatterCleanups.DISABLED.equals(dataItem))) {
-                    stringBuilder.append(OS.NEWLINE);
-                }
+            List<String> itemList = metaItem.getValue();
+            if (itemList.isEmpty()) {
+                // Only add non-empty values
+                continue;
             }
 
-            String serializedItem = stringBuilder.toString();
-            // Only add non-empty values
-            if (!serializedItem.isEmpty() && !MetaData.SEPARATOR_STRING.equals(serializedItem)) {
+            boolean isSaveActions = metaItem.getKey().equals(MetaData.SAVE_ACTIONS);
+            // The last "MetaData.SEPARATOR_STRING" adds compatibility to JabRef v5.9 and earlier
+            StringJoiner joiner = new StringJoiner(MetaData.SEPARATOR_STRING, "", MetaData.SEPARATOR_STRING);
+            boolean lastWasSaveActionsEnablement = false;
+            for (String dataItem : itemList) {
+                String string;
+                if (lastWasSaveActionsEnablement) {
+                    string = OS.NEWLINE;
+                } else {
+                    string = "";
+                }
+                string += StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER);
+                // in case of save actions, add an additional newline after the enabled flag
+                lastWasSaveActionsEnablement = isSaveActions
+                        && (FieldFormatterCleanups.ENABLED.equals(dataItem)
+                        || FieldFormatterCleanups.DISABLED.equals(dataItem));
+                joiner.add(string);
+            }
+            String serializedItem = joiner.toString();
+            if (!serializedItem.isEmpty()) {
+                // Only add non-empty values
                 serializedMetaData.put(metaItem.getKey(), serializedItem);
             }
         }
