@@ -128,7 +128,7 @@ public final class Word {
                 word += chars[i];
                 i++;
             }
-        return !(CONJUNCTIONS.contains(word));
+        return !CONJUNCTIONS.contains(word);
     }
 
     public void stripConsonants() {
