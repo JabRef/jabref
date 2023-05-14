@@ -157,7 +157,7 @@ recipeList:
   - org.openrewrite.java.cleanup.ReplaceRedundantFormatWithPrintf
 #  - org.openrewrite.java.cleanup.ShortenFullyQualifiedTypeReferences
   - org.openrewrite.java.cleanup.SimplifyBooleanExpression
-#  - org.openrewrite.java.cleanup.SimplifyBooleanReturn
+  - org.openrewrite.java.cleanup.SimplifyBooleanReturn
 #  - org.openrewrite.java.cleanup.SimplifyConsecutiveAssignments
 #  - org.openrewrite.java.cleanup.SimplifyCompoundStatement
   - org.openrewrite.java.cleanup.SimplifyDurationCreationUnits
