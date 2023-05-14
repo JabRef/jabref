@@ -1,5 +1,6 @@
 package org.jabref.model.database;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -249,7 +250,10 @@ public class BibDatabaseContext {
     }
 
     public static Path getFulltextIndexBasePath() {
-        return Path.of(AppDirsFactory.getInstance().getUserDataDir(OS.APP_DIR_APP_NAME, SearchFieldConstants.VERSION, OS.APP_DIR_APP_AUTHOR));
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
+                                             "lucene" + File.separator + SearchFieldConstants.VERSION,
+                                             OS.APP_DIR_APP_AUTHOR));
     }
 
     public Path getFulltextIndexPath() {
