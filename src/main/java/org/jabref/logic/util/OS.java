@@ -2,8 +2,10 @@ package org.jabref.logic.util;
 
 import java.util.Locale;
 
-/***
+/**
  * Operating system (OS) detection
+ *
+ * For OS-specific actions see {@link org.jabref.gui.desktop.JabRefDesktop} and {@link org.jabref.gui.desktop.os.NativeDesktop}.
  */
 public class OS {
     public static final String NEWLINE = System.lineSeparator();

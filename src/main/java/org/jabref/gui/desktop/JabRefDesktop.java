@@ -36,8 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
- * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
+ * See http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
+ * http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT
  */
 public class JabRefDesktop {
 
