@@ -494,6 +494,7 @@ checkstyle {
 rewrite {
     activeRecipe(
         'org.jabref.config.rewrite.cleanup',
+        'org.openrewrite.java.logging.slf4j.LoggersNamedForEnclosingClass',
         'org.openrewrite.java.logging.slf4j.ParameterizedLogging',
         'org.openrewrite.java.logging.slf4j.Slf4jLogShouldBeConstant'
     )
