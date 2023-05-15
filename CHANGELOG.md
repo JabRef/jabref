@@ -48,6 +48,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the preferences option to open the last edited files on startup to the 'General' tab. [#9808](https://github.com/JabRef/jabref/pull/9808)
 - We split the 'Import and Export' tab into 'Web Search' and 'Export'. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We improved the recognition of DOIs when pasting a link containing a DOI on the maintable [#9864](https://github.com/JabRef/jabref/issues/9864s)
+- The formatter `remove_unicode_ligatures` is now called `replace_unicode_ligatures`.
 
 ### Fixed
 
@@ -74,6 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the Save/save as file type shows BIBTEX_DB instead of "Bibtex library" [#9372](https://github.com/JabRef/jabref/issues/9372)
 - We fixed an issue regarding recording redundant prefixes in search history. [#9685](https://github.com/JabRef/jabref/issues/9685)
 - We fixed an issue where passing a URL containing a DOI led to a "No entry found" notification. [#9821](https://github.com/JabRef/jabref/issues/9821)
+- The order of save actions is now retained.
 
 ### Removed
 
