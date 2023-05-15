@@ -108,7 +108,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
             results.forEach(this::doPostCleanup);
             return results;
         } catch (IOException | ParseException e) {
-            throw new FetcherException("Error occured during fetching", e);
+            throw new FetcherException("Error occurred during fetching", e);
         }
     }
 }
