@@ -95,8 +95,8 @@ public class UpdateField {
         }
 
         String defaultOwner = ownerPreferences.getDefaultOwner();
-        String timestamp = timestampPreferences.now();
         boolean overwriteOwner = ownerPreferences.isOverwriteOwner();
+        String timestamp = timestampPreferences.now();
 
         for (BibEntry curEntry : entries) {
             boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(StandardField.OWNER)));
