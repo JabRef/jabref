@@ -469,13 +469,9 @@ public class LibraryTab extends Tab {
             bibDatabaseContext.getDatabase().insertEntries(entries);
 
             // Set owner and timestamp
-            for (BibEntry entry : entries) {
-                UpdateField.setAutomaticFields(entry,
-                        true,
-                        true,
-                        preferencesService.getOwnerPreferences(),
-                        preferencesService.getTimestampPreferences());
-            }
+            UpdateField.setAutomaticFields(entries,
+                    preferencesService.getOwnerPreferences(),
+                    preferencesService.getTimestampPreferences());
             // Create an UndoableInsertEntries object.
             getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
