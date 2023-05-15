@@ -1159,6 +1159,9 @@ public class BibEntry implements Cloneable {
     }
 
     public boolean isEmpty() {
-        return this.fields.isEmpty();
+        if (this.fields.isEmpty()) {
+            return true;
+        }
+        return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
     }
 }

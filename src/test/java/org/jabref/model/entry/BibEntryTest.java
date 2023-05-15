@@ -813,15 +813,24 @@ class BibEntryTest {
         assertEquals(expected.getFields(), copyEntry.getFields());
     }
 
-    @Test
-    void isEmptyPlain() {
-        BibEntry entry = new BibEntry();
-        assertTrue(entry.isEmpty());
+    public static Stream<BibEntry> isEmpty() {
+        return Stream.of(
+                new BibEntry(),
+                new BibEntry(StandardEntryType.Book),
+                new BibEntry().withField(StandardField.OWNER, "test"),
+                new BibEntry().withField(StandardField.CREATIONDATE, "test"),
+                new BibEntry()
+                        .withField(StandardField.OWNER, "test")
+                        .withField(StandardField.CREATIONDATE, "test"),
+                // source: https://github.com/JabRef/jabref/issues/8645
+                new BibEntry()
+                        .withField(StandardField.OWNER, "mlep")
+                        .withField(StandardField.CREATIONDATE, "2022-04-05T10:41:54"));
     }
 
-    @Test
-    void isEmptyTypeSet() {
-        BibEntry entry = new BibEntry(StandardEntryType.Book);
+    @ParameterizedTest
+    @MethodSource
+    void isEmpty(BibEntry entry) {
         assertTrue(entry.isEmpty());
     }
 
