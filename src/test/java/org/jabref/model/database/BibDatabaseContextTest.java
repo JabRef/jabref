@@ -135,7 +135,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setDatabasePath(null);
 
-        Path expectedPath = BibDatabaseContext.getFulltextIndexBasePath().resolve("unsaved");
+        Path expectedPath = JabRefDesktop.getNativeDesktop().getFulltextIndexBaseDirectory().resolve("unsaved");
         Path actualPath = bibDatabaseContext.getFulltextIndexPath();
 
         assertEquals(expectedPath, actualPath);
@@ -148,7 +148,7 @@ class BibDatabaseContextTest {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setDatabasePath(existingPath);
 
-        Path expectedPath = BibDatabaseContext.getFulltextIndexBasePath().resolve(existingPath.hashCode() + "");
+        Path expectedPath = JabRefDesktop.getNativeDesktop().getFulltextIndexBaseDirectory().resolve(existingPath.hashCode() + "");
         Path actualPath = bibDatabaseContext.getFulltextIndexPath();
 
         assertEquals(expectedPath, actualPath);

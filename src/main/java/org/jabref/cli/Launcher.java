@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -21,14 +22,10 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,12 +87,7 @@ public class Launcher {
      * the log configuration programmatically anymore.
      */
     private static void addLogToDisk() {
-        Path directory = Path.of(AppDirsFactory.getInstance()
-                                               .getUserDataDir(
-                OS.APP_DIR_APP_NAME,
-                "logs",
-                OS.APP_DIR_APP_AUTHOR))
-                .resolve(new BuildInfo().version.toString());
+        Path directory = JabRefDesktop.getNativeDesktop().getLogDirectory();
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -168,7 +160,7 @@ public class Launcher {
     }
 
     private static void clearOldSearchIndices() {
-        Path currentIndexPath = BibDatabaseContext.getFulltextIndexBasePath();
+        Path currentIndexPath = JabRefDesktop.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path appData = currentIndexPath.getParent();
 
         try {
