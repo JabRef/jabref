@@ -202,25 +202,64 @@ public class JabRefDesktop {
         boolean useCustomFileBrowser = preferencesService.getExternalApplicationsPreferences().useCustomFileBrowser();
         if (!useCustomFileBrowser) {
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
-        } else {
-            String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-            String command = preferencesService.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
-            if (!command.isEmpty()) {
-                command = command.replaceAll("\\s+", " "); // normalize white spaces
+            return;
+        }
+        String absolutePath = fileLink.toAbsolutePath().getParent().toString();
+        String command = preferencesService.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
+        if (command.isEmpty()) {
+            LOGGER.info("No custom file browser command defined");
+            NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
+            return;
+        }
+        executeCommand(command, absolutePath, dialogService);
+    }
 
-                // replace the placeholder if used
-                command = command.replace("%DIR", absolutePath);
-                String[] subcommands = command.split(" ");
+    /**
+     * Opens a new console starting on the given file location
+     * <p>
+     * If no command is specified in {@link Globals}, the default system console will be executed.
+     *
+     * @param file Location the console should be opened at.
+     *
+     */
+    public static void openConsole(File file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
+        if (file == null) {
+            return;
+        }
 
-                LOGGER.info("Executing command \"" + command + "\"...");
+        String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
 
-                try {
-                    new ProcessBuilder(subcommands).start();
-                } catch (IOException exception) {
-                    LOGGER.error("Open File Browser", exception);
-                    dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
-                }
-            }
+        boolean useCustomTerminal = preferencesService.getExternalApplicationsPreferences().useCustomTerminal();
+        if (!useCustomTerminal) {
+            NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
+            return;
+        }
+        String command = preferencesService.getExternalApplicationsPreferences().getCustomTerminalCommand();
+        command = command.trim();
+        if (command.isEmpty()) {
+            NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
+            LOGGER.info("Preference for custom terminal is empty. Using default terminal.");
+            return;
+        }
+        executeCommand(command, absolutePath, dialogService);
+    }
+
+    private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
+        // normalize white spaces
+        command = command.replaceAll("\\s+", " ");
+
+        // replace the placeholder if used
+        command = command.replace("%DIR", absolutePath);
+
+        LOGGER.info("Executing command \"{}\"...", command);
+        dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
+
+        String[] subcommands = command.split(" ");
+        try {
+            new ProcessBuilder(subcommands).start();
+        } catch (IOException exception) {
+            LOGGER.error("Error during command execution", exception);
+            dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
         }
     }
 
@@ -254,48 +293,6 @@ public class JabRefDesktop {
             String copiedToClipboard = Localization.lang("The link has been copied to the clipboard.");
             dialogService.notify(couldNotOpenBrowser);
             dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
-        }
-    }
-
-    /**
-     * Opens a new console starting on the given file location
-     * <p>
-     * If no command is specified in {@link Globals}, the default system console will be executed.
-     *
-     * @param file Location the console should be opened at.
-     *
-     */
-    public static void openConsole(File file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
-        if (file == null) {
-            return;
-        }
-
-        String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
-
-        boolean useCustomTerminal = preferencesService.getExternalApplicationsPreferences().useCustomTerminal();
-        if (!useCustomTerminal) {
-            NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
-        } else {
-            String command = preferencesService.getExternalApplicationsPreferences().getCustomTerminalCommand();
-            command = command.trim();
-
-            if (!command.isEmpty()) {
-                command = command.replaceAll("\\s+", " "); // normalize white spaces
-                command = command.replace("%DIR", absolutePath); // replace the placeholder if used
-
-                String[] subcommands = command.split(" ");
-
-                LOGGER.info("Executing command \"" + command + "\"...");
-                dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
-
-                try {
-                    new ProcessBuilder(subcommands).start();
-                } catch (IOException exception) {
-                    LOGGER.error("Open console", exception);
-
-                   dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
-                }
-            }
         }
     }
 
