@@ -2,6 +2,7 @@ package org.jabref.logic.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.preferences.OwnerPreferences;
@@ -179,7 +180,7 @@ public class UpdateFieldTest {
 
         OwnerPreferences ownerPreferences = createOwnerPreference(true, true);
         TimestampPreferences timestampPreferences = createTimestampPreference();
-        UpdateField.setAutomaticFields(entry, false, false, ownerPreferences, timestampPreferences);
+        UpdateField.setAutomaticFields(List.of(entry), ownerPreferences, timestampPreferences);
 
         assertEquals(Optional.of("testDefaultOwner"), entry.getField(StandardField.OWNER), "No owner exists");
     }
@@ -188,7 +189,7 @@ public class UpdateFieldTest {
     public void ownerAssignedCorrectlyAfterAutomaticSet() {
         OwnerPreferences ownerPreferences = createOwnerPreference(true, true);
         TimestampPreferences timestampPreferences = createTimestampPreference();
-        UpdateField.setAutomaticFields(entry, false, false, ownerPreferences, timestampPreferences);
+        UpdateField.setAutomaticFields(List.of(entry), ownerPreferences, timestampPreferences);
 
         assertEquals(Optional.of("testDefaultOwner"), entry.getField(StandardField.OWNER));
     }
@@ -202,19 +203,19 @@ public class UpdateFieldTest {
 
         OwnerPreferences ownerPreferences = createOwnerPreference(true, false);
         TimestampPreferences timestampPreferences = createTimestampPreference();
-        UpdateField.setAutomaticFields(entry, false, false, ownerPreferences, timestampPreferences);
+        UpdateField.setAutomaticFields(List.of(entry), ownerPreferences, timestampPreferences);
 
         assertNotEquals(Optional.of("testDefaultOwner"), entry.getField(StandardField.OWNER), "Owner has changed");
         assertEquals(Optional.of(alreadySetOwner), entry.getField(StandardField.OWNER), "Owner has not changed");
     }
 
     @Test
-    public void emptyCreationdateFieldNowPresentAfterAutomaticSet() {
+    public void emptyCreationDateFieldNowPresentAfterAutomaticSet() {
         assertEquals(Optional.empty(), entry.getField(StandardField.CREATIONDATE), "CreationDate is present");
 
         OwnerPreferences ownerPreferences = createOwnerPreference(true, true);
         TimestampPreferences timestampPreferences = createTimestampPreference();
-        UpdateField.setAutomaticFields(entry, false, false, ownerPreferences, timestampPreferences);
+        UpdateField.setAutomaticFields(List.of(entry), ownerPreferences, timestampPreferences);
 
         String creationDate = timestampPreferences.now();
 
@@ -222,10 +223,10 @@ public class UpdateFieldTest {
     }
 
     @Test
-    public void creationdateAssignedCorrectlyAfterAutomaticSet() {
+    public void creationDateAssignedCorrectlyAfterAutomaticSet() {
         OwnerPreferences ownerPreferences = createOwnerPreference(true, true);
         TimestampPreferences timestampPreferences = createTimestampPreference();
-        UpdateField.setAutomaticFields(entry, false, false, ownerPreferences, timestampPreferences);
+        UpdateField.setAutomaticFields(List.of(entry), ownerPreferences, timestampPreferences);
 
         String creationDate = timestampPreferences.now();
 
@@ -245,7 +246,7 @@ public class UpdateFieldTest {
 
         OwnerPreferences ownerPreferences = createOwnerPreference(true, true);
         TimestampPreferences timestampPreferences = createTimestampPreference();
-        UpdateField.setAutomaticFields(bibs, false, ownerPreferences, timestampPreferences);
+        UpdateField.setAutomaticFields(bibs, ownerPreferences, timestampPreferences);
 
         String defaultOwner = "testDefaultOwner";
 
@@ -269,7 +270,7 @@ public class UpdateFieldTest {
 
         OwnerPreferences ownerPreferences = createOwnerPreference(true, false);
         TimestampPreferences timestampPreferences = createTimestampPreference();
-        UpdateField.setAutomaticFields(bibs, false, ownerPreferences, timestampPreferences);
+        UpdateField.setAutomaticFields(bibs, ownerPreferences, timestampPreferences);
 
         assertEquals(Optional.of(initialOwner), entry.getField(StandardField.OWNER), "entry has new value for owner field");
         assertEquals(Optional.of(initialOwner), entry2.getField(StandardField.OWNER), "entry2 has new value for owner field");
