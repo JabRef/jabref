@@ -94,7 +94,7 @@ public class ImportAction {
                 frame.addTab(parserResult.getDatabaseContext(), true);
                 dialogService.notify(Localization.lang("Imported entries") + ": " + parserResult.getDatabase().getEntries().size());
             })
-           .onFailure(ex-> {
+           .onFailure(ex -> {
                LOGGER.error("Error importing", ex);
                dialogService.notify(Localization.lang("Error importing. See the error log for details."));
            })
