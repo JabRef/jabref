@@ -63,10 +63,10 @@ public interface NativeDesktop {
 
     default Path getBackupDirectory() {
         return Path.of(AppDirsFactory.getInstance()
-                                               .getUserDataDir(
-                                                       OS.APP_DIR_APP_NAME,
-                                                       "backups",
-                                                       OS.APP_DIR_APP_AUTHOR);
+                                     .getUserDataDir(
+                                             OS.APP_DIR_APP_NAME,
+                                             "backups",
+                                             OS.APP_DIR_APP_AUTHOR));
     }
 
     default Path getFulltextIndexBaseDirectory() {
