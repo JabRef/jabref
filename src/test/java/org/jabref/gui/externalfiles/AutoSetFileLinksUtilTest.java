@@ -32,7 +32,8 @@ public class AutoSetFileLinksUtilTest {
             AutoLinkPreferences.CitationKeyDependency.START,
             "",
             false,
-            ';');
+            ';',
+            true);
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);
     private Path path = null;

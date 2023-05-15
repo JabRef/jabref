@@ -158,7 +158,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
 
-        if (entry != null) {
+        if ((entry != null) && preferences.getAutoLinkPreferences().autoLinkFilesEnabled()) {
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask
                     .wrap(() -> findAssociatedNotLinkedFiles(entry))
                     .onSuccess(files::addAll);
