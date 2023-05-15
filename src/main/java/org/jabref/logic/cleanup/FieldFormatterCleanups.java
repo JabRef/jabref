@@ -35,14 +35,14 @@ import org.slf4j.LoggerFactory;
 
 public class FieldFormatterCleanups {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FieldFormatterCleanups.class);
-
     public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
     public static final List<FieldFormatterCleanup> RECOMMEND_BIBTEX_ACTIONS;
     public static final List<FieldFormatterCleanup> RECOMMEND_BIBLATEX_ACTIONS;
 
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "disabled";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldFormatterCleanups.class);
 
     /**
      * This parses the key/list map of fields and clean up actions for the field.
