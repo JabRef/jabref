@@ -246,7 +246,6 @@ public class BibDatabaseContext {
         return this.getEntries().stream().anyMatch(entry -> entry.getFields().isEmpty());
     }
 
-
     public Path getFulltextIndexPath() {
         Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
