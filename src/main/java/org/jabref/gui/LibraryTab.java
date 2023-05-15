@@ -816,7 +816,7 @@ public class LibraryTab extends Tab {
     /**
      * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
      *
-     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link Globals.TASK_EXECUTOR}.
+     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link org.jabref.gui.Globals.TASK_EXECUTOR}.
      * @param file the path to the file (loaded by the dataLoadingTask)
      */
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask, Path file, PreferencesService preferencesService, StateManager stateManager, JabRefFrame frame, ThemeManager themeManager) {
