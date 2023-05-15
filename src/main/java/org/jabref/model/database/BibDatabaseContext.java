@@ -239,15 +239,6 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
-    /**
-     * check if the database has any empty entries
-     *
-     * @return true if the database has any empty entries; otherwise false
-     */
-    public boolean hasEmptyEntries() {
-        return this.getEntries().stream().anyMatch(entry -> entry.getFields().isEmpty());
-    }
-
     public static Path getFulltextIndexBasePath() {
         return Path.of(AppDirsFactory.getInstance().getUserDataDir(OS.APP_DIR_APP_NAME, SearchFieldConstants.VERSION, OS.APP_DIR_APP_AUTHOR));
     }
