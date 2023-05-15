@@ -120,7 +120,7 @@ dependencies {
     implementation 'org.apache.lucene:lucene-core:9.5.0'
     implementation 'org.apache.lucene:lucene-queryparser:9.5.0'
     implementation 'org.apache.lucene:lucene-queries:9.5.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.5.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.6.0'
     implementation 'org.apache.lucene:lucene-highlighter:9.5.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
