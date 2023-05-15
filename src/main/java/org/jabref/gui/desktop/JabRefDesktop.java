@@ -1,6 +1,5 @@
 package org.jabref.gui.desktop;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -57,7 +56,7 @@ public class JabRefDesktop {
             throws IOException {
         String link = initialLink;
         Field field = initialField;
-        if (StandardField.PS == field || StandardField.PDF == field) {
+        if ((StandardField.PS == field) || (StandardField.PDF == field)) {
             // Find the default directory for this field type:
             List<Path> directories = databaseContext.getFileDirectories(preferencesService.getFilePreferences());
 
@@ -218,12 +217,12 @@ public class JabRefDesktop {
      * @param file Location the console should be opened at.
      *
      */
-    public static void openConsole(File file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
+    public static void openConsole(Path file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (file == null) {
             return;
         }
 
-        String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
+        String absolutePath = file.toAbsolutePath().getParent().toString();
 
         boolean useCustomTerminal = preferencesService.getExternalApplicationsPreferences().useCustomTerminal();
         if (!useCustomTerminal) {

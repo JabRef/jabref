@@ -47,7 +47,7 @@ public class OpenConsoleAction extends SimpleCommand {
     public void execute() {
         Optional.ofNullable(databaseContext.get()).or(stateManager::getActiveDatabase).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
             try {
-                JabRefDesktop.openConsole(path.toFile(), preferencesService, dialogService);
+                JabRefDesktop.openConsole(path, preferencesService, dialogService);
             } catch (IOException e) {
                 LOGGER.info("Could not open console", e);
             }
