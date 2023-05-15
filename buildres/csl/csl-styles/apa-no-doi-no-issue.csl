@@ -1102,14 +1102,8 @@
     <!--This should be localized -->
     <choose>
       <if type="bill legal_case legislation" match="any"/>
-      <else-if type="interview motion_picture song" match="any">
-        <text value="Original work recorded"/>
-      </else-if>
-      <else-if type="broadcast">
-        <text value="Original work broadcast"/>
-      </else-if>
       <else>
-        <text value="Original work published"/>
+        <text term="original-work-published" text-case="capitalize-first"/>
       </else>
     </choose>
   </macro>
