@@ -144,7 +144,7 @@ public class OracleProcessor extends DBMSProcessor {
                                 ") VALUES(?)";
 
                 try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery,
-                        new String[] {"SHARED_ID"})) {
+                        new String[]{"SHARED_ID"})) {
 
                     preparedEntryStatement.setString(1, entry.getType().getName());
                     preparedEntryStatement.executeUpdate();
