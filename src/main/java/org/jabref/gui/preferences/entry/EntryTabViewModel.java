@@ -14,6 +14,7 @@ import org.jabref.preferences.BibEntryPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class EntryTabViewModel implements PreferenceTabViewModel {
+
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
 
     private final BooleanProperty resolveStringsProperty = new SimpleBooleanProperty();

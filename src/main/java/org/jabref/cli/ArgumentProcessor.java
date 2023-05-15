@@ -234,7 +234,7 @@ public class ArgumentProcessor {
                         cli.getWriteMetadatatoPdf(),
                         preferencesService.getXmpPreferences(),
                         preferencesService.getFilePreferences(),
-                        preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
+                        preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
                         Globals.entryTypesManager,
                         preferencesService.getFieldPreferences(),
                         cli.isWriteXMPtoPdf() || cli.isWriteMetadatatoPdf(),
@@ -534,7 +534,7 @@ public class ArgumentProcessor {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SaveConfiguration saveConfiguration = new SaveConfiguration()
                         .withMetadataSaveOrder(true)
-                        .withReformatOnSave(preferencesService.getExportPreferences().shouldAlwaysReformatOnSave());
+                        .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,

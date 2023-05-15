@@ -18,6 +18,9 @@ import javafx.collections.ObservableSet;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.model.strings.StringUtil;
 
+/**
+ *  Preferences for the linked files
+ */
 public class FilePreferences {
 
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};

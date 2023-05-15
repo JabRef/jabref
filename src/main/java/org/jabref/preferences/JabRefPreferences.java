@@ -424,7 +424,7 @@ public class JabRefPreferences implements PreferencesService {
     private Map<String, Set<Field>> entryEditorTabList;
     private String userName;
 
-    private GeneralPreferences generalPreferences;
+    private LibraryPreferences libraryPreferences;
     private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
     private OwnerPreferences ownerPreferences;
@@ -432,7 +432,7 @@ public class JabRefPreferences implements PreferencesService {
     private PreviewPreferences previewPreferences;
     private OpenOfficePreferences openOfficePreferences;
     private SidePanePreferences sidePanePreferences;
-    private AppearancePreferences appearancePreferences;
+    private WorkspacePreferences workspacePreferences;
     private ImporterPreferences importerPreferences;
     private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
@@ -1256,40 +1256,22 @@ public class JabRefPreferences implements PreferencesService {
         return openOfficePreferences;
     }
 
-    //*************************************************************************************************************
-    // GeneralPreferences
-    //*************************************************************************************************************
-
     @Override
-    public GeneralPreferences getGeneralPreferences() {
-        if (Objects.nonNull(generalPreferences)) {
-            return generalPreferences;
+    public LibraryPreferences getLibraryPreferences() {
+        if (Objects.nonNull(libraryPreferences)) {
+            return libraryPreferences;
         }
 
-        generalPreferences = new GeneralPreferences(
-                getLanguage(),
+        libraryPreferences = new LibraryPreferences(
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
-                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
-                getBoolean(CONFIRM_DELETE),
-                getBoolean(MEMORY_STICK_MODE),
-                getBoolean(OPEN_LAST_EDITED),
-                getBoolean(SHOW_ADVANCED_HINTS));
+                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                getBoolean(LOCAL_AUTO_SAVE));
 
-        EasyBind.listen(generalPreferences.languageProperty(), (obs, oldValue, newValue) -> {
-            put(LANGUAGE, newValue.getId());
-            if (oldValue != newValue) {
-                setLanguageDependentDefaultValues();
-                Localization.setLanguage(newValue);
-            }
-        });
-        EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
-        EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
-        EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-        EasyBind.listen(generalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> putBoolean(MEMORY_STICK_MODE, newValue));
-        EasyBind.listen(generalPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
-        EasyBind.listen(generalPreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
+        EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
+        EasyBind.listen(libraryPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
-        return generalPreferences;
+        return libraryPreferences;
     }
 
     private Language getLanguage() {
@@ -2010,14 +1992,24 @@ public class JabRefPreferences implements PreferencesService {
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
-                getUser()
-        );
+                getUser(),
+                getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
                 (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
         EasyBind.listen(internalPreferences.lastPreferencesExportPathProperty(),
                 (obs, oldValue, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()));
         // user is a static value, should only be changed for debugging
+        EasyBind.listen(internalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(MEMORY_STICK_MODE, newValue);
+            if (!newValue) {
+                try {
+                    Files.deleteIfExists(Path.of("jabref.xml"));
+                } catch (IOException e) {
+                    LOGGER.warn("Error accessing filesystem");
+                }
+            }
+        });
 
         return internalPreferences;
     }
@@ -2041,23 +2033,38 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public AppearancePreferences getAppearancePreferences() {
-        if (appearancePreferences != null) {
-            return appearancePreferences;
+    public WorkspacePreferences getWorkspacePreferences() {
+        if (workspacePreferences != null) {
+            return workspacePreferences;
         }
 
-        appearancePreferences = new AppearancePreferences(
+        workspacePreferences = new WorkspacePreferences(
+                getLanguage(),
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
                 (Integer) defaults.get(MAIN_FONT_SIZE),
-                new Theme(get(FX_THEME))
-        );
+                new Theme(get(FX_THEME)),
+                getBoolean(OPEN_LAST_EDITED),
+                getBoolean(SHOW_ADVANCED_HINTS),
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
+                getBoolean(CONFIRM_DELETE));
 
-        EasyBind.listen(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
-        EasyBind.listen(appearancePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
-        EasyBind.listen(appearancePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
+            put(LANGUAGE, newValue.getId());
+            if (oldValue != newValue) {
+                setLanguageDependentDefaultValues();
+                Localization.setLanguage(newValue);
+            }
+        });
+        EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
+        EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
 
-        return appearancePreferences;
+        return workspacePreferences;
     }
 
     //*************************************************************************************************************
@@ -2188,17 +2195,13 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         exportPreferences = new ExportPreferences(
-                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)),
-                getExportSaveOrder(),
-                getBoolean(LOCAL_AUTO_SAVE));
+                getExportSaveOrder());
 
-        EasyBind.listen(exportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
         EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(exportPreferences.exportSaveOrderProperty(), (obs, oldValue, newValue) -> storeExportSaveOrder(newValue));
-        EasyBind.listen(exportPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
         return exportPreferences;
     }
@@ -2256,7 +2259,7 @@ public class JabRefPreferences implements PreferencesService {
         return new SaveConfiguration()
                 .withSaveOrder(saveOrder)
                 .withMetadataSaveOrder(false)
-                .withReformatOnSave(getExportPreferences().shouldAlwaysReformatOnSave());
+                .withReformatOnSave(getLibraryPreferences().shouldAlwaysReformatOnSave());
     }
 
     @Override

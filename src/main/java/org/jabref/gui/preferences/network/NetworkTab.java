@@ -80,7 +80,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     public void initialize() {
         this.viewModel = new NetworkTabViewModel(dialogService, preferencesService);
 
-        remoteLabel.setVisible(preferencesService.getGeneralPreferences().shouldShowAdvancedHints());
+        remoteLabel.setVisible(preferencesService.getWorkspacePreferences().shouldShowAdvancedHints());
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
