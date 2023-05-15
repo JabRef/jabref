@@ -108,10 +108,16 @@ public class Globals {
         return themeManager;
     }
 
+    public static synchronized FileUpdateMonitor getFileUpdateMonitor() {
+        if (fileUpdateMonitor == null) {
+            Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
+            JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
+        }
+        return fileUpdateMonitor;
+    }
+
     // Background tasks
     public static void startBackgroundTasks() {
-        Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
-        JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
         // TODO Currently deactivated due to incompatibilities in XML
       /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();
@@ -145,10 +151,6 @@ public class Globals {
         telemetryClient.getContext().getDevice().setScreenResolution(Screen.getPrimary().getVisualBounds().toString());
 
         telemetryClient.trackSessionState(SessionState.Start);
-    }
-
-    public static FileUpdateMonitor getFileUpdateMonitor() {
-        return fileUpdateMonitor;
     }
 
     public static void shutdownThreadPools() {

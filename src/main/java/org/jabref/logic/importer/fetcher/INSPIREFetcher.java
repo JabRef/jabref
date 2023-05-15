@@ -26,7 +26,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -83,7 +82,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(importFormatPreferences);
     }
 
     @Override

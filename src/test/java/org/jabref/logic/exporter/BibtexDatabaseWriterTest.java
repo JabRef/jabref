@@ -51,7 +51,6 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,7 +72,6 @@ public class BibtexDatabaseWriterTest {
     private MetaData metaData;
     private BibDatabaseContext bibtexContext;
     private ImportFormatPreferences importFormatPreferences;
-    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
     private SaveConfiguration saveConfiguration;
     private FieldPreferences fieldPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
@@ -411,7 +409,7 @@ public class BibtexDatabaseWriterTest {
     void roundtripWithArticleMonths() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/articleWithMonths.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
 
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -431,7 +429,7 @@ public class BibtexDatabaseWriterTest {
                 "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
         databaseWriter.saveDatabase(context);
         // @formatter:off
@@ -448,7 +446,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws Exception {
         Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
-        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile);
+        ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         Path pathToFile = bibFolder.resolve("JabRef.bib");
@@ -472,7 +470,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     void roundtripUtf8HeaderKept(@TempDir Path bibFolder) throws Exception {
         Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-with-header-with-databasetypecomment.bib").toURI());
-        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile);
+        ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         Path pathToFile = bibFolder.resolve("JabRef.bib");
@@ -496,7 +494,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     void roundtripNotExplicitUtf8HeaderNotInsertedDuringWrite(@TempDir Path bibFolder) throws Exception {
         Path testFile = Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-without-header-with-databasetypecomment.bib").toURI());
-        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(testFile);
+        ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         Path pathToFile = bibFolder.resolve("JabRef.bib");
@@ -521,7 +519,7 @@ public class BibtexDatabaseWriterTest {
     void roundtripWithComplexBib() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
 
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -540,7 +538,7 @@ public class BibtexDatabaseWriterTest {
     void roundtripWithUserComment() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
 
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -560,7 +558,7 @@ public class BibtexDatabaseWriterTest {
 
         // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibEntry));
 
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
@@ -593,7 +591,7 @@ public class BibtexDatabaseWriterTest {
 
         // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibEntry));
 
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
@@ -616,7 +614,7 @@ public class BibtexDatabaseWriterTest {
     void roundtripWithUserCommentAndEntryChange() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
 
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
@@ -631,7 +629,7 @@ public class BibtexDatabaseWriterTest {
     void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
 
         for (BibtexString string : result.getDatabase().getStringValues()) {
             // Mark them as changed
@@ -649,7 +647,7 @@ public class BibtexDatabaseWriterTest {
     void roundtripWithUnknownMetaData() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/unknownMetaData.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
 
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -914,7 +912,7 @@ public class BibtexDatabaseWriterTest {
         String fileContent = encodingHeader + commentEntry;
         Charset encoding = StandardCharsets.UTF_8;
 
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(fileContent));
+        ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(new StringReader(fileContent));
 
         BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
 
@@ -936,7 +934,7 @@ public class BibtexDatabaseWriterTest {
 
         // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
+        ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 

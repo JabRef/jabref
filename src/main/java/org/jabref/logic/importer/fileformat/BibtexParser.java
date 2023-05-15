@@ -41,6 +41,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -82,8 +83,12 @@ public class BibtexParser implements Parser {
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
-        metaDataParser = new MetaDataParser(fileMonitor);
+        this.fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
+        this.metaDataParser = new MetaDataParser(fileMonitor);
+    }
+
+    public BibtexParser(ImportFormatPreferences importFormatPreferences) {
+        this(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
     /**
@@ -94,8 +99,8 @@ public class BibtexParser implements Parser {
      * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
      * @throws ParseException
      */
-    public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws ParseException {
-        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences, fileMonitor).parseEntries(bibtexString);
+    public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) throws ParseException {
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
             return Optional.empty();
         }
@@ -224,7 +229,9 @@ public class BibtexParser implements Parser {
         }
 
         try {
-            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
+            parserResult.setMetaData(metaDataParser.parse(
+                    meta,
+                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }

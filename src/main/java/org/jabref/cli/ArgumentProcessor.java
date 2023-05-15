@@ -93,7 +93,7 @@ public class ArgumentProcessor {
     }
 
     private static Optional<ParserResult> importBibtexToOpenBase(String argument, ImportFormatPreferences importFormatPreferences) {
-        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
         try {
             List<BibEntry> entries = parser.parseEntries(argument);
             ParserResult result = new ParserResult(entries);
