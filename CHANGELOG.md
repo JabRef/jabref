@@ -50,6 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We reordered the preferences dialog. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We split the 'Import and Export' tab into 'Web Search' and 'Export'. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We moved the option to run JabRef in memory stick mode into the preferences dialog toolbar. [#9866](https://github.com/JabRef/jabref/pull/9866)
+- In case the library contains empty entries, they are not written to disk. [#8645](https://github.com/JabRef/jabref/issues/8645)
 - The formatter `remove_unicode_ligatures` is now called `replace_unicode_ligatures`. [#9890](https://github.com/JabRef/jabref/pull/9890)
 
 ### Fixed
@@ -371,7 +372,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
-- We added confirmation dialog when user wants to close a library where any empty entires are detected. [#8096](https://github.com/JabRef/jabref/issues/8096)
+- We added confirmation dialog when user wants to close a library where any empty entries are detected. [#8096](https://github.com/JabRef/jabref/issues/8096)
 - We added import support for CFF files. [#7945](https://github.com/JabRef/jabref/issues/7945)
 - We added the option to copy the DOI of an entry directly from the context menu copy submenu. [#7826](https://github.com/JabRef/jabref/issues/7826)
 - We added a fulltext search feature. [#2838](https://github.com/JabRef/jabref/pull/2838)

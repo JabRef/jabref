@@ -237,15 +237,6 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
-    /**
-     * check if the database has any empty entries
-     *
-     * @return true if the database has any empty entries; otherwise false
-     */
-    public boolean hasEmptyEntries() {
-        return this.getEntries().stream().anyMatch(entry -> entry.getFields().isEmpty());
-    }
-
     public Path getFulltextIndexPath() {
         Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
