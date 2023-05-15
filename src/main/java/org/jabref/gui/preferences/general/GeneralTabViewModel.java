@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.workspace;
+package org.jabref.gui.preferences.general;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
-public class WorkspaceTabViewModel implements PreferenceTabViewModel {
+public class GeneralTabViewModel implements PreferenceTabViewModel {
     protected enum ThemeTypes {
         LIGHT(Localization.lang("Light")),
         DARK(Localization.lang("Dark")),
@@ -99,7 +99,7 @@ public class WorkspaceTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    public WorkspaceTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.workspacePreferences = preferences.getWorkspacePreferences();
@@ -117,7 +117,7 @@ public class WorkspaceTabViewModel implements PreferenceTabViewModel {
                     }
                 },
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Workspace"),
+                        Localization.lang("General"),
                         Localization.lang("Font settings"),
                         Localization.lang("You must enter an integer value higher than 8."))));
 
@@ -125,7 +125,7 @@ public class WorkspaceTabViewModel implements PreferenceTabViewModel {
                 customPathToThemeProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Workspace"),
+                        Localization.lang("General"),
                         Localization.lang("Visual theme"),
                         Localization.lang("Please specify a css theme file."))));
     }

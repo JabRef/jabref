@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.workspace;
+package org.jabref.gui.preferences.general;
 
 import java.util.regex.Pattern;
 
@@ -30,10 +30,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class WorkspaceTab extends AbstractPreferenceTabView<WorkspaceTabViewModel> implements PreferencesTab {
+public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
     @FXML private ComboBox<Language> language;
-    @FXML private ComboBox<WorkspaceTabViewModel.ThemeTypes> theme;
+    @FXML private ComboBox<GeneralTabViewModel.ThemeTypes> theme;
     @FXML private TextField customThemePath;
     @FXML private Button customThemeBrowse;
     @FXML private CheckBox fontOverride;
@@ -62,7 +62,7 @@ public class WorkspaceTab extends AbstractPreferenceTabView<WorkspaceTabViewMode
                 return c;
             });
 
-    public WorkspaceTab() {
+    public GeneralTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -70,11 +70,11 @@ public class WorkspaceTab extends AbstractPreferenceTabView<WorkspaceTabViewMode
 
     @Override
     public String getTabName() {
-        return Localization.lang("Workspace");
+        return Localization.lang("General");
     }
 
     public void initialize() {
-        this.viewModel = new WorkspaceTabViewModel(dialogService, preferencesService);
+        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)
@@ -87,18 +87,18 @@ public class WorkspaceTab extends AbstractPreferenceTabView<WorkspaceTabViewMode
         // Spinner does neither support alignment nor disableProperty in FXML
         fontSize.disableProperty().bind(fontOverride.selectedProperty().not());
         fontSize.getEditor().setAlignment(Pos.CENTER_RIGHT);
-        fontSize.setValueFactory(WorkspaceTabViewModel.fontSizeValueFactory);
+        fontSize.setValueFactory(GeneralTabViewModel.fontSizeValueFactory);
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
-        new ViewModelListCellFactory<WorkspaceTabViewModel.ThemeTypes>()
-                .withText(WorkspaceTabViewModel.ThemeTypes::getDisplayName)
+        new ViewModelListCellFactory<GeneralTabViewModel.ThemeTypes>()
+                .withText(GeneralTabViewModel.ThemeTypes::getDisplayName)
                 .install(theme);
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
         EasyBind.subscribe(viewModel.selectedThemeProperty(), theme -> {
-            boolean isCustomTheme = theme == WorkspaceTabViewModel.ThemeTypes.CUSTOM;
+            boolean isCustomTheme = theme == GeneralTabViewModel.ThemeTypes.CUSTOM;
             customThemePath.disableProperty().set(!isCustomTheme);
             customThemeBrowse.disableProperty().set(!isCustomTheme);
         });

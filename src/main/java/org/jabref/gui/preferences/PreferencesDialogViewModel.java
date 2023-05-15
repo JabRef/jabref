@@ -24,6 +24,7 @@ import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.export.ExportTab;
 import org.jabref.gui.preferences.external.ExternalTab;
 import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
+import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
@@ -34,7 +35,6 @@ import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
 import org.jabref.gui.preferences.websearch.WebSearchTab;
-import org.jabref.gui.preferences.workspace.WorkspaceTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
@@ -63,7 +63,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
-                new WorkspaceTab(),
+                new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
                 new WebSearchTab(),
