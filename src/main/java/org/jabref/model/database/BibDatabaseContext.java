@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.study.Study;
@@ -248,7 +248,7 @@ public class BibDatabaseContext {
 
 
     public Path getFulltextIndexPath() {
-        Path appData = JabRefDesktop.getNativeDesktop().getFulltextIndexBaseDirectory();
+        Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {
