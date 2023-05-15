@@ -1,9 +1,15 @@
 package org.jabref.gui.desktop.os;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
+import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.OS;
+import org.jabref.model.pdf.search.SearchFieldConstants;
+
+import net.harawata.appdirs.AppDirsFactory;
 
 public interface NativeDesktop {
 
@@ -44,5 +50,36 @@ public interface NativeDesktop {
      */
     default Path getUserDirectory() {
         return Path.of(System.getProperty("user.home"));
+    }
+
+    default Path getLogDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(
+                                             OS.APP_DIR_APP_NAME,
+                                             "logs",
+                                             OS.APP_DIR_APP_AUTHOR))
+                   .resolve(new BuildInfo().version.toString());
+    }
+
+    default Path getBackupDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(
+                                             OS.APP_DIR_APP_NAME,
+                                             "backups",
+                                             OS.APP_DIR_APP_AUTHOR));
+    }
+
+    default Path getFulltextIndexBaseDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
+                                             "lucene" + File.separator + SearchFieldConstants.VERSION,
+                                             OS.APP_DIR_APP_AUTHOR));
+    }
+
+    default Path getSslDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
+                                             "ssl",
+                                             OS.APP_DIR_APP_AUTHOR));
     }
 }

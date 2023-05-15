@@ -1,6 +1,5 @@
 package org.jabref.gui.desktop;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -13,11 +12,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.desktop.os.DefaultDesktop;
-import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.desktop.os.OSX;
-import org.jabref.gui.desktop.os.Windows;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.importer.util.IdentifierParser;
@@ -36,14 +31,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
- * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
+ * See http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
+ * http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT
  */
 public class JabRefDesktop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDesktop.class);
 
-    private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
+    private static final NativeDesktop NATIVE_DESKTOP = OS.getNativeDesktop();
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
     private JabRefDesktop() {
@@ -51,6 +46,8 @@ public class JabRefDesktop {
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
+     *
+     * Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext,
                                           PreferencesService preferencesService,
@@ -61,7 +58,7 @@ public class JabRefDesktop {
             throws IOException {
         String link = initialLink;
         Field field = initialField;
-        if (StandardField.PS == field || StandardField.PDF == field) {
+        if ((StandardField.PS == field) || (StandardField.PDF == field)) {
             // Find the default directory for this field type:
             List<Path> directories = databaseContext.getFileDirectories(preferencesService.getFilePreferences());
 
@@ -151,23 +148,21 @@ public class JabRefDesktop {
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
                                                     PreferencesService preferencesService,
                                                     String link,
-                                                    final Optional<ExternalFileType> type)
-            throws IOException {
-
+                                                    final Optional<ExternalFileType> type) throws IOException {
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openExternalFilePlatformIndependent(type, link);
             return true;
         }
-
         Optional<Path> file = FileUtil.find(databaseContext, link, preferencesService.getFilePreferences());
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
-        } else {
-            // No file matched the name, try to open it directly using the given app
-            openExternalFilePlatformIndependent(type, link);
+            return true;
         }
+
+        // No file matched the name, try to open it directly using the given app
+        openExternalFilePlatformIndependent(type, link);
         return true;
     }
 
@@ -202,25 +197,64 @@ public class JabRefDesktop {
         boolean useCustomFileBrowser = preferencesService.getExternalApplicationsPreferences().useCustomFileBrowser();
         if (!useCustomFileBrowser) {
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
-        } else {
-            String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-            String command = preferencesService.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
-            if (!command.isEmpty()) {
-                command = command.replaceAll("\\s+", " "); // normalize white spaces
+            return;
+        }
+        String absolutePath = fileLink.toAbsolutePath().getParent().toString();
+        String command = preferencesService.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
+        if (command.isEmpty()) {
+            LOGGER.info("No custom file browser command defined");
+            NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
+            return;
+        }
+        executeCommand(command, absolutePath, dialogService);
+    }
 
-                // replace the placeholder if used
-                command = command.replace("%DIR", absolutePath);
-                String[] subcommands = command.split(" ");
+    /**
+     * Opens a new console starting on the given file location
+     * <p>
+     * If no command is specified in {@link Globals}, the default system console will be executed.
+     *
+     * @param file Location the console should be opened at.
+     *
+     */
+    public static void openConsole(Path file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
+        if (file == null) {
+            return;
+        }
 
-                LOGGER.info("Executing command \"" + command + "\"...");
+        String absolutePath = file.toAbsolutePath().getParent().toString();
 
-                try {
-                    new ProcessBuilder(subcommands).start();
-                } catch (IOException exception) {
-                    LOGGER.error("Open File Browser", exception);
-                    dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
-                }
-            }
+        boolean useCustomTerminal = preferencesService.getExternalApplicationsPreferences().useCustomTerminal();
+        if (!useCustomTerminal) {
+            NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
+            return;
+        }
+        String command = preferencesService.getExternalApplicationsPreferences().getCustomTerminalCommand();
+        command = command.trim();
+        if (command.isEmpty()) {
+            NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
+            LOGGER.info("Preference for custom terminal is empty. Using default terminal.");
+            return;
+        }
+        executeCommand(command, absolutePath, dialogService);
+    }
+
+    private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
+        // normalize white spaces
+        command = command.replaceAll("\\s+", " ");
+
+        // replace the placeholder if used
+        command = command.replace("%DIR", absolutePath);
+
+        LOGGER.info("Executing command \"{}\"...", command);
+        dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
+
+        String[] subcommands = command.split(" ");
+        try {
+            new ProcessBuilder(subcommands).start();
+        } catch (IOException exception) {
+            LOGGER.error("Error during command execution", exception);
+            dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
         }
     }
 
@@ -255,59 +289,5 @@ public class JabRefDesktop {
             dialogService.notify(couldNotOpenBrowser);
             dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
-    }
-
-    /**
-     * Opens a new console starting on the given file location
-     * <p>
-     * If no command is specified in {@link Globals}, the default system console will be executed.
-     *
-     * @param file Location the console should be opened at.
-     *
-     */
-    public static void openConsole(File file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
-        if (file == null) {
-            return;
-        }
-
-        String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
-
-        boolean useCustomTerminal = preferencesService.getExternalApplicationsPreferences().useCustomTerminal();
-        if (!useCustomTerminal) {
-            NATIVE_DESKTOP.openConsole(absolutePath, dialogService);
-        } else {
-            String command = preferencesService.getExternalApplicationsPreferences().getCustomTerminalCommand();
-            command = command.trim();
-
-            if (!command.isEmpty()) {
-                command = command.replaceAll("\\s+", " "); // normalize white spaces
-                command = command.replace("%DIR", absolutePath); // replace the placeholder if used
-
-                String[] subcommands = command.split(" ");
-
-                LOGGER.info("Executing command \"" + command + "\"...");
-                dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
-
-                try {
-                    new ProcessBuilder(subcommands).start();
-                } catch (IOException exception) {
-                    LOGGER.error("Open console", exception);
-
-                   dialogService.notify(Localization.lang("Error occured while executing the command \"%0\".", command));
-                }
-            }
-        }
-    }
-
-    // TODO: Move to OS.java
-    public static NativeDesktop getNativeDesktop() {
-        if (OS.WINDOWS) {
-            return new Windows();
-        } else if (OS.OS_X) {
-            return new OSX();
-        } else if (OS.LINUX) {
-            return new Linux();
-        }
-        return new DefaultDesktop();
     }
 }

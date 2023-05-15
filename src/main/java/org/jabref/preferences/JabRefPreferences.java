@@ -41,7 +41,6 @@ import javafx.scene.control.TableColumn.SortType;
 import org.jabref.gui.Globals;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -100,7 +99,6 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
@@ -118,7 +116,6 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
-import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -500,9 +497,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
 
-        defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
-        defaults.put(PUSH_WINEDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(PUSH_TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_TEXMAKER_PATH, OS.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
+        defaults.put(PUSH_WINEDT_PATH, OS.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        defaults.put(PUSH_TEXSTUDIO_PATH, OS.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
         defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(PUSH_VIM, "vim");
         defaults.put(PUSH_VIM_SERVER, "vim");
@@ -543,12 +540,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_PASSWORD, "");
 
         // SSL
-        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance()
-                                                            .getUserDataDir(
-                                                                    OS.APP_DIR_APP_NAME,
-                                                                    "ssl",
-                                                                    OS.APP_DIR_APP_AUTHOR))
-                                          .resolve("truststore.jks").toString());
+        defaults.put(TRUSTSTORE_PATH, OS.getNativeDesktop()
+                                        .getSslDirectory()
+                                        .resolve("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
@@ -1997,7 +1991,7 @@ public class JabRefPreferences implements PreferencesService {
 
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
-                getPath(PREFS_EXPORT_PATH, JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory()),
+                getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
                 getUser(),
                 getBoolean(MEMORY_STICK_MODE));
 
@@ -2120,7 +2114,7 @@ public class JabRefPreferences implements PreferencesService {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUser(),
-                getPath(MAIN_FILE_DIRECTORY, JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory()).toString(),
+                getPath(MAIN_FILE_DIRECTORY, OS.getNativeDesktop().getDefaultFileChooserDirectory()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
@@ -2130,7 +2124,7 @@ public class JabRefPreferences implements PreferencesService {
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
                 getBoolean(CREATE_BACKUP),
                 // We choose the data directory, because a ".bak" file should survive cache cleanups
-                getPath(BACKUP_DIRECTORY, BackupFileUtil.getAppDataBackupDir()));
+                getPath(BACKUP_DIRECTORY, OS.getNativeDesktop().getBackupDirectory()));
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
