@@ -1658,8 +1658,10 @@ class BibtexParserTest {
 
     @ParameterizedTest
     @CsvSource({
-            // single backsslash kept
+            // single backslash kept
             "C:\\temp\\test",
+            "\\\\servername\\path\\to\\file",
+            "//servername/path/to/file",
             "."})
     void fileDirectoriesUnmodified(String directory) throws IOException {
         ParserResult result = parser.parse(
@@ -1667,11 +1669,14 @@ class BibtexParserTest {
         assertEquals(directory, result.getMetaData().getDefaultFileDirectory().get());
     }
 
-    @Test
-    void fileDirectoryWithDoubleEscapeIsRead() throws IOException {
+    @ParameterizedTest
+    @CsvSource({
+            "C:\\temp\\test, C:\\\\temp\\\\test",
+            "\\\\servername\\path\\to\\file, \\\\\\\\servername\\\\path\\\\to\\\\file"})
+    void fileDirectoryWithDoubleEscapeIsRead(String expected, String provided) throws IOException {
         ParserResult result = parser.parse(
-                new StringReader("@comment{jabref-meta: fileDirectory: C:\\\\temp\\\\test}"));
-        assertEquals("C:\\temp\\test", result.getMetaData().getDefaultFileDirectory().get());
+                new StringReader("@comment{jabref-meta: fileDirectory: " + provided + "}"));
+        assertEquals(expected, result.getMetaData().getDefaultFileDirectory().get());
     }
 
     @Test

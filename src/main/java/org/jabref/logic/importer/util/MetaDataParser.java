@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.importer.ParseException;
@@ -84,46 +85,46 @@ public class MetaDataParser {
         entryList.sort(groupsLast());
 
         for (Map.Entry<String, String> entry : entryList) {
-            List<String> value = getAsList(entry.getValue());
+            List<String> values = getAsList(entry.getValue());
 
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 EntryType entryType = EntryTypeFactory.parse(entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length()));
-                nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(value)));
+                nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(values)));
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
+            } else if (entry.getKey().equals(MetaData.FILE_DIRECTORY)) {
+                metaData.setDefaultFileDirectory(parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
-                metaData.setUserFileDirectory(user, getSingleItem(value));
+                metaData.setUserFileDirectory(user, parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY_LATEX)) {
                 // The user name starts directly after FILE_DIRECTORY_LATEX" + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
-                Path path = Path.of(getSingleItem(value)).normalize();
+                Path path = Path.of(parseDirectory(entry.getValue())).normalize();
                 metaData.setLatexFileDirectory(user, path);
-            } else if (entry.getKey().equals(MetaData.FILE_DIRECTORY)) {
-                metaData.setDefaultFileDirectory(getSingleItem(value));
             } else if (entry.getKey().equals(MetaData.SAVE_ACTIONS)) {
-                metaData.setSaveActions(FieldFormatterCleanups.parse(value));
+                metaData.setSaveActions(FieldFormatterCleanups.parse(values));
             } else if (entry.getKey().equals(MetaData.DATABASE_TYPE)) {
-                metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)));
+                metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (entry.getKey().equals(MetaData.KEYPATTERNDEFAULT)) {
-                defaultCiteKeyPattern = Collections.singletonList(getSingleItem(value));
+                defaultCiteKeyPattern = Collections.singletonList(getSingleItem(values));
             } else if (entry.getKey().equals(MetaData.PROTECTED_FLAG_META)) {
-                if (Boolean.parseBoolean(getSingleItem(value))) {
+                if (Boolean.parseBoolean(getSingleItem(values))) {
                     metaData.markAsProtected();
                 } else {
                     metaData.markAsNotProtected();
                 }
             } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
-                metaData.setSaveOrderConfig(SaveOrder.parse(value));
+                metaData.setSaveOrderConfig(SaveOrder.parse(values));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
-                metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
+                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
             } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
-                metaData.setVersionDBStructure(getSingleItem(value));
+                metaData.setVersionDBStructure(getSingleItem(values));
             } else {
                 // Keep meta data items that we do not know in the file
-                metaData.putUnknownMetaDataItem(entry.getKey(), value);
+                metaData.putUnknownMetaDataItem(entry.getKey(), values);
             }
         }
 
@@ -132,6 +133,31 @@ public class MetaDataParser {
         }
 
         return metaData;
+    }
+
+    /**
+     * Parse the content of the value as provided by "raw" content.
+     *
+     * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
+     * because this leads to difficulties with UNC names.
+     *
+     * No normalization is done - the general file directory could be passed as Mac OS X path, but the user could sit on Windows.
+     *
+     * @param value the raw value (as stored in the .bib file)
+     */
+    static String parseDirectory(String value) {
+        value = StringUtil.removeStringAtTheEnd(value, MetaData.SEPARATOR_STRING);
+        Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
+        if (value.contains("\\\\\\\\")) {
+            // This is an escaped Windows UNC path
+            return value.replace("\\\\", "\\");
+        } else if (value.contains("\\\\") && !SINGLE_BACKSLASH.matcher(value).find()) {
+            // All backslashes escaped
+            return value.replace("\\\\", "\\");
+        } else {
+            // No backslash escaping
+            return value;
+        }
     }
 
     private static Comparator<? super Map.Entry<String, String>> groupsLast() {
