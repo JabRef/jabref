@@ -304,9 +304,6 @@
       </else>
     </choose>
   </macro>
-  <macro name="date-sort-date">
-    <date variable="issued" form="numeric"/>
-  </macro>
   <macro name="date-intext">
     <choose>
       <if variable="issued">
@@ -1401,7 +1398,7 @@
             </if>
             <else>
               <group delimiter=" ">
-                <text value="Original work published"/>
+                <text term="original-work-published" text-case="capitalize-first"/>
                 <choose>
                   <if is-uncertain-date="original-date">
                     <text term="circa" form="short"/>
