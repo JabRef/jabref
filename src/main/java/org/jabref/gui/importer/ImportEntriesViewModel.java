@@ -186,7 +186,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                Globals.IMPORT_FORMAT_READER,
+                Globals.importFormatReader,
                 taskExecutor);
         importHandler.importEntries(entriesToImport);
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());

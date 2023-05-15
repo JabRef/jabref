@@ -48,13 +48,17 @@ public class Globals {
      */
     public static StateManager stateManager = new StateManager();
 
-    public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
     public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor(stateManager);
 
     /**
      * Each test case initializes this field if required
      */
     public static JabRefPreferences prefs;
+
+    /**
+     * Repository of the custom import formats
+     */
+    public static ImportFormatReader importFormatReader;
 
     /**
      * This field is initialized upon startup.

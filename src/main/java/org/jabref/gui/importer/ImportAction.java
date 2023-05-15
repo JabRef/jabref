@@ -114,36 +114,28 @@ public class ImportAction {
     }
 
     private List<ImportFormatReader.UnknownFormatImport> doImport(List<Path> files) {
-        // We import all files and collect their results:
+        // We import all files and collect their results
         List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
         for (Path filename : files) {
             try {
                 if (importer.isEmpty()) {
-                    // Unknown format:
+                    // Unknown format
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getGrobidPreferences())) {
-                            Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                                    prefs.getImporterPreferences(),
-                                    prefs.getImportFormatPreferences(),
-                                    Globals.getFileUpdateMonitor());
+                        if (fileIsPdf(filename)) {
+                            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getGrobidPreferences());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
                     });
-                    // This import method never throws an IOException:
-                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
+                    // This import method never throws an IOException
+                    imports.add(Globals.importFormatReader.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
                 } else {
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if ((importer.get() instanceof PdfGrobidImporter) || (
-                                (importer.get() instanceof PdfMergeMetadataImporter)
-                                && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getGrobidPreferences()))) {
-                                Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                                        prefs.getImporterPreferences(),
-                                        prefs.getImportFormatPreferences(),
-                                        Globals.getFileUpdateMonitor());
+                        if ((importer.get() instanceof PdfGrobidImporter) || (importer.get() instanceof PdfMergeMetadataImporter)) {
+                            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, prefs.getGrobidPreferences());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
                     });
-                    // Specific importer:
+                    // Specific importer
                     ParserResult pr = importer.get().importDatabase(filename);
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));
                 }

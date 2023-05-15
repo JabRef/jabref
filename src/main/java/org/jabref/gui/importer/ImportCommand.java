@@ -48,7 +48,7 @@ public class ImportCommand extends SimpleCommand {
 
     @Override
     public void execute() {
-        SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
+        SortedSet<Importer> importers = Globals.importFormatReader.getImportFormats();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.ANY_FILE)

@@ -194,7 +194,7 @@ public class JabRefFrame extends BorderPane {
         this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
         this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
-        this.importFormatReader = Globals.IMPORT_FORMAT_READER;
+        this.importFormatReader = Globals.importFormatReader;
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {

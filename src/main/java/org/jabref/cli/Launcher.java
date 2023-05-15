@@ -9,8 +9,11 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Map;
 
+import javafx.beans.InvalidationListener;
+
 import org.jabref.gui.Globals;
 import org.jabref.gui.MainApplication;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -145,10 +148,12 @@ public class Launcher {
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(
+        Globals.importFormatReader = new ImportFormatReader(
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
                 Globals.getFileUpdateMonitor());
+        preferences.getImporterPreferences().getCustomImportList().addListener((InvalidationListener) c ->
+                Globals.importFormatReader.reset());
 
         Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
