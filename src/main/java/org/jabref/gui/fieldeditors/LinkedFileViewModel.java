@@ -225,7 +225,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                         databaseContext,
                         linkedFile.getLink(),
                         preferences.getFilePreferences());
-
                 if (resolvedPath.isPresent()) {
                     JabRefDesktop.openFolderAndSelectFile(resolvedPath.get(), preferences, dialogService);
                 } else {

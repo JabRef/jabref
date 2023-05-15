@@ -51,6 +51,8 @@ public class JabRefDesktop {
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
+     *
+     * Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext,
                                           PreferencesService preferencesService,
@@ -151,23 +153,21 @@ public class JabRefDesktop {
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
                                                     PreferencesService preferencesService,
                                                     String link,
-                                                    final Optional<ExternalFileType> type)
-            throws IOException {
-
+                                                    final Optional<ExternalFileType> type) throws IOException {
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openExternalFilePlatformIndependent(type, link);
             return true;
         }
-
         Optional<Path> file = FileUtil.find(databaseContext, link, preferencesService.getFilePreferences());
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
-        } else {
-            // No file matched the name, try to open it directly using the given app
-            openExternalFilePlatformIndependent(type, link);
+            return true;
         }
+
+        // No file matched the name, try to open it directly using the given app
+        openExternalFilePlatformIndependent(type, link);
         return true;
     }
 
