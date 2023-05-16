@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
 public class Linux implements NativeDesktop {
 
-
     private void nativeOpenFile(String filePath) {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
