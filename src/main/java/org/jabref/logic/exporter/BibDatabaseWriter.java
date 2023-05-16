@@ -171,7 +171,11 @@ public abstract class BibDatabaseWriter {
      * Saves the complete database.
      */
     public void saveDatabase(BibDatabaseContext bibDatabaseContext) throws IOException {
-        savePartOfDatabase(bibDatabaseContext, bibDatabaseContext.getDatabase().getEntries());
+        List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntries()
+                                                .stream()
+                                                .filter(entry -> !entry.isEmpty())
+                                                .toList();
+        savePartOfDatabase(bibDatabaseContext, entries);
     }
 
     /**

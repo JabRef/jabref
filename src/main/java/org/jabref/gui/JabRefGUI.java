@@ -142,7 +142,7 @@ public class JabRefGUI {
 
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && preferencesService.getGeneralPreferences().shouldOpenLastEdited()) {
+        if (!isBlank && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
 

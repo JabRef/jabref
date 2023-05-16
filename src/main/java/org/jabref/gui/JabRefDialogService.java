@@ -364,7 +364,7 @@ public class JabRefDialogService implements DialogService {
                                               .text(
                                                     "(" + Localization.lang("Check the event log to see all notifications") + ")"
                                                      + "\n\n" + message)
-                                              .onAction(e-> {
+                                              .onAction(e -> {
                                                      ErrorConsoleAction ec = new ErrorConsoleAction();
                                                      ec.execute();
                                                  }))

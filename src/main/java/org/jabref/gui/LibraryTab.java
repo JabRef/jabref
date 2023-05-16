@@ -297,7 +297,7 @@ public class LibraryTab extends Tab {
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED)
                 || ((context.getLocation() == DatabaseLocation.LOCAL)
-                && preferencesService.getExportPreferences().shouldAutoSave()))
+                && preferencesService.getLibraryPreferences().shouldAutoSave()))
                 && context.getDatabasePath().isPresent();
     }
 
@@ -313,7 +313,7 @@ public class LibraryTab extends Tab {
      * Example: *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
-        boolean isAutosaveEnabled = preferencesService.getExportPreferences().shouldAutoSave();
+        boolean isAutosaveEnabled = preferencesService.getLibraryPreferences().shouldAutoSave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -469,13 +469,9 @@ public class LibraryTab extends Tab {
             bibDatabaseContext.getDatabase().insertEntries(entries);
 
             // Set owner and timestamp
-            for (BibEntry entry : entries) {
-                UpdateField.setAutomaticFields(entry,
-                        true,
-                        true,
-                        preferencesService.getOwnerPreferences(),
-                        preferencesService.getTimestampPreferences());
-            }
+            UpdateField.setAutomaticFields(entries,
+                    preferencesService.getOwnerPreferences(),
+                    preferencesService.getTimestampPreferences());
             // Create an UndoableInsertEntries object.
             getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
@@ -668,7 +664,7 @@ public class LibraryTab extends Tab {
     }
 
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
-        if (preferencesService.getGeneralPreferences().shouldConfirmDelete()) {
+        if (preferencesService.getWorkspacePreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
             String message = Localization.lang("Really delete the selected entry?");
             String okButton = Localization.lang("Delete entry");
@@ -685,7 +681,7 @@ public class LibraryTab extends Tab {
                     okButton,
                     cancelButton,
                     Localization.lang("Do not ask again"),
-                    optOut -> preferencesService.getGeneralPreferences().setConfirmDelete(!optOut));
+                    optOut -> preferencesService.getWorkspacePreferences().setConfirmDelete(!optOut));
         } else {
             return true;
         }
@@ -820,7 +816,7 @@ public class LibraryTab extends Tab {
     /**
      * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
      *
-     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link Globals.TASK_EXECUTOR}.
+     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link org.jabref.gui.Globals.TASK_EXECUTOR}.
      * @param file the path to the file (loaded by the dataLoadingTask)
      */
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask, Path file, PreferencesService preferencesService, StateManager stateManager, JabRefFrame frame, ThemeManager themeManager) {

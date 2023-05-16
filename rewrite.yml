@@ -122,7 +122,7 @@ recipeList:
 #  - org.openrewrite.java.cleanup.IndexOfShouldNotCompareGreaterThanZero
 #  - org.openrewrite.java.cleanup.InstanceOfPatternMatch
 #  - org.openrewrite.java.cleanup.IsEmptyCallOnCollections
-#  - org.openrewrite.java.cleanup.MethodParamPad
+  - org.openrewrite.java.cleanup.MethodParamPad
 #  - org.openrewrite.java.cleanup.MissingOverrideAnnotation
 #  - org.openrewrite.java.cleanup.ModifierOrder
   - org.openrewrite.java.cleanup.MultipleVariableDeclarations
@@ -145,7 +145,7 @@ recipeList:
   - org.openrewrite.java.cleanup.RedundantFileCreation
   - org.openrewrite.java.cleanup.RemoveCallsToObjectFinalize
   - org.openrewrite.java.cleanup.RemoveEmptyJavaDocParameters
-#  - org.openrewrite.java.cleanup.RemoveExtraSemicolons
+  - org.openrewrite.java.cleanup.RemoveExtraSemicolons
 #  - org.openrewrite.java.cleanup.RemoveJavaDocAuthorTag
   - org.openrewrite.java.cleanup.RemoveRedundantTypeCast
   - org.openrewrite.java.cleanup.RemoveUnneededAssertion
@@ -157,7 +157,7 @@ recipeList:
   - org.openrewrite.java.cleanup.ReplaceRedundantFormatWithPrintf
 #  - org.openrewrite.java.cleanup.ShortenFullyQualifiedTypeReferences
   - org.openrewrite.java.cleanup.SimplifyBooleanExpression
-#  - org.openrewrite.java.cleanup.SimplifyBooleanReturn
+  - org.openrewrite.java.cleanup.SimplifyBooleanReturn
 #  - org.openrewrite.java.cleanup.SimplifyConsecutiveAssignments
 #  - org.openrewrite.java.cleanup.SimplifyCompoundStatement
   - org.openrewrite.java.cleanup.SimplifyDurationCreationUnits

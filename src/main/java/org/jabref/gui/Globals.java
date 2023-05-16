@@ -43,6 +43,7 @@ public class Globals {
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
     public static final RemoteListenerServerManager REMOTE_LISTENER = new RemoteListenerServerManager();
+
     /**
      * Manager for the state of the GUI.
      */
@@ -101,7 +102,7 @@ public class Globals {
     public static synchronized ThemeManager getThemeManager() {
         if (themeManager == null) {
             themeManager = new ThemeManager(
-                    prefs.getAppearancePreferences(),
+                    prefs.getWorkspacePreferences(),
                     getFileUpdateMonitor(),
                     Runnable::run);
         }

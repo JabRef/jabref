@@ -362,13 +362,15 @@ public class BibtexDatabaseWriterTest {
                         new OrFields(StandardField.AUTHOR),
                         new OrFields(StandardField.DATE)));
         entryTypesManager.addCustomOrModifiedType(customizedBibType, BibDatabaseMode.BIBTEX);
-        BibEntry entry = new BibEntry(customizedType);
+        BibEntry entry = new BibEntry(customizedType).withCitationKey("key");
+        // needed to get a proper serialization
+        entry.setChanged(true);
         database.insertEntry(entry);
         bibtexContext.setMode(BibDatabaseMode.BIBTEX);
 
         databaseWriter.saveDatabase(bibtexContext);
 
-        assertEquals("@Customizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
+        assertEquals("@Customizedtype{key," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-entrytype: customizedtype: req[title;author;date] opt[year;month;publisher]}" + OS.NEWLINE,
@@ -722,11 +724,12 @@ public class BibtexDatabaseWriterTest {
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
+        // The order should be kept (the cleanups are a list, not a set)
         assertEquals("@Comment{jabref-meta: saveActions:enabled;"
                         + OS.NEWLINE
-                        + "day[upper_case]" + OS.NEWLINE
-                        + "journal[title_case]" + OS.NEWLINE
                         + "title[lower_case]" + OS.NEWLINE
+                        + "journal[title_case]" + OS.NEWLINE
+                        + "day[upper_case]" + OS.NEWLINE
                         + ";}"
                         + OS.NEWLINE, stringWriter.toString());
     }

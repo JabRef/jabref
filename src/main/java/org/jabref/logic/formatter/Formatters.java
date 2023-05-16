@@ -35,6 +35,7 @@ import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 
 public class Formatters {
     private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
@@ -78,6 +79,7 @@ public class Formatters {
                 new EscapeAmpersandsFormatter(),
                 new EscapeDollarSignFormatter(),
                 new ShortenDOIFormatter(),
+                new ReplaceUnicodeLigaturesFormatter(),
                 new UnprotectTermsFormatter()
         );
     }
