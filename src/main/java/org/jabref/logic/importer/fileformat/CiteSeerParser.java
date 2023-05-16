@@ -1,40 +1,29 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.text.MessageFormat;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.http.client.utils.URIBuilder;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 public class CiteSeerParser implements Parser {
 
-    private static final String BASE_SEARCH_URL = "https://citeseerx.ist.psu.edu/search_result";
-
-    private static final String API_URL = "https://citeseerx.ist.psu.edu/api/search";
-
-    private static final Pattern PAPERID = Pattern.compile("pid/[0-9a-zA-Z]+", Pattern.MULTILINE);
+//    private static final Pattern PAPERID = Pattern.compile("pid/[0-9a-zA-Z]+", Pattern.MULTILINE);
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
@@ -62,15 +51,11 @@ public class CiteSeerParser implements Parser {
             String jsonString = new String((inputStream.readAllBytes()), StandardCharsets.UTF_8);
             JsonElement jsonElement = JsonParser.parseString(jsonString);
 
-            if (!jsonElement.isJsonObject()) {
-                return response;
-            }
-
-            JsonArray items = jsonElement.getAsJsonObject().getAsJsonArray("response");
-            for (JsonElement item: items) {
-                for (Map.Entry<String, JsonElement> entry : item.getAsJsonObject().entrySet()) {
-                    response.add(parseBibEntry(entry.getValue().getAsJsonObject()));
-                }
+            for (JsonElement element: jsonElement.getAsJsonArray()) {
+                response.add(parseBibEntry(element.getAsJsonObject()));
+//                for (Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
+//                    response.add(parseBibEntry(entry.getValue().getAsJsonObject()));
+//                }
             }
         } catch (IOException ex) {
             throw new FetcherException("Unable to parse input stream into json object: ", ex);
