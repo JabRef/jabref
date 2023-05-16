@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.cli.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
@@ -22,6 +23,12 @@ import org.jabref.logic.l10n.Localization;
 
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class contains Linux specific implementations for file directories and file/application open handling methods <br>
+ * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link Launcher#addLogToDisk}
+ * The configuration of tinylog will become immutable as soon as the first log entry is issued.
+ * https://tinylog.org/v2/configuration/
+ **/
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
 public class Linux implements NativeDesktop {
 
