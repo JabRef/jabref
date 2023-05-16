@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.cli.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
@@ -20,30 +21,33 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class contains Linux specific implementations for file directories and file/application open handling methods <br>
+ * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link Launcher#addLogToDisk}
+ * The configuration of tinylog will become immutable as soon as the first log entry is issued.
+ * https://tinylog.org/v2/configuration/
+ **/
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
 public class Linux implements NativeDesktop {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
 
     private void nativeOpenFile(String filePath) {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
                 File file = new File(filePath);
                 Desktop.getDesktop().open(file);
-                LOGGER.debug("Open file in default application with Desktop integration");
+                LoggerFactory.getLogger(Linux.class).debug("Open file in default application with Desktop integration");
             } catch (IllegalArgumentException e) {
-                LOGGER.debug("Fail back to xdg-open");
+                LoggerFactory.getLogger(Linux.class).debug("Fail back to xdg-open");
                 try {
                     String[] cmd = {"xdg-open", filePath};
                     Runtime.getRuntime().exec(cmd);
                 } catch (Exception e2) {
-                    LOGGER.warn("Open operation not successful: " + e2);
+                    LoggerFactory.getLogger(Linux.class).warn("Open operation not successful: ", e2);
                 }
             } catch (IOException e) {
-                LOGGER.warn("Native open operation not successful: " + e);
+                LoggerFactory.getLogger(Linux.class).warn("Native open operation not successful: ", e);
             }
         });
     }
@@ -57,8 +61,8 @@ public class Linux implements NativeDesktop {
             viewer = type.get().getOpenWithApplication();
             ProcessBuilder processBuilder = new ProcessBuilder(viewer, filePath);
             Process process = processBuilder.start();
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
 
             JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
             JabRefExecutorService.INSTANCE.execute(streamGobblerError);
@@ -80,8 +84,8 @@ public class Linux implements NativeDesktop {
             ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);
             Process process = processBuilder.start();
 
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
 
             JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
             JabRefExecutorService.INSTANCE.execute(streamGobblerError);
@@ -112,8 +116,8 @@ public class Linux implements NativeDesktop {
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         Process process = processBuilder.start();
 
-        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
 
         JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
         JabRefExecutorService.INSTANCE.execute(streamGobblerError);
@@ -150,8 +154,8 @@ public class Linux implements NativeDesktop {
                 builder.directory(new File(absolutePath));
                 Process processTerminal = builder.start();
 
-                StreamGobbler streamGobblerInput = new StreamGobbler(processTerminal.getInputStream(), LOGGER::debug);
-                StreamGobbler streamGobblerError = new StreamGobbler(processTerminal.getErrorStream(), LOGGER::debug);
+                StreamGobbler streamGobblerInput = new StreamGobbler(processTerminal.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
+                StreamGobbler streamGobblerError = new StreamGobbler(processTerminal.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
 
                 JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
                 JabRefExecutorService.INSTANCE.execute(streamGobblerError);

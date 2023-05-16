@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.cli.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -17,6 +18,12 @@ import com.sun.jna.platform.win32.ShlObj;
 import com.sun.jna.platform.win32.Win32Exception;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class contains Windows specific implementations for file directories and file/application open handling methods <br>
+ * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link Launcher#addLogToDisk}
+ * The configuration of tinylog will become immutable as soon as the first log entry is issued.
+ * https://tinylog.org/v2/configuration/
+ **/
 public class Windows implements NativeDesktop {
 
     private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
