@@ -33,7 +33,6 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
 
     @Inject private KeyBindingRepository keyBindingRepository;
 
-
     public EntryEditorTab() {
         ViewLoader.view(this)
                   .root(this)
