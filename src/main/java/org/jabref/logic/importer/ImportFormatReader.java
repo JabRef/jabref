@@ -38,9 +38,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.Subscription;
-
 public class ImportFormatReader {
 
     public static final String BIBTEX_FORMAT = "BibTeX";
@@ -51,26 +48,12 @@ public class ImportFormatReader {
      */
     private final List<Importer> formats = new ArrayList<>();
 
-    private final ImporterPreferences importerPreferences;
     private final ImportFormatPreferences importFormatPreferences;
-    private final FileUpdateMonitor fileMonitor;
-
-    private Importer grobidImporter;
-    @SuppressWarnings("unused")
-    private Subscription grobidSubscriber; // scope enlarged, so the subscription wont be destroyed by gc
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
                               FileUpdateMonitor fileMonitor) {
-        this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
-        this.fileMonitor = fileMonitor;
-
-        reset();
-    }
-
-    public void reset() {
-        formats.clear();
 
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter(importFormatPreferences));
@@ -86,6 +69,9 @@ public class ImportFormatReader {
         formats.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         formats.add(new PdfContentImporter(importFormatPreferences));
         formats.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
+        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
+            formats.add(new PdfGrobidImporter(importFormatPreferences));
+        }
         formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
@@ -94,15 +80,6 @@ public class ImportFormatReader {
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter(importFormatPreferences, fileMonitor));
         formats.add(new CitaviXmlImporter());
-
-        grobidSubscriber = EasyBind.subscribe(importFormatPreferences.grobidPreferences().grobidEnabledProperty(), enabled -> {
-            if (enabled) {
-                grobidImporter = new PdfGrobidImporter(importFormatPreferences);
-                formats.add(grobidImporter);
-            } else {
-                formats.remove(grobidImporter);
-            }
-        });
 
         // Get custom import formats
         formats.addAll(importerPreferences.getCustomImportList());

@@ -505,7 +505,6 @@ public class LibraryTab extends Tab {
                 stateManager,
                 Globals.getKeyPrefs(),
                 Globals.getClipboardManager(),
-                Globals.importFormatReader,
                 Globals.TASK_EXECUTOR);
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)

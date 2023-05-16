@@ -56,7 +56,6 @@ public class BibtexExtractorViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                importFormatReader,
                 taskExecutor);
     }
 

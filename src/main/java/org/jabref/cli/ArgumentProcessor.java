@@ -84,7 +84,7 @@ public class ArgumentProcessor {
      * @param argument See importFile.
      * @return ParserResult with setToOpenTab(true)
      */
-    private static Optional<ParserResult> importToOpenBase(String argument) {
+    private Optional<ParserResult> importToOpenBase(String argument) {
         Optional<ParserResult> result = importFile(argument);
 
         result.ifPresent(ParserResult::setToOpenTab);
@@ -92,7 +92,7 @@ public class ArgumentProcessor {
         return result;
     }
 
-    private static Optional<ParserResult> importBibtexToOpenBase(String argument, ImportFormatPreferences importFormatPreferences) {
+    private Optional<ParserResult> importBibtexToOpenBase(String argument, ImportFormatPreferences importFormatPreferences) {
         BibtexParser parser = new BibtexParser(importFormatPreferences);
         try {
             List<BibEntry> entries = parser.parseEntries(argument);
@@ -105,7 +105,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private static Optional<ParserResult> importFile(String argument) {
+    private Optional<ParserResult> importFile(String argument) {
         String[] data = argument.split(",");
 
         String address = data[0];
@@ -143,18 +143,23 @@ public class ArgumentProcessor {
         return importResult;
     }
 
-    private static Optional<ParserResult> importFile(Path file, String importFormat) {
+    private Optional<ParserResult> importFile(Path file, String importFormat) {
         try {
+            ImportFormatReader importFormatReader = new ImportFormatReader(
+                    preferencesService.getImporterPreferences(),
+                    preferencesService.getImportFormatPreferences(),
+                    Globals.getFileUpdateMonitor());
+
             if (!"*".equals(importFormat)) {
                 System.out.println(Localization.lang("Importing") + ": " + file);
-                ParserResult result = Globals.importFormatReader.importFromFile(importFormat, file);
+                ParserResult result = importFormatReader.importFromFile(importFormat, file);
                 return Optional.of(result);
             } else {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
                 ImportFormatReader.UnknownFormatImport importResult =
-                        Globals.importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
+                        importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);

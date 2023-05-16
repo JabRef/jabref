@@ -5,6 +5,7 @@ import java.util.List;
 import org.jabref.gui.Globals;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
@@ -290,8 +291,11 @@ public class JabRefCLI {
 
     public static void printUsage(PreferencesService preferencesService) {
         String header = "";
-
-        String importFormats = Globals.importFormatReader.getImportFormatList();
+        ImportFormatReader importFormatReader = new ImportFormatReader(
+                preferencesService.getImporterPreferences(),
+                preferencesService.getImportFormatPreferences(),
+                Globals.getFileUpdateMonitor());
+        String importFormats = importFormatReader.getImportFormatList();
         String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
 
         ExporterFactory exporterFactory = ExporterFactory.create(

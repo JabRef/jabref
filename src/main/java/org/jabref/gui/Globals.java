@@ -56,11 +56,6 @@ public class Globals {
     public static JabRefPreferences prefs;
 
     /**
-     * Repository of the custom import formats
-     */
-    public static ImportFormatReader importFormatReader;
-
-    /**
      * This field is initialized upon startup.
      * <p>
      * Only GUI code is allowed to access it, logic code should use dependency injection.
@@ -118,6 +113,13 @@ public class Globals {
             JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
         }
         return fileUpdateMonitor;
+    }
+
+    public static synchronized ImportFormatReader getImportFormatReader() {
+        return new ImportFormatReader(
+                prefs.getImporterPreferences(),
+                prefs.getImportFormatPreferences(),
+                getFileUpdateMonitor());
     }
 
     // Background tasks

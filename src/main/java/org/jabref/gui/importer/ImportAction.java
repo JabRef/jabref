@@ -44,14 +44,14 @@ public class ImportAction {
     private Exception importError;
     private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
 
-    private final PreferencesService prefs;
+    private final PreferencesService preferencesService;
 
-    public ImportAction(JabRefFrame frame, boolean openInNew, Importer importer, PreferencesService prefs) {
+    public ImportAction(JabRefFrame frame, boolean openInNew, Importer importer, PreferencesService preferencesService) {
         this.importer = Optional.ofNullable(importer);
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.openInNew = openInNew;
-        this.prefs = prefs;
+        this.preferencesService = preferencesService;
     }
 
     /**
@@ -116,22 +116,26 @@ public class ImportAction {
     private List<ImportFormatReader.UnknownFormatImport> doImport(List<Path> files) {
         // We import all files and collect their results
         List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
+        ImportFormatReader importFormatReader = new ImportFormatReader(
+                preferencesService.getImporterPreferences(),
+                preferencesService.getImportFormatPreferences(),
+                Globals.getFileUpdateMonitor());
         for (Path filename : files) {
             try {
                 if (importer.isEmpty()) {
                     // Unknown format
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (fileIsPdf(filename)) {
-                            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getGrobidPreferences());
+                            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), preferencesService.getGrobidPreferences());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
                     });
                     // This import method never throws an IOException
-                    imports.add(Globals.importFormatReader.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
+                    imports.add(importFormatReader.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
                 } else {
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if ((importer.get() instanceof PdfGrobidImporter) || (importer.get() instanceof PdfMergeMetadataImporter)) {
-                            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, prefs.getGrobidPreferences());
+                            GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences());
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
                     });
@@ -165,7 +169,7 @@ public class ImportAction {
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // additional treatment of BibTeX
-                new DatabaseMerger(prefs.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
+                new DatabaseMerger(preferencesService.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
                         importResult.parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
@@ -175,7 +179,7 @@ public class ImportAction {
         }
 
         // set timestamp and owner
-        UpdateField.setAutomaticFields(resultDatabase.getEntries(), prefs.getOwnerPreferences(), prefs.getTimestampPreferences()); // set timestamp and owner
+        UpdateField.setAutomaticFields(resultDatabase.getEntries(), preferencesService.getOwnerPreferences(), preferencesService.getTimestampPreferences()); // set timestamp and owner
 
         return result;
     }

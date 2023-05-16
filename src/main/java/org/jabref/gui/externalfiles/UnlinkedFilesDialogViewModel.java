@@ -98,7 +98,6 @@ public class UnlinkedFilesDialogViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                importFormatReader,
                 taskExecutor);
 
         this.fileFilterList = FXCollections.observableArrayList(

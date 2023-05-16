@@ -54,7 +54,7 @@ public class DefaultInjector implements PresenterFactory {
         } else if (clazz == BibEntryTypesManager.class) {
             return Globals.entryTypesManager;
         } else if (clazz == ImportFormatReader.class) {
-            return Globals.importFormatReader;
+            return Globals.getImportFormatReader();
         } else {
             try {
                 return clazz.newInstance();

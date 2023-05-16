@@ -177,7 +177,6 @@ public class EntryTypeViewModel {
                         libraryTab.getUndoManager(),
                         stateManager,
                         dialogService,
-                        importFormatReader,
                         taskExecutor);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
 
