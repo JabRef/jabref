@@ -23,6 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the option to automatically download online files when a new entry is created from an existing ID (e.g. DOI). The option can be disabled in the preferences under "Import and Export" [#9756](https://github.com/JabRef/jabref/issues/9756)
 - We added a new Integrity check for unscaped ampersands. [koppor#585](https://github.com/koppor/jabref/issues/585)
 - We added the possibility to automatically fetch entries when an IBSN is pasted on the main table [#9864](https://github.com/JabRef/jabref/issues/9864)
+- We added key binding to focus on groups <kbd>Shift</kbd> + <kbd>Tab</kbd> [#9863](https://github.com/JabRef/jabref/issues/9863)
 
 ### Changed
 
@@ -52,6 +53,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the option to run JabRef in memory stick mode into the preferences dialog toolbar. [#9866](https://github.com/JabRef/jabref/pull/9866)
 - In case the library contains empty entries, they are not written to disk. [#8645](https://github.com/JabRef/jabref/issues/8645)
 - The formatter `remove_unicode_ligatures` is now called `replace_unicode_ligatures`. [#9890](https://github.com/JabRef/jabref/pull/9890)
+- The key binding to focus on entry table is changed to <kbd>Tab</kbd> [#9863](https://github.com/JabRef/jabref/issues/9863)
 
 ### Fixed
 

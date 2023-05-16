@@ -19,9 +19,11 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
+import javafx.scene.control.TreeTableView;
 import javafx.util.Pair;
 
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+import org.jabref.gui.groups.GroupNodeViewModel;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -96,6 +98,8 @@ public class StateManager {
     public OptionalObjectProperty<SearchQuery> activeSearchQueryProperty() {
         return activeSearchQuery;
     }
+
+    private TreeTableView<GroupNodeViewModel> groupTree;
 
     public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
         searchResultMap.put(database, resultSize);
@@ -234,5 +238,13 @@ public class StateManager {
 
     public void clearSearchHistory() {
         searchHistory.clear();
+    }
+
+    public void setGroupTree(TreeTableView<GroupNodeViewModel> groupTree) {
+        this.groupTree = groupTree;
+    }
+
+    public TreeTableView<GroupNodeViewModel> getGroupTree() {
+        return this.groupTree;
     }
 }

@@ -320,6 +320,10 @@ public class JabRefFrame extends BorderPane {
                         getCurrentLibraryTab().getMainTable().requestFocus();
                         event.consume();
                         break;
+                    case FOCUS_GROUP_LIST:
+                        this.stateManager.getGroupTree().requestFocus();
+                        event.consume();
+                    break;
                     case NEXT_LIBRARY:
                         tabbedPane.getSelectionModel().selectNext();
                         event.consume();
