@@ -14,6 +14,7 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.PreferencesService;
@@ -27,17 +28,20 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
     private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
 
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final EntryEditorPreferences entryEditorPreferences;
+    private final AutoLinkPreferences autoLinkPreferences;
 
     public EntryEditorTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.autoLinkPreferences = preferencesService.getAutoLinkPreferences();
     }
 
     @Override
@@ -52,6 +56,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
+        autoLinkEnabledProperty.setValue(autoLinkPreferences.autoLinkFilesEnabled());
 
         setFields(entryEditorPreferences.getEntryEditorTabList());
     }
@@ -84,6 +89,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
         entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
         // entryEditorPreferences.setDividerPosition();
+        autoLinkPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
 
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
         String[] lines = fieldsProperty.get().split("\n");
@@ -146,5 +152,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty fieldsProperty() {
         return fieldsProperty;
+    }
+
+    public BooleanProperty autoLinkFilesEnabledProperty() {
+        return autoLinkEnabledProperty;
     }
 }

@@ -30,7 +30,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty mainFileDirectoryProperty = new SimpleStringProperty("");
     private final BooleanProperty useMainFileDirectoryProperty = new SimpleBooleanProperty();
     private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
-    private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkUseRegexProperty = new SimpleBooleanProperty();
@@ -81,7 +80,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
         fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
-        autoLinkEnabledProperty.setValue(autoLinkPreferences.autoLinkFilesEnabled());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -101,7 +99,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
-        autoLinkPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
@@ -180,10 +177,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty useMainFileDirectoryProperty() {
         return useMainFileDirectoryProperty;
-    }
-
-    public BooleanProperty autoLinkFilesEnabledProperty() {
-        return autoLinkEnabledProperty;
     }
 }
 

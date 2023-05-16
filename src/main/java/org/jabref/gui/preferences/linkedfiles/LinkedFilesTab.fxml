@@ -44,7 +44,6 @@
         </tooltip>
     </RadioButton>
     <Label styleClass="sectionHeader" text="%Autolink files"/>
-    <CheckBox fx:id="autoLinkFilesEnabled" text="%Enable automatic linking of files"></CheckBox>
     <RadioButton fx:id="autolinkFileStartsBibtex" text="%Autolink files with names starting with the citation key"
                  toggleGroup="$autolinkToggleGroup"/>
     <RadioButton fx:id="autolinkFileExactBibtex" text="%Autolink only files that match the citation key"
