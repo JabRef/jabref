@@ -120,7 +120,7 @@ recipeList:
   - org.openrewrite.java.cleanup.IndexOfChecksShouldUseAStartPosition
   - org.openrewrite.java.cleanup.IndexOfReplaceableByContains
 #  - org.openrewrite.java.cleanup.IndexOfShouldNotCompareGreaterThanZero
-#  - org.openrewrite.java.cleanup.InstanceOfPatternMatch
+  - org.openrewrite.java.cleanup.InstanceOfPatternMatch
 #  - org.openrewrite.java.cleanup.IsEmptyCallOnCollections
   - org.openrewrite.java.cleanup.MethodParamPad
 #  - org.openrewrite.java.cleanup.MissingOverrideAnnotation
