@@ -13,7 +13,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
@@ -113,13 +112,6 @@ public class Globals {
             JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
         }
         return fileUpdateMonitor;
-    }
-
-    public static synchronized ImportFormatReader getImportFormatReader() {
-        return new ImportFormatReader(
-                prefs.getImporterPreferences(),
-                prefs.getImportFormatPreferences(),
-                getFileUpdateMonitor());
     }
 
     // Background tasks

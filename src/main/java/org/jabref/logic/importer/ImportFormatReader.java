@@ -48,13 +48,20 @@ public class ImportFormatReader {
      */
     private final List<Importer> formats = new ArrayList<>();
 
+    private final ImporterPreferences importerPreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
-                              FileUpdateMonitor fileMonitor) {
+                              FileUpdateMonitor fileUpdateMonitor) {
+        this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        reset();
+    }
 
+    public void reset() {
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter(importFormatPreferences));
         formats.add(new EndnoteXmlImporter(importFormatPreferences));
@@ -78,7 +85,7 @@ public class ImportFormatReader {
         formats.add(new SilverPlatterImporter());
         formats.add(new CffImporter());
         formats.add(new BiblioscapeImporter());
-        formats.add(new BibtexImporter(importFormatPreferences, fileMonitor));
+        formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
         formats.add(new CitaviXmlImporter());
 
         // Get custom import formats

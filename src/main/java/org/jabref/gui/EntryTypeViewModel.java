@@ -21,7 +21,6 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -53,20 +52,17 @@ public class EntryTypeViewModel {
     private final DialogService dialogService;
     private final Validator idFieldValidator;
     private final StateManager stateManager;
-    private final ImportFormatReader importFormatReader;
     private final TaskExecutor taskExecutor;
 
     public EntryTypeViewModel(PreferencesService preferences,
                               LibraryTab libraryTab,
                               DialogService dialogService,
                               StateManager stateManager,
-                              ImportFormatReader importFormatReader,
                               TaskExecutor taskExecutor) {
         this.libraryTab = libraryTab;
         this.preferencesService = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.importFormatReader = importFormatReader;
         this.taskExecutor = taskExecutor;
 
         fetchers.addAll(WebFetchers.getIdBasedFetchers(
