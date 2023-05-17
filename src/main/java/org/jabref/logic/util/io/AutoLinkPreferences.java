@@ -20,18 +20,15 @@ public class AutoLinkPreferences {
     private final StringProperty regularExpression;
     private final BooleanProperty askAutoNamingPdfs;
     private final ReadOnlyObjectProperty<Character> keywordSeparator;
-    private final BooleanProperty autoLinkFiles;
 
     public AutoLinkPreferences(CitationKeyDependency citationKeyDependency,
                                String regularExpression,
                                boolean askAutoNamingPdfs,
-                               ObjectProperty<Character> keywordSeparatorProperty,
-                               boolean autoLinkFiles) {
+                               ObjectProperty<Character> keywordSeparatorProperty) {
         this.citationKeyDependency = new SimpleObjectProperty<>(citationKeyDependency);
         this.regularExpression = new SimpleStringProperty(regularExpression);
         this.askAutoNamingPdfs = new SimpleBooleanProperty(askAutoNamingPdfs);
         this.keywordSeparator = keywordSeparatorProperty;
-        this.autoLinkFiles = new SimpleBooleanProperty(autoLinkFiles);
     }
 
     /**
@@ -40,13 +37,11 @@ public class AutoLinkPreferences {
     public AutoLinkPreferences(CitationKeyDependency citationKeyDependency,
                                String regularExpression,
                                boolean askAutoNamingPdfs,
-                               Character keywordSeparator,
-                               boolean autoLinkFiles) {
+                               Character keywordSeparator) {
         this.citationKeyDependency = new SimpleObjectProperty<>(citationKeyDependency);
         this.regularExpression = new SimpleStringProperty(regularExpression);
         this.askAutoNamingPdfs = new SimpleBooleanProperty(askAutoNamingPdfs);
         this.keywordSeparator = new SimpleObjectProperty<>(keywordSeparator);
-        this.autoLinkFiles = new SimpleBooleanProperty(autoLinkFiles);
     }
 
     public CitationKeyDependency getCitationKeyDependency() {
@@ -89,15 +84,4 @@ public class AutoLinkPreferences {
         return keywordSeparator.getValue();
     }
 
-    public boolean autoLinkFilesEnabled() {
-        return this.autoLinkFiles.getValue();
-    }
-
-    public BooleanProperty autoLinkEnabledProperty() {
-        return this.autoLinkFiles;
-    }
-
-    public void setAutoLinkFilesEnabled(boolean enabled) {
-        this.autoLinkFiles.setValue(enabled);
-    }
 }

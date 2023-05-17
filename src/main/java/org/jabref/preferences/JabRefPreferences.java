@@ -1513,7 +1513,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getDouble(ENTRY_EDITOR_HEIGHT));
+                getDouble(ENTRY_EDITOR_HEIGHT),
+                getBoolean(AUTOLINK_FILES_ENABLED));
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabListProperty(), (obs, oldValue, newValue) -> storeEntryEditorTabList(newValue));
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
@@ -1524,6 +1525,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
         EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (obs, oldValue, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
         EasyBind.listen(entryEditorPreferences.dividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
+        EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
 
         return entryEditorPreferences;
     }
@@ -2161,8 +2163,7 @@ public class JabRefPreferences implements PreferencesService {
                 citationKeyDependency,
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
                 getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
-                bibEntryPreferences.keywordSeparatorProperty(),
-                getBoolean(AUTOLINK_FILES_ENABLED));
+                bibEntryPreferences.keywordSeparatorProperty());
 
         EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (obs, oldValue, newValue) -> {
             // Starts bibtex only omitted, as it is not being saved
@@ -2183,7 +2184,6 @@ public class JabRefPreferences implements PreferencesService {
         });
         EasyBind.listen(autoLinkPreferences.askAutoNamingPdfsProperty(), (obs, oldValue, newValue) -> putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));
         EasyBind.listen(autoLinkPreferences.regularExpressionProperty(), (obs, oldValue, newValue) -> put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, newValue));
-        EasyBind.listen(autoLinkPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
 
         return autoLinkPreferences;
     }
