@@ -167,35 +167,36 @@ class CitationKeyGeneratorTest {
     }
 
     @ParameterizedTest(name = "bibtexString={0}, expectedResult={1}")
-    @CsvSource({
-            // see https://sourceforge.net/forum/message.php?msg_id=4498555
-            "'@ARTICLE{kohn, author={Andreas Köning}, year={2000}}', 'Koe'",
+    @CsvSource(quoteCharacter = '"', textBlock = """
+            # see https://sourceforge.net/forum/message.php?msg_id=4498555
+            "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", "Koe",
 
-            // Accent ague: Á á Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
-            "'@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}', 'Aoe'",
-            "'@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}', 'Eoe'",
-            "'@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}', 'Ioe'",
-            "'@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}', 'Loe'",
-            "'@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}', 'Noe'",
-            "'@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}', 'Ooe'",
-            "'@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}', 'Roe'",
-            "'@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}', 'Soe'",
-            "'@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}', 'Uoe'",
-            "'@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}', 'Yoe'",
-            "'@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}', 'Zoe'",
+            # Accent ague: Á á Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
+            "@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}", "Aoe",
+            "@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}", "Eoe",
+            "@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}", "Ioe",
+            "@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}", "Loe",
+            "@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}", "Noe",
+            "@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}", "Ooe",
+            "@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}", "Roe",
+            "@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}", "Soe",
+            "@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}", "Uoe",
+            "@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}", "Yoe",
+            "@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}", "Zoe",
 
-            // Accent grave: À È Ì Ò Ù
-            "'@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}', 'Aoe'",
-            "'@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}', 'Eoe'",
-            "'@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}', 'Ioe'",
-            "'@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}', 'Ooe'",
-            "'@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}', 'Uoe'",
+            # Accent grave: À È Ì Ò Ù
+            "@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}", "Aoe",
+            "@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}", "Eoe",
+            "@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}", "Ioe",
+            "@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}", "Ooe",
+            "@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}", "Uoe",
 
-            // Special cases
-            "'@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}', 'AlK'",
-            "'@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}', 'DAl'",
-            "'@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}', 'Arn'",
-    })
+            # Special cases
+            "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "AlK",
+            "@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}", "DAl",
+            "@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}", "Arn"
+            """
+    )
     void testMakeLabelAndCheckLegalKeys(String bibtexString, String expectedResult) throws ParseException {
         Optional<BibEntry> bibEntry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
         String citationKey = generateKey(bibEntry.orElse(null), "[auth3]", new BibDatabase());
@@ -240,25 +241,26 @@ class CitationKeyGeneratorTest {
      * @see CitationKeyGenerator#cleanKey(String, String)
      */
     @ParameterizedTest(name = "accents={0}, expectedResult={1}")
-    @CsvSource({
-            "'ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ', 'AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy'",
-            "'ÄäËëÏïÖöÜüŸÿ', 'AeaeEeIiOeoeUeueYy'",
-            "'Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ', 'CcGgKkLlNnRrSsTt'",
-            "'Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ', 'AaEeGgIiOoUu'",
-            "'Ċ ċ Ė ė Ġ ġ İ ı Ż ż', 'CcEeGgIiZz'",
-            "'Ą ą Ę ę Į į Ǫ ǫ Ų ų', 'AaEeIiOoUu'", // O or Q? o or q?
-            "'Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ', 'AaEeIiOoUuYy'",
-            "'Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž', 'AaCcDdEeIiLlNnOoRrSsTtUuZz'",
-            "'AaEeIiNnOoUuYy', 'ÃãẼẽĨĩÑñÕõŨũỸỹ'",
-            "'Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ', 'DdHhLlLlMmNnRrRrSsTt'",
-            "'À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    ', 'AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYyAeaeEeIiOeoeUeueYy'",
-            "'Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ', 'AaEeIiNnOoUuYyCcGgKkLlNnRrSsTt'",
-            "' Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   ', 'AaCcDdEeIiLlNnOoRrSsTtUuZz'",
-            "'Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ', 'AaEeIiOoUuYy'",
-            "'Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ   ', 'AaEeGgIiOoUu'",
-            "'Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   ', 'CcEeGgIiZzAaEeIiOoUu'",
-            "'Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   ', 'DdHhLlLlMmNnRrRrSsTt'"
-    })
+    @CsvSource(quoteCharacter = '"', textBlock = """
+            "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ", "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy",
+            "ÄäËëÏïÖöÜüŸÿ", "AeaeEeIiOeoeUeueYy",
+            "Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ", "CcGgKkLlNnRrSsTt",
+            "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ", "AaEeGgIiOoUu",
+            "Ċ ċ Ė ė Ġ ġ İ ı Ż ż", "CcEeGgIiZz",
+            "Ą ą Ę ę Į į Ǫ ǫ Ų ų", "AaEeIiOoUu", # O or Q? o or q?
+            "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ", "AaEeIiOoUuYy",
+            "Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž", "AaCcDdEeIiLlNnOoRrSsTtUuZz",
+            "ÃãẼẽĨĩÑñÕõŨũỸỹ", "AaEeIiNnOoUuYy",
+            "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ", "DdHhLlLlMmNnRrRrSsTt",
+            "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    ", "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYyAeaeEeIiOeoeUeueYy",
+            "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ", "AaEeIiNnOoUuYyCcGgKkLlNnRrSsTt",
+            " Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž   ", "AaCcDdEeIiLlNnOoRrSsTtUuZz",
+            "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ", "AaEeIiOoUuYy",
+            "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ   ", "AaEeGgIiOoUu",
+            "Ċ ċ Ė ė Ġ ġ İ ı Ż ż   Ą ą Ę ę Į į Ǫ ǫ Ų ų   ", "CcEeGgIiZzAaEeIiOoUu",
+            "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ   ", "DdHhLlLlMmNnRrRrSsTt"
+            """
+    )
     void testCheckLegalKey(String accents, String expectedResult) {
         assertEquals(expectedResult, CitationKeyGenerator.cleanKey(accents, DEFAULT_UNWANTED_CHARACTERS));
     }
