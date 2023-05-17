@@ -44,6 +44,9 @@ public class GrobidService {
 
     public GrobidService(GrobidPreferences grobidPreferences) {
         this.grobidPreferences = grobidPreferences;
+        if (!grobidPreferences.isGrobidEnabled()) {
+            throw new UnsupportedOperationException("Grobid was used but not enabled.");
+        }
     }
 
     /**
@@ -53,10 +56,6 @@ public class GrobidService {
      * @throws IOException if an I/O exception during the call occurred or no BibTeX entry could be determined
      */
     public Optional<BibEntry> processCitation(String rawCitation, ImportFormatPreferences importFormatPreferences, ConsolidateCitations consolidateCitations) throws IOException, ParseException {
-        if (!grobidPreferences.isGrobidEnabled()) {
-            throw new UnsupportedOperationException("Grobid was used but not enabled.");
-        }
-
         Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + "/api/processCitation")
                 .header("Accept", MediaTypes.APPLICATION_BIBTEX)
                 .data("citations", rawCitation)
@@ -75,10 +74,6 @@ public class GrobidService {
     }
 
     public List<BibEntry> processPDF(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
-        if (!grobidPreferences.isGrobidEnabled()) {
-            throw new UnsupportedOperationException("Grobid was used but not enabled.");
-        }
-
         Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + "/api/processHeaderDocument")
                 .header("Accept", MediaTypes.APPLICATION_BIBTEX)
                 .data("input", filePath.toString(), Files.newInputStream(filePath))
