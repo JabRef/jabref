@@ -96,7 +96,7 @@ public class BibtexParser implements Parser {
      * <p>
      * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
      *
-     * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
+     * @return An {@code Optional<BibEntry>. Optional.empty()} if non was found or an error occurred.
      */
     public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) throws ParseException {
         Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);
