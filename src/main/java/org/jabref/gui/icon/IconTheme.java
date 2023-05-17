@@ -189,6 +189,7 @@ public class IconTheme {
         UNDO(MaterialDesignU.UNDO),
         MARKER(MaterialDesignM.MARKER),
         REFRESH(MaterialDesignR.REFRESH),
+        MEMORYSTICK(MaterialDesignU.USB_FLASH_DRIVE_OUTLINE),
         DELETE_ENTRY(MaterialDesignD.DELETE),
         SEARCH(MaterialDesignM.MAGNIFY),
         FILE_SEARCH(MaterialDesignF.FILE_FIND),

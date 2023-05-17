@@ -18,11 +18,9 @@ import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.study.Study;
 import org.jabref.preferences.FilePreferences;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -239,21 +237,8 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
-    /**
-     * check if the database has any empty entries
-     *
-     * @return true if the database has any empty entries; otherwise false
-     */
-    public boolean hasEmptyEntries() {
-        return this.getEntries().stream().anyMatch(entry -> entry.getFields().isEmpty());
-    }
-
-    public static Path getFulltextIndexBasePath() {
-        return Path.of(AppDirsFactory.getInstance().getUserDataDir(OS.APP_DIR_APP_NAME, SearchFieldConstants.VERSION, OS.APP_DIR_APP_AUTHOR));
-    }
-
     public Path getFulltextIndexPath() {
-        Path appData = getFulltextIndexBasePath();
+        Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {

@@ -158,8 +158,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     }
                 }
 
-                if (openConnection instanceof HttpURLConnection) {
-                    ((HttpURLConnection) openConnection).disconnect();
+                if (openConnection instanceof HttpURLConnection connection) {
+                    connection.disconnect();
                 }
                 return fetchedEntry;
             } else {
