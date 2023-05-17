@@ -27,6 +27,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -45,13 +46,19 @@ public class ImportAction {
     private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
 
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
-    public ImportAction(JabRefFrame frame, boolean openInNew, Importer importer, PreferencesService preferencesService) {
+    public ImportAction(JabRefFrame frame,
+                        boolean openInNew,
+                        Importer importer,
+                        PreferencesService preferencesService,
+                        FileUpdateMonitor fileUpdateMonitor) {
         this.importer = Optional.ofNullable(importer);
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.openInNew = openInNew;
         this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
     }
 
     /**
@@ -119,7 +126,7 @@ public class ImportAction {
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences(),
-                Globals.getFileUpdateMonitor());
+                fileUpdateMonitor);
         for (Path filename : files) {
             try {
                 if (importer.isEmpty()) {
@@ -131,7 +138,7 @@ public class ImportAction {
                         frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
                     });
                     // This import method never throws an IOException
-                    imports.add(importFormatReader.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
+                    imports.add(importFormatReader.importUnknownFormat(filename, fileUpdateMonitor));
                 } else {
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (((importer.get() instanceof PdfGrobidImporter)

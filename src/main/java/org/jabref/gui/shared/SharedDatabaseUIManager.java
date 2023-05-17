@@ -10,7 +10,6 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -33,6 +32,7 @@ import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -43,11 +43,13 @@ public class SharedDatabaseUIManager {
     private DatabaseSynchronizer dbmsSynchronizer;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
-    public SharedDatabaseUIManager(JabRefFrame jabRefFrame, PreferencesService preferencesService) {
+    public SharedDatabaseUIManager(JabRefFrame jabRefFrame, PreferencesService preferencesService, FileUpdateMonitor fileUpdateMonitor) {
         this.jabRefFrame = jabRefFrame;
         this.dialogService = jabRefFrame.getDialogService();
         this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
     }
 
     @Subscribe
@@ -141,7 +143,7 @@ public class SharedDatabaseUIManager {
                 bibDatabaseContext,
                 preferencesService.getBibEntryPreferences().getKeywordSeparator(),
                 preferencesService.getCitationKeyPatternPreferences().getKeyPattern(),
-                Globals.getFileUpdateMonitor());
+                fileUpdateMonitor);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
@@ -170,7 +172,7 @@ public class SharedDatabaseUIManager {
                 bibDatabaseContext,
                 preferencesService.getBibEntryPreferences().getKeywordSeparator(),
                 preferencesService.getCitationKeyPatternPreferences().getKeyPattern(),
-                Globals.getFileUpdateMonitor());
+                fileUpdateMonitor);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);

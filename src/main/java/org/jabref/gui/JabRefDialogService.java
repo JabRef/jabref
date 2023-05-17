@@ -27,7 +27,6 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -38,7 +37,6 @@ import javafx.util.Duration;
 
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -73,11 +71,9 @@ public class JabRefDialogService implements DialogService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
     private final Window mainWindow;
-    private final ThemeManager themeManager;
 
-    public JabRefDialogService(Window mainWindow, Pane mainPane, ThemeManager themeManager) {
+    public JabRefDialogService(Window mainWindow) {
         this.mainWindow = mainWindow;
-        this.themeManager = themeManager;
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {

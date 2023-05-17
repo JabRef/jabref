@@ -53,6 +53,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
@@ -68,12 +69,17 @@ public class ArgumentProcessor {
     private final List<ParserResult> parserResults;
     private final Mode startupMode;
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
     private boolean noGUINeeded;
 
-    public ArgumentProcessor(String[] args, Mode startupMode, PreferencesService preferencesService) throws org.apache.commons.cli.ParseException {
+    public ArgumentProcessor(String[] args,
+                             Mode startupMode,
+                             PreferencesService preferencesService,
+                             FileUpdateMonitor fileUpdateMonitor) throws org.apache.commons.cli.ParseException {
         this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         this.parserResults = processArguments();
     }
@@ -148,7 +154,7 @@ public class ArgumentProcessor {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     preferencesService.getImporterPreferences(),
                     preferencesService.getImportFormatPreferences(),
-                    Globals.getFileUpdateMonitor());
+                    fileUpdateMonitor);
 
             if (!"*".equals(importFormat)) {
                 System.out.println(Localization.lang("Importing") + ": " + file);
@@ -464,7 +470,7 @@ public class ArgumentProcessor {
                         pr = OpenDatabase.loadDatabase(
                                 Path.of(aLeftOver),
                                 preferencesService.getImportFormatPreferences(),
-                                Globals.getFileUpdateMonitor());
+                                fileUpdateMonitor);
                     } catch (IOException ex) {
                         pr = ParserResult.fromError(ex);
                         LOGGER.error("Error opening file '{}'", aLeftOver, ex);

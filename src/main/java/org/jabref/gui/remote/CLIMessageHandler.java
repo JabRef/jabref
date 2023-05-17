@@ -8,6 +8,7 @@ import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.cli.ParseException;
@@ -18,15 +19,21 @@ public class CLIMessageHandler implements RemoteMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CLIMessageHandler.class);
 
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
-    public CLIMessageHandler(PreferencesService preferencesService) {
+    public CLIMessageHandler(PreferencesService preferencesService, FileUpdateMonitor fileUpdateMonitor) {
         this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
     }
 
     @Override
     public void handleCommandLineArguments(String[] message) {
         try {
-            ArgumentProcessor argumentProcessor = new ArgumentProcessor(message, ArgumentProcessor.Mode.REMOTE_START, preferencesService);
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(
+                    message,
+                    ArgumentProcessor.Mode.REMOTE_START,
+                    preferencesService,
+                    fileUpdateMonitor);
 
             List<ParserResult> loaded = argumentProcessor.getParserResults();
             for (int i = 0; i < loaded.size(); i++) {

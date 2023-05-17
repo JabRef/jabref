@@ -108,8 +108,8 @@ public class Globals {
 
     public static synchronized FileUpdateMonitor getFileUpdateMonitor() {
         if (fileUpdateMonitor == null) {
-            Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
-            JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
+            fileUpdateMonitor = new DefaultFileUpdateMonitor();
+            JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
         }
         return fileUpdateMonitor;
     }
@@ -122,7 +122,7 @@ public class Globals {
         } */
         RemotePreferences remotePreferences = prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs, fileUpdateMonitor), remotePreferences.getPort());
         }
     }
 

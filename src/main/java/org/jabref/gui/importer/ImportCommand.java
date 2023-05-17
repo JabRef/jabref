@@ -9,7 +9,6 @@ import java.util.SortedSet;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -18,6 +17,7 @@ import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
@@ -31,14 +31,20 @@ public class ImportCommand extends SimpleCommand {
     private final boolean openInNew;
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     /**
      * @param openInNew Indicate whether the entries should import into a new database or into the currently open one.
      */
-    public ImportCommand(JabRefFrame frame, boolean openInNew, PreferencesService preferences, StateManager stateManager) {
+    public ImportCommand(JabRefFrame frame,
+                         boolean openInNew,
+                         PreferencesService preferences,
+                         StateManager stateManager,
+                         FileUpdateMonitor fileUpdateMonitor) {
         this.frame = frame;
         this.openInNew = openInNew;
         this.preferences = preferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         if (!openInNew) {
             this.executable.bind(needsDatabase(stateManager));
@@ -52,7 +58,7 @@ public class ImportCommand extends SimpleCommand {
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
-                Globals.getFileUpdateMonitor());
+                fileUpdateMonitor);
         SortedSet<Importer> importers = importFormatReader.getImportFormats();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -73,7 +79,7 @@ public class ImportCommand extends SimpleCommand {
             return;
         }
         Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
-        ImportAction importMenu = new ImportAction(frame, openInNew, format.orElse(null), preferences);
+        ImportAction importMenu = new ImportAction(frame, openInNew, format.orElse(null), preferences, fileUpdateMonitor);
         importMenu.automatedImport(Collections.singletonList(file.toString()));
         // Set last working dir for import
         preferences.getImporterPreferences().setImportWorkingDirectory(file.getParent());

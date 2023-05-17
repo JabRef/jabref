@@ -50,6 +50,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -80,7 +81,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
                      ClipBoardManager clipBoardManager,
-                     TaskExecutor taskExecutor) {
+                     TaskExecutor taskExecutor,
+                     FileUpdateMonitor fileUpdateMonitor) {
         super();
 
         this.libraryTab = libraryTab;
@@ -95,7 +97,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         importHandler = new ImportHandler(
                 database,
                 preferencesService,
-                Globals.getFileUpdateMonitor(),
+                fileUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,
