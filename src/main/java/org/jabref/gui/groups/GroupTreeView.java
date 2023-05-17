@@ -611,9 +611,7 @@ public class GroupTreeView extends BorderPane {
     }
 
     /**
-     * Returns GroupTree
+     * Focus on GroupTree
      */
-    public TreeTableView<GroupNodeViewModel> getGroupTree() {
-        return groupTree;
-    }
+    public void requestFocusGroupTree() { groupTree.requestFocus(); }
 }

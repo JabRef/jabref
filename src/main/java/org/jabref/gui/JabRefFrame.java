@@ -79,7 +79,6 @@ import org.jabref.gui.exporter.WriteMetadataToPdfAction;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
-import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
@@ -322,7 +321,7 @@ public class JabRefFrame extends BorderPane {
                         event.consume();
                         break;
                     case FOCUS_GROUP_LIST:
-                        getGroupTreeView().getGroupTree().requestFocus();
+                        sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus();
                         event.consume();
                     break;
                     case NEXT_LIBRARY:
@@ -738,21 +737,6 @@ public class JabRefFrame extends BorderPane {
             return null;
         }
         return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
-    }
-
-    /**
-     * Returns groupTreeView.
-     */
-    public GroupTreeView getGroupTreeView() {
-        GroupTreeView groupTreeView = null;
-
-        for (Node child : sidePane.getSidePaneComponent(SidePaneType.GROUPS).getChildren()) {
-            if (child instanceof GroupTreeView) {
-                groupTreeView = (GroupTreeView) child;
-                break;
-            }
-        }
-        return groupTreeView;
     }
 
     /**
