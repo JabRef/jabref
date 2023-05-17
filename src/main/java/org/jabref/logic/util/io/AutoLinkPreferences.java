@@ -83,5 +83,4 @@ public class AutoLinkPreferences {
     public Character getKeywordSeparator() {
         return keywordSeparator.getValue();
     }
-
 }
