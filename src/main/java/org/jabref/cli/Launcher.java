@@ -23,7 +23,6 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
