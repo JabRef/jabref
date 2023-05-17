@@ -251,9 +251,6 @@ public class GroupTreeView extends BorderPane {
 
         // Filter text field
         setupClearButtonField(searchField);
-
-        // set GroupTree in StateManger
-        this.stateManager.setGroupTree(this.groupTree);
     }
 
     private StackPane getArrowCell(GroupNodeViewModel viewModel) {
@@ -611,5 +608,12 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeSelectedEntries(group);
             }
         }
+    }
+
+    /**
+     * Returns GroupTree
+     */
+    public TreeTableView<GroupNodeViewModel> getGroupTree() {
+        return groupTree;
     }
 }

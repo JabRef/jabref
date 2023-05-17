@@ -57,4 +57,8 @@ public class SidePane extends VBox {
     public SimpleCommand getToggleCommandFor(SidePaneType sidePane) {
         return new TogglePaneAction(stateManager, sidePane, preferencesService.getSidePanePreferences());
     }
+
+    public SidePaneComponent getSidePaneComponent(SidePaneType type) {
+        return viewModel.getSidePaneComponent(type);
+    }
 }

@@ -99,8 +99,6 @@ public class StateManager {
         return activeSearchQuery;
     }
 
-    private TreeTableView<GroupNodeViewModel> groupTree;
-
     public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
         searchResultMap.put(database, resultSize);
     }
@@ -240,11 +238,4 @@ public class StateManager {
         searchHistory.clear();
     }
 
-    public void setGroupTree(TreeTableView<GroupNodeViewModel> groupTree) {
-        this.groupTree = groupTree;
-    }
-
-    public TreeTableView<GroupNodeViewModel> getGroupTree() {
-        return this.groupTree;
-    }
 }
