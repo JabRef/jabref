@@ -90,6 +90,7 @@ jobs:
           mkdir ${{runner.temp}}/jdk21
           wget -qO- ${{matrix.eaJDK}} | tar xvz -C ${{runner.temp}}/jdk21
           echo "JDK21=${{runner.temp}}/jdk21" >> "$GITHUB_ENV"
+          echo "org.gradle.java.installations.paths=${{env.JDK21}}" >> gradle.properties
       - name: Setup OSX key chain on OSX
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
@@ -107,10 +108,10 @@ jobs:
           keychain-password: jabref
       - name: Build runtime image
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Porg.gradle.java.installations.fromEnv=JDK21 jlinkZip
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Porg.gradle.java.installations.paths=${{env.JDK21}} jlinkZip
       - name: Build installer
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Porg.gradle.java.installations.fromEnv=JDK21 jpackage
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Porg.gradle.java.installations.paths=${{env.JDK21}} jpackage
         shell: bash
       - name: Resign app image for OSX and build dmg
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
