@@ -26,6 +26,7 @@ env:
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
   GRADLE_OPTS: -Xmx4g -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
   JAVA_OPTS: -Xmx4g
+  JDK21: ""
 
 concurrency:
   group: ${{ github.ref }}
@@ -41,12 +42,16 @@ jobs:
           - os: ubuntu-latest
             displayName: linux
             archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
+            eaJdk: https://download.java.net/java/early_access/jdk21/22/GPL/openjdk-21-ea+22_linux-x64_bin.tar.gz
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
+            eaJDK: https://download.java.net/java/early_access/jdk21/22/GPL/openjdk-21-ea+22_windows-x64_bin.zip
           - os: macos-latest
             displayName: macOS
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
+            eaJDK: https://download.java.net/java/early_access/jdk21/22/GPL/openjdk-21-ea+22_macos-x64_bin.tar.gz
+
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
@@ -78,6 +83,12 @@ jobs:
           java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
+      - name: Setup JDK EA
+        id: jdk21
+        shell: bash 
+        run: | 
+          wget -qO- ${{matrix.eaJDK}} | tar xvz -C ${{runner.temp}}/jdk21
+          echo "JDK21=${{runner.temp}}/jdk21" >> "$GITHUB_ENV"
       - name: Setup OSX key chain on OSX
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
@@ -95,10 +106,10 @@ jobs:
           keychain-password: jabref
       - name: Build runtime image
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Porg.gradle.java.installations.fromEnv=JDK21 jlinkZip
       - name: Build installer
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Porg.gradle.java.installations.fromEnv=JDK21 jpackage
         shell: bash
       - name: Resign app image for OSX and build dmg
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
