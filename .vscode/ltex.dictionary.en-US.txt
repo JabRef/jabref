@@ -1,3 +1,13 @@
 JabDrive
 JabRef
 CouchDB
+jabref
+FossHub
+WinEdt
+Kile
+MathSciNet
+CrossRef
+zbMATH
+Medline
+codecov
+io

@@ -3,7 +3,7 @@
 JabRef is an open-source, cross-platform citation and reference management tool.
 
 Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
-[![main table](docs/images/jabref-mainscreen.png)](http://www.jabref.org/img/jabref-mainscreen.png)
+[![Main table](docs/images/jabref-mainscreen.png)](http://www.jabref.org/img/jabref-mainscreen.png)
 
 ## Features
 
@@ -12,18 +12,18 @@ It supports you in every step of your research work.
 
 ### Collect
 
-- Search across many online scientific catalogues like CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv, and zbMATH
+- Search across many online scientific catalogs like Cites, CrossRef, Google Scholar, IEEE Explore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv, and zbMATH
 - Import options for over 15 reference formats
 - Easily retrieve and link full-text articles
 - Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
 - Extract metadata from PDFs
-- Import new references directly from the browser with one click using the [official browser extension](https://github.com/JabRef/JabRef-Browser-Extension) for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/jabref/?src=external-github),  [Chrome](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh), [Edge](https://microsoftedge.microsoft.com/addons/detail/pgkajmkfgbehiomipedjhoddkejohfna) and [Vivaldi](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh)
+- Import new references directly from the browser with one click using the [official browser extension](https://github.com/JabRef/JabRef-Browser-Extension) for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/jabref/?src=external-github), [Chrome](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh), [Edge](https://microsoftedge.microsoft.com/addons/detail/pgkajmkfgbehiomipedjhoddkejohfna) and [Vivaldi](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh)
 
 ### Organize
 
 - Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your manual assignments
 - Advanced search and filter features
-- Complete and fix bibliographic data by comparing with curated online catalogues such as Google Scholar, Springer or MathSciNet
+- Complete and fix bibliographic data by comparing with curated online catalogs such as Google Scholar, Springer or MathSciNet
 - Customizable citation key generator
 - Customize and add new metadata fields or reference types
 - Find and merge duplicates
@@ -33,15 +33,15 @@ It supports you in every step of your research work.
 
 ### Cite
 
-- Native BibTeX and Biblatex support
-- Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
+- Native BibTeX and Bib latex support
+- Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Text maker, TeXstudio, Vim and WinEdt.
 - Format references using one of thousands of built-in citation styles or create your own style
 - Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
 
 ### Share
 
 - Many built-in export options or create your export format
-- Library is saved as a simple text file and thus it is easy to share with others via Dropbox and is version-control friendly
+- Library is saved as a simple text file, and thus it is easy to share with others via Dropbox and is version-control friendly
 - Work in a team: sync the contents of your library via a SQL database
 
 ## Installation
@@ -54,7 +54,7 @@ Please see our [Installation Guide](https://docs.jabref.org/installation).
 ## Bug Reports, Suggestions, Other Feedback
 
 [![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
-[![Paypal Donate](https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square)](https://paypal.me/JabRef)
+[![PayPal Donate](https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square)](https://paypal.me/JabRef)
 
 We are thankful for any bug reports or other feedback.
 If you have ideas for new features you want to be included in JabRef, tell us in [the feature section](http://discourse.jabref.org/c/features) of our forum!
@@ -68,7 +68,7 @@ An explanation of donation possibilities and usage of donations is available at 
 [![dev-docs](https://img.shields.io/badge/dev-docs-blue)](https://devdocs.jabref.org/)
 [![Help Contribute to Open Source](https://www.codetriage.com/jabref/jabref/badges/users.svg)](https://www.codetriage.com/jabref/jabref)
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![OpenHub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
+[![Open Hub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
 [![Deployment Status](https://github.com/JabRef/jabref/workflows/Deployment/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ADeployment)
 [![Test Status](https://github.com/JabRef/jabref/workflows/Tests/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ATests)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=main)
@@ -76,7 +76,7 @@ An explanation of donation possibilities and usage of donations is available at 
 Want to be part of a free and open-source project that tens of thousands of scientists use every day?
 Check out the ways you can contribute, below:
 
-- Not a programmer? Help translating JabRef at [Crowdin](https://crowdin.com/project/jabref) or learn how to help at [contribute.jabref.org](https://contribute.jabref.org)
+- Not a programmer? Help to translate JabRef at [Crowdin](https://crowdin.com/project/jabref) or learn how to help at [contribute.jabref.org](https://contribute.jabref.org)
 - Quick overview on the architecture needed? Look at our [high-level documentation](https://devdocs.jabref.org/getting-into-the-code/high-level-documentation)
 - For details on how to contribute, have a look at our [guidelines for contributing](CONTRIBUTING.md).
 - You are welcome to contribute new features. To get your code included into JabRef, just [fork](https://help.github.com/en/articles/fork-a-repo) the JabRef repository, make your changes, and create a [pull request](https://help.github.com/en/articles/about-pull-requests).
@@ -86,7 +86,7 @@ We view pull requests as a collaborative process.
 Submit a pull request early to get feedback from the team on work in progress.
 We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve. Please also remember to discuss bigger changes early with the core developers to avoid a waste of time and work. Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
 
-If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
+If you want a step-by-step walk-through on how to set up your workspace, please check [this guideline](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
 To compile JabRef from source, you need a Java Development Kit 20 and `JAVA_HOME` pointing to this JDK.
 To run it, just execute `gradlew run`.
@@ -94,10 +94,9 @@ When you want to develop, it is necessary to generate additional sources using `
 and then generate the Eclipse `gradlew eclipse`.
 For IntelliJ IDEA, just import the project via a Gradle Import by pointing at the `build.gradle`.
 
-`gradlew test` executes all tests. We use [Github Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
+`gradlew test` executes all tests. We use [GitHub Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. GitHub will report any other failure.
 
 ## Sponsoring
 
-JabRef development is powered by YourKit Java Profiler [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
-
-[JabRef]: https://www.jabref.org
+JabRef development is powered by Your Kit Java Profiler [![Your Kit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
+[JabRef]: <https://www.jabref.org>
