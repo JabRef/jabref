@@ -83,18 +83,18 @@ jobs:
           java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
-      - name: setup jdk ea
+      - name: setup jdk ea windows
         if: (matrix.os == 'windows-latest')
         shell: bash
         run: |
          mkdir ${{runner.temp}}\jdk
-         wget -q -O temp.zip ${{matrix.eaJDK}} && unzip temp.zip 
+         wget curl -kLSs ${{matrix.eaJDK}} -o ${{runner.temp}}\temp.zip && 7z x temp.zip -o${{runner.temp}}\jdk
          echo "jdk=${{runner.temp}}/jdk" >> "$GITHUB_ENV"
          echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk/jdk-21" >> gradle.properties
          ls ${{runner.temp}}/jdk
          cat gradle.properties
-      - name: mkdir
-        if: (matrix.os != 'windows-latest')
+      - name: setup jdk ea ubuntu
+        if: (matrix.os == 'ubuntu-latest')
         shell: bash
         run: |
           mkdir ${{runner.temp}}/jdk
@@ -103,6 +103,17 @@ jobs:
           echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk/jdk-21" >> gradle.properties
           ls ${{runner.temp}}/jdk
           cat gradle.properties
+      - name: setup jdk ea mac
+        if: (matrix.os == 'macos-latest')
+        shell: bash
+        run: |
+          mkdir ${{runner.temp}}/jdk
+          wget -qO- ${{matrix.eaJDK}} | tar xvz -C ${{runner.temp}}/jdk
+          mv  ${{runner.temp}}/jdk/jdk-21.jdk ${{runner.temp}}/jdk/jdk-21
+          echo "JDK21=${{runner.temp}}/jdk" >> "$GITHUB_ENV"
+          echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk/jdk-21" >> gradle.properties
+          ls ${{runner.temp}}/jdk
+          cat gradle.properties    
       - name: Setup OSX key chain on OSX
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
