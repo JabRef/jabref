@@ -193,7 +193,8 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     public void insertColumnInList() {
-        if (addColumnProperty.getValue() == null) {
+        if (addColumnProperty.getValue() == null ||
+            addColumnProperty.getValue().getQualifier().isEmpty()) {
             return;
         }
 
