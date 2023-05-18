@@ -85,11 +85,7 @@ public interface PreferencesService {
 
     CleanupPreferences getDefaultCleanupPreset();
 
-    //*************************************************************************************************************
-    // GeneralPreferences
-    //*************************************************************************************************************
-
-    GeneralPreferences getGeneralPreferences();
+    LibraryPreferences getLibraryPreferences();
 
     TelemetryPreferences getTelemetryPreferences();
 
@@ -159,7 +155,7 @@ public interface PreferencesService {
     // AppearancePreferences
     //*************************************************************************************************************
 
-    AppearancePreferences getAppearancePreferences();
+    WorkspacePreferences getWorkspacePreferences();
 
     //*************************************************************************************************************
     // File preferences

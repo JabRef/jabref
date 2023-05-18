@@ -274,14 +274,14 @@ class OOBibStyleTest {
         assertEquals("Boström et al. [2006]",
                 getCitationMarker2(style,
                         Collections.singletonList(entry), entryDBMap,
-                        false, null, new Boolean[] {false}, null));
+                        false, null, new Boolean[]{false}, null));
 
         assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006]",
                 getCitationMarker2(style,
                         Collections.singletonList(entry), entryDBMap,
                         true,
                         null,
-                        new Boolean[] {true},
+                        new Boolean[]{true},
                         null));
     }
 
@@ -487,8 +487,8 @@ class OOBibStyleTest {
                 getCitationMarker2b(style, entries, entryDBMap, true, null, null, null));
         assertEquals("[Beta, 2000a,b; Epsilon, 2001]",
                 getCitationMarker2(style, entries, entryDBMap, true,
-                        new String[] {"a", "b", ""},
-                        new Boolean[] {false, false, false},
+                        new String[]{"a", "b", ""},
+                        new Boolean[]{false, false, false},
                         null));
     }
 
@@ -529,8 +529,8 @@ class OOBibStyleTest {
                 getCitationMarker2b(style, entries, entryDBMap, false, null, null, null));
         assertEquals("Beta [2000a,b]; Epsilon [2001]",
                 getCitationMarker2(style, entries, entryDBMap, false,
-                        new String[] {"a", "b", ""},
-                        new Boolean[] {false, false, false},
+                        new String[]{"a", "b", ""},
+                        new Boolean[]{false, false, false},
                         null));
     }
 
@@ -570,8 +570,8 @@ class OOBibStyleTest {
 
         assertEquals("[Beta, 2000a,b,c]",
                 getCitationMarker2(style, entries, entryDBMap, true,
-                        new String[] {"a", "b", "c"},
-                        new Boolean[] {false, false, false},
+                        new String[]{"a", "b", "c"},
+                        new Boolean[]{false, false, false},
                         null));
     }
 
@@ -611,8 +611,8 @@ class OOBibStyleTest {
 
         assertEquals("Beta [2000a,b,c]",
                 getCitationMarker2(style, entries, entryDBMap, false,
-                        new String[] {"a", "b", "c"},
-                        new Boolean[] {false, false, false},
+                        new String[]{"a", "b", "c"},
+                        new Boolean[]{false, false, false},
                         null));
     }
 

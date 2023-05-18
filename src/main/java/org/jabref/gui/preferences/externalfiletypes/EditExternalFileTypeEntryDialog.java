@@ -10,10 +10,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.util.OS;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -31,7 +31,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     @FXML private Label icon;
     @Inject private DialogService dialogService;
 
-    private final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
+    private final NativeDesktop nativeDesktop = OS.getNativeDesktop();
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
 
     private final ExternalFileTypeItemViewModel item;

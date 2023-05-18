@@ -28,7 +28,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
 import com.google.common.util.concurrent.RateLimiter;
@@ -143,7 +142,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 }
 
                 // BibTeX entry
-                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
+                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
                 // Crossref has a dynamic API rate limit
@@ -159,8 +158,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     }
                 }
 
-                if (openConnection instanceof HttpURLConnection) {
-                    ((HttpURLConnection) openConnection).disconnect();
+                if (openConnection instanceof HttpURLConnection connection) {
+                    connection.disconnect();
                 }
                 return fetchedEntry;
             } else {

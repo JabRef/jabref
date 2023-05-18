@@ -189,8 +189,8 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
             @Override
             public StyleableProperty<ArrowSide> getStyleableProperty(TitledPane styleable) {
                 Skin<?> skin = styleable.getSkin();
-                if (skin instanceof CustomTitledPaneSkin) {
-                    return ((CustomTitledPaneSkin) skin).arrowSide;
+                if (skin instanceof CustomTitledPaneSkin paneSkin) {
+                    return paneSkin.arrowSide;
                 }
                 return null;
             }

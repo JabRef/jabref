@@ -123,7 +123,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> styles.stream()
-                                                 .map(style-> new CitationStylePreviewLayout(style, Globals.entryTypesManager))
+                                                 .map(style -> new CitationStylePreviewLayout(style, Globals.entryTypesManager))
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->
                                                          item.getName().equals(style.getName())).isEmpty())
                                                  .sorted(Comparator.comparing(PreviewLayout::getName))

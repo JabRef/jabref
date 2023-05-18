@@ -21,13 +21,13 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -53,21 +53,21 @@ public class EntryTypeViewModel {
     private final DialogService dialogService;
     private final Validator idFieldValidator;
     private final StateManager stateManager;
-    private final ImportFormatReader importFormatReader;
     private final TaskExecutor taskExecutor;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     public EntryTypeViewModel(PreferencesService preferences,
                               LibraryTab libraryTab,
                               DialogService dialogService,
                               StateManager stateManager,
-                              ImportFormatReader importFormatReader,
-                              TaskExecutor taskExecutor) {
+                              TaskExecutor taskExecutor,
+                              FileUpdateMonitor fileUpdateMonitor) {
         this.libraryTab = libraryTab;
         this.preferencesService = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.importFormatReader = importFormatReader;
         this.taskExecutor = taskExecutor;
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         fetchers.addAll(WebFetchers.getIdBasedFetchers(
                 preferences.getImportFormatPreferences(),
@@ -130,7 +130,7 @@ public class EntryTypeViewModel {
         private String searchID = "";
 
         @Override
-        protected Optional<BibEntry> call() throws InterruptedException, FetcherException {
+        protected Optional<BibEntry> call() throws FetcherException {
             searchingProperty().setValue(true);
             storeSelectedFetcher();
             fetcher = selectedItemProperty().getValue();
@@ -173,11 +173,10 @@ public class EntryTypeViewModel {
                 ImportHandler handler = new ImportHandler(
                         libraryTab.getBibDatabaseContext(),
                         preferencesService,
-                        Globals.getFileUpdateMonitor(),
+                        fileUpdateMonitor,
                         libraryTab.getUndoManager(),
                         stateManager,
                         dialogService,
-                        importFormatReader,
                         taskExecutor);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
 
