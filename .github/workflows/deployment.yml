@@ -87,6 +87,7 @@ jobs:
         id: jdk21
         shell: bash 
         run: | 
+          mkdir ${{runner.temp}}/jdk21
           wget -qO- ${{matrix.eaJDK}} | tar xvz -C ${{runner.temp}}/jdk21
           echo "JDK21=${{runner.temp}}/jdk21" >> "$GITHUB_ENV"
       - name: Setup OSX key chain on OSX
