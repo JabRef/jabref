@@ -89,7 +89,7 @@ jobs:
         run: |
          mkdir ${{runner.temp}}\jdk21
       - name: mkdir
-        if: (matrix.os != 'windows-katest')
+        if: (matrix.os != 'windows-latest')
         shell: bash
         run: |
           mkdir ${{runner.temp}}/jdk21
