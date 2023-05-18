@@ -59,12 +59,12 @@ public class GroupTreeNodeViewModel {
         AbstractGroup group = node.getGroup();
         String shortDescription = "";
         boolean showDynamic = true;
-        if (group instanceof ExplicitGroup) {
-            shortDescription = GroupDescriptions.getShortDescriptionExplicitGroup((ExplicitGroup) group);
-        } else if (group instanceof KeywordGroup) {
-            shortDescription = GroupDescriptions.getShortDescriptionKeywordGroup((KeywordGroup) group, showDynamic);
-        } else if (group instanceof SearchGroup) {
-            shortDescription = GroupDescriptions.getShortDescription((SearchGroup) group, showDynamic);
+        if (group instanceof ExplicitGroup explicitGroup) {
+            shortDescription = GroupDescriptions.getShortDescriptionExplicitGroup(explicitGroup);
+        } else if (group instanceof KeywordGroup keywordGroup) {
+            shortDescription = GroupDescriptions.getShortDescriptionKeywordGroup(keywordGroup, showDynamic);
+        } else if (group instanceof SearchGroup searchGroup) {
+            shortDescription = GroupDescriptions.getShortDescription(searchGroup, showDynamic);
         } else {
             shortDescription = GroupDescriptions.getShortDescriptionAllEntriesGroup();
         }

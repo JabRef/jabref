@@ -112,7 +112,7 @@ public class BibDatabase {
     /**
      * Returns the list of entries sorted by the given comparator.
      */
-    public synchronized List<BibEntry> getEntriesSorted(Comparator<BibEntry> comparator) {
+    public List<BibEntry> getEntriesSorted(Comparator<BibEntry> comparator) {
         List<BibEntry> entriesSorted = new ArrayList<>(entries);
         entriesSorted.sort(comparator);
 

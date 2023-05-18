@@ -372,6 +372,10 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
 
+.menu-button > .label {
+    -fx-padding: 0 8 0 8;
+}
+
 .button:hover {
     -fx-background-color: rgba(0, 0, 0, 0.12);
 }
@@ -529,6 +533,12 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0.0em 0.666667em 0.0em 0.666667em;
 }
 
+.menu-bar .menu-button {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-radius: 0;
+}
+
 .menu-item {
     -fx-padding: 0.5em 0.41777em 0.5em 0.41777em;
 }
@@ -622,12 +632,14 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-green;
 }
 
-.table-view {
+.table-view,
+.tree-table-view {
     -fx-background-insets: 0;
     -fx-padding: 0;
 }
 
-.table-view:focused {
+.table-view:focused,
+.tree-table-view:focused {
     -fx-background-insets: 0;
 }
 
@@ -751,6 +763,9 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -fx-control-inner-background;
     -fx-background-insets: 0;
     -fx-effect: null;
+    -fx-border-width: 1;
+    -fx-border-color: -fx-outer-border;
+    -fx-padding: 0;
 }
 
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
@@ -1086,24 +1101,26 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -fx-mark-highlight-color, derive(-jr-theme-text, -30%);
 }
 
-.table-view {
+.table-view,
+.tree-table-view {
     -fx-border-width: 0;
     -fx-padding: 0;
     -fx-border-insets: 0;
     -fx-table-cell-border-color: transparent;
 }
 
-.table-view .column-header-background {
+.column-header-background {
     -fx-background-color: -fx-control-inner-background;
     -fx-border-width: 0;
 }
 
-.table-view .column-header-background:hover {
+.column-header-background:hover {
     -fx-background-color: -fx-outer-border;
 }
 
-.table-view .column-header,
-.table-view .filler {
+.column-header,
+.table-view .filler,
+.tree-table-view .filler {
     -fx-background-color: transparent, -fx-control-inner-background;
     -fx-background-insets: 0, 0 0.02em 0 0.02em;
     -fx-font-weight: bold;
@@ -1112,20 +1129,22 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-color: -fx-outer-border;
 }
 
-.table-view .column-header > .label {
+.column-header > .label {
     -fx-padding: 0 1em 0 1em;
     -fx-alignment: center-left;
     -fx-text-fill: -jr-head-fg;
 }
 
-.table-view .column-header .glyph-icon {
+.column-header .glyph-icon {
     -fx-alignment: baseline-center;
     -fx-text-fill: -jr-head-fg;
     -fx-fill: -jr-head-fg;
 }
 
 .table-cell,
-.table-cell .glyph-icon {
+.tree-table-cell,
+.table-cell .glyph-icon,
+.tree-table-cell .glyph-icon {
     -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-cell-size: 4.0em;
     -fx-text-fill: -fx-text-background-color;

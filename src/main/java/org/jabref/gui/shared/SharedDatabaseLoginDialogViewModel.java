@@ -40,6 +40,7 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -75,6 +76,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     private final Validator databaseValidator;
     private final Validator hostValidator;
@@ -84,10 +86,14 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator keystoreValidator;
     private final CompositeValidator formValidator;
 
-    public SharedDatabaseLoginDialogViewModel(JabRefFrame frame, DialogService dialogService, PreferencesService preferencesService) {
+    public SharedDatabaseLoginDialogViewModel(JabRefFrame frame,
+                                              DialogService dialogService,
+                                              PreferencesService preferencesService,
+                                              FileUpdateMonitor fileUpdateMonitor) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
 
@@ -157,7 +163,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         loading.set(true);
 
         try {
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame, preferencesService);
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame, preferencesService, fileUpdateMonitor);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 

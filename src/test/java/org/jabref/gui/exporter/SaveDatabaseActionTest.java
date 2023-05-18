@@ -31,6 +31,7 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.ExportPreferences;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.LibraryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,6 +126,7 @@ class SaveDatabaseActionTest {
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class));
         when(preferences.getCitationKeyPatternPreferences().getKeyPattern()).thenReturn(emptyGlobalCitationKeyPattern);
         when(preferences.getFieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(preferences.getLibraryPreferences()).thenReturn(mock(LibraryPreferences.class));
         when(libraryTab.frame()).thenReturn(jabRefFrame);
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(libraryTab.getUndoManager()).thenReturn(mock(CountingUndoManager.class));

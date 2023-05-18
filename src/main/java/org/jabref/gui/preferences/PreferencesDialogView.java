@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 
 import org.jabref.gui.DialogService;
@@ -35,6 +36,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML private ListView<PreferencesTab> preferenceTabList;
     @FXML private ScrollPane preferencesContainer;
     @FXML private ButtonType saveButton;
+    @FXML private ToggleButton memoryStickMode;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
@@ -104,6 +106,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         new ViewModelListCellFactory<PreferencesTab>()
                 .withText(PreferencesTab::getTabName)
                 .install(preferenceTabList);
+
+        memoryStickMode.selectedProperty().bindBidirectional(viewModel.getMemoryStickProperty());
 
         viewModel.setValues();
     }

@@ -45,6 +45,7 @@ public class MetaData {
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
     public static final String FILE_DIRECTORY = "fileDirectory";
+    public static final String FILE_DIRECTORY_LATEX = "fileDirectoryLatex";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
 
@@ -71,7 +72,7 @@ public class MetaData {
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
-    private String VersionDBStructure;
+    private String versionDBStructure;
 
     /**
      * Constructs an empty metadata.
@@ -213,11 +214,11 @@ public class MetaData {
     }
 
     public Optional<String> getVersionDBStructure() {
-        return Optional.ofNullable(VersionDBStructure);
+        return Optional.ofNullable(versionDBStructure);
     }
 
     public void setVersionDBStructure(String version) {
-        VersionDBStructure = Objects.requireNonNull(version).trim();
+        versionDBStructure = Objects.requireNonNull(version).trim();
         postChange();
     }
 
@@ -383,17 +384,17 @@ public class MetaData {
                 && (mode == metaData.mode)
                 && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
                 && Objects.equals(contentSelectors, metaData.contentSelectors)
-                && Objects.equals(VersionDBStructure, metaData.VersionDBStructure);
+                && Objects.equals(versionDBStructure, metaData.versionDBStructure);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, defaultFileDirectory, contentSelectors, VersionDBStructure);
+                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, defaultFileDirectory, contentSelectors, versionDBStructure);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + VersionDBStructure + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", defaultFileDirectory=" + defaultFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
     }
 }

@@ -17,6 +17,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -47,6 +48,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     private SharedDatabaseLoginDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
@@ -79,7 +81,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
 
-        viewModel = new SharedDatabaseLoginDialogViewModel(frame, dialogService, preferencesService);
+        viewModel = new SharedDatabaseLoginDialogViewModel(frame, dialogService, preferencesService, fileUpdateMonitor);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 
