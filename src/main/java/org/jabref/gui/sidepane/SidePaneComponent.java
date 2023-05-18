@@ -75,8 +75,8 @@ public class SidePaneComponent extends BorderPane {
 
     public void requestFocus() {
         for (Node child : getChildren()) {
-            if (child instanceof GroupTreeView) {
-                ((GroupTreeView) child).requestFocusGroupTree();
+            if (child instanceof GroupTreeView groupTreeView) {
+                groupTreeView.requestFocusGroupTree();
                 break;
             }
         }
