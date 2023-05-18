@@ -78,7 +78,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where an exception was thrown for the user after <kbd>Ctrl</kbd>+<kbd>Z</kbd> command. [#9737](https://github.com/JabRef/jabref/issues/9737)
 - We fixed the citation key generation for (`[authors]`, `[authshort]`, `[authorsAlpha]`, `authIniN`, `authEtAl`, `auth.etal`)[https://docs.jabref.org/setup/citationkeypatterns#special-field-markers] to handle `and others` properly. [koppor#626](https://github.com/koppor/jabref/issues/626)
 - We fixed the Save/save as file type shows BIBTEX_DB instead of "Bibtex library". [#9372](https://github.com/JabRef/jabref/issues/9372)
-- We fixed an issue when overwriting the owner was disabled. [#9896](https://github.com/JabRef/jabref/pull/9896)
+- We fixed the default main file directory for non-English Linux users. [#8010](https://github.com/JabRef/jabref/issues/8010)
 - We fixed an issue regarding recording redundant prefixes in search history. [#9685](https://github.com/JabRef/jabref/issues/9685)
 - We fixed an issue where passing a URL containing a DOI led to a "No entry found" notification. [#9821](https://github.com/JabRef/jabref/issues/9821)
 - We fixed some minor visual inconsistencies and issues in the preferences dialog. [#9866](https://github.com/JabRef/jabref/pull/9866)
