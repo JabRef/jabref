@@ -7,11 +7,13 @@ import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
@@ -81,6 +83,9 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         private Node createTag(ParsedEntryLink entryLink) {
             Label tagLabel = new Label();
             tagLabel.setText(getConverter().toString(entryLink));
+            tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
+            tagLabel.getGraphic().setOnMouseClicked(event -> removeTags(entryLink));
+            tagLabel.setContentDisplay(ContentDisplay.RIGHT);
             tagLabel.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2) {
                     viewModel.jumpToEntry(entryLink);
