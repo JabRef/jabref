@@ -24,6 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a new Integrity check for unscaped ampersands. [koppor#585](https://github.com/koppor/jabref/issues/585)
 - We added support for parsing `$\backslash$` in file paths (as exported by Mendeley). [forum#3470](https://discourse.jabref.org/t/mendeley-bib-import-with-linked-files/3470)
 - We added the possibility to automatically fetch entries when an ISBN is pasted on the main table. [#9864](https://github.com/JabRef/jabref/issues/9864)
+- We added the option to disable the automatic linking of files in the entry editor [#5105](https://github.com/JabRef/jabref/issues/5105)
 - We added key binding to focus on groups <kbd>Shift</kbd> + <kbd>Tab</kbd> [#9863](https://github.com/JabRef/jabref/issues/9863)
 
 ### Changed
