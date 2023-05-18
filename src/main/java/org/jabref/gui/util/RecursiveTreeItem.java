@@ -16,8 +16,8 @@ import javafx.util.Callback;
 import com.tobiasdiez.easybind.EasyBind;
 
 /**
- * @implNote Taken from https://gist.github.com/lestard/011e9ed4433f9eb791a8
- * @implNote As CheckBoxTreeItem extends TreeItem, this class will work for both.
+ * Taken from https://gist.github.com/lestard/011e9ed4433f9eb791a8
+ * As CheckBoxTreeItem extends TreeItem, this class will work for both.
  */
 public class RecursiveTreeItem<T> extends CheckBoxTreeItem<T> {
 

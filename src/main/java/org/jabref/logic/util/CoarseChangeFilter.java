@@ -34,10 +34,7 @@ public class CoarseChangeFilter {
 
     @Subscribe
     public synchronized void listen(BibDatabaseContextChangedEvent event) {
-        if (event instanceof FieldChangedEvent) {
-            // Only relay event if the field changes are more than one character or a new field is edited
-            FieldChangedEvent fieldChange = (FieldChangedEvent) event;
-
+        if (event instanceof FieldChangedEvent fieldChange) {
             // If editing has started
             boolean isNewEdit = lastFieldChanged.isEmpty() || lastEntryChanged.isEmpty();
 
