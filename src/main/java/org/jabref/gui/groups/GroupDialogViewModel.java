@@ -24,7 +24,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -52,6 +51,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
@@ -109,18 +109,18 @@ public class GroupDialogViewModel {
     private final PreferencesService preferencesService;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
-    private final GroupDialogHeader groupDialogHeader;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
                                 PreferencesService preferencesService,
                                 AbstractGroup editedGroup,
-                                GroupDialogHeader groupDialogHeader) {
+                                FileUpdateMonitor fileUpdateMonitor) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
-        this.groupDialogHeader = groupDialogHeader;
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         setupValidation();
         setValues();
@@ -359,7 +359,7 @@ public class GroupDialogViewModel {
                         groupHierarchySelectedProperty.getValue(),
                         Path.of(texGroupFilePathProperty.getValue().trim()),
                         new DefaultAuxParser(new BibDatabase()),
-                        Globals.getFileUpdateMonitor(),
+                        fileUpdateMonitor,
                         currentDatabase.getMetaData());
             }
 

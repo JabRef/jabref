@@ -38,7 +38,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
@@ -156,7 +155,7 @@ public class AstrophysicsDataSystem
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(preferences);
     }
 
     @Override
