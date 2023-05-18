@@ -53,6 +53,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
@@ -68,12 +69,17 @@ public class ArgumentProcessor {
     private final List<ParserResult> parserResults;
     private final Mode startupMode;
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
     private boolean noGUINeeded;
 
-    public ArgumentProcessor(String[] args, Mode startupMode, PreferencesService preferencesService) throws org.apache.commons.cli.ParseException {
+    public ArgumentProcessor(String[] args,
+                             Mode startupMode,
+                             PreferencesService preferencesService,
+                             FileUpdateMonitor fileUpdateMonitor) throws org.apache.commons.cli.ParseException {
         this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         this.parserResults = processArguments();
     }
@@ -84,7 +90,7 @@ public class ArgumentProcessor {
      * @param argument See importFile.
      * @return ParserResult with setToOpenTab(true)
      */
-    private static Optional<ParserResult> importToOpenBase(String argument) {
+    private Optional<ParserResult> importToOpenBase(String argument) {
         Optional<ParserResult> result = importFile(argument);
 
         result.ifPresent(ParserResult::setToOpenTab);
@@ -92,8 +98,8 @@ public class ArgumentProcessor {
         return result;
     }
 
-    private static Optional<ParserResult> importBibtexToOpenBase(String argument, ImportFormatPreferences importFormatPreferences) {
-        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+    private Optional<ParserResult> importBibtexToOpenBase(String argument, ImportFormatPreferences importFormatPreferences) {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
         try {
             List<BibEntry> entries = parser.parseEntries(argument);
             ParserResult result = new ParserResult(entries);
@@ -105,7 +111,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private static Optional<ParserResult> importFile(String argument) {
+    private Optional<ParserResult> importFile(String argument) {
         String[] data = argument.split(",");
 
         String address = data[0];
@@ -143,18 +149,23 @@ public class ArgumentProcessor {
         return importResult;
     }
 
-    private static Optional<ParserResult> importFile(Path file, String importFormat) {
+    private Optional<ParserResult> importFile(Path file, String importFormat) {
         try {
+            ImportFormatReader importFormatReader = new ImportFormatReader(
+                    preferencesService.getImporterPreferences(),
+                    preferencesService.getImportFormatPreferences(),
+                    fileUpdateMonitor);
+
             if (!"*".equals(importFormat)) {
                 System.out.println(Localization.lang("Importing") + ": " + file);
-                ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(importFormat, file);
+                ParserResult result = importFormatReader.importFromFile(importFormat, file);
                 return Optional.of(result);
             } else {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
                 ImportFormatReader.UnknownFormatImport importResult =
-                        Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, new DummyFileUpdateMonitor());
+                        importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);
@@ -234,7 +245,7 @@ public class ArgumentProcessor {
                         cli.getWriteMetadatatoPdf(),
                         preferencesService.getXmpPreferences(),
                         preferencesService.getFilePreferences(),
-                        preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
+                        preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
                         Globals.entryTypesManager,
                         preferencesService.getFieldPreferences(),
                         cli.isWriteXMPtoPdf() || cli.isWriteMetadatatoPdf(),
@@ -459,7 +470,7 @@ public class ArgumentProcessor {
                         pr = OpenDatabase.loadDatabase(
                                 Path.of(aLeftOver),
                                 preferencesService.getImportFormatPreferences(),
-                                Globals.getFileUpdateMonitor());
+                                fileUpdateMonitor);
                     } catch (IOException ex) {
                         pr = ParserResult.fromError(ex);
                         LOGGER.error("Error opening file '{}'", aLeftOver, ex);
@@ -533,7 +544,8 @@ public class ArgumentProcessor {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SaveConfiguration saveConfiguration = new SaveConfiguration()
-                        .withReformatOnSave(preferencesService.getExportPreferences().shouldAlwaysReformatOnSave());
+                        .withMetadataSaveOrder(true)
+                        .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,

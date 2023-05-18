@@ -38,10 +38,12 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 import org.controlsfx.control.PopOver;
@@ -86,6 +88,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML private TextField texGroupFilePath;
 
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
+
     private final EnumMap<GroupHierarchyType, String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
 
@@ -97,7 +101,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                            PreferencesService preferencesService,
                            AbstractGroup editedGroup,
                            GroupDialogHeader groupDialogHeader) {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, groupDialogHeader);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, fileUpdateMonitor);
 
         ViewLoader.view(this)
                   .load()

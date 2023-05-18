@@ -41,7 +41,6 @@ import javafx.scene.control.TableColumn.SortType;
 import org.jabref.gui.Globals;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -100,7 +99,6 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
@@ -118,7 +116,6 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
-import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -279,6 +276,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
+    public static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
@@ -427,7 +425,7 @@ public class JabRefPreferences implements PreferencesService {
     private Map<String, Set<Field>> entryEditorTabList;
     private String userName;
 
-    private GeneralPreferences generalPreferences;
+    private LibraryPreferences libraryPreferences;
     private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
     private OwnerPreferences ownerPreferences;
@@ -435,7 +433,7 @@ public class JabRefPreferences implements PreferencesService {
     private PreviewPreferences previewPreferences;
     private OpenOfficePreferences openOfficePreferences;
     private SidePanePreferences sidePanePreferences;
-    private AppearancePreferences appearancePreferences;
+    private WorkspacePreferences workspacePreferences;
     private ImporterPreferences importerPreferences;
     private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
@@ -500,9 +498,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
 
-        defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
-        defaults.put(PUSH_WINEDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(PUSH_TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_TEXMAKER_PATH, OS.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
+        defaults.put(PUSH_WINEDT_PATH, OS.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        defaults.put(PUSH_TEXSTUDIO_PATH, OS.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
         defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(PUSH_VIM, "vim");
         defaults.put(PUSH_VIM_SERVER, "vim");
@@ -543,12 +541,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_PASSWORD, "");
 
         // SSL
-        defaults.put(TRUSTSTORE_PATH, Path.of(AppDirsFactory.getInstance()
-                                                            .getUserDataDir(
-                                                                    OS.APP_DIR_APP_NAME,
-                                                                    "ssl",
-                                                                    OS.APP_DIR_APP_AUTHOR))
-                                          .resolve("truststore.jks").toString());
+        defaults.put(TRUSTSTORE_PATH, OS.getNativeDesktop()
+                                        .getSslDirectory()
+                                        .resolve("truststore.jks").toString());
 
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
@@ -694,6 +689,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
 
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
+        defaults.put(AUTOLINK_FILES_ENABLED, Boolean.TRUE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
         defaults.put(ALLOW_INTEGER_EDITION_BIBTEX, Boolean.FALSE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
@@ -1262,40 +1258,22 @@ public class JabRefPreferences implements PreferencesService {
         return openOfficePreferences;
     }
 
-    //*************************************************************************************************************
-    // GeneralPreferences
-    //*************************************************************************************************************
-
     @Override
-    public GeneralPreferences getGeneralPreferences() {
-        if (Objects.nonNull(generalPreferences)) {
-            return generalPreferences;
+    public LibraryPreferences getLibraryPreferences() {
+        if (Objects.nonNull(libraryPreferences)) {
+            return libraryPreferences;
         }
 
-        generalPreferences = new GeneralPreferences(
-                getLanguage(),
+        libraryPreferences = new LibraryPreferences(
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
-                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
-                getBoolean(CONFIRM_DELETE),
-                getBoolean(MEMORY_STICK_MODE),
-                getBoolean(OPEN_LAST_EDITED),
-                getBoolean(SHOW_ADVANCED_HINTS));
+                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                getBoolean(LOCAL_AUTO_SAVE));
 
-        EasyBind.listen(generalPreferences.languageProperty(), (obs, oldValue, newValue) -> {
-            put(LANGUAGE, newValue.getId());
-            if (oldValue != newValue) {
-                setLanguageDependentDefaultValues();
-                Localization.setLanguage(newValue);
-            }
-        });
-        EasyBind.listen(generalPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
-        EasyBind.listen(generalPreferences.isWarnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
-        EasyBind.listen(generalPreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-        EasyBind.listen(generalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> putBoolean(MEMORY_STICK_MODE, newValue));
-        EasyBind.listen(generalPreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
-        EasyBind.listen(generalPreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
+        EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
+        EasyBind.listen(libraryPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
-        return generalPreferences;
+        return libraryPreferences;
     }
 
     private Language getLanguage() {
@@ -1535,7 +1513,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getDouble(ENTRY_EDITOR_HEIGHT));
+                getDouble(ENTRY_EDITOR_HEIGHT),
+                getBoolean(AUTOLINK_FILES_ENABLED));
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabListProperty(), (obs, oldValue, newValue) -> storeEntryEditorTabList(newValue));
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
@@ -1546,6 +1525,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
         EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (obs, oldValue, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
         EasyBind.listen(entryEditorPreferences.dividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
+        EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
 
         return entryEditorPreferences;
     }
@@ -2015,15 +1995,25 @@ public class JabRefPreferences implements PreferencesService {
 
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
-                getPath(PREFS_EXPORT_PATH, JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory()),
-                getUser()
-        );
+                getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
+                getUser(),
+                getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
                 (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
         EasyBind.listen(internalPreferences.lastPreferencesExportPathProperty(),
                 (obs, oldValue, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()));
         // user is a static value, should only be changed for debugging
+        EasyBind.listen(internalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(MEMORY_STICK_MODE, newValue);
+            if (!newValue) {
+                try {
+                    Files.deleteIfExists(Path.of("jabref.xml"));
+                } catch (IOException e) {
+                    LOGGER.warn("Error accessing filesystem");
+                }
+            }
+        });
 
         return internalPreferences;
     }
@@ -2047,23 +2037,38 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public AppearancePreferences getAppearancePreferences() {
-        if (appearancePreferences != null) {
-            return appearancePreferences;
+    public WorkspacePreferences getWorkspacePreferences() {
+        if (workspacePreferences != null) {
+            return workspacePreferences;
         }
 
-        appearancePreferences = new AppearancePreferences(
+        workspacePreferences = new WorkspacePreferences(
+                getLanguage(),
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
                 (Integer) defaults.get(MAIN_FONT_SIZE),
-                new Theme(get(FX_THEME))
-        );
+                new Theme(get(FX_THEME)),
+                getBoolean(OPEN_LAST_EDITED),
+                getBoolean(SHOW_ADVANCED_HINTS),
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
+                getBoolean(CONFIRM_DELETE));
 
-        EasyBind.listen(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
-        EasyBind.listen(appearancePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
-        EasyBind.listen(appearancePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
+            put(LANGUAGE, newValue.getId());
+            if (oldValue != newValue) {
+                setLanguageDependentDefaultValues();
+                Localization.setLanguage(newValue);
+            }
+        });
+        EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
+        EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
 
-        return appearancePreferences;
+        return workspacePreferences;
     }
 
     //*************************************************************************************************************
@@ -2113,7 +2118,7 @@ public class JabRefPreferences implements PreferencesService {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUser(),
-                getPath(MAIN_FILE_DIRECTORY, JabRefDesktop.getNativeDesktop().getDefaultFileChooserDirectory()).toString(),
+                getPath(MAIN_FILE_DIRECTORY, OS.getNativeDesktop().getDefaultFileChooserDirectory()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
@@ -2123,7 +2128,7 @@ public class JabRefPreferences implements PreferencesService {
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
                 getBoolean(CREATE_BACKUP),
                 // We choose the data directory, because a ".bak" file should survive cache cleanups
-                getPath(BACKUP_DIRECTORY, BackupFileUtil.getAppDataBackupDir()));
+                getPath(BACKUP_DIRECTORY, OS.getNativeDesktop().getBackupDirectory()));
 
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
@@ -2194,17 +2199,13 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         exportPreferences = new ExportPreferences(
-                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)),
-                getExportSaveOrder(),
-                getBoolean(LOCAL_AUTO_SAVE));
+                getExportSaveOrder());
 
-        EasyBind.listen(exportPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
         EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(exportPreferences.exportSaveOrderProperty(), (obs, oldValue, newValue) -> storeExportSaveOrder(newValue));
-        EasyBind.listen(exportPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
         return exportPreferences;
     }
@@ -2239,7 +2240,7 @@ public class JabRefPreferences implements PreferencesService {
         List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
 
         for (var column : sortOrder) {
-            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            boolean descending = column.getSortType() == SortType.DESCENDING;
             criteria.add(new SaveOrder.SortCriterion(
                     FieldFactory.parseField(column.getQualifier()),
                     descending));
@@ -2262,7 +2263,7 @@ public class JabRefPreferences implements PreferencesService {
         return new SaveConfiguration()
                 .withSaveOrder(saveOrder)
                 .withMetadataSaveOrder(false)
-                .withReformatOnSave(getExportPreferences().shouldAlwaysReformatOnSave());
+                .withReformatOnSave(getLibraryPreferences().shouldAlwaysReformatOnSave());
     }
 
     @Override

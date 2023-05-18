@@ -20,7 +20,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -32,6 +31,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -54,19 +54,19 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final JabRefFrame frame;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
-    private final ThemeManager themeManager;
+    private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
 
     public OpenDatabaseAction(JabRefFrame frame,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               StateManager stateManager,
-                              ThemeManager themeManager) {
+                              FileUpdateMonitor fileUpdateMonitor) {
         this.frame = frame;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.themeManager = themeManager;
+        this.fileUpdateMonitor = fileUpdateMonitor;
     }
 
     /**
@@ -178,7 +178,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         // The backgroundTask is executed within the method createLibraryTab
-        LibraryTab newTab = LibraryTab.createLibraryTab(backgroundTask, file, preferencesService, stateManager, frame, themeManager);
+        LibraryTab newTab = LibraryTab.createLibraryTab(backgroundTask, file, preferencesService, stateManager, frame, fileUpdateMonitor);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 
@@ -198,7 +198,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService).orElse(null);
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService, fileUpdateMonitor)
+                                          .orElse(null);
         }
 
         try {
@@ -206,7 +207,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 // No backup was restored, do the "normal" loading
                 parserResult = OpenDatabase.loadDatabase(fileToLoad,
                         preferencesService.getImportFormatPreferences(),
-                        Globals.getFileUpdateMonitor());
+                        fileUpdateMonitor);
             }
 
             if (parserResult.hasWarnings()) {
@@ -222,7 +223,8 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         if (parserResult.getDatabase().isShared()) {
             try {
-                new SharedDatabaseUIManager(frame, preferencesService).openSharedDatabaseFromParserResult(parserResult);
+                new SharedDatabaseUIManager(frame, preferencesService, fileUpdateMonitor)
+                        .openSharedDatabaseFromParserResult(parserResult);
             } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                     NotASharedDatabaseException e) {
                 parserResult.getDatabaseContext().clearDatabasePath(); // do not open the original file

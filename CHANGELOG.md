@@ -72,7 +72,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the Save/save as file type shows BIBTEX_DB instead of "Bibtex library" [#9372](https://github.com/JabRef/jabref/issues/9372)
 - We fixed an issue regarding recording redundant prefixes in search history. [#9685](https://github.com/JabRef/jabref/issues/9685)
 - We fixed an issue where passing a URL containing a DOI led to a "No entry found" notification. [#9821](https://github.com/JabRef/jabref/issues/9821)
-- We fixed an issue where an Automatic Keyword Group could not be deleted in the UI. [#9778](https://github.com/JabRef/jabref/issues/9778)
 
 ### Removed
 

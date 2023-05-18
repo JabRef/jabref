@@ -101,8 +101,8 @@ public class AbbreviationsFileViewModel {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof AbbreviationsFileViewModel) {
-            return Objects.equals(this.name, ((AbbreviationsFileViewModel) obj).name);
+        if (obj instanceof AbbreviationsFileViewModel model) {
+            return Objects.equals(this.name, model.name);
         } else {
             return false;
         }

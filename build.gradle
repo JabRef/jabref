@@ -117,11 +117,11 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation 'org.apache.lucene:lucene-core:9.5.0'
-    implementation 'org.apache.lucene:lucene-queryparser:9.5.0'
-    implementation 'org.apache.lucene:lucene-queries:9.5.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.5.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.5.0'
+    implementation 'org.apache.lucene:lucene-core:9.6.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.6.0'
+    implementation 'org.apache.lucene:lucene-queries:9.6.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.6.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.6.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
@@ -179,8 +179,8 @@ dependencies {
     implementation 'com.konghq:unirest-java:3.14.2'
 
     implementation 'org.slf4j:slf4j-api:2.0.7'
-    implementation "org.tinylog:tinylog-api:2.6.1"
-    implementation "org.tinylog:slf4j-tinylog:2.6.1"
+    implementation "org.tinylog:tinylog-api:2.6.2"
+    implementation "org.tinylog:slf4j-tinylog:2.6.2"
     implementation "org.tinylog:tinylog-impl:2.6.1"
 
     implementation 'de.undercouch:citeproc-java:3.0.0-beta.2'
@@ -494,6 +494,7 @@ checkstyle {
 rewrite {
     activeRecipe(
         'org.jabref.config.rewrite.cleanup',
+        'org.openrewrite.java.logging.slf4j.LoggersNamedForEnclosingClass',
         'org.openrewrite.java.logging.slf4j.ParameterizedLogging',
         'org.openrewrite.java.logging.slf4j.Slf4jLogShouldBeConstant'
     )
@@ -511,6 +512,7 @@ rewrite {
         "**/*.yml"
     )
     plainTextMask("**/*.md")
+    failOnDryRunResults = true
 }
 
 modernizer {

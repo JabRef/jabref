@@ -87,8 +87,8 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
-        for (int i = 0; (i < (entries.size() - 1)); i++) {
-            for (int j = i + 1; (j < entries.size()); j++) {
+        for (int i = 0; i < (entries.size() - 1); i++) {
+            for (int j = i + 1; j < entries.size(); j++) {
                 if (Thread.interrupted()) {
                     return;
                 }

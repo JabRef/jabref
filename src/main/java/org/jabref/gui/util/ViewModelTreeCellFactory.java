@@ -18,7 +18,6 @@ import org.jabref.gui.icon.JabRefIcon;
 /**
  * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
  *
- * @param <S> view model
  * @param <T> cell value
  */
 public class ViewModelTreeCellFactory<T> implements Callback<TreeView<T>, TreeCell<T>> {

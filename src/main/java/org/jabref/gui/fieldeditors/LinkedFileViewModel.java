@@ -225,7 +225,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                         databaseContext,
                         linkedFile.getLink(),
                         preferences.getFilePreferences());
-
                 if (resolvedPath.isPresent()) {
                     JabRefDesktop.openFolderAndSelectFile(resolvedPath.get(), preferences, dialogService);
                 } else {
@@ -303,7 +302,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
-        if ((file.isPresent())) {
+        if (file.isPresent()) {
             // Found the linked file, so move it
             try {
                 linkedFileHandler.moveToDefaultDirectory();

@@ -7,5 +7,5 @@ import org.jabref.model.database.BibDatabaseContext;
  */
 public enum DatabaseLocation {
     LOCAL,
-    SHARED;
+    SHARED
 }

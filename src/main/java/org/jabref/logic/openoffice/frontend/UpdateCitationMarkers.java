@@ -45,7 +45,7 @@ public class UpdateCitationMarkers {
         CitationGroups citationGroups = frontend.citationGroups;
 
         for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
-            boolean withText = (group.citationType != CitationType.INVISIBLE_CIT);
+            boolean withText = group.citationType != CitationType.INVISIBLE_CIT;
             Optional<OOText> marker = group.getCitationMarker();
 
             if (marker.isEmpty()) {

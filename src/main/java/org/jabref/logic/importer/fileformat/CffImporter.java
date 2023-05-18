@@ -111,8 +111,8 @@ public class CffImporter extends Importer {
 
         // Translate CFF author format to JabRef author format
         String authorStr = citation.authors.stream()
-                        .map((author) -> author.values)
-                        .map((vals) -> vals.get("name") != null ?
+                        .map(author -> author.values)
+                        .map(vals -> vals.get("name") != null ?
                                 new Author(vals.get("name"), "", "", "", "") :
                                 new Author(vals.get("given-names"), null, vals.get("name-particle"),
                                         vals.get("family-names"), vals.get("name-suffix")))

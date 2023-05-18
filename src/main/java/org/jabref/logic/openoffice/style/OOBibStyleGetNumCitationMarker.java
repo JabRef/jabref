@@ -185,7 +185,7 @@ class OOBibStyleGetNumCitationMarker {
                                                List<CitationMarkerNumericEntry> entries,
                                                int minGroupingCount) {
 
-        final boolean joinIsDisabled = (minGroupingCount <= 0);
+        final boolean joinIsDisabled = minGroupingCount <= 0;
         final int nCitations = entries.size();
 
         final String bracketBefore = style.getBracketBefore();

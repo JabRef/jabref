@@ -45,7 +45,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<EntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
-    private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
+    private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[]{extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
     private final PreferencesService preferencesService;
@@ -57,7 +57,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final Validator fieldValidator;
     private final Set<Field> multiLineFields = new HashSet<>();
 
-    Predicate<Field> isMultiline = (field) -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
+    Predicate<Field> isMultiline = field -> this.multiLineFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT);
 
     public CustomEntryTypesTabViewModel(BibDatabaseMode mode,
                                         BibEntryTypesManager entryTypesManager,

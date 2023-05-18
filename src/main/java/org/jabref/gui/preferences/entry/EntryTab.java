@@ -19,6 +19,8 @@ import jakarta.inject.Inject;
 
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
 
+
+
     @FXML private TextField keywordSeparator;
 
     @FXML private CheckBox resolveStrings;

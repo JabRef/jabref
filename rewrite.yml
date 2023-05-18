@@ -93,6 +93,8 @@ recipeList:
   #  - org.openrewrite.java.cleanup.UseDiamondOperator
   # States that it gains performance, but the code is more unreable
   #  - org.openrewrite.java.cleanup.UseForEachRemoveInsteadOfSetRemoveAll
+  # We voted against it
+  #  - org.openrewrite.java.cleanup.ExplicitInitialization
 
   - org.openrewrite.java.cleanup.AtomicPrimitiveEqualsUsesGet
   - org.openrewrite.java.cleanup.BigDecimalRoundingConstantsToEnums
@@ -111,67 +113,66 @@ recipeList:
   - org.openrewrite.java.cleanup.EqualsAvoidsNull
   # Needs manual intervention
 #  - org.openrewrite.java.cleanup.ExplicitCharsetOnStringGetBytes
-#  - org.openrewrite.java.cleanup.ExplicitInitialization
-#  - org.openrewrite.java.cleanup.ExternalizableHasNoArgsConstructor
-#  - org.openrewrite.java.cleanup.FallThrough
+  - org.openrewrite.java.cleanup.ExternalizableHasNoArgsConstructor
+  - org.openrewrite.java.cleanup.FallThrough
 #  - org.openrewrite.java.cleanup.ForLoopControlVariablePostfixOperators
-#  - org.openrewrite.java.cleanup.ForLoopIncrementInUpdate
-#  - org.openrewrite.java.cleanup.IndexOfChecksShouldUseAStartPosition
-#  - org.openrewrite.java.cleanup.IndexOfReplaceableByContains
+  - org.openrewrite.java.cleanup.ForLoopIncrementInUpdate
+  - org.openrewrite.java.cleanup.IndexOfChecksShouldUseAStartPosition
+  - org.openrewrite.java.cleanup.IndexOfReplaceableByContains
 #  - org.openrewrite.java.cleanup.IndexOfShouldNotCompareGreaterThanZero
-#  - org.openrewrite.java.cleanup.InstanceOfPatternMatch
+  - org.openrewrite.java.cleanup.InstanceOfPatternMatch
 #  - org.openrewrite.java.cleanup.IsEmptyCallOnCollections
-#  - org.openrewrite.java.cleanup.MethodParamPad
+  - org.openrewrite.java.cleanup.MethodParamPad
 #  - org.openrewrite.java.cleanup.MissingOverrideAnnotation
 #  - org.openrewrite.java.cleanup.ModifierOrder
-#  - org.openrewrite.java.cleanup.MultipleVariableDeclarations
-#  - org.openrewrite.java.cleanup.NeedBraces
-#  - org.openrewrite.java.cleanup.NestedEnumsAreNotStatic
-#  - org.openrewrite.java.cleanup.NewStringBuilderBufferWithCharArgument
-#  - org.openrewrite.java.cleanup.NoDoubleBraceInitialization
+  - org.openrewrite.java.cleanup.MultipleVariableDeclarations
+  - org.openrewrite.java.cleanup.NeedBraces
+  - org.openrewrite.java.cleanup.NestedEnumsAreNotStatic
+  - org.openrewrite.java.cleanup.NewStringBuilderBufferWithCharArgument
+  - org.openrewrite.java.cleanup.NoDoubleBraceInitialization
 #  - org.openrewrite.java.cleanup.NoEmptyCollectionWithRawType
-#  - org.openrewrite.java.cleanup.NoEqualityInForCondition
-#  - org.openrewrite.java.cleanup.NoFinalizer
+  - org.openrewrite.java.cleanup.NoEqualityInForCondition
+  - org.openrewrite.java.cleanup.NoFinalizer
 #  - org.openrewrite.java.cleanup.NoPrimitiveWrappersForToStringOrCompareTo
 #  - org.openrewrite.java.cleanup.NoRedundantJumpStatements
-#  - org.openrewrite.java.cleanup.NoToStringOnStringType
-#  - org.openrewrite.java.cleanup.NoValueOfOnStringType
+  - org.openrewrite.java.cleanup.NoToStringOnStringType
+  - org.openrewrite.java.cleanup.NoValueOfOnStringType
 #  - org.openrewrite.java.cleanup.NoWhitespaceBefore
-#  - org.openrewrite.java.cleanup.ObjectFinalizeCallsSuper
+  - org.openrewrite.java.cleanup.ObjectFinalizeCallsSuper
 #  - org.openrewrite.java.cleanup.OperatorWrap
-#  - org.openrewrite.java.cleanup.PadEmptyForLoopComponents
-#  - org.openrewrite.java.cleanup.PrimitiveWrapperClassConstructorToValueOf
-#  - org.openrewrite.java.cleanup.RedundantFileCreation
-#  - org.openrewrite.java.cleanup.RemoveCallsToObjectFinalize
+  - org.openrewrite.java.cleanup.PadEmptyForLoopComponents
+  - org.openrewrite.java.cleanup.PrimitiveWrapperClassConstructorToValueOf
+  - org.openrewrite.java.cleanup.RedundantFileCreation
+  - org.openrewrite.java.cleanup.RemoveCallsToObjectFinalize
   - org.openrewrite.java.cleanup.RemoveEmptyJavaDocParameters
-#  - org.openrewrite.java.cleanup.RemoveExtraSemicolons
+  - org.openrewrite.java.cleanup.RemoveExtraSemicolons
 #  - org.openrewrite.java.cleanup.RemoveJavaDocAuthorTag
-#  - org.openrewrite.java.cleanup.RemoveRedundantTypeCast
-#  - org.openrewrite.java.cleanup.RemoveUnneededAssertion
-#  - org.openrewrite.java.cleanup.RemoveUnneededBlock
+  - org.openrewrite.java.cleanup.RemoveRedundantTypeCast
+  - org.openrewrite.java.cleanup.RemoveUnneededAssertion
+  - org.openrewrite.java.cleanup.RemoveUnneededBlock
 #  - org.openrewrite.java.cleanup.RemoveUnusedLocalVariables
 #  - org.openrewrite.java.cleanup.RemoveUnusedPrivateFields
 #  - org.openrewrite.java.cleanup.RenameLocalVariablesToCamelCase
-#  - org.openrewrite.java.cleanup.RenameMethodsNamedHashcodeEqualOrTostring
-#  - org.openrewrite.java.cleanup.ReplaceRedundantFormatWithPrintf
+  - org.openrewrite.java.cleanup.RenameMethodsNamedHashcodeEqualOrTostring
+  - org.openrewrite.java.cleanup.ReplaceRedundantFormatWithPrintf
 #  - org.openrewrite.java.cleanup.ShortenFullyQualifiedTypeReferences
-#  - org.openrewrite.java.cleanup.SimplifyBooleanExpression
-#  - org.openrewrite.java.cleanup.SimplifyBooleanReturn
+  - org.openrewrite.java.cleanup.SimplifyBooleanExpression
+  - org.openrewrite.java.cleanup.SimplifyBooleanReturn
 #  - org.openrewrite.java.cleanup.SimplifyConsecutiveAssignments
 #  - org.openrewrite.java.cleanup.SimplifyCompoundStatement
-#  - org.openrewrite.java.cleanup.SimplifyDurationCreationUnits
+  - org.openrewrite.java.cleanup.SimplifyDurationCreationUnits
 #  - org.openrewrite.java.cleanup.StaticMethodNotFinal
   - org.openrewrite.java.cleanup.StringLiteralEquality
-#  - org.openrewrite.java.cleanup.TypecastParenPad
-#  - org.openrewrite.java.cleanup.UnnecessaryParentheses
-#  - org.openrewrite.java.cleanup.UnwrapRepeatableAnnotations
-#  - org.openrewrite.java.cleanup.UpperCaseLiteralSuffixes
+  - org.openrewrite.java.cleanup.TypecastParenPad
+  - org.openrewrite.java.cleanup.UnnecessaryParentheses
+  - org.openrewrite.java.cleanup.UnwrapRepeatableAnnotations
+  - org.openrewrite.java.cleanup.UpperCaseLiteralSuffixes
 #  - org.openrewrite.java.cleanup.UseJavaStyleArrayDeclarations
-#  - org.openrewrite.java.cleanup.UseLambdaForFunctionalInterface
+  - org.openrewrite.java.cleanup.UseLambdaForFunctionalInterface
 #  - org.openrewrite.java.cleanup.UseListSort
-#  - org.openrewrite.java.cleanup.UseObjectNotifyAll
-#  - org.openrewrite.java.cleanup.UseStandardCharset
+  - org.openrewrite.java.cleanup.UseObjectNotifyAll
+  - org.openrewrite.java.cleanup.UseStandardCharset
 #  - org.openrewrite.java.cleanup.UseStringReplace
-#  - org.openrewrite.java.cleanup.UseSystemLineSeparator
-#  - org.openrewrite.java.cleanup.WhileInsteadOfFor
+  - org.openrewrite.java.cleanup.UseSystemLineSeparator
+  - org.openrewrite.java.cleanup.WhileInsteadOfFor
 #  - org.openrewrite.java.cleanup.WriteOctalValuesAsDecimal

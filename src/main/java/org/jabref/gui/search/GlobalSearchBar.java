@@ -392,7 +392,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     private void setSearchFieldHintTooltip(TextFlow description) {
-        if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
+        if (preferencesService.getWorkspacePreferences().shouldShowAdvancedHints()) {
             String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith and title=electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 
@@ -444,12 +444,12 @@ public class GlobalSearchBar extends HBox {
         }
 
         private void registerEventListener() {
-            this.suggestionList.setOnMouseClicked((me) -> {
+            this.suggestionList.setOnMouseClicked(me -> {
                 if (me.getButton() == MouseButton.PRIMARY) {
                     this.onSuggestionChosen(this.suggestionList.getSelectionModel().getSelectedItem());
                 }
             });
-            this.suggestionList.setOnKeyPressed((ke) -> {
+            this.suggestionList.setOnKeyPressed(ke -> {
                 switch (ke.getCode()) {
                     case TAB:
                     case ENTER:
