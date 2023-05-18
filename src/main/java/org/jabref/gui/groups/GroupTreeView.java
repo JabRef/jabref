@@ -175,7 +175,7 @@ public class GroupTreeView extends BorderPane {
                 BindingsHelper.bindContentBidirectional(
                         groupTree.getSelectionModel().getSelectedItems(),
                         viewModel.selectedGroupsProperty(),
-                        (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode),
+                        newSelectedGroups -> newSelectedGroups.forEach(this::selectNode),
                         this::updateSelection
                 ));
 
@@ -275,7 +275,7 @@ public class GroupTreeView extends BorderPane {
         }
         Text text = new Text();
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
-                (newValue) -> {
+                newValue -> {
                     if (text.textProperty().isBound()) {
                         text.textProperty().unbind();
                         text.setText("");
@@ -289,7 +289,7 @@ public class GroupTreeView extends BorderPane {
 
         text.styleProperty().bind(Bindings.createStringBinding(() -> {
             double reducedFontSize;
-            double font_size = preferencesService.getAppearancePreferences().getMainFontSize();
+            double font_size = preferencesService.getWorkspacePreferences().getMainFontSize();
             // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
             if (font_size > 26.0) {
                 reducedFontSize = 0.25;
@@ -301,7 +301,7 @@ public class GroupTreeView extends BorderPane {
                 reducedFontSize = 0.75;
             }
             return String.format("-fx-font-size: %fem;", reducedFontSize);
-        }, preferencesService.getAppearancePreferences().mainFontSizeProperty()));
+        }, preferencesService.getWorkspacePreferences().mainFontSizeProperty()));
 
         node.getChildren().add(text);
         node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -442,11 +442,11 @@ public class GroupTreeView extends BorderPane {
                     scrollBar.setValue(newValue);
                 }));
 
-        groupTree.setOnScroll((event) -> scrollTimer.stop());
-        groupTree.setOnDragDone((event) -> scrollTimer.stop());
-        groupTree.setOnDragEntered((event) -> scrollTimer.stop());
-        groupTree.setOnDragDropped((event) -> scrollTimer.stop());
-        groupTree.setOnDragExited((event) -> {
+        groupTree.setOnScroll(event -> scrollTimer.stop());
+        groupTree.setOnDragDone(event -> scrollTimer.stop());
+        groupTree.setOnDragEntered(event -> scrollTimer.stop());
+        groupTree.setOnDragDropped(event -> scrollTimer.stop());
+        groupTree.setOnDragExited(event -> {
             if (event.getY() > 0) {
                 scrollVelocity = 1.0 / SCROLL_SPEED;
             } else {

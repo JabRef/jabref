@@ -9,13 +9,13 @@ import java.nio.file.Path;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,13 +37,14 @@ class BackupManagerDiscardedTest {
     private BibDatabaseContext bibDatabaseContext;
     private BackupManager backupManager;
     private Path testBib;
-    private SavePreferences savePreferences;
+    private SaveConfiguration saveConfiguration;
     private PreferencesService preferencesService;
     private BibEntryTypesManager bibEntryTypesManager;
+    private Path backupDir;
 
     @BeforeEach
     public void setup(@TempDir Path tempDir) throws Exception {
-        Path backupDir = tempDir.resolve("backups");
+        this.backupDir = tempDir.resolve("backups");
         Files.createDirectories(backupDir);
 
         testBib = tempDir.resolve("test.bib");
@@ -53,14 +54,12 @@ class BackupManagerDiscardedTest {
 
         bibEntryTypesManager = new BibEntryTypesManager();
 
-        savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(savePreferences.shouldMakeBackup()).thenReturn(false);
-        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
-        when(savePreferences.withMakeBackup(anyBoolean())).thenReturn(savePreferences);
-        when(savePreferences.shouldSaveInOriginalOrder()).thenReturn(true);
+        saveConfiguration = mock(SaveConfiguration.class);
+        when(saveConfiguration.shouldMakeBackup()).thenReturn(false);
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(saveConfiguration.withMakeBackup(anyBoolean())).thenReturn(saveConfiguration);
 
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
 
         saveDatabase();
 
@@ -71,7 +70,12 @@ class BackupManagerDiscardedTest {
     private void saveDatabase() throws IOException {
         try (Writer writer = new AtomicFileWriter(testBib, StandardCharsets.UTF_8, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            new BibtexDatabaseWriter(bibWriter, preferencesService.getGeneralPreferences(), savePreferences, bibEntryTypesManager)
+            new BibtexDatabaseWriter(
+                    bibWriter,
+                    saveConfiguration,
+                    preferencesService.getFieldPreferences(),
+                    preferencesService.getCitationKeyPatternPreferences(),
+                    bibEntryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         }
     }
@@ -81,14 +85,14 @@ class BackupManagerDiscardedTest {
     }
 
     private void makeBackup() {
-        backupManager.determineBackupPathForNewBackup().ifPresent(backupManager::performBackup);
+        backupManager.determineBackupPathForNewBackup(backupDir).ifPresent(path -> backupManager.performBackup(path));
     }
 
     @Test
     public void noDiscardingAChangeLeadsToNewerBackupBeReported() throws Exception {
         databaseModification();
         makeBackup();
-        assertTrue(BackupManager.backupFileDiffers(testBib));
+        assertTrue(BackupManager.backupFileDiffers(testBib, backupDir));
     }
 
     @Test
@@ -96,14 +100,14 @@ class BackupManagerDiscardedTest {
         databaseModification();
         makeBackup();
         saveDatabase();
-        assertFalse(BackupManager.backupFileDiffers(testBib));
+        assertFalse(BackupManager.backupFileDiffers(testBib, backupDir));
     }
 
     @Test
     public void discardingAChangeLeadsToNewerBackupToBeIgnored() throws Exception {
         databaseModification();
         makeBackup();
-        backupManager.discardBackup();
-        assertFalse(BackupManager.backupFileDiffers(testBib));
+        backupManager.discardBackup(backupDir);
+        assertFalse(BackupManager.backupFileDiffers(testBib, backupDir));
     }
 }

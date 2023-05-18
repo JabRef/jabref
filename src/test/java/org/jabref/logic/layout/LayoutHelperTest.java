@@ -16,7 +16,7 @@ class LayoutHelperTest {
         StringReader stringReader = new StringReader("\\");
         LayoutFormatterPreferences layoutFormatterPreferences = mock(LayoutFormatterPreferences.class);
         LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences);
-        assertThrows(IOException.class, () -> layoutHelper.getLayoutFromText());
+        assertThrows(IOException.class, layoutHelper::getLayoutFromText);
     }
 
     @Test

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -12,20 +14,18 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.preferences.appearance.AppearanceTab;
+import org.jabref.gui.preferences.autocompletion.AutoCompletionTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
 import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
 import org.jabref.gui.preferences.customexporter.CustomExporterTab;
 import org.jabref.gui.preferences.customimporter.CustomImporterTab;
 import org.jabref.gui.preferences.entry.EntryTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
-import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
+import org.jabref.gui.preferences.export.ExportTab;
 import org.jabref.gui.preferences.external.ExternalTab;
 import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
-import org.jabref.gui.preferences.file.FileTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
-import org.jabref.gui.preferences.importexport.ImportExportTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
@@ -34,6 +34,7 @@ import org.jabref.gui.preferences.network.NetworkTab;
 import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
+import org.jabref.gui.preferences.websearch.WebSearchTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
@@ -49,6 +50,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialogViewModel.class);
 
+    private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();
+
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
@@ -62,27 +65,26 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
-                new FileTab(),
+                new GroupsTab(),
+                new WebSearchTab(),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
+                new EntryEditorTab(),
+                new CustomEntryTypesTab(),
+                new CitationKeyPatternTab(),
+                new LinkedFilesTab(),
+                new ExportTab(),
+                new AutoCompletionTab(),
                 new ProtectedTermsTab(),
                 new ExternalTab(),
                 new ExternalFileTypesTab(),
                 new JournalAbbreviationsTab(),
-                new GroupsTab(),
-                new EntryEditorTab(),
-                new ImportExportTab(),
-                new CustomEditorFieldsTab(),
-                new CitationKeyPatternTab(),
-                new LinkedFilesTab(),
                 new NameFormatterTab(),
+                new XmpPrivacyTab(),
                 new CustomImporterTab(),
                 new CustomExporterTab(),
-                new CustomEntryTypesTab(),
-                new XmpPrivacyTab(),
-                new NetworkTab(),
-                new AppearanceTab()
+                new NetworkTab()
         );
     }
 
@@ -186,6 +188,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         }
 
         // Store settings
+        preferences.getInternalPreferences().setMemoryStickMode(memoryStickProperty.get());
+
         for (PreferencesTab tab : preferenceTabs) {
             tab.storeSettings();
             restartWarnings.addAll(tab.getRestartWarnings());
@@ -211,8 +215,14 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      * Inserts the preference values into the Properties of the ViewModel
      */
     public void setValues() {
+        memoryStickProperty.setValue(preferences.getInternalPreferences().isMemoryStickMode());
+
         for (PreferencesTab preferencesTab : preferenceTabs) {
             preferencesTab.setValues();
         }
+    }
+
+    public BooleanProperty getMemoryStickProperty() {
+        return memoryStickProperty;
     }
 }

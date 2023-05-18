@@ -174,7 +174,7 @@ public class PreferencesMigrations {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
-                CustomEntryTypePreferenceMigration.upgradeStoredBibEntryTypes(prefs.getGeneralPreferences().getDefaultBibDatabaseMode());
+                CustomEntryTypePreferenceMigration.upgradeStoredBibEntryTypes(prefs.getLibraryPreferences().getDefaultBibDatabaseMode());
             }
         } catch (BackingStoreException ex) {
             LOGGER.error("Migrating old custom entry types failed.", ex);
@@ -274,7 +274,7 @@ public class PreferencesMigrations {
     }
 
     private static void upgradeKeyBindingsToJavaFX(JabRefPreferences prefs) {
-        UnaryOperator<String> replaceKeys = (str) -> {
+        UnaryOperator<String> replaceKeys = str -> {
             String result = str.replace("ctrl ", "ctrl+");
             result = result.replace("shift ", "shift+");
             result = result.replace("alt ", "alt+");

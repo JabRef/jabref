@@ -130,7 +130,7 @@ public class URLDownloadTest {
     public void test503ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
 
-        Exception exception = assertThrows(IOException.class, () -> urlDownload.asString());
+        Exception exception = assertThrows(IOException.class, urlDownload::asString);
         assertTrue(exception.getCause() instanceof FetcherServerException);
     }
 
@@ -138,7 +138,7 @@ public class URLDownloadTest {
     public void test429ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
 
-        Exception exception = assertThrows(IOException.class, () -> urlDownload.asString());
+        Exception exception = assertThrows(IOException.class, urlDownload::asString);
         assertTrue(exception.getCause() instanceof FetcherClientException);
     }
 }

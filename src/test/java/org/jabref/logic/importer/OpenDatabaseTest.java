@@ -13,7 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.LibraryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 class OpenDatabaseTest {
 
     private final Charset defaultEncoding = StandardCharsets.UTF_8;
-    private GeneralPreferences generalPreferences;
+    private LibraryPreferences libraryPreferences;
     private ImportFormatPreferences importFormatPreferences;
     private final Path bibNoHeader;
     private final Path bibWrongHeader;
@@ -44,7 +44,7 @@ class OpenDatabaseTest {
 
     @BeforeEach
     void setUp() {
-        generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 

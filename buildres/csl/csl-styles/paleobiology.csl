@@ -8,8 +8,8 @@
     <link href="http://www.paleosoc.org/content/AuthorContribInstr.html" rel="documentation"/>
     <author>
       <name>Martin R. Smith</name>
-      <email>martins@gmail.com</email>
-      <uri>https://plus.google.com/u/0/108450310917386384868</uri>
+      <email>martin.smith@durham.ac.uk</email>
+      <uri>https://smithlabdurham.github.io/</uri>
     </author>
     <category citation-format="author-date"/>
     <category field="biology"/>
@@ -20,14 +20,12 @@
   </info>
   <macro name="author">
     <names variable="author" suffix=".">
-      <name sort-separator=", " initialize-with=". " and="text" name-as-sort-order="first" delimiter=", " delimiter-precedes-last="always" form="long">
-      </name>
+      <name sort-separator=", " initialize-with=". " and="text" name-as-sort-order="first" delimiter=", " delimiter-precedes-last="always" form="long"/>
     </names>
   </macro>
   <macro name="editor">
     <names variable="editor">
-      <name sort-separator=", " initialize-with=". " delimiter=", " and="text" delimiter-precedes-last="contextual">
-      </name>
+      <name sort-separator=", " initialize-with=". " delimiter=", " and="text" delimiter-precedes-last="contextual"/>
       <label form="short" prefix=", " suffix="."/>
     </names>
   </macro>
@@ -79,11 +77,18 @@
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=" ">
-        <text macro="author-short"/>
-        <text macro="year-date"/>
+        <group delimiter="">
+          <group delimiter=" ">
+            <text macro="author-short"/>
+            <text macro="year-date"/>
+          </group>
+          <text variable="year-suffix" font-style="italic"/>
+        </group>
+        <group delimiter=" ">
+          <label variable="locator" form="short"/>
+          <text variable="locator"/>
+        </group>
       </group>
-      <text variable="locator"/>
-      <text variable="year-suffix" font-style="italic"/>
     </layout>
   </citation>
   <bibliography entry-spacing="0" hanging-indent="true" subsequent-author-substitute="&#8212;&#8212;&#8212;">

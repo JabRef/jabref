@@ -21,14 +21,12 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,15 +64,19 @@ public class Launcher {
             clearOldSearchIndices();
 
             try {
+                FileUpdateMonitor fileUpdateMonitor = Globals.getFileUpdateMonitor();
+
                 // Process arguments
-                ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START,
-                        preferences);
+                ArgumentProcessor argumentProcessor = new ArgumentProcessor(
+                        args, ArgumentProcessor.Mode.INITIAL_START,
+                        preferences,
+                        fileUpdateMonitor);
                 if (argumentProcessor.shouldShutDown()) {
                     LOGGER.debug("JabRef shut down after processing command line arguments");
                     return;
                 }
 
-                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, ARGUMENTS);
+                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, fileUpdateMonitor, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage(preferences);
@@ -90,12 +92,7 @@ public class Launcher {
      * the log configuration programmatically anymore.
      */
     private static void addLogToDisk() {
-        Path directory = Path.of(AppDirsFactory.getInstance()
-                                               .getUserDataDir(
-                OS.APP_DIR_APP_NAME,
-                "logs",
-                OS.APP_DIR_APP_AUTHOR))
-                .resolve(new BuildInfo().version.toString());
+        Path directory = OS.getNativeDesktop().getLogDirectory();
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -144,12 +141,6 @@ public class Launcher {
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
 
-        // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                preferences.getImporterPreferences(),
-                preferences.getImportFormatPreferences(),
-                Globals.getFileUpdateMonitor());
-
         Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
     }
@@ -168,7 +159,7 @@ public class Launcher {
     }
 
     private static void clearOldSearchIndices() {
-        Path currentIndexPath = BibDatabaseContext.getFulltextIndexBasePath();
+        Path currentIndexPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path appData = currentIndexPath.getParent();
 
         try {

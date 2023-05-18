@@ -47,8 +47,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
 
         disabledProperty().bind(command.executableProperty().not());
 
-        if (command instanceof SimpleCommand) {
-            SimpleCommand ourCommand = (SimpleCommand) command;
+        if (command instanceof SimpleCommand ourCommand) {
             longTextProperty().bind(Bindings.concat(action.getDescription(), ourCommand.statusMessageProperty()));
         }
     }

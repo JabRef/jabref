@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -38,7 +38,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         this(new OrFields(field), false);
     }
 
-    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
+    public FieldComparator(SaveOrder.SortCriterion sortCriterion) {
         this(new OrFields(sortCriterion.field), sortCriterion.descending);
     }
 
@@ -59,13 +59,13 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private FieldType determineFieldType() {
-        if (InternalField.TYPE_HEADER.equals(this.fields.getPrimary())) {
+        if (InternalField.TYPE_HEADER == this.fields.getPrimary()) {
             return FieldType.TYPE;
         } else if (this.fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if (StandardField.YEAR.equals(this.fields.getPrimary())) {
+        } else if (StandardField.YEAR == this.fields.getPrimary()) {
             return FieldType.YEAR;
-        } else if (StandardField.MONTH.equals(this.fields.getPrimary())) {
+        } else if (StandardField.MONTH == this.fields.getPrimary()) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;

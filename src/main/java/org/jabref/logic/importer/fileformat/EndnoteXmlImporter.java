@@ -117,19 +117,15 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-
         try {
             Object unmarshalledObject = unmarshallRoot(reader);
-
-            if (unmarshalledObject instanceof Xml) {
-                // Check whether we have an article set, an article, a book article or a book article set
-                Xml root = (Xml) unmarshalledObject;
+            if (unmarshalledObject instanceof Xml root) {
+                // We have an article set, an article, a book article or a book article set
                 List<BibEntry> bibEntries = root
                         .getRecords().getRecord()
                         .stream()
                         .map(this::parseRecord)
                         .collect(Collectors.toList());
-
                 return new ParserResult(bibEntries);
             } else {
                 return ParserResult.fromErrorMessage("File does not start with xml tag.");

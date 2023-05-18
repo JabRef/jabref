@@ -1,6 +1,5 @@
 package org.jabref.gui.edit;
 
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.web.WebView;
 
@@ -23,7 +22,6 @@ public class EditAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
     private final JabRefFrame frame;
-    private TextField text;
     private final StandardActions action;
     private final StateManager stateManager;
 
@@ -47,7 +45,8 @@ public class EditAction extends SimpleCommand {
     @Override
     public void execute() {
         stateManager.getFocusOwner().ifPresent(focusOwner -> {
-            LOGGER.debug("focusOwner: {}; Action: {}", focusOwner.toString(), action.getText());
+            LOGGER.debug("focusOwner: {}; Action: {}", focusOwner, action.getText());
+
             if (focusOwner instanceof TextInputControl) {
                 // Focus is on text field -> copy/paste/cut selected text
                 TextInputControl textInput = (TextInputControl) focusOwner;
@@ -75,7 +74,17 @@ public class EditAction extends SimpleCommand {
                     case CUT -> frame.getCurrentLibraryTab().cut();
                     case PASTE -> frame.getCurrentLibraryTab().paste();
                     case DELETE_ENTRY -> frame.getCurrentLibraryTab().delete(false);
-                    default -> throw new IllegalStateException("Only cut/copy/paste supported but got " + action);
+                    case REDO -> {
+                        if (frame.getUndoManager().canRedo()) {
+                            frame.getUndoManager().redo();
+                        }
+                    }
+                    case UNDO -> {
+                        if (frame.getUndoManager().canUndo()) {
+                            frame.getUndoManager().undo();
+                        }
+                    }
+                    default -> LOGGER.debug("Only cut/copy/paste/delete supported but got: {} and focus owner {}", action, focusOwner);
                 }
             }
         });

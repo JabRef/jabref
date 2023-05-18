@@ -25,7 +25,7 @@ public class StyleTesterMain extends Application {
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
         ThemeManager themeManager = new ThemeManager(
-                JabRefPreferences.getInstance().getAppearancePreferences(),
+                JabRefPreferences.getInstance().getWorkspacePreferences(),
                 fileUpdateMonitor,
                 Runnable::run);
 

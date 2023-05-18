@@ -134,9 +134,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             Object unmarshalledObject = unmarshallRoot(reader);
 
-            if (unmarshalledObject instanceof CitaviExchangeData) {
-                // Check whether we have an article set, an article, a book article, or a book article set
-                CitaviExchangeData data = (CitaviExchangeData) unmarshalledObject;
+            if (unmarshalledObject instanceof CitaviExchangeData data) {
                 List<BibEntry> bibEntries = parseDataList(data);
 
                 return new ParserResult(bibEntries);

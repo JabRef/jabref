@@ -84,7 +84,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         // Find default choice, if any
         Exporter defaultChoice = exporters.stream()
-                                          .filter(exporter -> exporter.getName().equals(preferences.getImportExportPreferences().getLastExportExtension()))
+                                          .filter(exporter -> exporter.getName().equals(preferences.getExportPreferences().getLastExportExtension()))
                                           .findAny()
                                           .orElse(null);
 
@@ -107,7 +107,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                     .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
         // Add chosen export type to last used preference, to become default
-        preferences.getImportExportPreferences().setLastExportExtension(exporter.getName());
+        preferences.getExportPreferences().setLastExportExtension(exporter.getName());
 
         Path tmp = null;
         try {
