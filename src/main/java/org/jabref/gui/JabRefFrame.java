@@ -124,7 +124,6 @@ import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportCleanup;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -138,6 +137,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
@@ -170,9 +170,9 @@ public class JabRefFrame extends BorderPane {
 
     private final Stage mainStage;
     private final StateManager stateManager;
-    private final ThemeManager themeManager;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
+    private final FileUpdateMonitor fileUpdateMonitor;
     private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
@@ -182,19 +182,17 @@ public class JabRefFrame extends BorderPane {
     private Subscription dividerSubscription;
 
     private final TaskExecutor taskExecutor;
-    private final ImportFormatReader importFormatReader;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
         this.stateManager = Globals.stateManager;
-        this.themeManager = Globals.getThemeManager();
-        this.dialogService = new JabRefDialogService(mainStage, this, themeManager);
+        this.dialogService = new JabRefDialogService(mainStage);
         this.undoManager = Globals.undoManager;
+        this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
         this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
-        this.importFormatReader = Globals.IMPORT_FORMAT_READER;
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -560,7 +558,7 @@ public class JabRefFrame extends BorderPane {
         ToolBar toolBar = new ToolBar(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(this, prefs)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, prefs, stateManager))),
 
                 leftSpacer,
@@ -772,8 +770,8 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.IMPORT,
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, false, prefs, stateManager)),
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true, prefs, stateManager))),
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, false, prefs, stateManager, fileUpdateMonitor)),
+                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true, prefs, stateManager, fileUpdateMonitor))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, this, stateManager, dialogService, prefs)),
@@ -912,9 +910,9 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 // Systematic Literature Review (SLR)
-                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager)),
+                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, fileUpdateMonitor, taskExecutor, prefs, stateManager)),
                 factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(this.dialogService, this.stateManager)),
-                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(this, this.getOpenDatabaseAction(), this.getDialogService(), Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager)),
+                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(this, this.getOpenDatabaseAction(), this.getDialogService(), fileUpdateMonitor, Globals.TASK_EXECUTOR, prefs, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -1155,7 +1153,7 @@ public class JabRefFrame extends BorderPane {
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, themeManager);
+        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, fileUpdateMonitor);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }
@@ -1273,7 +1271,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
-        return new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager);
+        return new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor);
     }
 
     public GlobalSearchBar getGlobalSearchBar() {

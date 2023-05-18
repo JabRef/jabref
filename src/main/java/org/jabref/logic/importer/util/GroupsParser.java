@@ -137,7 +137,7 @@ public class GroupsParser {
                 // Problem accessing file -> create without file monitoring
                 LOGGER.warn("Could not access file {}. The group {} will not reflect changes to the aux file.", path, name, ex);
 
-                TexGroup newGroup = TexGroup.createWithoutFileMonitoring(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
+                TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), metaData);
                 addGroupDetails(tok, newGroup);
                 return newGroup;
             }

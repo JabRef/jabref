@@ -11,9 +11,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import org.controlsfx.control.PopOver;
 
 public class GenerateEntryFromIdDialog {
@@ -21,6 +23,8 @@ public class GenerateEntryFromIdDialog {
     @FXML DialogPane dialogPane;
     @FXML TextField idTextField;
     @FXML Button generateButton;
+
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
@@ -56,7 +60,8 @@ public class GenerateEntryFromIdDialog {
                 taskExecutor,
                 entryFromIdPopOver,
                 idTextField.getText(),
-                stateManager
+                stateManager,
+                fileUpdateMonitor
         );
         generateEntryFromIdAction.execute();
     }

@@ -23,7 +23,6 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
@@ -36,6 +35,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -48,9 +48,9 @@ import jakarta.inject.Inject;
  */
 public class EntryTypeView extends BaseDialog<EntryType> {
 
-    @Inject StateManager stateManager;
-    @Inject ImportFormatReader importFormatReader;
-    @Inject TaskExecutor taskExecutor;
+    @Inject private StateManager stateManager;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
@@ -122,7 +122,13 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
-        viewModel = new EntryTypeViewModel(preferencesService, libraryTab, dialogService, stateManager, importFormatReader, taskExecutor);
+        viewModel = new EntryTypeViewModel(
+                preferencesService,
+                libraryTab,
+                dialogService,
+                stateManager,
+                taskExecutor,
+                fileUpdateMonitor);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
         idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());
