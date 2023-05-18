@@ -91,7 +91,7 @@ jobs:
          curl -kLSs ${{matrix.eaJDK}} -o ${{runner.temp}}\temp.zip && 7z x ${{runner.temp}}\temp.zip -o${{runner.temp}}\jdk
          echo "JDK21=${{runner.temp}}\jdk" >> "$GITHUB_ENV"
          echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" >> gradle.properties
-         ls ${{runner.temp}}\jdk
+         dir ${{runner.temp}}\jdk
          cat gradle.properties
       - name: setup jdk ea ubuntu
         if: (matrix.os == 'ubuntu-latest')
@@ -99,7 +99,7 @@ jobs:
         run: |
           mkdir ${{runner.temp}}/jdk
           wget -qO- ${{matrix.eaJDK}} | tar xvz -C ${{runner.temp}}/jdk
-          echo "JDK21=${{runner.temp}}/jdk" >> "$GITHUB_ENV"
+          echo "JDK21=${{runner.temp}}/jdk/jdk-21" >> "$GITHUB_ENV"
           echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk/jdk-21" >> gradle.properties
           ls ${{runner.temp}}/jdk
           cat gradle.properties
@@ -131,10 +131,10 @@ jobs:
           keychain-password: jabref
       - name: Build runtime image
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -Porg.gradle.java.installations.paths="${{runner.temp}}/jdk/jdk-21" -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
+        run: ./gradlew -Porg.gradle.java.installations.paths="${{env.JDK21}}" -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -Porg.gradle.java.installations.paths="${{runner.temp}}/jdk/jdk-21" -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
+        run: ./gradlew -Porg.gradle.java.installations.paths="${{env.JDK21}}" -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
       - name: Resign app image for OSX and build dmg
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
