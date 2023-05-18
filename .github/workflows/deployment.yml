@@ -42,15 +42,15 @@ jobs:
           - os: ubuntu-latest
             displayName: linux
             archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
-            eaJdk: https://download.java.net/java/early_access/jdk/22/GPL/openjdk-21-ea+22_linux-x64_bin.tar.gz
+            eaJdk: https://download.java.net/java/early_access/jdk21/22/GPL/openjdk-21-ea+22_linux-x64_bin.tar.gz
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-            eaJDK: https://download.java.net/java/early_access/jdk/22/GPL/openjdk-21-ea+22_windows-x64_bin.zip
+            eaJDK: https://download.java.net/java/early_access/jdk21/22/GPL/openjdk-21-ea+22_windows-x64_bin.zip
           - os: macos-latest
             displayName: macOS
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
-            eaJDK: https://download.java.net/java/early_access/jdk/22/GPL/openjdk-21-ea+22_macos-x64_bin.tar.gz
+            eaJDK: https://download.java.net/java/early_access/jdk21/22/GPL/openjdk-21-ea+22_macos-x64_bin.tar.gz
 
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
