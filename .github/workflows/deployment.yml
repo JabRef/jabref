@@ -90,9 +90,8 @@ jobs:
           mkdir ${{runner.temp}}/jdk21
           wget -qO- ${{matrix.eaJDK}} | tar xvz -C ${{runner.temp}}/jdk21
           echo "JDK21=${{runner.temp}}/jdk21" >> "$GITHUB_ENV"
-          echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk21" >> gradle.properties
-          echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk21" >> $GRADLE_USER_HOME/gradle.properties
-          cat $GRADLE_USER_HOME/gradle.properties
+          echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk21 >> gradle.properties
+          cat gradle.properties
       - name: Setup OSX key chain on OSX
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
@@ -110,10 +109,10 @@ jobs:
           keychain-password: jabref
       - name: Build runtime image
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: cat gradle.properties && ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
+        run: ./gradlew -Porg.gradle.java.installations.paths=${{runner.temp}}/jdk21 -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
+        run: ./gradlew -Porg.gradle.java.installations.paths=${{runner.temp}}/jdk21 -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
       - name: Resign app image for OSX and build dmg
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
