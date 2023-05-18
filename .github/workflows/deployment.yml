@@ -88,7 +88,7 @@ jobs:
         shell: bash
         run: |
          mkdir ${{runner.temp}}\jdk
-         curl -kLSs ${{matrix.eaJDK}} -o ${{runner.temp}}\temp.zip && 7z x ${{runner.temp}}\temp.zip -o${{runner.temp}}\jdk
+         curl -kLsS ${{matrix.eaJDK}} -o temp.zip && 7z x temp.zip -o${{runner.temp}}\jdk
          echo "JDK21=${{runner.temp}}\jdk" >> "$GITHUB_ENV"
          echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" >> gradle.properties
          dir ${{runner.temp}}\jdk
