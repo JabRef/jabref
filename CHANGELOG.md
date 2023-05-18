@@ -27,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the option to disable the automatic linking of files in the entry editor [#5105](https://github.com/JabRef/jabref/issues/5105)
 - We added key binding to focus on groups <kbd>Shift</kbd> + <kbd>Tab</kbd> [#9863](https://github.com/JabRef/jabref/issues/9863)
 
+
 ### Changed
 
 - We upgraded to Lucene 9.5 for the fulltext search. The search index will be rebuild. [#9584](https://github.com/JabRef/jabref/pull/9584)

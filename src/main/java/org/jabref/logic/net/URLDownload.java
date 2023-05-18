@@ -386,9 +386,9 @@ public class URLDownload {
             }
         }
 
-        if (connection instanceof HttpURLConnection) {
+        if (connection instanceof HttpURLConnection lConnection) {
             // normally, 3xx is redirect
-            int status = ((HttpURLConnection) connection).getResponseCode();
+            int status = lConnection.getResponseCode();
 
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
                 || (status == HttpURLConnection.HTTP_MOVED_PERM)

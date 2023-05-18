@@ -36,7 +36,8 @@ import static org.mockito.Mockito.mock;
 /**
  * This class tests the BibtexImporter.
  * <p>
- * The tests for writing can be found at {@link org.jabref.logic.exporter.BibtexDatabaseWriterTest}
+ * Tests for writing can be found at {@link org.jabref.logic.exporter.BibtexDatabaseWriterTest}.
+ * Tests for parsing single entry BibTeX can be found at {@link BibtexParserTest}
  */
 public class BibtexImporterTest {
 
