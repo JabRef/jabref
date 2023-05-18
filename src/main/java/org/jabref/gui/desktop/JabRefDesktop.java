@@ -290,6 +290,4 @@ public class JabRefDesktop {
             dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
     }
-
-
 }
