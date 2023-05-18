@@ -17,13 +17,15 @@ import de.undercouch.citeproc.output.Bibliography;
  * Provides an adapter class to CSL. It holds a CSL instance under the hood that is only recreated when
  * the style changes.
  *
- * @apiNote The first call to {@link #makeBibliography} is expensive since the
+ * Note on the API: The first call to {@link #makeBibliography} is expensive since the
  * CSL instance will be created. As long as the style stays the same, we can reuse this instance. On style-change, the
  * engine is re-instantiated. Therefore, the use-case of this class is many calls to {@link #makeBibliography} with the
  * same style. Changing the output format is cheap.
- * @implNote The main function {@link #makeBibliography} will enforce
+ *
+ * Note on the implementation:
+ * The main function {@link #makeBibliography} will enforce
  * synchronized calling. The main CSL engine under the hood is not thread-safe. Since this class is usually called from
- * a BackgroundTakk, the only other option would be to create several CSL instances which is wasting a lot of resources and very slow.
+ * a BackgroundTask, the only other option would be to create several CSL instances which is wasting a lot of resources and very slow.
  * In the current scheme, {@link #makeBibliography} can be called as usual
  * background task and to the best of my knowledge, concurrent calls will pile up and processed sequentially.
  */

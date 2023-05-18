@@ -968,8 +968,8 @@ public class BibEntry implements Cloneable {
     }
 
     public KeywordList getFieldAsKeywords(Field field, Character keywordSeparator) {
-        if (field instanceof StandardField) {
-            Optional<KeywordList> storedList = fieldsAsKeywords.get((StandardField) field, keywordSeparator);
+        if (field instanceof StandardField standardField) {
+            Optional<KeywordList> storedList = fieldsAsKeywords.get(standardField, keywordSeparator);
             if (storedList.isPresent()) {
                 return storedList.get();
             }
@@ -979,8 +979,8 @@ public class BibEntry implements Cloneable {
                 .map(content -> KeywordList.parse(content, keywordSeparator))
                 .orElse(new KeywordList());
 
-        if (field instanceof StandardField) {
-            fieldsAsKeywords.put((StandardField) field, keywordSeparator, keywords);
+        if (field instanceof StandardField standardField) {
+            fieldsAsKeywords.put(standardField, keywordSeparator, keywords);
         }
         return keywords;
     }
@@ -993,8 +993,8 @@ public class BibEntry implements Cloneable {
         latexFreeFields.remove(field);
         fieldsAsWords.remove(field);
 
-        if (field instanceof StandardField) {
-            fieldsAsKeywords.remove((StandardField) field);
+        if (field instanceof StandardField standardField) {
+            fieldsAsKeywords.remove(standardField);
         }
     }
 
