@@ -114,7 +114,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 reader.next();
                 if (isStartXMLEvent(reader)) {
                     String elementName = reader.getName().getLocalPart();
-                    if (elementName.equals("record")) {
+                    if ("record".equals(elementName)) {
                          parseRecord(reader, bibItems, elementName);
                     }
                 }
@@ -261,12 +261,12 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             reader.next();
             if (isStartXMLEvent(reader)) {
                 String tag = reader.getName().getLocalPart();
-                if (tag.equals("style")) {
+                if ("style".equals(tag)) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
-                        if (elementName.equals("abstract") || elementName.equals("electronic-resource-num") || elementName.equals("notes")) {
+                        if ("abstract".equals(elementName) || "electronic-resource-num".equals(elementName) || "notes".equals(elementName)) {
                             putIfValueNotNull(fields, field, reader.getText().trim());
-                        } else if (elementName.equals("isbn") || elementName.equals("secondary-title")) {
+                        } else if ("isbn".equals(elementName) || "secondary-title".equals(elementName)) {
                             putIfValueNotNull(fields, field, clean(reader.getText()));
                         } else {
                             putIfValueNotNull(fields, field, reader.getText());
@@ -356,7 +356,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                             reader.next();
                             if (isStartXMLEvent(reader)) {
                                 String tag = reader.getName().getLocalPart();
-                                if (tag.equals("style")) {
+                                if ("style".equals(tag)) {
                                     reader.next();
                                     if (isCharacterXMLEvent(reader)) {
                                         if (reader.getText() != null) {
@@ -398,7 +398,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("urls")) {
+            if (isEndXMLEvent(reader) && "urls".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -410,7 +410,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             reader.next();
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
-                if (elementName.equals("style")) {
+                if ("style".equals(elementName)) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         putIfValueNotNull(fields, StandardField.URL, reader.getText());
@@ -435,11 +435,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             reader.next();
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
-                if (elementName.equals("url")) {
+                if ("url".equals(elementName)) {
                     reader.next();
                     if (isStartXMLEvent(reader)) {
                         String tagName = reader.getName().getLocalPart();
-                        if (tagName.equals("style")) {
+                        if ("style".equals(tagName)) {
                             reader.next();
                             if (isCharacterXMLEvent(reader)) {
                                 try {
