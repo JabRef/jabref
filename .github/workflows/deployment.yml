@@ -89,7 +89,7 @@ jobs:
         run: |
          mkdir ${{runner.temp}}\jdk
          curl -kLsS ${{matrix.eaJDK}} -o temp.zip && 7z x temp.zip -o"$(cygpath -u "$RUNNER_TEMP\jdk")"
-         echo "JDK21=${{runner.temp}}\jdk\jdk-21)" >> "$GITHUB_ENV"
+         echo "JDK21=${{runner.temp}}\jdk\jdk-21" >> "$GITHUB_ENV"
          echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" >> gradle.properties
          ls "$(cygpath -u "$RUNNER_TEMP\jdk\jdk-21")"
          cat gradle.properties
