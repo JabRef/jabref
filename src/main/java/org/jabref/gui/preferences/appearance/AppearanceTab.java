@@ -28,6 +28,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     @FXML private RadioButton themeDark;
     @FXML private RadioButton customTheme;
     @FXML private TextField customThemePath;
+    @FXML private RadioButton themeAutomatic;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -66,6 +67,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
 
         themeLight.selectedProperty().bindBidirectional(viewModel.themeLightProperty());
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
+        themeAutomatic.selectedProperty().bindBidirectional(viewModel.themeAutomaticProperty());
         customTheme.selectedProperty().bindBidirectional(viewModel.customThemeProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
 

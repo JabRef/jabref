@@ -16,6 +16,8 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.ibm.icu.util.Calendar;
+
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -31,6 +33,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
     private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeDarkProperty = new SimpleBooleanProperty();
+    private final BooleanProperty themeAutomaticProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeCustomProperty = new SimpleBooleanProperty();
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
 
@@ -40,6 +43,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
+    //private final BooleanProperty automaticDetectionChecked = new SimpleBooleanProperty();
 
     public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
@@ -73,11 +77,19 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
-
+        
         // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
         // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
         Theme currentTheme = appearancePreferences.getTheme();
-        if (currentTheme.getType() == Theme.Type.DEFAULT) {
+        Calendar cal = Calendar.getInstance();
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        if(hour>=6 && hour<=18){
+            themeAutomaticProperty.setValue(true);
+            themeLightProperty.setValue(true);
+            themeDarkProperty.setValue(false);
+            themeCustomProperty.setValue(false);
+        }
+        else if (currentTheme.getType() == Theme.Type.DEFAULT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(false);
@@ -154,6 +166,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty customThemeProperty() {
         return themeCustomProperty;
+    }
+    
+    public BooleanProperty themeAutomaticProperty() {
+        return themeAutomaticProperty;
     }
 
     public StringProperty customPathToThemeProperty() {

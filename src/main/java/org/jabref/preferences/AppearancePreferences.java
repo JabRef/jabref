@@ -14,12 +14,27 @@ public class AppearancePreferences {
     private final IntegerProperty mainFontSize;
     private final IntegerProperty defaultFontSize;
     private final ObjectProperty<Theme> theme;
+    private final BooleanProperty automaticThemeDetection;
 
-    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, int defaultFontSize, Theme theme) {
+    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, int defaultFontSize, Theme theme,
+                                 boolean automaticThemeDetection) {
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
         this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
+        this.automaticThemeDetection = new SimpleBooleanProperty(automaticThemeDetection);
+
+    }
+    public boolean automaticThemeDetection() {
+        return automaticThemeDetection.get();
+    }
+
+    public void setautomaticThemeDetection(boolean newValue) {
+        automaticThemeDetection.set(newValue);
+    }
+
+    public BooleanProperty automaticThemeDetectionProperty() {
+        return automaticThemeDetection;
     }
 
     public boolean shouldOverrideDefaultFontSize() {

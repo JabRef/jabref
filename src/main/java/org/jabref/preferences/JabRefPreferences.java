@@ -147,6 +147,7 @@ public class JabRefPreferences implements PreferencesService {
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
      */
+    public static final String AUTOMATIC_THEME_DETECTION = "automaticthemedetection";
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     public static final String FX_THEME = "fxTheme";
     public static final String LANGUAGE = "language";
@@ -2056,13 +2057,14 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
                 (Integer) defaults.get(MAIN_FONT_SIZE),
-                new Theme(get(FX_THEME))
+                new Theme(get(FX_THEME)),
+                getBoolean(AUTOMATIC_THEME_DETECTION)
         );
 
         EasyBind.listen(appearancePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
         EasyBind.listen(appearancePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
         EasyBind.listen(appearancePreferences.themeProperty(), (obs, oldValue, newValue) -> put(FX_THEME, newValue.getName()));
-
+        EasyBind.listen(appearancePreferences.automaticThemeDetectionProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOMATIC_THEME_DETECTION, newValue));
         return appearancePreferences;
     }
 
