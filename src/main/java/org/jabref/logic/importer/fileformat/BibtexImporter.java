@@ -158,7 +158,7 @@ public class BibtexImporter extends Importer {
                 }
 
                 // Only keep the part after %
-                line = line.substring(percentPos+1).trim();
+                line = line.substring(percentPos + 1).trim();
 
                 if (line.startsWith(BibtexImporter.SIGNATURE)) {
                     // Signature line, so keep reading and skip to next line
