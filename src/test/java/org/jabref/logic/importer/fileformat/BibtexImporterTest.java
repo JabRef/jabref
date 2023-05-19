@@ -174,7 +174,24 @@ public class BibtexImporterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
+    @CsvSource({"encoding-utf-16BE-with-header.bib"})
+    public void testParsingOfUtf16EncodedFileReadsUmlautCharacterCorrectlyWithSuppliedEncoding(String filename) throws Exception {
+        ParserResult parserResult = importer.importDatabase(
+                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
+
+        assertEquals(
+                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
+                parserResult.getDatabase().getEntries());
+
+        MetaData metaData = new MetaData();
+        metaData.setEncodingExplicitlySupplied(true);
+        metaData.setMode(BibDatabaseMode.BIBTEX);
+        metaData.setEncoding(StandardCharsets.UTF_16BE);
+        assertEquals(metaData, parserResult.getMetaData());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"encoding-utf-16BE-without-header.bib"})
     public void testParsingOfUtf16EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
@@ -184,6 +201,7 @@ public class BibtexImporterTest {
                 parserResult.getDatabase().getEntries());
 
         MetaData metaData = new MetaData();
+        metaData.setEncodingExplicitlySupplied(false);
         metaData.setMode(BibDatabaseMode.BIBTEX);
         metaData.setEncoding(StandardCharsets.UTF_16BE);
         assertEquals(metaData, parserResult.getMetaData());
