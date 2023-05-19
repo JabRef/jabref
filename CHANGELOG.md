@@ -83,6 +83,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where passing a URL containing a DOI led to a "No entry found" notification. [#9821](https://github.com/JabRef/jabref/issues/9821)
 - We fixed some minor visual inconsistencies and issues in the preferences dialog. [#9866](https://github.com/JabRef/jabref/pull/9866)
 - The order of save actions is now retained. [#9890](https://github.com/JabRef/jabref/pull/9890)
+- We fixed an issue in the preferences 'External file types' tab ignoring a custom application path in the edit dialog. [#9895](https://github.com/JabRef/jabref/issues/9895)
 - We fixed an issue in the preferences where custom columns could be added to the entry table with no qualifier. [#9913](https://github.com/JabRef/jabref/issues/9913)
 
 ### Removed
