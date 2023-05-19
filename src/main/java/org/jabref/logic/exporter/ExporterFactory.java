@@ -55,8 +55,6 @@ public class ExporterFactory {
         List<Exporter> exporters = new ArrayList<>();
 
         // Initialize build-in exporters
-
-        // Initialize build-in exporters
         exporters.add(new TemplateExporter("HTML", "html", "html", null, StandardFileType.HTML, layoutPreferences, saveConfiguration));
         exporters.add(new TemplateExporter(Localization.lang("Simple HTML"), "simplehtml", "simplehtml", null, StandardFileType.HTML, layoutPreferences, saveConfiguration));
         exporters.add(new TemplateExporter("DocBook 5.1", "docbook5", "docbook5", null, StandardFileType.XML, layoutPreferences, saveConfiguration));

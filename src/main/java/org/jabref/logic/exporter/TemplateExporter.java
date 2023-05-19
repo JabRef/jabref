@@ -59,7 +59,11 @@ public class TemplateExporter extends Exporter {
      * @param directory   Directory in which to find the layout file.
      * @param extension   Should contain the . (for instance .txt).
      */
-    public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension) {
+    public TemplateExporter(String displayName,
+                            String consoleName,
+                            String lfFileName,
+                            String directory,
+                            FileType extension) {
         this(displayName, consoleName, lfFileName, directory, extension, null, null);
     }
 
@@ -72,7 +76,10 @@ public class TemplateExporter extends Exporter {
      * @param layoutPreferences Preferences for the layout
      * @param saveConfiguration   Preferences for saving
      */
-    public TemplateExporter(String name, String lfFileName, String extension, LayoutFormatterPreferences layoutPreferences,
+    public TemplateExporter(String name,
+                            String lfFileName,
+                            String extension,
+                            LayoutFormatterPreferences layoutPreferences,
                             SaveConfiguration saveConfiguration) {
         this(name, name, lfFileName, null, StandardFileType.fromExtensions(extension), layoutPreferences, saveConfiguration);
     }
@@ -88,8 +95,13 @@ public class TemplateExporter extends Exporter {
      * @param layoutPreferences Preferences for layout
      * @param saveConfiguration   Preferences for saving
      */
-    public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
-                            LayoutFormatterPreferences layoutPreferences, SaveConfiguration saveConfiguration) {
+    public TemplateExporter(String displayName,
+                            String consoleName,
+                            String lfFileName,
+                            String directory,
+                            FileType extension,
+                            LayoutFormatterPreferences layoutPreferences,
+                            SaveConfiguration saveConfiguration) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
             this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
@@ -113,8 +125,13 @@ public class TemplateExporter extends Exporter {
      * @param saveConfiguration   Preferences for saving
      * @param blankLineBehaviour how to behave regarding blank lines.
      */
-    public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
-                            LayoutFormatterPreferences layoutPreferences, SaveConfiguration saveConfiguration,
+    public TemplateExporter(String displayName,
+                            String consoleName,
+                            String lfFileName,
+                            String directory,
+                            FileType extension,
+                            LayoutFormatterPreferences layoutPreferences,
+                            SaveConfiguration saveConfiguration,
                             BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {

@@ -41,6 +41,16 @@ import org.jabref.model.entry.field.Field;
 
 public interface PreferencesService {
 
+    void clear() throws BackingStoreException;
+
+    void deleteKey(String key) throws IllegalArgumentException;
+
+    void flush();
+
+    void exportPreferences(Path file) throws JabRefException;
+
+    void importPreferences(Path file) throws JabRefException;
+
     InternalPreferences getInternalPreferences();
 
     BibEntryPreferences getBibEntryPreferences();
@@ -61,21 +71,11 @@ public interface PreferencesService {
 
     Map<String, Object> getDefaults();
 
-    void exportPreferences(Path file) throws JabRefException;
-
-    void importPreferences(Path file) throws JabRefException;
-
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
 
     ImportFormatPreferences getImportFormatPreferences();
 
     SaveConfiguration getExportConfiguration();
-
-    void clear() throws BackingStoreException;
-
-    void deleteKey(String key) throws IllegalArgumentException;
-
-    void flush();
 
     BibEntryTypesManager getCustomEntryTypesRepository();
 
@@ -95,15 +95,7 @@ public interface PreferencesService {
 
     TimestampPreferences getTimestampPreferences();
 
-    //*************************************************************************************************************
-    // GroupsPreferences
-    //*************************************************************************************************************
-
     GroupsPreferences getGroupsPreferences();
-
-    //*************************************************************************************************************
-    // EntryEditorPreferences
-    //*************************************************************************************************************
 
     Map<String, Set<Field>> getDefaultTabNamesAndFields();
 
@@ -111,33 +103,17 @@ public interface PreferencesService {
 
     EntryEditorPreferences getEntryEditorPreferences();
 
-    //*************************************************************************************************************
-    // Network preferences
-    //*************************************************************************************************************
-
     RemotePreferences getRemotePreferences();
 
     ProxyPreferences getProxyPreferences();
 
     SSLPreferences getSSLPreferences();
 
-    //*************************************************************************************************************
-    // CitationKeyPatternPreferences
-    //*************************************************************************************************************
-
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
-
-    //*************************************************************************************************************
-    // ExternalApplicationsPreferences
-    //*************************************************************************************************************
 
     PushToApplicationPreferences getPushToApplicationPreferences();
 
     ExternalApplicationsPreferences getExternalApplicationsPreferences();
-
-    //*************************************************************************************************************
-    // MainTablePreferences
-    //*************************************************************************************************************
 
     ColumnPreferences getMainTableColumnPreferences();
 
@@ -145,27 +121,11 @@ public interface PreferencesService {
 
     NameDisplayPreferences getNameDisplayPreferences();
 
-    //*************************************************************************************************************
-    // SearchDialogColumnPreferences
-    //*************************************************************************************************************
-
     ColumnPreferences getSearchDialogColumnPreferences();
-
-    //*************************************************************************************************************
-    // AppearancePreferences
-    //*************************************************************************************************************
 
     WorkspacePreferences getWorkspacePreferences();
 
-    //*************************************************************************************************************
-    // File preferences
-    //*************************************************************************************************************
-
     AutoLinkPreferences getAutoLinkPreferences();
-
-    //*************************************************************************************************************
-    // Import/Export preferences
-    //*************************************************************************************************************
 
     ExportPreferences getExportPreferences();
 
@@ -177,27 +137,11 @@ public interface PreferencesService {
 
     GrobidPreferences getGrobidPreferences();
 
-    //*************************************************************************************************************
-    // Preview preferences
-    //*************************************************************************************************************
-
     PreviewPreferences getPreviewPreferences();
-
-    //*************************************************************************************************************
-    // SidePanePreferences
-    //*************************************************************************************************************
 
     SidePanePreferences getSidePanePreferences();
 
-    //*************************************************************************************************************
-    // GuiPreferences
-    //*************************************************************************************************************
-
     GuiPreferences getGuiPreferences();
-
-    //*************************************************************************************************************
-    // Misc preferences
-    //*************************************************************************************************************
 
     XmpPreferences getXmpPreferences();
 
