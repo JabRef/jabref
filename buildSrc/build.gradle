@@ -25,3 +25,5 @@ sourceSets{
  * Source: https://github.com/gradle/gradle/issues/17236#issuecomment-923074298
  */
 tasks.getByName("jar").setProperty("duplicatesStrategy", DuplicatesStrategy.EXCLUDE);
+sourceCompatibility = JavaVersion.VERSION_19
+targetCompatibility = JavaVersion.VERSION_19

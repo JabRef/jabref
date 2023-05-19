@@ -61,8 +61,10 @@ public class BibEntryTableViewModel {
                 entry.getFieldBinding(StandardField.DOI),
                 entry.getFieldBinding(StandardField.URI),
                 entry.getFieldBinding(StandardField.EPRINT),
-                (url, doi, uri, eprint) -> {
+                entry.getFieldBinding(StandardField.ISBN),
+                (url, doi, uri, eprint,isbn) -> {
                     Map<Field, String> identifiers = new HashMap<>();
+                    isbn.ifPresent(value -> identifiers.put(StandardField.URL,"https://openlibrary.org/isbn/"+value));
                     url.ifPresent(value -> identifiers.put(StandardField.URL, value));
                     doi.ifPresent(value -> identifiers.put(StandardField.DOI, value));
                     uri.ifPresent(value -> identifiers.put(StandardField.URI, value));
