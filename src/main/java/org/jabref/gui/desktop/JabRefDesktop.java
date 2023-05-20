@@ -105,7 +105,7 @@ public class JabRefDesktop {
             field = StandardField.URL;
         }
 
-        if (StandardField.URL == field) {
+        if (StandardField.URL == field || StandardField.ISBN == field) {
             openBrowser(link);
         } else if (StandardField.PS == field) {
             try {

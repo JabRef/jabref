@@ -62,6 +62,10 @@ public class OpenUrlAction extends SimpleCommand {
                 link = entry.getField(StandardField.URL);
                 field = StandardField.URL;
             }
+            if (entry.hasField(StandardField.ISBN)) {
+                link = Optional.of("https://openlibrary.org/isbn/" + entry.getField(StandardField.ISBN).get());
+                field = StandardField.ISBN;
+            }
 
             if (link.isPresent()) {
                 try {
