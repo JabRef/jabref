@@ -1,40 +1,30 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.Parser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import kong.unirest.json.JSONArray;
 
-public class CiteSeerParser implements Parser {
+public class CiteSeerParser {
 
 //    private static final Pattern PAPERID = Pattern.compile("pid/[0-9a-zA-Z]+", Pattern.MULTILINE);
-
-    @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
-        List<BibEntry> bibEntries;
-        try {
-            bibEntries = parseCiteSeerResponse(inputStream);
-        } catch (FetcherException e) {
-            throw new ParseException("Could not parse CiteSeer data, ", e);
-        }
-        return bibEntries;
-    }
 
     private void appendData(String data, BibEntry entry, Pattern pattern, Field field) {
         Matcher matcher = pattern.matcher(data);
@@ -43,58 +33,50 @@ public class CiteSeerParser implements Parser {
         }
     }
 
-    private List<BibEntry> parseCiteSeerResponse(InputStream inputStream) throws FetcherException {
+    public List<BibEntry> parseCiteSeerResponse(JSONArray jsonResponse) throws ParseException {
         List<BibEntry> response = new ArrayList<>();
         CookieHandler.setDefault(new CookieManager());
 
-        try {
-            String jsonString = new String((inputStream.readAllBytes()), StandardCharsets.UTF_8);
-            JsonElement jsonElement = JsonParser.parseString(jsonString);
+        // this is a placeholder, conversion from json -> string -> json
+        // I plan to reformat this with the kong.unirest library for consistency
+        String jsonString = jsonResponse.toString();
+        JsonElement jsonElement = JsonParser.parseString(jsonString);
 
-            for (JsonElement element: jsonElement.getAsJsonArray()) {
-                response.add(parseBibEntry(element.getAsJsonObject()));
-//                for (Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
-//                    response.add(parseBibEntry(entry.getValue().getAsJsonObject()));
-//                }
-            }
-        } catch (IOException ex) {
-            throw new FetcherException("Unable to parse input stream into json object: ", ex);
+        for (JsonElement element: jsonElement.getAsJsonArray()) {
+            response.add(parseBibEntry(element.getAsJsonObject()));
         }
 
         return response;
     }
 
-    private BibEntry parseBibEntry(JsonObject jsonObj) {
-        BibEntry bibEntry = new BibEntry();
+    private BibEntry parseBibEntry(JsonObject jsonObj) throws ParseException {
+        try {
+            BibEntry bibEntry = new BibEntry();
 
-        if (jsonObj.has("title")) {
-            bibEntry.setField(StandardField.TITLE, jsonObj.get("title").getAsString());
+            bibEntry.setField(StandardField.TITLE,
+                    Optional.ofNullable(jsonObj.get("title").getAsString())
+                            .orElse(""));
+            bibEntry.setField(StandardField.VENUE,
+                    Optional.ofNullable(jsonObj.get("venue").getAsString())
+                            .orElse(""));
+            bibEntry.setField(StandardField.YEAR,
+                    Optional.ofNullable(jsonObj.get("year").getAsString())
+                            .orElse(""));
+            bibEntry.setField(StandardField.PUBLISHER,
+                    Optional.ofNullable(jsonObj.get("publisher").getAsString())
+                            .orElse(""));
+            bibEntry.setField(StandardField.ABSTRACT,
+                    Optional.ofNullable(jsonObj.get("abstract").getAsString())
+                            .orElse(""));
+            bibEntry.setField(StandardField.AUTHOR,
+                    Optional.ofNullable(jsonObj.get("authors").getAsJsonArray().)
+                            .orElse(new JsonArray()).forEach());
+            bibEntry.setField(StandardField.JOURNAL,
+                    Optional.ofNullable(jsonObj.get("journal").getAsString())
+                            .orElse(""));
+            return bibEntry;
+        } catch (JsonParseException exception) {
+            throw new ParseException("CiteSeer API JSON format has changed ", exception);
         }
-
-        if (jsonObj.has("venue")) {
-            bibEntry.setField(StandardField.VENUE, jsonObj.get("venue").getAsString());
-        }
-
-        if (jsonObj.has("year")) {
-            bibEntry.setField(StandardField.YEAR, jsonObj.get("year").getAsString());
-        }
-
-        if (jsonObj.has("publisher")) {
-            bibEntry.setField(StandardField.PUBLISHER, jsonObj.get("publisher").getAsString());
-        }
-
-        if (jsonObj.has("abstract")) {
-            bibEntry.setField(StandardField.ABSTRACT, jsonObj.get("abstract").getAsString());
-        }
-
-        if (jsonObj.has("author")) {
-            bibEntry.setField(StandardField.AUTHOR, jsonObj.get("author").getAsString());
-        }
-
-        if (jsonObj.has("journal")) {
-            bibEntry.setField(StandardField.JOURNAL, jsonObj.get("journal").getAsString());
-        }
-
-        return bibEntry;
     }
 }
