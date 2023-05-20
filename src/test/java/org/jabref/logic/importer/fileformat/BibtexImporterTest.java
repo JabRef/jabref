@@ -141,7 +141,9 @@ public class BibtexImporterTest {
         return Stream.of(
                 Arguments.of(StandardCharsets.US_ASCII, "encoding-us-ascii-with-header.bib"),
                 Arguments.of(StandardCharsets.UTF_8, "encoding-utf-8-with-header.bib"),
-                Arguments.of(Charset.forName("Windows-1252"), "encoding-windows-1252-with-header.bib")
+                Arguments.of(Charset.forName("Windows-1252"), "encoding-windows-1252-with-header.bib"),
+                Arguments.of(StandardCharsets.UTF_16BE, "encoding-utf-16BE-with-header.bib"),
+                Arguments.of(StandardCharsets.UTF_16BE, "encoding-utf-16BE-without-header.bib")
         );
     }
 
@@ -164,54 +166,31 @@ public class BibtexImporterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib"})
-    public void testParsingOfUtf8EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
+    @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib",
+                "encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
+    public void testParsingFilesReadsUmlautCharacterCorrectly(String filename) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
                 List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
                 parserResult.getDatabase().getEntries());
+    }
+
+    private static Stream<Arguments> encodingExplicitlySuppliedCorrectlyDetermined() {
+        return Stream.of(
+                Arguments.of("encoding-utf-8-with-header.bib", true),
+                Arguments.of("encoding-utf-8-without-header.bib", false),
+                Arguments.of("encoding-utf-16BE-with-header.bib", true),
+                Arguments.of("encoding-utf-16BE-without-header.bib", false)
+        );
     }
 
     @ParameterizedTest
-    @CsvSource({"encoding-utf-16BE-with-header.bib"})
-    public void testParsingOfUtf16EncodedFileReadsUmlautCharacterCorrectlyWithSuppliedEncoding(String filename) throws Exception {
+    @MethodSource
+    public void encodingExplicitlySuppliedCorrectlyDetermined(String filename, boolean encodingExplicitlySupplied) throws Exception {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
-
-        assertEquals(
-                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
-                parserResult.getDatabase().getEntries());
-
-        MetaData metaData = new MetaData();
-        metaData.setEncodingExplicitlySupplied(true);
-        metaData.setMode(BibDatabaseMode.BIBTEX);
-        metaData.setEncoding(StandardCharsets.UTF_16BE);
-        assertEquals(metaData, parserResult.getMetaData());
-    }
-
-    @ParameterizedTest
-    @CsvSource({"encoding-utf-16BE-without-header.bib"})
-    public void testParsingOfUtf16EncodedFileReadsUmlautCharacterCorrectly(String filename) throws Exception {
-        ParserResult parserResult = importer.importDatabase(
-                Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
-
-        assertEquals(
-                List.of(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "Ü ist ein Umlaut")),
-                parserResult.getDatabase().getEntries());
-
-        MetaData metaData = new MetaData();
-        metaData.setEncodingExplicitlySupplied(false);
-        metaData.setMode(BibDatabaseMode.BIBTEX);
-        metaData.setEncoding(StandardCharsets.UTF_16BE);
-        assertEquals(metaData, parserResult.getMetaData());
-    }
-
-    @Test
-    public void encodingSupplied() throws Exception {
-        ParserResult parserResult = importer.importDatabase(
-                Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-with-header.bib").toURI()));
-        assertTrue(parserResult.getMetaData().getEncodingExplicitlySupplied());
+        assertEquals(encodingExplicitlySupplied, parserResult.getMetaData().getEncodingExplicitlySupplied());
     }
 
     @Test
