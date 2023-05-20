@@ -113,6 +113,8 @@ public class MarcXmlParser implements Parser {
                 putSummary(bibEntry, datafield);
             } else if ("653".equals(tag)) {
                 putKeywords(bibEntry, datafield);
+            } else if ("773".equals(tag)) {
+                putIssue(bibEntry, datafield);
             } else if ("856".equals(tag)) {
                 putElectronicLocation(bibEntry, datafield);
             } else if ("966".equals(tag)) {
@@ -398,6 +400,44 @@ public class MarcXmlParser implements Parser {
         }
     }
 
+    private void putIssue(BibEntry bibEntry, Element datafield) {
+        List<String> issues = getSubfields("g", datafield);
+
+        for (String issue : issues) {
+            String[] parts = issue.split(":");
+            if (parts.length == 2) {
+                String key = parts[0].trim();
+                String value = parts[1].trim();
+
+                if (StringUtil.isNotBlank(value)) {
+                    switch (key) {
+                        case "number":
+                            bibEntry.setField(StandardField.NUMBER, value);
+                            break;
+                        case "year":
+                            bibEntry.setField(StandardField.YEAR, value);
+                            break;
+                        case "pages":
+                            bibEntry.setField(StandardField.PAGES, value);
+                            break;
+                        case "volume":
+                            bibEntry.setField(StandardField.VOLUME, value);
+                            break;
+                        case "day":
+                            bibEntry.setField(StandardField.DAY, value);
+                            break;
+                        case "month":
+                            bibEntry.setField(StandardField.MONTH, value);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+
     private String getSubfield(String a, Element datafield) {
         List<Element> subfields = getChildren("subfield", datafield);
 
@@ -406,7 +446,15 @@ public class MarcXmlParser implements Parser {
                 return subfield.getTextContent();
             }
         }
+
+
         return null;
+    }
+
+    private List<String> getSubfields(String a, Element datafield) {
+        List<Element> subfields = getChildren("subfield", datafield);
+
+        return subfields.stream().filter(field -> field.getAttribute("code").equals(a)).map(Node::getTextContent).toList();
     }
 
     private Element getChild(String name, Element e) {
