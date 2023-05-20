@@ -25,6 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added support for parsing `$\backslash$` in file paths (as exported by Mendeley). [forum#3470](https://discourse.jabref.org/t/mendeley-bib-import-with-linked-files/3470)
 - We added the possibility to automatically fetch entries when an ISBN is pasted on the main table. [#9864](https://github.com/JabRef/jabref/issues/9864)
 - We added the option to disable the automatic linking of files in the entry editor [#5105](https://github.com/JabRef/jabref/issues/5105)
+- We added the link icon for ISBNs in linked identifiers column. [#9819](https://github.com/JabRef/jabref/issues/9819)
 
 ### Changed
 
@@ -85,7 +86,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The order of save actions is now retained. [#9890](https://github.com/JabRef/jabref/pull/9890)
 - We fixed an issue in the preferences 'External file types' tab ignoring a custom application path in the edit dialog. [#9895](https://github.com/JabRef/jabref/issues/9895)
 - We fixed an issue in the preferences where custom columns could be added to the entry table with no qualifier. [#9913](https://github.com/JabRef/jabref/issues/9913)
-- We fixed an issue where ISBNs were not having a link icon in linked identifiers column. [#9819](https://github.com/JabRef/jabref/issues/9819)
 
 ### Removed
 

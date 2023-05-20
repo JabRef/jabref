@@ -102,8 +102,10 @@ public class JabRefDesktop {
             field = StandardField.URL;
         }
 
-        if (StandardField.URL == field || StandardField.ISBN == field) {
+        if (StandardField.URL == field) {
             openBrowser(link);
+        } else if(StandardField.ISBN == field) {
+          openIsbn(link);
         } else if (StandardField.PS == field) {
             try {
                 NATIVE_DESKTOP.openFile(link, StandardField.PS.getName());
@@ -136,6 +138,11 @@ public class JabRefDesktop {
                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
                }
            });
+    }
+
+    private static void openIsbn(String doi) throws IOException {
+        String link = "https://openlibrary.org/isbn/" + doi;
+        openBrowser(link);
     }
 
     /**
