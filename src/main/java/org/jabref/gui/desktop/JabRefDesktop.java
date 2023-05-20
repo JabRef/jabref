@@ -140,8 +140,8 @@ public class JabRefDesktop {
            });
     }
 
-    private static void openIsbn(String doi) throws IOException {
-        String link = "https://openlibrary.org/isbn/" + doi;
+    private static void openIsbn(String isbn) throws IOException {
+        String link = "https://openlibrary.org/isbn/" + isbn;
         openBrowser(link);
     }
 
