@@ -55,7 +55,7 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
         viewModel.setValues();
         bibtexKeyPatternTable.setValues(
                 bibEntryTypesManager.getAllTypes(databaseContext.getMetaData().getMode()
-                                                                .orElse(preferencesService.getGeneralPreferences()
+                                                                .orElse(preferencesService.getLibraryPreferences()
                                                                                           .getDefaultBibDatabaseMode())),
                 databaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences().getKeyPattern()));
     }

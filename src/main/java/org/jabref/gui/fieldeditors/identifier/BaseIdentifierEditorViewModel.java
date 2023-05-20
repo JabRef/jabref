@@ -75,9 +75,9 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         } else if (exception instanceof FetcherServerException) {
             dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Server not available"));
         } else if (exception.getCause() != null) {
-            dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
+            dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Error occurred %0", exception.getCause().getMessage()));
         } else {
-            dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Error occured %0", exception.getCause().getMessage()));
+            dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Error occurred %0", exception.getCause().getMessage()));
         }
     }
 

@@ -13,6 +13,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -32,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
  *
  * Note that we also have custom fetchers in place.
- * See {@link org.jabref.logic.importer.WebFetchers#getFullTextFetchers(org.jabref.logic.importer.ImportFormatPreferences)}.
+ * See {@link WebFetchers#getFullTextFetchers(ImportFormatPreferences, ImporterPreferences)}.
  */
 public class DoiResolution implements FulltextFetcher {
 

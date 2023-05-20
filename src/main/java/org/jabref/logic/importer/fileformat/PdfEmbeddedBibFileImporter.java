@@ -18,7 +18,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentNameDictionary;
@@ -40,7 +39,7 @@ public class PdfEmbeddedBibFileImporter extends Importer {
 
     public PdfEmbeddedBibFileImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-        bibtexParser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        bibtexParser = new BibtexParser(importFormatPreferences);
     }
 
     @Override

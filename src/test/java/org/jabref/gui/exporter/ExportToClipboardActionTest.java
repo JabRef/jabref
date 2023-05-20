@@ -26,7 +26,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.ExportPreferences;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -93,10 +93,10 @@ public class ExportToClipboardActionTest {
 
         when(importExportPrefs.getLastExportExtension()).thenReturn("HTML");
         when(preferences.getExportPreferences()).thenReturn(importExportPrefs);
-        GeneralPreferences generalPreferences = mock(GeneralPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        LibraryPreferences libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
-        when(preferences.getGeneralPreferences()).thenReturn(generalPreferences);
+        when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         // noinspection ConstantConditions since databaseContext is mocked

@@ -10,9 +10,7 @@ import java.util.HexFormat;
 import java.util.Optional;
 
 import org.jabref.logic.util.BackupFileType;
-import org.jabref.logic.util.OS;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,15 +19,6 @@ public class BackupFileUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupFileUtil.class);
 
     private BackupFileUtil() {
-    }
-
-    public static Path getAppDataBackupDir() {
-        Path directory = Path.of(AppDirsFactory.getInstance()
-                                               .getUserDataDir(
-                                                       OS.APP_DIR_APP_NAME,
-                                                       "backups",
-                                                       OS.APP_DIR_APP_AUTHOR));
-        return directory;
     }
 
     /**

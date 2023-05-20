@@ -26,7 +26,7 @@ public class BibWriter {
     }
 
     /**
-     * Writes the given string. The newlines of the given string are converted to the newline set for this clas
+     * Writes the given string. The newlines of the given string are converted to the newline set for this class
      */
     public void write(String string) throws IOException {
         if (precedingNewLineRequired) {

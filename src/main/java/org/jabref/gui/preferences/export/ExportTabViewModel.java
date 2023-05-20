@@ -26,9 +26,6 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
-    private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
-    private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
-
     private final ExportPreferences exportPreferences;
 
     public ExportTabViewModel(ExportPreferences exportPreferences) {
@@ -50,9 +47,6 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
         List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
         fieldNames.sort(Comparator.comparing(Field::getDisplayName));
         sortableFieldsProperty.addAll(fieldNames);
-
-        alwaysReformatBibProperty.setValue(exportPreferences.shouldAlwaysReformatOnSave());
-        autosaveLocalLibraries.setValue(exportPreferences.shouldAutoSave());
     }
 
     @Override
@@ -61,9 +55,6 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
                 SaveOrder.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInOriginalProperty.getValue()),
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
         exportPreferences.setExportSaveOrder(newSaveOrder);
-
-        exportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
-        exportPreferences.setAutoSave(autosaveLocalLibraries.getValue());
     }
 
     public BooleanProperty saveInOriginalProperty() {
@@ -84,13 +75,5 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
 
     public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
         return sortCriteriaProperty;
-    }
-
-    public BooleanProperty alwaysReformatBibProperty() {
-        return alwaysReformatBibProperty;
-    }
-
-    public BooleanProperty autosaveLocalLibrariesProperty() {
-        return autosaveLocalLibraries;
     }
 }

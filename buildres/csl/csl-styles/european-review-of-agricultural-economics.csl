@@ -214,9 +214,6 @@
       </else>
     </choose>
   </macro>
-  <macro name="date-sort-date">
-    <date variable="issued" form="numeric"/>
-  </macro>
   <macro name="date-intext">
     <choose>
       <if variable="issued">
@@ -1227,7 +1224,7 @@
     <sort>
       <key macro="author-bib" names-min="3" names-use-first="1"/>
       <key macro="date-sort-group"/>
-      <key macro="date-sort-date" sort="ascending"/>
+      <key macro="date-bib" sort="ascending"/>
       <key variable="status"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
@@ -1242,7 +1239,7 @@
     <sort>
       <key macro="author-bib"/>
       <key macro="date-sort-group"/>
-      <key macro="date-sort-date" sort="ascending"/>
+      <key macro="date-bib" sort="ascending"/>
       <key variable="status"/>
       <key macro="title"/>
     </sort>
