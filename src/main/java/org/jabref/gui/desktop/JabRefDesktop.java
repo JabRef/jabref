@@ -86,9 +86,9 @@ public class JabRefDesktop {
         } else if (StandardField.EPRINT == field) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
             link = identifierParser.parse(StandardField.EPRINT)
-                    .flatMap(Identifier::getExternalURI)
-                    .map(URI::toASCIIString)
-                    .orElse(link);
+                                   .flatMap(Identifier::getExternalURI)
+                                   .map(URI::toASCIIString)
+                                   .orElse(link);
 
             if (Objects.equals(link, initialLink)) {
                 Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
@@ -127,15 +127,15 @@ public class JabRefDesktop {
     }
 
     public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
-            DOI.parse(link)
-                        .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
-                        .ifPresent(uri -> {
-                            try {
-                                JabRefDesktop.openBrowser(uri);
-                            } catch (IOException e) {
-                                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
-                            }
-                        });
+        DOI.parse(link)
+           .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
+           .ifPresent(uri -> {
+               try {
+                   JabRefDesktop.openBrowser(uri);
+               } catch (IOException e) {
+                   dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+               }
+           });
     }
 
     /**
