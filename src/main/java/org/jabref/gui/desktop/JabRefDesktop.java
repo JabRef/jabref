@@ -83,6 +83,9 @@ public class JabRefDesktop {
         } else if (StandardField.DOI == field) {
             openDoi(link);
             return;
+        } else if (StandardField.ISBN == field) {
+            openIsbn(link);
+            return;
         } else if (StandardField.EPRINT == field) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
             link = identifierParser.parse(StandardField.EPRINT)
@@ -104,8 +107,6 @@ public class JabRefDesktop {
 
         if (StandardField.URL == field) {
             openBrowser(link);
-        } else if (StandardField.ISBN == field) {
-          openIsbn(link);
         } else if (StandardField.PS == field) {
             try {
                 NATIVE_DESKTOP.openFile(link, StandardField.PS.getName());

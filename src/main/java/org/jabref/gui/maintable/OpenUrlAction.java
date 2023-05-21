@@ -54,6 +54,10 @@ public class OpenUrlAction extends SimpleCommand {
                 link = entry.getField(StandardField.URI);
                 field = StandardField.URI;
             }
+            if (entry.hasField(StandardField.ISBN)) {
+                link = entry.getField(StandardField.ISBN);
+                field = StandardField.ISBN;
+            }
             if (entry.hasField(StandardField.DOI)) {
                 link = entry.getField(StandardField.DOI);
                 field = StandardField.DOI;
@@ -61,10 +65,6 @@ public class OpenUrlAction extends SimpleCommand {
             if (entry.hasField(StandardField.URL)) {
                 link = entry.getField(StandardField.URL);
                 field = StandardField.URL;
-            }
-            if (entry.hasField(StandardField.ISBN)) {
-                link = entry.getField(StandardField.ISBN);
-                field = StandardField.ISBN;
             }
 
             if (link.isPresent()) {
