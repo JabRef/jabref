@@ -143,5 +143,4 @@ class JabRefCLITest {
 
         assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given, 26));
     }
-
 }
