@@ -244,7 +244,7 @@ class CitationKeyGeneratorTest {
     @CsvSource(quoteCharacter = '"', textBlock = """
             "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ", "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy",
             "ÄäËëÏïÖöÜüŸÿ", "AeaeEeIiOeoeUeueYy",
-            "ÅåŮů", "AaaaUu"
+            "ÅåŮů", "AaaaUu",
             "Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ", "CcGgKkLlNnRrSsTt",
             "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ", "AaEeGgIiOoUu",
             "Ċ ċ Ė ė Ġ ġ İ ı Ż ż", "CcEeGgIiZz",
