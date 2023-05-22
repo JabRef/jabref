@@ -343,14 +343,14 @@ public class JabRefPreferences implements PreferencesService {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
+    // Preview - public for pref migrations
+    public static final String PREVIEW_STYLE = "previewStyle";
+    public static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
+    public static final String CYCLE_PREVIEW = "cyclePreview";
+    public static final String PREVIEW_AS_TAB = "previewAsTab";
+
     // UI
     private static final String FONT_FAMILY = "fontFamily";
-
-    // Preview
-    private static final String PREVIEW_STYLE = "previewStyle";
-    private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
-    private static final String CYCLE_PREVIEW = "cyclePreview";
-    private static final String PREVIEW_AS_TAB = "previewAsTab";
 
     // Proxy
     private static final String PROXY_PORT = "proxyPort";
@@ -1147,14 +1147,6 @@ public class JabRefPreferences implements PreferencesService {
     public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
         putStringList(BIND_NAMES, keyBindingRepository.getBindNames());
         putStringList(BINDINGS, keyBindingRepository.getBindings());
-    }
-
-    public String getPreviewStyle() {
-        return get(PREVIEW_STYLE);
-    }
-
-    public void setPreviewStyle(String previewStyle) {
-        put(PREVIEW_STYLE, previewStyle);
     }
 
     @Override
