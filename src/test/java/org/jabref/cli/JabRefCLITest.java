@@ -146,7 +146,7 @@ class JabRefCLITest {
     }
 
     @Test
-    void uniformImportExportFormat(){
+    void uniformImportExportFormat() {
         JabRefPreferences preferences = JabRefPreferences.getInstance();
         JabRefCLI.printUsage(preferences);
     }

@@ -162,7 +162,7 @@ public class JabRefCLI {
     public String getWriteMetadatatoPdf() {
         return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadatatoPdf") :
                 cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXMPtoPdf") :
-                cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
+                        cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
     }
 
     private static Options getOptions() {
@@ -326,7 +326,7 @@ public class JabRefCLI {
         return leftOver;
     }
 
-    protected static String getExportFormatList(List<Exporter> exporters){
+    protected static String getExportFormatList(List<Exporter> exporters) {
         StringBuilder sb = new StringBuilder();
 
         for (Exporter exporter : exporters) {
