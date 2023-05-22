@@ -2784,7 +2784,7 @@ public class JabRefPreferences implements PreferencesService {
         return importers;
     }
 
-    public void storeCustomImportFormats(Set<CustomImporter> importers) {
+    private void storeCustomImportFormats(Set<CustomImporter> importers) {
         purgeSeries(CUSTOM_IMPORT_FORMAT, 0);
         CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
         for (int i = 0; i < importersArray.length; i++) {

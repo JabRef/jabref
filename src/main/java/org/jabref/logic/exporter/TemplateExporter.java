@@ -19,6 +19,7 @@ import java.util.Objects;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
+import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
@@ -260,9 +261,9 @@ public class TemplateExporter extends Exporter {
             Map<EntryType, Layout> layouts = new HashMap<>();
             Layout layout;
 
-            ExporterFactory.entryNumber = 0;
+            Number.serialExportNumber = 0;
             for (BibEntry entry : sorted) {
-                ExporterFactory.entryNumber++; // Increment entry counter.
+                Number.serialExportNumber++; // Increment entry counter.
                 // Get the layout
                 EntryType type = entry.getType();
                 if (layouts.containsKey(type)) {

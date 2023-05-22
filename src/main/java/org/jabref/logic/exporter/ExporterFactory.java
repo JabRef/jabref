@@ -18,13 +18,6 @@ import org.jabref.preferences.PreferencesService;
 
 public class ExporterFactory {
 
-    /**
-     * Global variable that is used for counting output entries when exporting:
-     *
-     * @deprecated find a better way to do this
-     */
-    @Deprecated public static int entryNumber;
-
     private final List<Exporter> exporters;
 
     private ExporterFactory(List<Exporter> exporters) {
