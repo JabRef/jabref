@@ -3,6 +3,7 @@ package org.jabref.cli;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.preferences.JabRefPreferences;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -142,5 +143,11 @@ class JabRefCLITest {
                 oocalc, ods, MSBib, mods, xmp, pdf, bib""";
 
         assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given, 26));
+    }
+
+    @Test
+    void uniformImportExportFormat(){
+        JabRefPreferences preferences = JabRefPreferences.getInstance();
+        JabRefCLI.printUsage(preferences);
     }
 }
