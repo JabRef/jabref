@@ -1,7 +1,6 @@
 package org.jabref.model.entry.field;
 
 import java.util.EnumSet;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -38,12 +37,12 @@ public class UserSpecificCommentField implements Field {
             return false;
         }
         Field other = (Field) o;
-        return name.equalsIgnoreCase(other.getName());
+        return name.equals(other.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name.toLowerCase(Locale.ENGLISH));
+        return Objects.hash(name);
     }
 
     @Override
