@@ -8,6 +8,7 @@ import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.cli.CommandLine;
@@ -304,8 +305,12 @@ public class JabRefCLI {
                 Globals.entryTypesManager,
                 Globals.journalAbbreviationRepository);
         String outFormatsIntro = Localization.lang("Available export formats");
-        String outFormats = wrapStringList(exporterFactory.getExporters().stream().map(Exporter::getId).toList(), outFormatsIntro.length());
-        String outFormatsList = String.format("%s: %s%n", outFormatsIntro, outFormats);
+
+        // issue 429: change the output format into "display name : id" pairs and start from new line
+        String outFormats = getExportFormatList(exporterFactory.getExporters());
+
+//        String outFormatsList = String.format("%s: %s%n", outFormatsIntro, outFormats);
+        String outFormatsList = String.format("%s:%n%s%n", outFormatsIntro, outFormats);
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
@@ -319,6 +324,24 @@ public class JabRefCLI {
 
     public List<String> getLeftOver() {
         return leftOver;
+    }
+
+    protected static String getExportFormatList(List<Exporter> exporters){
+        StringBuilder sb = new StringBuilder();
+
+        for (Exporter exporter : exporters) {
+            int pad = Math.max(0, 14 - exporter.getName().length());
+            sb.append("  ");
+            sb.append(exporter.getName());
+
+            sb.append(StringUtil.repeatSpaces(pad));
+
+            sb.append(" : ");
+            sb.append(exporter.getId());
+            sb.append('\n');
+        }
+
+        return sb.toString();
     }
 
     /**

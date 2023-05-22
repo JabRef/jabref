@@ -88,6 +88,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue in the preferences 'External file types' tab ignoring a custom application path in the edit dialog. [#9895](https://github.com/JabRef/jabref/issues/9895)
 - We fixed an issue in the preferences where custom columns could be added to the entry table with no qualifier. [#9913](https://github.com/JabRef/jabref/issues/9913)
 - We fixed an issue where the encoding header in a bib file was not respected when the file contained a BOM (Byte Order Mark). [#9926](https://github.com/JabRef/jabref/issues/9926)
+- We fixed the issue where cli output import and export format inconsistent. [koppor#429](https://github.com/koppor/jabref/issues/429)
 
 ### Removed
 
