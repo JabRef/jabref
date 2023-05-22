@@ -7,8 +7,8 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.cli.CommandLine;
@@ -305,11 +305,7 @@ public class JabRefCLI {
                 Globals.entryTypesManager,
                 Globals.journalAbbreviationRepository);
         String outFormatsIntro = Localization.lang("Available export formats");
-
-        // issue 429: change the output format into "display name : id" pairs and start from new line
         String outFormats = getExportFormatList(exporterFactory.getExporters());
-
-//        String outFormatsList = String.format("%s: %s%n", outFormatsIntro, outFormats);
         String outFormatsList = String.format("%s:%n%s%n", outFormatsIntro, outFormats);
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
