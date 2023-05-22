@@ -226,6 +226,20 @@ public class UnicodeToReadableCharMap extends HashMap<String, String> {
         put("\u1E63", "s");
         put("\u1E6C", "T");
         put("\u1E6D", "t");
+        put("\u1EA2", "A"); // hook
+        put("\u1EA3", "a");
+        put("\u1EBA", "E");
+        put("\u1EBB", "e");
+        put("\u1EC8", "I");
+        put("\u1EC9", "i");
+        put("\u1ECE", "O");
+        put("\u1ECF", "o");
+        put("\u1EE6", "U");
+        put("\u1EE7", "u");
+        put("\u1EF6", "Y");
+        put("\u1EF7", "y");
+
+
         put("\u00CF", "I");
 
         put("\u008C", "AE"); // doesn't work?
