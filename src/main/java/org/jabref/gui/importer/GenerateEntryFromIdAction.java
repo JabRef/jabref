@@ -3,7 +3,6 @@ package org.jabref.gui.importer;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -17,6 +16,7 @@ import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.PopOver;
@@ -33,6 +33,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
     private final PopOver entryFromIdPopOver;
     private final StateManager stateManager;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     public GenerateEntryFromIdAction(LibraryTab libraryTab,
                                      DialogService dialogService,
@@ -40,7 +41,8 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                                      TaskExecutor taskExecutor,
                                      PopOver entryFromIdPopOver,
                                      String identifier,
-                                     StateManager stateManager) {
+                                     StateManager stateManager,
+                                     FileUpdateMonitor fileUpdateMonitor) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
@@ -48,6 +50,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
         this.entryFromIdPopOver = entryFromIdPopOver;
         this.stateManager = stateManager;
+        this.fileUpdateMonitor = fileUpdateMonitor;
     }
 
     @Override
@@ -80,7 +83,14 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             Optional<BibEntry> result = bibEntry;
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
-                ImportHandler handler = new ImportHandler(libraryTab.getBibDatabaseContext(), preferencesService, Globals.getFileUpdateMonitor(), libraryTab.getUndoManager(), stateManager, dialogService, null, taskExecutor);
+                ImportHandler handler = new ImportHandler(
+                        libraryTab.getBibDatabaseContext(),
+                        preferencesService,
+                        fileUpdateMonitor,
+                        libraryTab.getUndoManager(),
+                        stateManager,
+                        dialogService,
+                        taskExecutor);
                 handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), entry);
             } else {
                 dialogService.notify("No entry found or import canceled");

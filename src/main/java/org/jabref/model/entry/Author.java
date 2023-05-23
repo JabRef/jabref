@@ -144,8 +144,7 @@ public class Author {
             return true;
         }
 
-        if (other instanceof Author) {
-            Author that = (Author) other;
+        if (other instanceof Author that) {
             return Objects.equals(firstPart, that.firstPart)
                     && Objects.equals(firstAbbr, that.firstAbbr)
                     && Objects.equals(vonPart, that.vonPart)

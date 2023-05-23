@@ -117,11 +117,11 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation 'org.apache.lucene:lucene-core:9.5.0'
-    implementation 'org.apache.lucene:lucene-queryparser:9.5.0'
-    implementation 'org.apache.lucene:lucene-queries:9.5.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.5.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.5.0'
+    implementation 'org.apache.lucene:lucene-core:9.6.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.6.0'
+    implementation 'org.apache.lucene:lucene-queries:9.6.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.6.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.6.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
@@ -132,7 +132,7 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:unoloader:7.5.1'
+    implementation 'org.libreoffice:unoloader:7.5.3'
     implementation 'org.libreoffice:libreoffice:7.5.1'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
@@ -179,9 +179,9 @@ dependencies {
     implementation 'com.konghq:unirest-java:3.14.2'
 
     implementation 'org.slf4j:slf4j-api:2.0.7'
-    implementation "org.tinylog:tinylog-api:2.6.1"
-    implementation "org.tinylog:slf4j-tinylog:2.6.1"
-    implementation "org.tinylog:tinylog-impl:2.6.1"
+    implementation "org.tinylog:tinylog-api:2.6.2"
+    implementation "org.tinylog:slf4j-tinylog:2.6.2"
+    implementation "org.tinylog:tinylog-impl:2.6.2"
 
     implementation 'de.undercouch:citeproc-java:3.0.0-beta.2'
 
@@ -261,7 +261,6 @@ processResources {
 
 task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateSearchGrammarSource",
-                                "generateEndnoteSource",
                                 "generateCitaviSource"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
@@ -289,14 +288,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
-task generateEndnoteSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the endnote importer."
 
-    schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
-    outputDirectory = "src-gen/main/java/"
-    javaPackage = "org.jabref.logic.importer.fileformat.endnote"
-}
 
 task generateCitaviSource(type: XjcTask) {
     group = 'JabRef'
@@ -494,6 +486,7 @@ checkstyle {
 rewrite {
     activeRecipe(
         'org.jabref.config.rewrite.cleanup',
+        'org.openrewrite.java.logging.slf4j.LoggersNamedForEnclosingClass',
         'org.openrewrite.java.logging.slf4j.ParameterizedLogging',
         'org.openrewrite.java.logging.slf4j.Slf4jLogShouldBeConstant'
     )

@@ -12,7 +12,6 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.importer.ImporterViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -54,10 +53,6 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
         preferences.getImporterPreferences().getCustomImportList().addAll(importers.stream()
                                                                                    .map(ImporterViewModel::getLogic)
                                                                                    .collect(Collectors.toSet()));
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                preferences.getImporterPreferences(),
-                preferences.getImportFormatPreferences(),
-                Globals.getFileUpdateMonitor());
     }
 
     /**

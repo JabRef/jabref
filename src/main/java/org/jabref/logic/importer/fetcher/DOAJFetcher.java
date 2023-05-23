@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Fetches data from the Directory of Open Access Journals (DOAJ)
  *
- * @implNote <a href="https://doaj.org/api/v1/docs">API documentation</a>
+ * @see <a href="https://doaj.org/api/v1/docs">API documentation</a>
  */
 public class DOAJFetcher implements SearchBasedParserFetcher {
 
@@ -155,10 +155,8 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
         return entry;
     }
 
-    /**
-     * @implNote slightly altered version based on https://gist.github.com/enginer/230e2dc2f1d213a825d5
-     */
     public static URIBuilder addPath(URIBuilder base, String subPath) {
+        // slightly altered version based on https://gist.github.com/enginer/230e2dc2f1d213a825d5
         if (StringUtil.isBlank(subPath) || "/".equals(subPath)) {
             return base;
         } else {

@@ -37,7 +37,7 @@ public class CustomImporter extends Importer {
 
     private static Importer load(URL basePathURL, String className)
             throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-        try (URLClassLoader cl = new URLClassLoader(new URL[] {basePathURL})) {
+        try (URLClassLoader cl = new URLClassLoader(new URL[]{basePathURL})) {
             Class<?> clazz = Class.forName(className, true, cl);
             return (Importer) clazz.newInstance();
         }
