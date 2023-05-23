@@ -30,7 +30,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -102,7 +101,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
 
             List<BibEntry> entries = new ArrayList<>();
-            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
+            BibtexParser bibtexParser = new BibtexParser(preferences);
             Pattern pattern = Pattern.compile("<pre>(?s)(.*)</pre>");
             Matcher matcher = pattern.matcher(response);
             while (matcher.find()) {

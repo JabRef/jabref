@@ -54,8 +54,6 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,13 +78,12 @@ class BibtexParserTest {
 
     private ImportFormatPreferences importFormatPreferences;
     private BibtexParser parser;
-    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @BeforeEach
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        parser = new BibtexParser(importFormatPreferences);
     }
 
     @Test
@@ -125,7 +122,7 @@ class BibtexParserTest {
                         @article{canh05,  author = {Crowston, K. and Annabi, H.},
                           title = {Title A}}
                         """,
-                importFormatPreferences, fileMonitor);
+                importFormatPreferences);
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("canh05")
                 .withField(StandardField.AUTHOR, "Crowston, K. and Annabi, H.")
@@ -139,20 +136,20 @@ class BibtexParserTest {
                         @article{canh05, author = {Crowston, K. and Annabi, H.},
                             title = {Title A}}
                         @inProceedings{foo,  author={Norton Bar}}""",
-                importFormatPreferences, fileMonitor);
+                importFormatPreferences);
         assertTrue(parsed.get().getCitationKey().equals(Optional.of("canh05"))
                 || parsed.get().getCitationKey().equals(Optional.of("foo")));
     }
 
     @Test
     void singleFromStringReturnsEmptyFromEmptyString() throws ParseException {
-        Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences, fileMonitor);
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
     }
 
     @Test
     void singleFromStringReturnsEmptyIfNoEntryRecognized() throws ParseException {
-        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences, fileMonitor);
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
     }
 
@@ -1009,7 +1006,7 @@ class BibtexParserTest {
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(
                 FXCollections.observableArrayList(List.of(StandardField.FILE)));
-        BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
         ParserResult result = parser
                 .parse(new StringReader("@article{canh05,file = {ups  sala}}"));
 
