@@ -96,7 +96,7 @@ public class ContentSelectorViewModelTest {
         addFieldForUnknownField(testField);
 
         ListProperty<Field> fields = viewModel.getFieldNamesBackingList();
-        boolean fieldsContainTestValue = fields.stream().anyMatch(field -> "tEst".equals(field.getDisplayName2()));
+        boolean fieldsContainTestValue = fields.stream().anyMatch(field -> "tEst".equals(field.getDisplayNameForField()));
 
         assertTrue(fieldsContainTestValue);
     }
@@ -167,7 +167,7 @@ public class ContentSelectorViewModelTest {
     private void addFieldForUnknownField(Field field) {
         when(dialogService.showInputDialogAndWait(
                 Localization.lang("Add new field name"), Localization.lang("Field name:")))
-                .thenReturn(Optional.of(field.getDisplayName2()));
+                .thenReturn(Optional.of(field.getDisplayNameForField()));
 
         viewModel.showInputFieldNameDialog();
     }

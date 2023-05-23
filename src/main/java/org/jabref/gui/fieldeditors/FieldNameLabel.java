@@ -17,7 +17,7 @@ import org.jabref.model.strings.StringUtil;
 public class FieldNameLabel extends Label {
 
     public FieldNameLabel(Field field) {
-        super(field.getDisplayName2());
+        super(field.getDisplayNameForField());
 
         setPadding(new Insets(4, 0, 0, 0));
         setAlignment(Pos.CENTER);

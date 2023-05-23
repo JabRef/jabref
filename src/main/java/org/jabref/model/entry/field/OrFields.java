@@ -27,10 +27,10 @@ public class OrFields extends LinkedHashSet<Field> implements Comparable<OrField
         return joiner.toString();
     }
 
-    public String getDisplayName2() {
+    public String getDisplayNameForField() {
         StringJoiner joiner = new StringJoiner("/");
         for (Field field : this) {
-            joiner.add(field.getDisplayName2());
+            joiner.add(field.getDisplayNameForField());
         }
         return joiner.toString();
     }

@@ -20,7 +20,7 @@ public interface Field {
         return StringUtil.capitalizeFirst(getName());
     }
 
-    default String getDisplayName2() {
+    default String getDisplayNameForField() {
         return getName();
     }
 

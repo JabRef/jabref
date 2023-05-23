@@ -18,7 +18,7 @@ public class FieldsUtil {
         @Override
         public String toString(Field object) {
             if (object != null) {
-                return object.getDisplayName2();
+                return object.getDisplayNameForField();
             } else {
                 return "";
             }

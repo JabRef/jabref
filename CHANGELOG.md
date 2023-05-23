@@ -55,7 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the option to run JabRef in memory stick mode into the preferences dialog toolbar. [#9866](https://github.com/JabRef/jabref/pull/9866)
 - In case the library contains empty entries, they are not written to disk. [#8645](https://github.com/JabRef/jabref/issues/8645)
 - The formatter `remove_unicode_ligatures` is now called `replace_unicode_ligatures`. [#9890](https://github.com/JabRef/jabref/pull/9890)
-
+- We enabled casing when adding custom field for entry type. [#9840](https://github.com/JabRef/jabref/issues/9840)
 
 ### Fixed
 
