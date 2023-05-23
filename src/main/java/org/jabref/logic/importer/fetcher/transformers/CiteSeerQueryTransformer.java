@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.strings.StringUtil;
@@ -12,23 +11,19 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
 
     private JSONObject payload = new JSONObject();
 
-    private JSONArray publisher;
-    private String queryString;
-    private String sortBy; // supported options include "relevance" or "year"
-
     @Override
     protected String getLogicalAndOperator() {
-        return " ";
+        return " AND ";
     }
 
     @Override
     protected String getLogicalOrOperator() {
-        return " ";
+        return " OR ";
     }
 
     @Override
     protected String getLogicalNotOperator() {
-        return " ";
+        return " NOT ";
     }
 
     @Override
@@ -65,21 +60,17 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
          return "";
     }
 
+    // the five fields are required to make a POST request
     @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return switch (fieldAsString) {
-            case "publisher" -> handlePublisher(term);
             case "queryString" -> handleQueryString(term);
+            case "page" -> handlePage(term);
+            case "pageSize" -> handlePageSize(term);
+            case "must_have_pdf" -> handleMustHavePdf(term);
             case "sortBy" -> handleSortBy(term);
             default -> super.handleOtherField(fieldAsString, term);
         };
-    }
-
-    private Optional<String> handlePublisher(String publisher) {
-        if (!this.getJSONPayload().has("publisher")) {
-            this.getJSONPayload().put("publisher", new JSONArray());
-        }
-        return Optional.of(this.getJSONPayload().getJSONArray("publisher").put(publisher).toString());
     }
 
     private Optional<String> handleQueryString(String queryString) {
@@ -87,21 +78,25 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
         return Optional.empty();
     }
 
-    private Optional<String> handleSortBy(String sortBy) {
-        this.getJSONPayload().put("sortBy", sortBy);
+    // as mentioned before, there may be a Jabref constant for page/page-size
+    private Optional<String> handlePage(String page) {
+        this.getJSONPayload().put("page", page);
         return Optional.empty();
     }
 
-    private Optional<String> getPublisher() {
-        return Objects.isNull(publisher) ? Optional.empty() : Optional.of(publisher.toString());
+    private Optional<String> handlePageSize(String pageSize) {
+        this.getJSONPayload().put("pageSize", pageSize);
+        return Optional.empty();
     }
 
-    private Optional<String> getQueryString() {
-        return Objects.isNull(queryString) ? Optional.empty() : Optional.of(queryString);
+    private Optional<String> handleMustHavePdf(String mustHavePdf) {
+        this.getJSONPayload().put("must_have_pdf", mustHavePdf);
+        return Optional.empty();
     }
 
-    private Optional<String> getSortBy() {
-        return Objects.isNull(sortBy) ? Optional.empty() : Optional.of(sortBy);
+    private Optional<String> handleSortBy(String sortBy) {
+        this.getJSONPayload().put("sortBy", sortBy);
+        return Optional.empty();
     }
 
     public JSONObject getJSONPayload() {

@@ -43,12 +43,13 @@ public class CiteSeer implements SearchBasedFetcher {
     public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         // ADR-0014
         try {
+            JSONElement payload = getPayloadJSON(luceneQuery);
             JsonNode requestResponse = Unirest.post(API_URL)
                                               .header("authority", BASE_URL)
                                               .header("accept", "application/json, text/plain, */*")
                                               .header("content-type", "application/json;charset=UTF-8")
                                               .header("origin", "https://" + BASE_URL)
-                                              .body(getPayloadJSON(luceneQuery))
+                                              .body(payload)
                                               .asJson().getBody();
 
             Optional<JSONArray> jsonResponse = Optional.of(requestResponse)
@@ -71,29 +72,4 @@ public class CiteSeer implements SearchBasedFetcher {
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         return transformer.getJSONPayload();
     }
-
-//    private JSONObject getPayloadString(String queryString) {
-//        JSONObject payload = new JSONObject();
-//        payload.put("queryString", "value");
-//        payload.put("key", "value");
-//        payload.put("key", "value");
-//        payload.put("key", "value");
-//        payload.put("key", "value");
-
-//        String payload = """
-//            '{'
-//                  \"queryString\":\"{0}\",
-//                  \"page\":1,
-//                  \"pageSize\":20,
-//                   \"sortBy\":\"relevance\",
-//                  \"must_have_pdf\":\"false\",
-//                  \"yearStart\":1913,
-//                  \"yearEnd\":2023,
-//                  \"author\":[],
-//                  \"publisher\":[]
-//            '}'
-//            """;
-//        return MessageFormat.format(payload, queryString);
-//        return payload;
-//    }
 }

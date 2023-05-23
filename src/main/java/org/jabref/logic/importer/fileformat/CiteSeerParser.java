@@ -54,13 +54,13 @@ public class CiteSeerParser {
                     Optional.ofNullable(jsonObj.get("title").getAsString())
                             .orElse(""));
             bibEntry.setField(StandardField.VENUE,
-                    Optional.ofNullable(jsonObj.get("venue").getAsString())
-                            .orElse(""));
+                    Optional.of(jsonObj.get("venue").isJsonNull() ? "" : jsonObj.get("venue").getAsString()).
+                            orElse(""));
             bibEntry.setField(StandardField.YEAR,
                     Optional.ofNullable(jsonObj.get("year").getAsString())
                             .orElse(""));
             bibEntry.setField(StandardField.PUBLISHER,
-                    Optional.ofNullable(jsonObj.get("publisher").getAsString())
+                    Optional.of(jsonObj.get("publisher").isJsonNull() ? "" : jsonObj.get("publisher").getAsString())
                             .orElse(""));
             bibEntry.setField(StandardField.ABSTRACT,
                     Optional.ofNullable(jsonObj.get("abstract").getAsString())
@@ -69,7 +69,7 @@ public class CiteSeerParser {
 //                    Optional.ofNullable(jsonObj.get("authors").getAsJsonArray())
 //                            .orElse(new JsonArray()).forEach());
             bibEntry.setField(StandardField.JOURNAL,
-                    Optional.ofNullable(jsonObj.get("journal").getAsString())
+                    Optional.of(jsonObj.get("journal").isJsonNull() ? "" : jsonObj.get("journal").getAsString())
                             .orElse(""));
             return bibEntry;
         } catch (JsonParseException exception) {

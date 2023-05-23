@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// @Disabled
 @FetcherTest
 class CiteSeerTest {
 
@@ -46,23 +45,26 @@ class CiteSeerTest {
     @Test
     void searchByQueryFindsEntryRigorousDerivation() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
-            .withField(StandardField.ABSTRACT, "ar")
-            .withField(StandardField.AUTHOR, "Wang Wei and Zhang Pingwen and Zhang Zhifei")
-            .withField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory");
+                .withField(StandardField.ABSTRACT, "ar")
+                .withField(StandardField.AUTHOR, "Wang Wei and Zhang Pingwen and Zhang Zhifei")
+                .withField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("queryString:Ericksen-Leslie AND page:1 AND pageSize:20 AND must_have_pdf:false AND sortBy:relevance");
+//        List<BibEntry> fetchedEntries = fetcher.performSearch("Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 
     @Test
     void searchByQueryFindsEntryCopingTheoryAndResearch() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
-            .withField(StandardField.AUTHOR, "Lazarus Richard S.")
-            .withField(StandardField.TITLE, "Coping Theory and Research: Past Present and Future")
-            .withField(StandardField.YEAR, "1993")
-            .withField(StandardField.VENUE, "Psychosomatic Medicine");
+                .withField(StandardField.AUTHOR, "Lazarus Richard S.")
+                .withField(StandardField.TITLE, "Coping Theory and Research: Past Present and Future")
+                .withField(StandardField.YEAR, "1993")
+                .withField(StandardField.VENUE, "Psychosomatic Medicine");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("Coping Theory and Research: Past Present and Future");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 }
+
+// @Disabled
