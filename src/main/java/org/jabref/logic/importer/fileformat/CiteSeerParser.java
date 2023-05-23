@@ -4,6 +4,7 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,11 +14,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
 
 public class CiteSeerParser {
 
@@ -33,47 +31,34 @@ public class CiteSeerParser {
     public List<BibEntry> parseCiteSeerResponse(JSONArray jsonResponse) throws ParseException {
         List<BibEntry> response = new ArrayList<>();
         CookieHandler.setDefault(new CookieManager());
-
-        // this is a placeholder, 'json -> string -> json' conversion should not be allowed
-        // I plan to reformat this with the kong.unirest JSON classes / library for consistency
-        String jsonString = jsonResponse.toString();
-        JsonElement jsonElement = JsonParser.parseString(jsonString);
-
-        for (JsonElement element: jsonElement.getAsJsonArray()) {
-            response.add(parseBibEntry(element.getAsJsonObject()));
+        for (int i = 0; i < jsonResponse.length(); ++i) {
+            response.add(parseBibEntry(jsonResponse.getJSONObject(i)));
         }
-
         return response;
     }
 
-    private BibEntry parseBibEntry(JsonObject jsonObj) throws ParseException {
-        try {
-            BibEntry bibEntry = new BibEntry();
+    // potentially add this to StringUtil library?
+    private String nullToEmptyString(String input) {
+        return input == null ? "" : input;
+    }
 
+    private BibEntry parseBibEntry(JSONObject jsonObj) throws ParseException {
+//        try {
+            BibEntry bibEntry = new BibEntry();
             bibEntry.setField(StandardField.TITLE,
-                    Optional.ofNullable(jsonObj.get("title").getAsString())
+                    Optional.ofNullable(jsonObj.get("title").toString())
                             .orElse(""));
-            bibEntry.setField(StandardField.VENUE,
-                    Optional.of(jsonObj.get("venue").isJsonNull() ? "" : jsonObj.get("venue").getAsString()).
-                            orElse(""));
-            bibEntry.setField(StandardField.YEAR,
-                    Optional.ofNullable(jsonObj.get("year").getAsString())
-                            .orElse(""));
-            bibEntry.setField(StandardField.PUBLISHER,
-                    Optional.of(jsonObj.get("publisher").isJsonNull() ? "" : jsonObj.get("publisher").getAsString())
-                            .orElse(""));
-            bibEntry.setField(StandardField.ABSTRACT,
-                    Optional.ofNullable(jsonObj.get("abstract").getAsString())
-                            .orElse(""));
-//            bibEntry.setField(StandardField.AUTHOR,
+            bibEntry.setField(StandardField.VENUE, Objects.toString(jsonObj.get("venue"), ""));
+            bibEntry.setField(StandardField.YEAR, Objects.toString(jsonObj.get("year"), ""));
+            bibEntry.setField(StandardField.PUBLISHER, Objects.toString(jsonObj.get("publisher"), ""));
+            bibEntry.setField(StandardField.ABSTRACT, Objects.toString(jsonObj.get("abstract"), ""));
+            // have not implemented this quite yet
+//            bibEntry.setField(StandardField.AUTHOR, Optional.ofNullable(jsonObj.getJSONObject("authors").))
+            //            bibEntry.setField(StandardField.AUTHOR,
 //                    Optional.ofNullable(jsonObj.get("authors").getAsJsonArray())
 //                            .orElse(new JsonArray()).forEach());
-            bibEntry.setField(StandardField.JOURNAL,
-                    Optional.of(jsonObj.get("journal").isJsonNull() ? "" : jsonObj.get("journal").getAsString())
-                            .orElse(""));
+            bibEntry.setField(StandardField.JOURNAL, Objects.toString(jsonObj.get("journal"), ""));
             return bibEntry;
-        } catch (JsonParseException exception) {
-            throw new ParseException("CiteSeer API JSON format has changed ", exception);
-        }
+//        }
     }
 }

@@ -58,6 +58,10 @@ public class CiteSeer implements SearchBasedFetcher {
                                                     .map(response -> response.optJSONArray("response"))
                                                     .filter(Objects::nonNull);
 
+            if (!jsonResponse.isPresent()) {
+                return List.of();
+            }
+
             CiteSeerParser parser = new CiteSeerParser();
             List<BibEntry> fetchedEntries = parser.parseCiteSeerResponse(jsonResponse.orElse(new JSONArray()));
             return fetchedEntries;
