@@ -32,7 +32,6 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -67,6 +66,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -84,8 +84,8 @@ public class LibraryTab extends Tab {
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
     private final StateManager stateManager;
-    private final ThemeManager themeManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
 
@@ -122,14 +122,14 @@ public class LibraryTab extends Tab {
                       JabRefFrame frame,
                       PreferencesService preferencesService,
                       StateManager stateManager,
-                      ThemeManager themeManager) {
+                      FileUpdateMonitor fileUpdateMonitor) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.undoManager = frame.getUndoManager();
         this.dialogService = frame.getDialogService();
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.stateManager = Objects.requireNonNull(stateManager);
-        this.themeManager = Objects.requireNonNull(themeManager);
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -501,8 +501,8 @@ public class LibraryTab extends Tab {
                 stateManager,
                 Globals.getKeyPrefs(),
                 Globals.getClipboardManager(),
-                Globals.IMPORT_FORMAT_READER,
-                Globals.TASK_EXECUTOR);
+                Globals.TASK_EXECUTOR,
+                fileUpdateMonitor);
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -764,7 +764,7 @@ public class LibraryTab extends Tab {
     public void resetChangeMonitor() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext,
-                Globals.getFileUpdateMonitor(),
+                fileUpdateMonitor,
                 Globals.TASK_EXECUTOR,
                 dialogService,
                 preferencesService,
@@ -819,11 +819,16 @@ public class LibraryTab extends Tab {
      * @param dataLoadingTask The task to execute to load the data. It is executed using {@link org.jabref.gui.Globals.TASK_EXECUTOR}.
      * @param file the path to the file (loaded by the dataLoadingTask)
      */
-    public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask, Path file, PreferencesService preferencesService, StateManager stateManager, JabRefFrame frame, ThemeManager themeManager) {
+    public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
+                                              Path file,
+                                              PreferencesService preferencesService,
+                                              StateManager stateManager,
+                                              JabRefFrame frame,
+                                              FileUpdateMonitor fileUpdateMonitor) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
-        LibraryTab newTab = new LibraryTab(context, frame, preferencesService, stateManager, themeManager);
+        LibraryTab newTab = new LibraryTab(context, frame, preferencesService, stateManager, fileUpdateMonitor);
 
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)

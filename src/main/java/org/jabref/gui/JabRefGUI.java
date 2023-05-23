@@ -25,6 +25,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.WebViewStore;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -39,6 +40,7 @@ public class JabRefGUI {
 
     private static JabRefFrame mainFrame;
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     private final List<ParserResult> bibDatabases;
     private final boolean isBlank;
@@ -46,10 +48,15 @@ public class JabRefGUI {
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
-    public JabRefGUI(Stage mainStage, List<ParserResult> databases, boolean isBlank, PreferencesService preferencesService) {
+    public JabRefGUI(Stage mainStage,
+                     List<ParserResult> databases,
+                     boolean isBlank,
+                     PreferencesService preferencesService,
+                     FileUpdateMonitor fileUpdateMonitor) {
         this.bibDatabases = databases;
         this.isBlank = isBlank;
         this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
         this.correctedWindowPos = false;
 
         WebViewStore.init();
@@ -132,7 +139,7 @@ public class JabRefGUI {
         });
         Platform.runLater(this::openDatabases);
 
-        if (!(Globals.getFileUpdateMonitor().isActive())) {
+        if (!(fileUpdateMonitor.isActive())) {
             getMainFrame().getDialogService()
                           .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
                                   "and processes and restart. You may encounter errors if you continue " +
@@ -173,7 +180,8 @@ public class JabRefGUI {
 
             if (pr.getDatabase().isShared()) {
                 try {
-                    new SharedDatabaseUIManager(mainFrame, preferencesService).openSharedDatabaseFromParserResult(pr);
+                    new SharedDatabaseUIManager(mainFrame, preferencesService, fileUpdateMonitor)
+                            .openSharedDatabaseFromParserResult(pr);
                 } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                         NotASharedDatabaseException e) {
                     pr.getDatabaseContext().clearDatabasePath(); // do not open the original file
