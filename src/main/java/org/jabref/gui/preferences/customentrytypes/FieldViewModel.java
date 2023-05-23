@@ -28,7 +28,7 @@ public class FieldViewModel {
                           FieldPriority priorityProperty,
                           boolean multiline) {
         this.field = field;
-        this.fieldName.setValue(field.getDisplayName());
+        this.fieldName.setValue(field.getDisplayName2());
         this.required.setValue(required == Mandatory.REQUIRED);
         this.priorityProperty.setValue(priorityProperty);
         this.multiline.setValue(multiline);

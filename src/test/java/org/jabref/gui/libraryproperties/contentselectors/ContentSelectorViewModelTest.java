@@ -91,6 +91,17 @@ public class ContentSelectorViewModelTest {
     }
 
     @Test
+    void addsNewFieldWithCaseInsensitiveName() {
+        UnknownField testField = new UnknownField("tEst");
+        addFieldForUnknownField(testField);
+
+        ListProperty<Field> fields = viewModel.getFieldNamesBackingList();
+        boolean fieldsContainTestValue = fields.stream().anyMatch(field -> "tEst".equals(field.getDisplayName2()));
+
+        assertTrue(fieldsContainTestValue);
+    }
+
+    @Test
     void removesField() {
         UnknownField testField = new UnknownField("Test");
         addField(testField);
@@ -153,6 +164,13 @@ public class ContentSelectorViewModelTest {
         viewModel.showInputFieldNameDialog();
     }
 
+    private void addFieldForUnknownField(Field field) {
+        when(dialogService.showInputDialogAndWait(
+                Localization.lang("Add new field name"), Localization.lang("Field name:")))
+                .thenReturn(Optional.of(field.getDisplayName2()));
+
+        viewModel.showInputFieldNameDialog();
+    }
     private void removeField(Field field) {
         when(dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove field name"),

@@ -76,7 +76,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
                 ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(
                 newFieldToAdd,
-                input -> input != null && StringUtil.isNotBlank(input.getDisplayName()),
+                input -> input != null && StringUtil.isNotBlank(input.getDisplayName2()),
                 ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
@@ -146,7 +146,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         Field field = newFieldToAdd.getValue();
         ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
         boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel ->
-                fieldViewModel.nameProperty().getValue().equals(field.getDisplayName()));
+                fieldViewModel.nameProperty().getValue().equals(field.getDisplayName2()));
 
         if (!fieldExists) {
             this.selectedEntryType.getValue().addField(new FieldViewModel(
@@ -157,7 +157,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         } else {
             dialogService.showWarningDialogAndWait(
                     Localization.lang("Duplicate fields"),
-                    Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
+                    Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName2()));
         }
         newFieldToAddProperty().setValue(null);
     }

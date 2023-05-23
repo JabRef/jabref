@@ -16,11 +16,11 @@ public interface Field {
     /**
      * @return A version of the field name more suitable for display
      */
-//    default String getDisplayName() {
-//        return StringUtil.capitalizeFirst(getName());
-//    }
-
     default String getDisplayName() {
+        return StringUtil.capitalizeFirst(getName());
+    }
+
+    default String getDisplayName2() {
         return getName();
     }
 

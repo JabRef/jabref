@@ -11,12 +11,13 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.strings.StringUtil;
 
 public class FieldNameLabel extends Label {
 
     public FieldNameLabel(Field field) {
-        super(field.getDisplayName());
+        super(field.getDisplayName2());
 
         setPadding(new Insets(4, 0, 0, 0));
         setAlignment(Pos.CENTER);

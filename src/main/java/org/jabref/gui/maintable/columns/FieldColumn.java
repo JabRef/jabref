@@ -53,6 +53,7 @@ public class FieldColumn extends MainTableColumn<String> {
         return fields.getDisplayName();
     }
 
+
     private ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {
         if (fields.isEmpty()) {
             return null;
