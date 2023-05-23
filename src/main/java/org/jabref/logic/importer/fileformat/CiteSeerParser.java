@@ -1,9 +1,7 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +13,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -37,8 +34,8 @@ public class CiteSeerParser {
         List<BibEntry> response = new ArrayList<>();
         CookieHandler.setDefault(new CookieManager());
 
-        // this is a placeholder, conversion from json -> string -> json
-        // I plan to reformat this with the kong.unirest library for consistency
+        // this is a placeholder, 'json -> string -> json' conversion should not be allowed
+        // I plan to reformat this with the kong.unirest JSON classes / library for consistency
         String jsonString = jsonResponse.toString();
         JsonElement jsonElement = JsonParser.parseString(jsonString);
 
@@ -68,9 +65,9 @@ public class CiteSeerParser {
             bibEntry.setField(StandardField.ABSTRACT,
                     Optional.ofNullable(jsonObj.get("abstract").getAsString())
                             .orElse(""));
-            bibEntry.setField(StandardField.AUTHOR,
-                    Optional.ofNullable(jsonObj.get("authors").getAsJsonArray().)
-                            .orElse(new JsonArray()).forEach());
+//            bibEntry.setField(StandardField.AUTHOR,
+//                    Optional.ofNullable(jsonObj.get("authors").getAsJsonArray())
+//                            .orElse(new JsonArray()).forEach());
             bibEntry.setField(StandardField.JOURNAL,
                     Optional.ofNullable(jsonObj.get("journal").getAsString())
                             .orElse(""));

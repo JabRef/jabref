@@ -1,11 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,6 +8,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.transformers.CiteSeerQueryTransformer;
 import org.jabref.logic.importer.fileformat.CiteSeerParser;
 import org.jabref.model.entry.BibEntry;
 
@@ -21,12 +16,15 @@ import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONElement;
-import kong.unirest.json.JSONObject;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class CiteSeer implements SearchBasedFetcher {
 
+    private static final String BASE_URL = "citeseerx.ist.psu.edu";
+
     private static final String API_URL = "https://citeseerx.ist.psu.edu/api/search";
+
+    private CiteSeerQueryTransformer transformer;
 
     public CiteSeer() {
     }
@@ -45,13 +43,12 @@ public class CiteSeer implements SearchBasedFetcher {
     public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         // ADR-0014
         try {
-            JSONElement payload = getPayloadJSON(luceneQuery);
             JsonNode requestResponse = Unirest.post(API_URL)
-                                              .header("authority", "citeseerx.ist.psu.edu")
+                                              .header("authority", BASE_URL)
                                               .header("accept", "application/json, text/plain, */*")
                                               .header("content-type", "application/json;charset=UTF-8")
-                                              .header("origin", "https://citeseerx.ist.psu.edu")
-                                              .body(payload)
+                                              .header("origin", "https://" + BASE_URL)
+                                              .body(getPayloadJSON(luceneQuery))
                                               .asJson().getBody();
 
             Optional<JSONArray> jsonResponse = Optional.of(requestResponse)
@@ -63,16 +60,16 @@ public class CiteSeer implements SearchBasedFetcher {
             CiteSeerParser parser = new CiteSeerParser();
             List<BibEntry> fetchedEntries = parser.parseCiteSeerResponse(jsonResponse.orElse(new JSONArray()));
             return fetchedEntries;
-        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
-            throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         } catch (ParseException ex) {
-            throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries, " ex);
+            throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries, ", ex);
         }
     }
 
     private JSONElement getPayloadJSON(QueryNode luceneQuery) {
         // use CiteSeerQueryTransformer
-        return null;
+        transformer = new CiteSeerQueryTransformer();
+        String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
+        return transformer.getJSONPayload();
     }
 
 //    private JSONObject getPayloadString(String queryString) {
