@@ -28,8 +28,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class GroupsParserTest {
     private FileUpdateMonitor fileMonitor;
@@ -62,6 +61,11 @@ class GroupsParserTest {
         AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', ';');
         AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;,;\\;;1;;;;;", ';', fileMonitor, metaData);
         assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void testKeywordGroupFromString() {
+        assertDoesNotThrow(()-> GroupsParser.fromString("KeywordGroup:;0;priority;prio1;1;0;1;0x8a8a8aff;\\;\\;;", '\\', null, null));
     }
 
     @Test

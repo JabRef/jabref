@@ -191,11 +191,11 @@ public class GroupsParser {
                 .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
+        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(convertTokenToNumber(tok.nextToken()));
         Field field = FieldFactory.parseField(StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         String expression = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-        boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+        boolean caseSensitive = convertTokenToNumber(tok.nextToken()) == 1;
+        boolean regExp = convertTokenToNumber(tok.nextToken()) == 1;
         KeywordGroup newGroup;
         if (regExp) {
             newGroup = new RegexKeywordGroup(name, context, field, expression, caseSensitive);
@@ -204,6 +204,14 @@ public class GroupsParser {
         }
         addGroupDetails(tok, newGroup);
         return newGroup;
+    }
+
+    private static int convertTokenToNumber(String token) {
+        try {
+            return Integer.parseInt(token);
+    	} catch (Exception e) {
+    		return -1;
+    	}
     }
 
     private static ExplicitGroup explicitGroupFromString(String input, Character keywordSeparator) throws ParseException {

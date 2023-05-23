@@ -23,9 +23,9 @@ public class QuotedStringTokenizer {
         quoteChar = quoteCharacter;
         contentLength = this.content.length();
         // skip leading delimiters
-        while (isDelimiter(this.content.charAt(index)) && index < contentLength) {
-            ++index;
-        }
+//        while (isDelimiter(this.content.charAt(index)) && index < contentLength) {
+//            ++index;
+//        }
     }
 
     /**
