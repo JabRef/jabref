@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -109,6 +110,8 @@ public class MarcXmlParser implements Parser {
                 putPhysicalDescription(bibEntry, datafield);
             } else if ("490".equals(tag) || "830".equals(tag)) {
                 putSeries(bibEntry, datafield);
+            } else if ("502".equals(tag)) {
+                putThesisDetails(bibEntry, datafield); // Master's thesis, PhD thesis, Thesis
             } else if ("520".equals(tag)) {
                 putSummary(bibEntry, datafield);
             } else if ("653".equals(tag)) {
@@ -133,8 +136,13 @@ public class MarcXmlParser implements Parser {
          *  pages
          *  volume and number correct
          *  series and journals stored in different tags
-         *  thesis
-         *  proceedings
+         *  thesis //doctor & masterarbeit (Unterschied?) | type
+         *  proceedings //konferenzbeiträge
+         *  BibTex --> entryType
+         *  bestimmte Anzahl ist suchbar
+         *  unbestimmt nicht
+         *  SRU suche
+         *  Z39.50
          */
 
         return bibEntry;
@@ -401,6 +409,8 @@ public class MarcXmlParser implements Parser {
     }
 
     private void putIssue(BibEntry bibEntry, Element datafield) {
+        bibEntry.setType(StandardEntryType.Article);
+
         List<String> issues = getSubfields("g", datafield);
 
         for (String issue : issues) {
@@ -437,6 +447,21 @@ public class MarcXmlParser implements Parser {
         }
     }
 
+    private void putThesisDetails(BibEntry bibEntry, Element datafield) {
+        String thesisDegree = getSubfield("b", datafield);
+        String school = getSubfield("c", datafield);
+
+
+        if ("Masterarbeit".equals(thesisDegree) & StringUtil.isNotBlank(school)) {
+            bibEntry.setType(StandardEntryType.MastersThesis);
+            bibEntry.setField(StandardField.SCHOOL, school);
+        }
+
+        if ("Dissertation".equals(thesisDegree)) {
+            bibEntry.setType(StandardEntryType.PhdThesis);
+            bibEntry.setField(StandardField.SCHOOL, school);
+        }
+    }
 
     private String getSubfield(String a, Element datafield) {
         List<Element> subfields = getChildren("subfield", datafield);
