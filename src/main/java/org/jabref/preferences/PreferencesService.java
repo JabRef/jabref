@@ -85,11 +85,7 @@ public interface PreferencesService {
 
     CleanupPreferences getDefaultCleanupPreset();
 
-    //*************************************************************************************************************
-    // GeneralPreferences
-    //*************************************************************************************************************
-
-    GeneralPreferences getGeneralPreferences();
+    LibraryPreferences getLibraryPreferences();
 
     TelemetryPreferences getTelemetryPreferences();
 
@@ -159,7 +155,7 @@ public interface PreferencesService {
     // AppearancePreferences
     //*************************************************************************************************************
 
-    AppearancePreferences getAppearancePreferences();
+    WorkspacePreferences getWorkspacePreferences();
 
     //*************************************************************************************************************
     // File preferences
@@ -171,7 +167,7 @@ public interface PreferencesService {
     // Import/Export preferences
     //*************************************************************************************************************
 
-    ImportExportPreferences getImportExportPreferences();
+    ExportPreferences getExportPreferences();
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 

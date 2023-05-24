@@ -57,7 +57,7 @@ public final class ApplicationInsightsLogEvent extends ApplicationInsightsEvent 
 
         if (isException()) {
             Throwable throwable = this.logEvent.getException();
-            exception = throwable instanceof Exception ? (Exception) throwable : new Exception(throwable);
+            exception = throwable instanceof Exception e ? e : new Exception(throwable);
         }
 
         return exception;

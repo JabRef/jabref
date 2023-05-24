@@ -35,8 +35,7 @@ import org.tinylog.Logger;
 /**
  * Fetches data from the Biodiversity Heritage Library
  *
- * @implNote
- * <a href="https://www.biodiversitylibrary.org/docs/api3.html">API documentation</a>
+ * @see <a href="https://www.biodiversitylibrary.org/docs/api3.html">API documentation</a>
  */
 public class BiodiversityLibrary implements SearchBasedParserFetcher, CustomizableKeyFetcher {
 
@@ -162,7 +161,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
         // input: list of { "Name": "Author name,"}
         return IntStream.range(0, authors.length())
                         .mapToObj(authors::getJSONObject)
-                        .map((author) -> new Author(
+                        .map(author -> new Author(
                                 author.optString("Name", ""), "", "", "", ""))
                         .collect(AuthorList.collect())
                         .getAsFirstLastNamesWithAnd();

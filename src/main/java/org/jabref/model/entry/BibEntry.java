@@ -260,7 +260,7 @@ public class BibEntry implements Cloneable {
             }
 
             // for these fields, inheritance is not allowed for the specified entry types
-            if ((targetField == StandardField.SHORTTITLE)) {
+            if (targetField == StandardField.SHORTTITLE) {
                 return Optional.empty();
             }
         }
@@ -281,7 +281,7 @@ public class BibEntry implements Cloneable {
             }
 
             // for these fields, inheritance is not allowed for the specified entry types
-            if ((targetField == StandardField.SHORTTITLE)) {
+            if (targetField == StandardField.SHORTTITLE) {
                 return Optional.empty();
             }
         }
@@ -313,11 +313,11 @@ public class BibEntry implements Cloneable {
     }
 
     private Optional<String> genericGetResolvedFieldOrAlias(Field field, BibDatabase database, BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
-        if (InternalField.TYPE_HEADER.equals(field) || InternalField.OBSOLETE_TYPE_HEADER.equals(field)) {
+        if (InternalField.TYPE_HEADER == field || InternalField.OBSOLETE_TYPE_HEADER == field) {
             return Optional.of(type.get().getDisplayName());
         }
 
-        if (InternalField.KEY_FIELD.equals(field)) {
+        if (InternalField.KEY_FIELD == field) {
             return getCitationKey();
         }
 
@@ -480,7 +480,7 @@ public class BibEntry implements Cloneable {
         }
 
         // Finally, handle dates
-        if (StandardField.DATE.equals(field)) {
+        if (StandardField.DATE == field) {
             Optional<Date> date = Date.parse(
                     getFieldValue.apply(this, StandardField.YEAR),
                     getFieldValue.apply(this, StandardField.MONTH),
@@ -489,7 +489,7 @@ public class BibEntry implements Cloneable {
             return date.map(Date::getNormalized);
         }
 
-        if (StandardField.YEAR.equals(field) || StandardField.MONTH.equals(field) || StandardField.DAY.equals(field)) {
+        if (StandardField.YEAR == field || StandardField.MONTH == field || StandardField.DAY == field) {
             Optional<String> date = getFieldValue.apply(this, StandardField.DATE);
             if (date.isEmpty()) {
                 return Optional.empty();
@@ -497,13 +497,13 @@ public class BibEntry implements Cloneable {
 
             Optional<Date> parsedDate = Date.parse(date.get());
             if (parsedDate.isPresent()) {
-                if (StandardField.YEAR.equals(field)) {
+                if (StandardField.YEAR == field) {
                     return parsedDate.get().getYear().map(Object::toString);
                 }
-                if (StandardField.MONTH.equals(field)) {
+                if (StandardField.MONTH == field) {
                     return parsedDate.get().getMonth().map(Month::getJabRefFormat);
                 }
-                if (StandardField.DAY.equals(field)) {
+                if (StandardField.DAY == field) {
                     return parsedDate.get().getDay().map(Object::toString);
                 }
             } else {
@@ -968,8 +968,8 @@ public class BibEntry implements Cloneable {
     }
 
     public KeywordList getFieldAsKeywords(Field field, Character keywordSeparator) {
-        if (field instanceof StandardField) {
-            Optional<KeywordList> storedList = fieldsAsKeywords.get((StandardField) field, keywordSeparator);
+        if (field instanceof StandardField standardField) {
+            Optional<KeywordList> storedList = fieldsAsKeywords.get(standardField, keywordSeparator);
             if (storedList.isPresent()) {
                 return storedList.get();
             }
@@ -979,8 +979,8 @@ public class BibEntry implements Cloneable {
                 .map(content -> KeywordList.parse(content, keywordSeparator))
                 .orElse(new KeywordList());
 
-        if (field instanceof StandardField) {
-            fieldsAsKeywords.put((StandardField) field, keywordSeparator, keywords);
+        if (field instanceof StandardField standardField) {
+            fieldsAsKeywords.put(standardField, keywordSeparator, keywords);
         }
         return keywords;
     }
@@ -993,16 +993,16 @@ public class BibEntry implements Cloneable {
         latexFreeFields.remove(field);
         fieldsAsWords.remove(field);
 
-        if (field instanceof StandardField) {
-            fieldsAsKeywords.remove((StandardField) field);
+        if (field instanceof StandardField standardField) {
+            fieldsAsKeywords.remove(standardField);
         }
     }
 
     public Optional<String> getLatexFreeField(Field field) {
-        if (InternalField.KEY_FIELD.equals(field)) {
+        if (InternalField.KEY_FIELD == field) {
             // the key field should not be converted
             return getCitationKey();
-        } else if (InternalField.TYPE_HEADER.equals(field)) {
+        } else if (InternalField.TYPE_HEADER == field) {
             return Optional.of(type.get().getDisplayName());
         } else if (latexFreeFields.containsKey(field)) {
             return Optional.ofNullable(latexFreeFields.get(field));
@@ -1156,5 +1156,12 @@ public class BibEntry implements Cloneable {
                 otherFieldValue.ifPresent(s -> this.setField(otherField, s));
             }
         }
+    }
+
+    public boolean isEmpty() {
+        if (this.fields.isEmpty()) {
+            return true;
+        }
+        return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
     }
 }

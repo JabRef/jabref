@@ -11,10 +11,7 @@ public class DocBookAuthorFormatter {
     private static final XMLChars XML_CHARS = new XMLChars();
 
     /**
-     * @param sb      {@link StringBuilder}
-     * @param al      {@link AuthorList}
      * @param tagName Editor or author field/tag
-     * @param version @link {@link DocBookVersion}
      */
     public void addBody(StringBuilder sb, AuthorList al, String tagName, DocBookVersion version) {
         for (int i = 0; i < al.getNumberOfAuthors(); i++) {

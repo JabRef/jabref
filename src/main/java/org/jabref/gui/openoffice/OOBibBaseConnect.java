@@ -146,9 +146,9 @@ public class OOBibBaseConnect {
             }
         }
 
-        List<DocumentTitleViewModel> viewModel = (list.stream()
+        List<DocumentTitleViewModel> viewModel = list.stream()
                                                       .map(DocumentTitleViewModel::new)
-                                                      .collect(Collectors.toList()));
+                                                      .collect(Collectors.toList());
 
         // This whole method is part of a background task when
         // auto-detecting instances, so we need to show dialog in FX

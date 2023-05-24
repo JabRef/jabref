@@ -7,6 +7,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -61,6 +62,14 @@
                             <Tooltip text="%Reset preferences"/>
                         </tooltip>
                     </Button>
+                    <ToggleButton fx:id="memoryStickMode" styleClass="icon-button,narrow" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                        <graphic>
+                            <JabRefIconView glyph="MEMORYSTICK"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%Memory stick mode - Store preferences in 'jabref.xml' in the app folder."/>
+                        </tooltip>
+                    </ToggleButton>
                 </HBox>
             </VBox>
             <ScrollPane fx:id="preferencesContainer"/>

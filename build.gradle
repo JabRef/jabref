@@ -12,7 +12,7 @@ plugins {
 
     id 'org.javamodularity.moduleplugin' version '1.8.12'
 
-    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.openjfx.javafxplugin' version '0.0.14'
 
     id 'org.beryx.jlink' version '2.26.0'
 
@@ -27,6 +27,8 @@ plugins {
     id 'project-report'
 
     id 'idea'
+
+    id("org.openrewrite.rewrite") version("5.40.4")
 }
 
 // Enable following for debugging
@@ -115,11 +117,11 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation 'org.apache.lucene:lucene-core:9.5.0'
-    implementation 'org.apache.lucene:lucene-queryparser:9.5.0'
-    implementation 'org.apache.lucene:lucene-queries:9.5.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.5.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.5.0'
+    implementation 'org.apache.lucene:lucene-core:9.6.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.6.0'
+    implementation 'org.apache.lucene:lucene-queries:9.6.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.6.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.6.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
@@ -130,14 +132,14 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:unoloader:7.5.1'
+    implementation 'org.libreoffice:unoloader:7.5.3'
     implementation 'org.libreoffice:libreoffice:7.5.1'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
-    antlr4 'org.antlr:antlr4:4.12.0'
-    implementation 'org.antlr:antlr4-runtime:4.12.0'
+    antlr4 'org.antlr:antlr4:4.13.0'
+    implementation 'org.antlr:antlr4-runtime:4.13.0'
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.5.0.202303070854-r'
 
@@ -177,9 +179,9 @@ dependencies {
     implementation 'com.konghq:unirest-java:3.14.2'
 
     implementation 'org.slf4j:slf4j-api:2.0.7'
-    implementation "org.tinylog:tinylog-api:2.6.1"
-    implementation "org.tinylog:slf4j-tinylog:2.6.1"
-    implementation "org.tinylog:tinylog-impl:2.6.1"
+    implementation "org.tinylog:tinylog-api:2.6.2"
+    implementation "org.tinylog:slf4j-tinylog:2.6.2"
+    implementation "org.tinylog:tinylog-impl:2.6.2"
 
     implementation 'de.undercouch:citeproc-java:3.0.0-beta.2'
 
@@ -196,13 +198,13 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.64.2'
+    implementation 'com.vladsch.flexmark:flexmark:0.64.4'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
     implementation group: 'org.zalando', name: 'faux-pas', version: '0.9.0'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.157'
+    testImplementation 'io.github.classgraph:classgraph:4.8.158'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.9.3'
 
@@ -219,6 +221,9 @@ dependencies {
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
+
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:1.19.3"))
+    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
 }
 
 clean {
@@ -258,8 +263,6 @@ processResources {
 
 task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateSearchGrammarSource",
-                                "generateEndnoteSource",
-                                "generateModsSource",
                                 "generateCitaviSource"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
@@ -287,14 +290,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
-task generateEndnoteSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the endnote importer."
 
-    schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
-    outputDirectory = "src-gen/main/java/"
-    javaPackage = "org.jabref.logic.importer.fileformat.endnote"
-}
 
 task generateCitaviSource(type: XjcTask) {
     group = 'JabRef'
@@ -303,17 +299,6 @@ task generateCitaviSource(type: XjcTask) {
     schemaFile = "src/main/resources/xjc/citavi/citavi.xsd"
     outputDirectory = "src-gen/main/java/"
     javaPackage = "org.jabref.logic.importer.fileformat.citavi"
-}
-
-task generateModsSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the mods importer."
-
-    schemaFile = "src/main/resources/xjc/mods/mods-3-7.xsd"
-    bindingFile = "src/main/resources/xjc/mods/mods-binding.xjb"
-    outputDirectory = "src-gen/main/java"
-    javaPackage = "org.jabref.logic.importer.fileformat.mods"
-    arguments = '-npa'
 }
 
 task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
@@ -498,6 +483,38 @@ jacocoTestReport {
 checkstyle {
     // will only run when called explicitly from the command line
     sourceSets = []
+}
+
+rewrite {
+    activeRecipe(
+        'org.jabref.config.rewrite.cleanup',
+        'org.openrewrite.java.logging.slf4j.LoggersNamedForEnclosingClass',
+        'org.openrewrite.java.logging.slf4j.ParameterizedLogging',
+        'org.openrewrite.java.logging.slf4j.Slf4jLogShouldBeConstant'
+    )
+    exclusion (
+        "build.gradle",
+        "buildSrc/build.gradle",
+        "eclipse.gradle",
+        "settings.gradle",
+        "src-gen/**",
+        "src/main/resources/**",
+        "src/test/resources/**",
+        "**/module-info.java",
+        "**/*.py",
+        "**/*.xml",
+        "**/*.yml"
+    )
+    plainTextMask("**/*.md")
+    failOnDryRunResults = true
+}
+
+modernizer {
+    failOnViolations = false
+    includeTestClasses = true
+    exclusions = [
+        'java/util/Optional.get:()Ljava/lang/Object;'
+    ]
 }
 
 // Release tasks

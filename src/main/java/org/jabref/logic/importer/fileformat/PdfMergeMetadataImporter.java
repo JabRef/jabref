@@ -115,7 +115,7 @@ public class PdfMergeMetadataImporter extends Importer {
             for (Map.Entry<Field, String> fieldEntry : candidate.getFieldMap().entrySet()) {
                 // Don't merge FILE fields that point to a stored file as we set that to filePath anyway.
                 // Nevertheless, retain online links.
-                if (StandardField.FILE.equals(fieldEntry.getKey()) &&
+                if (StandardField.FILE == fieldEntry.getKey() &&
                         FileFieldParser.parse(fieldEntry.getValue()).stream().noneMatch(LinkedFile::isOnlineLink)) {
                     continue;
                 }

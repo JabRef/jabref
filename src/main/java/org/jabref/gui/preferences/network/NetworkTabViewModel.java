@@ -34,6 +34,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
@@ -66,6 +67,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final FileUpdateMonitor fileUpdateMonitor;
+
     private final RemotePreferences remotePreferences;
     private final ProxyPreferences proxyPreferences;
     private final ProxyPreferences backupProxyPreferences;
@@ -75,9 +78,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
-    public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences, FileUpdateMonitor fileUpdateMonitor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
         this.remotePreferences = preferences.getRemotePreferences();
         this.proxyPreferences = preferences.getProxyPreferences();
         this.sslPreferences = preferences.getSSLPreferences();
@@ -203,7 +207,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor), remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
             Globals.REMOTE_LISTENER.stop();

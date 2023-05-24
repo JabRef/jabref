@@ -154,7 +154,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         // input: list of {"given":"A.","family":"Riel","affiliation":[]}
         return IntStream.range(0, authors.length())
                         .mapToObj(authors::getJSONObject)
-                        .map((author) -> new Author(
+                        .map(author -> new Author(
                                 author.optString("given", ""), "", "",
                                 author.optString("family", ""), ""))
                         .collect(AuthorList.collect())
@@ -162,7 +162,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     private EntryType convertType(String type) {
-        return type.equals("journal-article") ? StandardEntryType.Article : StandardEntryType.Misc;
+        return "journal-article".equals(type) ? StandardEntryType.Article : StandardEntryType.Misc;
     }
 
     @Override

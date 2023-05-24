@@ -40,7 +40,7 @@ public class ExporterFactory {
                 preferencesService.getExportConfiguration(),
                 preferencesService.getXmpPreferences(),
                 preferencesService.getFieldPreferences(),
-                preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
+                preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
                 entryTypesManager);
     }
 

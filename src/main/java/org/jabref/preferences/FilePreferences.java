@@ -18,6 +18,9 @@ import javafx.collections.ObservableSet;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.model.strings.StringUtil;
 
+/**
+ *  Preferences for the linked files
+ */
 public class FilePreferences {
 
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
@@ -31,6 +34,8 @@ public class FilePreferences {
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
     private final ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(new TreeSet<>(Comparator.comparing(ExternalFileType::getName)));
+    private final BooleanProperty createBackup = new SimpleBooleanProperty();
+    private final ObjectProperty<Path> backupDiretory = new SimpleObjectProperty<>();
 
     public FilePreferences(String user,
                            String mainFileDirectory,
@@ -40,7 +45,9 @@ public class FilePreferences {
                            boolean downloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
                            Path workingDirectory,
-                           Set<ExternalFileType> externalFileTypes) {
+                           Set<ExternalFileType> externalFileTypes,
+                           boolean createBackup,
+                           Path backupDirectory) {
         this.user.setValue(user);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -50,6 +57,8 @@ public class FilePreferences {
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
         this.externalFileTypes.addAll(externalFileTypes);
+        this.createBackup.setValue(createBackup);
+        this.backupDiretory.setValue(backupDirectory);
     }
 
     public String getUser() {
@@ -146,5 +155,29 @@ public class FilePreferences {
 
     public ObservableSet<ExternalFileType> getExternalFileTypes() {
         return this.externalFileTypes;
+    }
+
+    public void setCreateBackup(boolean createBackup) {
+        this.createBackup.set(createBackup);
+    }
+
+    public boolean shouldCreateBackup() {
+        return this.createBackup.getValue();
+    }
+
+    public BooleanProperty createBackupProperty() {
+        return this.createBackup;
+    }
+
+    public ObjectProperty<Path> backupDirectoryProperty() {
+        return this.backupDiretory;
+    }
+
+    public void setBackupDirectory(Path backupPath) {
+        this.backupDiretory.set(backupPath);
+    }
+
+    public Path getBackupDirectory() {
+        return this.backupDiretory.getValue();
     }
 }

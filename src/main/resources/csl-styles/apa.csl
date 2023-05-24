@@ -14,7 +14,7 @@
     <category citation-format="author-date"/>
     <category field="psychology"/>
     <category field="generic-base"/>
-    <updated>2022-01-31T14:30:00+00:00</updated>
+    <updated>2022-10-02T20:08:41+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -501,9 +501,6 @@
         <text value="0"/>
       </else>
     </choose>
-  </macro>
-  <macro name="date-sort-date">
-    <date variable="issued" form="numeric"/>
   </macro>
   <macro name="date-intext">
     <choose>
@@ -1599,7 +1596,7 @@
             </if>
             <else>
               <group delimiter=" ">
-                <text value="Original work published"/>
+                <text term="original-work-published" text-case="capitalize-first"/>
                 <choose>
                   <if is-uncertain-date="original-date">
                     <text term="circa" form="short"/>
@@ -1865,7 +1862,7 @@
     <sort>
       <key macro="author-bib" names-min="3" names-use-first="1"/>
       <key macro="date-sort-group"/>
-      <key macro="date-sort-date" sort="ascending"/>
+      <key macro="date-bib" sort="ascending"/>
       <key variable="status"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
@@ -1880,7 +1877,7 @@
     <sort>
       <key macro="author-bib"/>
       <key macro="date-sort-group"/>
-      <key macro="date-sort-date" sort="ascending"/>
+      <key macro="date-bib" sort="ascending"/>
       <key variable="status"/>
       <key macro="title"/>
     </sort>

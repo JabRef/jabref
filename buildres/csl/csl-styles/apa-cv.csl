@@ -446,9 +446,6 @@
       </else>
     </choose>
   </macro>
-  <macro name="date-sort-date">
-    <date variable="issued" form="numeric"/>
-  </macro>
   <!-- APA has two description elements following the title:
         title (parenthetical) [bracketed]  -->
   <macro name="title-and-descriptions">
@@ -1345,7 +1342,7 @@
             </if>
             <else>
               <group delimiter=" ">
-                <text value="Original work published"/>
+                <text term="original-work-published" text-case="capitalize-first"/>
                 <choose>
                   <if is-uncertain-date="original-date">
                     <text term="circa" form="short"/>
@@ -1597,7 +1594,7 @@
   <citation et-al-min="21" et-al-use-first="19" et-al-use-last="true">
     <sort>
       <key macro="date-sort-group" sort="descending"/>
-      <key macro="date-sort-date" sort="descending"/>
+      <key macro="date-bib" sort="descending"/>
       <key variable="status"/>
       <key macro="author-bib"/>
       <key macro="title"/>
@@ -1636,7 +1633,7 @@
   <bibliography hanging-indent="true" et-al-min="21" et-al-use-first="19" et-al-use-last="true" entry-spacing="0" line-spacing="2">
     <sort>
       <key macro="date-sort-group" sort="descending"/>
-      <key macro="date-sort-date" sort="descending"/>
+      <key macro="date-bib" sort="descending"/>
       <key variable="status"/>
       <key macro="author-bib"/>
       <key macro="title"/>

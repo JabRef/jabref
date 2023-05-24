@@ -26,10 +26,12 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
@@ -60,6 +62,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
     @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
 
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -78,9 +81,9 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor);
 
-        remoteLabel.setVisible(preferencesService.getGeneralPreferences().shouldShowAdvancedHints());
+        remoteLabel.setVisible(preferencesService.getWorkspacePreferences().shouldShowAdvancedHints());
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
@@ -155,7 +158,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     private void proxyPasswordMask(MouseEvent event) {
-        if (!proxyPasswordText.equals("")) {
+        if (!"".equals(proxyPasswordText)) {
             proxyPassword.setText(proxyPasswordText);
             proxyPassword.positionCaret(proxyPasswordCaretPosition);
             proxyPassword.setPromptText("");

@@ -547,8 +547,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if (this == object) {
             return true;
         }
-        if (object instanceof OOBibStyle) {
-            OOBibStyle otherStyle = (OOBibStyle) object;
+        if (object instanceof OOBibStyle otherStyle) {
             return Objects.equals(path, otherStyle.path)
                     && Objects.equals(name, otherStyle.name)
                     && Objects.equals(citProperties, otherStyle.citProperties)
@@ -918,8 +917,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         OOBibStyle style = this;
         OOText title = style.getReferenceHeaderText();
         String parStyle = style.getReferenceHeaderParagraphFormat();
-        return (parStyle == null
+        return parStyle == null
                 ? OOFormat.paragraph(title)
-                : OOFormat.paragraph(title, parStyle));
+                : OOFormat.paragraph(title, parStyle);
     }
 }

@@ -58,11 +58,11 @@ public class FieldWriter {
         }
 
         // Then we throw an exception if the error criteria are met.
-        if (!(right == 0) && (left == 0)) {
+        if (right != 0 && (left == 0)) {
             LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
             throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
-        if (!(right == 0) && (right < left)) {
+        if (right != 0 && (right < left)) {
             LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
             throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }

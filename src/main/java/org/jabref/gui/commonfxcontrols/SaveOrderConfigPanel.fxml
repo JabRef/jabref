@@ -16,7 +16,7 @@
         <ToggleGroup fx:id="saveOrderToggleGroup"/>
     </fx:define>
 
-    <RadioButton fx:id="exportInOriginalOrder" text="%Keep original order"
+    <RadioButton fx:id="exportInOriginalOrder" text="%Keep original order and add new entries at the end"
                  toggleGroup="$saveOrderToggleGroup"/>
     <RadioButton fx:id="exportInTableOrder" text="%Use current table sort order"
                  toggleGroup="$saveOrderToggleGroup"/>

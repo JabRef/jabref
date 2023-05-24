@@ -41,6 +41,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -82,8 +83,12 @@ public class BibtexParser implements Parser {
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
-        metaDataParser = new MetaDataParser(fileMonitor);
+        this.fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
+        this.metaDataParser = new MetaDataParser(fileMonitor);
+    }
+
+    public BibtexParser(ImportFormatPreferences importFormatPreferences) {
+        this(importFormatPreferences, new DummyFileUpdateMonitor());
     }
 
     /**
@@ -91,13 +96,10 @@ public class BibtexParser implements Parser {
      * <p>
      * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
      *
-     * @param bibtexString
-     * @param fileMonitor
-     * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
-     * @throws ParseException
+     * @return An {@code Optional<BibEntry>. Optional.empty()} if non was found or an error occurred.
      */
-    public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws ParseException {
-        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences, fileMonitor).parseEntries(bibtexString);
+    public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) throws ParseException {
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
             return Optional.empty();
         }
@@ -226,7 +228,9 @@ public class BibtexParser implements Parser {
         }
 
         try {
-            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
+            parserResult.setMetaData(metaDataParser.parse(
+                    meta,
+                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }
@@ -617,7 +621,7 @@ public class BibtexParser implements Parser {
                 // for users if JabRef did not accept it.
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
-                } else if (StandardField.KEYWORDS.equals(field)) {
+                } else if (StandardField.KEYWORDS == field) {
                     // multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
@@ -773,8 +777,6 @@ public class BibtexParser implements Parser {
     /**
      * returns a new <code>StringBuilder</code> which corresponds to <code>toRemove</code> without whitespaces
      *
-     * @param toRemove
-     * @return
      */
     private StringBuilder removeWhitespaces(StringBuilder toRemove) {
         StringBuilder result = new StringBuilder();
@@ -791,7 +793,6 @@ public class BibtexParser implements Parser {
     /**
      * pushes buffer back into input
      *
-     * @param stringBuilder
      * @throws IOException can be thrown if buffer is bigger than LOOKAHEAD
      */
     private void unreadBuffer(StringBuilder stringBuilder) throws IOException {

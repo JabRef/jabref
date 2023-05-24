@@ -73,7 +73,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     public void initialize() {
         BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                                           .orElse(preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode());
+                                           .orElse(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode());
         BibEntryTypesManager entryTypesRepository = preferencesService.getCustomEntryTypesRepository();
 
         this.viewModel = new CustomEntryTypesTabViewModel(mode, entryTypesRepository, dialogService, preferencesService);
@@ -113,7 +113,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 })
                 .withTooltip((type, name) -> {
                     if (type instanceof CustomEntryTypeViewModel) {
-                        return (Localization.lang("Remove entry type") + " " + name);
+                        return Localization.lang("Remove entry type") + " " + name;
                     } else {
                         return null;
                     }

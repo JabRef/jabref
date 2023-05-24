@@ -117,13 +117,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         chosenListProperty.getValue().addAll(previewPreferences.getLayoutCycle());
 
         availableListProperty.clear();
-        if (chosenListProperty.stream().noneMatch(layout -> layout instanceof TextBasedPreviewLayout)) {
+        if (chosenListProperty.stream().noneMatch(TextBasedPreviewLayout.class::isInstance)) {
             availableListProperty.getValue().add(previewPreferences.getCustomPreviewLayout());
         }
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> styles.stream()
-                                                 .map(style-> new CitationStylePreviewLayout(style, Globals.entryTypesManager))
+                                                 .map(style -> new CitationStylePreviewLayout(style, Globals.entryTypesManager))
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->
                                                          item.getName().equals(style.getName())).isEmpty())
                                                  .sorted(Comparator.comparing(PreviewLayout::getName))

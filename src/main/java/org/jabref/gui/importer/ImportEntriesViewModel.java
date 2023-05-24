@@ -14,7 +14,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiles.ImportHandler;
@@ -126,7 +125,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles) {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
-        if (preferences.getImportExportPreferences().shouldWarnAboutDuplicatesOnImport()) {
+        if (preferences.getImporterPreferences().shouldWarnAboutDuplicatesOnImport()) {
             BackgroundTask.wrap(() -> entriesToImport.stream()
                                                      .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
                 if (duplicateFound) {
@@ -135,7 +134,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                             Localization.lang("Continue with import"),
                             Localization.lang("Cancel import"),
                             Localization.lang("Do not ask again"),
-                            optOut -> preferences.getImportExportPreferences().setWarnAboutDuplicatesOnImport(!optOut));
+                            optOut -> preferences.getImporterPreferences().setWarnAboutDuplicatesOnImport(!optOut));
 
                     if (!continueImport) {
                         dialogService.notify(Localization.lang("Import canceled"));
@@ -186,7 +185,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 undoManager,
                 stateManager,
                 dialogService,
-                Globals.IMPORT_FORMAT_READER,
                 taskExecutor);
         importHandler.importEntries(entriesToImport);
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());

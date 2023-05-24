@@ -106,7 +106,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             // Read more: https://stackoverflow.com/questions/45866249/javafx-8-alert-different-button-sizes
             getDialogPane().getButtonTypes().stream()
                            .map(getDialogPane()::lookupButton)
-                           .forEach(btn-> ButtonBar.setButtonUniformSize(btn, false));
+                           .forEach(btn -> ButtonBar.setButtonUniformSize(btn, false));
         }
 
         // Retrieves the previous window state and sets the new dialog window size and position to match it

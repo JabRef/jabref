@@ -107,7 +107,7 @@ public class OpenOfficeDocumentCreatorTest {
             ZipEntry zipEntry = zis.getNextEntry();
 
             while (zipEntry != null) {
-                boolean isContentXml = zipEntry.getName().equals("content.xml");
+                boolean isContentXml = "content.xml".equals(zipEntry.getName());
 
                 Path newPath = zipSlipProtect(zipEntry, unzipFolder);
 
