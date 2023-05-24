@@ -19,8 +19,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jsoup.HttpStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.zalando.fauxpas.ThrowingFunction;
+import org.zalando.fauxpas.FauxPas;
 
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 
@@ -70,13 +69,12 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
-        ThrowingFunction<String, Optional<BibEntry>, FetcherException> parseGrobidThrowFunction = this::parseUsingGrobid;
         List<BibEntry> collect;
         try {
             collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                             .map(String::trim)
                             .filter(str -> !str.isBlank())
-                            .map(parseGrobidThrowFunction)
+                            .map(FauxPas.throwingFunction(this::parseUsingGrobid))
                             .flatMap(Optional::stream)
                             .collect(Collectors.toList());
         } catch (RuntimeException e) {
