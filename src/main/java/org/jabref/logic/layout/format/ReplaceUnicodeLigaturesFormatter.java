@@ -28,13 +28,12 @@ public class ReplaceUnicodeLigaturesFormatter extends Formatter implements Layou
 
     @Override
     public String getKey() {
-        return "remove_unicode_ligatures";
+        return "replace_unicode_ligatures";
     }
 
     @Override
     public String format(String fieldText) {
         String result = fieldText;
-
         for (Pattern key : ligaturesMap.keySet()) {
             result = key.matcher(result).replaceAll(ligaturesMap.get(key));
         }

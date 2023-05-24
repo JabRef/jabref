@@ -58,7 +58,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
@@ -111,14 +110,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     if (linkedFile.isOnlineLink()) {
                         return true;
                     } else {
-                        Optional<Path> path = FileHelper.find(databaseContext, link, preferences.getFilePreferences());
+                        Optional<Path> path = FileUtil.find(databaseContext, link, preferences.getFilePreferences());
                         return path.isPresent() && Files.exists(path.get());
                     }
                 },
                 ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink())));
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
-        isOfflinePdf.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
+        isOfflinePdf.setValue(!linkedFile.isOnlineLink() && "pdf".equalsIgnoreCase(linkedFile.getFileType()));
     }
 
     public BooleanProperty isOfflinePdfProperty() {
@@ -222,11 +221,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void openFolder() {
         try {
             if (!linkedFile.isOnlineLink()) {
-                Optional<Path> resolvedPath = FileHelper.find(
+                Optional<Path> resolvedPath = FileUtil.find(
                         databaseContext,
                         linkedFile.getLink(),
                         preferences.getFilePreferences());
-
                 if (resolvedPath.isPresent()) {
                     JabRefDesktop.openFolderAndSelectFile(resolvedPath.get(), preferences, dialogService);
                 } else {
@@ -304,7 +302,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
 
         Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
-        if ((file.isPresent())) {
+        if (file.isPresent()) {
             // Found the linked file, so move it
             try {
                 linkedFileHandler.moveToDefaultDirectory();

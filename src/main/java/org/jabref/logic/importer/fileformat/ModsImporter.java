@@ -92,7 +92,7 @@ public class ModsImporter extends Importer implements Parser {
     private void parseModsCollection(List<BibEntry> bibItems, XMLStreamReader reader) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
-            if (isStartXMLEvent(reader) && reader.getName().getLocalPart().equals("mods")) {
+            if (isStartXMLEvent(reader) && "mods".equals(reader.getName().getLocalPart())) {
                 BibEntry entry = new BibEntry();
                 Map<Field, String> fields = new HashMap<>();
 
@@ -174,7 +174,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("mods")) {
+            if (isEndXMLEvent(reader) && "mods".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -210,7 +210,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("relatedItem")) {
+            if (isEndXMLEvent(reader) && "relatedItem".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -246,7 +246,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("extent")) {
+            if (isEndXMLEvent(reader) && "extent".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -279,7 +279,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("detail")) {
+            if (isEndXMLEvent(reader) && "detail".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -292,12 +292,12 @@ public class ModsImporter extends Importer implements Parser {
             reader.next();
 
             if (isStartXMLEvent(reader)) {
-                if (reader.getName().getLocalPart().equals("affiliation")) {
+                if ("affiliation".equals(reader.getName().getLocalPart())) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         putIfValueNotNull(fields, new UnknownField("affiliation"), reader.getText());
                     }
-                } else if (reader.getName().getLocalPart().equals("namePart")) {
+                } else if ("namePart".equals(reader.getName().getLocalPart())) {
                     String type = reader.getAttributeValue(null, "type");
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
@@ -306,7 +306,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("name")) {
+            if (isEndXMLEvent(reader) && "name".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -356,7 +356,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("originInfo")) {
+            if (isEndXMLEvent(reader) && "originInfo".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -391,7 +391,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("subject")) {
+            if (isEndXMLEvent(reader) && "subject".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -411,7 +411,7 @@ public class ModsImporter extends Importer implements Parser {
                     if (isCharacterXMLEvent(reader)) {
                         recordContents.add(0, reader.getText());
                     }
-                } else if (reader.getName().getLocalPart().equals("languageTerm")) {
+                } else if ("languageTerm".equals(reader.getName().getLocalPart())) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         languages.add(reader.getText());
@@ -419,7 +419,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("recordInfo")) {
+            if (isEndXMLEvent(reader) && "recordInfo".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -434,14 +434,14 @@ public class ModsImporter extends Importer implements Parser {
         while (reader.hasNext()) {
             reader.next();
 
-            if (isStartXMLEvent(reader) && reader.getName().getLocalPart().equals("languageTerm")) {
+            if (isStartXMLEvent(reader) && "languageTerm".equals(reader.getName().getLocalPart())) {
                 reader.next();
                 if (isCharacterXMLEvent(reader)) {
                     putIfValueNotNull(fields, StandardField.LANGUAGE, reader.getText());
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("language")) {
+            if (isEndXMLEvent(reader) && "language".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -451,14 +451,14 @@ public class ModsImporter extends Importer implements Parser {
         while (reader.hasNext()) {
             reader.next();
 
-            if (isStartXMLEvent(reader) && reader.getName().getLocalPart().equals("title")) {
+            if (isStartXMLEvent(reader) && "title".equals(reader.getName().getLocalPart())) {
                 reader.next();
                 if (isCharacterXMLEvent(reader)) {
                     putIfValueNotNull(fields, StandardField.TITLE, reader.getText());
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("titleInfo")) {
+            if (isEndXMLEvent(reader) && "titleInfo".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -472,12 +472,12 @@ public class ModsImporter extends Importer implements Parser {
             reader.next();
 
             if (isStartXMLEvent(reader)) {
-                if (reader.getName().getLocalPart().equals("physicalLocation")) {
+                if ("physicalLocation".equals(reader.getName().getLocalPart())) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         locations.add(reader.getText());
                     }
-                } else if (reader.getName().getLocalPart().equals("url")) {
+                } else if ("url".equals(reader.getName().getLocalPart())) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         urls.add(reader.getText());
@@ -485,7 +485,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("location")) {
+            if (isEndXMLEvent(reader) && "location".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }

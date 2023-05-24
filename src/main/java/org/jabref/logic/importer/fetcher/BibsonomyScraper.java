@@ -9,7 +9,6 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +28,6 @@ public class BibsonomyScraper {
 
     /**
      * Return a BibEntry by looking up the given url from the BibSonomy scraper.
-     *
-     * @param entryUrl
-     * @return
      */
     public static Optional<BibEntry> getEntry(String entryUrl, ImportFormatPreferences importFormatPreferences) {
         try {
@@ -41,7 +37,7 @@ public class BibsonomyScraper {
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
             String bibtex = new URLDownload(url).asString();
-            return BibtexParser.singleFromString(bibtex, importFormatPreferences, new DummyFileUpdateMonitor());
+            return BibtexParser.singleFromString(bibtex, importFormatPreferences);
         } catch (IOException ex) {
             LOGGER.warn("Could not download entry", ex);
             return Optional.empty();

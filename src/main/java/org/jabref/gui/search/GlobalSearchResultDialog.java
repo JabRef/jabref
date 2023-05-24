@@ -7,6 +7,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -56,7 +57,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager);
 
-        resultsTable.getColumns().removeIf(col -> col instanceof SpecialFieldColumn);
+        resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
         resultsTable.getSelectionModel().selectFirst();
 
         if (resultsTable.getSelectionModel().getSelectedItem() != null) {
@@ -80,6 +81,16 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             keepOnTop.setGraphic(value
                     ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
                     : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
+        });
+
+        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_SHOWN, event -> {
+            getDialogPane().setPrefHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
+            getDialogPane().setPrefWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
+        });
+
+        getDialogPane().getScene().getWindow().addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
+            preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
+            preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
         });
     }
 }

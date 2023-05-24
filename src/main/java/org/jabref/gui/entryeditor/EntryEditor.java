@@ -277,7 +277,7 @@ public class EntryEditor extends BorderPane {
         sourceTab = new SourceTab(
                 databaseContext,
                 undoManager,
-                preferencesService.getFieldWriterPreferences(),
+                preferencesService.getFieldPreferences(),
                 preferencesService.getImportFormatPreferences(),
                 fileMonitor,
                 dialogService,

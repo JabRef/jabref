@@ -6,7 +6,7 @@ import org.jabref.model.entry.BibEntry;
 
 /**
  * Searches web resources for bibliographic information based on a {@link BibEntry}.
- * Useful to <emph>complete</emph> an existing entry with fetched information.
+ * Useful to <b>complete</b> an existing entry with fetched information.
  * May return multiple search hits.
  */
 public interface EntryBasedFetcher extends WebFetcher {

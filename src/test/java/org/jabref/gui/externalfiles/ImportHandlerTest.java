@@ -6,8 +6,8 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -40,7 +40,7 @@ class ImportHandlerTest {
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(DialogService.class),
-                mock(ImportFormatReader.class));
+                new CurrentThreadTaskExecutor());
 
         List<BibEntry> bibEntries = importHandler.handleBibTeXData("""
                 @InProceedings{Wen2013,

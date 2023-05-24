@@ -23,7 +23,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -125,7 +124,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(preferences);
     }
 
     @Override

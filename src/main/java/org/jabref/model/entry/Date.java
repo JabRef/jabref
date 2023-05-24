@@ -44,8 +44,20 @@ public class Date {
                 "uuuu.M.d",                             // covers 2015.1.15
                 "uuuu",                                 // covers 2015
                 "MMM, uuuu",                            // covers Jan, 2020
-                "uuuu.MM.d"                             // covers 2015.10.15
+                "uuuu.MM.d",                            // covers 2015.10.15
+                "d MMMM u/d MMMM u",                    // covers 20 January 2015/20 February 2015
+                "d MMMM u",                             // covers 20 January 2015
+                "d MMMM u / d MMMM u"
                 );
+
+        /* TODO: The following date formats do not yet work and need to be created with tests
+         *      "u G",                                  // covers 1 BC
+         *       "u G / u G",                           // covers 30 BC / 5 AD
+         *      "uuuu G / uuuu G",                      // covers 0030 BC / 0005 AD
+         *      "uuuu-MM G / uuuu-MM G",                // covers 0030-01 BC / 0005-02 AD
+         *      "u'-'",                                 // covers 2015-
+         *      "u'?'",                                 // covers 2023?
+         */
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
                                            .map(DateTimeFormatter::ofPattern)
@@ -99,15 +111,47 @@ public class Date {
             return Optional.empty();
         }
 
-        // if dateString has format of uuuu/uuuu, treat as date range
-        if (dateString.matches("[0-9]{4}/[0-9]{4}")) {
+        // if dateString has range format, treat as date range
+        if (dateString.matches(
+               "\\d{4}/\\d{4}|" + // uuuu/uuuu
+               "\\d{4}-\\d{2}/\\d{4}-\\d{2}|" + // uuuu-mm/uuuu-mm
+               "\\d{4}-\\d{2}-\\d{2}/\\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd/uuuu-mm-dd
+               "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
+               "( |\\-)(\\d{1,4})/(January|February|March|April|May|June|July|August|September|October|November" +
+               "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
+               "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
+               "( |\\-)(\\d{1,4})/(\\d{1,2})( )" +
+               "(January|February|March|April|May|June|July|August|September|October|November|December)" +
+               "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
+        )) {
             try {
                 String[] strDates = dateString.split("/");
-                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0]);
-                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1]);
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0].strip());
+                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
-                LOGGER.debug("Invalid Date format", e);
+                LOGGER.debug("Invalid Date format for range", e);
+                return Optional.empty();
+            }
+        } else if (dateString.matches(
+              "\\d{4} / \\d{4}|" + // uuuu / uuuu
+              "\\d{4}-\\d{2} / \\d{4}-\\d{2}|" + // uuuu-mm / uuuu-mm
+              "\\d{4}-\\d{2}-\\d{2} / \\d{4}-\\d{2}-\\d{2}|" + // uuuu-mm-dd / uuuu-mm-dd
+              "(?i)(January|February|March|April|May|June|July|August|September|October|November|December)" +
+              "( |\\-)(\\d{1,4}) / (January|February|March|April|May|June|July|August|September|October|November" +
+              "|December)( |\\-)(\\d{1,4})(?i-)|" + // January 2015/January 2015
+              "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
+              "( |\\-)(\\d{1,4}) / (\\d{1,2})( )" +
+              "(January|February|March|April|May|June|July|August|September|October|November|December)" +
+              "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
+        )) {
+            try {
+                String[] strDates = dateString.split(" / ");
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(strDates[0].strip());
+                TemporalAccessor parsedEndDate = SIMPLE_DATE_FORMATS.parse(strDates[1].strip());
+                return Optional.of(new Date(parsedDate, parsedEndDate));
+            } catch (DateTimeParseException e) {
+                LOGGER.debug("Invalid Date format range", e);
                 return Optional.empty();
             }
         }
@@ -202,21 +246,21 @@ public class Date {
 
     @Override
     public String toString() {
-        String formattedDate;
+        String formattedDate = date.toString();
         if (date.isSupported(ChronoField.OFFSET_SECONDS)) {
             formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date);
         } else if (date.isSupported(ChronoField.HOUR_OF_DAY)) {
             formattedDate = DateTimeFormatter.ISO_DATE_TIME.format(date);
-        } else {
+        } else if (date.isSupported(ChronoField.MONTH_OF_YEAR) && date.isSupported(ChronoField.DAY_OF_MONTH)) {
             formattedDate = DateTimeFormatter.ISO_DATE.format(date);
         }
         return "Date{" +
-                "date=" + formattedDate +
-                '}';
+               "date=" + formattedDate +
+               '}';
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(date);
+        return Objects.hash(getYear(), getMonth(), getDay(), get(ChronoField.HOUR_OF_DAY), get(ChronoField.MINUTE_OF_HOUR), get(ChronoField.OFFSET_SECONDS));
     }
 }

@@ -15,7 +15,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 public class CollectionOfComputerScienceBibliographiesParser implements Parser {
 
@@ -26,7 +25,7 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
     final HtmlToUnicodeFormatter htmlToUnicodeFormatter;
 
     public CollectionOfComputerScienceBibliographiesParser(ImportFormatPreferences importFormatPreferences) {
-        this.bibtexParser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        this.bibtexParser = new BibtexParser(importFormatPreferences);
         this.htmlToUnicodeFormatter = new HtmlToUnicodeFormatter();
     }
 

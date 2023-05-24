@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   checkstyle:
-    name: Checkstyle
+    name: Code style check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -31,18 +31,40 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
-      - name: Run check style reporter
+      - name: Run checkstyle reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
           checkstyle_version: '10.3'
-      - name: Run checkstyle gradle
+      - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+      - name: Add comment on pull request
+        if: ${{ failure() }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: >
+              Your code currently does not meet JabRef's code guidelines.
+              The tool reviewdog already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
+              Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+              Afterwards, please run checkstyle locally and fix the issues.
+
+
+              More information on code quality in JabRef is available at <https://devdocs.jabref.org/getting-into-the-code/development-strategy.html>.
+          comment_tag: checkstyle
+          reactions: eyes
+      - name: Run OpenRewrite
+        run: |
+          ./gradlew rewriteDryRun
+      - name: Run modernizer
+        run: |
+          # enable failing of this task if modernizer complains
+          sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
+          ./gradlew modernizer
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
@@ -57,11 +79,11 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
-        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
+        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
       - name: Format failed test results
@@ -89,7 +111,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
@@ -123,7 +145,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
@@ -161,7 +183,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
       - name: Update test coverage metrics

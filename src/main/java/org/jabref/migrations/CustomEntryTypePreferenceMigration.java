@@ -37,7 +37,7 @@ class CustomEntryTypePreferenceMigration {
             number++;
         }
 
-        prefs.storeCustomEntryTypes(Globals.entryTypesManager);
+        prefs.storeCustomEntryTypesRepository(Globals.entryTypesManager);
     }
 
     /**

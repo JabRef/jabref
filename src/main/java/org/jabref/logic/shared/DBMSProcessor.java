@@ -56,23 +56,22 @@ public abstract class DBMSProcessor {
      * @throws SQLException
      */
     public boolean checkBaseIntegrity() throws SQLException {
-        boolean value;
-        value = false;
+        boolean databasePassesIntegrityCheck = false;
         DBMSType type = this.connectionProperties.getType();
         Map<String, String> metadata = getSharedMetaData();
         if (type == DBMSType.POSTGRESQL || type == DBMSType.MYSQL) {
             try {
                 Integer VERSION_DB_STRUCT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
                 if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
-                    value = true;
+                    databasePassesIntegrityCheck = true;
                 }
             } catch (Exception e) {
-                value = false;
+                databasePassesIntegrityCheck = false;
             }
         } else {
-            value = checkTableAvailability("ENTRY", "FIELD", "METADATA");
+            databasePassesIntegrityCheck = checkTableAvailability("ENTRY", "FIELD", "METADATA");
         }
-        return value;
+        return databasePassesIntegrityCheck;
     }
 
     /**
@@ -192,7 +191,7 @@ public abstract class DBMSProcessor {
         }
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                new String[] {"SHARED_ID"})) {
+                new String[]{"SHARED_ID"})) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
@@ -225,7 +224,7 @@ public abstract class DBMSProcessor {
         List<Integer> localIds = bibEntries.stream()
                                            .map(BibEntry::getSharedBibEntryData)
                                            .map(SharedBibEntryData::getSharedID)
-                                           .filter((id) -> id != -1)
+                                           .filter(id -> id != -1)
                                            .collect(Collectors.toList());
         if (localIds.isEmpty()) {
             return bibEntries;
@@ -244,7 +243,7 @@ public abstract class DBMSProcessor {
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
-        return bibEntries.stream().filter((entry) ->
+        return bibEntries.stream().filter(entry ->
                 !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
                          .collect(Collectors.toList());
     }

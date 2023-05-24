@@ -57,6 +57,12 @@ class FileFieldParserTest {
                         "Desc:File.PDF:PDF"
                 ),
 
+                // Mendeley input
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", Path.of("C:/Users/XXXXXX/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Brown - 2017 - Physical test methods for elastomers.pdf"), "pdf")),
+                        ":C$\\backslash$:/Users/XXXXXX/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Brown - 2017 - Physical test methods for elastomers.pdf:pdf"
+                ),
+
                 // parseCorrectOnlineInput
                 Arguments.of(
                         Collections.singletonList(new LinkedFile(new URL("http://arxiv.org/pdf/2010.08497v1"), "PDF")),

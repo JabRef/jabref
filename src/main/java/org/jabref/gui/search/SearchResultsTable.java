@@ -41,7 +41,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                                    dialogService,
                                    stateManager).createColumns();
 
-        if (allCols.stream().noneMatch(col -> col instanceof LibraryColumn)) {
+        if (allCols.stream().noneMatch(LibraryColumn.class::isInstance)) {
             allCols.add(0, new LibraryColumn());
         }
         this.getColumns().addAll(allCols);

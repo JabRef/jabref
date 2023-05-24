@@ -219,7 +219,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             return Objects.equals(oldRegexKeywordGroup.getSearchField().getName(), newRegexKeywordGroup.getSearchField().getName())
                    && Objects.equals(oldRegexKeywordGroup.getSearchExpression(), newRegexKeywordGroup.getSearchExpression())
                    && Objects.equals(oldRegexKeywordGroup.isCaseSensitive(), newRegexKeywordGroup.isCaseSensitive());
-        } else if ((oldGroup.getClass() == SearchGroup.class)) {
+        } else if (oldGroup.getClass() == SearchGroup.class) {
             SearchGroup oldSearchGroup = (SearchGroup) oldGroup;
             SearchGroup newSearchGroup = (SearchGroup) newGroup;
 
@@ -371,9 +371,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
                 // }
 
-                oldGroup.getParent().ifPresent(parent -> {
-                    sortAlphabeticallyRecursive(parent);
-                });
+                oldGroup.getParent().ifPresent(this::sortAlphabeticallyRecursive);
 
                 dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
@@ -633,6 +631,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
         } else {
             throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
         }
+    }
+
+    public boolean hasSubgroups(GroupNodeViewModel groupnode) {
+        return groupnode.getChildren().size() > 0;
     }
 
     public boolean canAddEntriesIn(GroupNodeViewModel groupnode) {

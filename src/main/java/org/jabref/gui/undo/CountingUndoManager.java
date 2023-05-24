@@ -44,7 +44,7 @@ public class CountingUndoManager extends UndoManager {
     }
 
     public synchronized boolean hasChanged() {
-        return (current != unchangedPoint);
+        return current != unchangedPoint;
     }
 
     public void registerListener(Object object) {

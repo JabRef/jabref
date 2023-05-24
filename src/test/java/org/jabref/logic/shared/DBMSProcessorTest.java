@@ -42,8 +42,8 @@ class DBMSProcessorTest {
     @BeforeEach
     public void setup() throws Exception {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
-        this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType));
+        this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(ConnectorTest.getTestDBMSConnection(dbmsType));
         TestManager.clearTables(this.dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
     }
@@ -90,7 +90,7 @@ class DBMSProcessorTest {
             }
         }
 
-        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue));
+        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue));
 
         assertEquals(expectedFieldMap, actualFieldMap);
     }
@@ -417,8 +417,8 @@ class DBMSProcessorTest {
         }
         Map<Integer, Map<String, String>> expectedFieldMap = entries.stream()
                                                                     .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedID(),
-                                                                            (bibEntry) -> bibEntry.getFieldMap().entrySet().stream()
-                                                                                                  .collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue))));
+                                                                            bibEntry -> bibEntry.getFieldMap().entrySet().stream()
+                                                                                                  .collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue))));
 
         assertEquals(expectedFieldMap, actualFieldMap);
     }

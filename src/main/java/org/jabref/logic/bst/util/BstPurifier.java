@@ -67,7 +67,7 @@ public class BstPurifier {
             }
             i++;
         }
-        if ((braceLevel != 0)) {
+        if (braceLevel != 0) {
             LOGGER.warn("Unbalanced brace in string for purify$: {}", toPurify);
         }
 

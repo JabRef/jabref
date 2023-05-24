@@ -13,7 +13,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
@@ -43,12 +42,12 @@ public class Globals {
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
     public static final RemoteListenerServerManager REMOTE_LISTENER = new RemoteListenerServerManager();
+
     /**
      * Manager for the state of the GUI.
      */
     public static StateManager stateManager = new StateManager();
 
-    public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
     public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor(stateManager);
 
     /**
@@ -101,24 +100,30 @@ public class Globals {
     public static synchronized ThemeManager getThemeManager() {
         if (themeManager == null) {
             themeManager = new ThemeManager(
-                    prefs.getAppearancePreferences(),
+                    prefs.getWorkspacePreferences(),
                     getFileUpdateMonitor(),
                     Runnable::run);
         }
         return themeManager;
     }
 
+    public static synchronized FileUpdateMonitor getFileUpdateMonitor() {
+        if (fileUpdateMonitor == null) {
+            fileUpdateMonitor = new DefaultFileUpdateMonitor();
+            JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+        }
+        return fileUpdateMonitor;
+    }
+
     // Background tasks
     public static void startBackgroundTasks() {
-        Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
-        JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
         // TODO Currently deactivated due to incompatibilities in XML
       /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();
         } */
         RemotePreferences remotePreferences = prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs, fileUpdateMonitor), remotePreferences.getPort());
         }
     }
 
@@ -145,10 +150,6 @@ public class Globals {
         telemetryClient.getContext().getDevice().setScreenResolution(Screen.getPrimary().getVisualBounds().toString());
 
         telemetryClient.trackSessionState(SessionState.Start);
-    }
-
-    public static FileUpdateMonitor getFileUpdateMonitor() {
-        return fileUpdateMonitor;
     }
 
     public static void shutdownThreadPools() {

@@ -16,7 +16,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Anglia Ruskin University Harvard style</summary>
-    <updated>2022-08-25T13:44:56+00:00</updated>
+    <updated>2023-01-10T13:43:36+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -225,11 +225,13 @@
         <text variable="number" suffix="."/>
       </else-if>
       <else-if type="motion_picture">
-        <text variable="medium" prefix="[" suffix="]"/>
-        <names variable="author">
-          <name and="text" sort-separator=", " initialize-with="." delimiter-precedes-last="never" delimiter=", " prefix=" Directed by " suffix="."/>
-          <label form="short" prefix=" "/>
-        </names>
+        <group delimiter=" " suffix=".">
+          <text variable="medium" prefix="[" suffix="]"/>
+          <names variable="director">
+            <label form="verb" text-case="capitalize-first" suffix=" "/>
+            <name and="text" sort-separator=", " initialize-with="." delimiter-precedes-last="never" delimiter=", " suffix="."/>
+          </names>
+        </group>
       </else-if>
       <else>
         <choose>

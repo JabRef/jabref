@@ -21,6 +21,13 @@ public class BibEntryType implements Comparable<BibEntryType> {
     private final LinkedHashSet<OrFields> requiredFields;
     private final LinkedHashSet<BibField> fields;
 
+    /**
+     * Provides an enriched EntryType with information about defined standards as mandatory fields etc.
+     *
+     * @param type              The EntryType this BibEntryType is wrapped around.
+     * @param fields            A BibFields list of all fields, including the required fields
+     * @param requiredFields    A OrFields list of just the required fields
+     */
     public BibEntryType(EntryType type, Collection<BibField> fields, Collection<OrFields> requiredFields) {
         this.type = Objects.requireNonNull(type);
         this.requiredFields = new LinkedHashSet<>(requiredFields);
@@ -34,7 +41,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
     /**
      * Returns all supported optional field names.
      *
-     * @return a List of optional field name Strings
+     * @return a Set of optional field name Strings
      */
     public Set<BibField> getOptionalFields() {
         return getAllBibFields().stream()
@@ -52,7 +59,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
      * If fields have an OR relationship the name includes both field names divided by /, e.g. author/editor.
      * If you need all required fields as sole entities use @see{getRequiredFieldsFlat} .
      *
-     * @return a List of required field name Strings
+     * @return a Set of required field name Strings
      */
     public Set<OrFields> getRequiredFields() {
         return Collections.unmodifiableSet(requiredFields);

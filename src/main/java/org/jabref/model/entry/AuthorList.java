@@ -361,7 +361,7 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
-        return andCoordinatedConjunction(getAuthors(), (auth) -> auth.getLastFirst(abbreviate), oxfordComma);
+        return andCoordinatedConjunction(getAuthors(), auth -> auth.getLastFirst(abbreviate), oxfordComma);
     }
 
     @Override

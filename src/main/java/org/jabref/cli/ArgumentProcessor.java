@@ -16,7 +16,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -25,7 +25,7 @@ import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.XmpPdfExporter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
@@ -44,6 +44,7 @@ import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -52,9 +53,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileHelper;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
@@ -69,12 +69,17 @@ public class ArgumentProcessor {
     private final List<ParserResult> parserResults;
     private final Mode startupMode;
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
     private boolean noGUINeeded;
 
-    public ArgumentProcessor(String[] args, Mode startupMode, PreferencesService preferencesService) throws org.apache.commons.cli.ParseException {
+    public ArgumentProcessor(String[] args,
+                             Mode startupMode,
+                             PreferencesService preferencesService,
+                             FileUpdateMonitor fileUpdateMonitor) throws org.apache.commons.cli.ParseException {
         this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         this.parserResults = processArguments();
     }
@@ -85,7 +90,7 @@ public class ArgumentProcessor {
      * @param argument See importFile.
      * @return ParserResult with setToOpenTab(true)
      */
-    private static Optional<ParserResult> importToOpenBase(String argument) {
+    private Optional<ParserResult> importToOpenBase(String argument) {
         Optional<ParserResult> result = importFile(argument);
 
         result.ifPresent(ParserResult::setToOpenTab);
@@ -93,8 +98,8 @@ public class ArgumentProcessor {
         return result;
     }
 
-    private static Optional<ParserResult> importBibtexToOpenBase(String argument, ImportFormatPreferences importFormatPreferences) {
-        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+    private Optional<ParserResult> importBibtexToOpenBase(String argument, ImportFormatPreferences importFormatPreferences) {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
         try {
             List<BibEntry> entries = parser.parseEntries(argument);
             ParserResult result = new ParserResult(entries);
@@ -106,7 +111,7 @@ public class ArgumentProcessor {
         }
     }
 
-    private static Optional<ParserResult> importFile(String argument) {
+    private Optional<ParserResult> importFile(String argument) {
         String[] data = argument.split(",");
 
         String address = data[0];
@@ -144,18 +149,23 @@ public class ArgumentProcessor {
         return importResult;
     }
 
-    private static Optional<ParserResult> importFile(Path file, String importFormat) {
+    private Optional<ParserResult> importFile(Path file, String importFormat) {
         try {
+            ImportFormatReader importFormatReader = new ImportFormatReader(
+                    preferencesService.getImporterPreferences(),
+                    preferencesService.getImportFormatPreferences(),
+                    fileUpdateMonitor);
+
             if (!"*".equals(importFormat)) {
                 System.out.println(Localization.lang("Importing") + ": " + file);
-                ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(importFormat, file);
+                ParserResult result = importFormatReader.importFromFile(importFormat, file);
                 return Optional.of(result);
             } else {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
                 ImportFormatReader.UnknownFormatImport importResult =
-                        Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, new DummyFileUpdateMonitor());
+                        importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);
@@ -235,9 +245,9 @@ public class ArgumentProcessor {
                         cli.getWriteMetadatatoPdf(),
                         preferencesService.getXmpPreferences(),
                         preferencesService.getFilePreferences(),
-                        preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode(),
+                        preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
                         Globals.entryTypesManager,
-                        preferencesService.getFieldWriterPreferences(),
+                        preferencesService.getFieldPreferences(),
                         cli.isWriteXMPtoPdf() || cli.isWriteMetadatatoPdf(),
                         cli.isEmbeddBibfileInPdf() || cli.isWriteMetadatatoPdf());
             }
@@ -267,7 +277,7 @@ public class ArgumentProcessor {
         return loaded;
     }
 
-    private void writeMetadatatoPdf(List<ParserResult> loaded, String filesAndCitekeys, XmpPreferences xmpPreferences, FilePreferences filePreferences, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, boolean writeXMP, boolean embeddBibfile) {
+    private void writeMetadatatoPdf(List<ParserResult> loaded, String filesAndCitekeys, XmpPreferences xmpPreferences, FilePreferences filePreferences, BibDatabaseMode databaseMode, BibEntryTypesManager entryTypesManager, FieldPreferences fieldPreferences, boolean writeXMP, boolean embeddBibfile) {
         if (loaded.isEmpty()) {
             LOGGER.error("The write xmp option depends on a valid import option.");
             return;
@@ -277,7 +287,7 @@ public class ArgumentProcessor {
         BibDatabase dataBase = pr.getDatabase();
 
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
-        EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldWriterPreferences);
+        EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldPreferences);
 
         if ("all".equals(filesAndCitekeys)) {
             for (BibEntry entry : dataBase.getEntries()) {
@@ -338,7 +348,7 @@ public class ArgumentProcessor {
         for (String fileName : pdfs) {
             Path filePath = Path.of(fileName);
             if (!filePath.isAbsolute()) {
-                filePath = FileHelper.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileHelper.find(fileName, List.of(Path.of("").toAbsolutePath())).orElse(filePath));
+                filePath = FileUtil.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileUtil.find(fileName, List.of(Path.of("").toAbsolutePath())).orElse(filePath));
             }
             if (Files.exists(filePath)) {
                 try {
@@ -397,7 +407,7 @@ public class ArgumentProcessor {
                 }
             }
 
-            if (formatName.equals("bib")) {
+            if ("bib".equals(formatName)) {
                 // output a bib file as default or if
                 // provided exportFormat is "bib"
                 saveDatabase(new BibDatabase(matches), data[1]);
@@ -460,7 +470,7 @@ public class ArgumentProcessor {
                         pr = OpenDatabase.loadDatabase(
                                 Path.of(aLeftOver),
                                 preferencesService.getImportFormatPreferences(),
-                                Globals.getFileUpdateMonitor());
+                                fileUpdateMonitor);
                     } catch (IOException ex) {
                         pr = ParserResult.fromError(ex);
                         LOGGER.error("Error opening file '{}'", aLeftOver, ex);
@@ -531,16 +541,18 @@ public class ArgumentProcessor {
     private void saveDatabase(BibDatabase newBase, String subName) {
         try {
             System.out.println(Localization.lang("Saving") + ": " + subName);
-            GeneralPreferences generalPreferences = preferencesService.getGeneralPreferences();
-            SavePreferences savePreferences = preferencesService.getSavePreferences();
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+                SaveConfiguration saveConfiguration = new SaveConfiguration()
+                        .withMetadataSaveOrder(true)
+                        .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
-                                                                            bibWriter,
-                                                                            generalPreferences,
-                                                                            savePreferences,
-                                                                            Globals.entryTypesManager);
+                        bibWriter,
+                        saveConfiguration,
+                        preferencesService.getFieldPreferences(),
+                        preferencesService.getCitationKeyPatternPreferences(),
+                        Globals.entryTypesManager);
                 databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
                 // Show just a warning message if encoding did not work for all characters:
@@ -603,8 +615,7 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             preferencesService.importPreferences(Path.of(cli.getPreferencesImport()));
-            Globals.entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
-                    preferencesService.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
+            Globals.entryTypesManager = preferencesService.getCustomEntryTypesRepository();
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }
