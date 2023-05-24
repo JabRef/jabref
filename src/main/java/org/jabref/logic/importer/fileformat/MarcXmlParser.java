@@ -100,6 +100,8 @@ public class MarcXmlParser implements Parser {
                 putIsbn(bibEntry, datafield);
             } else if ("100".equals(tag) || "700".equals(tag) || "710".equals(tag)) {
                 putPersonalName(bibEntry, datafield); // Author, Editor, Publisher
+            } else if ("111".equals(tag)) {
+                putProceedings(bibEntry, datafield); //title of meeting, place of meeting
             } else if ("245".equals(tag)) {
                 putTitle(bibEntry, datafield);
             } else if ("250".equals(tag)) {
@@ -133,16 +135,11 @@ public class MarcXmlParser implements Parser {
 
         /*
          * ToDo:
-         *  pages
-         *  volume and number correct
-         *  series and journals stored in different tags
-         *  thesis //doctor & masterarbeit (Unterschied?) | type
-         *  proceedings //konferenzbeiträge
-         *  BibTex --> entryType
-         *  bestimmte Anzahl ist suchbar
-         *  unbestimmt nicht
-         *  SRU suche
-         *  Z39.50
+         *  pages //Done
+         *  volume and number correct //Done
+         *  series and journals stored in different tags //Done?
+         *  thesis //differences between doctor, master's thesis
+         *  proceedings //information about meeting
          */
 
         return bibEntry;
@@ -450,14 +447,13 @@ public class MarcXmlParser implements Parser {
     private void putThesisDetails(BibEntry bibEntry, Element datafield) {
         String thesisDegree = getSubfield("b", datafield);
         String school = getSubfield("c", datafield);
+        bibEntry.setType(StandardEntryType.MastersThesis);
 
-
-        if ("Masterarbeit".equals(thesisDegree) & StringUtil.isNotBlank(school)) {
-            bibEntry.setType(StandardEntryType.MastersThesis);
+        if (StringUtil.isNotBlank(school)) {
             bibEntry.setField(StandardField.SCHOOL, school);
         }
 
-        if ("Dissertation".equals(thesisDegree)) {
+        if ("Dissertation".equals(thesisDegree) && StringUtil.isNotBlank(school)) {
             bibEntry.setType(StandardEntryType.PhdThesis);
             bibEntry.setField(StandardField.SCHOOL, school);
         }
