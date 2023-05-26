@@ -1,5 +1,9 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Optional;
+import java.util.Set;
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -27,17 +31,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testfx.framework.junit5.ApplicationExtension;
 
-import java.util.Optional;
-import java.util.Set;
-
-import javax.swing.undo.UndoManager;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.any;
 
 @GUITest
 @ExtendWith(ApplicationExtension.class)
