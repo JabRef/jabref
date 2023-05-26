@@ -3,7 +3,6 @@ package org.jabref.gui.entryeditor;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -28,13 +27,17 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testfx.framework.junit5.ApplicationExtension;
 
-import javax.swing.undo.UndoManager;
-
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import javax.swing.undo.UndoManager;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 @GUITest
 @ExtendWith(ApplicationExtension.class)
@@ -44,10 +47,6 @@ class CommentsTabTest {
 
     @Mock
     private BibEntryTypesManager entryTypesManager;
-    @Mock
-    private BibEntry entry;
-    @Mock
-    private FieldEditorFX fieldEditorFX;
     @Mock
     private BibDatabaseContext databaseContext;
     @Mock
@@ -91,7 +90,6 @@ class CommentsTabTest {
 
     @Test
     void testDetermineFieldsToShowWithoutEntryType() {
-        // Setup
         BibEntry entry = new BibEntry();
 
         // Add a standard comment and a user-specific comment to the entry
@@ -110,7 +108,6 @@ class CommentsTabTest {
 
     @Test
     void testDetermineFieldsToShow() {
-        // Setup
         BibEntry entry = new BibEntry();
         EntryType entryType = StandardEntryType.Book;
         entry.setType(entryType);
@@ -137,19 +134,17 @@ class CommentsTabTest {
         assertTrue(fields.contains(standardComment));
         assertTrue(fields.contains(userComment));
 
-        // Verify that defaultCommentField is in the resulting set
+        // Verify that user-specific comment is in the resulting set
         UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(username);
         assertTrue(fields.contains(defaultCommentField));
     }
 
     @Test
     public void testDifferentiateCaseInUserName() {
-
         UserSpecificCommentField field1 = new UserSpecificCommentField("USER");
         UserSpecificCommentField field2 = new UserSpecificCommentField("user");
 
-        assertFalse(field1.equals(field2),
-                "Two UserSpecificCommentField instances with usernames that differ only by case should be considered different");
+        assertNotEquals(field1, field2, "Two UserSpecificCommentField instances with usernames that differ only by case should be considered different");
 
         assertNotEquals(field1.hashCode(), field2.hashCode(),
                 "Hash codes of two UserSpecificCommentField instances with usernames that differ only by case should be different");
