@@ -100,8 +100,6 @@ public class MarcXmlParser implements Parser {
                 putIsbn(bibEntry, datafield);
             } else if ("100".equals(tag) || "700".equals(tag) || "710".equals(tag)) {
                 putPersonalName(bibEntry, datafield); // Author, Editor, Publisher
-            } else if ("111".equals(tag)) {
-                putProceedings(bibEntry, datafield); //title of meeting, place of meeting
             } else if ("245".equals(tag)) {
                 putTitle(bibEntry, datafield);
             } else if ("250".equals(tag)) {
@@ -113,7 +111,7 @@ public class MarcXmlParser implements Parser {
             } else if ("490".equals(tag) || "830".equals(tag)) {
                 putSeries(bibEntry, datafield);
             } else if ("502".equals(tag)) {
-                putThesisDetails(bibEntry, datafield); // Master's thesis, PhD thesis, Thesis
+                putThesisDescription(bibEntry, datafield); // Master's thesis, PhD thesis, Thesis
             } else if ("520".equals(tag)) {
                 putSummary(bibEntry, datafield);
             } else if ("653".equals(tag)) {
@@ -139,11 +137,12 @@ public class MarcXmlParser implements Parser {
          *  volume and number correct //Done
          *  series and journals stored in different tags //Done?
          *  thesis //differences between doctor, master's thesis
-         *  proceedings //information about meeting
+         *  proceedings //Title Tag:245, Series Tag:490 -> Identifier
          */
 
         return bibEntry;
     }
+
 
     private void putIsbn(BibEntry bibEntry, Element datafield) {
         String isbn = getSubfield("a", datafield);
@@ -444,7 +443,7 @@ public class MarcXmlParser implements Parser {
         }
     }
 
-    private void putThesisDetails(BibEntry bibEntry, Element datafield) {
+    private void putThesisDescription(BibEntry bibEntry, Element datafield) {
         String thesisDegree = getSubfield("b", datafield);
         String school = getSubfield("c", datafield);
         bibEntry.setType(StandardEntryType.MastersThesis);
@@ -452,7 +451,6 @@ public class MarcXmlParser implements Parser {
         if (StringUtil.isNotBlank(school)) {
             bibEntry.setField(StandardField.SCHOOL, school);
         }
-
         if ("Dissertation".equals(thesisDegree) && StringUtil.isNotBlank(school)) {
             bibEntry.setType(StandardEntryType.PhdThesis);
             bibEntry.setField(StandardField.SCHOOL, school);
