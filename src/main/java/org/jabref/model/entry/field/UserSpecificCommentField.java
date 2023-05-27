@@ -6,16 +6,15 @@ import java.util.Set;
 
 public class UserSpecificCommentField implements Field {
     private final String name;
-    private final Set<FieldProperty> properties;
+    private static final Set<FieldProperty> PROPERTIES = EnumSet.of(FieldProperty.COMMENT);
 
     public UserSpecificCommentField(String username) {
         this.name = "comment-" + username;
-        this.properties = EnumSet.of(FieldProperty.COMMENT);
     }
 
     @Override
     public Set<FieldProperty> getProperties() {
-        return properties;
+        return PROPERTIES;
     }
 
     @Override
