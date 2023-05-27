@@ -85,8 +85,9 @@ public class CommentsTab extends FieldsEditorTab {
                 if (field.getName().contains(name)) {
                     editor.getNode().setDisable(false);
                 }
-            } else
+            } else {
                 editor.getNode().setDisable(!field.getName().equals(StandardField.COMMENT.getName()));
+            }
         }
     }
 }
