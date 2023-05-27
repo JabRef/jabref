@@ -245,7 +245,6 @@ public class UnicodeToReadableCharMap extends HashMap<String, String> {
         put("\u1EF6", "Y");
         put("\u1EF7", "y");
 
-
         put("\u00CF", "I");
 
         put("\u008C", "AE"); // doesn't work?
