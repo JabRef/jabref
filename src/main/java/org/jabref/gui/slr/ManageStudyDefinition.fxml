@@ -208,13 +208,13 @@
                             </VBox>
                         </ScrollPane>
                     </Tab>
-                    <Tab text="%Databases">
+                    <Tab text="%Catalogs">
                         <ScrollPane
                                 fitToWidth="true"
                                 fitToHeight="true"
                                 styleClass="slr-tab">
                             <VBox spacing="20.0">
-                                <Label text="%Select Databases:"/>
+                                <Label text="%Select Catalogs:"/>
                                 <HBox alignment="CENTER_LEFT">
                                     <TableView
                                             fx:id="databaseTable"
@@ -231,7 +231,7 @@
                                                     resizable="false"/>
                                             <TableColumn
                                                     fx:id="databaseColumn"
-                                                    text="%Database"/>
+                                                    text="%Catalog"/>
                                         </columns>
                                         <columnResizePolicy>
                                             <TableView
