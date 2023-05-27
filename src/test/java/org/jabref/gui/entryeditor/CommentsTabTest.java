@@ -81,28 +81,9 @@ class CommentsTabTest {
                 stateManager,
                 themeManager,
                 indexingTaskManager,
-                entryTypesManager,
                 taskExecutor,
                 journalAbbreviationRepository
         );
-    }
-
-    @Test
-    void testDetermineFieldsToShowWithoutEntryType() {
-        BibEntry entry = new BibEntry();
-
-        // Add a standard comment and a user-specific comment to the entry
-        Field standardComment = StandardField.COMMENT;
-        UserSpecificCommentField userComment = new UserSpecificCommentField("TestName");
-
-        entry.setField(standardComment, "Standard comment text");
-        entry.setField(userComment, "User-specific comment text");
-
-        // Run the method under test
-        Set<Field> fields = commentsTab.determineFieldsToShow(entry);
-
-        // Verify that the result is an empty set
-        assertTrue(fields.isEmpty());
     }
 
     @Test

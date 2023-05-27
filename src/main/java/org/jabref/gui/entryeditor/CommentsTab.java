@@ -1,9 +1,7 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,18 +20,13 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.preferences.PreferencesService;
 
 public class CommentsTab extends FieldsEditorTab {
-
-    private final BibEntryTypesManager entryTypesManager;
 
     private final String name;
     public CommentsTab(String name,
@@ -45,7 +38,6 @@ public class CommentsTab extends FieldsEditorTab {
                        StateManager stateManager,
                        ThemeManager themeManager,
                        IndexingTaskManager indexingTaskManager,
-                       BibEntryTypesManager entryTypesManager,
                        TaskExecutor taskExecutor,
                        JournalAbbreviationRepository journalAbbreviationRepository) {
         super(
@@ -61,7 +53,6 @@ public class CommentsTab extends FieldsEditorTab {
                 journalAbbreviationRepository,
                 indexingTaskManager
         );
-        this.entryTypesManager = entryTypesManager;
         this.name = name;
         setText(Localization.lang("All comments"));
         setTooltip(new Tooltip(Localization.lang("Display all comments")));
@@ -69,25 +60,17 @@ public class CommentsTab extends FieldsEditorTab {
     }
 
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
-        BibDatabaseMode mode = databaseContext.getMode();
-        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
+        UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(name);
+        Set<Field> comments = new LinkedHashSet<>();
+        comments.add(defaultCommentField);
 
-        if (entryType.isPresent()) {
-            UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(name);
-            Set<Field> comments = new LinkedHashSet<>();
-            comments.add(defaultCommentField);
+        comments.addAll(entry.getFields().stream()
+                             .filter(field -> field.equals(StandardField.COMMENT) ||
+                                     field instanceof UserSpecificCommentField ||
+                                     field.getName().toLowerCase().contains("comment"))
+                             .collect(Collectors.toSet()));
 
-            comments.addAll(entry.getFields().stream()
-                                 .filter(field -> field.equals(StandardField.COMMENT) ||
-                                         field instanceof UserSpecificCommentField ||
-                                         field.getName().toLowerCase().contains("comment"))
-                                 .collect(Collectors.toSet()));
-
-            return comments;
-        } else {
-            // Entry type unknown -> treat all fields as required
-            return Collections.emptySet();
-        }
+        return comments;
     }
 
     @Override
@@ -102,11 +85,8 @@ public class CommentsTab extends FieldsEditorTab {
                 if (field.getName().contains(name)) {
                     editor.getNode().setDisable(false);
                 }
-            } else if (field.getName().equals(StandardField.COMMENT.getName())) {
-                editor.getNode().setDisable(false);
-            } else {
-                editor.getNode().setDisable(true);
-            }
+            } else
+                editor.getNode().setDisable(!field.getName().equals(StandardField.COMMENT.getName()));
         }
     }
 }

@@ -5,8 +5,8 @@ import java.util.Objects;
 import java.util.Set;
 
 public class UserSpecificCommentField implements Field {
-    private final String name;
     private static final Set<FieldProperty> PROPERTIES = EnumSet.of(FieldProperty.COMMENT);
+    private final String name;
 
     public UserSpecificCommentField(String username) {
         this.name = "comment-" + username;
