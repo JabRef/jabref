@@ -74,6 +74,11 @@ public class FieldFactory {
     }
 
     public static <T> Field parseField(T type, String fieldName) {
+        // Check if the field name starts with "comment-" which indicates it's a UserSpecificCommentField
+        if (fieldName.startsWith("comment-")) {
+            String username = fieldName.substring("comment-".length());
+            return new UserSpecificCommentField(username);
+        }
         return OptionalUtil.<Field>orElse(
               OptionalUtil.<Field>orElse(
                OptionalUtil.<Field>orElse(
