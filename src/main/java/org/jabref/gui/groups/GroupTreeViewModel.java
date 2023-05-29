@@ -689,7 +689,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         } else if (group instanceof SearchGroup) {
             return false;
         } else if (group instanceof AutomaticKeywordGroup) {
-            return true;
+            return false;
         } else if (group instanceof AutomaticPersonsGroup) {
             return false;
         } else if (group instanceof TexGroup) {
