@@ -1,13 +1,9 @@
 package org.jabref.preferences;
 
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 public class ExternalApplicationsPreferences {
 
@@ -18,8 +14,7 @@ public class ExternalApplicationsPreferences {
     private final StringProperty customTerminalCommand;
     private final BooleanProperty useCustomFileBrowser;
     private final StringProperty customFileBrowserCommand;
-    private final BooleanProperty shouldConnectLastSharedDatabases;
-    private final ObservableList<String> lastConnectedSharedDatabases;
+    private final BooleanProperty shouldConnectLastSharedDatabase;
 
     public ExternalApplicationsPreferences(String eMailSubject,
                                            boolean shouldAutoOpenEmailAttachmentsFolder,
@@ -28,7 +23,7 @@ public class ExternalApplicationsPreferences {
                                            String customTerminalCommand,
                                            boolean useCustomFileBrowser,
                                            String customFileBrowserCommand,
-                                           boolean shouldConnectLastSharedDatabases, List<String> lastConnectedSharedDatabases) {
+                                           boolean shouldConnectLastSharedDatabase) {
 
         this.eMailSubject = new SimpleStringProperty(eMailSubject);
         this.shouldAutoOpenEmailAttachmentsFolder = new SimpleBooleanProperty(shouldAutoOpenEmailAttachmentsFolder);
@@ -37,8 +32,7 @@ public class ExternalApplicationsPreferences {
         this.customTerminalCommand = new SimpleStringProperty(customTerminalCommand);
         this.useCustomFileBrowser = new SimpleBooleanProperty(useCustomFileBrowser);
         this.customFileBrowserCommand = new SimpleStringProperty(customFileBrowserCommand);
-        this.shouldConnectLastSharedDatabases = new SimpleBooleanProperty(shouldConnectLastSharedDatabases);
-        this.lastConnectedSharedDatabases = FXCollections.observableArrayList(lastConnectedSharedDatabases);
+        this.shouldConnectLastSharedDatabase = new SimpleBooleanProperty(shouldConnectLastSharedDatabase);
     }
 
     public String getEmailSubject() {
@@ -125,23 +119,15 @@ public class ExternalApplicationsPreferences {
         this.customFileBrowserCommand.set(customFileBrowserCommand);
     }
 
-    public boolean shouldAutoConnectToLastSharedDatabases() {
-        return shouldConnectLastSharedDatabases.get();
+    public boolean shouldAutoConnectToLastSharedDatabase() {
+        return shouldConnectLastSharedDatabase.get();
     }
 
-    public BooleanProperty autoConnectToLastSharedDatabases() {
-        return shouldConnectLastSharedDatabases;
+    public BooleanProperty autoConnectToLastSharedDatabase() {
+        return shouldConnectLastSharedDatabase;
     }
 
-    public void setAutoConnectToLastSharedDatabases(boolean shouldAutoConnectToLastSharedDatabase) {
-        this.shouldConnectLastSharedDatabases.set(shouldAutoConnectToLastSharedDatabase);
-    }
-
-    public ObservableList<String> getLastConnectedSharedDatabases() {
-        return lastConnectedSharedDatabases;
-    }
-
-    public void setLastConnectedSharedDatabases(List<String> sharedDBs) {
-        this.lastConnectedSharedDatabases.setAll(sharedDBs);
+    public void setAutoConnectToLastSharedDatabase(boolean shouldAutoConnectToLastSharedDatabase) {
+        this.shouldConnectLastSharedDatabase.set(shouldAutoConnectToLastSharedDatabase);
     }
 }

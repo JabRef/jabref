@@ -129,7 +129,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
@@ -423,7 +422,7 @@ public class JabRefFrame extends BorderPane {
      * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is
      *                  set to true
      */
-    private void tearDownJabRef(List<String> filenames, List<String> sharedDBs) {
+    private void tearDownJabRef(List<String> filenames) {
         if (prefs.getImportExportPreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
@@ -435,13 +434,6 @@ public class JabRefFrame extends BorderPane {
                                                              .orElse(null);
                 prefs.getGuiPreferences().setLastFilesOpened(filenames);
                 prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
-            }
-        }
-        if (prefs.getExternalApplicationsPreferences().shouldAutoConnectToLastSharedDatabases()) {
-            if (sharedDBs.isEmpty()) {
-                prefs.getExternalApplicationsPreferences().getLastConnectedSharedDatabases().clear();
-            } else {
-                prefs.getExternalApplicationsPreferences().setLastConnectedSharedDatabases(sharedDBs);
             }
         }
 
@@ -477,7 +469,6 @@ public class JabRefFrame extends BorderPane {
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
-        List<String> sharedDBs = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             LibraryTab libraryTab = getLibraryTabAt(i);
             final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
@@ -494,10 +485,6 @@ public class JabRefFrame extends BorderPane {
                     return false;
                 }
             } else if (context.getLocation() == DatabaseLocation.SHARED) {
-                new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
-                        .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
-                sharedDBs.add(context.getDatabase().getSharedDatabaseID().orElse(""));
-
                 context.convertToLocalDatabase();
                 context.getDBMSSynchronizer().closeSharedDatabase();
                 context.clearDBMSSynchronizer();
@@ -511,7 +498,7 @@ public class JabRefFrame extends BorderPane {
         waitForSaveFinishedDialog.showAndWait(getLibraryTabs());
 
         // Good bye!
-        tearDownJabRef(filenames, sharedDBs);
+        tearDownJabRef(filenames);
         Platform.exit();
         return true;
     }

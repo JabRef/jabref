@@ -17,12 +17,12 @@ public class SharedDatabaseTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        connectLastStartupProperty.setValue(externalApplicationsPreferences.shouldAutoConnectToLastSharedDatabases());
+        connectLastStartupProperty.setValue(externalApplicationsPreferences.shouldAutoConnectToLastSharedDatabase());
     }
 
     @Override
     public void storeSettings() {
-        externalApplicationsPreferences.setAutoConnectToLastSharedDatabases(connectLastStartupProperty.getValue());
+        externalApplicationsPreferences.setAutoConnectToLastSharedDatabase(connectLastStartupProperty.getValue());
     }
 
     public BooleanProperty connectLastStartupProperty() {
