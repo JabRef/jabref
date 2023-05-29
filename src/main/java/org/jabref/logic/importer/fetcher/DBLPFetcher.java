@@ -22,7 +22,6 @@ import org.jabref.logic.layout.LayoutFormatterBasedFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -58,7 +57,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(importFormatPreferences);
     }
 
     @Override

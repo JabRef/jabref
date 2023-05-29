@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.cli.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -15,11 +16,15 @@ import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 import com.sun.jna.platform.win32.ShlObj;
 import com.sun.jna.platform.win32.Win32Exception;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class contains Windows specific implementations for file directories and file/application open handling methods <br>
+ * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link Launcher#addLogToDisk}
+ * The configuration of tinylog will become immutable as soon as the first log entry is issued.
+ * https://tinylog.org/v2/configuration/
+ **/
 public class Windows implements NativeDesktop {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Windows.class);
 
     private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
@@ -89,7 +94,8 @@ public class Windows implements NativeDesktop {
                 return Path.of(Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS));
             }
         } catch (Win32Exception e) {
-            LOGGER.error("Error accessing folder", e);
+            // needs to be non-static because of org.jabref.cli.Launcher.addLogToDisk
+            LoggerFactory.getLogger(Windows.class).error("Error accessing folder", e);
             return Path.of(System.getProperty("user.home"));
         }
     }

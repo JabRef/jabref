@@ -150,14 +150,15 @@ public class BibtexImporter extends Importer {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-
+                // % = char 37, we might have some bom chars in front that we need to skip, so we use index of
+                var percentPos = line.indexOf('%', 0);
                 // Line does not start with %, so there are no comment lines for us and we can stop parsing
-                if (!line.startsWith("%")) {
+                if (percentPos == -1) {
                     return Optional.empty();
                 }
 
                 // Only keep the part after %
-                line = line.substring(1).trim();
+                line = line.substring(percentPos + 1).trim();
 
                 if (line.startsWith(BibtexImporter.SIGNATURE)) {
                     // Signature line, so keep reading and skip to next line

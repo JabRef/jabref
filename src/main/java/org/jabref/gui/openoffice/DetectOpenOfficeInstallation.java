@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -33,7 +32,7 @@ public class DetectOpenOfficeInstallation {
     }
 
     public Optional<Path> selectInstallationPath() {
-        final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
+        final NativeDesktop nativeDesktop = OS.getNativeDesktop();
 
         dialogService.showInformationDialogAndWait(Localization.lang("Could not find OpenOffice/LibreOffice installation"),
                 Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."));

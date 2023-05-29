@@ -191,7 +191,7 @@ public abstract class DBMSProcessor {
         }
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                new String[] {"SHARED_ID"})) {
+                new String[]{"SHARED_ID"})) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
