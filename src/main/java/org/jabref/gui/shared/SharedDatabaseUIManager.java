@@ -179,7 +179,8 @@ public class SharedDatabaseUIManager {
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dbmsSynchronizer.registerListener(this);
-        parserResult.setDatabaseContext(bibDatabaseContext);
+//      parserResult.setDatabaseContext(bibDatabaseContext);
+        parserResult.setContext(bibDatabaseContext);
         jabRefFrame.getDialogService().notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
     }
 }

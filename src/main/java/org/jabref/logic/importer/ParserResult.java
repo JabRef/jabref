@@ -26,6 +26,7 @@ public class ParserResult {
     private boolean invalid;
     private boolean toOpenTab;
     private boolean changedOnMigration = false;
+    private BibDatabaseContext context;
 
     public ParserResult() {
         this(Collections.emptyList());
@@ -144,6 +145,14 @@ public class ParserResult {
         database = bibDatabaseContext.getDatabase();
         metaData = bibDatabaseContext.getMetaData();
         file = bibDatabaseContext.getDatabasePath().orElse(null);
+    }
+
+    public BibDatabaseContext getContext() {
+        return this.context;
+    }
+
+    public void setContext(BibDatabaseContext context) {
+        this.context = context;
     }
 
     public boolean isEmpty() {

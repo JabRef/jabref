@@ -1087,8 +1087,12 @@ public class JabRefFrame extends BorderPane {
             // Add the entries to the open tab.
             LibraryTab libraryTab = getCurrentLibraryTab();
             if (libraryTab == null) {
+                if (parserResult.getContext().getLocation() == DatabaseLocation.SHARED) {
+                    addTab(parserResult.getContext(), focusPanel);
+                } else {
                 // There is no open tab to add to, so we create a new tab:
                 addTab(parserResult.getDatabaseContext(), focusPanel);
+                }
             } else {
                 addImportedEntries(libraryTab, parserResult);
             }
