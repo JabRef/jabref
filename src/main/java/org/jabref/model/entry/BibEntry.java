@@ -313,7 +313,7 @@ public class BibEntry implements Cloneable {
     }
 
     private Optional<String> genericGetResolvedFieldOrAlias(Field field, BibDatabase database, BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
-        if (InternalField.TYPE_HEADER == field || InternalField.OBSOLETE_TYPE_HEADER == field) {
+        if ((InternalField.TYPE_HEADER == field) || (InternalField.OBSOLETE_TYPE_HEADER == field)) {
             return Optional.of(type.get().getDisplayName());
         }
 
@@ -434,7 +434,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns a set containing the names of all fields that are set for this particular entry.
+     * Returns an {@link Collections#unmodifiableSet(Set)} containing the names of all fields that are set for this particular entry.
      *
      * @return a set of existing field names
      */
@@ -489,7 +489,7 @@ public class BibEntry implements Cloneable {
             return date.map(Date::getNormalized);
         }
 
-        if (StandardField.YEAR == field || StandardField.MONTH == field || StandardField.DAY == field) {
+        if ((StandardField.YEAR == field) || (StandardField.MONTH == field) || (StandardField.DAY == field)) {
             Optional<String> date = getFieldValue.apply(this, StandardField.DATE);
             if (date.isEmpty()) {
                 return Optional.empty();
