@@ -568,11 +568,14 @@ public class GroupTreeView extends BorderPane {
                         case GROUP_EDIT ->
                                 viewModel.isEditable(group);
                         case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
-                                viewModel.isEditable(group) && viewModel.canAddGroupsIn(group);
+                                viewModel.isEditable(group) && viewModel.canRemove(group);
                         case GROUP_SUBGROUP_ADD ->
                                 viewModel.isEditable(group) && viewModel.canAddGroupsIn(group)
                                         || group.isRoot();
-                        case GROUP_SUBGROUP_REMOVE, GROUP_SUBGROUP_SORT ->
+                        case GROUP_SUBGROUP_REMOVE ->
+                                viewModel.isEditable(group) && viewModel.hasSubgroups(group) && viewModel.canRemove(group)
+                                        || group.isRoot();
+                        case GROUP_SUBGROUP_SORT ->
                                 viewModel.isEditable(group) && viewModel.hasSubgroups(group) && viewModel.canAddGroupsIn(group)
                                         || group.isRoot();
                         case GROUP_ENTRIES_ADD, GROUP_ENTRIES_REMOVE ->

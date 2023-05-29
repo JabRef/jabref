@@ -210,28 +210,28 @@ public class GroupTreeViewModel extends AbstractViewModel {
             WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;
 
             return Objects.equals(oldWordKeywordGroup.getSearchField().getName(), newWordKeywordGroup.getSearchField().getName())
-                   && Objects.equals(oldWordKeywordGroup.getSearchExpression(), newWordKeywordGroup.getSearchExpression())
-                   && Objects.equals(oldWordKeywordGroup.isCaseSensitive(), newWordKeywordGroup.isCaseSensitive());
+                    && Objects.equals(oldWordKeywordGroup.getSearchExpression(), newWordKeywordGroup.getSearchExpression())
+                    && Objects.equals(oldWordKeywordGroup.isCaseSensitive(), newWordKeywordGroup.isCaseSensitive());
         } else if (oldGroup.getClass() == RegexKeywordGroup.class) {
             RegexKeywordGroup oldRegexKeywordGroup = (RegexKeywordGroup) oldGroup;
             RegexKeywordGroup newRegexKeywordGroup = (RegexKeywordGroup) newGroup;
 
             return Objects.equals(oldRegexKeywordGroup.getSearchField().getName(), newRegexKeywordGroup.getSearchField().getName())
-                   && Objects.equals(oldRegexKeywordGroup.getSearchExpression(), newRegexKeywordGroup.getSearchExpression())
-                   && Objects.equals(oldRegexKeywordGroup.isCaseSensitive(), newRegexKeywordGroup.isCaseSensitive());
+                    && Objects.equals(oldRegexKeywordGroup.getSearchExpression(), newRegexKeywordGroup.getSearchExpression())
+                    && Objects.equals(oldRegexKeywordGroup.isCaseSensitive(), newRegexKeywordGroup.isCaseSensitive());
         } else if (oldGroup.getClass() == SearchGroup.class) {
             SearchGroup oldSearchGroup = (SearchGroup) oldGroup;
             SearchGroup newSearchGroup = (SearchGroup) newGroup;
 
             return Objects.equals(oldSearchGroup.getSearchExpression(), newSearchGroup.getSearchExpression())
-                   && Objects.equals(oldSearchGroup.getSearchFlags(), newSearchGroup.getSearchFlags());
+                    && Objects.equals(oldSearchGroup.getSearchFlags(), newSearchGroup.getSearchFlags());
         } else if (oldGroup.getClass() == AutomaticKeywordGroup.class) {
             AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
             AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;
 
             return Objects.equals(oldAutomaticKeywordGroup.getKeywordDelimiter(), newAutomaticKeywordGroup.getKeywordDelimiter())
-                   && Objects.equals(oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter(), newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter())
-                   && Objects.equals(oldAutomaticKeywordGroup.getField().getName(), newAutomaticKeywordGroup.getField().getName());
+                    && Objects.equals(oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter(), newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter())
+                    && Objects.equals(oldAutomaticKeywordGroup.getField().getName(), newAutomaticKeywordGroup.getField().getName());
         } else if (oldGroup.getClass() == AutomaticPersonsGroup.class) {
             AutomaticPersonsGroup oldAutomaticPersonsGroup = (AutomaticPersonsGroup) oldGroup;
             AutomaticPersonsGroup newAutomaticPersonsGroup = (AutomaticPersonsGroup) newGroup;
@@ -251,11 +251,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void editGroup(GroupNodeViewModel oldGroup) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
-                     dialogService,
-                     database,
-                     preferences,
-                     oldGroup.getGroupNode().getGroup(),
-                     GroupDialogHeader.SUBGROUP));
+                    dialogService,
+                    database,
+                    preferences,
+                    oldGroup.getGroupNode().getGroup(),
+                    GroupDialogHeader.SUBGROUP));
             newGroup.ifPresent(group -> {
 
                 AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
@@ -280,10 +280,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     }
 
                     oldGroup.getGroupNode().setGroup(
-                                                     group,
-                                                     true,
-                                                     removePreviousAssignments,
-                                                     database.getEntries());
+                            group,
+                            true,
+                            removePreviousAssignments,
+                            database.getEntries());
 
                     dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                     writeGroupChangesToMetaData();
@@ -294,10 +294,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 if (groupTypeEqual && onlyMinorChanges(oldGroup.getGroupNode().getGroup(), group)) {
                     oldGroup.getGroupNode().setGroup(
-                                     group,
-                                     true,
-                                     true,
-                                     database.getEntries());
+                            group,
+                            true,
+                            true,
+                            database.getEntries());
 
                     writeGroupChangesToMetaData();
                     refresh();
@@ -313,16 +313,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 if (newGroup.get().getClass() == WordKeywordGroup.class) {
                     content = content + "\n\n" +
-                              Localization.lang("(Note: If original entries lack keywords to qualify for the new group configuration, confirming here will add them)");
+                            Localization.lang("(Note: If original entries lack keywords to qualify for the new group configuration, confirming here will add them)");
                 }
                 Optional<ButtonType> previousAssignments = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.WARNING,
-                                                                                                       Localization.lang("Change of Grouping Method"),
-                                                                                                       content,
-                                                                                                       keepAssignments,
-                                                                                                       removeAssignments,
-                                                                                                       cancel);
+                        Localization.lang("Change of Grouping Method"),
+                        content,
+                        keepAssignments,
+                        removeAssignments,
+                        cancel);
                 boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
-                                                    && (group instanceof ExplicitGroup);
+                        && (group instanceof ExplicitGroup);
 
                 int groupsWithSameName = 0;
                 Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
@@ -338,16 +338,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES)) {
                     oldGroup.getGroupNode().setGroup(
-                                 group,
-                                 true,
-                                 removePreviousAssignments,
-                                 database.getEntries());
+                            group,
+                            true,
+                            removePreviousAssignments,
+                            database.getEntries());
                 } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.NO)) {
                     oldGroup.getGroupNode().setGroup(
-                                 group,
-                                 false,
-                                 removePreviousAssignments,
-                                 database.getEntries());
+                            group,
+                            false,
+                            removePreviousAssignments,
+                            database.getEntries());
                 } else if (previousAssignments.isPresent() && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE)) {
                     return;
                 }
@@ -623,13 +623,43 @@ public class GroupTreeViewModel extends AbstractViewModel {
         } else if (group instanceof SearchGroup) {
             return true;
         } else if (group instanceof AutomaticKeywordGroup) {
-            return true;
+            return false;
         } else if (group instanceof AutomaticPersonsGroup) {
             return false;
         } else if (group instanceof TexGroup) {
             return true;
         } else {
             throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean canRemove(GroupNodeViewModel groupNode) {
+        AbstractGroup group = groupNode.getGroupNode().getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof KeywordGroup || group instanceof RegexKeywordGroup) {
+            if (groupNode.getParent().isPresent()) {
+                AbstractGroup groupParent = groupNode.getParent().get().getGroup();
+                if (groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return true;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return true;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("canRemove method not yet implemented in group: " + group.getClass().getName());
         }
     }
 
