@@ -491,8 +491,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 } else if (ex instanceof FetcherServerException) {
                     FetcherServerException serverException = (FetcherServerException) ex;
                     int statusCode = serverException.getStatusCode();
+                    String serverErrorMessage = serverException.getMessage(); 
                     dialogService.showErrorDialogAndWait(Localization.lang("Error downloading from URL"),
-                            "HTTP Error " + statusCode + ": " + serverException.getMessage() + "\nURL: " + urlDownload + "\nPlease try again later or contact the server administrator.");
+                            "HTTP Error " + statusCode + ": " + serverErrorMessage + "\nURL: " + urlDownload + "\nPlease try again later or contact the server administrator.");
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Error downloading from URL"),
                             "Error message: " + ex.getMessage() + "\nURL: " + urlDownload + "\nPlease check the URL and try again.");
@@ -500,10 +501,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
             });
 
             taskExecutor.execute(downloadTask);
-        } catch (MalformedURLException exception) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
-        }
-    }
+            } catch (MalformedURLException exception) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
+            }
+            }
 
     public boolean checkSSLHandshake(URLDownload urlDownload) {
         try {
