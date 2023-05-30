@@ -661,7 +661,6 @@ class BracketedPatternTest {
         assertEquals("ACS Medicinal Chemistry Letters", BracketedPattern.expandBrackets("[JOURNAL:unprotect_terms]", null, bibEntry, null));
     }
 
-
     @ParameterizedTest
     @CsvSource({
             "'Newton', '[edtr]', 'Isaac Newton'",
@@ -679,10 +678,10 @@ class BracketedPatternTest {
             "'Agency', '[editors]', 'European Union Aviation Safety Agency'",
             "'EUASA', '[editors]', '{European Union Aviation Safety Agency}'"
     })
+
     void testEditorFieldMarkers(String expectedCitationKey, String pattern, String editor) {
         BibEntry bibEntry = new BibEntry().withField(StandardField.EDITOR, editor);
         BracketedPattern bracketedPattern = new BracketedPattern(pattern);
         assertEquals(expectedCitationKey, bracketedPattern.expand(bibEntry));
     }
-
 }
