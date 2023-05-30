@@ -91,6 +91,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the encoding header in a bib file was not respected when the file contained a BOM (Byte Order Mark). [#9926](https://github.com/JabRef/jabref/issues/9926)
 - We fixed an issue where cli help output for import and export format was inconsistent. [koppor#429](https://github.com/koppor/jabref/issues/429)
 - We fixed an issue where no preview could be generated for some entry types and led to an exception [#9947](https://github.com/JabRef/jabref/issues/9947)
+- We fixed an issue where the Linux terminal working directory argument was malformed and therefore ignored upon opening a terminal [#9953](https://github.com/JabRef/jabref/issues/9953)
 
 ### Removed
 
