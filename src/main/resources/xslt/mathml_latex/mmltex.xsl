@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-		xmlns:m="http://www.w3.org/1998/Math/MathML"
+        xmlns:m="http://www.w3.org/1998/Math/MathML"
                 version='1.0'>
-                
+
 <xsl:output method="text" indent="no" encoding="UTF-8"/>
 
 <!-- ====================================================================== -->
@@ -22,24 +22,24 @@
 <!-- Note: variables colora (template color) and symbola (template startspace) only for Sablotron -->
 
 <xsl:template name="startspace">
-	<xsl:param name="symbol"/>
-	<xsl:if test="contains($symbol,' ')">
-		<xsl:variable name="symbola" select="concat(substring-before($symbol,' '),substring-after($symbol,' '))"/>
-		<xsl:call-template name="startspace">
-			<xsl:with-param name="symbol" select="$symbola"/>
-		</xsl:call-template>
-	</xsl:if>
-	<xsl:if test="not(contains($symbol,' '))">
-		<xsl:value-of select="$symbol"/>
-	</xsl:if>
+    <xsl:param name="symbol"/>
+    <xsl:if test="contains($symbol,' ')">
+        <xsl:variable name="symbola" select="concat(substring-before($symbol,' '),substring-after($symbol,' '))"/>
+        <xsl:call-template name="startspace">
+            <xsl:with-param name="symbol" select="$symbola"/>
+        </xsl:call-template>
+    </xsl:if>
+    <xsl:if test="not(contains($symbol,' '))">
+        <xsl:value-of select="$symbol"/>
+    </xsl:if>
 </xsl:template>
 
 <xsl:strip-space elements="m:*"/>
 
 <xsl:template match="m:math">
-	<xsl:text>&#x00024;</xsl:text>
-	<xsl:apply-templates/>
-	<xsl:text>&#x00024;</xsl:text>
+    <xsl:text>&#x00024;</xsl:text>
+    <xsl:apply-templates/>
+    <xsl:text>&#x00024;</xsl:text>
 </xsl:template>
 
 </xsl:stylesheet>
