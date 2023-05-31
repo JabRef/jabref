@@ -28,7 +28,7 @@
     </xsl:variable>
 
     <xsl:choose>
-        <xsl:when test="$over='&#x000AF;'">	<!-- OverBar - over bar -->
+        <xsl:when test="$over='&#x000AF;'">    <!-- OverBar - over bar -->
             <xsl:text>\overline{</xsl:text>
             <xsl:call-template name="munder">
                 <xsl:with-param name="base" select="$base"/>
@@ -36,7 +36,7 @@
             </xsl:call-template>
             <xsl:text>}</xsl:text>
         </xsl:when>
-        <xsl:when test="$over='&#x0FE37;'">	<!-- OverBrace - over brace -->
+        <xsl:when test="$over='&#x0FE37;'">    <!-- OverBrace - over brace -->
             <xsl:text>\overbrace{</xsl:text>
             <xsl:call-template name="munder">
                 <xsl:with-param name="base" select="$base"/>
@@ -44,7 +44,7 @@
             </xsl:call-template>
             <xsl:text>}</xsl:text>
         </xsl:when>
-        <xsl:when test="$under='&#x00332;'">	<!-- UnderBar - combining low line -->
+        <xsl:when test="$under='&#x00332;'">    <!-- UnderBar - combining low line -->
             <xsl:text>\underline{</xsl:text>
             <xsl:call-template name="mover">
                 <xsl:with-param name="base" select="$base"/>
@@ -53,7 +53,7 @@
             </xsl:call-template>
             <xsl:text>}</xsl:text>
         </xsl:when>
-        <xsl:when test="$under='&#x0FE38;'">	<!-- UnderBrace - under brace -->
+        <xsl:when test="$under='&#x0FE38;'">    <!-- UnderBrace - under brace -->
             <xsl:text>\underbrace{</xsl:text>
             <xsl:call-template name="mover">
                 <xsl:with-param name="base" select="$base"/>
@@ -65,12 +65,12 @@
         <xsl:when test="translate($base,'&#x0220F;&#x02210;&#x022c2;&#x022c3;&#x02294;',
                         '&#x02211;&#x02211;&#x02211;&#x02211;&#x02211;')='&#x02211;'">
 <!-- if $base is operator, such as
-            &#x02211;	/sum L: summation operator
-            &#x0220F;	/prod L: product operator
-            &#x02210;	/coprod L: coproduct operator
-            &#x022c2;	/bigcap
-            &#x022c3;	/bigcup
-            &#x02294;	/bigsqcup
+            &#x02211;    /sum L: summation operator
+            &#x0220F;    /prod L: product operator
+            &#x02210;    /coprod L: coproduct operator
+            &#x022c2;    /bigcap
+            &#x022c3;    /bigcup
+            &#x02294;    /bigsqcup
 -->
             <xsl:apply-templates select="./*[1]"/>
             <xsl:text>_{</xsl:text>
@@ -126,12 +126,12 @@
     <xsl:param name="over"/>
     <xsl:param name="pos_over" select="2"/>
     <xsl:choose>
-        <xsl:when test="$over='&#x000AF;'">	<!-- OverBar - over bar -->
+        <xsl:when test="$over='&#x000AF;'">    <!-- OverBar - over bar -->
             <xsl:text>\overline{</xsl:text>
             <xsl:apply-templates select="./*[1]"/>
             <xsl:text>}</xsl:text>
         </xsl:when>
-        <xsl:when test="$over='&#x0FE37;'">	<!-- OverBrace - over brace -->
+        <xsl:when test="$over='&#x0FE37;'">    <!-- OverBrace - over brace -->
             <xsl:text>\overbrace{</xsl:text>
             <xsl:apply-templates select="./*[1]"/>
             <xsl:text>}</xsl:text>
@@ -139,12 +139,12 @@
         <xsl:when test="translate($base,'&#x0220F;&#x02210;&#x022c2;&#x022c3;&#x02294;',
                         '&#x02211;&#x02211;&#x02211;&#x02211;&#x02211;')='&#x02211;'">
 <!-- if $base is operator, such as
-            &#x02211;	/sum L: summation operator
-            &#x0220F;	/prod L: product operator
-            &#x02210;	/coprod L: coproduct operator
-            &#x022c2;	/bigcap
-            &#x022c3;	/bigcup
-            &#x02294;	/bigsqcup
+            &#x02211;    /sum L: summation operator
+            &#x0220F;    /prod L: product operator
+            &#x02210;    /coprod L: coproduct operator
+            &#x022c2;    /bigcap
+            &#x022c3;    /bigcup
+            &#x02294;    /bigsqcup
 -->
             <xsl:apply-templates select="./*[1]"/>
             <xsl:text>^{</xsl:text>
@@ -171,12 +171,12 @@
     <xsl:param name="base"/>
     <xsl:param name="under"/>
     <xsl:choose>
-        <xsl:when test="$under='&#x00332;'">	<!-- UnderBar - combining low line -->
+        <xsl:when test="$under='&#x00332;'">    <!-- UnderBar - combining low line -->
             <xsl:text>\underline{</xsl:text>
             <xsl:apply-templates select="./*[1]"/>
             <xsl:text>}</xsl:text>
         </xsl:when>
-        <xsl:when test="$under='&#x0FE38;'">	<!-- UnderBrace - under brace -->
+        <xsl:when test="$under='&#x0FE38;'">    <!-- UnderBrace - under brace -->
             <xsl:text>\underbrace{</xsl:text>
             <xsl:apply-templates select="./*[1]"/>
             <xsl:text>}</xsl:text>
@@ -184,12 +184,12 @@
         <xsl:when test="translate($base,'&#x0220F;&#x02210;&#x022c2;&#x022c3;&#x02294;',
                         '&#x02211;&#x02211;&#x02211;&#x02211;&#x02211;')='&#x02211;'">
 <!-- if $base is operator, such as
-            &#x02211;	/sum L: summation operator
-            &#x0220F;	/prod L: product operator
-            &#x02210;	/coprod L: coproduct operator
-            &#x022c2;	/bigcap
-            &#x022c3;	/bigcup
-            &#x02294;	/bigsqcup
+            &#x02211;    /sum L: summation operator
+            &#x0220F;    /prod L: product operator
+            &#x02210;    /coprod L: coproduct operator
+            &#x022c2;    /bigcap
+            &#x022c3;    /bigcup
+            &#x02294;    /bigsqcup
 -->
             <xsl:apply-templates select="./*[1]"/>
             <xsl:text>_{</xsl:text>
@@ -197,7 +197,7 @@
             <xsl:text>}</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-            <xsl:text>\underset{</xsl:text>		<!-- Required AmsMath package -->
+            <xsl:text>\underset{</xsl:text>        <!-- Required AmsMath package -->
             <xsl:apply-templates select="./*[2]"/>
             <xsl:text>}{</xsl:text>
             <xsl:apply-templates select="./*[1]"/>

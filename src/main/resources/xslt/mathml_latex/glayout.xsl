@@ -13,7 +13,7 @@
 <xsl:template match="m:mfrac">
     <xsl:choose>
         <xsl:when test="@bevelled='true'">
-<!--			<xsl:text>\raisebox{1ex}{</xsl:text>
+<!--            <xsl:text>\raisebox{1ex}{</xsl:text>
             <xsl:apply-templates select="./*[1]"/>
             <xsl:text>}\!\left/ \!\raisebox{-1ex}{</xsl:text>
             <xsl:apply-templates select="./*[2]"/>

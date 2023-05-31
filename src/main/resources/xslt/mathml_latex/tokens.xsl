@@ -102,22 +102,22 @@
             <xsl:when test="@mathvariant='italic'">
                 <xsl:text>\mathit{</xsl:text>
             </xsl:when>
-            <xsl:when test="@mathvariant='bold-italic'">	<!-- Required definition -->
+            <xsl:when test="@mathvariant='bold-italic'">    <!-- Required definition -->
                 <xsl:text>\mathbit{</xsl:text>
             </xsl:when>
-            <xsl:when test="@mathvariant='double-struck'">	<!-- Required amsfonts -->
+            <xsl:when test="@mathvariant='double-struck'">    <!-- Required amsfonts -->
                 <xsl:text>\mathbb{</xsl:text>
             </xsl:when>
-            <xsl:when test="@mathvariant='bold-fraktur'">	<!-- Error -->
+            <xsl:when test="@mathvariant='bold-fraktur'">    <!-- Error -->
                 <xsl:text>{</xsl:text>
             </xsl:when>
             <xsl:when test="@mathvariant='script'">
                 <xsl:text>\mathcal{</xsl:text>
             </xsl:when>
-            <xsl:when test="@mathvariant='bold-script'">	<!-- Error -->
+            <xsl:when test="@mathvariant='bold-script'">    <!-- Error -->
                 <xsl:text>\mathsc{</xsl:text>
             </xsl:when>
-            <xsl:when test="@mathvariant='fraktur'">	<!-- Required amsfonts -->
+            <xsl:when test="@mathvariant='fraktur'">    <!-- Required amsfonts -->
                 <xsl:text>\mathfrak{</xsl:text>
             </xsl:when>
             <xsl:when test="@mathvariant='sans-serif'">
@@ -129,7 +129,7 @@
             <xsl:when test="@mathvariant='sans-serif-italic'"> <!-- Required definition -->
                 <xsl:text>\mathsfit{</xsl:text>
             </xsl:when>
-            <xsl:when test="@mathvariant='sans-serif-bold-italic'">	<!-- Error -->
+            <xsl:when test="@mathvariant='sans-serif-bold-italic'">    <!-- Error -->
                 <xsl:text>\mathbsfit{</xsl:text>
             </xsl:when>
             <xsl:when test="@mathvariant='monospace'">
@@ -153,7 +153,7 @@
 </xsl:template>
 
 <xsl:template name="selectTemplate">
-<!--	<xsl:variable name="name" select="local-name()"/>
+<!--    <xsl:variable name="name" select="local-name()"/>
     <xsl:call-template name="{$name}"/>-->
     <xsl:choose>
         <xsl:when test="local-name(.)='mi'">

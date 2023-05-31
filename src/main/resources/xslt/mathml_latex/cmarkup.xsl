@@ -184,11 +184,11 @@
   <xsl:if test="$this-p &lt; $p"><xsl:text>\left(</xsl:text></xsl:if>
   <xsl:text>\frac{</xsl:text>
     <xsl:apply-templates select="*[2]"/>
-<!--		<xsl:with-param name="p" select="$this-p"/>
+<!--        <xsl:with-param name="p" select="$this-p"/>
     </xsl:apply-templates>-->
     <xsl:text>}{</xsl:text>
     <xsl:apply-templates select="*[3]"/>
-<!--    	<xsl:with-param name="p" select="$this-p"/>
+<!--        <xsl:with-param name="p" select="$this-p"/>
     </xsl:apply-templates>-->
     <xsl:text>}</xsl:text>
     <xsl:if test="$this-p &lt; $p"><xsl:text>\right)</xsl:text></xsl:if>
@@ -837,10 +837,10 @@ priority="2">
 
 <!-- 4.4.8.1 common tringonometric functions 4.4.8.3 natural logarithm -->
 <xsl:template match="m:apply[*[1][
- self::m:sin or 		self::m:cos or 	self::m:tan or		self::m:sec or
- self::m:csc or 		self::m:cot or 	self::m:sinh or	 	self::m:cosh or
- self::m:tanh or 		self::m:coth or	self::m:arcsin or 	self::m:arccos or
- self::m:arctan or 	self::m:ln]]">
+ self::m:sin or         self::m:cos or     self::m:tan or        self::m:sec or
+ self::m:csc or         self::m:cot or     self::m:sinh or         self::m:cosh or
+ self::m:tanh or         self::m:coth or    self::m:arcsin or     self::m:arccos or
+ self::m:arctan or     self::m:ln]]">
     <xsl:text>\</xsl:text>
     <xsl:value-of select="local-name(*[1])"/>
     <xsl:text> </xsl:text>
@@ -858,9 +858,9 @@ priority="2">
 </xsl:template>
 
 <xsl:template match="m:apply[*[1][
- self::m:sech or 		self::m:csch or		self::m:arccosh or
- self::m:arccot or 	self::m:arccoth or 	self::m:arccsc or
- self::m:arccsch or self::m:arcsec or 	self::m:arcsech or
+ self::m:sech or         self::m:csch or        self::m:arccosh or
+ self::m:arccot or     self::m:arccoth or     self::m:arccsc or
+ self::m:arccsch or self::m:arcsec or     self::m:arcsech or
  self::m:arcsinh or self::m:arctanh]]">
     <xsl:text>\mathrm{</xsl:text>
     <xsl:value-of select="local-name(*[1])"/>
