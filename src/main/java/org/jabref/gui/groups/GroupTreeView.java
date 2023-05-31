@@ -489,7 +489,6 @@ public class GroupTreeView extends BorderPane {
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
                 removeGroup,
-                factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
@@ -569,11 +568,14 @@ public class GroupTreeView extends BorderPane {
                         case GROUP_EDIT ->
                                 viewModel.isEditable(group);
                         case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
-                                viewModel.isEditable(group) && viewModel.canAddGroupsIn(group);
+                                viewModel.isEditable(group) && viewModel.canRemove(group);
                         case GROUP_SUBGROUP_ADD ->
                                 viewModel.isEditable(group) && viewModel.canAddGroupsIn(group)
                                         || group.isRoot();
-                        case GROUP_SUBGROUP_REMOVE, GROUP_SUBGROUP_SORT ->
+                        case GROUP_SUBGROUP_REMOVE ->
+                                viewModel.isEditable(group) && viewModel.hasSubgroups(group) && viewModel.canRemove(group)
+                                        || group.isRoot();
+                        case GROUP_SUBGROUP_SORT ->
                                 viewModel.isEditable(group) && viewModel.hasSubgroups(group) && viewModel.canAddGroupsIn(group)
                                         || group.isRoot();
                         case GROUP_ENTRIES_ADD, GROUP_ENTRIES_REMOVE ->
