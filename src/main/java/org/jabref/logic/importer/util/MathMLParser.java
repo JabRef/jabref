@@ -1,8 +1,11 @@
 package org.jabref.logic.importer.util;
 
-import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Objects;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -19,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class MathMLParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MathMLParser.class);
-    private static final String XSLT_FILE_PATH = "src/main/resources/xslt/mathml_latex/mmltex.xsl";
+    private static final String XSLT_FILE_PATH = "/xslt/mathml_latex/mmltex.xsl";
 
     /**
      * Parses the MathML element into its corresponding
@@ -38,7 +41,9 @@ public class MathMLParser {
 
             // convert to LaTeX using XSLT file
             Source xmlSource = new StreamSource(new StringReader(xmlContent));
-            Source xsltSource = new StreamSource(new File(XSLT_FILE_PATH));
+
+            URL xsltResource = MathMLParser.class.getResource(XSLT_FILE_PATH);
+            Source xsltSource = new StreamSource(Objects.requireNonNull(xsltResource).openStream(), xsltResource.toURI().toASCIIString());
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer(xsltSource);
@@ -48,8 +53,14 @@ public class MathMLParser {
             transformer.transform(xmlSource, result);
 
             latexResult = writer.getBuffer().toString();
-        } catch (XMLStreamException | TransformerException e) {
-            LOGGER.debug("could not convert MathML element into LaTeX", e);
+        } catch (XMLStreamException e) {
+            LOGGER.debug("An exception occurred when getting XML content", e);
+        } catch (IOException e) {
+            LOGGER.debug("An I/O exception occurred", e);
+        } catch (URISyntaxException e) {
+            LOGGER.debug("XSLT Source URI invalid", e);
+        } catch (TransformerException e) {
+            LOGGER.debug("An exception occurred during transformation", e);
         }
 
         return latexResult;
