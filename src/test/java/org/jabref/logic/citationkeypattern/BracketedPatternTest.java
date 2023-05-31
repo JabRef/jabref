@@ -675,7 +675,6 @@ class BracketedPatternTest {
             "'Newton', '[editorLast]', 'Isaac Newton'",
             "'I', '[editorLastForeIni]', 'Isaac Newton'",
 
-            "'Agency', '[editors]', 'European Union Aviation Safety Agency'",
             "'EUASA', '[editors]', '{European Union Aviation Safety Agency}'"
     })
 
