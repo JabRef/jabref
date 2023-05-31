@@ -71,7 +71,7 @@ public interface PreferencesService {
 
     Map<String, Object> getDefaults();
 
-    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
+    LayoutFormatterPreferences getLayoutFormatterPreferences();
 
     ImportFormatPreferences getImportFormatPreferences();
 

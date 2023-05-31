@@ -1131,11 +1131,10 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository) {
+    public LayoutFormatterPreferences getLayoutFormatterPreferences() {
         return new LayoutFormatterPreferences(
                 getNameFormatterPreferences(),
-                getFilePreferences().mainFileDirectoryProperty(),
-                repository);
+                getFilePreferences().mainFileDirectoryProperty());
     }
 
     @Override
@@ -2250,7 +2249,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
-        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
+        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences();
         SaveConfiguration saveConfiguration = getExportConfiguration();
         List<TemplateExporter> formats = new ArrayList<>();
 
@@ -2261,6 +2260,7 @@ public class JabRefPreferences implements PreferencesService {
                     formatData.get(EXPORTER_FILENAME_INDEX),
                     formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
+                    abbreviationRepository,
                     saveConfiguration);
             format.setCustomExport(true);
             formats.add(format);
@@ -2301,7 +2301,7 @@ public class JabRefPreferences implements PreferencesService {
         this.previewPreferences = new PreviewPreferences(
                 layouts,
                 getPreviewCyclePosition(layouts),
-                new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationRepository)),
+                new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(), Globals.journalAbbreviationRepository),
                 (String) defaults.get(PREVIEW_STYLE),
                 getBoolean(PREVIEW_AS_TAB));
 
@@ -2328,7 +2328,7 @@ public class JabRefPreferences implements PreferencesService {
                                                 .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, Globals.entryTypesManager))
                                                 .orElse(null);
                         } else {
-                            return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationRepository));
+                            return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(), Globals.journalAbbreviationRepository);
                         }
                     })
                     .filter(Objects::nonNull)

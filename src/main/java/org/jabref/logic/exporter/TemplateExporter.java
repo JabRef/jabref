@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
@@ -47,6 +48,7 @@ public class TemplateExporter extends Exporter {
     private final String lfFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
     private final SaveConfiguration saveConfiguration;
     private boolean customExport;
     private BlankLineBehaviour blankLineBehaviour;
@@ -65,7 +67,7 @@ public class TemplateExporter extends Exporter {
                             String lfFileName,
                             String directory,
                             FileType extension) {
-        this(displayName, consoleName, lfFileName, directory, extension, null, null);
+        this(displayName, consoleName, lfFileName, directory, extension, null, null, null);
     }
 
     /**
@@ -81,8 +83,16 @@ public class TemplateExporter extends Exporter {
                             String lfFileName,
                             String extension,
                             LayoutFormatterPreferences layoutPreferences,
+                            JournalAbbreviationRepository abbreviationRepository,
                             SaveConfiguration saveConfiguration) {
-        this(name, name, lfFileName, null, StandardFileType.fromExtensions(extension), layoutPreferences, saveConfiguration);
+        this(name,
+                name,
+                lfFileName,
+                null,
+                StandardFileType.fromExtensions(extension),
+                layoutPreferences,
+                abbreviationRepository,
+                saveConfiguration);
     }
 
     /**
@@ -102,6 +112,7 @@ public class TemplateExporter extends Exporter {
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
+                            JournalAbbreviationRepository abbreviationRepository,
                             SaveConfiguration saveConfiguration) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
@@ -111,6 +122,7 @@ public class TemplateExporter extends Exporter {
         }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
+        this.abbreviationRepository = abbreviationRepository;
         this.saveConfiguration = saveConfiguration;
     }
 
@@ -132,6 +144,7 @@ public class TemplateExporter extends Exporter {
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
+                            JournalAbbreviationRepository abbreviationRepository,
                             SaveConfiguration saveConfiguration,
                             BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
@@ -142,6 +155,7 @@ public class TemplateExporter extends Exporter {
         }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
+        this.abbreviationRepository = abbreviationRepository;
         this.saveConfiguration = saveConfiguration;
         this.blankLineBehaviour = blankLineBehaviour;
     }
@@ -224,7 +238,7 @@ public class TemplateExporter extends Exporter {
 
             // Print header
             try (Reader reader = getReader(lfFileName + BEGIN_INFIX + LAYOUT_EXTENSION)) {
-                LayoutHelper layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences);
+                LayoutHelper layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
                 beginLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was cast, export filter doesn't have a begin
@@ -249,7 +263,7 @@ public class TemplateExporter extends Exporter {
             Layout defLayout;
             LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + LAYOUT_EXTENSION)) {
-                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences);
+                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
                 defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
@@ -271,7 +285,7 @@ public class TemplateExporter extends Exporter {
                 } else {
                     try (Reader reader = getReader(lfFileName + '.' + type.getName() + LAYOUT_EXTENSION)) {
                         // We try to get a type-specific layout for this entry.
-                        layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences);
+                        layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
                         layout = layoutHelper.getLayoutFromText();
                         layouts.put(type, layout);
                         if (layout != null) {
@@ -303,7 +317,7 @@ public class TemplateExporter extends Exporter {
             // Print footer
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {
-                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences);
+                layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
                 endLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was thrown, export filter doesn't have an end

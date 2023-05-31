@@ -10,21 +10,25 @@ import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 
 public class SidePaneContentFactory {
     private final PreferencesService preferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
     public SidePaneContentFactory(PreferencesService preferences,
+                                  JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,
                                   DialogService dialogService,
                                   StateManager stateManager,
                                   UndoManager undoManager) {
         this.preferences = preferences;
+        this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -40,8 +44,8 @@ public class SidePaneContentFactory {
                     dialogService);
             case OPEN_OFFICE -> new OpenOfficePanel(
                     preferences,
-                    preferences.getOpenOfficePreferences(),
                     preferences.getKeyBindingRepository(),
+                    abbreviationRepository,
                     taskExecutor,
                     dialogService,
                     stateManager,

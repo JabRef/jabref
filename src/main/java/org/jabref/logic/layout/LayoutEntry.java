@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.format.AuthorAbbreviator;
 import org.jabref.logic.layout.format.AuthorAndToSemicolonReplacer;
 import org.jabref.logic.layout.format.AuthorAndsCommaReplacer;
@@ -108,31 +109,37 @@ class LayoutEntry {
 
     private final List<Path> fileDirForDatabase;
     private final LayoutFormatterPreferences preferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
-    public LayoutEntry(StringInt si, List<Path> fileDirForDatabase, LayoutFormatterPreferences preferences) {
+    public LayoutEntry(StringInt si,
+                       List<Path> fileDirForDatabase,
+                       LayoutFormatterPreferences preferences,
+                       JournalAbbreviationRepository abbreviationRepository) {
         this.preferences = preferences;
+        this.abbreviationRepository = abbreviationRepository;
         this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, Collections.emptyList());
 
         type = si.i;
         switch (type) {
-            case LayoutHelper.IS_LAYOUT_TEXT:
-                text = si.s;
-                break;
-            case LayoutHelper.IS_SIMPLE_COMMAND:
-                text = si.s.trim();
-                break;
-            case LayoutHelper.IS_OPTION_FIELD:
-                doOptionField(si.s);
-                break;
-            case LayoutHelper.IS_FIELD_START:
-            case LayoutHelper.IS_FIELD_END:
-            default:
-                break;
+            case LayoutHelper.IS_LAYOUT_TEXT ->
+                    text = si.s;
+            case LayoutHelper.IS_SIMPLE_COMMAND ->
+                    text = si.s.trim();
+            case LayoutHelper.IS_OPTION_FIELD ->
+                    doOptionField(si.s);
+            default -> {
+                // IS_FIELD_START and IS_FIELD_END
+            }
         }
     }
 
-    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, List<Path> fileDirForDatabase, LayoutFormatterPreferences preferences) {
+    public LayoutEntry(List<StringInt> parsedEntries,
+                       int layoutType,
+                       List<Path> fileDirForDatabase,
+                       LayoutFormatterPreferences preferences,
+                       JournalAbbreviationRepository abbreviationRepository) {
         this.preferences = preferences;
+        this.abbreviationRepository = abbreviationRepository;
         this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, Collections.emptyList());
 
         List<LayoutEntry> tmpEntries = new ArrayList<>();
@@ -159,7 +166,7 @@ class LayoutEntry {
                         blockEntries.add(parsedEntry);
                         int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :
                                 LayoutHelper.IS_FIELD_START;
-                        LayoutEntry le = new LayoutEntry(blockEntries, groupType, fileDirForDatabase, preferences);
+                        LayoutEntry le = new LayoutEntry(blockEntries, groupType, fileDirForDatabase, preferences, abbreviationRepository);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
@@ -175,7 +182,7 @@ class LayoutEntry {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, fileDirForDatabase, preferences));
+                tmpEntries.add(new LayoutEntry(parsedEntry, fileDirForDatabase, preferences, abbreviationRepository));
             } else {
                 blockEntries.add(parsedEntry);
             }
@@ -446,7 +453,7 @@ class LayoutEntry {
             case "HTMLParagraphs" -> new HTMLParagraphs();
             case "Iso690FormatDate" -> new Iso690FormatDate();
             case "Iso690NamesAuthors" -> new Iso690NamesAuthors();
-            case "JournalAbbreviator" -> new JournalAbbreviator(preferences.getJournalAbbreviationRepository());
+            case "JournalAbbreviator" -> new JournalAbbreviator(abbreviationRepository);
             case "LastPage" -> new LastPage();
 // For backward compatibility
             case "FormatChars", "LatexToUnicode" -> new LatexToUnicodeFormatter();

@@ -133,6 +133,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         undoManager,
                         clipBoardManager,
                         Globals.TASK_EXECUTOR,
+                        Globals.journalAbbreviationRepository,
                         Globals.entryTypesManager))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)

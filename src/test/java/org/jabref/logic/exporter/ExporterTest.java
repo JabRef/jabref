@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -47,6 +48,7 @@ public class ExporterTest {
         ExporterFactory exporterFactory = ExporterFactory.create(
                 new ArrayList<>(),
                 mock(LayoutFormatterPreferences.class),
+                mock(JournalAbbreviationRepository.class),
                 mock(SaveConfiguration.class),
                 mock(XmpPreferences.class),
                 mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),

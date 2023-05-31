@@ -27,7 +27,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
@@ -43,6 +42,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -94,8 +94,8 @@ public class OpenOfficePanel {
     private OOBibStyle style;
 
     public OpenOfficePanel(PreferencesService preferencesService,
-                           OpenOfficePreferences openOfficePreferences,
                            KeyBindingRepository keyBindingRepository,
+                           JournalAbbreviationRepository abbreviationRepository,
                            TaskExecutor taskExecutor,
                            DialogService dialogService,
                            StateManager stateManager,
@@ -130,8 +130,10 @@ public class OpenOfficePanel {
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
         update.setMaxWidth(Double.MAX_VALUE);
 
-        loader = new StyleLoader(openOfficePreferences,
-                preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository));
+        loader = new StyleLoader(
+                preferencesService.getOpenOfficePreferences(),
+                preferencesService.getLayoutFormatterPreferences(),
+                abbreviationRepository);
 
         initPanel();
     }

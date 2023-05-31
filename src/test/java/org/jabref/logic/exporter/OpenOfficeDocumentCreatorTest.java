@@ -15,6 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -53,6 +54,7 @@ public class OpenOfficeDocumentCreatorTest {
         ExporterFactory exporterFactory = ExporterFactory.create(
                 new ArrayList<>(),
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(JournalAbbreviationRepository.class),
                 mock(SaveConfiguration.class),
                 mock(XmpPreferences.class),
                 mock(FieldPreferences.class),

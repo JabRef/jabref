@@ -4,10 +4,10 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -40,6 +40,7 @@ public class CsvExportFormatTest {
         ExporterFactory exporterFactory = ExporterFactory.create(
                 new ArrayList<>(),
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(JournalAbbreviationRepository.class),
                 saveConfiguration,
                 mock(XmpPreferences.class),
                 mock(FieldPreferences.class),
@@ -60,9 +61,8 @@ public class CsvExportFormatTest {
     public void testPerformExportForSingleAuthor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "Someone, Van Something");
-        List<BibEntry> entries = Arrays.asList(entry);
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Someone, Van Something");
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, path, entries);
 
@@ -77,9 +77,8 @@ public class CsvExportFormatTest {
     public void testPerformExportForMultipleAuthors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "von Neumann, John and Smith, John and Black Brown, Peter");
-        List<BibEntry> entries = Arrays.asList(entry);
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "von Neumann, John and Smith, John and Black Brown, Peter");
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, path, entries);
 
@@ -94,9 +93,8 @@ public class CsvExportFormatTest {
     public void testPerformExportForSingleEditor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.EDITOR, "Someone, Van Something");
-        List<BibEntry> entries = Arrays.asList(entry);
+        BibEntry entry = new BibEntry().withField(StandardField.EDITOR, "Someone, Van Something");
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, tmpFile.toPath(), entries);
 
@@ -113,7 +111,7 @@ public class CsvExportFormatTest {
         File tmpFile = path.toFile();
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.EDITOR, "von Neumann, John and Smith, John and Black Brown, Peter");
-        List<BibEntry> entries = Arrays.asList(entry);
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, tmpFile.toPath(), entries);
 

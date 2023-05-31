@@ -8,11 +8,9 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.PreferencesService;
 
@@ -37,15 +35,15 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private final StringProperty layoutFile = new SimpleStringProperty("");
     private final StringProperty extension = new SimpleStringProperty("");
 
-    private final JournalAbbreviationRepository repository;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
     public CreateModifyExporterDialogViewModel(ExporterViewModel exporter,
                                                DialogService dialogService,
                                                PreferencesService preferences,
-                                               JournalAbbreviationRepository repository) {
+                                               JournalAbbreviationRepository abbreviationRepository) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.repository = repository;
+        this.abbreviationRepository = abbreviationRepository;
 
         // Set text of each of the boxes
         if (exporter != null) {
@@ -69,14 +67,13 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         }
 
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(repository);
-        SaveConfiguration saveConfiguration = preferences.getExportConfiguration();
         TemplateExporter format = new TemplateExporter(
                 name.get(),
                 layoutFile.get(),
                 extension.get(),
-                layoutPreferences,
-                saveConfiguration);
+                preferences.getLayoutFormatterPreferences(),
+                abbreviationRepository,
+                preferences.getExportConfiguration());
         format.setCustomExport(true);
         return new ExporterViewModel(format);
     }

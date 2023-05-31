@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -42,6 +43,7 @@ public class HtmlExportFormatTest {
         ExporterFactory exporterFactory = ExporterFactory.create(
                 new ArrayList<>(),
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(JournalAbbreviationRepository.class),
                 saveConfiguration,
                 mock(XmpPreferences.class),
                 mock(FieldPreferences.class),
