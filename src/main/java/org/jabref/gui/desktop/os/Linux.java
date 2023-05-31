@@ -106,7 +106,7 @@ public class Linux implements NativeDesktop {
 
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
-            if (desktopSession.contains("gnome") ) {
+            if (desktopSession.contains("gnome")) {
                 cmd = new String[] {"nautilus", "--select", absoluteFilePath};
             } else if (desktopSession.contains("kde") || desktopSession.contains("plasma")) {
                 cmd = new String[] {"dolphin", "--select", absoluteFilePath};
