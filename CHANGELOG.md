@@ -93,6 +93,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where no preview could be generated for some entry types and led to an exception [#9947](https://github.com/JabRef/jabref/issues/9947)
 - We fixed an issue where the Linux terminal working directory argument was malformed and therefore ignored upon opening a terminal [#9953](https://github.com/JabRef/jabref/issues/9953)
 - We fixed an issue where an Automatic Keyword Group could not be deleted in the UI. [#9778](https://github.com/JabRef/jabref/issues/9778)
+- We fixed an issue where the citation key pattern `[edtrN_M]` was not handled properly. [#9946](https://github.com/JabRef/jabref/pull/9946)
 
 ### Removed
 
