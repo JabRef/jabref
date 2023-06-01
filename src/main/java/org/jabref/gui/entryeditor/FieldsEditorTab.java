@@ -120,6 +120,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                     suggestionProviders,
                     undoManager);
             fieldEditor.bindToEntry(entry);
+
             editors.put(field, fieldEditor);
             labels.add(new FieldNameLabel(field));
         }

@@ -143,7 +143,6 @@ public class EntryEditor extends BorderPane {
 
         this.setOnDragDropped(event -> {
             BibEntry entry = this.getEntry();
-
             boolean success = false;
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
