@@ -26,7 +26,6 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
@@ -54,7 +53,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -137,9 +135,6 @@ public class EntryEditor extends BorderPane {
         this.tabs = createTabs();
 
         this.setOnDragOver(event -> {
-            if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
-                event.acceptTransferModes(TransferMode.MOVE);
-            }
             if (event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE, TransferMode.LINK);
             }
@@ -148,17 +143,6 @@ public class EntryEditor extends BorderPane {
 
         this.setOnDragDropped(event -> {
             BibEntry entry = this.getEntry();
-            if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
-               List<String> group = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
-               String changedGroup = null;
-                if (entry.getField(StandardField.GROUPS).isPresent()) {
-                    changedGroup = entry.getField(StandardField.GROUPS).get() + "," + group.get(0);
-                } else {
-                    changedGroup = group.get(0);
-                }
-
-                entry.setField(StandardField.GROUPS, changedGroup);
-            }
 
             boolean success = false;
 
