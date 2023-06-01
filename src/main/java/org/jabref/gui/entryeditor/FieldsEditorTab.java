@@ -123,6 +123,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                     suggestionProviders,
                     undoManager);
             fieldEditor.bindToEntry(entry);
+
             if (field == StandardField.GROUPS) {
                 fieldEditor.getNode().setOnDragOver(event -> {
                     if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
