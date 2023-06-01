@@ -67,8 +67,8 @@ public abstract class Formatter {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Formatter) {
-            return getKey().equals(((Formatter) obj).getKey());
+        if (obj instanceof Formatter formatter) {
+            return getKey().equals(formatter.getKey());
         } else {
             return false;
         }

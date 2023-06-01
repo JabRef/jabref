@@ -31,8 +31,8 @@ public class FieldsUtil {
     };
 
     public static String getNameWithType(Field field) {
-        if (field instanceof SpecialField) {
-            return new SpecialFieldViewModel((SpecialField) field, Globals.prefs, Globals.undoManager).getLocalization()
+        if (field instanceof SpecialField specialField) {
+            return new SpecialFieldViewModel(specialField, Globals.prefs, Globals.undoManager).getLocalization()
                     + " (" + Localization.lang("Special") + ")";
         } else if (field instanceof IEEEField) {
             return field.getDisplayName() + " (" + Localization.lang("IEEE") + ")";

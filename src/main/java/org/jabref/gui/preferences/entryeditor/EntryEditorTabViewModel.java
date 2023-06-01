@@ -27,6 +27,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
     private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
 
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
@@ -52,6 +53,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
+        autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
 
         setFields(entryEditorPreferences.getEntryEditorTabList());
     }
@@ -84,6 +86,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
         entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
         // entryEditorPreferences.setDividerPosition();
+        entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
 
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
         String[] lines = fieldsProperty.get().split("\n");
@@ -146,5 +149,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty fieldsProperty() {
         return fieldsProperty;
+    }
+
+    public BooleanProperty autoLinkFilesEnabledProperty() {
+        return autoLinkEnabledProperty;
     }
 }

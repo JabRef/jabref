@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="text" et-al-min="4" et-al-use-first="1" page-range-format="expanded" demote-non-dropping-particle="never" default-locale="de-CH">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="text" page-range-format="expanded" demote-non-dropping-particle="never" default-locale="de-CH">
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Universität Bern - Institut für Sozialanthropologie (Deutsch - Schweiz)</title>
@@ -24,6 +24,7 @@
   <locale xml:lang="de-CH">
     <terms>
       <term name="editor" form="symbol">Hg.</term>
+      <term name="et-al">et al.</term>
       <term name="collection-number" form="symbol">Nr.</term>
     </terms>
   </locale>
@@ -32,11 +33,11 @@
       <if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
         <group delimiter=", ">
           <names variable="container-author" delimiter=", ">
-            <name and="symbol" initialize-with=". " delimiter=", "/>
+            <name initialize-with=". " delimiter=", "/>
             <label form="short" prefix=" (" text-case="title" suffix=")"/>
           </names>
           <names variable="editor translator" delimiter=", ">
-            <name and="symbol" name-as-sort-order="first"/>
+            <name name-as-sort-order="first"/>
             <label form="symbol" prefix=" (" suffix=")"/>
           </names>
         </group>
@@ -48,11 +49,11 @@
       <if type="article-journal chapter paper-conference entry-dictionary entry-encyclopedia" match="none">
         <group delimiter=", " prefix=" (" suffix=")">
           <names variable="container-author" delimiter=", ">
-            <name and="symbol" initialize-with=". " delimiter=", "/>
+            <name initialize-with=". " delimiter=", "/>
             <label form="short" prefix=", " text-case="title"/>
           </names>
           <names variable="editor translator" delimiter=", ">
-            <name and="symbol" initialize-with=". " delimiter=", "/>
+            <name initialize-with=". " delimiter=", "/>
             <label form="short" prefix=", " text-case="title"/>
           </names>
         </group>
@@ -61,7 +62,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name and="text" delimiter-precedes-last="never" initialize="false" initialize-with="." name-as-sort-order="first"/>
+      <name delimiter-precedes-last="never" initialize="false" initialize-with="." name-as-sort-order="first"/>
       <label form="symbol" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
@@ -80,7 +81,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="text" initialize-with=". "/>
+      <name form="short" initialize-with=". "/>
       <substitute>
         <names variable="editor"/>
         <choose>
@@ -180,7 +181,7 @@
                 <text variable="reviewed-title" font-style="italic" prefix="Review of "/>
                 <names variable="reviewed-author" delimiter=", ">
                   <label form="verb-short" suffix=" "/>
-                  <name and="symbol" initialize-with=". " delimiter=", "/>
+                  <name initialize-with=". " delimiter=", "/>
                 </names>
               </group>
             </group>
@@ -190,7 +191,7 @@
               <text variable="title" font-style="italic" prefix="Review of "/>
               <names variable="reviewed-author" delimiter=", ">
                 <label form="verb-short" suffix=" "/>
-                <name and="symbol" initialize-with=". " delimiter=", "/>
+                <name initialize-with=". " delimiter=", "/>
               </names>
             </group>
           </else>
@@ -590,7 +591,7 @@
       </if>
     </choose>
   </macro>
-  <citation and="text" delimiter-precedes-last="never" et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year-suffix" cite-group-delimiter="; ">
+  <citation delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year-suffix" cite-group-delimiter="; ">
     <sort>
       <key macro="issued-sort"/>
       <key macro="author"/>
@@ -610,7 +611,7 @@
       <text macro="citation-locator" prefix=": "/>
     </layout>
   </citation>
-  <bibliography et-al-min="4" et-al-use-first="1" et-al-use-last="true" entry-spacing="0" line-spacing="2" hanging-indent="true">
+  <bibliography entry-spacing="0" line-spacing="2" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key macro="issued-sort" sort="ascending"/>
