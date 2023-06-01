@@ -17,7 +17,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -25,7 +24,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
@@ -39,7 +37,6 @@ import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -123,31 +120,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                     suggestionProviders,
                     undoManager);
             fieldEditor.bindToEntry(entry);
-
-            if (field == StandardField.GROUPS) {
-                fieldEditor.getNode().setOnDragOver(event -> {
-                    if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
-                        event.acceptTransferModes(TransferMode.MOVE);
-                    }
-                    event.consume();
-                });
-
-                fieldEditor.getNode().setOnDragDropped(event -> {
-                    boolean success = false;
-
-                    if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
-                        List<String> group = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
-
-                        String changedGroup = entry.getField(StandardField.GROUPS)
-                                                    .map(setGroup -> setGroup + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (group.get(0)))
-                                                    .orElse(group.get(0));
-                        entry.setField(StandardField.GROUPS, changedGroup);
-                        success = true;
-                    }
-                    event.setDropCompleted(success);
-                    event.consume();
-                });
-            }
             editors.put(field, fieldEditor);
             labels.add(new FieldNameLabel(field));
         }
