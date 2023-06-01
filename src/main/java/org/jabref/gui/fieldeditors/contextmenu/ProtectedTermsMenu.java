@@ -42,6 +42,18 @@ class ProtectedTermsMenu extends Menu {
         }
     };
 
+    private final Action unprotectSelectionActionInformation = new Action() {
+        @Override
+        public String getText() {
+            return Localization.lang("Unprotect selection");
+        }
+
+        @Override
+        public String getDescription() {
+            return Localization.lang("Remove all {} in selected text");
+        }
+    };
+
     private class ProtectSelectionAction extends SimpleCommand {
         ProtectSelectionAction() {
             this.executable.bind(textInputControl.selectedTextProperty().isNotEmpty());
@@ -51,6 +63,16 @@ class ProtectedTermsMenu extends Menu {
         public void execute() {
             String selectedText = textInputControl.getSelectedText();
             textInputControl.replaceSelection("{" + selectedText + "}");
+        }
+    }
+
+    private class UnprotectSelectionAction extends SimpleCommand {
+
+        @Override
+        public void execute() {
+            String selectedText = textInputControl.getSelectedText();
+            String strippedOfCurlyBracesText = selectedText.replaceAll("\\{([^{}]*?)\\}", "$1");
+            textInputControl.replaceSelection(strippedOfCurlyBracesText);
         }
     }
 
@@ -88,7 +110,8 @@ class ProtectedTermsMenu extends Menu {
         getItems().addAll(factory.createMenuItem(protectSelectionActionInformation, new ProtectSelectionAction()),
                 getExternalFilesMenu(),
                 new SeparatorMenuItem(),
-                factory.createMenuItem(() -> Localization.lang("Format field"), new FormatFieldAction()));
+                factory.createMenuItem(() -> Localization.lang("Format field"), new FormatFieldAction()),
+                factory.createMenuItem(unprotectSelectionActionInformation, new UnprotectSelectionAction()));
     }
 
     private Menu getExternalFilesMenu() {
