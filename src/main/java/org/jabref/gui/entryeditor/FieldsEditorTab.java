@@ -138,7 +138,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                     if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
                         List<String> group = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
 
-                        String changedGroup =  entry.getField(StandardField.GROUPS)
+                        String changedGroup = entry.getField(StandardField.GROUPS)
                                                     .map(setGroup -> setGroup + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (group.get(0)))
                                                     .orElse(group.get(0));
                         entry.setField(StandardField.GROUPS, changedGroup);
