@@ -45,6 +45,7 @@ public class Launcher {
 
     public static void main(String[] args) {
         ARGUMENTS = args;
+
         addLogToDisk();
         try {
             // Init preferences
@@ -53,7 +54,7 @@ public class Launcher {
             PreferencesMigrations.runMigrations(preferences);
 
             // Early exit in case another instance is already running
-            if (!handleMultipleAppInstances(args, preferences)) {
+            if (!handleMultipleAppInstances(ARGUMENTS, preferences)) {
                 return;
             }
 
@@ -68,7 +69,7 @@ public class Launcher {
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                        args, ArgumentProcessor.Mode.INITIAL_START,
+                        ARGUMENTS, ArgumentProcessor.Mode.INITIAL_START,
                         preferences,
                         fileUpdateMonitor);
                 if (argumentProcessor.shouldShutDown()) {

@@ -142,11 +142,12 @@ public class Linux implements NativeDesktop {
 
                 String[] cmd;
                 if (emulatorName.contains("gnome")) {
-                    cmd = new String[] {"gnome-terminal", "--working-directory=", absolutePath};
+                    cmd = new String[] {"gnome-terminal", "--working-directory", absolutePath};
                 } else if (emulatorName.contains("xfce4")) {
-                    cmd = new String[] {"xfce4-terminal", "--working-directory=", absolutePath};
+                    // xfce4-terminal requires "--working-directory=<directory>" format (one arg)
+                    cmd = new String[] {"xfce4-terminal", "--working-directory=" + absolutePath};
                 } else if (emulatorName.contains("konsole")) {
-                    cmd = new String[] {"konsole", "--workdir=", absolutePath};
+                    cmd = new String[] {"konsole", "--workdir", absolutePath};
                 } else {
                     cmd = new String[] {emulatorName, absolutePath};
                 }
