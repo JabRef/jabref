@@ -40,8 +40,10 @@ public class GroupEditor extends SimpleEditor {
                                                .orElse(group.get(0));
                     entry.setField(StandardField.GROUPS, changedGroup);
                     event.setDropCompleted(true);
-                }},
-                    () -> {event.setDropCompleted(false);});
+                }
+                },
+                    () -> {
+                event.setDropCompleted(false); });
             event.consume();
         });
     }
