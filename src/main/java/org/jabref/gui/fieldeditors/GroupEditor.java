@@ -1,8 +1,8 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.List;
+import java.util.Optional;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DragAndDropDataFormats;
@@ -13,12 +13,9 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
-
 public class GroupEditor extends SimpleEditor {
 
-    private ObservableOptionalValue<BibEntry> bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>());
+    private Optional<BibEntry> bibEntry;
 
     public GroupEditor(final Field field,
                        final SuggestionProvider<?> suggestionProvider,
@@ -38,13 +35,12 @@ public class GroupEditor extends SimpleEditor {
             boolean success = false;
             if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
                 List<String> group = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
-                if (bibEntry.isValuePresent()) {
-                    String changedGroup = bibEntry.getValue()
-                                                  .map(entry -> entry.getField(StandardField.GROUPS)
+                if (bibEntry.isPresent()) {
+                    String changedGroup = bibEntry.map(entry -> entry.getField(StandardField.GROUPS)
                                                                      .map(setGroup -> setGroup + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (group.get(0)))
                                                                      .orElse(group.get(0)))
                                                   .orElse(null);
-                    bibEntry.getValue().map(entry -> entry.setField(StandardField.GROUPS, changedGroup));
+                    bibEntry.map(entry -> entry.setField(StandardField.GROUPS, changedGroup));
                     success = true;
                 }
             }
@@ -55,7 +51,7 @@ public class GroupEditor extends SimpleEditor {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>(entry));
         super.bindToEntry(entry);
+        this.bibEntry = Optional.of(entry);
     }
 }
