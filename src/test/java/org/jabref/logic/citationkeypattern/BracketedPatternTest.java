@@ -660,4 +660,27 @@ class BracketedPatternTest {
                 .withField(StandardField.JOURNAL, "{ACS} Medicinal Chemistry Letters");
         assertEquals("ACS Medicinal Chemistry Letters", BracketedPattern.expandBrackets("[JOURNAL:unprotect_terms]", null, bibEntry, null));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'Newton', '[edtr]', 'Isaac Newton'",
+            "'I', '[edtrForeIni]', 'Isaac Newton'",
+            "'Newton', '[editors]', 'Isaac Newton'",
+            "'Ne', '[edtrIni2]', 'Isaac Newton'",
+            "'New', '[edtr3]', 'Isaac Newton'",
+            "'Newton', '[edtr7]', 'Isaac Newton'",
+            "'New', '[edtr3_1]', 'Isaac Newton'",
+            "'Newton.Maxwell', '[edtr.edtr.ea]', 'Isaac Newton and James Maxwell'",
+            "'Newton', '[edtrshort]', 'Isaac Newton'",
+            "'Newton', '[editorLast]', 'Isaac Newton'",
+            "'I', '[editorLastForeIni]', 'Isaac Newton'",
+
+            "'EUASA', '[editors]', '{European Union Aviation Safety Agency}'"
+    })
+
+    void testEditorFieldMarkers(String expectedCitationKey, String pattern, String editor) {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.EDITOR, editor);
+        BracketedPattern bracketedPattern = new BracketedPattern(pattern);
+        assertEquals(expectedCitationKey, bracketedPattern.expand(bibEntry));
+    }
 }
