@@ -32,19 +32,16 @@ public class GroupEditor extends SimpleEditor {
         });
 
         this.setOnDragDropped(event -> {
-            boolean success = false;
-            if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
-                List<String> group = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
-                if (bibEntry.isPresent()) {
-                    String changedGroup = bibEntry.map(entry -> entry.getField(StandardField.GROUPS)
-                                                                     .map(setGroup -> setGroup + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (group.get(0)))
-                                                                     .orElse(group.get(0)))
-                                                  .orElse(null);
-                    bibEntry.map(entry -> entry.setField(StandardField.GROUPS, changedGroup));
-                    success = true;
-                }
-            }
-            event.setDropCompleted(success);
+            bibEntry.ifPresentOrElse((entry) -> {
+                if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
+                    List<String> group = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
+                    String changedGroup = entry.getField(StandardField.GROUPS)
+                                               .map(setGroup -> setGroup + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (group.get(0)))
+                                               .orElse(group.get(0));
+                    entry.setField(StandardField.GROUPS, changedGroup);
+                    event.setDropCompleted(true);
+                }},
+                    () -> {event.setDropCompleted(false);});
             event.consume();
         });
     }
