@@ -80,6 +80,10 @@ public class CleanupPreferences {
          */
         CLEAN_UP_DOI,
         CLEANUP_EPRINT,
+        /**
+         * Removes the http://... for each NOTE. Moves URL from NOTE and URL field to URL field.
+         */
+        CLEAN_UP_URL,
         MAKE_PATHS_RELATIVE,
         RENAME_PDF,
         RENAME_PDF_ONLY_RELATIVE_PATHS,
