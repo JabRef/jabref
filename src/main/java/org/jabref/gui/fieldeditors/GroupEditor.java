@@ -35,10 +35,11 @@ public class GroupEditor extends SimpleEditor {
             boolean success = false;
             if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {
                 List<String> draggedGroups = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
+                String draggedGroup = draggedGroups.get(0);
                 if (bibEntry.isPresent()) {
                     String newGroup = bibEntry.map(entry -> entry.getField(StandardField.GROUPS)
-                                                                     .map(oldGroup -> oldGroup + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (draggedGroups.get(0)))
-                                                                     .orElse(draggedGroups.get(0)))
+                                                                     .map(oldGroups -> oldGroups + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (draggedGroup))
+                                                                     .orElse(draggedGroup))
                                                   .orElse(null);
                     bibEntry.map(entry -> entry.setField(StandardField.GROUPS, newGroup));
                     success = true;
