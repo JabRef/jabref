@@ -21,6 +21,7 @@ import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.eclipse.jgit.api.Git;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
@@ -48,37 +49,11 @@ class CrawlerTest {
 
     PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
 
-    @Test
-    public void testWhetherAllFilesAreCreated() throws Exception {
-        setUp();
-        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
-                gitHandler,
-                preferencesService,
-                entryTypesManager,
-                new DummyFileUpdateMonitor());
-
-        testCrawler.performCrawl();
-
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));
-
-        List<String> filesToAssert = List.of("ArXiv.bib", "Springer.bib", "result.bib", "Medline_PubMed.bib");
-        filesToAssert.forEach(
-                fileName -> {
-                    assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", fileName)));
-                    assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", fileName)));
-                });
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "studyResult.bib")));
-    }
-
-    private Path getPathToStudyDefinitionFile() {
-        return tempRepositoryDirectory;
-    }
-
     /**
      * Set up mocks and copies the study definition file into the test repository
      */
-    private void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() throws Exception {
         setUpRepository();
 
         CitationKeyPatternPreferences citationKeyPatternPreferences = new CitationKeyPatternPreferences(
@@ -101,6 +76,8 @@ class CrawlerTest {
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
+        when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+
         entryTypesManager = new BibEntryTypesManager();
     }
 
@@ -122,5 +99,31 @@ class CrawlerTest {
         Path destination = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         URL studyDefinition = this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
+    }
+
+    @Test
+    public void testWhetherAllFilesAreCreated() throws Exception {
+        Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
+                gitHandler,
+                preferencesService,
+                entryTypesManager,
+                new DummyFileUpdateMonitor());
+
+        testCrawler.performCrawl();
+
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));
+
+        List<String> filesToAssert = List.of("ArXiv.bib", "Springer.bib", "result.bib", "Medline_PubMed.bib");
+        filesToAssert.forEach(
+                fileName -> {
+                    assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", fileName)));
+                    assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", fileName)));
+                });
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "studyResult.bib")));
+    }
+
+    private Path getPathToStudyDefinitionFile() {
+        return tempRepositoryDirectory;
     }
 }

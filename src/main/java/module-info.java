@@ -98,6 +98,8 @@ open module org.jabref {
     requires flexmark.util.data;
     requires com.h2database.mvstore;
 
+    requires faux.pas;
+
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version

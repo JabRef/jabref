@@ -27,6 +27,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -44,14 +45,20 @@ public class ImportAction {
     private Exception importError;
     private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
 
-    private final PreferencesService prefs;
+    private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
-    public ImportAction(JabRefFrame frame, boolean openInNew, Importer importer, PreferencesService prefs) {
+    public ImportAction(JabRefFrame frame,
+                        boolean openInNew,
+                        Importer importer,
+                        PreferencesService preferencesService,
+                        FileUpdateMonitor fileUpdateMonitor) {
         this.importer = Optional.ofNullable(importer);
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.openInNew = openInNew;
-        this.prefs = prefs;
+        this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
     }
 
     /**
@@ -114,36 +121,34 @@ public class ImportAction {
     }
 
     private List<ImportFormatReader.UnknownFormatImport> doImport(List<Path> files) {
-        // We import all files and collect their results:
+        // We import all files and collect their results
         List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
+        ImportFormatReader importFormatReader = new ImportFormatReader(
+                preferencesService.getImporterPreferences(),
+                preferencesService.getImportFormatPreferences(),
+                fileUpdateMonitor);
         for (Path filename : files) {
             try {
                 if (importer.isEmpty()) {
-                    // Unknown format:
+                    // Unknown format
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getGrobidPreferences())) {
-                            Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                                    prefs.getImporterPreferences(),
-                                    prefs.getImportFormatPreferences(),
-                                    Globals.getFileUpdateMonitor());
+                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences())) {
+                            importFormatReader.reset();
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "...");
                     });
-                    // This import method never throws an IOException:
-                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
+                    // This import method never throws an IOException
+                    imports.add(importFormatReader.importUnknownFormat(filename, fileUpdateMonitor));
                 } else {
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if ((importer.get() instanceof PdfGrobidImporter) || (
-                                (importer.get() instanceof PdfMergeMetadataImporter)
-                                && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(frame.getDialogService(), prefs.getGrobidPreferences()))) {
-                                Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                                        prefs.getImporterPreferences(),
-                                        prefs.getImportFormatPreferences(),
-                                        Globals.getFileUpdateMonitor());
+                        if (((importer.get() instanceof PdfGrobidImporter)
+                                        || (importer.get() instanceof PdfMergeMetadataImporter))
+                                        && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences())) {
+                            importFormatReader.reset();
                         }
                         frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "...");
                     });
-                    // Specific importer:
+                    // Specific importer
                     ParserResult pr = importer.get().importDatabase(filename);
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));
                 }
@@ -173,7 +178,7 @@ public class ImportAction {
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // additional treatment of BibTeX
-                new DatabaseMerger(prefs.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
+                new DatabaseMerger(preferencesService.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
                         importResult.parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
@@ -183,7 +188,7 @@ public class ImportAction {
         }
 
         // set timestamp and owner
-        UpdateField.setAutomaticFields(resultDatabase.getEntries(), prefs.getOwnerPreferences(), prefs.getTimestampPreferences()); // set timestamp and owner
+        UpdateField.setAutomaticFields(resultDatabase.getEntries(), preferencesService.getOwnerPreferences(), preferencesService.getTimestampPreferences()); // set timestamp and owner
 
         return result;
     }

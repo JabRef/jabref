@@ -391,8 +391,8 @@ class LayoutEntry {
             option = getOptionalLayout(v.get(1));
             // See if there was an undefined formatter:
             for (LayoutFormatter anOption : option) {
-                if (anOption instanceof NotFoundFormatter) {
-                    String notFound = ((NotFoundFormatter) anOption).getNotFound();
+                if (anOption instanceof NotFoundFormatter formatter) {
+                    String notFound = formatter.getNotFound();
 
                     invalidFormatter.add(notFound);
                 }
@@ -504,8 +504,8 @@ class LayoutEntry {
             LayoutFormatter formatter = getLayoutFormatterByName(nameFormatterName);
             if (formatter != null) {
                 // If this formatter accepts an argument, check if we have one, and set it if so
-                if ((formatter instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
-                    ((ParamLayoutFormatter) formatter).setArgument(strings.get(1));
+                if ((formatter instanceof ParamLayoutFormatter layoutFormatter) && (strings.size() >= 2)) {
+                    layoutFormatter.setArgument(strings.get(1));
                 }
                 results.add(formatter);
                 continue;

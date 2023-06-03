@@ -421,7 +421,7 @@ public class BracketedPattern {
                     String[] nums = pattern.substring(4).split("_");
                     return authNofMth(editorList,
                             Integer.parseInt(nums[0]),
-                            Integer.parseInt(nums[1]) - 1);
+                            Integer.parseInt(nums[1]));
                 } else if (pattern.matches("edtr\\d+")) {
                     String fa = firstAuthor(editorList);
                     int num = Integer.parseInt(pattern.substring(4));

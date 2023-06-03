@@ -276,6 +276,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
+    public static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
@@ -688,6 +689,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
 
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
+        defaults.put(AUTOLINK_FILES_ENABLED, Boolean.TRUE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
         defaults.put(ALLOW_INTEGER_EDITION_BIBTEX, Boolean.FALSE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
@@ -1511,7 +1513,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getDouble(ENTRY_EDITOR_HEIGHT));
+                getDouble(ENTRY_EDITOR_HEIGHT),
+                getBoolean(AUTOLINK_FILES_ENABLED));
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabListProperty(), (obs, oldValue, newValue) -> storeEntryEditorTabList(newValue));
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
@@ -1522,6 +1525,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
         EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (obs, oldValue, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
         EasyBind.listen(entryEditorPreferences.dividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
+        EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
 
         return entryEditorPreferences;
     }

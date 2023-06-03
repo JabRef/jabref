@@ -20,9 +20,13 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added support for more biblatex date formats for parsing dates [#2753](https://github.com/JabRef/issues/2753).
 - We added support for multiple languages for exporting to and importing references from MS Office. [#9699](https://github.com/JabRef/jabref/issues/9699)
 - We enabled scrolling in the groups list when dragging a group on another group. [#2869](https://github.com/JabRef/jabref/pull/2869)
-- We added the option to automatically download online files when a new entry is created from an existing ID (e.g. DOI). The option can be disabled in the preferences under "Import and Export". [#9756](https://github.com/JabRef/jabref/issues/9756)
+- We added the option to automatically download online files when a new entry is created from an existing ID (e.g., DOI). The option can be disabled in the preferences under "Import and Export". [#9756](https://github.com/JabRef/jabref/issues/9756)
 - We added a new Integrity check for unscaped ampersands. [koppor#585](https://github.com/koppor/jabref/issues/585)
-- We added the possibility to automatically fetch entries when an IBSN is pasted on the main table. [#9864](https://github.com/JabRef/jabref/issues/9864)
+- We added support for parsing `$\backslash$` in file paths (as exported by Mendeley). [forum#3470](https://discourse.jabref.org/t/mendeley-bib-import-with-linked-files/3470)
+- We added the possibility to automatically fetch entries when an ISBN is pasted on the main table. [#9864](https://github.com/JabRef/jabref/issues/9864)
+- We added the option to disable the automatic linking of files in the entry editor [#5105](https://github.com/JabRef/jabref/issues/5105)
+- We added the link icon for ISBNs in linked identifiers column. [#9819](https://github.com/JabRef/jabref/issues/9819)
+- We added support for parsing MathML in the Medline importer. [#4273](https://github.com/JabRef/jabref/issues/4273)
 - We added a cleanup activity that identifies a url in note field and moves it to the URL field. [koppor#216](https://github.com/koppor/jabref/issues/216)
 
 ### Changed
@@ -54,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - In case the library contains empty entries, they are not written to disk. [#8645](https://github.com/JabRef/jabref/issues/8645)
 - The formatter `remove_unicode_ligatures` is now called `replace_unicode_ligatures`. [#9890](https://github.com/JabRef/jabref/pull/9890)
 
+
 ### Fixed
 
 - We fixed an issue where the browser import would add ' characters before the BibTeX entry on Linux. [#9588](https://github.com/JabRef/jabref/issues/9588)
@@ -75,13 +80,22 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where searching for unlinked files would include the current library's .bib file. [#9735](https://github.com/JabRef/jabref/issues/9735)
 - We fixed an issue where it was no longer possible to connect to a shared mysql database due to an exception. [#9761](https://github.com/JabRef/jabref/issues/9761)
 - We fixed an issue where an exception was thrown for the user after <kbd>Ctrl</kbd>+<kbd>Z</kbd> command. [#9737](https://github.com/JabRef/jabref/issues/9737)
-- We fixed the citation key generation for (`[authors]`, `[authshort]`, `[authorsAlpha]`, `authIniN`, `authEtAl`, `auth.etal`)[https://docs.jabref.org/setup/citationkeypatterns#special-field-markers] to handle `and others` properly. [koppor#626](https://github.com/koppor/jabref/issues/626)
+- We fixed the citation key generation for [`[authors]`, `[authshort]`, `[authorsAlpha]`, `[authIniN]`, `[authEtAl]`, `[auth.etal]`](https://docs.jabref.org/setup/citationkeypatterns#special-field-markers) to handle `and others` properly. [koppor#626](https://github.com/koppor/jabref/issues/626)
 - We fixed the Save/save as file type shows BIBTEX_DB instead of "Bibtex library". [#9372](https://github.com/JabRef/jabref/issues/9372)
+- We fixed the default main file directory for non-English Linux users. [#8010](https://github.com/JabRef/jabref/issues/8010)
 - We fixed an issue when overwriting the owner was disabled. [#9896](https://github.com/JabRef/jabref/pull/9896)
 - We fixed an issue regarding recording redundant prefixes in search history. [#9685](https://github.com/JabRef/jabref/issues/9685)
 - We fixed an issue where passing a URL containing a DOI led to a "No entry found" notification. [#9821](https://github.com/JabRef/jabref/issues/9821)
 - We fixed some minor visual inconsistencies and issues in the preferences dialog. [#9866](https://github.com/JabRef/jabref/pull/9866)
-- The order of save actions is now retained. [#9890](https://github.com/JabRef/jabref/pull/9890)
+- We fixed an issue where the order of save actions was not retained in the bib file. [#9890](https://github.com/JabRef/jabref/pull/9890)
+- We fixed an issue in the preferences 'External file types' tab ignoring a custom application path in the edit dialog. [#9895](https://github.com/JabRef/jabref/issues/9895)
+- We fixed an issue in the preferences where custom columns could be added to the entry table with no qualifier. [#9913](https://github.com/JabRef/jabref/issues/9913)
+- We fixed an issue where the encoding header in a bib file was not respected when the file contained a BOM (Byte Order Mark). [#9926](https://github.com/JabRef/jabref/issues/9926)
+- We fixed an issue where cli help output for import and export format was inconsistent. [koppor#429](https://github.com/koppor/jabref/issues/429)
+- We fixed an issue where no preview could be generated for some entry types and led to an exception [#9947](https://github.com/JabRef/jabref/issues/9947)
+- We fixed an issue where the Linux terminal working directory argument was malformed and therefore ignored upon opening a terminal [#9953](https://github.com/JabRef/jabref/issues/9953)
+- We fixed an issue where an Automatic Keyword Group could not be deleted in the UI. [#9778](https://github.com/JabRef/jabref/issues/9778)
+- We fixed an issue where the citation key pattern `[edtrN_M]` returned the wrong editor. [#9946](https://github.com/JabRef/jabref/pull/9946)
 
 ### Removed
 
@@ -107,6 +121,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We now have more "dots" in the offered journal abbreviations. [#9504](https://github.com/JabRef/jabref/pull/9504)
 - We now disable the button "Full text search" in the Searchbar by default [#9527](https://github.com/JabRef/jabref/pull/9527)
 
+
 ### Fixed
 
 - The tab "deprecated fields" is shown in biblatex-mode only. [#7757](https://github.com/JabRef/jabref/issues/7757)
@@ -119,8 +134,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - For portable versions, the `.deb` file now works on plain debian again. [#9472](https://github.com/JabRef/jabref/issues/9472)
 - We fixed an issue where the download of linked online files failed after an import of entries for certain urls. [#9518](https://github.com/JabRef/jabref/issues/9518)
 - We fixed an issue where an exception occurred when manually downloading a file from an URL in the entry editor. [#9521](https://github.com/JabRef/jabref/issues/9521)
-- We fixed an issue with open office csv file formatting where commas in the abstract field where not escaped. [#9087][https://github.com/JabRef/jabref/issues/9087]
-- We fixed an issue with deleting groups where subgroups different from the selected group were deleted. [#9281][https://github.com/JabRef/jabref/issues/9281]
+- We fixed an issue with open office csv file formatting where commas in the abstract field where not escaped. [#9087](https://github.com/JabRef/jabref/issues/9087)
+- We fixed an issue with deleting groups where subgroups different from the selected group were deleted. [#9281](https://github.com/JabRef/jabref/issues/9281)
 
 ## [5.8] - 2022-12-18
 
