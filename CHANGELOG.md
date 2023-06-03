@@ -23,6 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the option to automatically download online files when a new entry is created from an existing ID (e.g. DOI). The option can be disabled in the preferences under "Import and Export". [#9756](https://github.com/JabRef/jabref/issues/9756)
 - We added a new Integrity check for unscaped ampersands. [koppor#585](https://github.com/koppor/jabref/issues/585)
 - We added the possibility to automatically fetch entries when an IBSN is pasted on the main table. [#9864](https://github.com/JabRef/jabref/issues/9864)
+- We added a cleanup activity that identifies a url in note field and moves it to the URL field. [koppor#216](https://github.com/koppor/jabref/issues/216)
 
 ### Changed
 
