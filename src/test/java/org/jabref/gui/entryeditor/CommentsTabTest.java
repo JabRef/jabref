@@ -12,6 +12,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -66,18 +67,22 @@ class CommentsTabTest {
     private JournalAbbreviationRepository journalAbbreviationRepository;
     @Mock
     private IndexingTaskManager indexingTaskManager;
+    @Mock
+    private OwnerPreferences ownerPreferences;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
+        when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
+        when(ownerPreferences.getDefaultOwner()).thenReturn("user1");
+
         commentsTab = new CommentsTab(
-                "TestName",
+                preferences,
                 databaseContext,
                 suggestionProviders,
                 undoManager,
                 dialogService,
-                preferences,
                 stateManager,
                 themeManager,
                 indexingTaskManager,

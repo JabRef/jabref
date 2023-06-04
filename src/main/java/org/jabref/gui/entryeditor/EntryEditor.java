@@ -261,7 +261,7 @@ public class EntryEditor extends BorderPane {
 
         // Comment Tab
         // Tab for general and user-specific comments
-        entryEditorTabs.add(new CommentsTab(preferencesService.getOwnerPreferences().getDefaultOwner(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
+        entryEditorTabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
 
         // General fields from preferences
         for (Map.Entry<String, Set<Field>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {

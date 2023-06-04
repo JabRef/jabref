@@ -29,12 +29,11 @@ import org.jabref.preferences.PreferencesService;
 public class CommentsTab extends FieldsEditorTab {
 
     private final String name;
-    public CommentsTab(String name,
+    public CommentsTab(PreferencesService preferences,
                        BibDatabaseContext databaseContext,
                        SuggestionProviders suggestionProviders,
                        UndoManager undoManager,
                        DialogService dialogService,
-                       PreferencesService preferences,
                        StateManager stateManager,
                        ThemeManager themeManager,
                        IndexingTaskManager indexingTaskManager,
@@ -53,7 +52,7 @@ public class CommentsTab extends FieldsEditorTab {
                 journalAbbreviationRepository,
                 indexingTaskManager
         );
-        this.name = name;
+        this.name = preferences.getOwnerPreferences().getDefaultOwner();
         setText(Localization.lang("All comments"));
         setTooltip(new Tooltip(Localization.lang("Display all comments")));
         setGraphic(IconTheme.JabRefIcons.REQUIRED.getGraphicNode());
