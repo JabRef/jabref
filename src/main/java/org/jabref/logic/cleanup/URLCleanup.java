@@ -17,7 +17,7 @@ public class URLCleanup implements CleanupJob {
 
     private static final Field NOTE_FIELD = StandardField.NOTE;
     private static final Field URL_FIELD = StandardField.URL;
-    
+
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
@@ -29,12 +29,10 @@ public class URLCleanup implements CleanupJob {
          * https://stackoverflow.com/questions/28185064/python-infinite-loop-in-regex-to-match-url. In order to be
          * functional, we made the necessary adjustments regarding Java features. (mainly doubled backslashes)
          */
-        String urlRegex = (
-                "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.]"
+        String urlRegex = "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.]"
                 + "[a-z]{2,4}/)(?:[^\\s()<>\\\\]+|\\(([^\\s()<>\\\\]+|(\\([^\\s()"
                 + "<>\\\\]+\\)))*\\))+(?:\\(([^\\s()<>\\\\]+|(\\([^\\s()<>\\\\]+\\"
-                + ")))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))"
-        );
+                + ")))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
 
         final Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
         final Matcher matcher = pattern.matcher(NoteFieldValue);
@@ -45,7 +43,7 @@ public class URLCleanup implements CleanupJob {
             // Remove the URL from the NoteFieldValue
             String newNoteFieldValue = NoteFieldValue
                     .replace(url, "")
-                    .replace("/url{}", "")
+                    .replace("\\url{}", "")
                     .replace(",", "").trim();
 
             /*
