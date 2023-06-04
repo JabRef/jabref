@@ -23,6 +23,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -44,6 +45,7 @@ public class Launcher {
 
     public static void main(String[] args) {
         ARGUMENTS = args;
+
         addLogToDisk();
         try {
             // Init preferences
@@ -52,7 +54,7 @@ public class Launcher {
             PreferencesMigrations.runMigrations(preferences);
 
             // Early exit in case another instance is already running
-            if (!handleMultipleAppInstances(args, preferences)) {
+            if (!handleMultipleAppInstances(ARGUMENTS, preferences)) {
                 return;
             }
 
@@ -63,15 +65,19 @@ public class Launcher {
             clearOldSearchIndices();
 
             try {
+                FileUpdateMonitor fileUpdateMonitor = Globals.getFileUpdateMonitor();
+
                 // Process arguments
-                ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START,
-                        preferences);
+                ArgumentProcessor argumentProcessor = new ArgumentProcessor(
+                        ARGUMENTS, ArgumentProcessor.Mode.INITIAL_START,
+                        preferences,
+                        fileUpdateMonitor);
                 if (argumentProcessor.shouldShutDown()) {
                     LOGGER.debug("JabRef shut down after processing command line arguments");
                     return;
                 }
 
-                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, ARGUMENTS);
+                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, fileUpdateMonitor, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage(preferences);
@@ -135,12 +141,6 @@ public class Launcher {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
-
-        // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                preferences.getImporterPreferences(),
-                preferences.getImportFormatPreferences(),
-                Globals.getFileUpdateMonitor());
 
         Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());

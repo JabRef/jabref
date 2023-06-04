@@ -10,7 +10,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.ISBN;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
 
@@ -34,6 +33,6 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(importFormatPreferences);
     }
 }

@@ -35,8 +35,7 @@ import org.tinylog.Logger;
 /**
  * Fetches data from the Biodiversity Heritage Library
  *
- * @implNote
- * <a href="https://www.biodiversitylibrary.org/docs/api3.html">API documentation</a>
+ * @see <a href="https://www.biodiversitylibrary.org/docs/api3.html">API documentation</a>
  */
 public class BiodiversityLibrary implements SearchBasedParserFetcher, CustomizableKeyFetcher {
 
