@@ -85,9 +85,9 @@ public class WebSearchPaneViewModel {
                         return null;
                     }
 
-                    // check if DOI is present
                     Optional<DOI> doi = DOI.findInText(queryText);
                     if (doi.isPresent()) {
+                        // in case the query contains a DOI, it is treated as valid
                         return null;
                     }
 
@@ -144,7 +144,6 @@ public class WebSearchPaneViewModel {
         }
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
-        BackgroundTask<ParserResult> task;
         Callable<ParserResult> parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
         String fetcherName = activeFetcher.getName();
 
@@ -159,7 +158,7 @@ public class WebSearchPaneViewModel {
         Globals.getTelemetryClient().ifPresent(client ->
                 client.trackEvent("search", Map.of("fetcher", finalFetcherName), Map.of()));
 
-        task = BackgroundTask.wrap(parserResultCallable)
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
                              .withInitialMessage(Localization.lang("Processing %0", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
