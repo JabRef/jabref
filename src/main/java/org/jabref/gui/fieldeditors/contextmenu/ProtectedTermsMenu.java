@@ -16,6 +16,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 
@@ -71,8 +72,8 @@ class ProtectedTermsMenu extends Menu {
         @Override
         public void execute() {
             String selectedText = textInputControl.getSelectedText();
-            String strippedOfCurlyBracesText = selectedText.replaceAll("\\{([^{}]*?)\\}", "$1");
-            textInputControl.replaceSelection(strippedOfCurlyBracesText);
+            String formattedString = new UnprotectTermsFormatter().format(selectedText);
+            textInputControl.replaceSelection(formattedString);
         }
     }
 
