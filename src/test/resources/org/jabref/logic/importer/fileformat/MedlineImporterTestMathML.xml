@@ -1,0 +1,490 @@
+<PubmedArticleSet>
+    <PubmedArticle>
+        <MedlineCitation Status="MEDLINE" Owner="NLM" IndexingMethod="Automated">
+            <PMID Version="1">32759406</PMID>
+            <DateCompleted>
+                <Year>2021</Year>
+                <Month>04</Month>
+                <Day>27</Day>
+            </DateCompleted>
+            <DateRevised>
+                <Year>2021</Year>
+                <Month>05</Month>
+                <Day>06</Day>
+            </DateRevised>
+            <Article PubModel="Electronic">
+                <Journal>
+                    <ISSN IssnType="Electronic">1613-4516</ISSN>
+                    <JournalIssue CitedMedium="Internet">
+                        <Volume>17</Volume>
+                        <Issue>2-3</Issue>
+                        <PubDate>
+                            <Year>2020</Year>
+                            <Month>Jul</Month>
+                            <Day>24</Day>
+                        </PubDate>
+                    </JournalIssue>
+                    <Title>Journal of integrative bioinformatics</Title>
+                    <ISOAbbreviation>J Integr Bioinform</ISOAbbreviation>
+                </Journal>
+                <ArticleTitle>CellML 2.0.</ArticleTitle>
+                <ELocationID EIdType="pii" ValidYN="Y">20200021</ELocationID>
+                <ELocationID EIdType="doi" ValidYN="Y">10.1515/jib-2020-0021</ELocationID>
+                <Abstract>
+                    <AbstractText>
+                        Following are examples of MathML elements:
+
+                        <!--Indices & Exponents:-->
+                        <mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML">
+                            <mml:mrow>
+                                <mml:msubsup>
+                                    <mml:mi>η</mml:mi>
+                                    <mml:mi>p</mml:mi>
+                                    <mml:mn>2</mml:mn>
+                                </mml:msubsup>
+                            </mml:mrow>
+                        </mml:math>
+
+                        <!--Symbol:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <infinity/>
+                        </math>
+
+                        <!--Matrix:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <matrix>
+                                <matrixrow>
+                                    <cn> 0 </cn> <cn> 1 </cn> <cn> 0 </cn>
+                                </matrixrow>
+                                <matrixrow>
+                                    <cn> 0 </cn> <cn> 0 </cn> <cn> 1 </cn>
+                                </matrixrow>
+                                <matrixrow>
+                                    <cn> 1 </cn> <cn> 0 </cn> <cn> 0 </cn>
+                                </matrixrow>
+                            </matrix>
+                        </math>
+
+                        <!--Cartesian:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <apply>
+                                <in/>
+                                <cn type="complex-cartesian">17<sep/>29</cn>
+                                <complexes/>
+                            </apply>
+                        </math>
+
+                        <!--Brackets:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <mfenced>
+                                <mi>a</mi>
+                                <mi>b</mi>
+                                <mi>c</mi>
+                            </mfenced>
+                            <mfenced separators=''>
+                                <mi>a</mi>
+                                <mi>b</mi>
+                                <mi>c</mi>
+                            </mfenced>
+                            <mfenced open="|" close=">">
+                                <mi>a</mi>
+                                <mi>b</mi>
+                                <mi>c</mi>
+                            </mfenced>
+                        </math>
+
+                        <!--Sum:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML" display='block'>
+                            <munderover>
+                                <mo>&#x2211;</mo>
+                                <mrow>
+                                    <mi>i</mi>
+                                    <mo>=</mo>
+                                    <mn>1</mn>
+                                </mrow>
+                                <mi>n</mi>
+                            </munderover>
+                            <mfenced separators=''>
+                                <msub>
+                                    <mi>a</mi>
+                                    <mi>i</mi>
+                                </msub>
+                            </mfenced>
+                        </math>
+
+                        <!--Integral:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <munderover>
+                                <mo>&#x222B;</mo>
+                                <mi>a</mi>
+                                <mi>b</mi>
+                            </munderover>
+                            <mfenced separators=''>
+                                <mn>5</mn>
+                                <mi>x</mi>
+                                <mo>+</mo>
+                                <mn>2</mn>
+                                <mi>sin</mi>
+                                <mfenced separators=''>
+                                    <mi>x</mi>
+                                </mfenced>
+                            </mfenced>
+                            <mi>dx</mi>
+                        </math>
+
+                        <!--Fractions:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <mfrac>
+                                <mrow>
+                                    <mi>a</mi>
+                                    <mo>+</mo>
+                                    <mn>1</mn>
+                                </mrow>
+                                <mi>b</mi>
+                            </mfrac>
+                        </math>
+
+                        <!--Root:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <mi>y</mi>
+                            <mo>=</mo>
+                            <mroot>
+                                <msup>
+                                    <mi>x</mi>
+                                    <mn>2</mn>
+                                </msup>
+                                <mn>3</mn>
+                            </mroot>
+                        </math>
+
+                        <!--Determinant:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <mi>det A</mi>
+                            <mo>=</mo>
+                            <mfenced open='|' close='|'>
+                                <mtable>
+                                    <mtr>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mn>1</mn>
+                                                    <mn>1</mn>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mn>1</mn>
+                                                    <mn>2</mn>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                        <mtd><mi>&#x2026;</mi>
+                                        </mtd>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mn>1</mn>
+                                                    <mi>n</mi>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                    </mtr>
+                                    <mtr>
+                                        <mtd></mtd>
+                                        <mtd><mi>&#x22ee;</mi>
+                                        </mtd>
+                                    </mtr>
+                                    <mtr mathcolor='#00cc00'>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mi>j</mi>
+                                                    <mn>1</mn>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mi>j</mi>
+                                                    <mn>2</mn>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                        <mtd><mi>&#x2026;</mi>
+                                        </mtd>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mi>j</mi>
+                                                    <mi>n</mi>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                    </mtr>
+                                    <mtr>
+                                        <mtd></mtd>
+                                        <mtd><mi>&#x22ee;</mi>
+                                        </mtd>
+                                    </mtr>
+                                    <mtr mathcolor='#0000cc'>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mi>k</mi>
+                                                    <mn>1</mn>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mi>k</mi>
+                                                    <mn>2</mn>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                        <mtd><mi>&#x2026;</mi>
+                                        </mtd>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mi>k</mi>
+                                                    <mi>n</mi>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                    </mtr>
+                                    <mtr>
+                                        <mtd></mtd>
+                                        <mtd><mi>&#x22ee;</mi>
+                                        </mtd>
+                                    </mtr>
+                                    <mtr>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mi>n</mi>
+                                                    <mn>1</mn>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mi>n</mi>
+                                                    <mn>2</mn>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                        <mtd><mi>&#x2026;</mi>
+                                        </mtd>
+                                        <mtd>
+                                            <msub>
+                                                <mi>a</mi>
+                                                <mrow>
+                                                    <mi>n</mi>
+                                                    <mi>n</mi>
+                                                </mrow>
+                                            </msub>
+                                        </mtd>
+                                    </mtr>
+                                </mtable>
+                            </mfenced>
+                        </math>
+
+                        <!--Vector:-->
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <mover>
+                                <mi>v</mi>
+                                <mo>&#x2192;</mo>
+                            </mover>
+                            <mo>=</mo>
+                            <mfenced>
+                                <msub>
+                                    <mi>v</mi>
+                                    <mn>1</mn>
+                                </msub>
+                                <msub>
+                                    <mi>v</mi>
+                                    <mn>2</mn>
+                                </msub>
+                                <msub>
+                                    <mi>v</mi>
+                                    <mn>3</mn>
+                                </msub>
+                            </mfenced>
+                        </math>
+
+                    </AbstractText>
+                </Abstract>
+                <AuthorList CompleteYN="Y">
+                    <Author ValidYN="Y">
+                        <LastName>Clerx</LastName>
+                        <ForeName>Michael</ForeName>
+                        <Initials>M</Initials>
+                        <Identifier Source="ORCID">0000-0003-4062-3061</Identifier>
+                        <AffiliationInfo>
+                            <Affiliation>University of Oxford, Oxford, UK.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Cooling</LastName>
+                        <ForeName>Michael T</ForeName>
+                        <Initials>MT</Initials>
+                        <Identifier Source="ORCID">0000-0002-3417-0177</Identifier>
+                        <AffiliationInfo>
+                            <Affiliation>University of Auckland, Auckland, New Zealand.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Cooper</LastName>
+                        <ForeName>Jonathan</ForeName>
+                        <Initials>J</Initials>
+                        <Identifier Source="ORCID">0000-0001-6009-3542</Identifier>
+                        <AffiliationInfo>
+                            <Affiliation>University College London, London, UK.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Garny</LastName>
+                        <ForeName>Alan</ForeName>
+                        <Initials>A</Initials>
+                        <Identifier Source="ORCID">0000-0001-7606-5888</Identifier>
+                        <AffiliationInfo>
+                            <Affiliation>University of Auckland, Auckland, New Zealand.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Moyle</LastName>
+                        <ForeName>Keri</ForeName>
+                        <Initials>K</Initials>
+                        <Identifier Source="ORCID">0000-0002-7178-2631</Identifier>
+                        <AffiliationInfo>
+                            <Affiliation>University of Auckland, Auckland, New Zealand.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Nickerson</LastName>
+                        <ForeName>David P</ForeName>
+                        <Initials>DP</Initials>
+                        <Identifier Source="ORCID">0000-0003-4667-9779</Identifier>
+                        <AffiliationInfo>
+                            <Affiliation>University of Auckland, Auckland, New Zealand.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Nielsen</LastName>
+                        <ForeName>Poul M F</ForeName>
+                        <Initials>PMF</Initials>
+                        <Identifier Source="ORCID">0000-0002-4704-0179</Identifier>
+                        <AffiliationInfo>
+                            <Affiliation>University of Auckland, Auckland, New Zealand.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Sorby</LastName>
+                        <ForeName>Hugh</ForeName>
+                        <Initials>H</Initials>
+                        <Identifier Source="ORCID">0000-0001-8991-4703</Identifier>
+                        <AffiliationInfo>
+                            <Affiliation>University of Auckland, Auckland, New Zealand.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                </AuthorList>
+                <Language>eng</Language>
+                <PublicationTypeList>
+                    <PublicationType UI="D016428">Journal Article</PublicationType>
+                </PublicationTypeList>
+                <ArticleDate DateType="Electronic">
+                    <Year>2020</Year>
+                    <Month>07</Month>
+                    <Day>24</Day>
+                </ArticleDate>
+            </Article>
+            <MedlineJournalInfo>
+                <Country>Germany</Country>
+                <MedlineTA>J Integr Bioinform</MedlineTA>
+                <NlmUniqueID>101503361</NlmUniqueID>
+                <ISSNLinking>1613-4516</ISSNLinking>
+            </MedlineJournalInfo>
+            <CitationSubset>IM</CitationSubset>
+            <MeshHeadingList>
+                <MeshHeading>
+                    <DescriptorName UI="D003198" MajorTopicYN="N">Computer Simulation</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D008954" MajorTopicYN="Y">Models, Biological</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D008962" MajorTopicYN="N">Models, Theoretical</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D012984" MajorTopicYN="Y">Software</DescriptorName>
+                </MeshHeading>
+            </MeshHeadingList>
+            <KeywordList Owner="NOTNLM">
+                <Keyword MajorTopicYN="N">computational physiology</Keyword>
+                <Keyword MajorTopicYN="N">modularity</Keyword>
+                <Keyword MajorTopicYN="N">physiome project</Keyword>
+                <Keyword MajorTopicYN="N">reproducibility</Keyword>
+                <Keyword MajorTopicYN="N">reusability</Keyword>
+            </KeywordList>
+        </MedlineCitation>
+        <PubmedData>
+            <History>
+                <PubMedPubDate PubStatus="received">
+                    <Year>2020</Year>
+                    <Month>4</Month>
+                    <Day>18</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="accepted">
+                    <Year>2020</Year>
+                    <Month>4</Month>
+                    <Day>20</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="pubmed">
+                    <Year>2020</Year>
+                    <Month>8</Month>
+                    <Day>8</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="medline">
+                    <Year>2021</Year>
+                    <Month>4</Month>
+                    <Day>28</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="entrez">
+                    <Year>2020</Year>
+                    <Month>8</Month>
+                    <Day>8</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+            </History>
+            <PublicationStatus>epublish</PublicationStatus>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">32759406</ArticleId>
+                <ArticleId IdType="pmc">PMC7756617</ArticleId>
+                <ArticleId IdType="doi">10.1515/jib-2020-0021</ArticleId>
+                <ArticleId IdType="pii">jib-2020-0021</ArticleId>
+            </ArticleIdList>
+        </PubmedData>
+    </PubmedArticle>
+</PubmedArticleSet>

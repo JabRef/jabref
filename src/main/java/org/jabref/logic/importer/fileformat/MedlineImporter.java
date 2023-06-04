@@ -29,6 +29,7 @@ import org.jabref.logic.importer.fileformat.medline.Investigator;
 import org.jabref.logic.importer.fileformat.medline.MeshHeading;
 import org.jabref.logic.importer.fileformat.medline.OtherId;
 import org.jabref.logic.importer.fileformat.medline.PersonalNameSubject;
+import org.jabref.logic.importer.util.MathMLParser;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -1082,6 +1083,9 @@ public class MedlineImporter extends Importer implements Parser {
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
+                    case "math" -> {
+                        result.append(MathMLParser.parse(reader));
+                    }
                     case "sup", "sub" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
