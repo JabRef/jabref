@@ -17,8 +17,7 @@ public class URLCleanup implements CleanupJob {
 
     private static final Field NOTE_FIELD = StandardField.NOTE;
     private static final Field URL_FIELD = StandardField.URL;
-
-    @SuppressWarnings("checkstyle:InvalidJavadocPosition")
+    
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
