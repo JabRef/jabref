@@ -18,11 +18,18 @@ public class URLCleanup implements CleanupJob {
     private static final Field NOTE_FIELD = StandardField.NOTE;
     private static final Field URL_FIELD = StandardField.URL;
 
+    @SuppressWarnings("checkstyle:InvalidJavadocPosition")
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
         String NoteFieldValue = entry.getField(NOTE_FIELD).orElse(null);
+
+        /*
+         * The urlRegex was originally fetched from a suggested solution in
+         * https://stackoverflow.com/questions/28185064/python-infinite-loop-in-regex-to-match-url. In order to be
+         * functional, we made the necessary adjustments regarding Java features. (mainly doubled backslashes)
+         */
         String urlRegex = (
                 "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.]"
                 + "[a-z]{2,4}/)(?:[^\\s()<>\\\\]+|\\(([^\\s()<>\\\\]+|(\\([^\\s()"
