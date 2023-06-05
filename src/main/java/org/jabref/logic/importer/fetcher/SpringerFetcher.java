@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Fetches data from the Springer
  *
- * @implNote see <a href="https://dev.springernature.com/">API documentation</a> for more details
+ * @see <a href="https://dev.springernature.com/">API documentation</a> for more details
  */
 public class SpringerFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
 

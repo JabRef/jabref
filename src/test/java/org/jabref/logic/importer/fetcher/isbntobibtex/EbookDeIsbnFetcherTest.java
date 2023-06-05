@@ -84,6 +84,6 @@ public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
      */
     @Test
     public void searchForValidButNotFoundISBN() throws Exception {
-        assertThrows(FetcherClientException.class, ()-> fetcher.performSearchById("3728128155"));
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("3728128155"));
     }
 }

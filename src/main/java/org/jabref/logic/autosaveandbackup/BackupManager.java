@@ -226,7 +226,7 @@ public class BackupManager {
         SaveConfiguration saveConfiguration = new SaveConfiguration()
                 .withMakeBackup(false)
                 .withMetadataSaveOrder(true)
-                .withReformatOnSave(preferences.getExportPreferences().shouldAlwaysReformatOnSave());
+                .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
         // We want to have successful backups only

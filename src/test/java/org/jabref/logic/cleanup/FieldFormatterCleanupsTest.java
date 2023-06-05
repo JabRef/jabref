@@ -1,4 +1,4 @@
-package org.jabref.logic.exporter;
+package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.IdentityFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
@@ -17,6 +15,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -308,5 +307,30 @@ public class FieldFormatterCleanupsTest {
                         new FieldFormatterCleanup(StandardField.BOOKTITLE, new LatexCleanupFormatter())
                 ),
                 fieldFormatterCleanups);
+    }
+
+    @Test
+    void getMetaDataStringWorks() {
+        assertEquals("""
+                pages[normalize_page_numbers]
+                date[normalize_date]
+                month[normalize_month]
+                all-text-fields[replace_unicode_ligatures]
+                """, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, "\n"));
+    }
+
+    @Test
+    void parsingOfDefaultSaveActions() {
+        assertEquals(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, FieldFormatterCleanups.parse("""
+                pages[normalize_page_numbers]
+                date[normalize_date]
+                month[normalize_month]
+                all-text-fields[replace_unicode_ligatures]
+                """));
+    }
+
+    @Test
+    void formatterFromString() {
+        assertEquals(new ReplaceUnicodeLigaturesFormatter(), FieldFormatterCleanups.getFormatterFromString("replace_unicode_ligatures"));
     }
 }

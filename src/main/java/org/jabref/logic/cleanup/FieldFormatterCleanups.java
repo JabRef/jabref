@@ -3,12 +3,11 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +30,9 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FieldFormatterCleanups {
 
     public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
@@ -40,25 +42,27 @@ public class FieldFormatterCleanups {
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "disabled";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldFormatterCleanups.class);
+
     /**
      * This parses the key/list map of fields and clean up actions for the field.
-     *
+     * <p>
      * General format for one key/list map: <code>...[...]</code> - <code>field[formatter1,formatter2,...]</code>
      * Multiple are written as <code>...[...]...[...]...[...]</code>
-     *   <code>field1[formatter1,formatter2,...]field2[formatter3,formatter4,...]</code>
-     *
+     * <code>field1[formatter1,formatter2,...]field2[formatter3,formatter4,...]</code>
+     * <p>
      * The idea is that characters are field names until <code>[</code> is reached and that formatter lists are terminated by <code>]</code>
-     *
+     * <p>
      * Example: <code>pages[normalize_page_numbers]title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]</code>
      */
     private static final Pattern FIELD_FORMATTER_CLEANUP_PATTERN = Pattern.compile("([^\\[]+)\\[([^]]+)]");
 
     static {
         DEFAULT_SAVE_ACTIONS = List.of(
-            new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
-            new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
-            new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
-            new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()));
+                new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
+                new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
+                new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
+                new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()));
 
         List<FieldFormatterCleanup> recommendedBibtexFormatters = new ArrayList<>(DEFAULT_SAVE_ACTIONS);
         recommendedBibtexFormatters.addAll(List.of(
@@ -87,8 +91,9 @@ public class FieldFormatterCleanups {
      * Note: String parsing is done at {@link FieldFormatterCleanups#parse(String)}
      */
     public static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newLineSeparator) {
-        // first, group all formatters by the field for which they apply
-        Map<Field, List<String>> groupedByField = new TreeMap<>(Comparator.comparing(Field::getName));
+        // First, group all formatters by the field for which they apply
+        // Order of the list should be kept
+        Map<Field, List<String>> groupedByField = new LinkedHashMap<>();
         for (FieldFormatterCleanup cleanup : actionList) {
             Field key = cleanup.getField();
 
@@ -198,12 +203,13 @@ public class FieldFormatterCleanups {
         }
     }
 
-    private static Formatter getFormatterFromString(String formatterName) {
+    static Formatter getFormatterFromString(String formatterName) {
         for (Formatter formatter : Formatters.getAll()) {
             if (formatterName.equals(formatter.getKey())) {
                 return formatter;
             }
         }
+        LOGGER.info("Formatter {} not found.", formatterName);
         return new IdentityFormatter();
     }
 

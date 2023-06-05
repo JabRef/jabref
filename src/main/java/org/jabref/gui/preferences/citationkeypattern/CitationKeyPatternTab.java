@@ -67,7 +67,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     public void setValues() {
         viewModel.setValues();
         bibtexKeyPatternTable.setValues(
-                Globals.entryTypesManager.getAllTypes(preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode()),
+                Globals.entryTypesManager.getAllTypes(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode()),
                 preferencesService.getCitationKeyPatternPreferences().getKeyPattern());
     }
 
