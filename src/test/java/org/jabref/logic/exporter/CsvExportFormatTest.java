@@ -3,17 +3,13 @@ package org.jabref.logic.exporter;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 
@@ -37,17 +33,15 @@ public class CsvExportFormatTest {
         SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
 
-        ExporterFactory exporterFactory = ExporterFactory.create(
-                new ArrayList<>(),
+        exportFormat = new TemplateExporter(
+                "OpenOffice/LibreOffice CSV",
+                "oocsv",
+                "openoffice-csv",
+                "openoffice",
+                StandardFileType.CSV,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 mock(JournalAbbreviationRepository.class),
-                saveConfiguration,
-                mock(XmpPreferences.class),
-                mock(FieldPreferences.class),
-                BibDatabaseMode.BIBTEX,
-                mock(BibEntryTypesManager.class));
-
-        exportFormat = exporterFactory.getExporterByName("oocsv").get();
+                saveConfiguration);
 
         databaseContext = new BibDatabaseContext();
     }

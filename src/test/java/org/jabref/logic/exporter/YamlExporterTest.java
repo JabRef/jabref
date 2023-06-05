@@ -1,21 +1,15 @@
 package org.jabref.logic.exporter;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.SaveOrder;
@@ -31,7 +25,6 @@ import static org.mockito.Mockito.when;
 
 public class YamlExporterTest {
 
-    private static Charset charset;
     private static Exporter yamlExporter;
     private static BibDatabaseContext databaseContext;
 
@@ -40,19 +33,18 @@ public class YamlExporterTest {
         SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
 
-        ExporterFactory exporterFactory = ExporterFactory.create(
-                new ArrayList<>(),
+        yamlExporter = new TemplateExporter(
+                "CSL YAML",
+                "yaml",
+                "yaml",
+                null,
+                StandardFileType.YAML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 mock(JournalAbbreviationRepository.class),
                 saveConfiguration,
-                mock(XmpPreferences.class),
-                mock(FieldPreferences.class),
-                BibDatabaseMode.BIBTEX,
-                mock(BibEntryTypesManager.class));
+                BlankLineBehaviour.DELETE_BLANKS);
 
         databaseContext = new BibDatabaseContext();
-        charset = StandardCharsets.UTF_8;
-        yamlExporter = exporterFactory.getExporterByName("yaml").get();
     }
 
     @Test

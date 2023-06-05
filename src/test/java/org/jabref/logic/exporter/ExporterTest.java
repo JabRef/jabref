@@ -10,14 +10,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.metadata.SaveOrder;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -27,7 +25,9 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ExporterTest {
 
@@ -43,18 +43,16 @@ public class ExporterTest {
     }
 
     private static Stream<Object[]> exportFormats() {
-        Collection<Object[]> result = new ArrayList<>();
+        PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferencesService.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(preferencesService.getCustomExportFormats(any())).thenReturn(new ArrayList<>());
 
         ExporterFactory exporterFactory = ExporterFactory.create(
-                new ArrayList<>(),
-                mock(LayoutFormatterPreferences.class),
-                mock(JournalAbbreviationRepository.class),
-                mock(SaveConfiguration.class),
-                mock(XmpPreferences.class),
-                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                BibDatabaseMode.BIBTEX,
-                mock(BibEntryTypesManager.class));
+                preferencesService,
+                mock(BibEntryTypesManager.class),
+                mock(JournalAbbreviationRepository.class));
 
+        Collection<Object[]> result = new ArrayList<>();
         for (Exporter format : exporterFactory.getExporters()) {
             result.add(new Object[]{format, format.getName()});
         }

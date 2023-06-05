@@ -27,25 +27,13 @@ public class ExporterFactory {
     public static ExporterFactory create(PreferencesService preferencesService,
                                          BibEntryTypesManager entryTypesManager,
                                          JournalAbbreviationRepository abbreviationRepository) {
-        return ExporterFactory.create(
-                preferencesService.getCustomExportFormats(abbreviationRepository),
-                preferencesService.getLayoutFormatterPreferences(),
-                abbreviationRepository,
-                preferencesService.getExportConfiguration(),
-                preferencesService.getXmpPreferences(),
-                preferencesService.getFieldPreferences(),
-                preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                entryTypesManager);
-    }
 
-    public static ExporterFactory create(List<TemplateExporter> customFormats,
-                                         LayoutFormatterPreferences layoutPreferences,
-                                         JournalAbbreviationRepository abbreviationRepository,
-                                         SaveConfiguration saveConfiguration,
-                                         XmpPreferences xmpPreferences,
-                                         FieldPreferences fieldPreferences,
-                                         BibDatabaseMode bibDatabaseMode,
-                                         BibEntryTypesManager entryTypesManager) {
+        List<TemplateExporter> customFormats = preferencesService.getCustomExportFormats(abbreviationRepository);
+        LayoutFormatterPreferences layoutPreferences = preferencesService.getLayoutFormatterPreferences();
+        SaveConfiguration saveConfiguration = preferencesService.getExportConfiguration();
+        XmpPreferences xmpPreferences = preferencesService.getXmpPreferences();
+        FieldPreferences fieldPreferences = preferencesService.getFieldPreferences();
+        BibDatabaseMode bibDatabaseMode = preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode();
 
         List<Exporter> exporters = new ArrayList<>();
 
