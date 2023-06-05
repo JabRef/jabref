@@ -154,7 +154,7 @@ public class WebSearchPaneViewModel {
             fetcherName = doiFetcher.getName();
         }
 
-        String finalFetcherName = fetcherName;
+        final String finalFetcherName = fetcherName;
         Globals.getTelemetryClient().ifPresent(client ->
                 client.trackEvent("search", Map.of("fetcher", finalFetcherName), Map.of()));
 
@@ -163,7 +163,7 @@ public class WebSearchPaneViewModel {
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
-        dialog.setTitle(fetcherName);
+        dialog.setTitle(finalFetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }
 
