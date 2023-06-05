@@ -167,8 +167,8 @@ public class ArgumentProcessor {
                 ImportFormatReader.UnknownFormatImport importResult =
                         importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
-                System.out.println(Localization.lang("Format used") + ": " + importResult.format);
-                return Optional.of(importResult.parserResult);
+                System.out.println(Localization.lang("Format used") + ": " + importResult.format());
+                return Optional.of(importResult.parserResult());
             }
         } catch (ImportException ex) {
             System.err

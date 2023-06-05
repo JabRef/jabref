@@ -125,8 +125,7 @@ public class ImportFormatReader {
 
     /**
      * All importers.
-     * <p>
-     * <p>
+     *
      * Elements are sorted by name.
      * </p>
      *
@@ -136,15 +135,7 @@ public class ImportFormatReader {
         return new TreeSet<>(this.formats);
     }
 
-    public static class UnknownFormatImport {
-
-        public final String format;
-        public final ParserResult parserResult;
-
-        public UnknownFormatImport(String format, ParserResult parserResult) {
-            this.format = format;
-            this.parserResult = parserResult;
-        }
+    public record UnknownFormatImport(String format, ParserResult parserResult) {
     }
 
     /**
