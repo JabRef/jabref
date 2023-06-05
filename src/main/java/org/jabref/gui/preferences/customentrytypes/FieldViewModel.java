@@ -69,6 +69,9 @@ public class FieldViewModel {
     public FieldPriority getPriority() {
         return priorityProperty.getValue();
     }
+    public void setField(String field){
+        this.fieldName.setValue(field);
+    }
 
     public BibField toBibField() {
         return new BibField(field, priorityProperty.getValue());

@@ -12,6 +12,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -143,6 +144,12 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     private void setupFieldsTable() {
         fieldNameColumn.setCellValueFactory(item -> item.getValue().nameProperty());
+        fieldNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        fieldNameColumn.setEditable(true);
+        fieldNameColumn.setOnEditCommit(
+                (TableColumn.CellEditEvent<FieldViewModel, String> event) ->
+                        event.getRowValue().setField(event.getNewValue())
+        );
 
         fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));
         fieldTypeColumn.setCellValueFactory(item -> item.getValue().requiredProperty());
