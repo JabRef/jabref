@@ -1,7 +1,9 @@
 package org.jabref.gui.importer.fetcher;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedSet;
+import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -20,8 +22,11 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SidePanePreferences;
 
@@ -43,6 +48,7 @@ public class WebSearchPaneViewModel {
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
     private final StateManager stateManager;
 
     private final Validator searchQueryValidator;
@@ -51,6 +57,7 @@ public class WebSearchPaneViewModel {
     public WebSearchPaneViewModel(PreferencesService preferencesService, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.preferencesService = preferencesService;
 
         SortedSet<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(
                 preferencesService.getImportFormatPreferences(),
@@ -77,6 +84,13 @@ public class WebSearchPaneViewModel {
                         // in case user did not enter something, it is treated as valid (to avoid UI WTFs)
                         return null;
                     }
+
+                    Optional<DOI> doi = DOI.findInText(queryText);
+                    if (doi.isPresent()) {
+                        // in case the query contains a DOI, it is treated as valid
+                        return null;
+                    }
+
                     try {
                         parser.parse(queryText, NO_EXPLICIT_FIELD);
                         return null;
@@ -130,16 +144,26 @@ public class WebSearchPaneViewModel {
         }
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
-        Globals.getTelemetryClient().ifPresent(client ->
-                client.trackEvent("search", Map.of("fetcher", activeFetcher.getName()), Map.of()));
+        Callable<ParserResult> parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
+        String fetcherName = activeFetcher.getName();
 
-        BackgroundTask<ParserResult> task;
-        task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(query)))
+        Optional<DOI> doi = DOI.findInText(query);
+        if (doi.isPresent()) {
+            DoiFetcher doiFetcher = new DoiFetcher(preferencesService.getImportFormatPreferences());
+            parserResultCallable = () -> new ParserResult(OptionalUtil.toList(doiFetcher.performSearchById(doi.get().getDOI())));
+            fetcherName = doiFetcher.getName();
+        }
+
+        final String finalFetcherName = fetcherName;
+        Globals.getTelemetryClient().ifPresent(client ->
+                client.trackEvent("search", Map.of("fetcher", finalFetcherName), Map.of()));
+
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
                              .withInitialMessage(Localization.lang("Processing %0", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
-        dialog.setTitle(activeFetcher.getName());
+        dialog.setTitle(finalFetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }
 

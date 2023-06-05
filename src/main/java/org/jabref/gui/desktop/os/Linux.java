@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
 public class Linux implements NativeDesktop {
 
+    private static final String ETC_ALTERNATIVES_X_TERMINAL_EMULATOR = "/etc/alternatives/x-terminal-emulator";
+
     private void nativeOpenFile(String filePath) {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
@@ -100,7 +102,7 @@ public class Linux implements NativeDesktop {
         String desktopSession = System.getenv("DESKTOP_SESSION");
 
         String absoluteFilePath = filePath.toAbsolutePath().toString();
-        String[] cmd = {"xdg-open", absoluteFilePath}; // default command
+        String[] cmd = {"xdg-open", filePath.getParent().toString()}; // default is the folder of the file
 
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
@@ -112,8 +114,11 @@ public class Linux implements NativeDesktop {
                 cmd = new String[] {"caja", "--select", absoluteFilePath};
             } else if (desktopSession.contains("cinnamon")) {
                 cmd = new String[] {"nemo", absoluteFilePath}; // Although nemo is based on nautilus it does not support --select, it directly highlights the file
+            } else if (desktopSession.contains("xfce")) {
+                cmd = new String[] {"thunar", absoluteFilePath};
             }
         }
+        LoggerFactory.getLogger(Linux.class).debug("Opening folder and selecting file using {}", String.join(" ", cmd));
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         Process process = processBuilder.start();
 
@@ -127,12 +132,12 @@ public class Linux implements NativeDesktop {
     @Override
     public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
 
-        if (!Files.exists(Path.of("/etc/alternatives/x-terminal-emulator"))) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not detect terminal automatically. Please define a custom terminal in the preferences."));
+        if (!Files.exists(Path.of(ETC_ALTERNATIVES_X_TERMINAL_EMULATOR))) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not detect terminal automatically using '%0'. Please define a custom terminal in the preferences.", ETC_ALTERNATIVES_X_TERMINAL_EMULATOR));
             return;
         }
 
-        ProcessBuilder processBuilder = new ProcessBuilder("readlink", "/etc/alternatives/x-terminal-emulator");
+        ProcessBuilder processBuilder = new ProcessBuilder("readlink", ETC_ALTERNATIVES_X_TERMINAL_EMULATOR);
         Process process = processBuilder.start();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -151,6 +156,8 @@ public class Linux implements NativeDesktop {
                 } else {
                     cmd = new String[] {emulatorName, absolutePath};
                 }
+
+                LoggerFactory.getLogger(Linux.class).debug("Opening terminal using {}", String.join(" ", cmd));
 
                 ProcessBuilder builder = new ProcessBuilder(cmd);
                 builder.directory(new File(absolutePath));
