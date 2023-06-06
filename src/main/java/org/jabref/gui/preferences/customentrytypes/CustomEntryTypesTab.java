@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.customentrytypes;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -34,6 +35,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.UnknownField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -147,9 +149,27 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         fieldNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         fieldNameColumn.setEditable(true);
         fieldNameColumn.setOnEditCommit(
-                (TableColumn.CellEditEvent<FieldViewModel, String> event) ->
-                        event.getRowValue().setField(event.getNewValue())
-        );
+                (TableColumn.CellEditEvent<FieldViewModel, String> event) -> {
+                    String newFieldValue = event.getNewValue();
+                    FieldViewModel fieldViewModel = event.getRowValue();
+
+                    UnknownField field = (UnknownField) fieldViewModel.getField();
+                    EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
+                    ObservableList<FieldViewModel> entryFields = selectedEntryType.fields();
+
+                    boolean fieldExists = entryFields.stream().anyMatch(fieldView ->
+                            fieldView.nameProperty().getValue().equals(newFieldValue));
+
+                    if (!fieldExists) {
+                        field.setName(newFieldValue);
+                    } else {
+                        dialogService.showWarningDialogAndWait(
+                                Localization.lang("Duplicate fields"),
+                                Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", newFieldValue));
+                        event.getTableView().edit(-1, null);
+                        event.getTableView().refresh();
+                    }
+                });
 
         fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));
         fieldTypeColumn.setCellValueFactory(item -> item.getValue().requiredProperty());
