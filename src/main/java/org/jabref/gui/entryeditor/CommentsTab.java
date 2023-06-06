@@ -62,12 +62,12 @@ public class CommentsTab extends FieldsEditorTab {
     @Override
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(defaultOwner);
-        Set<Field> comments = new LinkedHashSet<>();
-        comments.add(defaultCommentField);
+
+        // As default: Show BibTeX comment field and the user-specific comment field of the default owner
+        Set<Field> comments = new LinkedHashSet<>(Set.of(defaultCommentField, StandardField.COMMENT));
 
         comments.addAll(entry.getFields().stream()
-                             .filter(field -> field.equals(StandardField.COMMENT) ||
-                                     field instanceof UserSpecificCommentField ||
+                             .filter(field -> field instanceof UserSpecificCommentField ||
                                      field.getName().toLowerCase().contains("comment"))
                              .collect(Collectors.toSet()));
 
