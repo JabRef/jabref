@@ -154,17 +154,14 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                     UnknownField field = (UnknownField) event.getRowValue().getField();
                     EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
                     ObservableList<FieldViewModel> entryFields = selectedEntryType.fields();
-
                     boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel ->
-                            fieldViewModel.nameProperty().getValue().equals(newFieldValue));
+                            fieldViewModel.nameProperty().getValue().equalsIgnoreCase(newFieldValue));
 
                     if (!fieldExists) {
                         event.getRowValue().setField(newFieldValue);
                         field.setName(newFieldValue);
                     } else {
-                        dialogService.showWarningDialogAndWait(
-                                Localization.lang("Duplicate fields"),
-                                Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", newFieldValue));
+                        dialogService.notify(Localization.lang("Duplicate fields: You added field \"%0\" twice. Only one will be kept.", newFieldValue));
                         event.getTableView().edit(-1, null);
                         event.getTableView().refresh();
                     }
