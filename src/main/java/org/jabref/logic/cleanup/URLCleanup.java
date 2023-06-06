@@ -51,7 +51,7 @@ public class URLCleanup implements CleanupJob {
                      * <ul>
                      *     <li>"(, )?": Matches an optional comma followed by a space</li>
                      *     <li>"\\?": Matches an optional backslash</li>
-                     *     <li>"url\{\}": Matches the literal string "url{}"
+                     *     <li>"url\{\}": Matches the literal string "url{}"</li>
                      * </ul>
                      * Note that the backslashes are doubled as Java requirement
                      */
