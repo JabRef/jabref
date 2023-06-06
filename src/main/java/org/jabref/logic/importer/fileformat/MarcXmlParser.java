@@ -417,26 +417,12 @@ public class MarcXmlParser implements Parser {
 
                 if (StringUtil.isNotBlank(value)) {
                     switch (key) {
-                        case "number":
-                            bibEntry.setField(StandardField.NUMBER, value);
-                            break;
-                        case "year":
-                            bibEntry.setField(StandardField.YEAR, value);
-                            break;
-                        case "pages":
-                            bibEntry.setField(StandardField.PAGES, value);
-                            break;
-                        case "volume":
-                            bibEntry.setField(StandardField.VOLUME, value);
-                            break;
-                        case "day":
-                            bibEntry.setField(StandardField.DAY, value);
-                            break;
-                        case "month":
-                            bibEntry.setField(StandardField.MONTH, value);
-                            break;
-                        default:
-                            break;
+                        case "number" -> bibEntry.setField(StandardField.NUMBER, value);
+                        case "year" -> bibEntry.setField(StandardField.YEAR, value);
+                        case "pages" -> bibEntry.setField(StandardField.PAGES, value);
+                        case "volume" -> bibEntry.setField(StandardField.VOLUME, value);
+                        case "day" -> bibEntry.setField(StandardField.DAY, value);
+                        case "month" -> bibEntry.setField(StandardField.MONTH, value);
                     }
                 }
             }
