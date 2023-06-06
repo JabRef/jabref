@@ -133,16 +133,11 @@ public class MarcXmlParser implements Parser {
 
         /*
          * ToDo:
-         *  pages //Done
-         *  volume and number correct //Done
-         *  series and journals stored in different tags //Done?
-         *  thesis //differences between doctor, master's thesis
-         *  proceedings //Title Tag:245, Series Tag:490 -> Identifier
+         *  proceedings //Tag:111 -> Information about meeting
          */
 
         return bibEntry;
     }
-
 
     private void putIsbn(BibEntry bibEntry, Element datafield) {
         String isbn = getSubfield("a", datafield);
@@ -437,9 +432,9 @@ public class MarcXmlParser implements Parser {
         if (StringUtil.isNotBlank(school)) {
             bibEntry.setField(StandardField.SCHOOL, school);
         }
-        if ("Dissertation".equals(thesisDegree) && StringUtil.isNotBlank(school)) {
+
+        if ("Dissertation".equals(thesisDegree)) {
             bibEntry.setType(StandardEntryType.PhdThesis);
-            bibEntry.setField(StandardField.SCHOOL, school);
         }
     }
 
@@ -451,7 +446,6 @@ public class MarcXmlParser implements Parser {
                 return subfield.getTextContent();
             }
         }
-
 
         return null;
     }
