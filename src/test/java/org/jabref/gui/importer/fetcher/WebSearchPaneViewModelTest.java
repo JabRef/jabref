@@ -57,4 +57,22 @@ class WebSearchPaneViewModelTest {
         viewModel.queryProperty().setValue("Miami AND Beach OR Houston AND Texas");
         assertFalse(viewModel.queryValidationStatus().validProperty().not().getValue());
     }
+
+    @Test
+    void queryConsistingOfDOIIsValid() {
+        viewModel.queryProperty().setValue("10.1007/JHEP02(2023)082");
+        assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
+    }
+
+    @Test
+    void canExtractDOIFromQueryText() {
+        viewModel.queryProperty().setValue("this is the DOI: 10.1007/JHEP02(2023)082, other text");
+        assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
+    }
+
+    @Test
+    void queryConsistingOfInvalidDOIIsInvalid() {
+        viewModel.queryProperty().setValue("101.1007/JHEP02(2023)082");
+        assertFalse(viewModel.queryValidationStatus().validProperty().getValue());
+    }
 }

@@ -30,6 +30,7 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class DeprecatedFieldsTab extends FieldsEditorTab {
 
+    public static final String NAME = "Deprecated fields";
     private final BibEntryTypesManager entryTypesManager;
 
     public DeprecatedFieldsTab(BibDatabaseContext databaseContext,
