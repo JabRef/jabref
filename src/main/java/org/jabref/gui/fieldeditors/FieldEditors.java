@@ -67,6 +67,8 @@ public class FieldEditors {
             return new IdentifierEditor(field, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, preferences, suggestionProvider, fieldCheckers);
+        } else if (field == StandardField.GROUPS) {
+            return new GroupEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine);
         } else if (fieldProperties.contains(FieldProperty.FILE_EDITOR)) {
             return new LinkedFilesEditor(field, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {

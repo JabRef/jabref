@@ -169,8 +169,10 @@
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true">
     <!-- no sorting for citation -->
     <layout prefix="(" suffix=")" delimiter="; ">
-      <text macro="author-short"/>
-      <text macro="year-date" prefix=", "/>
+      <group delimiter=", ">
+        <text macro="author-short"/>
+        <text macro="year-date"/>
+      </group>
     </layout>
   </citation>
   <bibliography et-al-min="20" et-al-use-first="19">

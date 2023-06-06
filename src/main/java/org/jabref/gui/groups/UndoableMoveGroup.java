@@ -7,9 +7,6 @@ import org.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.GroupTreeNode;
 
-/**
- * @author jzieren
- */
 class UndoableMoveGroup extends AbstractUndoableJabRefEdit {
 
     private final GroupTreeNodeViewModel root;
