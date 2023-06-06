@@ -100,6 +100,8 @@ public class MarcXmlParser implements Parser {
                 putIsbn(bibEntry, datafield);
             } else if ("100".equals(tag) || "700".equals(tag) || "710".equals(tag)) {
                 putPersonalName(bibEntry, datafield); // Author, Editor, Publisher
+            } else if ("111".equals(tag) || "245".equals(tag) || "710".equals(tag)) {
+                putConferenceDetail(bibEntry, datafield);
             } else if ("245".equals(tag)) {
                 putTitle(bibEntry, datafield);
             } else if ("250".equals(tag)) {
@@ -133,7 +135,10 @@ public class MarcXmlParser implements Parser {
 
         /*
          * ToDo:
-         *  proceedings //Tag:111 -> Information about meeting
+         *  proceedings:
+         *      Tag:111 -> Tag for information about conference or meeting
+         *      Tag:245 -> Subtitle often contains the information about a conference or meeting
+         *      Tag:710 -> The conference if often marked as the author
          */
 
         return bibEntry;
@@ -199,6 +204,13 @@ public class MarcXmlParser implements Parser {
                 }
             }
         }
+    }
+
+    private void putConferenceDetail(BibEntry bibEntry, Element datafield) {
+        String conference = getSubfield("a", datafield);
+        String location = getSubfield("c", datafield);
+
+
     }
 
     private void putTitle(BibEntry bibEntry, Element datafield) {
@@ -302,6 +314,20 @@ public class MarcXmlParser implements Parser {
         }
     }
 
+    private void putThesisDescription(BibEntry bibEntry, Element datafield) {
+        String thesisDegree = getSubfield("b", datafield);
+        String school = getSubfield("c", datafield);
+        bibEntry.setType(StandardEntryType.MastersThesis);
+
+        if (StringUtil.isNotBlank(school)) {
+            bibEntry.setField(StandardField.SCHOOL, school);
+        }
+
+        if ("Dissertation".equals(thesisDegree)) {
+            bibEntry.setType(StandardEntryType.PhdThesis);
+        }
+    }
+
     private void putSummary(BibEntry bibEntry, Element datafield) {
         String summary = getSubfield("a", datafield);
 
@@ -324,6 +350,31 @@ public class MarcXmlParser implements Parser {
                 bibEntry.setField(StandardField.KEYWORDS, keywords.get() + ", " + keyword);
             } else {
                 bibEntry.setField(StandardField.KEYWORDS, keyword);
+            }
+        }
+    }
+
+    private void putIssue(BibEntry bibEntry, Element datafield) {
+        bibEntry.setType(StandardEntryType.Article);
+
+        List<String> issues = getSubfields("g", datafield);
+
+        for (String issue : issues) {
+            String[] parts = issue.split(":");
+            if (parts.length == 2) {
+                String key = parts[0].trim();
+                String value = parts[1].trim();
+
+                if (StringUtil.isNotBlank(value)) {
+                    switch (key) {
+                        case "number" -> bibEntry.setField(StandardField.NUMBER, value);
+                        case "year" -> bibEntry.setField(StandardField.YEAR, value);
+                        case "pages" -> bibEntry.setField(StandardField.PAGES, value);
+                        case "volume" -> bibEntry.setField(StandardField.VOLUME, value);
+                        case "day" -> bibEntry.setField(StandardField.DAY, value);
+                        case "month" -> bibEntry.setField(StandardField.MONTH, value);
+                    }
+                }
             }
         }
     }
@@ -396,45 +447,6 @@ public class MarcXmlParser implements Parser {
             bibEntry.setField(StandardField.NOTE, bibEntry.getField(StandardField.NOTE).get().concat(notesJoined));
         } else {
             bibEntry.setField(StandardField.NOTE, notesJoined);
-        }
-    }
-
-    private void putIssue(BibEntry bibEntry, Element datafield) {
-        bibEntry.setType(StandardEntryType.Article);
-
-        List<String> issues = getSubfields("g", datafield);
-
-        for (String issue : issues) {
-            String[] parts = issue.split(":");
-            if (parts.length == 2) {
-                String key = parts[0].trim();
-                String value = parts[1].trim();
-
-                if (StringUtil.isNotBlank(value)) {
-                    switch (key) {
-                        case "number" -> bibEntry.setField(StandardField.NUMBER, value);
-                        case "year" -> bibEntry.setField(StandardField.YEAR, value);
-                        case "pages" -> bibEntry.setField(StandardField.PAGES, value);
-                        case "volume" -> bibEntry.setField(StandardField.VOLUME, value);
-                        case "day" -> bibEntry.setField(StandardField.DAY, value);
-                        case "month" -> bibEntry.setField(StandardField.MONTH, value);
-                    }
-                }
-            }
-        }
-    }
-
-    private void putThesisDescription(BibEntry bibEntry, Element datafield) {
-        String thesisDegree = getSubfield("b", datafield);
-        String school = getSubfield("c", datafield);
-        bibEntry.setType(StandardEntryType.MastersThesis);
-
-        if (StringUtil.isNotBlank(school)) {
-            bibEntry.setField(StandardField.SCHOOL, school);
-        }
-
-        if ("Dissertation".equals(thesisDegree)) {
-            bibEntry.setType(StandardEntryType.PhdThesis);
         }
     }
 
