@@ -45,11 +45,10 @@ class CiteSeerTest {
     @Test
     void searchByQueryFindsEntryRigorousDerivation() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
-                .withField(StandardField.ABSTRACT, "ar")
                 .withField(StandardField.AUTHOR, "Wang Wei and Zhang Pingwen and Zhang Zhifei")
                 .withField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("queryString:Ericksen-Leslie AND page:1 AND pageSize:20 AND must_have_pdf:false AND sortBy:relevance");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND page:1 AND pageSize:20 AND must_have_pdf:false AND sortBy:relevance");
 //        List<BibEntry> fetchedEntries = fetcher.performSearch("Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
@@ -62,7 +61,7 @@ class CiteSeerTest {
                 .withField(StandardField.YEAR, "1993")
                 .withField(StandardField.VENUE, "Psychosomatic Medicine");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Coping Theory and Research: Past Present and Future");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("queryString:Coping Theory and Research: Past Present and Future AND page:1 AND pageSize:20 AND must_have_pdf:false AND sortBy:relevance");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 }

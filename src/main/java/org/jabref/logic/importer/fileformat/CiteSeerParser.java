@@ -37,28 +37,18 @@ public class CiteSeerParser {
         return response;
     }
 
-    // potentially add this to StringUtil library?
-    private String nullToEmptyString(String input) {
-        return input == null ? "" : input;
-    }
-
     private BibEntry parseBibEntry(JSONObject jsonObj) throws ParseException {
-//        try {
-            BibEntry bibEntry = new BibEntry();
-            bibEntry.setField(StandardField.TITLE,
-                    Optional.ofNullable(jsonObj.get("title").toString())
-                            .orElse(""));
-            bibEntry.setField(StandardField.VENUE, Objects.toString(jsonObj.get("venue"), ""));
-            bibEntry.setField(StandardField.YEAR, Objects.toString(jsonObj.get("year"), ""));
-            bibEntry.setField(StandardField.PUBLISHER, Objects.toString(jsonObj.get("publisher"), ""));
-            bibEntry.setField(StandardField.ABSTRACT, Objects.toString(jsonObj.get("abstract"), ""));
-            // have not implemented this quite yet
-//            bibEntry.setField(StandardField.AUTHOR, Optional.ofNullable(jsonObj.getJSONObject("authors").))
-            //            bibEntry.setField(StandardField.AUTHOR,
-//                    Optional.ofNullable(jsonObj.get("authors").getAsJsonArray())
-//                            .orElse(new JsonArray()).forEach());
-            bibEntry.setField(StandardField.JOURNAL, Objects.toString(jsonObj.get("journal"), ""));
-            return bibEntry;
-//        }
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.TITLE,
+                Optional.of(jsonObj.get("title").toString())
+                        .orElse(""));
+        bibEntry.setField(StandardField.VENUE, Objects.toString(jsonObj.get("venue"), ""));
+        bibEntry.setField(StandardField.YEAR, Objects.toString(jsonObj.get("year"), ""));
+        bibEntry.setField(StandardField.PUBLISHER, Objects.toString(jsonObj.get("publisher"), ""));
+        bibEntry.setField(StandardField.ABSTRACT, Objects.toString(jsonObj.get("abstract"), ""));
+        bibEntry.setField(StandardField.AUTHOR, Objects.toString(Optional.ofNullable(jsonObj.get("authors"))
+                                                                         .orElse(new JSONArray()), ""));
+        bibEntry.setField(StandardField.JOURNAL, Objects.toString(jsonObj.get("journal"), ""));
+        return bibEntry;
     }
 }
