@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id("org.openrewrite.rewrite") version("5.40.6")
+    id("org.openrewrite.rewrite") version("6.0.0")
 }
 
 // Enable following for debugging
@@ -222,6 +222,8 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.0.0"))
+    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis")
 }
 
 clean {
