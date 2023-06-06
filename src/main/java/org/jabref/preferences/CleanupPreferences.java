@@ -80,9 +80,6 @@ public class CleanupPreferences {
          */
         CLEAN_UP_DOI,
         CLEANUP_EPRINT,
-        /**
-         * Moves URL from NOTE to URL field.
-         */
         CLEAN_UP_URL,
         MAKE_PATHS_RELATIVE,
         RENAME_PDF,
