@@ -69,7 +69,8 @@ public class FieldViewModel {
     public FieldPriority getPriority() {
         return priorityProperty.getValue();
     }
-    public void setField(String field){
+
+    public void setField(String field) {
         this.fieldName.setValue(field);
     }
 

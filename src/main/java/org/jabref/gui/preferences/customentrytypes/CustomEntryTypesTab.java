@@ -151,16 +151,15 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         fieldNameColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<FieldViewModel, String> event) -> {
                     String newFieldValue = event.getNewValue();
-                    FieldViewModel fieldViewModel = event.getRowValue();
-
-                    UnknownField field = (UnknownField) fieldViewModel.getField();
+                    UnknownField field = (UnknownField) event.getRowValue().getField();
                     EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
                     ObservableList<FieldViewModel> entryFields = selectedEntryType.fields();
 
-                    boolean fieldExists = entryFields.stream().anyMatch(fieldView ->
-                            fieldView.nameProperty().getValue().equals(newFieldValue));
+                    boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel ->
+                            fieldViewModel.nameProperty().getValue().equals(newFieldValue));
 
                     if (!fieldExists) {
+                        event.getRowValue().setField(newFieldValue);
                         field.setName(newFieldValue);
                     } else {
                         dialogService.showWarningDialogAndWait(
