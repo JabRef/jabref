@@ -14,6 +14,8 @@ import org.jabref.model.entry.identifier.MathSciNetId;
 
 public class MathSciNetTab extends EntryEditorTab {
 
+    public static final String NAME = "MathSciNet Review";
+
     public MathSciNetTab() {
         setText(Localization.lang("MathSciNet Review"));
     }
