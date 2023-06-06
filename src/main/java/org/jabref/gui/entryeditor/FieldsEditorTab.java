@@ -184,9 +184,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
     }
 
-    /**
-     * Focuses the given field.
-     */
     public void requestFocus(Field fieldName) {
         if (editors.containsKey(fieldName)) {
             editors.get(fieldName).focus();
@@ -202,7 +199,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         initPanel();
         setupPanel(entry, isCompressed);
-
         if (previewPanel != null) {
             previewPanel.setEntry(entry);
         }

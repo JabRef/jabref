@@ -59,6 +59,7 @@ public class CommentsTab extends FieldsEditorTab {
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
     }
 
+    @Override
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
         UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(defaultOwner);
         Set<Field> comments = new LinkedHashSet<>();
