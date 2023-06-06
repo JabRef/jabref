@@ -11,7 +11,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 /**
- * Checks whether URL exists in note field, and stores it under url field .
+ * Checks whether URL exists in note field, and stores it under url field.
  */
 public class URLCleanup implements CleanupJob {
 
@@ -26,8 +26,9 @@ public class URLCleanup implements CleanupJob {
 
         /*
          * The urlRegex was originally fetched from a suggested solution in
-         * https://stackoverflow.com/questions/28185064/python-infinite-loop-in-regex-to-match-url. In order to be
-         * functional, we made the necessary adjustments regarding Java features. (mainly doubled backslashes)
+         * https://stackoverflow.com/questions/28185064/python-infinite-loop-in-regex-to-match-url.
+         * In order to be functional, we made the necessary adjustments regarding Java
+         * features (mainly doubled backslashes).
          */
         String urlRegex = "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.]"
                 + "[a-z]{2,4}/)(?:[^\\s()<>\\\\]+|\\(([^\\s()<>\\\\]+|(\\([^\\s()"
@@ -43,8 +44,18 @@ public class URLCleanup implements CleanupJob {
             // Remove the URL from the NoteFieldValue
             String newNoteFieldValue = NoteFieldValue
                     .replace(url, "")
-                    .replace("\\url{}", "")
-                    .replace(",", "").trim();
+
+                    /*
+                     * The following regex erases unnecessary remaining
+                     * content in Note field. Explanation:
+                     * <ul>
+                     *     <li>"(, )?": Matches an optional comma followed by a space</li>
+                     *     <li>"\\?": Matches an optional backslash</li>
+                     *     <li>"url\{\}": Matches the literal string "url{}"
+                     * </ul>
+                     * Note that the backslashes are doubled as Java requirement
+                     */
+                    .replaceAll("(, )?\\\\?url\\{\\}(, )?", "");
 
             /*
              * In case the url and note fields hold the same URL, then we just
