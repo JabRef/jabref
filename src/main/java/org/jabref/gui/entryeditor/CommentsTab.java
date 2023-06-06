@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.scene.control.Tooltip;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -55,7 +53,6 @@ public class CommentsTab extends FieldsEditorTab {
         );
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner();
         setText(Localization.lang("Comments"));
-        setTooltip(new Tooltip(Localization.lang("Display all comments")));
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
     }
 
