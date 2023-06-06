@@ -274,7 +274,7 @@ public class GroupTreeView extends BorderPane {
         }
         Text text = new Text();
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
-                newValue -> {
+                shouldDisplayGroupCount -> {
                     if (text.textProperty().isBound()) {
                         text.textProperty().unbind();
                         text.setText("");
@@ -282,8 +282,8 @@ public class GroupTreeView extends BorderPane {
 
                     node.getStyleClass().clear();
 
-                    if (newValue) {
-                        node.getStyleClass().setAll("hits");
+                    if (shouldDisplayGroupCount) {
+                        node.getStyleClass().add("hits");
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                     }
                 });
