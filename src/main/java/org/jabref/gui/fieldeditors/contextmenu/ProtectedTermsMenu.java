@@ -69,6 +69,10 @@ class ProtectedTermsMenu extends Menu {
 
     private class UnprotectSelectionAction extends SimpleCommand {
 
+        public UnprotectSelectionAction() {
+            this.executable.bind(textInputControl.selectedTextProperty().isNotEmpty());
+        }
+
         @Override
         public void execute() {
             String selectedText = textInputControl.getSelectedText();
