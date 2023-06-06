@@ -31,7 +31,7 @@ public enum StandardField implements Field {
     BOOKTITLEADDON("booktitleaddon"),
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
-    COMMENT("comment"),
+    COMMENT("comment", FieldProperty.COMMENT),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
     DAY("day"),

@@ -34,7 +34,6 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.openjdk.jmh.Main;
@@ -93,7 +92,7 @@ public class Benchmarks {
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
         return parser.parse(new StringReader(bibtexString));
     }
 

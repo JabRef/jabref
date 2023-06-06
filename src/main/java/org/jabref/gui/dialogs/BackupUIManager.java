@@ -8,7 +8,6 @@ import java.util.Optional;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
@@ -23,6 +22,7 @@ import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -37,14 +37,17 @@ public class BackupUIManager {
     private BackupUIManager() {
     }
 
-    public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService, Path originalPath, PreferencesService preferencesService) {
+    public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
+                                                                 Path originalPath,
+                                                                 PreferencesService preferencesService,
+                                                                 FileUpdateMonitor fileUpdateMonitor) {
         var actionOpt = showBackupResolverDialog(dialogService, originalPath, preferencesService.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 BackupManager.restoreBackup(originalPath, preferencesService.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferencesService);
+                return showReviewBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor);
             }
             return Optional.empty();
         });
@@ -54,12 +57,16 @@ public class BackupUIManager {
         return DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir)));
     }
 
-    private static Optional<ParserResult> showReviewBackupDialog(DialogService dialogService, Path originalPath, PreferencesService preferencesService) {
+    private static Optional<ParserResult> showReviewBackupDialog(
+            DialogService dialogService,
+            Path originalPath,
+            PreferencesService preferencesService,
+            FileUpdateMonitor fileUpdateMonitor) {
         try {
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
 
             // The database of the originalParserResult will be modified
-            ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, Globals.getFileUpdateMonitor());
+            ParserResult originalParserResult = OpenDatabase.loadDatabase(originalPath, importFormatPreferences, fileUpdateMonitor);
             // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
@@ -77,7 +84,7 @@ public class BackupUIManager {
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
                     // In case not all changes are resolved, start from scratch
-                    return showRestoreBackupDialog(dialogService, originalPath, preferencesService);
+                    return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor);
                 }
 
                 // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected

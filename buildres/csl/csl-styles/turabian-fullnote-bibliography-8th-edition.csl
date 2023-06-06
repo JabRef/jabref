@@ -2,8 +2,8 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
     <title>Turabian 8th edition (full note)</title>
-    <id>http://www.zotero.org/styles/turabian-fullnote-bibliography</id>
-    <link href="http://www.zotero.org/styles/turabian-fullnote-bibliography" rel="self"/>
+    <id>http://www.zotero.org/styles/turabian-fullnote-bibliography-8th-edition</id>
+    <link href="http://www.zotero.org/styles/turabian-fullnote-bibliography-8th-edition" rel="self"/>
     <link href="http://www.press.uchicago.edu/books/turabian/turabian_citationguide.html" rel="documentation"/>
     <author>
       <name>Elena Razlogova</name>
@@ -18,7 +18,7 @@
     <category citation-format="note"/>
     <category field="history"/>
     <summary>Turabian note style, a variant of Chicago for students</summary>
-    <updated>2012-10-25T21:15:26+00:00</updated>
+    <updated>2021-12-31T11:50:55+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>

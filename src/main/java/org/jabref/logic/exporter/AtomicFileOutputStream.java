@@ -105,8 +105,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
         try {
             // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
-            if (out instanceof FileOutputStream) {
-                temporaryFileLock = ((FileOutputStream) out).getChannel().lock();
+            if (out instanceof FileOutputStream stream) {
+                temporaryFileLock = stream.getChannel().lock();
             } else {
                 temporaryFileLock = null;
             }
@@ -184,8 +184,8 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             try {
                 // Make sure we have written everything to the temporary file
                 flush();
-                if (out instanceof FileOutputStream) {
-                    ((FileOutputStream) out).getFD().sync();
+                if (out instanceof FileOutputStream stream) {
+                    stream.getFD().sync();
                 }
             } catch (IOException exception) {
                 // Try to close nonetheless
