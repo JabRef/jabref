@@ -27,8 +27,9 @@ import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.preferences.PreferencesService;
 
 public class CommentsTab extends FieldsEditorTab {
+    public static final String NAME = "Comments";
 
-    private final String name;
+    private final String defaultOwner;
     public CommentsTab(PreferencesService preferences,
                        BibDatabaseContext databaseContext,
                        SuggestionProviders suggestionProviders,
@@ -52,14 +53,14 @@ public class CommentsTab extends FieldsEditorTab {
                 journalAbbreviationRepository,
                 indexingTaskManager
         );
-        this.name = preferences.getOwnerPreferences().getDefaultOwner();
-        setText(Localization.lang("All comments"));
+        this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner();
+        setText(Localization.lang("Comments"));
         setTooltip(new Tooltip(Localization.lang("Display all comments")));
-        setGraphic(IconTheme.JabRefIcons.REQUIRED.getGraphicNode());
+        setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
     }
 
     protected Set<Field> determineFieldsToShow(BibEntry entry) {
-        UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(name);
+        UserSpecificCommentField defaultCommentField = new UserSpecificCommentField(defaultOwner);
         Set<Field> comments = new LinkedHashSet<>();
         comments.add(defaultCommentField);
 
@@ -81,7 +82,7 @@ public class CommentsTab extends FieldsEditorTab {
             FieldEditorFX editor = fieldEditorEntry.getValue();
 
             if (field instanceof UserSpecificCommentField) {
-                if (field.getName().contains(name)) {
+                if (field.getName().contains(defaultOwner)) {
                     editor.getNode().setDisable(false);
                 }
             } else {

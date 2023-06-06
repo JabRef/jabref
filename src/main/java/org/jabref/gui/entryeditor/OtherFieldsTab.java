@@ -34,6 +34,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class OtherFieldsTab extends FieldsEditorTab {
 
+    public static final String NAME = "Other fields";
     private final List<Field> customTabFieldNames;
     private final BibEntryTypesManager entryTypesManager;
 
