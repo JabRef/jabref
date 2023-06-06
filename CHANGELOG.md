@@ -27,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the option to disable the automatic linking of files in the entry editor [#5105](https://github.com/JabRef/jabref/issues/5105)
 - We added the link icon for ISBNs in linked identifiers column. [#9819](https://github.com/JabRef/jabref/issues/9819)
 - We added support for parsing MathML in the Medline importer. [#4273](https://github.com/JabRef/jabref/issues/4273)
+- We added the ability to search for a DOI directly from 'Web Search'. [#9674](https://github.com/JabRef/jabref/issues/9674)
 - We added a cleanup activity that identifies a url in note field and moves it to the URL field. [koppor#216](https://github.com/koppor/jabref/issues/216)
 
 ### Changed
