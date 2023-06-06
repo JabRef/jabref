@@ -81,6 +81,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where passing a URL containing a DOI led to a "No entry found" notification. [#9821](https://github.com/JabRef/jabref/issues/9821)
 - We fixed some minor visual inconsistencies and issues in the preferences dialog. [#9866](https://github.com/JabRef/jabref/pull/9866)
 - The order of save actions is now retained. [#9890](https://github.com/JabRef/jabref/pull/9890)
+- We fixed an issue where empty grey containers would remain in the groups panel, if displaying of group item count is turned off [#9972](https://github.com/JabRef/jabref/issues/9972)
 
 ### Removed
 
