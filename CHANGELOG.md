@@ -45,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - `log.txt` now contains an entry if a BibTeX entry could not be parsed.
 - `log.txt` now contains debug messages. Debugging needs to be enabled explicitly. [#9678](https://github.com/JabRef/jabref/pull/9678)
 - `log.txt` does not contain entries for non-found files during PDF indexing. [#9678](https://github.com/JabRef/jabref/pull/9678)
+- The hostname is now determined using environment variables (`COMPUTERNAME`/`HOSTNAME`) first. [#9910](https://github.com/JabRef/jabref/pull/9910)
 - We improved the Medline importer to correctly import ISO dates for `revised`. [#9536](https://github.com/JabRef/jabref/issues/9536)
 - To avoid cluttering of the directory, We always delete the `.sav` file upon successful write. [#9675](https://github.com/JabRef/jabref/pull/9675)
 - We improved the unlinking/deletion of multiple linked files of an entry using the <kbd>Delete</kbd> key. [#9473](https://github.com/JabRef/jabref/issues/9473)

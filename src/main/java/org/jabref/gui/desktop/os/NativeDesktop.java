@@ -105,4 +105,23 @@ public abstract class NativeDesktop {
                                              "ssl",
                                              OS.APP_DIR_APP_AUTHOR));
     }
+
+    public String getHostName() {
+        String hostName;
+        // Following code inspired by https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/SystemUtils.html#getHostName--
+        // See also https://stackoverflow.com/a/20793241/873282
+        hostName = System.getenv("HOSTNAME");
+        if (StringUtil.isBlank(hostName)) {
+            hostName = System.getenv("COMPUTERNAME");
+        }
+        if (StringUtil.isBlank(hostName)) {
+            try {
+                hostName = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                LoggerFactory.getLogger(OS.class).info("Hostname not found. Using \"localhost\" as fallback.", e);
+                hostName = "localhost";
+            }
+        }
+        return hostName;
+    }
 }

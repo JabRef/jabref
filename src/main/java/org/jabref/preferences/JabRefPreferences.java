@@ -423,7 +423,7 @@ public class JabRefPreferences implements PreferencesService {
      * Cache variables
      */
     private Map<String, Set<Field>> entryEditorTabList;
-    private String userName;
+    private String userAndHost;
 
     private LibraryPreferences libraryPreferences;
     private TelemetryPreferences telemetryPreferences;
@@ -2019,17 +2019,11 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private String getUserAndHost() {
-        if (StringUtil.isNotBlank(userName)) {
-            return userName;
+        if (StringUtil.isNotBlank(userAndHost)) {
+            return userAndHost;
         }
-
-        try {
-            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
-            return userName;
-        } catch (UnknownHostException ex) {
-            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible problem resolution", ex);
-            return get(DEFAULT_OWNER);
-        }
+        userAndHost = get(DEFAULT_OWNER) + '-' + OS.getNativeDesktop().getHostName();
+        return userAndHost;
     }
 
     //*************************************************************************************************************
