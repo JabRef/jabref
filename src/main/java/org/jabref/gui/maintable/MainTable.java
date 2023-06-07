@@ -329,23 +329,22 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void paste() {
         List<BibEntry> entriesToAdd;
-            entriesToAdd = this.clipBoardManager.getBibTeXEntriesFromClipboard()
-            .map(importHandler::handleBibTeXData)
-            .orElseGet(this::handleNonBibTeXStringData);
-
+        String content = ClipBoardManager.getContents();
+        entriesToAdd = importHandler.handleBibTeXData(content);
+        if (entriesToAdd.isEmpty()) {
+            entriesToAdd = handleNonBibTeXStringData(content);
+        }
+        if (entriesToAdd.isEmpty()) {
+            return;
+        }
         for (BibEntry entry : entriesToAdd) {
             importHandler.importEntryWithDuplicateCheck(database, entry);
         }
-        if (!entriesToAdd.isEmpty()) {
-            this.requestFocus();
-        }
     }
 
-    private List<BibEntry> handleNonBibTeXStringData() {
-        String data = ClipBoardManager.getContents();
-        List<BibEntry> entries = new ArrayList<>();
+    private List<BibEntry> handleNonBibTeXStringData(String data) {
         try {
-            entries = this.importHandler.handleStringData(data);
+            return this.importHandler.handleStringData(data);
         } catch (FetcherException exception) {
             if (exception instanceof FetcherClientException) {
                 dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("No data was found for the identifier"));
@@ -354,8 +353,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             } else {
                 dialogService.showErrorDialogAndWait(exception);
             }
+            return List.of();
         }
-        return entries;
     }
 
     public void dropEntry(List<BibEntry> entriesToAdd) {

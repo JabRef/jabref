@@ -87,10 +87,6 @@ public class ClipBoardManager {
         return result;
     }
 
-    public Optional<String> getBibTeXEntriesFromClipboard() {
-        return Optional.ofNullable(clipboard.getContent(DragAndDropDataFormats.ENTRIES)).map(String.class::cast);
-    }
-
     /**
      * Get the String residing on the primary clipboard (if it exists).
      *
@@ -150,7 +146,9 @@ public class ClipBoardManager {
         final ClipboardContent content = new ClipboardContent();
         BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), Globals.entryTypesManager);
         String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
-        content.put(DragAndDropDataFormats.ENTRIES, serializedEntries);
+        // BibEntry is not Java serializable. Thus, we need to do the serialization manually
+        // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
+        // Furthermore, storing a string also enables other applications to work with the data
         content.putString(serializedEntries);
         clipboard.setContent(content);
         setPrimaryClipboardContent(content);
