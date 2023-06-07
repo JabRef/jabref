@@ -1340,7 +1340,11 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OVERWRITE_OWNER));
 
         EasyBind.listen(ownerPreferences.useOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_OWNER, newValue));
-        EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (obs, oldValue, newValue) -> put(DEFAULT_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (obs, oldValue, newValue) -> {
+            put(DEFAULT_OWNER, newValue);
+            // trigger re-determination of userAndHost
+            userAndHost = null;
+        });
         EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
 
         return ownerPreferences;
