@@ -90,6 +90,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue regarding recording redundant prefixes in search history. [#9685](https://github.com/JabRef/jabref/issues/9685)
 - We fixed an issue where passing a URL containing a DOI led to a "No entry found" notification. [#9821](https://github.com/JabRef/jabref/issues/9821)
 - We fixed some minor visual inconsistencies and issues in the preferences dialog. [#9866](https://github.com/JabRef/jabref/pull/9866)
+- The order of save actions is now retained. [#9890](https://github.com/JabRef/jabref/pull/9890)
 - We fixed an issue where the order of save actions was not retained in the bib file. [#9890](https://github.com/JabRef/jabref/pull/9890)
 - We fixed an issue in the preferences 'External file types' tab ignoring a custom application path in the edit dialog. [#9895](https://github.com/JabRef/jabref/issues/9895)
 - We fixed an issue in the preferences where custom columns could be added to the entry table with no qualifier. [#9913](https://github.com/JabRef/jabref/issues/9913)
@@ -100,7 +101,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixen an issue under Linux where under some systems the file instead of the folder was opened [#9607](https://github.com/JabRef/jabref/issues/9607)
 - We fixed an issue where an Automatic Keyword Group could not be deleted in the UI. [#9778](https://github.com/JabRef/jabref/issues/9778)
 - We fixed an issue where the citation key pattern `[edtrN_M]` returned the wrong editor. [#9946](https://github.com/JabRef/jabref/pull/9946)
-
+- We fixed an issue where empty grey containers would remain in the groups panel, if displaying of group item count is turned off [#9972](https://github.com/JabRef/jabref/issues/9972)
 
 ### Removed
 

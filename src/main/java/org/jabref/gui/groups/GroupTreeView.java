@@ -266,7 +266,6 @@ public class GroupTreeView extends BorderPane {
 
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
-        node.getStyleClass().setAll("hits");
         if (!group.isRoot()) {
             BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ANYSELECTED,
                     group.anySelectedEntriesMatchedProperty());
@@ -275,13 +274,16 @@ public class GroupTreeView extends BorderPane {
         }
         Text text = new Text();
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
-                newValue -> {
+                shouldDisplayGroupCount -> {
                     if (text.textProperty().isBound()) {
                         text.textProperty().unbind();
                         text.setText("");
                     }
 
-                    if (newValue) {
+                    node.getStyleClass().clear();
+
+                    if (shouldDisplayGroupCount) {
+                        node.getStyleClass().add("hits");
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                     }
                 });
