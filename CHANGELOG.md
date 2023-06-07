@@ -61,7 +61,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - In case the library contains empty entries, they are not written to disk. [#8645](https://github.com/JabRef/jabref/issues/8645)
 - The formatter `remove_unicode_ligatures` is now called `replace_unicode_ligatures`. [#9890](https://github.com/JabRef/jabref/pull/9890)
 - We improved the error message when no terminal was found [#9607](https://github.com/JabRef/jabref/issues/9607)
-- We changed and removed some illegal tags in javadoc. [koppor#475](https://github.com/koppor/jabref/issues/475)
 
 ### Fixed
 
