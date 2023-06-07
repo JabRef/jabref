@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id("org.openrewrite.rewrite") version("5.40.4")
+    id("org.openrewrite.rewrite") version("6.0.0")
 }
 
 // Enable following for debugging
@@ -143,8 +143,8 @@ dependencies {
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.5.0.202303070854-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.15.0'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.0'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.15.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.2'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
@@ -221,8 +221,9 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:1.19.3"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.0.0"))
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis")
 }
 
 clean {
@@ -486,10 +487,7 @@ checkstyle {
 
 rewrite {
     activeRecipe(
-        'org.jabref.config.rewrite.cleanup',
-        'org.openrewrite.java.logging.slf4j.LoggersNamedForEnclosingClass',
-        'org.openrewrite.java.logging.slf4j.ParameterizedLogging',
-        'org.openrewrite.java.logging.slf4j.Slf4jLogShouldBeConstant'
+        'org.jabref.config.rewrite.cleanup'
     )
     exclusion (
         "build.gradle",
