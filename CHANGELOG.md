@@ -102,6 +102,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where an Automatic Keyword Group could not be deleted in the UI. [#9778](https://github.com/JabRef/jabref/issues/9778)
 - We fixed an issue where the citation key pattern `[edtrN_M]` returned the wrong editor. [#9946](https://github.com/JabRef/jabref/pull/9946)
 - We fixed an issue where empty grey containers would remain in the groups panel, if displaying of group item count is turned off [#9972](https://github.com/JabRef/jabref/issues/9972)
+- We fixed an issue where fetching an ISBN could lead to application freezing when the fetcher did not return any results [#9979](https://github.com/JabRef/jabref/issues/9979)
 
 ### Removed
 

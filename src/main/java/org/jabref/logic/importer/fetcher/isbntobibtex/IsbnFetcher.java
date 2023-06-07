@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -69,8 +70,10 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
                 LOGGER.debug("Try using the alternate ISBN fetchers to find an entry.");
             }
         } finally {
-            while (bibEntry.isEmpty() && retryIsbnFetcher.iterator().hasNext()) {
-                AbstractIsbnFetcher fetcher = retryIsbnFetcher.iterator().next();
+            // do not move the iterator in the loop as this would always return a new one and thus create and endless loop
+            Iterator<AbstractIsbnFetcher> iterator = retryIsbnFetcher.iterator();
+            while (bibEntry.isEmpty() && iterator.hasNext()) {
+                AbstractIsbnFetcher fetcher = iterator.next();
                 LOGGER.debug("No entry found for ISBN=" + identifier + "; trying " + fetcher.getName() + " next.");
                 bibEntry = fetcher.performSearchById(identifier);
             }
