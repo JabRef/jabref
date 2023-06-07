@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * The configuration of tinylog will become immutable as soon as the first log entry is issued.
  * https://tinylog.org/v2/configuration/
  * </p>
- **/
+ */
 public abstract class NativeDesktop {
 
     public abstract void openFile(String filePath, String fileType) throws IOException;
