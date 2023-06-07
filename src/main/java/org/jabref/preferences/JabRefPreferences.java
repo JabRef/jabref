@@ -1340,8 +1340,10 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(ownerPreferences.useOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_OWNER, newValue));
         EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (obs, oldValue, newValue) -> {
             put(DEFAULT_OWNER, newValue);
-            // trigger re-determination of userAndHost
+            // trigger re-determination of userAndHost and the dependent preferences
             userAndHost = null;
+            filePreferences = null;
+            internalPreferences = null;
         });
         EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
 
