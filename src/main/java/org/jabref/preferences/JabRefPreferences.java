@@ -733,7 +733,7 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(FILE_BROWSER_COMMAND, "");
         }
 
-        // versioncheck defaults
+        // version check defaults
         defaults.put(VERSION_IGNORED_UPDATE, "");
 
         // preview
@@ -1996,7 +1996,7 @@ public class JabRefPreferences implements PreferencesService {
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
-                getUser(),
+                getUserAndHost(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
@@ -2018,7 +2018,7 @@ public class JabRefPreferences implements PreferencesService {
         return internalPreferences;
     }
 
-    private String getUser() {
+    private String getUserAndHost() {
         if (StringUtil.isNotBlank(userName)) {
             return userName;
         }
@@ -2117,7 +2117,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         filePreferences = new FilePreferences(
-                getInternalPreferences().getUser(),
+                getInternalPreferences().getUserAndHost(),
                 getPath(MAIN_FILE_DIRECTORY, OS.getNativeDesktop().getDefaultFileChooserDirectory()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
