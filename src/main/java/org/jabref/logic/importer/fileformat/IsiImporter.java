@@ -32,11 +32,10 @@ import org.slf4j.LoggerFactory;
  * Importer for the ISI Web of Science, INSPEC and Medline format.
  * <p>
  * Documentation about ISI WOS format:
- * <p>
+ * </p>
  * <ul>
  * <li>https://web.archive.org/web/20131031052339/http://wos.isitrial.com/help/helpprn.html</li>
  * </ul>
- * <p>
  * <ul>
  * <li>Deal with capitalization correctly</li>
  * </ul>
