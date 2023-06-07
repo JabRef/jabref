@@ -36,6 +36,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -150,7 +151,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         fieldNameColumn.setEditable(true);
         fieldNameColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<FieldViewModel, String> event) -> {
-                    String newFieldValue = event.getNewValue();
+                    String newFieldValue = StringUtil.capitalizeFirst(event.getNewValue());
                     UnknownField field = (UnknownField) event.getRowValue().getField();
                     EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
                     ObservableList<FieldViewModel> entryFields = selectedEntryType.fields();
