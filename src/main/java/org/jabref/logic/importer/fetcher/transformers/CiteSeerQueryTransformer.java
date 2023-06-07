@@ -24,25 +24,25 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {
-        return " AND ";
+        return " ";
     }
 
     @Override
     protected String getLogicalOrOperator() {
-        return " OR ";
+        return " ";
     }
 
     @Override
     protected String getLogicalNotOperator() {
-        return " NOT ";
+        return "";
     }
 
     @Override
     protected String handleAuthor(String author) {
         if (!getJSONPayload().has("author")) {
-            getJSONPayload().put("author", new JSONArray());
+            this.getJSONPayload().put("author", new JSONArray());
         }
-        getJSONPayload().getJSONArray("author").put(author).toString();
+        this.getJSONPayload().getJSONArray("author").put(author).toString();
         return StringUtil.quoteStringIfSpaceIsContained(author);
     }
 
@@ -60,8 +60,8 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleYear(String year) {
-        this.getJSONPayload().put("yearStart", year);
-        this.getJSONPayload().put("yearEnd", year);
+        this.getJSONPayload().put("yearStart", Integer.parseInt(year));
+        this.getJSONPayload().put("yearEnd", Integer.parseInt(year));
         return StringUtil.quoteStringIfSpaceIsContained(year);
     }
 
@@ -100,7 +100,7 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
     }
 
     private Optional<String> handlePageSize(String pageSize) {
-        this.getJSONPayload().put("pageSize", pageSize);
+        this.getJSONPayload().put("pageSize", StringUtil.intValueOf(pageSize));
         return Optional.of(pageSize);
     }
 
