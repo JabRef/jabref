@@ -7,7 +7,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextInputControl;
