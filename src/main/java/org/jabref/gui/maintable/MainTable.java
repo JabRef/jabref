@@ -267,6 +267,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
+        EditAction pasteAction = new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager);
+        EditAction copyAction = new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager);
+        EditAction cutAction = new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager);
+        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager);
+
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
@@ -288,19 +293,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case PASTE:
-                        new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager).execute();
+                        pasteAction.execute();
                         event.consume();
                         break;
                     case COPY:
-                        new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager).execute();
+                        copyAction.execute();
                         event.consume();
                         break;
                     case CUT:
-                        new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager).execute();
+                        cutAction.execute();
                         event.consume();
                         break;
                     case DELETE_ENTRY:
-                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager).execute();
+                        deleteAction.execute();
                         event.consume();
                         break;
                     default:
@@ -393,8 +398,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
 
-        // The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
-        // It doesn't work without
+        // The following is necessary to initiate the drag and drop in JavaFX,
+        // although we don't need the contents, it does not work without
         // Drag'n'drop to other tabs use COPY TransferMode, drop to group sidepane use MOVE
         ClipboardContent content = new ClipboardContent();
         Dragboard dragboard = startDragAndDrop(TransferMode.COPY_OR_MOVE);
