@@ -217,12 +217,12 @@
                                 <Label text="%Select Databases:"/>
                                 <HBox alignment="CENTER_LEFT">
                                     <TableView
-                                            fx:id="databaseTable"
+                                            fx:id="catalogTable"
                                             HBox.hgrow="ALWAYS"
                                             editable="true">
                                         <columns>
                                             <TableColumn
-                                                    fx:id="databaseEnabledColumn"
+                                                    fx:id="catalogEnabledColumn"
                                                     text="%Enabled"
                                                     maxWidth="80.0"
                                                     prefWidth="80.0"
@@ -230,7 +230,7 @@
                                                     reorderable="false"
                                                     resizable="false"/>
                                             <TableColumn
-                                                    fx:id="databaseColumn"
+                                                    fx:id="catalogColumn"
                                                     text="%Database"/>
                                         </columns>
                                         <columnResizePolicy>

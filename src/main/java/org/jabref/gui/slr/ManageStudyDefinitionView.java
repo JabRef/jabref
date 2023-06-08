@@ -66,9 +66,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableColumn<String, String> queriesColumn;
     @FXML private TableColumn<String, String> queriesActionColumn;
 
-    @FXML private TableView<StudyDatabaseItem> databaseTable;
-    @FXML private TableColumn<StudyDatabaseItem, Boolean> databaseEnabledColumn;
-    @FXML private TableColumn<StudyDatabaseItem, String> databaseColumn;
+    @FXML private TableView<StudyCatalogItem> catalogTable;
+    @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService prefs;
@@ -132,7 +132,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
                                 Bindings.isEmpty(viewModel.getQueries()),
-                                Bindings.isEmpty(viewModel.getDatabases())),
+                                Bindings.isEmpty(viewModel.getCatalogs())),
                                 Bindings.isEmpty(viewModel.getAuthors())),
                                 viewModel.getTitle().isEmpty()),
                                 viewModel.getDirectory().isEmpty()));
@@ -166,14 +166,14 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
             selectStudyDirectory.setDisable(true);
         }
 
-        // Listen whether any databases are removed from selection -> Add back to the database selector
+        // Listen whether any catalogs are removed from selection -> Add back to the catalog selector
         studyTitle.textProperty().bindBidirectional(viewModel.titleProperty());
         studyDirectory.textProperty().bindBidirectional(viewModel.getDirectory());
 
         initAuthorTab();
         initQuestionsTab();
         initQueriesTab();
-        initDatabasesTab();
+        initCatalogsTab();
     }
 
     private void initAuthorTab() {
@@ -202,27 +202,27 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 .toString()));
     }
 
-    private void initDatabasesTab() {
-        new ViewModelTableRowFactory<StudyDatabaseItem>()
+    private void initCatalogsTab() {
+        new ViewModelTableRowFactory<StudyCatalogItem>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getButton() == MouseButton.PRIMARY) {
                         entry.setEnabled(!entry.isEnabled());
                     }
                 })
-                .install(databaseTable);
+                .install(catalogTable);
 
-        databaseColumn.setReorderable(false);
-        databaseColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        catalogColumn.setReorderable(false);
+        catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        databaseEnabledColumn.setResizable(false);
-        databaseEnabledColumn.setReorderable(false);
-        databaseEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(databaseEnabledColumn));
-        databaseEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
+        catalogEnabledColumn.setResizable(false);
+        catalogEnabledColumn.setReorderable(false);
+        catalogEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(catalogEnabledColumn));
+        catalogEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
 
-        databaseColumn.setEditable(false);
-        databaseColumn.setCellValueFactory(param -> param.getValue().nameProperty());
+        catalogColumn.setEditable(false);
+        catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
 
-        databaseTable.setItems(viewModel.getDatabases());
+        catalogTable.setItems(viewModel.getCatalogs());
     }
 
     private void setupCommonPropertiesForTables(Node addControl,
