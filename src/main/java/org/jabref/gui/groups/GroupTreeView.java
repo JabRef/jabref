@@ -266,7 +266,6 @@ public class GroupTreeView extends BorderPane {
 
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
-        node.getStyleClass().setAll("hits");
         if (!group.isRoot()) {
             BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ANYSELECTED,
                     group.anySelectedEntriesMatchedProperty());
@@ -275,13 +274,16 @@ public class GroupTreeView extends BorderPane {
         }
         Text text = new Text();
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(),
-                newValue -> {
+                shouldDisplayGroupCount -> {
                     if (text.textProperty().isBound()) {
                         text.textProperty().unbind();
                         text.setText("");
                     }
 
-                    if (newValue) {
+                    node.getStyleClass().clear();
+
+                    if (shouldDisplayGroupCount) {
+                        node.getStyleClass().add("hits");
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                     }
                 });
@@ -338,14 +340,14 @@ public class GroupTreeView extends BorderPane {
         Dragboard dragboard = event.getDragboard();
         boolean success = false;
 
-        if (dragboard.hasContent(DragAndDropDataFormats.GROUP) && viewModel.canAddGroupsIn(row.getItem())) {
+        if (dragboard.hasContent(DragAndDropDataFormats.GROUP) && row.getItem().canAddGroupsIn()) {
             List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
             List<GroupNodeViewModel> changedGroups = new LinkedList<>();
             for (String pathToSource : pathToSources) {
                 Optional<GroupNodeViewModel> source = viewModel
                         .rootGroupProperty().get()
                         .getChildByPath(pathToSource);
-                if (source.isPresent() && viewModel.canBeDragged(source.get())) {
+                if (source.isPresent() && source.get().canBeDragged()) {
                     source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
                     changedGroups.add(source.get());
                     success = true;
@@ -475,7 +477,7 @@ public class GroupTreeView extends BorderPane {
         ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
         MenuItem removeGroup;
-        if (viewModel.hasSubgroups(group) && viewModel.canAddGroupsIn(group) && !group.isRoot()) {
+        if (group.hasSubgroups() && group.canAddGroupsIn() && !group.isRoot()) {
             removeGroup = new Menu(Localization.lang("Remove group"), null,
                     factory.createMenuItem(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS,
                             new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE_KEEP_SUBGROUPS, group)),
@@ -566,20 +568,20 @@ public class GroupTreeView extends BorderPane {
             this.executable.bind(BindingsHelper.constantOf(
                     switch (command) {
                         case GROUP_EDIT ->
-                                viewModel.isEditable(group);
+                                group.isEditable();
                         case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
-                                viewModel.isEditable(group) && viewModel.canRemove(group);
+                                group.isEditable() && group.canRemove();
                         case GROUP_SUBGROUP_ADD ->
-                                viewModel.isEditable(group) && viewModel.canAddGroupsIn(group)
+                                group.isEditable() && group.canAddGroupsIn()
                                         || group.isRoot();
                         case GROUP_SUBGROUP_REMOVE ->
-                                viewModel.isEditable(group) && viewModel.hasSubgroups(group) && viewModel.canRemove(group)
+                                group.isEditable() && group.hasSubgroups() && group.canRemove()
                                         || group.isRoot();
                         case GROUP_SUBGROUP_SORT ->
-                                viewModel.isEditable(group) && viewModel.hasSubgroups(group) && viewModel.canAddGroupsIn(group)
+                                group.isEditable() && group.hasSubgroups() && group.canAddEntriesIn()
                                         || group.isRoot();
                         case GROUP_ENTRIES_ADD, GROUP_ENTRIES_REMOVE ->
-                                viewModel.canAddEntriesIn(group);
+                                group.canAddEntriesIn();
                         default ->
                                 true;
                     }));

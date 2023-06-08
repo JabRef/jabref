@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RelatedArticlesTab extends EntryEditorTab {
 
+    public static final String NAME = "Related articles";
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
