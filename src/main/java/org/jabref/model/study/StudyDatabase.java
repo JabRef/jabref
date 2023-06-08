@@ -1,9 +1,7 @@
 package org.jabref.model.study;
 
-import org.jabref.gui.slr.StudyCatalogItem;
-
 /**
- * data model for the view {@link StudyCatalogItem}
+ * data model for the view {@link org.jabref.gui.slr.StudyCatalogItem}
  */
 public class StudyDatabase {
     private String name;
