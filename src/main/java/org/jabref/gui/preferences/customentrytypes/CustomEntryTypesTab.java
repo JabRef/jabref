@@ -156,9 +156,9 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                     UnknownField field = (UnknownField) event.getRowValue().getField();
                     EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
                     ObservableList<FieldViewModel> entryFields = selectedEntryType.fields();
-                    // The second predicate will check if the user input the original field name or doesn't edit anything after double click
-                    boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel ->
-                            fieldViewModel.nameProperty().getValue().equalsIgnoreCase(newFieldValue) && !newFieldValue.equals(field.getDisplayName()));
+                    // The first predicate will check if the user input the original field name or doesn't edit anything after double click
+                    boolean fieldExists = !newFieldValue.equals(field.getDisplayName()) && entryFields.stream().anyMatch(fieldViewModel ->
+                            fieldViewModel.nameProperty().getValue().equalsIgnoreCase(newFieldValue));
 
                     if (fieldExists) {
                         dialogService.notify(Localization.lang("Duplicate fields: You added field \"%0\" twice. Only one will be kept.", newFieldValue));
