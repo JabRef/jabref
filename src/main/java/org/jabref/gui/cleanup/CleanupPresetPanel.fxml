@@ -16,6 +16,7 @@
     <CheckBox fx:id="cleanUpDOI" text="%Move DOIs from note and URL field to DOI field and remove http prefix"/>
     <CheckBox fx:id="cleanUpEprint"
               text="%Move preprint information from 'URL' and 'journal' field to the 'eprint' field"/>
+    <CheckBox fx:id="cleanUpURL" text="%Move URL in note field to url field"/>
     <CheckBox fx:id="cleanUpISSN" text="%Reformat ISSN"/>
     <CheckBox fx:id="cleanUpUpgradeExternalLinks"/>
     <CheckBox fx:id="cleanUpMovePDF"/>

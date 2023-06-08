@@ -80,6 +80,7 @@ public class CleanupPreferences {
          */
         CLEAN_UP_DOI,
         CLEANUP_EPRINT,
+        CLEAN_UP_URL,
         MAKE_PATHS_RELATIVE,
         RENAME_PDF,
         RENAME_PDF_ONLY_RELATIVE_PATHS,
