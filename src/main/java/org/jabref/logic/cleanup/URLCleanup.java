@@ -22,7 +22,7 @@ public class URLCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
-        String NoteFieldValue = entry.getField(NOTE_FIELD).orElse(null);
+        String noteFieldValue = entry.getField(NOTE_FIELD).orElse(null);
 
         /*
          * The urlRegex was originally fetched from a suggested solution in
@@ -36,7 +36,7 @@ public class URLCleanup implements CleanupJob {
                 + ")))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
 
         final Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
-        final Matcher matcher = pattern.matcher(NoteFieldValue);
+        final Matcher matcher = pattern.matcher(noteFieldValue);
 
         if (matcher.find()) {
             String url = matcher.group();
@@ -47,7 +47,7 @@ public class URLCleanup implements CleanupJob {
 
                     /*
                      * The following regex erases unnecessary remaining
-                     * content in Note field. Explanation:
+                     * content in note field. Explanation:
                      * <ul>
                      *     <li>"(, )?": Matches an optional comma followed by a space</li>
                      *     <li>"\\?": Matches an optional backslash</li>
@@ -62,8 +62,8 @@ public class URLCleanup implements CleanupJob {
              * remove it from the note field, and no other action is performed.
              */
             if (entry.hasField(URL_FIELD)) {
-                String UrlFieldValue = entry.getField(URL_FIELD).orElse(null);
-                if (UrlFieldValue.equals(url)) {
+                String urlFieldValue = entry.getField(URL_FIELD).orElse(null);
+                if (urlFieldValue.equals(url)) {
                     entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
                 }
             } else {
