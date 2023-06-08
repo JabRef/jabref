@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.customentrytypes;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -12,6 +13,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -33,6 +35,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -143,6 +147,29 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     private void setupFieldsTable() {
         fieldNameColumn.setCellValueFactory(item -> item.getValue().nameProperty());
+        fieldNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        fieldNameColumn.setEditable(true);
+        fieldNameColumn.setOnEditCommit(
+                (TableColumn.CellEditEvent<FieldViewModel, String> event) -> {
+                    // This makes the displayed name consistent to org.jabref.model.entry.field.Field #getDisplayName()
+                    String newFieldValue = StringUtil.capitalizeFirst(event.getNewValue());
+                    UnknownField field = (UnknownField) event.getRowValue().getField();
+                    EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
+                    ObservableList<FieldViewModel> entryFields = selectedEntryType.fields();
+                    // The first predicate will check if the user input the original field name or doesn't edit anything after double click
+                    boolean fieldExists = !newFieldValue.equals(field.getDisplayName()) && entryFields.stream().anyMatch(fieldViewModel ->
+                            fieldViewModel.nameProperty().getValue().equalsIgnoreCase(newFieldValue));
+
+                    if (fieldExists) {
+                        dialogService.notify(Localization.lang("Unable to change field name. \"%0\" already in use.", newFieldValue));
+                        event.getTableView().edit(-1, null);
+                        event.getTableView().refresh();
+                    } else {
+                        event.getRowValue().setField(newFieldValue);
+                        field.setName(newFieldValue);
+                        event.getTableView().refresh();
+                    }
+                });
 
         fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));
         fieldTypeColumn.setCellValueFactory(item -> item.getValue().requiredProperty());
