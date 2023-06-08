@@ -161,7 +161,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                             fieldViewModel.nameProperty().getValue().equalsIgnoreCase(newFieldValue));
 
                     if (fieldExists) {
-                        dialogService.notify(Localization.lang("Duplicate fields: You added field \"%0\" twice. Only one will be kept.", newFieldValue));
+                        dialogService.notify(Localization.lang("Unable to change field name. \"%0\" already in use.", newFieldValue));
                         event.getTableView().edit(-1, null);
                         event.getTableView().refresh();
                     } else {
