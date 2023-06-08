@@ -71,7 +71,7 @@ jobs:
           args: CHANGELOG.md CONTRIBUTING.md README.md
           config: '.markdownlint.yml'
   tests-linux:
-    name: Unit tests
+    name: Unit tests [Linux]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -92,7 +92,7 @@ jobs:
           sudo apt-get install -qq -y xml-twig-tools xsltproc
           scripts/after-failure.sh
   tests-windows:
-    name: Unit tests
+    name: Unit tests [Windows]
     runs-on: windows-latest
     steps:
       - name: Checkout source
@@ -104,11 +104,11 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
-        run: gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
   tests-mac:
-    name: Unit tests
+    name: Unit tests [mac OS]
     runs-on: macos-latest
     steps:
       - name: Checkout source
@@ -120,7 +120,7 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
-        run: gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
   databasetests:
