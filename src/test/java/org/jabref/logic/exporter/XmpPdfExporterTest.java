@@ -103,7 +103,7 @@ class XmpPdfExporterTest {
         encoding = Charset.defaultCharset();
 
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.getUser()).thenReturn(tempDir.toAbsolutePath().toString());
+        when(filePreferences.getUserAndHost()).thenReturn(tempDir.toAbsolutePath().toString());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
         importer = new PdfXmpImporter(xmpPreferences);

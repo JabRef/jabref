@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * https://tinylog.org/v2/configuration/
  **/
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
-public class Linux implements NativeDesktop {
+public class Linux extends NativeDesktop {
 
     private static final String ETC_ALTERNATIVES_X_TERMINAL_EMULATOR = "/etc/alternatives/x-terminal-emulator";
 

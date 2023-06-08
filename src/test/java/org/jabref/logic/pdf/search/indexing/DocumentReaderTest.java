@@ -33,7 +33,7 @@ public class DocumentReaderTest {
         this.databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
         this.filePreferences = mock(FilePreferences.class);
-        when(filePreferences.getUser()).thenReturn("test");
+        when(filePreferences.getUserAndHost()).thenReturn("testuser-testhost");
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
     }

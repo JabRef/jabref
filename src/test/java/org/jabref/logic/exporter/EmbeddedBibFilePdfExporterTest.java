@@ -94,7 +94,7 @@ class EmbeddedBibFilePdfExporterTest {
     @BeforeEach
     void setUp() throws IOException {
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.getUser()).thenReturn(tempDir.toAbsolutePath().toString());
+        when(filePreferences.getUserAndHost()).thenReturn(tempDir.toAbsolutePath().toString());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
         BibDatabaseMode bibDatabaseMode = BibDatabaseMode.BIBTEX;
