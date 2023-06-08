@@ -42,7 +42,7 @@ public class URLCleanup implements CleanupJob {
             String url = matcher.group();
 
             // Remove the URL from the NoteFieldValue
-            String newNoteFieldValue = NoteFieldValue
+            String newNoteFieldValue = noteFieldValue
                     .replace(url, "")
 
                     /*
