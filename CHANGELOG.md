@@ -32,6 +32,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added support for parsing MathML in the Medline importer. [#4273](https://github.com/JabRef/jabref/issues/4273)
 - We added the ability to search for a DOI directly from 'Web Search'. [#9674](https://github.com/JabRef/jabref/issues/9674)
 - We added a cleanup activity that identifies a URL in the `note` field and moves it to the `url` field. [koppor#216](https://github.com/koppor/jabref/issues/216)
+- We enabled the user to change the name of a field in a custom entry type by double-clicking on it. [#9840](https://github.com/JabRef/jabref/issues/9840)
+
 
 ### Changed
 
@@ -102,7 +104,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixen an issue under Linux where under some systems the file instead of the folder was opened. [#9607](https://github.com/JabRef/jabref/issues/9607)
 - We fixed an issue where an Automatic Keyword Group could not be deleted in the UI. [#9778](https://github.com/JabRef/jabref/issues/9778)
 - We fixed an issue where the citation key pattern `[edtrN_M]` returned the wrong editor. [#9946](https://github.com/JabRef/jabref/pull/9946)
-- We fixed an issue where allow user to update the value of field in custom entry type with double-clicking it. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We fixed an issue where empty grey containers would remain in the groups panel, if displaying of group item count is turned off. [#9972](https://github.com/JabRef/jabref/issues/9972)
 - We fixed an issue where fetching an ISBN could lead to application freezing when the fetcher did not return any results. [#9979](https://github.com/JabRef/jabref/issues/9979)
 
