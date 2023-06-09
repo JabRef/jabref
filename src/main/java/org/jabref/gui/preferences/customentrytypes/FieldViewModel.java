@@ -13,9 +13,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.model.entry.field.UnknownField;
-
-import com.tobiasdiez.easybind.EasyBind;
 
 public class FieldViewModel {
 

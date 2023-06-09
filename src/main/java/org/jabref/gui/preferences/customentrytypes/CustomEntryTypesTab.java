@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.customentrytypes;
 
-import java.util.Locale;
-
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
