@@ -42,6 +42,9 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 
+import org.jooq.lambda.Unchecked;
+import org.zalando.fauxpas.FauxPas;
+
 /**
  * A generic writer for our database. This is independent of the concrete serialization format.
  * For instance, we could also write out YAML or XML by subclassing this class.
@@ -183,10 +186,7 @@ public abstract class BibDatabaseWriter {
      */
     public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
-        if (sharedDatabaseIDOptional.isPresent()) {
-            // may throw an IOException. Thus, we do not use "ifPresent", but the "old" isPresent way
-            writeDatabaseID(sharedDatabaseIDOptional.get());
-        }
+        sharedDatabaseIDOptional.ifPresent(Unchecked.consumer(id -> writeDatabaseID(id)));
 
         // Some file formats write something at the start of the file (like the encoding)
         if (saveConfiguration.getSaveType() != SaveType.PLAIN_BIBTEX) {
