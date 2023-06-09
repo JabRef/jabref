@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
@@ -24,14 +25,16 @@ public class BibEntryType implements Comparable<BibEntryType> {
     /**
      * Provides an enriched EntryType with information about defined standards as mandatory fields etc.
      *
+     * A builder is available at {@link BibEntryTypeBuilder}
+     *
      * @param type              The EntryType this BibEntryType is wrapped around.
      * @param fields            A BibFields list of all fields, including the required fields
      * @param requiredFields    A OrFields list of just the required fields
      */
     public BibEntryType(EntryType type, Collection<BibField> fields, Collection<OrFields> requiredFields) {
         this.type = Objects.requireNonNull(type);
-        this.requiredFields = new LinkedHashSet<>(requiredFields);
         this.fields = new LinkedHashSet<>(fields);
+        this.requiredFields = new LinkedHashSet<>(requiredFields);
     }
 
     public EntryType getType() {
@@ -146,13 +149,14 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return Objects.hash(type, requiredFields, fields);
     }
 
+    /**
+     * This representation is also used in the UI, thus it is formatted more pretty
+     */
     @Override
     public String toString() {
-        return "BibEntryType{" +
-               "type=" + type +
-               ", requiredFields=" + requiredFields +
-               ", fields=" + fields +
-               '}';
+        return "type           = " + type + "," + OS.NEWLINE +
+               "allFields      = " + fields + "," + OS.NEWLINE +
+               "requiredFields = " + requiredFields;
     }
 
     @Override

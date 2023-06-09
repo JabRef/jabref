@@ -12,7 +12,12 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.preferences.PreferencesService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ImportCustomEntryTypesDialogViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomEntryTypesDialogViewModel.class);
 
     private final BibDatabaseMode mode;
     private final PreferencesService preferencesService;
@@ -30,6 +35,8 @@ public class ImportCustomEntryTypesDialogViewModel {
                 newTypes.add(customType);
             } else {
                 if (!EntryTypeFactory.isEqualNameAndFieldBased(customType, currentlyStoredType.get())) {
+                    LOGGER.info("currently stored type:    {}", currentlyStoredType.get());
+                    LOGGER.info("type provided by library: {}", customType);
                     differentCustomizationTypes.add(customType);
                 }
             }

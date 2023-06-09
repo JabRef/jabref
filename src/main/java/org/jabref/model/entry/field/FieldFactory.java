@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
@@ -33,8 +34,14 @@ public class FieldFactory {
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
-    public static String serializeOrFieldsList(Set<OrFields> fields) {
-        return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
+    private static String serializeOrFieldsUsingDisplayName(OrFields fields) {
+        return fields.stream()
+                     .map(Field::getDisplayName)
+                     .collect(Collectors.joining(FIELD_OR_SEPARATOR));
+    }
+
+    public static String serializeOrFieldsListUsingDisplayName(Set<OrFields> fields) {
+        return fields.stream().map(FieldFactory::serializeOrFieldsUsingDisplayName).collect(Collectors.joining(DELIMITER));
     }
 
     public static List<Field> getNotTextFieldNames() {
@@ -73,7 +80,17 @@ public class FieldFactory {
                      .collect(Collectors.joining(DELIMITER));
     }
 
-    public static <T> Field parseField(T type, String fieldName) {
+    public static String serializeFieldsListUsingDisplayName(Collection<Field> fields) {
+        return fields.stream()
+                     .map(Field::getDisplayName)
+                     .collect(Collectors.joining(DELIMITER));
+    }
+
+    /**
+     * Type T is an entry type and is used to direct the mapping to the Java field class.
+     * This somehow acts as filter, BibLaTeX "APA" entry type has field "article", but we want to have StandardField (if not explicitly requested otherwise)
+     */
+    public static <T extends EntryType> Field parseField(T type, String fieldName) {
         // Check if the field name starts with "comment-" which indicates it's a UserSpecificCommentField
         if (fieldName.startsWith("comment-")) {
             String username = fieldName.substring("comment-".length());
@@ -92,7 +109,7 @@ public class FieldFactory {
               BiblatexSoftwareField.fromName(type, fieldName)),
               BiblatexApaField.fromName(type, fieldName)),
               AMSField.fromName(type, fieldName))
-              .orElse(new UnknownField(fieldName));
+              .orElse(UnknownField.fromDisplayName(fieldName));
     }
 
     public static Field parseField(String fieldName) {
