@@ -158,9 +158,9 @@ public class MetaDataSerializer {
         builder.append(MetaData.ENTRYTYPE_FLAG);
         builder.append(entryType.getType().getName());
         builder.append(": req[");
-        builder.append(FieldFactory.serializeOrFieldsListUsingDisplayName(entryType.getRequiredFields()));
+        builder.append(FieldFactory.serializeOrFieldsList(entryType.getRequiredFields()));
         builder.append("] opt[");
-        builder.append(FieldFactory.serializeFieldsListUsingDisplayName(
+        builder.append(FieldFactory.serializeFieldsList(
                 entryType.getOptionalFields()
                          .stream()
                          .map(BibField::field)

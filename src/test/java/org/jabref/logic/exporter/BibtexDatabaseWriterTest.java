@@ -371,7 +371,7 @@ public class BibtexDatabaseWriterTest {
         assertEquals("@Customizedtype{key," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
-                        + "@Comment{jabref-entrytype: customizedtype: req[Title;Author;Date] opt[Year;Month;Publisher]}" + OS.NEWLINE,
+                        + "@Comment{jabref-entrytype: customizedtype: req[title;author;date] opt[year;month;publisher]}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 

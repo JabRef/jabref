@@ -30,18 +30,20 @@ public class FieldFactory {
 
     public static String serializeOrFields(OrFields fields) {
         return fields.stream()
-                     .map(Field::getName)
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             // In case a user has put a user-defined field, the casing of that field is kept
+                             return unknownField.getDisplayName();
+                         } else {
+                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
+                             return field.getName();
+                         }
+                     })
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
-    private static String serializeOrFieldsUsingDisplayName(OrFields fields) {
-        return fields.stream()
-                     .map(Field::getDisplayName)
-                     .collect(Collectors.joining(FIELD_OR_SEPARATOR));
-    }
-
-    public static String serializeOrFieldsListUsingDisplayName(Set<OrFields> fields) {
-        return fields.stream().map(FieldFactory::serializeOrFieldsUsingDisplayName).collect(Collectors.joining(DELIMITER));
+    public static String serializeOrFieldsList(Set<OrFields> fields) {
+        return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
     }
 
     public static List<Field> getNotTextFieldNames() {
@@ -54,9 +56,9 @@ public class FieldFactory {
 
     public static OrFields parseOrFields(String fieldNames) {
         Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
-                     .filter(StringUtil::isNotBlank)
-                     .map(FieldFactory::parseField)
-                     .collect(Collectors.toCollection(LinkedHashSet::new));
+                                  .filter(StringUtil::isNotBlank)
+                                  .map(FieldFactory::parseField)
+                                  .collect(Collectors.toCollection(LinkedHashSet::new));
         return new OrFields(fields);
     }
 
@@ -76,13 +78,15 @@ public class FieldFactory {
 
     public static String serializeFieldsList(Collection<Field> fields) {
         return fields.stream()
-                     .map(Field::getName)
-                     .collect(Collectors.joining(DELIMITER));
-    }
-
-    public static String serializeFieldsListUsingDisplayName(Collection<Field> fields) {
-        return fields.stream()
-                     .map(Field::getDisplayName)
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             // In case a user has put a user-defined field, the casing of that field is kept
+                             return unknownField.getDisplayName();
+                         } else {
+                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
+                             return field.getName();
+                         }
+                     })
                      .collect(Collectors.joining(DELIMITER));
     }
 
@@ -184,7 +188,7 @@ public class FieldFactory {
 
     /**
      * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
-     *
+     * <p>
      * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
      * separate preferences object
      */
