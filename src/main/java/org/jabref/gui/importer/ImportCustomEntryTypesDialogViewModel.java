@@ -23,7 +23,7 @@ public class ImportCustomEntryTypesDialogViewModel {
     private final PreferencesService preferencesService;
 
     private final ObservableList<BibEntryType> newTypes = FXCollections.observableArrayList();
-    private final ObservableList<BibEntryType> differentCustomizationTypes = FXCollections.observableArrayList();
+    private final ObservableList<BibEntryTypePrefsAndFileViewModel> differentCustomizationTypes = FXCollections.observableArrayList();
 
     public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<BibEntryType> entryTypes, PreferencesService preferencesService) {
         this.mode = mode;
@@ -37,7 +37,7 @@ public class ImportCustomEntryTypesDialogViewModel {
                 if (!EntryTypeFactory.isEqualNameAndFieldBased(customType, currentlyStoredType.get())) {
                     LOGGER.info("currently stored type:    {}", currentlyStoredType.get());
                     LOGGER.info("type provided by library: {}", customType);
-                    differentCustomizationTypes.add(customType);
+                    differentCustomizationTypes.add(new BibEntryTypePrefsAndFileViewModel(currentlyStoredType.get(), customType));
                 }
             }
         }
@@ -47,7 +47,7 @@ public class ImportCustomEntryTypesDialogViewModel {
         return this.newTypes;
     }
 
-    public ObservableList<BibEntryType> differentCustomizations() {
+    public ObservableList<BibEntryTypePrefsAndFileViewModel> differentCustomizations() {
         return this.differentCustomizationTypes;
     }
 

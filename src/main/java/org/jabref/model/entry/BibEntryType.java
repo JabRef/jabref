@@ -7,7 +7,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.util.OS;
+import org.jabref.gui.importer.BibEntryTypePrefsAndFileViewModel;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
@@ -41,11 +42,6 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return type;
     }
 
-    /**
-     * Returns all supported optional field names.
-     *
-     * @return a Set of optional field name Strings
-     */
     public Set<BibField> getOptionalFields() {
         return getAllBibFields().stream()
                              .filter(field -> !isRequired(field.field()))
@@ -150,13 +146,20 @@ public class BibEntryType implements Comparable<BibEntryType> {
     }
 
     /**
-     * This representation is also used in the UI, thus it is formatted more pretty
+     * Generates a **single line** string containing the information. This is used for debugging purposes.
+     *
+     * See "<a href="https://biratkirat.medium.com/learning-effective-java-item-10-84cc3ab553bc">Effective Java, Item 10</a>" for a discussion on contracts.
+     *
+     * We are sure, we are using this method in a) logs (which should use single lines for output) and b) in the UI. For the UI, we use {@link BibEntryTypePrefsAndFileViewModel},
+     * which in turn uses {@link MetaDataSerializer#serializeCustomEntryTypes(BibEntryType)}
      */
     @Override
     public String toString() {
-        return "type           = " + type + "," + OS.NEWLINE +
-               "allFields      = " + fields + "," + OS.NEWLINE +
-               "requiredFields = " + requiredFields;
+        return "BibEntryType{" +
+                "type=" + type +
+                ", allFields=" + fields +
+                ", requiredFields=" + requiredFields +
+                '}';
     }
 
     @Override
