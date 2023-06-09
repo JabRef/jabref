@@ -279,7 +279,7 @@ public class StudyRepository {
      */
     private void setUpRepositoryStructureForQueriesAndFetchers() throws IOException {
         // Cannot use stream here since IOException has to be thrown
-        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(
+        StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
                 this.getActiveLibraryEntries(),
                 preferencesService.getImportFormatPreferences(),
                 preferencesService.getImporterPreferences());

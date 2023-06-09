@@ -60,8 +60,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         selectedEncodingProperty.setValue(metaData.getEncoding().orElse(StandardCharsets.UTF_8));
         selectedDatabaseModeProperty.setValue(metaData.getMode().orElse(BibDatabaseMode.BIBLATEX));
         generalFileDirectoryProperty.setValue(metaData.getDefaultFileDirectory().orElse("").trim());
-        userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferencesService.getFilePreferences().getUser()).orElse("").trim());
-        laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUser()).map(Path::toString).orElse(""));
+        userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferencesService.getFilePreferences().getUserAndHost()).orElse("").trim());
+        laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
     }
 
     @Override
@@ -80,16 +80,16 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
-            newMetaData.clearUserFileDirectory(preferencesService.getFilePreferences().getUser());
+            newMetaData.clearUserFileDirectory(preferencesService.getFilePreferences().getUserAndHost());
         } else {
-            newMetaData.setUserFileDirectory(preferencesService.getFilePreferences().getUser(), userSpecificFileDirectory);
+            newMetaData.setUserFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
-            newMetaData.clearLatexFileDirectory(preferencesService.getFilePreferences().getUser());
+            newMetaData.clearLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost());
         } else {
-            newMetaData.setLatexFileDirectory(preferencesService.getFilePreferences().getUser(), Path.of(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), Path.of(latexFileDirectory));
         }
 
         databaseContext.setMetaData(newMetaData);

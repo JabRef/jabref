@@ -102,7 +102,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     }
 
     void showInputFieldNameDialog() {
-        dialogService.showInputDialogAndWait(Localization.lang("Add new field name"), Localization.lang("Field name:"))
+        dialogService.showInputDialogAndWait(Localization.lang("Add new field name"), Localization.lang("Field name"))
                      .map(FieldFactory::parseField)
                      .ifPresent(this::addFieldIfUnique);
     }

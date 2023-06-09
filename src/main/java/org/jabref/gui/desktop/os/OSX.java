@@ -18,7 +18,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
  * https://tinylog.org/v2/configuration/
  **/
 @AllowedToUseAwt("Requires AWT to open a file")
-public class OSX implements NativeDesktop {
+public class OSX extends NativeDesktop {
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {

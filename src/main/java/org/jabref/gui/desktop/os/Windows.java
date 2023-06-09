@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * The configuration of tinylog will become immutable as soon as the first log entry is issued.
  * https://tinylog.org/v2/configuration/
  **/
-public class Windows implements NativeDesktop {
+public class Windows extends NativeDesktop {
 
     private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 

@@ -253,9 +253,9 @@ public class JabRefFrame extends BorderPane {
 
                         Dragboard dragboard = tabDragEvent.getDragboard();
 
-                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
+                        if (DragAndDropHelper.hasBibFiles(dragboard)) {
                             tabbedPane.getTabs().remove(dndIndicator);
-                            List<Path> bibFiles = DragAndDropHelper.getBibFiles(tabDragEvent.getDragboard());
+                            List<Path> bibFiles = DragAndDropHelper.getBibFiles(dragboard);
                             OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
                             openDatabaseAction.openFiles(bibFiles);
                             tabDragEvent.setDropCompleted(true);
@@ -265,8 +265,8 @@ public class JabRefFrame extends BorderPane {
                                 if (libraryTab.getId().equals(destinationTabNode.getId()) &&
                                         !tabbedPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
                                     LibraryTab destinationLibraryTab = (LibraryTab) libraryTab;
-                                    if (DragAndDropHelper.hasGroups(tabDragEvent.getDragboard())) {
-                                        List<String> groupPathToSources = DragAndDropHelper.getGroups(tabDragEvent.getDragboard());
+                                    if (DragAndDropHelper.hasGroups(dragboard)) {
+                                        List<String> groupPathToSources = DragAndDropHelper.getGroups(dragboard);
 
                                         copyRootNode(destinationLibraryTab);
 

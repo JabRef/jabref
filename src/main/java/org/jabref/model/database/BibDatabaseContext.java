@@ -154,7 +154,7 @@ public class BibDatabaseContext {
         List<Path> fileDirs = new ArrayList<>();
 
         // 1. Metadata user-specific directory
-        metaData.getUserFileDirectory(preferences.getUser())
+        metaData.getUserFileDirectory(preferences.getUserAndHost())
                 .ifPresent(userFileDirectory -> fileDirs.add(getFileDirectoryPath(userFileDirectory)));
 
         // 2. Metadata general directory
