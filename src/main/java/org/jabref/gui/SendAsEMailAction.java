@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -43,11 +45,13 @@ public class SendAsEMailAction extends SimpleCommand {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final StandardActions action;
 
-    public SendAsEMailAction(DialogService dialogService, PreferencesService preferencesService, StateManager stateManager) {
+    public SendAsEMailAction(StandardActions action, DialogService dialogService, PreferencesService preferencesService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.action = action;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -107,19 +111,30 @@ public class SendAsEMailAction extends SimpleCommand {
             }
         }
 
-        String mailTo = "?Body=".concat(rawEntries.toString());
-        mailTo = mailTo.concat("&Subject=");
-        mailTo = mailTo.concat(preferencesService.getExternalApplicationsPreferences().getEmailSubject());
-        for (String path : attachments) {
-            mailTo = mailTo.concat("&Attachment=\"").concat(path);
-            mailTo = mailTo.concat("\"");
-        }
-
-        URI uriMailTo = new URI("mailto", mailTo, null);
+        URI uriMailTo = getUriMailTo(rawEntries, attachments);
 
         Desktop desktop = Desktop.getDesktop();
         desktop.mail(uriMailTo);
 
         return String.format("%s: %d", Localization.lang("Entries added to an email"), entries.size());
+    }
+
+    private URI getUriMailTo(StringWriter rawEntries, List<String> attachments) throws URISyntaxException {
+        StringBuilder mailTo = new StringBuilder();
+        if (action == StandardActions.SEND_TO_KINDLE) {
+            mailTo.append(preferencesService.getExternalApplicationsPreferences().getKindleEmail());
+            mailTo.append("?Subject=").append(Localization.lang("Send to Kindle"));
+        } else if (action == StandardActions.SEND_AS_EMAIL) {
+            mailTo.append("?Body=").append(rawEntries.toString());
+            mailTo.append("&Subject=");
+            mailTo.append(preferencesService.getExternalApplicationsPreferences().getEmailSubject());
+        }
+
+        for (String path : attachments) {
+            mailTo.append("&Attachment=\"").append(path);
+            mailTo.append("\"");
+        }
+
+        return new URI("mailto", mailTo.toString(), null);
     }
 }

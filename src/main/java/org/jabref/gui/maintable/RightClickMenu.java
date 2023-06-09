@@ -57,7 +57,8 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(StandardActions.SEND_AS_EMAIL, dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsEMailAction(StandardActions.SEND_TO_KINDLE, dialogService, preferencesService, stateManager)),
 
                 new SeparatorMenuItem(),
 

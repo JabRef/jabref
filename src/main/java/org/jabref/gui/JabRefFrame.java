@@ -904,7 +904,8 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, this.prefs, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(StandardActions.SEND_AS_EMAIL, dialogService, this.prefs, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsEMailAction(StandardActions.SEND_TO_KINDLE, dialogService, this.prefs, stateManager)),
                 pushToApplicationMenuItem,
 
                 new SeparatorMenuItem(),
