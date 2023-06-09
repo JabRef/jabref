@@ -5,6 +5,8 @@ import java.util.List;
 
 import javafx.util.Pair;
 
+import org.jabref.logic.util.OS;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -160,7 +162,8 @@ class JabRefCLITest {
                 Paper   : Sheet
                 Country : County
                 """;
-
+        // java text blocks use \n, but the cli method uses system newline
+        expected = expected.replace("\n", OS.NEWLINE);
         assertEquals(expected, JabRefCLI.alignStringTable(given));
     }
 }
