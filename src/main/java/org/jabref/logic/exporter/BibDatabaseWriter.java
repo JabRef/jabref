@@ -182,6 +182,8 @@ public abstract class BibDatabaseWriter {
 
     /**
      * Saves the database, including only the specified entries.
+     *
+     * @param entries A list of entries to save. The list itself is not modified in this code
      */
     public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
