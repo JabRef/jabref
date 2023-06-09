@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +43,6 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 
 import org.jooq.lambda.Unchecked;
-import org.zalando.fauxpas.FauxPas;
 
 /**
  * A generic writer for our database. This is independent of the concrete serialization format.
@@ -212,7 +211,7 @@ public abstract class BibDatabaseWriter {
         }
 
         // Map to collect entry type definitions that we must save along with entries using them.
-        Set<BibEntryType> typesToWrite = new TreeSet<>();
+        SortedSet<BibEntryType> typesToWrite = new TreeSet<>();
 
         for (BibEntry entry : sortedEntries) {
             // Check if we must write the type definition for this
@@ -325,7 +324,7 @@ public abstract class BibDatabaseWriter {
     protected abstract void writeString(BibtexString bibtexString, int maxKeyLength)
             throws IOException;
 
-    protected void writeEntryTypeDefinitions(Set<BibEntryType> types) throws IOException {
+    protected void writeEntryTypeDefinitions(SortedSet<BibEntryType> types) throws IOException {
         for (BibEntryType type : types) {
             writeEntryTypeDefinition(type);
         }
