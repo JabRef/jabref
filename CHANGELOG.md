@@ -31,6 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added drag and drop events for field 'Groups' in entry editor panel. [#569](https://github.com/koppor/jabref/issues/569)
 - We added support for parsing MathML in the Medline importer. [#4273](https://github.com/JabRef/jabref/issues/4273)
 - We added the ability to search for a DOI directly from 'Web Search'. [#9674](https://github.com/JabRef/jabref/issues/9674)
+- We added "Send to Kindle" to the right-click context & Tools menus. This creates an email targeted to the user's Kindle email, which can be set in preferences under "External programs" [#6186](https://github.com/JabRef/jabref/issues/6186)
 
 ### Changed
 
