@@ -107,9 +107,9 @@ public class URLCleanup implements CleanupJob {
                     String formattedDate = formatter.format(date);
                     newNoteFieldValue = newNoteFieldValue
                             .replace(date, "").trim()
-                            .replaceAll("^,|,$", "").trim(); // either starts or ends with comma
+                            .replaceAll("^,|,$", "").trim(); // either starts or ends with a comma
 
-                    // same behaviour with URL cleanup
+                    // Same approach with the URL cleanup.
                     if (entry.hasField(URLDATE_FIELD)) {
                         String urlDateFieldValue = entry.getField(URLDATE_FIELD).orElse(null);
                         if (urlDateFieldValue.equals(formattedDate)) {
