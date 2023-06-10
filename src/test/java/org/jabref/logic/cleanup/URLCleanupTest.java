@@ -123,7 +123,7 @@ public class URLCleanupTest {
                 new BibEntry().withField(StandardField.NOTE,
                                     "https://www.example.com/foo/?bar=baz&inga=42&quux")),
 
-            // Expected entry returns formatted the url-date in Urldate field.
+            // Expected entry returns formatted the url-date in the Urldate field.
             Arguments.of(
                 new BibEntry().withField(StandardField.URL,
                                     "http://142.42.1.1:8080")
@@ -132,14 +132,14 @@ public class URLCleanupTest {
                 new BibEntry().withField(StandardField.NOTE,
                                     "\\url{http://142.42.1.1:8080}, Accessed on January 15, 2021")),
 
-            // Input entry doesn't hold any URL both in Note field.
+            // Input entry doesn't hold any URL in the Note field.
             Arguments.of(
                 new BibEntry().withField(StandardField.NOTE,
                                     "Accessed on 2015-01-15"),
                 new BibEntry().withField(StandardField.NOTE,
                                     "Accessed on 2015-01-15")),
 
-            // Input entry has multiple url-dates stored in Note field.
+            // Input entry has multiple url-dates stored in the Note field.
             Arguments.of(
                 new BibEntry().withField(StandardField.URL,
                                     "http://142.42.1.1:8080")
