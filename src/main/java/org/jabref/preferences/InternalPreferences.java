@@ -15,16 +15,16 @@ public class InternalPreferences {
 
     private final ObjectProperty<Version> ignoredVersion;
     private final ObjectProperty<Path> lastPreferencesExportPath;
-    private final StringProperty user;
+    private final StringProperty userAndHost;
     private final BooleanProperty memoryStickMode;
 
     public InternalPreferences(Version ignoredVersion,
                                Path exportPath,
-                               String user,
+                               String userAndHost,
                                boolean memoryStickMode) {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
         this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);
-        this.user = new SimpleStringProperty(user);
+        this.userAndHost = new SimpleStringProperty(userAndHost);
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
     }
 
@@ -52,8 +52,8 @@ public class InternalPreferences {
         this.lastPreferencesExportPath.set(lastPreferencesExportPath);
     }
 
-    public String getUser() {
-        return user.get();
+    public String getUserAndHost() {
+        return userAndHost.get();
     }
 
     public boolean isMemoryStickMode() {

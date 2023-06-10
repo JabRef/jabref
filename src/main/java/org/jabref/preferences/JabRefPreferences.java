@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -423,7 +421,7 @@ public class JabRefPreferences implements PreferencesService {
      * Cache variables
      */
     private Map<String, Set<Field>> entryEditorTabList;
-    private String userName;
+    private String userAndHost;
 
     private LibraryPreferences libraryPreferences;
     private TelemetryPreferences telemetryPreferences;
@@ -733,7 +731,7 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(FILE_BROWSER_COMMAND, "");
         }
 
-        // versioncheck defaults
+        // version check defaults
         defaults.put(VERSION_IGNORED_UPDATE, "");
 
         // preview
@@ -1340,7 +1338,13 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OVERWRITE_OWNER));
 
         EasyBind.listen(ownerPreferences.useOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_OWNER, newValue));
-        EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (obs, oldValue, newValue) -> put(DEFAULT_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (obs, oldValue, newValue) -> {
+            put(DEFAULT_OWNER, newValue);
+            // trigger re-determination of userAndHost and the dependent preferences
+            userAndHost = null;
+            filePreferences = null;
+            internalPreferences = null;
+        });
         EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
 
         return ownerPreferences;
@@ -1996,7 +2000,7 @@ public class JabRefPreferences implements PreferencesService {
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
-                getUser(),
+                getUserAndHost(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
@@ -2018,18 +2022,12 @@ public class JabRefPreferences implements PreferencesService {
         return internalPreferences;
     }
 
-    private String getUser() {
-        if (StringUtil.isNotBlank(userName)) {
-            return userName;
+    private String getUserAndHost() {
+        if (StringUtil.isNotBlank(userAndHost)) {
+            return userAndHost;
         }
-
-        try {
-            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
-            return userName;
-        } catch (UnknownHostException ex) {
-            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible problem resolution", ex);
-            return get(DEFAULT_OWNER);
-        }
+        userAndHost = get(DEFAULT_OWNER) + '-' + OS.getNativeDesktop().getHostName();
+        return userAndHost;
     }
 
     //*************************************************************************************************************
@@ -2117,7 +2115,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         filePreferences = new FilePreferences(
-                getInternalPreferences().getUser(),
+                getInternalPreferences().getUserAndHost(),
                 getPath(MAIN_FILE_DIRECTORY, OS.getNativeDesktop().getDefaultFileChooserDirectory()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),

@@ -27,7 +27,7 @@ import org.mockito.Answers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class StudyDatabaseToFetcherConverterTest {
+class StudyCatalogToFetcherConverterTest {
     SaveConfiguration saveConfiguration;
     PreferencesService preferencesService;
     BibEntryTypesManager entryTypesManager;
@@ -59,7 +59,7 @@ class StudyDatabaseToFetcherConverterTest {
                 preferencesService,
                 new DummyFileUpdateMonitor(),
                 entryTypesManager);
-        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(
+        StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 mock(ImporterPreferences.class));

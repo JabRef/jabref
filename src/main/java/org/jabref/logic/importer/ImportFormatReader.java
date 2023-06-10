@@ -35,7 +35,6 @@ import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class ImportFormatReader {
@@ -135,31 +134,6 @@ public class ImportFormatReader {
      */
     public SortedSet<Importer> getImportFormats() {
         return new TreeSet<>(this.formats);
-    }
-
-    /**
-     * Human readable list of all known import formats (name and CLI Id).
-     * <p>
-     * <p>List is sorted by importer name.</p>
-     *
-     * @return human readable list of all known import formats
-     */
-    public String getImportFormatList() {
-        StringBuilder sb = new StringBuilder();
-
-        for (Importer imFo : getImportFormats()) {
-            int pad = Math.max(0, 14 - imFo.getName().length());
-            sb.append("  ");
-            sb.append(imFo.getName());
-
-            sb.append(StringUtil.repeatSpaces(pad));
-
-            sb.append(" : ");
-            sb.append(imFo.getId());
-            sb.append('\n');
-        }
-
-        return sb.toString();
     }
 
     public static class UnknownFormatImport {

@@ -46,7 +46,7 @@ import com.tobiasdiez.easybind.EasyBind;
  */
 abstract class FieldsEditorTab extends EntryEditorTab {
     protected final BibDatabaseContext databaseContext;
-    private final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
+    protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
     private final DialogService dialogService;
@@ -93,7 +93,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
     }
 
-    private void setupPanel(BibEntry entry, boolean compressed) {
+    protected void setupPanel(BibEntry entry, boolean compressed) {
         // The preferences might be not initialized in tests -> return immediately
         // TODO: Replace this ugly workaround by proper injection propagation
         if (preferences == null) {
@@ -184,9 +184,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
     }
 
-    /**
-     * Focuses the given field.
-     */
     public void requestFocus(Field fieldName) {
         if (editors.containsKey(fieldName)) {
             editors.get(fieldName).focus();
@@ -202,7 +199,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         initPanel();
         setupPanel(entry, isCompressed);
-
         if (previewPanel != null) {
             previewPanel.setEntry(entry);
         }

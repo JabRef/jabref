@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class UnknownField implements Field {
-    private final String name;
+    private String name;
     private final Set<FieldProperty> properties;
 
     public UnknownField(String name) {
@@ -27,6 +27,10 @@ public class UnknownField implements Field {
     @Override
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

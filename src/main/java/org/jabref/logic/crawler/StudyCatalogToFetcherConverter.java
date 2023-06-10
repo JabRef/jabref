@@ -14,14 +14,14 @@ import org.jabref.model.study.StudyDatabase;
 /**
  * Converts library entries from the given study into their corresponding fetchers.
  */
-class StudyDatabaseToFetcherConverter {
+class StudyCatalogToFetcherConverter {
     private final List<StudyDatabase> libraryEntries;
     private final ImportFormatPreferences importFormatPreferences;
     private final ImporterPreferences importerPreferences;
 
-    public StudyDatabaseToFetcherConverter(List<StudyDatabase> libraryEntries,
-                                           ImportFormatPreferences importFormatPreferences,
-                                           ImporterPreferences importerPreferences) {
+    public StudyCatalogToFetcherConverter(List<StudyDatabase> libraryEntries,
+                                          ImportFormatPreferences importFormatPreferences,
+                                          ImporterPreferences importerPreferences) {
         this.libraryEntries = libraryEntries;
         this.importFormatPreferences = importFormatPreferences;
         this.importerPreferences = importerPreferences;
