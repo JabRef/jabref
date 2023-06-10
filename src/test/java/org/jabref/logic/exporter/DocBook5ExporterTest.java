@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -53,7 +52,6 @@ public class DocBook5ExporterTest {
                 null,
                 StandardFileType.XML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(JournalAbbreviationRepository.class),
                 saveConfiguration);
 
         LocalDate myDate = LocalDate.of(2018, 1, 1);

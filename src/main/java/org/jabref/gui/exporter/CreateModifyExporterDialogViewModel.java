@@ -9,7 +9,6 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.PreferencesService;
@@ -35,15 +34,11 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private final StringProperty layoutFile = new SimpleStringProperty("");
     private final StringProperty extension = new SimpleStringProperty("");
 
-    private final JournalAbbreviationRepository abbreviationRepository;
-
     public CreateModifyExporterDialogViewModel(ExporterViewModel exporter,
                                                DialogService dialogService,
-                                               PreferencesService preferences,
-                                               JournalAbbreviationRepository abbreviationRepository) {
+                                               PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.abbreviationRepository = abbreviationRepository;
 
         // Set text of each of the boxes
         if (exporter != null) {
@@ -72,7 +67,6 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
                 layoutFile.get(),
                 extension.get(),
                 preferences.getLayoutFormatterPreferences(),
-                abbreviationRepository,
                 preferences.getExportConfiguration());
         format.setCustomExport(true);
         return new ExporterViewModel(format);

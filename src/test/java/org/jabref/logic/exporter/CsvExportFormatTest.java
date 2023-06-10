@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -40,7 +39,6 @@ public class CsvExportFormatTest {
                 "openoffice",
                 StandardFileType.CSV,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(JournalAbbreviationRepository.class),
                 saveConfiguration);
 
         databaseContext = new BibDatabaseContext();

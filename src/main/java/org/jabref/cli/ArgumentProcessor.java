@@ -478,8 +478,7 @@ public class ArgumentProcessor {
                 // export new database
                 ExporterFactory exporterFactory = ExporterFactory.create(
                         preferencesService,
-                        Globals.entryTypesManager,
-                        Globals.journalAbbreviationRepository);
+                        Globals.entryTypesManager);
                 Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
                 if (exporter.isEmpty()) {
                     System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
@@ -653,8 +652,7 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
             ExporterFactory exporterFactory = ExporterFactory.create(
                     preferencesService,
-                    Globals.entryTypesManager,
-                    Globals.journalAbbreviationRepository);
+                    Globals.entryTypesManager);
             Optional<Exporter> exporter = exporterFactory.getExporterByName(data[1]);
             if (exporter.isEmpty()) {
                 System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);

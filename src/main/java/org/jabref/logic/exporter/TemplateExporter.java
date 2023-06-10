@@ -49,7 +49,6 @@ public class TemplateExporter extends Exporter {
     private final String lfFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
-    private final JournalAbbreviationRepository abbreviationRepository;
     private final SaveConfiguration saveConfiguration;
     private boolean customExport;
     private BlankLineBehaviour blankLineBehaviour;
@@ -84,7 +83,6 @@ public class TemplateExporter extends Exporter {
                             String lfFileName,
                             String extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            JournalAbbreviationRepository abbreviationRepository,
                             SaveConfiguration saveConfiguration) {
         this(name,
                 name,
@@ -92,7 +90,6 @@ public class TemplateExporter extends Exporter {
                 null,
                 StandardFileType.fromExtensions(extension),
                 layoutPreferences,
-                abbreviationRepository,
                 saveConfiguration);
     }
 
@@ -113,7 +110,6 @@ public class TemplateExporter extends Exporter {
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            JournalAbbreviationRepository abbreviationRepository,
                             SaveConfiguration saveConfiguration) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
@@ -123,7 +119,6 @@ public class TemplateExporter extends Exporter {
         }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
-        this.abbreviationRepository = abbreviationRepository;
         this.saveConfiguration = saveConfiguration;
     }
 
@@ -145,7 +140,6 @@ public class TemplateExporter extends Exporter {
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            JournalAbbreviationRepository abbreviationRepository,
                             SaveConfiguration saveConfiguration,
                             BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
@@ -156,7 +150,6 @@ public class TemplateExporter extends Exporter {
         }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
-        this.abbreviationRepository = abbreviationRepository;
         this.saveConfiguration = saveConfiguration;
         this.blankLineBehaviour = blankLineBehaviour;
     }
@@ -219,7 +212,7 @@ public class TemplateExporter extends Exporter {
                        final Path file,
                        List<BibEntry> entries,
                        List<Path> fileDirForDatabase,
-                       JournalAbbreviationRepository journalAbbreviationRepository) throws Exception {
+                       JournalAbbreviationRepository abbreviationRepository) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 

@@ -1,7 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -10,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -25,32 +22,28 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ExporterTest {
 
     public BibDatabaseContext databaseContext;
-    public Charset charset;
     public List<BibEntry> entries;
 
     @BeforeEach
     public void setUp() {
         databaseContext = new BibDatabaseContext();
-        charset = StandardCharsets.UTF_8;
         entries = Collections.emptyList();
     }
 
     private static Stream<Object[]> exportFormats() {
         PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         when(preferencesService.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(preferencesService.getCustomExportFormats(any())).thenReturn(new ArrayList<>());
+        when(preferencesService.getCustomExportFormats()).thenReturn(new ArrayList<>());
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferencesService,
-                mock(BibEntryTypesManager.class),
-                mock(JournalAbbreviationRepository.class));
+                mock(BibEntryTypesManager.class));
 
         Collection<Object[]> result = new ArrayList<>();
         for (Exporter format : exporterFactory.getExporters()) {

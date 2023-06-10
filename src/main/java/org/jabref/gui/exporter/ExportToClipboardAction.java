@@ -75,8 +75,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferences,
-                Globals.entryTypesManager,
-                Globals.journalAbbreviationRepository);
+                Globals.entryTypesManager);
         List<Exporter> exporters = exporterFactory.getExporters().stream()
                                                   .sorted(Comparator.comparing(Exporter::getName))
                                                   .filter(exporter -> SUPPORTED_FILETYPES.contains(exporter.getFileType()))

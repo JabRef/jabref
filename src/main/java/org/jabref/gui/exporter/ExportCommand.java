@@ -70,8 +70,7 @@ public class ExportCommand extends SimpleCommand {
         // Get list of exporters and sort before adding to file dialog
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferences,
-                Globals.entryTypesManager,
-                Globals.journalAbbreviationRepository);
+                Globals.entryTypesManager);
         List<Exporter> exporters = exporterFactory.getExporters().stream()
                                                   .sorted(Comparator.comparing(Exporter::getName))
                                                   .collect(Collectors.toList());
