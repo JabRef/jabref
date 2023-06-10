@@ -49,8 +49,8 @@ public class URLCleanup implements CleanupJob {
          *     <li>"\d{1,2}": Matches one or two digits (D or DD)</li>
          * </ul>
          * Indicative formats identified:
-         * YYYY-MM-DD, YYYY-MM-DD, YYYY-M-DD, YYYY-MM-D, YYYY-M-D
-         * YYYY.MM.DD, YYYY.MM.DD, YYYY.M.DD, YYYY.MM.D, YYYY.M.D
+         * YYYY-MM-DD, YYYY-M-DD, YYYY-MM-D, YYYY-M-D
+         * YYYY.MM.DD, YYYY.M.DD, YYYY.MM.D, YYYY.M.D
          * Month DD, YYYY & Month D, YYYY
          */
         String dateRegex = ("\\d{4}-\\d{1,2}-\\d{1,2}|\\d{4}\\.\\d{1,2}\\.\\d{1,2}|" +
