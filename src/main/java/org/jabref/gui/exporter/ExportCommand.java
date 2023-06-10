@@ -120,7 +120,8 @@ public class ExportCommand extends SimpleCommand {
                     format.export(stateManager.getActiveDatabase().get(),
                             file,
                             finEntries,
-                            fileDirForDatabase);
+                            fileDirForDatabase,
+                            Globals.journalAbbreviationRepository);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {

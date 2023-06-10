@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -210,14 +211,15 @@ public class TemplateExporter extends Exporter {
 
     @Override
     public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
-        export(databaseContext, file, entries, Collections.emptyList());
+        export(databaseContext, file, entries, Collections.emptyList(), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 
     @Override
     public void export(final BibDatabaseContext databaseContext,
                        final Path file,
                        List<BibEntry> entries,
-                       List<Path> fileDirForDatabase) throws Exception {
+                       List<Path> fileDirForDatabase,
+                       JournalAbbreviationRepository journalAbbreviationRepository) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 
