@@ -10,9 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.architecture.AllowedToUseAwt;
-import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -39,21 +37,17 @@ import org.slf4j.LoggerFactory;
  * preferences/external programs
  */
 @AllowedToUseAwt("Requires AWT to send an email")
-public class SendAsEMailAction extends SimpleCommand {
+public abstract class SendAsEMailAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
-    private final StandardActions action;
 
-    public SendAsEMailAction(StandardActions action, DialogService dialogService, PreferencesService preferencesService, StateManager stateManager) {
+    public SendAsEMailAction(DialogService dialogService, PreferencesService preferencesService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
-        this.action = action;
-
-        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
     @Override
@@ -119,22 +113,5 @@ public class SendAsEMailAction extends SimpleCommand {
         return String.format("%s: %d", Localization.lang("Entries added to an email"), entries.size());
     }
 
-    private URI getUriMailTo(StringWriter rawEntries, List<String> attachments) throws URISyntaxException {
-        StringBuilder mailTo = new StringBuilder();
-        if (action == StandardActions.SEND_TO_KINDLE) {
-            mailTo.append(preferencesService.getExternalApplicationsPreferences().getKindleEmail());
-            mailTo.append("?Subject=").append(Localization.lang("Send to Kindle"));
-        } else if (action == StandardActions.SEND_AS_EMAIL) {
-            mailTo.append("?Body=").append(rawEntries.toString());
-            mailTo.append("&Subject=");
-            mailTo.append(preferencesService.getExternalApplicationsPreferences().getEmailSubject());
-        }
-
-        for (String path : attachments) {
-            mailTo.append("&Attachment=\"").append(path);
-            mailTo.append("\"");
-        }
-
-        return new URI("mailto", mailTo.toString(), null);
-    }
+    protected abstract URI getUriMailTo(StringWriter rawEntries, List<String> attachments) throws URISyntaxException;
 }
