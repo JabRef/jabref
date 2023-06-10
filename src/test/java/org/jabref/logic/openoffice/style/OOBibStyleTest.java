@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class OOBibStyleTest {
-    private final LayoutFormatterPreferences layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);;
+    private final LayoutFormatterPreferences layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
 
     @Test
@@ -415,10 +415,10 @@ class OOBibStyleTest {
 
     @Test
     void testNullAuthorMarker() throws IOException {
-        OOBibStyle style = new OOBibStyle
-                (StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                        layoutFormatterPreferences,
-                        abbreviationRepository);
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();

@@ -32,7 +32,6 @@ class LayoutTest {
     void setUp() {
         layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         abbreviationRepository = mock(JournalAbbreviationRepository.class);
-
     }
 
     private String layout(String layout, List<Path> fileDirForDatabase, BibEntry entry) throws IOException {
