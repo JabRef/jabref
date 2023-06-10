@@ -53,6 +53,15 @@ public class URLCleanupTest {
                                     "\\url{https://hdl.handle.net/10442/hedi/6089}, "
                                         + "\\url{http://142.42.1.1:8080}")),
 
+            // Input entry holds the same URL both in Note and Url field.
+            Arguments.of(
+                new BibEntry().withField(StandardField.URL,
+                                     "https://hdl.handle.net/10442/hedi/6089"),
+                new BibEntry().withField(StandardField.NOTE,
+                                     "\\url{https://hdl.handle.net/10442/hedi/6089}")
+                              .withField(StandardField.URL,
+                                     "https://hdl.handle.net/10442/hedi/6089")),
+
             // Input Note field has several values stored.
             Arguments.of(
                 new BibEntry().withField(StandardField.URL,
@@ -112,7 +121,56 @@ public class URLCleanupTest {
                 new BibEntry().withField(StandardField.URL,
                                     "https://www.example.com/foo/?bar=baz&inga=42&quux"),
                 new BibEntry().withField(StandardField.NOTE,
-                                    "https://www.example.com/foo/?bar=baz&inga=42&quux"))
+                                    "https://www.example.com/foo/?bar=baz&inga=42&quux")),
+
+            // Expected entry returns formatted the url-date in Urldate field.
+            Arguments.of(
+                new BibEntry().withField(StandardField.URL,
+                                    "http://142.42.1.1:8080")
+                              .withField(StandardField.URLDATE,
+                                    "2021-01-15"),
+                new BibEntry().withField(StandardField.NOTE,
+                                    "\\url{http://142.42.1.1:8080}, Accessed on January 15, 2021")),
+
+            // Input entry doesn't hold any URL both in Note field.
+            Arguments.of(
+                new BibEntry().withField(StandardField.NOTE,
+                                    "Accessed on 2015-01-15"),
+                new BibEntry().withField(StandardField.NOTE,
+                                    "Accessed on 2015-01-15")),
+
+            // Input entry has multiple url-dates stored in Note field.
+            Arguments.of(
+                new BibEntry().withField(StandardField.URL,
+                                    "http://142.42.1.1:8080")
+                              .withField(StandardField.URLDATE,
+                                    "2021-01-15")
+                              .withField(StandardField.NOTE,
+                                    "Visited on February 12, 2017"),
+                new BibEntry().withField(StandardField.NOTE,
+                                    "\\url{http://142.42.1.1:8080}, Accessed on January 15, 2021, Visited on February 12, 2017")),
+
+            // Input entry holds the same url-date in both Note and Urldate field.
+            Arguments.of(
+                new BibEntry().withField(StandardField.URL,
+                                    "http://142.42.1.1:8080")
+                              .withField(StandardField.URLDATE,
+                                    "2015-01-15"),
+                new BibEntry().withField(StandardField.NOTE,
+                                    "\\url{http://142.42.1.1:8080}, Visited on 2015.01.15")
+                              .withField(StandardField.URLDATE,
+                                    "2015-01-15")),
+
+            // Input Note field has several values stored.
+            Arguments.of(
+                new BibEntry().withField(StandardField.URL,
+                                    "https://example.org")
+                              .withField(StandardField.URLDATE,
+                                    "2023-04-11")
+                              .withField(StandardField.NOTE,
+                                    "cited by Kramer"),
+                new BibEntry().withField(StandardField.NOTE,
+                                    "\\url{https://example.org}, cited by Kramer, Accessed on 2023-04-11"))
         );
     }
 }
