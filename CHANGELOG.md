@@ -27,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the possibility to automatically fetch entries when an ISBN is pasted on the main table. [#9864](https://github.com/JabRef/jabref/issues/9864)
 - We added the option to disable the automatic linking of files in the entry editor [#5105](https://github.com/JabRef/jabref/issues/5105)
 - We added the link icon for ISBNs in linked identifiers column. [#9819](https://github.com/JabRef/jabref/issues/9819)
+- We added key binding to focus on groups <kbd>alt</kbd> + <kbd>s</kbd> [#9863](https://github.com/JabRef/jabref/issues/9863)
 - We added the option to unprotect a text selection, which strips all pairs of curly braces away. [#9950](https://github.com/JabRef/jabref/issues/9950)
 - We added drag and drop events for field 'Groups' in entry editor panel. [#569](https://github.com/koppor/jabref/issues/569)
 - We added support for parsing MathML in the Medline importer. [#4273](https://github.com/JabRef/jabref/issues/4273)
