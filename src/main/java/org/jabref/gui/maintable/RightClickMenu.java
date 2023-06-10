@@ -9,7 +9,8 @@ import javafx.scene.control.SeparatorMenuItem;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.SendAsEMailAction;
+import org.jabref.gui.SendAsGeneralEmailAction;
+import org.jabref.gui.SendAsKindleEmailAction;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -57,10 +58,7 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(StandardActions.SEND_AS_EMAIL, dialogService, preferencesService, stateManager)),
-                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsEMailAction(StandardActions.SEND_TO_KINDLE, dialogService, preferencesService, stateManager)),
-
-                new SeparatorMenuItem(),
+                createSendSubMenu(factory, dialogService, stateManager, preferencesService),
 
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
@@ -122,5 +120,19 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferencesService)));
 
         return copySpecialMenu;
+    }
+
+    private static Menu createSendSubMenu(ActionFactory factory,
+                                          DialogService dialogService,
+                                          StateManager stateManager,
+                                          PreferencesService preferencesService) {
+        Menu sendMenu = factory.createMenu(StandardActions.SEND);
+        sendMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsGeneralEmailAction(dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager)),
+                new SeparatorMenuItem()
+        );
+
+        return sendMenu;
     }
 }
