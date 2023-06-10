@@ -9,8 +9,8 @@ import javafx.scene.control.SeparatorMenuItem;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.SendAsGeneralEmailAction;
 import org.jabref.gui.SendAsKindleEmailAction;
+import org.jabref.gui.SendAsStandardEmailAction;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -128,7 +128,7 @@ public class RightClickMenu {
                                           PreferencesService preferencesService) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsGeneralEmailAction(dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager)),
                 factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager)),
                 new SeparatorMenuItem()
         );

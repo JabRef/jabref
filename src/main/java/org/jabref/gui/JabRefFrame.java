@@ -1328,7 +1328,7 @@ public class JabRefFrame extends BorderPane {
                                           PreferencesService preferencesService) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsGeneralEmailAction(dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager)),
                 factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager))
         );
 

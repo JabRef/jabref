@@ -1,9 +1,6 @@
 package org.jabref.gui;
 
 import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
 
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.logic.l10n.Localization;
@@ -23,17 +20,17 @@ public class SendAsKindleEmailAction extends SendAsEMailAction {
     }
 
     @Override
-    protected URI getUriMailTo(StringWriter rawEntries, List<String> attachments) throws URISyntaxException {
-        StringBuilder mailTo = new StringBuilder();
-        mailTo.append(preferencesService.getExternalApplicationsPreferences().getKindleEmail());
-        mailTo.append("?Body=").append(Localization.lang("Send to Kindle"));
-        mailTo.append("&Subject=").append(Localization.lang("Send to Kindle"));
+    protected String getEmailAddress() {
+        return preferencesService.getExternalApplicationsPreferences().getKindleEmail();
+    }
 
-        for (String path : attachments) {
-            mailTo.append("&Attachment=\"").append(path);
-            mailTo.append("\"");
-        }
+    @Override
+    protected String getSubject() {
+        return Localization.lang("Send to Kindle");
+    }
 
-        return new URI("mailto", mailTo.toString(), null);
+    @Override
+    protected String getBody(StringWriter rawEntries) {
+        return Localization.lang("Send to Kindle");
     }
 }

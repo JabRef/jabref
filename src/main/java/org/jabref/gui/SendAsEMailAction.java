@@ -113,5 +113,24 @@ public abstract class SendAsEMailAction extends SimpleCommand {
         return String.format("%s: %d", Localization.lang("Entries added to an email"), entries.size());
     }
 
-    protected abstract URI getUriMailTo(StringWriter rawEntries, List<String> attachments) throws URISyntaxException;
+    private URI getUriMailTo(StringWriter rawEntries, List<String> attachments) throws URISyntaxException {
+        StringBuilder mailTo = new StringBuilder();
+
+        mailTo.append(getEmailAddress());
+        mailTo.append("?Body=").append(getBody(rawEntries));
+        mailTo.append("&Subject=").append(getSubject());
+
+        for (String path : attachments) {
+            mailTo.append("&Attachment=\"").append(path);
+            mailTo.append("\"");
+        }
+
+        return new URI("mailto", mailTo.toString(), null);
+    }
+
+    protected abstract String getEmailAddress();
+
+    protected abstract String getSubject();
+
+    protected abstract String getBody(StringWriter rawEntries);
 }
