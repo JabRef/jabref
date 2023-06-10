@@ -53,9 +53,9 @@ public class URLCleanup implements CleanupJob {
          * YYYY.MM.DD, YYYY.M.DD, YYYY.MM.D, YYYY.M.D
          * Month DD, YYYY & Month D, YYYY
          */
-        String dateRegex = ("\\d{4}-\\d{1,2}-\\d{1,2}|\\d{4}\\.\\d{1,2}\\.\\d{1,2}|" +
+        String dateRegex = "\\d{4}-\\d{1,2}-\\d{1,2}|\\d{4}\\.\\d{1,2}\\.\\d{1,2}|" +
                 "(January|February|March|April|May|June|July|August|September|" +
-                "October|November|December) \\d{1,2}, \\d{4}");
+                "October|November|December) \\d{1,2}, \\d{4}";
 
         final Pattern urlPattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
         final Pattern termsPattern = Pattern.compile(dateTermsRegex, Pattern.CASE_INSENSITIVE);
