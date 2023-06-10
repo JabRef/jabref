@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -17,6 +18,9 @@ public class URLCleanup implements CleanupJob {
 
     private static final Field NOTE_FIELD = StandardField.NOTE;
     private static final Field URL_FIELD = StandardField.URL;
+    private static final Field URLDATE_FIELD = StandardField.URLDATE;
+
+    private NormalizeDateFormatter formatter = new NormalizeDateFormatter();
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
@@ -35,11 +39,34 @@ public class URLCleanup implements CleanupJob {
                 + "<>\\\\]+\\)))*\\))+(?:\\(([^\\s()<>\\\\]+|(\\([^\\s()<>\\\\]+\\"
                 + ")))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
 
-        final Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
-        final Matcher matcher = pattern.matcher(noteFieldValue);
+        String dateTermsRegex = "Accessed on|Visited on|Retrieved on|Viewed on";
 
-        if (matcher.find()) {
-            String url = matcher.group();
+        /*
+         * dateRegex matches several date formats. Explanation:
+         * <ul>
+         *     <li>"\d{4}": Matches exactly four digits (YYYY)</li>
+         *     <li>"\d{1,2}": Matches one or two digits (M or MM)</li>
+         *     <li>"\d{1,2}": Matches one or two digits (D or DD)</li>
+         * </ul>
+         * Indicative formats identified:
+         * YYYY-MM-DD, YYYY-MM-DD, YYYY-M-DD, YYYY-MM-D, YYYY-M-D
+         * YYYY.MM.DD, YYYY.MM.DD, YYYY.M.DD, YYYY.MM.D, YYYY.M.D
+         * Month DD, YYYY & Month D, YYYY
+         */
+        String dateRegex = ("\\d{4}-\\d{1,2}-\\d{1,2}|\\d{4}\\.\\d{1,2}\\.\\d{1,2}|" +
+                "(January|February|March|April|May|June|July|August|September|" +
+                "October|November|December) \\d{1,2}, \\d{4}");
+
+        final Pattern urlPattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
+        final Pattern termsPattern = Pattern.compile(dateTermsRegex, Pattern.CASE_INSENSITIVE);
+        final Pattern datePattern = Pattern.compile(dateRegex, Pattern.CASE_INSENSITIVE);
+
+        final Matcher urlMatcher = urlPattern.matcher(noteFieldValue);
+        final Matcher termsMatcher = termsPattern.matcher(noteFieldValue);
+        final Matcher dateMatcher = datePattern.matcher(noteFieldValue);
+
+        if (urlMatcher.find()) {
+            String url = urlMatcher.group();
 
             // Remove the URL from the NoteFieldValue
             String newNoteFieldValue = noteFieldValue
@@ -69,6 +96,30 @@ public class URLCleanup implements CleanupJob {
             } else {
                 entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
                 entry.setField(URL_FIELD, url).ifPresent(changes::add);
+            }
+
+            if (termsMatcher.find()) {
+                String term = termsMatcher.group();
+                newNoteFieldValue = newNoteFieldValue
+                        .replace(term, "");
+                if (dateMatcher.find()) {
+                    String date = dateMatcher.group();
+                    String formattedDate = formatter.format(date);
+                    newNoteFieldValue = newNoteFieldValue
+                            .replace(date, "").trim()
+                            .replaceAll("^,|,$", "").trim(); // either starts or ends with comma
+
+                    // same behaviour with URL cleanup
+                    if (entry.hasField(URLDATE_FIELD)) {
+                        String urlDateFieldValue = entry.getField(URLDATE_FIELD).orElse(null);
+                        if (urlDateFieldValue.equals(formattedDate)) {
+                            entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
+                        }
+                    } else {
+                        entry.setField(NOTE_FIELD, newNoteFieldValue).ifPresent(changes::add);
+                        entry.setField(URLDATE_FIELD, formattedDate).ifPresent(changes::add);
+                    }
+                }
             }
         }
         return changes;
