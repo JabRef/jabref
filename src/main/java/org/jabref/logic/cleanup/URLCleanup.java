@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -41,37 +42,9 @@ public class URLCleanup implements CleanupJob {
 
         String dateTermsRegex = "accessed on|visited on|retrieved on|viewed on";
 
-        /*
-         * Several date patterns are available at:
-         * jabref/src/main/java/org/jabref/model/entry/Date.java class
-         *
-         * However, these cannot be used for the needs of the operation
-         * as Date.parse static method requires the newNoteFieldValue String to
-         * hold only a date to match correctly. Besides that, it is not possible to
-         * extract a certain regex introduced in the parse method and call it in
-         * the current class. Reasoning:
-         * Defining a public static final attribute (containing desired regex)
-         * within the parse static method, it is not allowed, as public static
-         * constants must be declared at class-level and not inside the method.
-         *
-         * dateRegex matches several date formats. Explanation:
-         * <ul>
-         *     <li>"\d{4}": Matches exactly four digits (YYYY)</li>
-         *     <li>"\d{1,2}": Matches one or two digits (M or MM)</li>
-         *     <li>"\d{1,2}": Matches one or two digits (D or DD)</li>
-         * </ul>
-         * Indicative formats identified:
-         * YYYY-MM-DD, YYYY-M-DD, YYYY-MM-D, YYYY-M-D
-         * YYYY.MM.DD, YYYY.M.DD, YYYY.MM.D, YYYY.M.D
-         * Month DD, YYYY & Month D, YYYY
-         */
-        String dateRegex = "\\d{4}-\\d{1,2}-\\d{1,2}|\\d{4}\\.\\d{1,2}\\.\\d{1,2}|" +
-                "(January|February|March|April|May|June|July|August|September|" +
-                "October|November|December) \\d{1,2}, \\d{4}";
-
         final Pattern urlPattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
         final Pattern dateTermsPattern = Pattern.compile(dateTermsRegex, Pattern.CASE_INSENSITIVE);
-        final Pattern datePattern = Pattern.compile(dateRegex, Pattern.CASE_INSENSITIVE);
+        final Pattern datePattern = Pattern.compile(Date.DATE_REGEX, Pattern.CASE_INSENSITIVE);
 
         final Matcher urlMatcher = urlPattern.matcher(noteFieldValue);
         final Matcher dateTermsMatcher = dateTermsPattern.matcher(noteFieldValue);
