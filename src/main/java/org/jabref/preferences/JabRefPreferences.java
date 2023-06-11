@@ -2215,7 +2215,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
     }
 
-    private SaveOrder loadTableSaveOrder() {
+    private SaveOrder getTableSaveOrder() {
         List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
         List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
 
@@ -2231,11 +2231,8 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SaveConfiguration getExportConfiguration() {
-        SaveOrder.OrderType orderType = SaveOrder.OrderType.fromBooleans(
-                getBoolean(EXPORT_IN_SPECIFIED_ORDER),
-                getBoolean(EXPORT_IN_ORIGINAL_ORDER));
-        SaveOrder saveOrder = switch (orderType) {
-            case TABLE -> this.loadTableSaveOrder();
+        SaveOrder saveOrder = switch (getExportPreferences().getExportSaveOrder().getOrderType()) {
+            case TABLE -> this.getTableSaveOrder();
             case SPECIFIED -> this.getExportSaveOrder();
             case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
         };
@@ -2756,7 +2753,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
-        importerPreferences.getCustomImportList().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImportList()));
+        importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
 
         return importerPreferences;
     }

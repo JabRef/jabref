@@ -26,7 +26,7 @@ class ImportFormatReaderIntegrationTest {
     @BeforeEach
     void setUp() {
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         reader = new ImportFormatReader(
                 importerPreferences,
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
