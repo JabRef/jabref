@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
@@ -98,5 +101,43 @@ public class BvbFetcherTest {
     public void testPerformSearchEmpty() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
         assertEquals(Collections.emptyList(), searchResult);
+    }
+
+    @Test
+    void testIsAPhDThesis() throws Exception {
+        BibEntry bibStandardEntryTypePhDThesis = new BibEntry(StandardEntryType.PhdThesis)
+                .withField(StandardField.AUTHOR, "Strzyźowski, Casimir")
+                .withField(StandardField.TITLE, "Physiologisch-Toxikolische Studien")
+                .withField(StandardField.SCHOOL, "Universität Lausanne")
+                .withField(StandardField.SUBTITLE, "Beobachtungen über die Zersetzung des Morphins in faulenden Tierorganen : Ueber einen Versuch zum Nachweis von Umwandlungsprodukten des Morphins im Organismus des Kaninchens : Kritische Untersuchungen zur Mikrochemie krystallisierter Hämatinverbindungen nebst einem Beitrag zum Blutnachweise : Ueber den Nachweis des Acetylens im Blut : Ueber blauen resp. grünen Harn nach Einverleibung von Methylenblau : Inaugural-Dissertation")
+                .withField(StandardField.TITLEADDON, "vorgelegt von Casimir Strzyźowski");
+
+        List<BibEntry> searchResult = fetcher.performSearch("Physiologisch-Toxikolische Studien");
+        assertEquals(List.of(bibStandardEntryTypePhDThesis), searchResult);
+    }
+
+    @Test
+    void testPhDThesisIsNotAMisc() throws Exception {
+        BibEntry bibStandardEntryTypeMisc = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Strzyźowski, Casimir")
+                .withField(StandardField.TITLE, "Physiologisch-Toxikolische Studien")
+                .withField(StandardField.SCHOOL, "Universität Lausanne")
+                .withField(StandardField.SUBTITLE, "Beobachtungen über die Zersetzung des Morphins in faulenden Tierorganen : Ueber einen Versuch zum Nachweis von Umwandlungsprodukten des Morphins im Organismus des Kaninchens : Kritische Untersuchungen zur Mikrochemie krystallisierter Hämatinverbindungen nebst einem Beitrag zum Blutnachweise : Ueber den Nachweis des Acetylens im Blut : Ueber blauen resp. grünen Harn nach Einverleibung von Methylenblau : Inaugural-Dissertation")
+                .withField(StandardField.TITLEADDON, "vorgelegt von Casimir Strzyźowski");
+
+        List<BibEntry> searchResult = fetcher.performSearch("Physiologisch-Toxikolische Studien");
+        assertNotEquals(List.of(bibStandardEntryTypeMisc), searchResult);
+    }
+
+    @Test
+    void testMiscIsNotAPhDThesis() throws Exception {
+        BibEntry bibStandardEntryTypePhDThesis = new BibEntry(StandardEntryType.PhdThesis)
+                .withField(StandardField.LOCATION, "West Conshohocken, PA")
+                .withField(StandardField.PUBLISHER, "{ASTM International}")
+                .withField(StandardField.TITLE, "Standard test method for swell index of clay mineral component of geosynthetic clay liners")
+                .withField(StandardField.YEAR, "2019");
+
+        List<BibEntry> searchResult = fetcher.performSearch("Standard test method for swell index of clay mineral component of geosynthetic clay liners");
+        assertNotEquals(List.of(bibStandardEntryTypePhDThesis), searchResult);
     }
 }
