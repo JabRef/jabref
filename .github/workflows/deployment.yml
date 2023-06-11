@@ -50,7 +50,7 @@ jobs:
           - os: macos-latest
             displayName: macOS
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
-            eaJDK: https://download.java.net/java/early_access/jdk21/22/GPL/openjdk-21-ea+22_macos-x64_bin.tar.gz
+            eaJDK: https://files.jabref.org/jdks/openjdk-21-jabref_macos-x64_bin.tar.gz
 
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
@@ -93,6 +93,7 @@ jobs:
          echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" >> gradle.properties
          ls "$(cygpath -u "$RUNNER_TEMP\jdk\jdk-21")"
          cat gradle.properties
+         sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
       - name: setup jdk ea ubuntu
         if: (matrix.os == 'ubuntu-latest')
         shell: bash
@@ -103,6 +104,7 @@ jobs:
           echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk/jdk-21" >> gradle.properties
           ls ${{runner.temp}}/jdk
           cat gradle.properties
+          sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
       - name: setup jdk ea mac
         if: (matrix.os == 'macos-latest')
         shell: bash
@@ -114,6 +116,7 @@ jobs:
           echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk/jdk-21" >> gradle.properties
           ls ${{runner.temp}}/jdk
           cat gradle.properties    
+          sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
       - name: Setup OSX key chain on OSX
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
