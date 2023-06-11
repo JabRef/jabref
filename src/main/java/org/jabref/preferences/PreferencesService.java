@@ -98,8 +98,6 @@ public interface PreferencesService {
 
     Map<String, Set<Field>> getDefaultTabNamesAndFields();
 
-    List<Field> getAllDefaultTabFieldNames();
-
     EntryEditorPreferences getEntryEditorPreferences();
 
     RemotePreferences getRemotePreferences();

@@ -1475,30 +1475,6 @@ public class JabRefPreferences implements PreferencesService {
         return customTabsMap;
     }
 
-    /**
-     * Get a Map of default tab names to default tab fields.
-     *
-     * @return A map of keys with tab names and a set of corresponding fields
-     */
-    @Override
-    public List<Field> getAllDefaultTabFieldNames() {
-        List<Field> customFields = new ArrayList<>();
-
-        int defNumber = 0;
-        while (true) {
-            // saved as CUSTOMTABNAME_def{number} and ; separated
-            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
-
-            if (StringUtil.isNullOrEmpty(fields)) {
-                break;
-            }
-
-            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).toList());
-            defNumber++;
-        }
-        return customFields;
-    }
-
     @Override
     public EntryEditorPreferences getEntryEditorPreferences() {
         if (Objects.nonNull(entryEditorPreferences)) {
