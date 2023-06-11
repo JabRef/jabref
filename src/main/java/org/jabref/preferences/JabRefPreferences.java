@@ -2181,11 +2181,13 @@ public class JabRefPreferences implements PreferencesService {
         exportPreferences = new ExportPreferences(
                 get(LAST_USED_EXPORT),
                 Path.of(get(EXPORT_WORKING_DIRECTORY)),
-                getExportSaveOrder());
+                getExportSaveOrder(),
+                getCustomExportFormats());
 
         EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
         EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(exportPreferences.exportSaveOrderProperty(), (obs, oldValue, newValue) -> storeExportSaveOrder(newValue));
+        exportPreferences.getCustomExporters().addListener((InvalidationListener) c -> storeCustomExportFormats(exportPreferences.getCustomExporters()));
 
         return exportPreferences;
     }
@@ -2215,7 +2217,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
     }
 
-    private SaveOrder loadTableSaveOrder() {
+    private SaveOrder getTableSaveOrder() {
         List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
         List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
 
@@ -2231,11 +2233,8 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SaveConfiguration getExportConfiguration() {
-        SaveOrder.OrderType orderType = SaveOrder.OrderType.fromBooleans(
-                getBoolean(EXPORT_IN_SPECIFIED_ORDER),
-                getBoolean(EXPORT_IN_ORIGINAL_ORDER));
-        SaveOrder saveOrder = switch (orderType) {
-            case TABLE -> this.loadTableSaveOrder();
+        SaveOrder saveOrder = switch (getExportSaveOrder().getOrderType()) {
+            case TABLE -> this.getTableSaveOrder();
             case SPECIFIED -> this.getExportSaveOrder();
             case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
         };
@@ -2246,8 +2245,7 @@ public class JabRefPreferences implements PreferencesService {
                 .withReformatOnSave(getLibraryPreferences().shouldAlwaysReformatOnSave());
     }
 
-    @Override
-    public List<TemplateExporter> getCustomExportFormats() {
+    private List<TemplateExporter> getCustomExportFormats() {
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences();
         SaveConfiguration saveConfiguration = getExportConfiguration();
         List<TemplateExporter> formats = new ArrayList<>();
@@ -2266,8 +2264,7 @@ public class JabRefPreferences implements PreferencesService {
         return formats;
     }
 
-    @Override
-    public void storeCustomExportFormats(List<TemplateExporter> exporters) {
+    private void storeCustomExportFormats(List<TemplateExporter> exporters) {
         if (exporters.isEmpty()) {
             purgeSeries(CUSTOM_EXPORT_FORMAT, 0);
         } else {
@@ -2756,7 +2753,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
-        importerPreferences.getCustomImportList().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImportList()));
+        importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
 
         return importerPreferences;
     }

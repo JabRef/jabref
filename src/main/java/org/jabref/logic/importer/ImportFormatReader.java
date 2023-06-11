@@ -88,7 +88,7 @@ public class ImportFormatReader {
         formats.add(new CitaviXmlImporter());
 
         // Get custom import formats
-        formats.addAll(importerPreferences.getCustomImportList());
+        formats.addAll(importerPreferences.getCustomImporters());
     }
 
     /**
