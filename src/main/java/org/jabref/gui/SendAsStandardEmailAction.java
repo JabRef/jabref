@@ -49,7 +49,6 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
         StringWriter rawEntries = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntries, OS.NEWLINE);
 
-        // write the entries via this writer to "rawEntries" (being a StringWriter), which is used later to form the email content
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), Globals.entryTypesManager);
 
         for (BibEntry entry : entries) {
