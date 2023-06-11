@@ -23,7 +23,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.ExportPreferences;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -48,7 +47,6 @@ public class ExportToClipboardActionTest {
     private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final PreferencesService preferences = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-    private final ExportPreferences importExportPrefs = mock(ExportPreferences.class);
     private final StateManager stateManager = mock(StateManager.class);
 
     private TaskExecutor taskExecutor;
@@ -67,7 +65,7 @@ public class ExportToClipboardActionTest {
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
 
         taskExecutor = new CurrentThreadTaskExecutor();
-        when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
+        when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.observableList(List.of()));
         when(preferences.getExportConfiguration()).thenReturn(mock(SaveConfiguration.class));
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);
@@ -89,12 +87,11 @@ public class ExportToClipboardActionTest {
             }
         };
 
-        when(importExportPrefs.getLastExportExtension()).thenReturn("HTML");
-        when(preferences.getExportPreferences()).thenReturn(importExportPrefs);
         LibraryPreferences libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
+        when(preferences.getExportPreferences().getLastExportExtension()).thenReturn("HTML");
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         // noinspection ConstantConditions since databaseContext is mocked
