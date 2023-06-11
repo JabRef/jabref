@@ -14,6 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SidePanePreferences;
 
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.when;
 class SidePaneViewModelTest {
 
     PreferencesService preferencesService = mock(PreferencesService.class);
+    JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     StateManager stateManager = mock(StateManager.class);
     TaskExecutor taskExecutor = mock(TaskExecutor.class);
     DialogService dialogService = mock(DialogService.class);
@@ -52,7 +54,7 @@ class SidePaneViewModelTest {
         sidePanePreferences.getPreferredPositions().put(SidePaneType.WEB_SEARCH, 1);
         sidePanePreferences.getPreferredPositions().put(SidePaneType.OPEN_OFFICE, 2);
 
-        sidePaneViewModel = new SidePaneViewModel(preferencesService, stateManager, taskExecutor, dialogService, undoManager);
+        sidePaneViewModel = new SidePaneViewModel(preferencesService, abbreviationRepository, stateManager, taskExecutor, dialogService, undoManager);
     }
 
     @Test

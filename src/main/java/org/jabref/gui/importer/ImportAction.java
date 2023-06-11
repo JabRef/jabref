@@ -173,15 +173,15 @@ public class ImportAction {
             if (importResult == null) {
                 continue;
             }
-            ParserResult parserResult = importResult.parserResult;
+            ParserResult parserResult = importResult.parserResult();
             resultDatabase.insertEntries(parserResult.getDatabase().getEntries());
 
-            if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
+            if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format())) {
                 // additional treatment of BibTeX
                 new DatabaseMerger(preferencesService.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
-                        importResult.parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
+                        importResult.parserResult().getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                         parserResult.getDatabase().getEntries());
             }
             // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)

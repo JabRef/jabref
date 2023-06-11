@@ -23,8 +23,7 @@
         <Button onAction="#fetchFulltext" styleClass="icon-button">
             <graphic>
                 <StackPane>
-                    <JabRefIconView glyph="FETCH_FULLTEXT"
-                                    visible="${controller.viewModel.fulltextLookupInProgress == false}"/>
+                    <JabRefIconView fx:id="fulltextFetcher" glyph="FETCH_FULLTEXT" visible="false"/>
                     <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
                                        visible="${controller.viewModel.fulltextLookupInProgress}"/>
                 </StackPane>

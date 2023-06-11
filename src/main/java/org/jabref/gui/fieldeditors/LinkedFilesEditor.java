@@ -38,6 +38,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidOptInDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
@@ -56,36 +57,49 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import jakarta.inject.Inject;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
+    @FXML private JabRefIconView fulltextFetcher;
 
-    private final DialogService dialogService;
+    private final Field field;
     private final BibDatabaseContext databaseContext;
-    private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
-    private final PreferencesService preferencesService;
+    private final SuggestionProvider<?> suggestionProvider;
+    private final FieldCheckers fieldCheckers;
+
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
+    @Inject private TaskExecutor taskExecutor;
+
+    private LinkedFilesEditorViewModel viewModel;
 
     private ObservableOptionalValue<BibEntry> bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>());
+    private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
 
     public LinkedFilesEditor(Field field,
-                             DialogService dialogService,
                              BibDatabaseContext databaseContext,
-                             TaskExecutor taskExecutor,
                              SuggestionProvider<?> suggestionProvider,
-                             FieldCheckers fieldCheckers,
-                             PreferencesService preferences) {
-        this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
-        this.dialogService = dialogService;
+                             FieldCheckers fieldCheckers) {
+        this.field = field;
         this.databaseContext = databaseContext;
-        this.preferencesService = preferences;
+        this.suggestionProvider = suggestionProvider;
+        this.fieldCheckers = fieldCheckers;
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
-        ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
+        decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
+    }
+
+    @FXML
+    private void initialize() {
+        this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferencesService);
+
+        new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
                 .withGraphic(this::createFileDisplay)
                 .withContextMenu(this::createContextMenuForFile)
@@ -93,13 +107,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
-                .withValidation(LinkedFileViewModel::fileExistsValidationStatus);
-
-        listView.setCellFactory(cellFactory);
+                .withValidation(LinkedFileViewModel::fileExistsValidationStatus)
+                .install(listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
-        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
+        fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
+
         setUpKeyBindings();
     }
 
