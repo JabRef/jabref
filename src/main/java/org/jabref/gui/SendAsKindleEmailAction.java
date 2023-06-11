@@ -1,7 +1,5 @@
 package org.jabref.gui;
 
-import java.io.StringWriter;
-
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
@@ -30,7 +28,7 @@ public class SendAsKindleEmailAction extends SendAsEMailAction {
     }
 
     @Override
-    protected String getBody(StringWriter rawEntries) {
+    protected String getBody() {
         return Localization.lang("Send to Kindle");
     }
 }

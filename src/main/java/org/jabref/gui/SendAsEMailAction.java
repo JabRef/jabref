@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.awt.Desktop;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -13,11 +12,7 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.bibtex.BibEntryWriter;
-import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -71,29 +66,40 @@ public abstract class SendAsEMailAction extends SimpleCommand {
             return Localization.lang("This operation requires one or more entries to be selected.");
         }
 
-        StringWriter rawEntries = new StringWriter();
-        BibWriter bibWriter = new BibWriter(rawEntries, OS.NEWLINE);
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         List<BibEntry> entries = stateManager.getSelectedEntries();
+        URI uriMailTo = getUriMailTo(entries);
 
-        // write the entries via this writer to "rawEntries" (being a StringWriter), which  used later to form the email content
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), Globals.entryTypesManager);
+        Desktop desktop = Desktop.getDesktop();
+        desktop.mail(uriMailTo);
 
-        for (BibEntry entry : entries) {
-            try {
-                bibtexEntryWriter.write(entry, bibWriter, databaseContext.getMode());
-            } catch (IOException e) {
-                LOGGER.warn("Problem creating BibTeX file for mailing.", e);
-            }
+        return String.format("%s: %d", Localization.lang("Entries added to an email"), entries.size());
+    }
+
+    private URI getUriMailTo(List<BibEntry> entries) throws URISyntaxException {
+        StringBuilder mailTo = new StringBuilder();
+
+        mailTo.append(getEmailAddress());
+        mailTo.append("?Body=").append(getBody());
+        mailTo.append("&Subject=").append(getSubject());
+
+        List<String> attachments = getAttachments(entries);
+        for (String path : attachments) {
+            mailTo.append("&Attachment=\"").append(path);
+            mailTo.append("\"");
         }
 
-        List<String> attachments = new ArrayList<>();
+        return new URI("mailto", mailTo.toString(), null);
+    }
 
+    private List<String> getAttachments(List<BibEntry> entries) {
         // open folders is needed to indirectly support email programs, which cannot handle
         //   the unofficial "mailto:attachment" property
         boolean openFolders = preferencesService.getExternalApplicationsPreferences().shouldAutoOpenEmailAttachmentsFolder();
 
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(preferencesService.getFilePreferences()));
+
+        List<String> attachments = new ArrayList<>();
         for (Path path : fileList) {
             attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {
@@ -104,33 +110,12 @@ public abstract class SendAsEMailAction extends SimpleCommand {
                 }
             }
         }
-
-        URI uriMailTo = getUriMailTo(rawEntries, attachments);
-
-        Desktop desktop = Desktop.getDesktop();
-        desktop.mail(uriMailTo);
-
-        return String.format("%s: %d", Localization.lang("Entries added to an email"), entries.size());
-    }
-
-    private URI getUriMailTo(StringWriter rawEntries, List<String> attachments) throws URISyntaxException {
-        StringBuilder mailTo = new StringBuilder();
-
-        mailTo.append(getEmailAddress());
-        mailTo.append("?Body=").append(getBody(rawEntries));
-        mailTo.append("&Subject=").append(getSubject());
-
-        for (String path : attachments) {
-            mailTo.append("&Attachment=\"").append(path);
-            mailTo.append("\"");
-        }
-
-        return new URI("mailto", mailTo.toString(), null);
+        return attachments;
     }
 
     protected abstract String getEmailAddress();
 
     protected abstract String getSubject();
 
-    protected abstract String getBody(StringWriter rawEntries);
+    protected abstract String getBody();
 }

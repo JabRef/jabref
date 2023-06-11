@@ -1,20 +1,34 @@
 package org.jabref.gui;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 
 import org.jabref.gui.actions.ActionHelper;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.util.OS;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sends the selected entries to any specifiable email
  * by populating the email body
  */
 public class SendAsStandardEmailAction extends SendAsEMailAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendAsStandardEmailAction.class);
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
 
     public SendAsStandardEmailAction(DialogService dialogService, PreferencesService preferencesService, StateManager stateManager) {
         super(dialogService, preferencesService, stateManager);
         this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
@@ -29,7 +43,23 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
     }
 
     @Override
-    protected String getBody(StringWriter rawEntries) {
+    protected String getBody() {
+        List<BibEntry> entries = stateManager.getSelectedEntries();
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
+        StringWriter rawEntries = new StringWriter();
+        BibWriter bibWriter = new BibWriter(rawEntries, OS.NEWLINE);
+
+        // write the entries via this writer to "rawEntries" (being a StringWriter), which is used later to form the email content
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), Globals.entryTypesManager);
+
+        for (BibEntry entry : entries) {
+            try {
+                bibtexEntryWriter.write(entry, bibWriter, databaseContext.getMode());
+            } catch (IOException e) {
+                LOGGER.warn("Problem creating BibTeX file for mailing.", e);
+            }
+        }
+
         return rawEntries.toString();
     }
 }
