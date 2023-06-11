@@ -402,8 +402,8 @@ public class BibtexDatabaseWriterTest {
                         + "@Othercustomizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
-                        + "@Comment{jabref-entrytype: customizedtype: req[Title] opt[]}" + OS.NEWLINE + OS.NEWLINE
-                        + "@Comment{jabref-entrytype: othercustomizedtype: req[Title] opt[]}" + OS.NEWLINE,
+                        + "@Comment{jabref-entrytype: customizedtype: req[title] opt[]}" + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-entrytype: othercustomizedtype: req[title] opt[]}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 

@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class FieldFactoryTest {
     @Test
     void testOrFieldsTwoTerms() {
-        assertEquals("aaa/bbb", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb")));
+        assertEquals("Aaa/Bbb", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb")));
     }
 
     @Test
     void testOrFieldsThreeTerms() {
-        assertEquals("aaa/bbb/ccc", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb"), new UnknownField("ccc")));
+        assertEquals("Aaa/Bbb/Ccc", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb"), new UnknownField("ccc")));
     }
 
     private static Stream<Arguments> fieldsWithoutFieldProperties() {
