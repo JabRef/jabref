@@ -3,7 +3,6 @@ package org.jabref.preferences;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -36,7 +35,6 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.Field;
 
 public interface PreferencesService {
 
@@ -95,8 +93,6 @@ public interface PreferencesService {
     TimestampPreferences getTimestampPreferences();
 
     GroupsPreferences getGroupsPreferences();
-
-    Map<String, Set<Field>> getDefaultTabNamesAndFields();
 
     EntryEditorPreferences getEntryEditorPreferences();
 
