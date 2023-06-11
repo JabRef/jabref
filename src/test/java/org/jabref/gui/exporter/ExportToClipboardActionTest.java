@@ -14,7 +14,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -52,7 +51,6 @@ public class ExportToClipboardActionTest {
     private final ExportPreferences importExportPrefs = mock(ExportPreferences.class);
     private final StateManager stateManager = mock(StateManager.class);
 
-    private ExporterFactory exporterFactory;
     private TaskExecutor taskExecutor;
     private ObservableList<BibEntry> selectedEntries;
 
@@ -69,7 +67,7 @@ public class ExportToClipboardActionTest {
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
 
         taskExecutor = new CurrentThreadTaskExecutor();
-        when(preferences.getCustomExportFormats(any())).thenReturn(List.of());
+        when(preferences.getCustomExportFormats()).thenReturn(List.of());
         when(preferences.getExportConfiguration()).thenReturn(mock(SaveConfiguration.class));
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);

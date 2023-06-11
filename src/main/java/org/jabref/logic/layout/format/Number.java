@@ -1,6 +1,5 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
 /**
@@ -9,6 +8,8 @@ import org.jabref.logic.layout.ParamLayoutFormatter;
  */
 public class Number implements ParamLayoutFormatter {
 
+    public static int serialExportNumber;
+
     @Override
     public void setArgument(String arg) {
         // No effect currently.
@@ -16,6 +17,6 @@ public class Number implements ParamLayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        return String.valueOf(ExporterFactory.entryNumber);
+        return String.valueOf(serialExportNumber);
     }
 }

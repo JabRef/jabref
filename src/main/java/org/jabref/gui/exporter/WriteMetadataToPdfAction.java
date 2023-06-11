@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
@@ -196,7 +197,7 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
         new XmpUtilWriter(xmpPreferences).writeXmp(file, entry, database);
 
         EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), entryTypesManager, fieldPreferences);
-        embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
+        embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file, Globals.journalAbbreviationRepository);
     }
 
     class OptionsDialog extends FXDialog {
