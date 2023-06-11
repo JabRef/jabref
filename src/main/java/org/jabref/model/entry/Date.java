@@ -67,6 +67,13 @@ public class Date {
                                                    (builder, formatterBuilder) -> builder.append(formatterBuilder.toFormatter()))
                                            .toFormatter(Locale.US);
 
+        /*
+         * There is also {@link org.jabref.model.entry.Date#parse(java.lang.String)}.
+         * The regex of that method cannot be used as we parse single dates here and that method parses:
+         * i) date ranges
+         * ii) two dates separated by '/'
+         * Additionally, parse method requires the reviewed String to hold only a date.
+         */
         DATE_REGEX = "\\d{4}-\\d{1,2}-\\d{1,2}" + // covers YYYY-MM-DD, YYYY-M-DD, YYYY-MM-D, YYYY-M-D
                 "|\\d{4}\\.\\d{1,2}\\.\\d{1,2}|" + // covers YYYY.MM.DD, YYYY.M.DD, YYYY.MM.D, YYYY.M.D
                 "(January|February|March|April|May|June|July|August|September|" +
