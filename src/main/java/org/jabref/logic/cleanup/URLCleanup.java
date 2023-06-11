@@ -42,17 +42,17 @@ public class URLCleanup implements CleanupJob {
         String dateTermsRegex = "accessed on|visited on|retrieved on|viewed on";
 
         /*
-         * Several date patterns are available in:
+         * Several date patterns are available at:
          * jabref/src/main/java/org/jabref/model/entry/Date.java class
          *
          * However, these cannot be used for the needs of the operation
-         * as Date.parse method requires the whole String (i.e. newNoteFieldValue)
-         * to be a date, in order to be matched. Besides that, it is not possible to
+         * as Date.parse static method requires the newNoteFieldValue String to
+         * hold only a date to match correctly. Besides that, it is not possible to
          * extract a certain regex introduced in the parse method and call it in
          * the current class. Reasoning:
-         * Defining a public static final variable (containing desired regex)
-         * within the parse static method, it is not allowed, as public static constants
-         * must be declared at class-level and not inside the method.
+         * Defining a public static final attribute (containing desired regex)
+         * within the parse static method, it is not allowed, as public static
+         * constants must be declared at class-level and not inside the method.
          *
          * dateRegex matches several date formats. Explanation:
          * <ul>
