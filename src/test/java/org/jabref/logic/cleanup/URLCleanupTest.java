@@ -130,7 +130,7 @@ public class URLCleanupTest {
                               .withField(StandardField.URLDATE,
                                     "2021-01-15"),
                 new BibEntry().withField(StandardField.NOTE,
-                                    "\\url{http://142.42.1.1:8080}, Accessed on January 15, 2021")),
+                                    "\\url{http://142.42.1.1:8080}, accessed on January 15, 2021")),
 
             // Input entry doesn't hold any URL in the Note field.
             Arguments.of(
@@ -146,9 +146,9 @@ public class URLCleanupTest {
                               .withField(StandardField.URLDATE,
                                     "2021-01-15")
                               .withField(StandardField.NOTE,
-                                    "Visited on February 12, 2017"),
+                                    "visited on February 12, 2017"),
                 new BibEntry().withField(StandardField.NOTE,
-                                    "\\url{http://142.42.1.1:8080}, Accessed on January 15, 2021, Visited on February 12, 2017")),
+                                    "\\url{http://142.42.1.1:8080}, accessed on January 15, 2021, visited on February 12, 2017")),
 
             // Input entry holds the same url-date in both Note and Urldate field.
             Arguments.of(
@@ -157,7 +157,7 @@ public class URLCleanupTest {
                               .withField(StandardField.URLDATE,
                                     "2015-01-15"),
                 new BibEntry().withField(StandardField.NOTE,
-                                    "\\url{http://142.42.1.1:8080}, Visited on 2015.01.15")
+                                    "\\url{http://142.42.1.1:8080}, visited on 2015.01.15")
                               .withField(StandardField.URLDATE,
                                     "2015-01-15")),
 
@@ -170,7 +170,7 @@ public class URLCleanupTest {
                               .withField(StandardField.NOTE,
                                     "cited by Kramer"),
                 new BibEntry().withField(StandardField.NOTE,
-                                    "\\url{https://example.org}, cited by Kramer, Accessed on 2023-04-11"))
+                                    "\\url{https://example.org}, cited by Kramer, accessed on 2023-04-11"))
         );
     }
 }
