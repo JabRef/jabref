@@ -1,8 +1,9 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ import org.jabref.preferences.PreferencesService;
 public class OtherFieldsTab extends FieldsEditorTab {
 
     public static final String NAME = "Other fields";
-    private final Set<Field> customTabFieldNames;
+    private final List<Field> customTabFieldNames;
     private final BibEntryTypesManager entryTypesManager;
 
     public OtherFieldsTab(BibDatabaseContext databaseContext,
@@ -62,7 +63,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 indexingTaskManager);
 
         this.entryTypesManager = entryTypesManager;
-        this.customTabFieldNames = new HashSet<>();
+        this.customTabFieldNames = new ArrayList<>();
         preferences.getEntryEditorPreferences().getDefaultEntryEditorTabs().values().forEach(customTabFieldNames::addAll);
 
         setText(Localization.lang("Other fields"));
