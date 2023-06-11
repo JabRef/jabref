@@ -100,7 +100,8 @@ public class MarcXmlParser implements Parser {
                 putIsbn(bibEntry, datafield);
             } else if ("100".equals(tag) || "700".equals(tag) || "710".equals(tag)) {
                 putPersonalName(bibEntry, datafield); // Author, Editor, Publisher
-            } else if ("111".equals(tag) || "245".equals(tag) || "710".equals(tag)) {
+            } else if ("111".equals(tag)) {
+                //FixMe: Conference Information also in Subtitle (245) & Author (710)
                 putConferenceDetail(bibEntry, datafield);
             } else if ("245".equals(tag)) {
                 putTitle(bibEntry, datafield);
@@ -132,15 +133,6 @@ public class MarcXmlParser implements Parser {
                 LOGGER.debug("Unparsed tag: {}", tag);
             }
         }
-
-        /*
-         * ToDo:
-         *  proceedings:
-         *      Tag:111 -> Tag for information about conference or meeting
-         *      Tag:245 -> Subtitle often contains the information about a conference or meeting
-         *      Tag:710 -> The conference if often marked as the author
-         */
-
         return bibEntry;
     }
 
@@ -208,9 +200,11 @@ public class MarcXmlParser implements Parser {
 
     private void putConferenceDetail(BibEntry bibEntry, Element datafield) {
         String conference = getSubfield("a", datafield);
-        String location = getSubfield("c", datafield);
+        bibEntry.setType(StandardEntryType.Proceedings);
 
-
+        if (StringUtil.isNotBlank(conference)) {
+            bibEntry.setField(StandardField.EVENTTITLE, conference);
+        }
     }
 
     private void putTitle(BibEntry bibEntry, Element datafield) {
