@@ -76,4 +76,9 @@ public class ImporterPreferences {
     public ObservableSet<CustomImporter> getCustomImporters() {
         return customImporters;
     }
+
+    public void setCustomImporters(Set<CustomImporter> importers) {
+        customImporters.clear();
+        customImporters.addAll(importers);
+    }
 }

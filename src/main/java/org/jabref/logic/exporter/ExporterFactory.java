@@ -26,7 +26,7 @@ public class ExporterFactory {
     public static ExporterFactory create(PreferencesService preferencesService,
                                          BibEntryTypesManager entryTypesManager) {
 
-        List<TemplateExporter> customFormats = preferencesService.getCustomExportFormats();
+        List<TemplateExporter> customFormats = preferencesService.getExportPreferences().getCustomExporters();
         LayoutFormatterPreferences layoutPreferences = preferencesService.getLayoutFormatterPreferences();
         SaveConfiguration saveConfiguration = preferencesService.getExportConfiguration();
         XmpPreferences xmpPreferences = preferencesService.getXmpPreferences();

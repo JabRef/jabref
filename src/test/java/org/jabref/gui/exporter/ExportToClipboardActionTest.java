@@ -47,7 +47,7 @@ public class ExportToClipboardActionTest {
     private final DialogService dialogService = spy(DialogService.class);
     private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
-    private final PreferencesService preferences = mock(PreferencesService.class);
+    private final PreferencesService preferences = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
     private final ExportPreferences importExportPrefs = mock(ExportPreferences.class);
     private final StateManager stateManager = mock(StateManager.class);
 
@@ -67,7 +67,7 @@ public class ExportToClipboardActionTest {
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
 
         taskExecutor = new CurrentThreadTaskExecutor();
-        when(preferences.getCustomExportFormats()).thenReturn(List.of());
+        when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
         when(preferences.getExportConfiguration()).thenReturn(mock(SaveConfiguration.class));
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);

@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -39,7 +41,7 @@ public class ExporterTest {
     private static Stream<Object[]> exportFormats() {
         PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         when(preferencesService.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(preferencesService.getCustomExportFormats()).thenReturn(new ArrayList<>());
+        when(preferencesService.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferencesService,

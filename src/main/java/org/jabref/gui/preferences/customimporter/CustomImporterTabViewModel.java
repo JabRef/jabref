@@ -50,10 +50,9 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferences.getImporterPreferences().getCustomImporters().clear();
-        preferences.getImporterPreferences().getCustomImporters().addAll(importers.stream()
-                                                                                  .map(ImporterViewModel::getLogic)
-                                                                                  .collect(Collectors.toSet()));
+        preferences.getImporterPreferences().setCustomImporters(importers.stream()
+                                                                         .map(ImporterViewModel::getLogic)
+                                                                         .collect(Collectors.toSet()));
     }
 
     /**
