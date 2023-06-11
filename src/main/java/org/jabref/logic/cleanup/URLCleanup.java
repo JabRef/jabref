@@ -39,9 +39,21 @@ public class URLCleanup implements CleanupJob {
                 + "<>\\\\]+\\)))*\\))+(?:\\(([^\\s()<>\\\\]+|(\\([^\\s()<>\\\\]+\\"
                 + ")))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
 
-        String dateTermsRegex = "Accessed on|Visited on|Retrieved on|Viewed on";
+        String dateTermsRegex = "accessed on|visited on|retrieved on|viewed on";
 
         /*
+         * Several date patterns are available in:
+         * jabref/src/main/java/org/jabref/model/entry/Date.java class
+         *
+         * However, these cannot be used for the needs of the operation
+         * as Date.parse method requires the whole String (i.e. newNoteFieldValue)
+         * to be a date, in order to be matched. Besides that, it is not possible to
+         * extract a certain regex introduced in the parse method and call it in
+         * the current class. Reasoning:
+         * Defining a public static final variable (containing desired regex)
+         * within the parse static method, it is not allowed, as public static constants
+         * must be declared at class-level and not inside the method.
+         *
          * dateRegex matches several date formats. Explanation:
          * <ul>
          *     <li>"\d{4}": Matches exactly four digits (YYYY)</li>
@@ -58,11 +70,11 @@ public class URLCleanup implements CleanupJob {
                 "October|November|December) \\d{1,2}, \\d{4}";
 
         final Pattern urlPattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
-        final Pattern termsPattern = Pattern.compile(dateTermsRegex, Pattern.CASE_INSENSITIVE);
+        final Pattern dateTermsPattern = Pattern.compile(dateTermsRegex, Pattern.CASE_INSENSITIVE);
         final Pattern datePattern = Pattern.compile(dateRegex, Pattern.CASE_INSENSITIVE);
 
         final Matcher urlMatcher = urlPattern.matcher(noteFieldValue);
-        final Matcher termsMatcher = termsPattern.matcher(noteFieldValue);
+        final Matcher dateTermsMatcher = dateTermsPattern.matcher(noteFieldValue);
         final Matcher dateMatcher = datePattern.matcher(noteFieldValue);
 
         if (urlMatcher.find()) {
@@ -98,8 +110,8 @@ public class URLCleanup implements CleanupJob {
                 entry.setField(URL_FIELD, url).ifPresent(changes::add);
             }
 
-            if (termsMatcher.find()) {
-                String term = termsMatcher.group();
+            if (dateTermsMatcher.find()) {
+                String term = dateTermsMatcher.group();
                 newNoteFieldValue = newNoteFieldValue
                         .replace(term, "");
                 if (dateMatcher.find()) {
