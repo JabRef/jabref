@@ -30,7 +30,7 @@ public class CustomExporterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        List<TemplateExporter> exportersLogic = preferences.getCustomExportFormats();
+        List<TemplateExporter> exportersLogic = preferences.getExportPreferences().getCustomExporters();
         for (TemplateExporter exporter : exportersLogic) {
             exporters.add(new ExporterViewModel(exporter));
         }
@@ -41,7 +41,7 @@ public class CustomExporterTabViewModel implements PreferenceTabViewModel {
         List<TemplateExporter> exportersLogic = exporters.stream()
                                                          .map(ExporterViewModel::getLogic)
                                                          .collect(Collectors.toList());
-        preferences.storeCustomExportFormats(exportersLogic);
+        preferences.getExportPreferences().setCustomExporters(exportersLogic);
     }
 
     public void addExporter() {

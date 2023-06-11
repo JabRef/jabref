@@ -42,7 +42,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        Set<CustomImporter> importersLogic = preferences.getImporterPreferences().getCustomImportList();
+        Set<CustomImporter> importersLogic = preferences.getImporterPreferences().getCustomImporters();
         for (CustomImporter importer : importersLogic) {
             importers.add(new ImporterViewModel(importer));
         }
@@ -50,10 +50,9 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferences.getImporterPreferences().getCustomImportList().clear();
-        preferences.getImporterPreferences().getCustomImportList().addAll(importers.stream()
-                                                                                   .map(ImporterViewModel::getLogic)
-                                                                                   .collect(Collectors.toSet()));
+        preferences.getImporterPreferences().setCustomImporters(importers.stream()
+                                                                         .map(ImporterViewModel::getLogic)
+                                                                         .collect(Collectors.toSet()));
     }
 
     /**
