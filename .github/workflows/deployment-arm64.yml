@@ -74,7 +74,7 @@ jobs:
             echo "org.gradle.java.installations.auto-detect=false" >> gradle.properties
             cat gradle.properties
 
-            sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
+            sed -i'.bak' -e "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
       - name: Clean up keychain
         if: (matrix.os == 'self-hosted') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: |

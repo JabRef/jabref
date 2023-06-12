@@ -124,7 +124,7 @@ jobs:
           echo "org.gradle.java.installations.auto-detect=false" >> gradle.properties
           cat gradle.properties    
 
-          sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
+          sed -i'.bak' -e "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
       - name: Setup OSX key chain on OSX
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
