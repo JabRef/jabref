@@ -14,6 +14,7 @@ public class ExternalApplicationsPreferences {
     private final StringProperty customTerminalCommand;
     private final BooleanProperty useCustomFileBrowser;
     private final StringProperty customFileBrowserCommand;
+    private final StringProperty kindleEmail;
 
     public ExternalApplicationsPreferences(String eMailSubject,
                                            boolean shouldAutoOpenEmailAttachmentsFolder,
@@ -21,7 +22,8 @@ public class ExternalApplicationsPreferences {
                                            boolean useCustomTerminal,
                                            String customTerminalCommand,
                                            boolean useCustomFileBrowser,
-                                           String customFileBrowserCommand) {
+                                           String customFileBrowserCommand,
+                                           String kindleEmail) {
 
         this.eMailSubject = new SimpleStringProperty(eMailSubject);
         this.shouldAutoOpenEmailAttachmentsFolder = new SimpleBooleanProperty(shouldAutoOpenEmailAttachmentsFolder);
@@ -30,6 +32,7 @@ public class ExternalApplicationsPreferences {
         this.customTerminalCommand = new SimpleStringProperty(customTerminalCommand);
         this.useCustomFileBrowser = new SimpleBooleanProperty(useCustomFileBrowser);
         this.customFileBrowserCommand = new SimpleStringProperty(customFileBrowserCommand);
+        this.kindleEmail = new SimpleStringProperty(kindleEmail);
     }
 
     public String getEmailSubject() {
@@ -114,5 +117,17 @@ public class ExternalApplicationsPreferences {
 
     public void setCustomFileBrowserCommand(String customFileBrowserCommand) {
         this.customFileBrowserCommand.set(customFileBrowserCommand);
+    }
+
+    public String getKindleEmail() {
+        return kindleEmail.get();
+    }
+
+    public StringProperty kindleEmailProperty() {
+        return kindleEmail;
+    }
+
+    public void setKindleEmail(String kindleEmail) {
+        this.kindleEmail.set(kindleEmail);
     }
 }

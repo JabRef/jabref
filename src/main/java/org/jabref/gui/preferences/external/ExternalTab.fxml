@@ -21,6 +21,10 @@
         <Label text="%Subject for sending an email with references"/>
         <TextField fx:id="eMailReferenceSubject" minWidth="150.0" HBox.hgrow="ALWAYS"/>
     </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="%Email address for sending to Kindle"/>
+        <TextField fx:id="kindleEmail" minWidth="150.0" HBox.hgrow="ALWAYS"/>
+    </HBox>
     <CheckBox fx:id="autoOpenAttachedFolders" text="%Automatically open folders of attached files"/>
 
     <Label styleClass="sectionHeader" text="%Push applications"/>
