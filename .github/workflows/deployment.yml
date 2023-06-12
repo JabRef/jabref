@@ -42,7 +42,7 @@ jobs:
           - os: ubuntu-latest
             displayName: linux
             archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
-            eaJdk: https://files.jabref.org/jdks/openjdk-21-jabref_linux-x64_bin.tar.gz
+            eaJdk: https://files.jabref.org/jdks/jdk-linux-x64.tar.gz
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
@@ -50,8 +50,7 @@ jobs:
           - os: macos-latest
             displayName: macOS
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
-            eaJDK: https://files.jabref.org/jdks/openjdk-21-jabref_macos-x64_bin.tar.gz
-
+            eaJDK: https://files.jabref.org/jdks/jdk-macos-x64.tar.gz
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
