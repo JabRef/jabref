@@ -43,8 +43,8 @@ public class UTF8CheckerTest {
     @Test
     void fieldDoesNotAcceptUmlauts() throws UnsupportedEncodingException {
         UTF8Checker checker = new UTF8Checker(Charset.forName("GBK"));
-        String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), GBK);
-        entry.setField(StandardField.MONTH, NonUTF8);
+        String nonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), GBK);
+        entry.setField(StandardField.MONTH, nonUTF8);
         assertEquals(List.of(new IntegrityMessage("Non-UTF-8 encoded field found", entry, StandardField.MONTH)), checker.check(entry));
     }
 
@@ -57,8 +57,8 @@ public class UTF8CheckerTest {
      */
     @Test
     void NonUTF8EncodingCheckerTest() throws UnsupportedEncodingException {
-        String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), GBK);
-            assertFalse(UTF8Checker.UTF8EncodingChecker(NonUTF8.getBytes(GBK)));
+        String nonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), GBK);
+            assertFalse(UTF8Checker.UTF8EncodingChecker(nonUTF8.getBytes(GBK)));
     }
 
     /**
@@ -67,7 +67,7 @@ public class UTF8CheckerTest {
      */
     @Test
     void UTF8EncodingCheckerTest() {
-        String UTF8Demo = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
-            assertTrue(UTF8Checker.UTF8EncodingChecker(UTF8Demo.getBytes(StandardCharsets.UTF_8)));
+        String utf8Demo = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+            assertTrue(UTF8Checker.UTF8EncodingChecker(utf8Demo.getBytes(StandardCharsets.UTF_8)));
     }
 }

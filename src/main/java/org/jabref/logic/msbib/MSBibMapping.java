@@ -176,11 +176,11 @@ public class MSBibMapping {
     /**
      * <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
      *
-     * @param  LCID The LCID to transform
+     * @param  lcid The LCID to transform
      * @return "english" as default. Corresponding language from BiMap otherwise.
      */
-    public static String getLanguage(int LCID) {
-        return LANG_TO_LCID.inverse().getOrDefault(LCID, "english");
+    public static String getLanguage(int lcid) {
+        return LANG_TO_LCID.inverse().getOrDefault(lcid, "english");
     }
 
     public static String getMSBibField(Field field) {

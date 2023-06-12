@@ -249,7 +249,7 @@ public class PdfContentImporter extends Importer {
         String keywords = null;
         String title;
         String conference = null;
-        String DOI = null;
+        String doi = null;
         String series = null;
         String volume = null;
         String number = null;
@@ -394,7 +394,7 @@ public class PdfContentImporter extends Importer {
                     }
                 }
             } else {
-                if (DOI == null) {
+                if (doi == null) {
                     pos = curString.indexOf("DOI");
                     if (pos < 0) {
                         pos = curString.indexOf(StandardField.DOI.getName());
@@ -408,9 +408,9 @@ public class PdfContentImporter extends Importer {
                             }
                             int nextSpace = curString.indexOf(' ', pos);
                             if (nextSpace > 0) {
-                                DOI = curString.substring(pos, nextSpace);
+                                doi = curString.substring(pos, nextSpace);
                             } else {
-                                DOI = curString.substring(pos);
+                                doi = curString.substring(pos);
                             }
                         }
                     }
@@ -469,8 +469,8 @@ public class PdfContentImporter extends Importer {
         if (conference != null) {
             entry.setField(StandardField.BOOKTITLE, conference);
         }
-        if (DOI != null) {
-            entry.setField(StandardField.DOI, DOI);
+        if (doi != null) {
+            entry.setField(StandardField.DOI, doi);
         }
         if (series != null) {
             entry.setField(StandardField.SERIES, series);

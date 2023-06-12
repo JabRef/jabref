@@ -211,11 +211,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences.getImportFormatPreferences(),
                 preferences.getImporterPreferences());
         Optional<String> urlField = entry.getField(StandardField.URL);
-        boolean download_success = false;
+        boolean downloadSuccess = false;
         if (urlField.isPresent()) {
-            download_success = downloadFile(urlField.get());
+            downloadSuccess = downloadFile(urlField.get());
         }
-        if (urlField.isEmpty() || !download_success) {
+        if (urlField.isEmpty() || !downloadSuccess) {
             BackgroundTask
                 .wrap(() -> fetcher.findFullTextPDF(entry))
                 .onRunning(() -> fulltextLookupInProgress.setValue(true))

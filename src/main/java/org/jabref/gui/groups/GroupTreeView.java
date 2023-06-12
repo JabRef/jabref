@@ -291,13 +291,13 @@ public class GroupTreeView extends BorderPane {
 
         text.styleProperty().bind(Bindings.createStringBinding(() -> {
             double reducedFontSize;
-            double font_size = preferencesService.getWorkspacePreferences().getMainFontSize();
+            double fontSize = preferencesService.getWorkspacePreferences().getMainFontSize();
             // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
-            if (font_size > 26.0) {
+            if (fontSize > 26.0) {
                 reducedFontSize = 0.25;
-            } else if (font_size > 22.0) {
+            } else if (fontSize > 22.0) {
                 reducedFontSize = 0.35;
-            } else if (font_size > 18.0) {
+            } else if (fontSize > 18.0) {
                 reducedFontSize = 0.55;
             } else {
                 reducedFontSize = 0.75;

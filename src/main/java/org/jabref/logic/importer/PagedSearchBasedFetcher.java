@@ -31,9 +31,9 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
             return new Page<>(searchQuery, pageNumber, Collections.emptyList());
         }
         SyntaxParser parser = new StandardSyntaxParser();
-        final String NO_EXPLICIT_FIELD = "default";
+        final String noExplicitField = "default";
         try {
-            return this.performSearchPaged(parser.parse(searchQuery, NO_EXPLICIT_FIELD), pageNumber);
+            return this.performSearchPaged(parser.parse(searchQuery, noExplicitField), pageNumber);
         } catch (QueryNodeParseException e) {
             throw new FetcherException("An error occurred during parsing of the query.");
         }

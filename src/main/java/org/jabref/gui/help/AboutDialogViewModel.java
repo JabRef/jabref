@@ -59,10 +59,10 @@ public class AboutDialogViewModel extends AbstractViewModel {
         license.set(Localization.lang("License") + ":");
         changelogUrl = buildInfo.version.getChangelogUrl();
 
-        String javafx_version = System.getProperty("javafx.runtime.version", BuildInfo.UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
+        String javafxVersion = System.getProperty("javafx.runtime.version", BuildInfo.UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
 
         versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s %nJavaFX %s", buildInfo.version, BuildInfo.OS,
-                BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION, javafx_version);
+                BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION, javafxVersion);
     }
 
     public String getDevelopmentVersion() {

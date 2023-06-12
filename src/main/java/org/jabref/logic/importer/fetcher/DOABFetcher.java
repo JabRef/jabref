@@ -54,11 +54,11 @@ public class DOABFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return InputStream -> {
+        return inputStream -> {
             // can't use this method JsonReader.toJsonObject(inputStream) because the results are sent in an array
             // like format resulting in an error when trying to convert them into a json object
             // created a similar method suitable for this case "toJsonArray"
-            JSONArray response = JsonReader.toJsonArray(InputStream);
+            JSONArray response = JsonReader.toJsonArray(inputStream);
             if (response.isEmpty()) {
                 return Collections.emptyList();
             }

@@ -148,11 +148,11 @@ public class MetaDataParser {
      */
     static String parseDirectory(String value) {
         value = StringUtil.removeStringAtTheEnd(value, MetaData.SEPARATOR_STRING);
-        Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
+        Pattern singleBackslash = Pattern.compile("[^\\\\]\\\\[^\\\\]");
         if (value.contains("\\\\\\\\")) {
             // This is an escaped Windows UNC path
             return value.replace("\\\\", "\\");
-        } else if (value.contains("\\\\") && !SINGLE_BACKSLASH.matcher(value).find()) {
+        } else if (value.contains("\\\\") && !singleBackslash.matcher(value).find()) {
             // All backslashes escaped
             return value.replace("\\\\", "\\");
         } else {

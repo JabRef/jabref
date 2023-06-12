@@ -427,18 +427,18 @@ class OOBibBase {
      *
      * ******************************************************/
     public Optional<List<CitationEntry>> guiActionGetCitationEntries() {
-        final Optional<List<CitationEntry>> FAIL = Optional.empty();
+        final Optional<List<CitationEntry>> fail = Optional.empty();
         final String errorTitle = Localization.lang("Problem collecting citations");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
         if (testDialog(errorTitle, odoc.asVoidResult())) {
-            return FAIL;
+            return fail;
         }
         XTextDocument doc = odoc.get();
 
         if (testDialog(errorTitle, checkIfOpenOfficeIsRecordingChanges(doc))) {
             LOGGER.warn(errorTitle);
-            return FAIL;
+            return fail;
         }
 
         try {
@@ -446,14 +446,14 @@ class OOBibBase {
             return Optional.of(ManageCitations.getCitationEntries(doc));
         } catch (NoDocumentException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            return FAIL;
+            return fail;
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            return FAIL;
+            return fail;
         } catch (WrappedTargetException ex) {
             LOGGER.warn(errorTitle, ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            return FAIL;
+            return fail;
         }
     }
 

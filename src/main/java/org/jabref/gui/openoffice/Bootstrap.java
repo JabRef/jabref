@@ -114,12 +114,12 @@ public class Bootstrap {
     /**
      * backwards compatibility stub.
      *
-     * @param context_entries the hash table contains mappings of entry names (type string) to context entries (type class ComponentContextEntry).
+     * @param contextEntries the hash table contains mappings of entry names (type string) to context entries (type class ComponentContextEntry).
      * @return a new context.
      * @throws Exception if things go awry.
      */
-    public static XComponentContext createInitialComponentContext(Hashtable<String, Object> context_entries) throws Exception {
-        return createInitialComponentContext((Map<String, Object>) context_entries);
+    public static XComponentContext createInitialComponentContext(Hashtable<String, Object> contextEntries) throws Exception {
+        return createInitialComponentContext((Map<String, Object>) contextEntries);
     }
 
     /**
@@ -183,13 +183,13 @@ public class Bootstrap {
     /**
      * Backwards compatibility stub.
      *
-     * @param ini_file             ini_file (may be null: uno.rc besides cppuhelper lib)
-     * @param bootstrap_parameters bootstrap parameters (maybe null)
+     * @param iniFile             ini_file (may be null: uno.rc besides cppuhelper lib)
+     * @param bootstrapParameters bootstrap parameters (maybe null)
      * @return a freshly bootstrapped component context.
      * @throws Exception if things go awry.
      */
-    public static final XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Hashtable<String, String> bootstrap_parameters) throws Exception {
-        return defaultBootstrap_InitialComponentContext(ini_file, (Map<String, String>) bootstrap_parameters);
+    public static final XComponentContext defaultBootstrap_InitialComponentContext(String iniFile, Hashtable<String, String> bootstrapParameters) throws Exception {
+        return defaultBootstrap_InitialComponentContext(iniFile, (Map<String, String>) bootstrapParameters);
     }
 
     /**
@@ -209,9 +209,9 @@ public class Bootstrap {
         if (null != bootstrap_parameters) {
             pairs = new String[2 * bootstrap_parameters.size()];
             int n = 0;
-            for (Map.Entry<String, String> bootstrap_parameter : bootstrap_parameters.entrySet()) {
-                pairs[n++] = bootstrap_parameter.getKey();
-                pairs[n++] = bootstrap_parameter.getValue();
+            for (Map.Entry<String, String> bootstrapParameter : bootstrap_parameters.entrySet()) {
+                pairs[n++] = bootstrapParameter.getKey();
+                pairs[n++] = bootstrapParameter.getValue();
             }
         }
 
@@ -226,14 +226,14 @@ public class Bootstrap {
                 // on Android, merging in master periodically, until I know
                 // for sure whether it is what I want, or not.
 
-                boolean disable_dynloading = false;
+                boolean disableDynloading = false;
                 try {
                     System.loadLibrary("lo-bootstrap");
                 } catch (UnsatisfiedLinkError e) {
-                    disable_dynloading = true;
+                    disableDynloading = true;
                 }
 
-                if (!disable_dynloading) {
+                if (!disableDynloading) {
                     NativeLibraryLoader.loadLibrary(Bootstrap.class.getClassLoader(), "juh");
                 }
             } else {

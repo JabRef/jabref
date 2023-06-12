@@ -186,35 +186,35 @@ public class PreferencesMigrations {
      * Introduced in <a href="https://github.com/JabRef/jabref/pull/1704">#1704</a>
      */
     private static void upgradeLabelPatternToCitationKeyPattern(JabRefPreferences prefs, Preferences mainPrefsNode) {
-        final String V3_6_DEFAULT_BIBTEX_KEYPATTERN = "defaultBibtexKeyPattern";
-        final String V3_6_BIBTEX_KEYPATTERN_NODE = "bibtexkeypatterns";
-        final String V3_3_DEFAULT_LABELPATTERN = "defaultLabelPattern";
-        final String V3_3_LOGIC_LABELPATTERN = "logic/labelpattern"; // version 3.3 - 3.5, mind the case
-        final String V3_0_LOGIC_LABELPATTERN = "logic/labelPattern"; // node used for version 3.0 - 3.2
-        final String LEGACY_LABELPATTERN = "labelPattern"; // version <3.0
+        final String v36DefaultBibtexKeypattern = "defaultBibtexKeyPattern";
+        final String v36BibtexKeypatternNode = "bibtexkeypatterns";
+        final String v33DefaultLabelpattern = "defaultLabelPattern";
+        final String v33LogicLabelpattern = "logic/labelpattern"; // version 3.3 - 3.5, mind the case
+        final String v30LogicLabelpattern = "logic/labelPattern"; // node used for version 3.0 - 3.2
+        final String legacyLabelpattern = "labelPattern"; // version <3.0
 
         try {
             // Migrate default pattern
-            if (mainPrefsNode.get(V3_6_DEFAULT_BIBTEX_KEYPATTERN, null) == null) {
+            if (mainPrefsNode.get(v36DefaultBibtexKeypattern, null) == null) {
                 // Check whether old defaultLabelPattern is set
-                String oldDefault = mainPrefsNode.get(V3_3_DEFAULT_LABELPATTERN, null);
+                String oldDefault = mainPrefsNode.get(v33DefaultLabelpattern, null);
                 if (oldDefault != null) {
-                    prefs.put(V3_6_DEFAULT_BIBTEX_KEYPATTERN, oldDefault);
+                    prefs.put(v36DefaultBibtexKeypattern, oldDefault);
                     LOGGER.info("Upgraded old default key generator pattern '{}' to new version.", oldDefault);
                 }
             }
             // Pref node already exists do not migrate from previous version
-            if (mainPrefsNode.nodeExists(V3_6_BIBTEX_KEYPATTERN_NODE)) {
+            if (mainPrefsNode.nodeExists(v36BibtexKeypatternNode)) {
                 return;
             }
 
             // Migrate type specific patterns
-            if (mainPrefsNode.nodeExists(V3_3_LOGIC_LABELPATTERN)) {
-                migrateTypedKeyPrefs(prefs, mainPrefsNode.node(V3_3_LOGIC_LABELPATTERN));
-            } else if (mainPrefsNode.nodeExists(V3_0_LOGIC_LABELPATTERN)) {
-                migrateTypedKeyPrefs(prefs, mainPrefsNode.node(V3_0_LOGIC_LABELPATTERN));
-            } else if (mainPrefsNode.nodeExists(LEGACY_LABELPATTERN)) {
-                migrateTypedKeyPrefs(prefs, mainPrefsNode.node(LEGACY_LABELPATTERN));
+            if (mainPrefsNode.nodeExists(v33LogicLabelpattern)) {
+                migrateTypedKeyPrefs(prefs, mainPrefsNode.node(v33LogicLabelpattern));
+            } else if (mainPrefsNode.nodeExists(v30LogicLabelpattern)) {
+                migrateTypedKeyPrefs(prefs, mainPrefsNode.node(v30LogicLabelpattern));
+            } else if (mainPrefsNode.nodeExists(legacyLabelpattern)) {
+                migrateTypedKeyPrefs(prefs, mainPrefsNode.node(legacyLabelpattern));
             }
         } catch (BackingStoreException e) {
             LOGGER.error("Migrating old bibtexKeyPatterns failed.", e);
@@ -398,23 +398,23 @@ public class PreferencesMigrations {
 
     static void changeColumnVariableNamesFor51(JabRefPreferences preferences) {
         // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
-        final String V5_0_COLUMN_NAMES = "columnNames";
-        final String V5_0_COLUMN_WIDTHS = "columnWidths";
-        final String V5_0_COLUMN_SORT_TYPES = "columnSortTypes";
-        final String V5_0_COLUMN_SORT_ORDER = "columnSortOrder";
+        final String v50ColumnNames = "columnNames";
+        final String v50ColumnWidths = "columnWidths";
+        final String v50ColumnSortTypes = "columnSortTypes";
+        final String v50ColumnSortOrder = "columnSortOrder";
 
-        final String V5_1_COLUMN_NAMES = "mainTableColumnNames";
-        final String V5_1_COLUMN_WIDTHS = "mainTableColumnWidths";
-        final String V5_1_COLUMN_SORT_TYPES = "mainTableColumnSortTypes";
-        final String V5_1_COLUMN_SORT_ORDER = "mainTableColumnSortOrder";
+        final String v51ColumnNames = "mainTableColumnNames";
+        final String v51ColumnWidths = "mainTableColumnWidths";
+        final String v51ColumnSortTypes = "mainTableColumnSortTypes";
+        final String v51ColumnSortOrder = "mainTableColumnSortOrder";
 
-        List<String> oldColumnNames = preferences.getStringList(V5_0_COLUMN_NAMES);
-        List<String> columnNames = preferences.getStringList(V5_1_COLUMN_NAMES);
+        List<String> oldColumnNames = preferences.getStringList(v50ColumnNames);
+        List<String> columnNames = preferences.getStringList(v51ColumnNames);
         if (!oldColumnNames.isEmpty() && columnNames.isEmpty()) {
-            preferences.putStringList(V5_1_COLUMN_NAMES, preferences.getStringList(V5_0_COLUMN_NAMES));
-            preferences.putStringList(V5_1_COLUMN_WIDTHS, preferences.getStringList(V5_0_COLUMN_WIDTHS));
-            preferences.putStringList(V5_1_COLUMN_SORT_TYPES, preferences.getStringList(V5_0_COLUMN_SORT_TYPES));
-            preferences.putStringList(V5_1_COLUMN_SORT_ORDER, preferences.getStringList(V5_0_COLUMN_SORT_ORDER));
+            preferences.putStringList(v51ColumnNames, preferences.getStringList(v50ColumnNames));
+            preferences.putStringList(v51ColumnWidths, preferences.getStringList(v50ColumnWidths));
+            preferences.putStringList(v51ColumnSortTypes, preferences.getStringList(v50ColumnSortTypes));
+            preferences.putStringList(v51ColumnSortOrder, preferences.getStringList(v50ColumnSortOrder));
         }
     }
 
@@ -485,35 +485,35 @@ public class PreferencesMigrations {
      * </table>
      */
     private static void upgradeCleanups(JabRefPreferences prefs) {
-        final String V5_8_CLEANUP = "CleanUp";
-        final String V6_0_CLEANUP_JOBS = "CleanUpJobs";
+        final String v58Cleanup = "CleanUp";
+        final String v60CleanupJobs = "CleanUpJobs";
 
-        final String V5_8_CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
-        final String V6_0_CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
-        final String V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
+        final String v58CleanupFieldFormatters = "CleanUpFormatters";
+        final String v60CleanupFieldFormatters = "CleanUpFormatters";
+        final String v60CleanupFieldFormattersEnabled = "CleanUpFormattersEnabled";
 
         List<String> activeJobs = new ArrayList<>();
         for (CleanupPreferences.CleanupStep action : EnumSet.allOf(CleanupPreferences.CleanupStep.class)) {
-            Optional<String> job = prefs.getAsOptional(V5_8_CLEANUP + action.name());
+            Optional<String> job = prefs.getAsOptional(v58Cleanup + action.name());
             if (job.isPresent() && Boolean.parseBoolean(job.get())) {
                 activeJobs.add(action.name());
                 // prefs.deleteKey(V5_8_CLEANUP + action.name()); // for backward compatibility in comments
             }
         }
         if (!activeJobs.isEmpty()) {
-            prefs.put(V6_0_CLEANUP_JOBS, String.join(";", activeJobs));
+            prefs.put(v60CleanupJobs, String.join(";", activeJobs));
         }
 
-        List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(V5_8_CLEANUP_FIELD_FORMATTERS), "\n")
+        List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(v58CleanupFieldFormatters), "\n")
                                                            .split("\n"));
         if (formatterCleanups.size() >= 2
                 && (formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
                 || formatterCleanups.get(0).equals(FieldFormatterCleanups.DISABLED))) {
-            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
+            prefs.putBoolean(v60CleanupFieldFormattersEnabled, formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
                     ? Boolean.TRUE
                     : Boolean.FALSE);
 
-            prefs.put(V6_0_CLEANUP_FIELD_FORMATTERS, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
+            prefs.put(v60CleanupFieldFormatters, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
         }
     }
 }

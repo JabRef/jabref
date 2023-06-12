@@ -294,19 +294,19 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
      * @return highlighted span for codeArea
      */
     public StyleSpans<Collection<String>> computeHighlighting(String text) {
-        final Pattern XML_TAG = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
+        final Pattern xmlTag = Pattern.compile("(?<ELEMENT>(</?\\h*)(\\w+)([^<>]*)(\\h*/?>))"
                 + "|(?<COMMENT><!--[^<>]+-->)");
-        final Pattern ATTRIBUTES = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
+        final Pattern attributes = Pattern.compile("(\\w+\\h*)(=)(\\h*\"[^\"]+\")");
 
-        final int GROUP_OPEN_BRACKET = 2;
-        final int GROUP_ELEMENT_NAME = 3;
-        final int GROUP_ATTRIBUTES_SECTION = 4;
-        final int GROUP_CLOSE_BRACKET = 5;
-        final int GROUP_ATTRIBUTE_NAME = 1;
-        final int GROUP_EQUAL_SYMBOL = 2;
-        final int GROUP_ATTRIBUTE_VALUE = 3;
+        final int groupOpenBracket = 2;
+        final int groupElementName = 3;
+        final int groupAttributesSection = 4;
+        final int groupCloseBracket = 5;
+        final int groupAttributeName = 1;
+        final int groupEqualSymbol = 2;
+        final int groupAttributeValue = 3;
 
-        Matcher matcher = XML_TAG.matcher(text);
+        Matcher matcher = xmlTag.matcher(text);
         int lastKeywordEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
         while (matcher.find()) {
@@ -315,20 +315,20 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 spansBuilder.add(Collections.singleton("comment"), matcher.end() - matcher.start());
             } else {
                 if (matcher.group("ELEMENT") != null) {
-                    String attributesText = matcher.group(GROUP_ATTRIBUTES_SECTION);
+                    String attributesText = matcher.group(groupAttributesSection);
 
-                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_OPEN_BRACKET) - matcher.start(GROUP_OPEN_BRACKET));
-                    spansBuilder.add(Collections.singleton("anytag"), matcher.end(GROUP_ELEMENT_NAME) - matcher.end(GROUP_OPEN_BRACKET));
+                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(groupOpenBracket) - matcher.start(groupOpenBracket));
+                    spansBuilder.add(Collections.singleton("anytag"), matcher.end(groupElementName) - matcher.end(groupOpenBracket));
 
                     if (!attributesText.isEmpty()) {
                         lastKeywordEnd = 0;
 
-                        Matcher attributesMatcher = ATTRIBUTES.matcher(attributesText);
+                        Matcher attributesMatcher = attributes.matcher(attributesText);
                         while (attributesMatcher.find()) {
                             spansBuilder.add(Collections.emptyList(), attributesMatcher.start() - lastKeywordEnd);
-                            spansBuilder.add(Collections.singleton("attribute"), attributesMatcher.end(GROUP_ATTRIBUTE_NAME) - attributesMatcher.start(GROUP_ATTRIBUTE_NAME));
-                            spansBuilder.add(Collections.singleton("tagmark"), attributesMatcher.end(GROUP_EQUAL_SYMBOL) - attributesMatcher.end(GROUP_ATTRIBUTE_NAME));
-                            spansBuilder.add(Collections.singleton("avalue"), attributesMatcher.end(GROUP_ATTRIBUTE_VALUE) - attributesMatcher.end(GROUP_EQUAL_SYMBOL));
+                            spansBuilder.add(Collections.singleton("attribute"), attributesMatcher.end(groupAttributeName) - attributesMatcher.start(groupAttributeName));
+                            spansBuilder.add(Collections.singleton("tagmark"), attributesMatcher.end(groupEqualSymbol) - attributesMatcher.end(groupAttributeName));
+                            spansBuilder.add(Collections.singleton("avalue"), attributesMatcher.end(groupAttributeValue) - attributesMatcher.end(groupEqualSymbol));
                             lastKeywordEnd = attributesMatcher.end();
                         }
                         if (attributesText.length() > lastKeywordEnd) {
@@ -336,9 +336,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                         }
                     }
 
-                    lastKeywordEnd = matcher.end(GROUP_ATTRIBUTES_SECTION);
+                    lastKeywordEnd = matcher.end(groupAttributesSection);
 
-                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(GROUP_CLOSE_BRACKET) - lastKeywordEnd);
+                    spansBuilder.add(Collections.singleton("tagmark"), matcher.end(groupCloseBracket) - lastKeywordEnd);
                 }
             }
             lastKeywordEnd = matcher.end();

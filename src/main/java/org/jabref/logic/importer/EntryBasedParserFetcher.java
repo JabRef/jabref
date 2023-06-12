@@ -55,16 +55,16 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
     default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
-        URL UrlForEntry;
+        URL urlForEntry;
         try {
-            if ((UrlForEntry = getURLForEntry(entry)) == null) {
+            if ((urlForEntry = getURLForEntry(entry)) == null) {
                 return Collections.emptyList();
             }
         } catch (MalformedURLException | URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         }
 
-        try (InputStream stream = new BufferedInputStream(UrlForEntry.openStream())) {
+        try (InputStream stream = new BufferedInputStream(urlForEntry.openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup

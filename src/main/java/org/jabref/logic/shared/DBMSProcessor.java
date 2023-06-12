@@ -61,8 +61,8 @@ public abstract class DBMSProcessor {
         Map<String, String> metadata = getSharedMetaData();
         if (type == DBMSType.POSTGRESQL || type == DBMSType.MYSQL) {
             try {
-                Integer VERSION_DB_STRUCT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
-                if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
+                Integer versionDbStruct = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
+                if (versionDbStruct == getCURRENT_VERSION_DB_STRUCT()) {
                     databasePassesIntegrityCheck = true;
                 }
             } catch (Exception e) {

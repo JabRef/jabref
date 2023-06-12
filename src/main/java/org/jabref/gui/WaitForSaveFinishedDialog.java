@@ -17,12 +17,12 @@ public class WaitForSaveFinishedDialog {
         this.dialogService = dialogService;
     }
 
-    public void showAndWait(List<LibraryTab> LibraryTabs) {
-        if (LibraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
+    public void showAndWait(List<LibraryTab> libraryTabs) {
+        if (libraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
             Task<Void> waitForSaveFinished = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    while (LibraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
+                    while (libraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
                         if (isCancelled()) {
                             return null;
                         } else {

@@ -639,12 +639,12 @@ class OOBibStyleGetCitationMarker {
 
         boolean[] startsNewGroup = new boolean[nEntries];
         List<CitationMarkerEntry> filteredCitationMarkerEntries = new ArrayList<>(nEntries);
-        int i_out = 0;
+        int iOut = 0;
 
         if (nEntries > 0) {
             filteredCitationMarkerEntries.add(citationMarkerEntries.get(0));
-            startsNewGroup[i_out] = true;
-            i_out++;
+            startsNewGroup[iOut] = true;
+            iOut++;
         }
 
         for (int i = 1; i < nEntries; i++) {
@@ -752,8 +752,8 @@ class OOBibStyleGetCitationMarker {
 
             if (!sameAsPrev) {
                 filteredCitationMarkerEntries.add(ce2);
-                startsNewGroup[i_out] = startingNewGroup;
-                i_out++;
+                startsNewGroup[iOut] = startingNewGroup;
+                iOut++;
             }
         }
 

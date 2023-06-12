@@ -323,9 +323,9 @@ class BracketedPatternTest {
 
     @Test
     void nullDatabaseExpansionTest() {
-        BibDatabase another_database = null;
+        BibDatabase anotherDatabase = null;
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
-        assertEquals("2017_Kitsune_213", pattern.expand(bibentry, another_database));
+        assertEquals("2017_Kitsune_213", pattern.expand(bibentry, anotherDatabase));
     }
 
     @Test
@@ -409,11 +409,11 @@ class BracketedPatternTest {
     void suppliedBibentryBracketExpansionTest() {
         BibDatabase another_database = null;
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
-        BibEntry another_bibentry = new BibEntry()
+        BibEntry anotherBibentry = new BibEntry()
                 .withField(StandardField.AUTHOR, "Gražulis, Saulius")
                 .withField(StandardField.YEAR, "2017")
                 .withField(StandardField.PAGES, "213--216");
-        assertEquals("2017_Gražulis_213", pattern.expand(another_bibentry, ';', another_database));
+        assertEquals("2017_Gražulis_213", pattern.expand(anotherBibentry, ';', another_database));
     }
 
     @Test

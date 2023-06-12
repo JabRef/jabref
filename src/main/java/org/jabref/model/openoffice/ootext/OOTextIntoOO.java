@@ -738,19 +738,19 @@ public class OOTextIntoOO {
      * @return true on failure
      */
     public static boolean setParagraphStyle(XTextCursor cursor, String paragraphStyle) {
-        final boolean FAIL = true;
-        final boolean PASS = false;
+        final boolean fail = true;
+        final boolean pass = false;
 
         XParagraphCursor paragraphCursor = UnoCast.cast(XParagraphCursor.class, cursor).get();
         XPropertySet propertySet = UnoCast.cast(XPropertySet.class, paragraphCursor).get();
         try {
             propertySet.setPropertyValue(PARA_STYLE_NAME, paragraphStyle);
-            return PASS;
+            return pass;
         } catch (UnknownPropertyException
                 | PropertyVetoException
                 | com.sun.star.lang.IllegalArgumentException
                 | WrappedTargetException ex) {
-            return FAIL;
+            return fail;
         }
     }
 

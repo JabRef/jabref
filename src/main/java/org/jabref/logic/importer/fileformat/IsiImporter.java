@@ -183,7 +183,7 @@ public class IsiImporter extends Importer {
             }
 
             EntryType type = BibEntry.DEFAULT_TYPE;
-            String PT = "";
+            String pt = "";
             String pages = "";
             hm.clear();
 
@@ -202,9 +202,9 @@ public class IsiImporter extends Importer {
 
                 if ("PT".equals(beg)) {
                     if (value.startsWith("J")) {
-                        PT = "article";
+                        pt = "article";
                     } else {
-                        PT = value;
+                        pt = value;
                     }
                     type = StandardEntryType.Article; // make all of them PT?
                 } else if ("TY".equals(beg)) {
@@ -272,7 +272,7 @@ public class IsiImporter extends Importer {
                 } else if ("DT".equals(beg)) {
                     if ("Review".equals(value)) {
                         type = StandardEntryType.Article; // set "Review" in Note/Comment?
-                    } else if (value.startsWith("Article") || value.startsWith("Journal") || "article".equals(PT)) {
+                    } else if (value.startsWith("Article") || value.startsWith("Journal") || "article".equals(pt)) {
                         type = StandardEntryType.Article;
                     } else {
                         type = BibEntry.DEFAULT_TYPE;

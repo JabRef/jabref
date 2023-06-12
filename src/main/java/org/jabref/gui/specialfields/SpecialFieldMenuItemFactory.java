@@ -54,8 +54,8 @@ public class SpecialFieldMenuItemFactory {
         SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, preferencesService, undoManager);
         Menu menu = factory.createMenu(viewModel.getAction());
 
-        for (SpecialFieldValue Value : field.getValues()) {
-            SpecialFieldValueViewModel valueViewModel = new SpecialFieldValueViewModel(Value);
+        for (SpecialFieldValue value : field.getValues()) {
+            SpecialFieldValueViewModel valueViewModel = new SpecialFieldValueViewModel(value);
             menu.getItems().add(factory.createMenuItem(valueViewModel.getAction(), commandFactory.apply(valueViewModel)));
         }
 
