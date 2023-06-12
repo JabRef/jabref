@@ -81,7 +81,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        if (this.entryTypesWithFields.size() > 0) {
+        if (!this.entryTypesWithFields.isEmpty()) {
             this.entryTypesWithFields.clear();
         }
         Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
@@ -105,12 +105,12 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
             multilineFields.addAll(allFields.stream()
                                             .filter(FieldViewModel::isMultiline)
-                                            .map(FieldViewModel::getField)
+                                            .map(FieldViewModel::toField)
                                             .toList());
 
             List<OrFields> required = allFields.stream()
                                                .filter(FieldViewModel::isRequired)
-                                               .map(FieldViewModel::getField)
+                                               .map(FieldViewModel::toField)
                                                .map(OrFields::new)
                                                .collect(Collectors.toList());
             List<BibField> fields = allFields.stream().map(FieldViewModel::toBibField).collect(Collectors.toList());
@@ -144,22 +144,26 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
-        ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
-        boolean fieldExists = entryFields.stream().anyMatch(fieldViewModel ->
-                fieldViewModel.nameProperty().getValue().equals(field.getDisplayName()));
+        boolean fieldExists = displayNameExists(field.getDisplayName());
 
-        if (!fieldExists) {
+        if (fieldExists) {
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Duplicate fields"),
+                    Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
+        } else {
             this.selectedEntryType.getValue().addField(new FieldViewModel(
                     field,
                     FieldViewModel.Mandatory.REQUIRED,
                     FieldPriority.IMPORTANT,
                     false));
-        } else {
-            dialogService.showWarningDialogAndWait(
-                    Localization.lang("Duplicate fields"),
-                    Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
         }
         newFieldToAddProperty().setValue(null);
+    }
+
+    public boolean displayNameExists(String displayName) {
+        ObservableList<FieldViewModel> entryFields = this.selectedEntryType.getValue().fields();
+        return entryFields.stream().anyMatch(fieldViewModel ->
+                fieldViewModel.displayNameProperty().getValue().equals(displayName));
     }
 
     public void removeField(FieldViewModel focusedItem) {

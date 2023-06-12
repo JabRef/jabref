@@ -159,7 +159,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:32.0.0-jre') {
+    implementation ('com.google.guava:guava:32.0.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -205,7 +205,8 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark:0.64.8'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
-    implementation group: 'org.zalando', name: 'faux-pas', version: '0.9.0'
+
+    implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.160'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'

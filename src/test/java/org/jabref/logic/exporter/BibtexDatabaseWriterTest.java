@@ -395,7 +395,7 @@ public class BibtexDatabaseWriterTest {
         database.insertEntry(entry);
         bibtexContext.setMode(BibDatabaseMode.BIBTEX);
 
-        databaseWriter.savePartOfDatabase(bibtexContext, Arrays.asList(entry, otherEntry));
+        databaseWriter.savePartOfDatabase(bibtexContext, List.of(entry, otherEntry));
 
         assertEquals(
                 "@Customizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
@@ -801,24 +801,22 @@ public class BibtexDatabaseWriterTest {
                         new SaveOrder.SortCriterion(StandardField.ABSTRACT, false)));
         metaData.setSaveOrderConfig(saveOrder);
 
-        BibEntry firstEntry = new BibEntry();
-        firstEntry.setType(StandardEntryType.Article);
-        firstEntry.setField(StandardField.AUTHOR, "A");
-        firstEntry.setField(StandardField.YEAR, "2010");
+        BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "A")
+                .withField(StandardField.YEAR, "2010")
+                .withChanged(true);
 
-        BibEntry secondEntry = new BibEntry();
-        secondEntry.setType(StandardEntryType.Article);
-        secondEntry.setField(StandardField.AUTHOR, "A");
-        secondEntry.setField(StandardField.YEAR, "2000");
+        BibEntry secondEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "A")
+                .withField(StandardField.YEAR, "2000")
+                .withChanged(true);
 
-        BibEntry thirdEntry = new BibEntry();
-        thirdEntry.setType(StandardEntryType.Article);
-        thirdEntry.setField(StandardField.AUTHOR, "B");
-        thirdEntry.setField(StandardField.YEAR, "2000");
+        BibEntry thirdEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "B")
+                .withField(StandardField.YEAR, "2000")
+                .withChanged(true);
 
-        database.insertEntry(secondEntry);
-        database.insertEntry(thirdEntry);
-        database.insertEntry(firstEntry);
+        database.insertEntries(secondEntry, thirdEntry, firstEntry);
 
         databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries());
 

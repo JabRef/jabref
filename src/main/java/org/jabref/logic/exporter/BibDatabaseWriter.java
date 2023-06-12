@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +41,8 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
+
+import org.jooq.lambda.Unchecked;
 
 /**
  * A generic writer for our database. This is independent of the concrete serialization format.
@@ -180,13 +182,12 @@ public abstract class BibDatabaseWriter {
 
     /**
      * Saves the database, including only the specified entries.
+     *
+     * @param entries A list of entries to save. The list itself is not modified in this code
      */
     public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
-        if (sharedDatabaseIDOptional.isPresent()) {
-            // may throw an IOException. Thus, we do not use "ifPresent", but the "old" isPresent way
-            writeDatabaseID(sharedDatabaseIDOptional.get());
-        }
+        sharedDatabaseIDOptional.ifPresent(Unchecked.consumer(id -> writeDatabaseID(id)));
 
         // Some file formats write something at the start of the file (like the encoding)
         if (saveConfiguration.getSaveType() != SaveType.PLAIN_BIBTEX) {
@@ -212,7 +213,7 @@ public abstract class BibDatabaseWriter {
         }
 
         // Map to collect entry type definitions that we must save along with entries using them.
-        Set<BibEntryType> typesToWrite = new TreeSet<>();
+        SortedSet<BibEntryType> typesToWrite = new TreeSet<>();
 
         for (BibEntry entry : sortedEntries) {
             // Check if we must write the type definition for this
@@ -325,7 +326,7 @@ public abstract class BibDatabaseWriter {
     protected abstract void writeString(BibtexString bibtexString, int maxKeyLength)
             throws IOException;
 
-    protected void writeEntryTypeDefinitions(Set<BibEntryType> types) throws IOException {
+    protected void writeEntryTypeDefinitions(SortedSet<BibEntryType> types) throws IOException {
         for (BibEntryType type : types) {
             writeEntryTypeDefinition(type);
         }

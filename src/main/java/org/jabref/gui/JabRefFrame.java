@@ -908,7 +908,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, this.prefs, stateManager)),
+                createSendSubMenu(factory, dialogService, stateManager, prefs),
                 pushToApplicationMenuItem,
 
                 new SeparatorMenuItem(),
@@ -1324,6 +1324,19 @@ public class JabRefFrame extends BorderPane {
         destinationLibraryTab.getBibDatabaseContext()
                              .getMetaData()
                              .setGroups(currentLibraryGroupRoot);
+    }
+
+    private Menu createSendSubMenu(ActionFactory factory,
+                                          DialogService dialogService,
+                                          StateManager stateManager,
+                                          PreferencesService preferencesService) {
+        Menu sendMenu = factory.createMenu(StandardActions.SEND);
+        sendMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager))
+        );
+
+        return sendMenu;
     }
 
     /**
