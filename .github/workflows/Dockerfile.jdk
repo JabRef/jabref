@@ -1,0 +1,27 @@
+# This Dockerfile builds a JDK with JabRef's patch
+# Execute:
+# docker build -t jdk -f Dockerfile.jdk .
+# docker create jdk   # should output 8855e90fb483a6463182994792fdac3bb36fb726a2a0922f4dd8afd38a4bbd42
+# docker cp 8855e90fb483a6463182994792fdac3bb36fb726a2a0922f4dd8afd38a4bbd42:/tmp/result/openjdk-21-jabref_linux-x64_bin.tar.gz c:\temp\openjdk-21-jabref_linux-x64_bin.tar.gz
+
+FROM ubuntu:22.10
+
+RUN apt-get update
+RUN apt-get -yqq upgrade
+RUN apt-get install -y git build-essential openjdk-20-jdk zip unzip
+RUN mkdir /tmp/jdk
+RUN git clone https://github.com/JabRef/jdk.git /tmp/jdk
+WORKDIR /tmp/jdk
+RUN git checkout jdk-21-fix-8240567
+RUN apt-get install -y autoconf
+RUN apt-get install -y file
+RUN apt-get install -y libasound2-dev
+RUN apt-get install -y libcups2-dev
+RUN apt-get install -y libfontconfig1-dev
+RUN apt-get install -y libx11-dev libxext-dev libxrender-dev libxrandr-dev libxtst-dev libxt-dev
+RUN bash ./configure --build=x86_64-unknown-linux-gnu --openjdk-target=x86_64-unknown-linux-gnu --with-debug-level=release --with-native-debug-symbols=none --with-stdc++lib=static 
+RUN make images
+RUN mv build/linux-x86_64-server-release/images/jdk /tmp/jdk-21
+WORKDIR /tmp
+RUN mkdir result
+RUN tar cf result/openjdk-21-jabref_linux-x64_bin.tar.gz jdk-21
