@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
@@ -29,7 +30,15 @@ public class FieldFactory {
 
     public static String serializeOrFields(OrFields fields) {
         return fields.stream()
-                     .map(Field::getName)
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             // In case a user has put a user-defined field, the casing of that field is kept
+                             return unknownField.getDisplayName();
+                         } else {
+                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
+                             return field.getName();
+                         }
+                     })
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
@@ -47,9 +56,9 @@ public class FieldFactory {
 
     public static OrFields parseOrFields(String fieldNames) {
         Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
-                     .filter(StringUtil::isNotBlank)
-                     .map(FieldFactory::parseField)
-                     .collect(Collectors.toCollection(LinkedHashSet::new));
+                                  .filter(StringUtil::isNotBlank)
+                                  .map(FieldFactory::parseField)
+                                  .collect(Collectors.toCollection(LinkedHashSet::new));
         return new OrFields(fields);
     }
 
@@ -69,11 +78,23 @@ public class FieldFactory {
 
     public static String serializeFieldsList(Collection<Field> fields) {
         return fields.stream()
-                     .map(Field::getName)
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             // In case a user has put a user-defined field, the casing of that field is kept
+                             return unknownField.getDisplayName();
+                         } else {
+                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
+                             return field.getName();
+                         }
+                     })
                      .collect(Collectors.joining(DELIMITER));
     }
 
-    public static <T> Field parseField(T type, String fieldName) {
+    /**
+     * Type T is an entry type and is used to direct the mapping to the Java field class.
+     * This somehow acts as filter, BibLaTeX "APA" entry type has field "article", but we want to have StandardField (if not explicitly requested otherwise)
+     */
+    public static <T extends EntryType> Field parseField(T type, String fieldName) {
         // Check if the field name starts with "comment-" which indicates it's a UserSpecificCommentField
         if (fieldName.startsWith("comment-")) {
             String username = fieldName.substring("comment-".length());
@@ -92,7 +113,7 @@ public class FieldFactory {
               BiblatexSoftwareField.fromName(type, fieldName)),
               BiblatexApaField.fromName(type, fieldName)),
               AMSField.fromName(type, fieldName))
-              .orElse(new UnknownField(fieldName));
+              .orElse(UnknownField.fromDisplayName(fieldName));
     }
 
     public static Field parseField(String fieldName) {
@@ -167,7 +188,7 @@ public class FieldFactory {
 
     /**
      * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
-     *
+     * <p>
      * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
      * separate preferences object
      */
