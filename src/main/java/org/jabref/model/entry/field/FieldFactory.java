@@ -198,9 +198,9 @@ public class FieldFactory {
         return defaultGeneralFields;
     }
 
-    // TODO: This should ideally be user configurable! Move somewhere more appropriate in the future
+    // TODO: This should ideally be user configurable! (https://github.com/JabRef/jabref/issues/9840)
+    // TODO: Move somewhere more appropriate in the future
     public static boolean isMultiLineField(final Field field, List<Field> nonWrappableFields) {
-        // Treat unknown fields as multi-line fields
-        return nonWrappableFields.contains(field) || field.equals(StandardField.ABSTRACT) || field.equals(StandardField.COMMENT) || field.equals(StandardField.REVIEW);
+        return field.getProperties().contains(FieldProperty.MULTILINE_TEXT) || nonWrappableFields.contains(field);
     }
 }
