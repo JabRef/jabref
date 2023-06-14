@@ -38,6 +38,8 @@ public class MetaDataParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);
     private static FileUpdateMonitor fileMonitor;
 
+    private static final Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
+
     public MetaDataParser(FileUpdateMonitor fileMonitor) {
         MetaDataParser.fileMonitor = fileMonitor;
     }
@@ -148,7 +150,6 @@ public class MetaDataParser {
      */
     static String parseDirectory(String value) {
         value = StringUtil.removeStringAtTheEnd(value, MetaData.SEPARATOR_STRING);
-        Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
         if (value.contains("\\\\\\\\")) {
             // This is an escaped Windows UNC path
             return value.replace("\\\\", "\\");
