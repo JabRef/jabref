@@ -71,7 +71,6 @@ public class CiteSeer implements SearchBasedFetcher {
     }
 
     private JSONElement getPayloadJSON(QueryNode luceneQuery) {
-        // use CiteSeerQueryTransformer
         transformer = new CiteSeerQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         return transformer.getJSONPayload();

@@ -87,7 +87,7 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
         return switch (fieldAsString) {
             case "page" -> handlePage(term);
             case "pageSize" -> handlePageSize(term);
-//            case "must_have_pdf" -> handleMustHavePdf(term);
+            case "must_have_pdf" -> handleMustHavePdf(term);
             case "sortBy" -> handleSortBy(term);
             default -> super.handleOtherField(fieldAsString, term);
         };
@@ -104,10 +104,10 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
         return Optional.of(pageSize);
     }
 
-//    private Optional<String> handleMustHavePdf(String mustHavePdf) {
-//        this.getJSONPayload().put("must_have_pdf", mustHavePdf);
-//        return Optional.empty();
-//    }
+    private Optional<String> handleMustHavePdf(String mustHavePdf) {
+        this.getJSONPayload().put("must_have_pdf", mustHavePdf);
+        return Optional.of(mustHavePdf);
+    }
 
     private Optional<String> handleSortBy(String sortBy) {
         this.getJSONPayload().put("sortBy", sortBy);

@@ -17,39 +17,17 @@ class CiteSeerTest {
 
     private CiteSeer fetcher = new CiteSeer();
 
-//    @Test
-//    @Disabled("CiteseerX currently has issues with ncites query")
-//    void searchByQueryFindsEntryRigorousDerivation() throws Exception {
-//        BibEntry expected = new BibEntry(StandardEntryType.Misc)
-//                .withField(StandardField.AUTHOR, "Wang Wei and Zhang Pingwen and Zhang Zhifei")
-//                .withField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Eericksen-leslie Theory")
-//                .withField(StandardField.DOI, "10.1.1.744.5780");
-//
-//        List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND venue:q AND ncites:[10 TO 15000]");
-//        assertEquals(Collections.singletonList(expected), fetchedEntries);
-//    }
-
-//    @Test
-//    void searchByQueryFindsEntryCopingTheoryAndResearch() throws Exception {
-//        BibEntry expected = new BibEntry(StandardEntryType.Misc)
-//                .withField(StandardField.AUTHOR, "Lazarus Richard S.")
-//                .withField(StandardField.TITLE, "Coping Theory and Research: Past Present and Future")
-//                .withField(StandardField.DOI, "10.1.1.115.9665")
-//                .withField(StandardField.YEAR, "1993")
-//                .withField(StandardField.JOURNALTITLE, "PSYCHOSOMATIC MEDICINE");
-//
-//        List<BibEntry> fetchedEntries = fetcher.performSearch("doi:10.1.1.115.9665");
-//        assertEquals(Collections.singletonList(expected), fetchedEntries);
-//    }
-
     @Test
     void searchByQueryFindsEntryRigorousDerivation() throws Exception {
+        String title = "RIGOROUS DERIVATION FROM LANDAU-DE GENNES THEORY TO ERICKSEN-LESLIE THEORY";
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.AUTHOR, "Wang Wei and Zhang Pingwen and Zhang Zhifei")
-                .withField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory");
+                .withField(StandardField.TITLE, title)
+                .withField(StandardField.ABSTRACT, "ar")
+                .withField(StandardField.YEAR, "0")
+                .withField(StandardField.URL, "http://arxiv.org/pdf/1307.0986.pdf");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND page:1 AND pageSize:20 AND must_have_pdf:false AND sortBy:relevance");
-//        List<BibEntry> fetchedEntries = fetcher.performSearch("Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("title:\"Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory\" AND pageSize:1");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 
@@ -57,13 +35,13 @@ class CiteSeerTest {
     void searchByQueryFindsEntryCopingTheoryAndResearch() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.AUTHOR, "Lazarus Richard S.")
-                .withField(StandardField.TITLE, "Coping Theory and Research: Past Present and Future")
+                .withField(StandardField.TITLE, "Coping theory and research: Past, present, and future")
+                .withField(StandardField.ABSTRACT, "In this essay in honor of Donald Oken, I emphasize coping as a key concept for theory and research on adaptation and health. My focus will be the contrasts between two approaches to coping, one that emphasizes")
                 .withField(StandardField.YEAR, "1993")
-                .withField(StandardField.VENUE, "Psychosomatic Medicine");
+                .withField(StandardField.VENUE, "Psychosomatic Medicine")
+                .withField(StandardField.URL, "http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("queryString:Coping Theory and Research: Past Present and Future AND page:1 AND pageSize:20 AND must_have_pdf:false AND sortBy:relevance");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("title:\"Coping Theory and Research: Past Present and Future\" AND pageSize:1");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 }
-
-// @Disabled
