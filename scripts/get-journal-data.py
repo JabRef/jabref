@@ -30,6 +30,7 @@ def parse_int(str):
 
 def download_all_data():
     for year in range(start_year, current_year+1):
+        # download file
         print(f'Downloading data for {year}')
         url = journal_url(year)
         filename = f'scimagojr-journal-{year}.csv'
@@ -82,20 +83,16 @@ def get_combined_data():
 
                 # populate yearly varying fields
                 entry = journals[issn]
-                entry['rank'].append({'x': year, 'y': rank})
-                entry['sjr'].append({'x': year, 'y': sjr})
-                entry['hIndex'].append({'x': year, 'y': hIndex})
-                entry['totalDocs'].append({'x': year, 'y': totalDocs})
-                entry['totalDocs3Years'].append(
-                    {'x': year, 'y': totalDocs3Years})
-                entry['totalRefs'].append({'x': year, 'y': totalRefs})
-                entry['totalCites3Years'].append(
-                    {'x': year, 'y': totalCites3Years})
-                entry['citableDocs3Years'].append(
-                    {'x': year, 'y': citableDocs3Years})
-                entry['citesPerDoc2Years'].append(
-                    {'x': year, 'y': citesPerDoc2Years})
-                entry['refPerDoc'].append({'x': year, 'y': refPerDoc})
+                entry['rank'].append((year, rank))
+                entry['sjr'].append((year, sjr))
+                entry['hIndex'].append((year, hIndex))
+                entry['totalDocs'].append((year, totalDocs))
+                entry['totalDocs3Years'].append((year, totalDocs3Years))
+                entry['totalRefs'].append((year, totalRefs))
+                entry['totalCites3Years'].append((year, totalCites3Years))
+                entry['citableDocs3Years'].append((year, citableDocs3Years))
+                entry['citesPerDoc2Years'].append((year, citesPerDoc2Years))
+                entry['refPerDoc'].append((year, refPerDoc))
 
     # write to json file
     print('Writing to json')
