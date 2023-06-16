@@ -1,8 +1,6 @@
 package org.jabref.gui.preferences.export;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -44,9 +42,7 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
                                                    .map(SortCriterionViewModel::new)
                                                    .toList());
 
-        List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
-        fieldNames.sort(Comparator.comparing(Field::getDisplayName));
-        sortableFieldsProperty.addAll(fieldNames);
+        sortableFieldsProperty.addAll(FieldFactory.getAllFieldsSortedWithoutInternalExceptSome());
     }
 
     @Override
