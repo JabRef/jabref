@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.export;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -12,6 +13,7 @@ import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.ExportPreferences;
 
@@ -42,7 +44,12 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
                                                    .map(SortCriterionViewModel::new)
                                                    .toList());
 
-        sortableFieldsProperty.addAll(FieldFactory.getAllFieldsSortedWithoutInternalExceptSome());
+        Set<Field> fields = FieldFactory.getAllFieldsWithOutInternal();
+        fields.add(InternalField.INTERNAL_ALL_FIELD);
+        fields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
+        fields.add(InternalField.KEY_FIELD);
+        fields.add(InternalField.TYPE_HEADER);
+        sortableFieldsProperty.addAll(FieldFactory.getStandardFieldsWithCitationKey());
     }
 
     @Override

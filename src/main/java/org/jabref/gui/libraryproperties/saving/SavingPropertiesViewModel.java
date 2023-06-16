@@ -2,6 +2,7 @@ package org.jabref.gui.libraryproperties.saving;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -16,6 +17,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.CleanupPreferences;
@@ -62,9 +64,15 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             case TABLE -> saveInTableOrderProperty.setValue(true);
         }
 
-
         sortableFieldsProperty.clear();
-        sortableFieldsProperty.addAll(FieldFactory.getAllFieldsSortedWithoutInternalExceptSome());
+
+        Set<Field> fields = FieldFactory.getAllFieldsWithOutInternal();
+        fields.add(InternalField.INTERNAL_ALL_FIELD);
+        fields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
+        fields.add(InternalField.KEY_FIELD);
+        fields.add(InternalField.TYPE_HEADER);
+
+        sortableFieldsProperty.addAll(FieldFactory.getStandardFieldsWithCitationKey());
         sortCriteriaProperty.clear();
         sortCriteriaProperty.addAll(exportSaveOrder.getSortCriteria().stream()
                                                    .map(SortCriterionViewModel::new)

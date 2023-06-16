@@ -150,19 +150,12 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a sorted Set of Fields (by {@link Field#getDisplayName} with all fields without internal ones, except {@link InternalField#TYPE_HEADER} and {@link InternalField#KEY_FIELD} as they are useful for sorting
+     * Returns a sorted Set of Fields (by {@link Field#getDisplayName} with all fields without internal ones
      */
-    public static Set<Field> getAllFieldsSortedWithoutInternalExceptSome() {
+    public static Set<Field> getAllFieldsWithOutInternal() {
         Set<Field> fields = new TreeSet<>(Comparator.comparing(Field::getDisplayName));
-
-        fields.addAll(EnumSet.allOf(StandardField.class));
-        fields.addAll(EnumSet.allOf(SpecialField.class));
-        fields.addAll(EnumSet.allOf(IEEEField.class));
-        fields.addAll(EnumSet.allOf(BiblatexApaField.class));
-        fields.addAll(EnumSet.allOf(BiblatexSoftwareField.class));
-        fields.removeIf(field -> field instanceof UserSpecificCommentField);
-        fields.add(InternalField.KEY_FIELD);
-        fields.add(InternalField.TYPE_HEADER);
+        fields.addAll(getAllFields());
+        fields.removeAll(EnumSet.allOf(InternalField.class));
 
         return fields;
     }
