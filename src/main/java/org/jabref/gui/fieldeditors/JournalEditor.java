@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
@@ -19,6 +20,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     @FXML private JournalEditorViewModel viewModel;
     @FXML private EditorTextField textField;
+    @FXML private Button journalInfoButton;
 
     public JournalEditor(Field field,
                          JournalAbbreviationRepository journalAbbreviationRepository,
@@ -56,5 +58,10 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML
     private void toggleAbbreviation() {
         viewModel.toggleAbbreviation();
+    }
+
+    @FXML
+    private void showJournalInfo() {
+        viewModel.showJournalInfo(journalInfoButton);
     }
 }

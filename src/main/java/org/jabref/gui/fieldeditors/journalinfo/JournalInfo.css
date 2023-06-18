@@ -1,0 +1,8 @@
+.info-container {
+    -fx-background-color: -jr-background-alt;
+}
+
+.info-heading {
+    -fx-font-size: 30;
+    -fx-text-fill: -jr-theme;
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root alignment="TOP_CENTER" prefHeight="400.0" prefWidth="600.0" styleClass="info-container" type="VBox" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.fieldeditors.journalinfo.JournalInfoView">
+    <Label styleClass="info-heading" text="%Journal Information">
+        <opaqueInsets>
+            <Insets bottom="1.0" right="10.0" top="10.0" />
+        </opaqueInsets>
+    </Label>
+</fx:root>
