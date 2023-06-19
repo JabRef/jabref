@@ -68,6 +68,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The formatter `remove_unicode_ligatures` is now called `replace_unicode_ligatures`. [#9890](https://github.com/JabRef/jabref/pull/9890)
 - We improved the error message when no terminal was found [#9607](https://github.com/JabRef/jabref/issues/9607)
 - In the context of the "systematic literature functionality", we changed the name "database" to "catalog" to use a separate term for online catalogs in comparison to SQL databases. [#9951](https://github.com/JabRef/jabref/pull/9951)
+- We now show more fields (including Special Fields) in the dropdown selection for "Save sort order" in the library properties and for "Export sort order" in the preferences. [#10010](https://github.com/JabRef/jabref/issues/10010)
 
 ### Fixed
 

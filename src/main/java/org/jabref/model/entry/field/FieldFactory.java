@@ -3,11 +3,13 @@ package org.jabref.model.entry.field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -133,7 +135,7 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a  List with all standard fields and including some common internal fields
+     * Returns a Set with all standard fields and including some common internal fields
      */
     public static Set<Field> getCommonFields() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
@@ -145,6 +147,17 @@ public class FieldFactory {
         publicAndInternalFields.addAll(allFields);
 
         return publicAndInternalFields;
+    }
+
+    /**
+     * Returns a sorted Set of Fields (by {@link Field#getDisplayName} with all fields without internal ones
+     */
+    public static Set<Field> getAllFieldsWithOutInternal() {
+        Set<Field> fields = new TreeSet<>(Comparator.comparing(Field::getDisplayName));
+        fields.addAll(getAllFields());
+        fields.removeAll(EnumSet.allOf(InternalField.class));
+
+        return fields;
     }
 
     /**
