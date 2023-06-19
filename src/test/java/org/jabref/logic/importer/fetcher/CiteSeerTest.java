@@ -1,16 +1,21 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
 class CiteSeerTest {
@@ -43,5 +48,37 @@ class CiteSeerTest {
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:\"Coping Theory and Research: Past Present and Future\" AND pageSize:1");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
+    }
+
+    /*
+    * CiteSeer seems to only apply year ranges effectively when we search
+    * for entries with associated pdfs*/
+    @Disabled
+    @Test
+    void searchWithSortingByYear() throws FetcherException {
+        Optional<String> expected = Optional.of("1552");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("title:Theory AND year:1552 AND sortBy:Year");
+        System.out.println(fetchedEntries);
+        for (BibEntry actual: fetchedEntries) {
+            if (actual.hasField(StandardField.YEAR)) {
+                assertEquals(expected, actual.getField(StandardField.YEAR));
+            }
+        }
+    }
+
+    @Test
+    void searchWithSortingByYearWithYearRange() throws FetcherException {
+        List<BibEntry> fetchedEntries = fetcher.performSearch("title:Theory AND year-range:2002-2012 AND sortBy:Year");
+        Iterator<BibEntry> fetchedEntriesIter = fetchedEntries.iterator();
+        BibEntry recentEntry = fetchedEntriesIter.next();
+        while (fetchedEntriesIter.hasNext()) {
+            BibEntry laterEntry = fetchedEntriesIter.next();
+            if (recentEntry.hasField(StandardField.YEAR) && laterEntry.hasField(StandardField.YEAR)) {
+                Integer recentYear = Integer.parseInt(recentEntry.getField(StandardField.YEAR).orElse("0"));
+                Integer laterYear = Integer.parseInt(laterEntry.getField(StandardField.YEAR).orElse("0"));
+                assertFalse(recentYear < laterYear);
+            }
+            recentEntry = laterEntry;
+        }
     }
 }
