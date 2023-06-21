@@ -30,9 +30,7 @@ public class CiteSeerParser {
 
     private BibEntry parseBibEntry(JSONObject jsonObj) throws ParseException {
         BibEntry bibEntry = new BibEntry();
-        bibEntry.setField(StandardField.TITLE,
-                Optional.of(jsonObj.get("title").toString())
-                        .orElse(""));
+        bibEntry.setField(StandardField.TITLE, Optional.of(jsonObj.get("title").toString()).orElse(""));
         bibEntry.setField(StandardField.VENUE, Objects.toString(jsonObj.get("venue"), ""));
         bibEntry.setField(StandardField.YEAR, Objects.toString(jsonObj.get("year"), ""));
         bibEntry.setField(StandardField.PUBLISHER, Objects.toString(jsonObj.get("publisher"), ""));

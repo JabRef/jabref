@@ -103,7 +103,6 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
         List<String> withYearAndYearRange = List.of(
                 StringUtil.join(new String[]{baseString, "year:2020"}, " ", 0, 2),
                 StringUtil.join(new String[]{baseString, "year-range:2019-2023"}, " ", 0, 2)
-
         );
 
         JSONObject expectedJson = new JSONObject();
