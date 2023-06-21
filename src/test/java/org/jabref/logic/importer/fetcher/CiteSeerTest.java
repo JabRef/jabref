@@ -26,7 +26,7 @@ class CiteSeerTest {
     void searchByQueryFindsEntryRigorousDerivation() throws Exception {
         String title = "RIGOROUS DERIVATION FROM LANDAU-DE GENNES THEORY TO ERICKSEN-LESLIE THEORY";
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
-                .withField(StandardField.AUTHOR, "Wang Wei and Zhang Pingwen and Zhang Zhifei")
+                .withField(StandardField.AUTHOR, "Wang, Wei and Zhang, Pingwen and Zhang, Zhifei")
                 .withField(StandardField.TITLE, title)
                 .withField(StandardField.ABSTRACT, "ar")
                 .withField(StandardField.YEAR, "0")
@@ -39,7 +39,7 @@ class CiteSeerTest {
     @Test
     void searchByQueryFindsEntryCopingTheoryAndResearch() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
-                .withField(StandardField.AUTHOR, "Lazarus Richard S.")
+                .withField(StandardField.AUTHOR, "Lazarus, Richard S.")
                 .withField(StandardField.TITLE, "Coping theory and research: Past, present, and future")
                 .withField(StandardField.ABSTRACT, "In this essay in honor of Donald Oken, I emphasize coping as a key concept for theory and research on adaptation and health. My focus will be the contrasts between two approaches to coping, one that emphasizes")
                 .withField(StandardField.YEAR, "1993")
@@ -67,7 +67,7 @@ class CiteSeerTest {
     }
 
     @Test
-    void searchWithSortingByYearWithYearRange() throws FetcherException {
+    void searchWithSortingByYearAndYearRange() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:Theory AND year-range:2002-2012 AND sortBy:Year");
         Iterator<BibEntry> fetchedEntriesIter = fetchedEntries.iterator();
         BibEntry recentEntry = fetchedEntriesIter.next();

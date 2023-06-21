@@ -3,11 +3,11 @@ package org.jabref.logic.importer.fileformat;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -15,7 +15,6 @@ import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class CiteSeerParser {
@@ -45,16 +44,19 @@ public class CiteSeerParser {
     }
 
     private String parseAuthors(Object authorsObj) {
-        String authorsStr = StringUtils.remove(StringUtil.stripBrackets(Objects.toString(authorsObj, "")), '"');
-        return Arrays.stream(authorsStr.split(","))
-                      .reduce(null, (allAuthors, currAuthor) -> {
-                          String[] fullName = StringUtils.remove(currAuthor, '"').split(" ");
-                          ArrayUtils.shift(fullName, 1);
-                          String lastNameFirstName = StringUtil.join(fullName, " ", 0, fullName.length);
-                          if (allAuthors == null) {
-                              return lastNameFirstName;
-                          }
-                          return StringUtils.join(List.of(allAuthors, lastNameFirstName), " and ");
-                      });
+        String authorsStr = StringUtils.replace(
+                StringUtils.remove(
+                        StringUtil.stripBrackets(
+                                Objects.toString(
+                                        authorsObj,
+                                        ""
+                                )
+                        ),
+                        '"'
+                ),
+                ",",
+                " and "
+        );
+        return new AuthorListParser().parse(authorsStr).getAsLastFirstNamesWithAnd(false);
     }
 }
