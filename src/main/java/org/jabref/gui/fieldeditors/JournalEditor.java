@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
@@ -25,11 +26,18 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     public JournalEditor(Field field,
                          TaskExecutor taskExecutor,
+                         DialogService dialogService,
                          JournalAbbreviationRepository journalAbbreviationRepository,
                          PreferencesService preferences,
                          SuggestionProvider<?> suggestionProvider,
                          FieldCheckers fieldCheckers) {
-        this.viewModel = new JournalEditorViewModel(field, suggestionProvider, journalAbbreviationRepository, fieldCheckers, taskExecutor);
+        this.viewModel = new JournalEditorViewModel(
+                field,
+                suggestionProvider,
+                journalAbbreviationRepository,
+                fieldCheckers,
+                taskExecutor,
+                dialogService);
 
         ViewLoader.view(this)
                   .root(this)

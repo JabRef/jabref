@@ -1,25 +1,32 @@
 package org.jabref.gui.fieldeditors.journalinfo;
 
+import java.util.List;
+
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
+import javafx.util.Pair;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.logic.journals.JournalInformation;
+import org.jabref.logic.journals.JournalInformationFetcher;
 
 public class JournalInfoViewModel extends AbstractViewModel {
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
     private final ObservableList<XYChart.Series<String, Double>> sjrData = FXCollections.observableArrayList();
     private final ObservableList<XYChart.Series<String, Double>> snipData = FXCollections.observableArrayList();
 
-    public JournalInfoViewModel() {
-        init();
+    public JournalInfoViewModel(String issn) {
+        init(issn);
     }
 
-    private void init() {
-        setHeading("Oncotarget");
-        setSjrData();
-        setSnipData();
+    private void init(String issn) {
+        JournalInformation journalInformation = new JournalInformationFetcher().getJournalInformation(issn);
+
+        setHeading(journalInformation.title());
+        sjrData.add(convertToSeries(journalInformation.sjrArray()));
+        snipData.add(convertToSeries(journalInformation.snipArray()));
     }
 
     public String getHeading() {
@@ -42,27 +49,11 @@ public class JournalInfoViewModel extends AbstractViewModel {
         return snipData;
     }
 
-    public void setSjrData() {
+    public XYChart.Series<String, Double> convertToSeries(List<Pair<Integer, Double>> data) {
         XYChart.Series<String, Double> series = new XYChart.Series<>();
-        series.getData().add(new XYChart.Data<>("2013", 0.85));
-        series.getData().add(new XYChart.Data<>("2014", 0.75));
-        series.getData().add(new XYChart.Data<>("2015", 0.695));
-        series.getData().add(new XYChart.Data<>("2016", 0.25));
-        series.getData().add(new XYChart.Data<>("2017", 0.15));
-        series.getData().add(new XYChart.Data<>("2018", 0.95));
-
-        sjrData.add(series);
-    }
-
-    public void setSnipData() {
-        XYChart.Series<String, Double> series = new XYChart.Series<>();
-        series.getData().add(new XYChart.Data<>("2013", 0.85));
-        series.getData().add(new XYChart.Data<>("2014", 0.75));
-        series.getData().add(new XYChart.Data<>("2015", 0.695));
-        series.getData().add(new XYChart.Data<>("2016", 0.25));
-        series.getData().add(new XYChart.Data<>("2017", 0.15));
-        series.getData().add(new XYChart.Data<>("2018", 0.95));
-
-        snipData.add(series);
+        data.stream()
+            .map(pair -> new XYChart.Data<>(pair.getKey().toString(), pair.getValue()))
+            .forEach(series.getData()::add);
+        return series;
     }
 }

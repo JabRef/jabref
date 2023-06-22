@@ -62,7 +62,7 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.EXTERNAL)) {
             return new UrlEditor(field, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(field, taskExecutor, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
+            return new JournalEditor(field, taskExecutor, dialogService, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.DOI) || fieldProperties.contains(FieldProperty.EPRINT) || fieldProperties.contains(FieldProperty.ISBN)) {
             return new IdentifierEditor(field, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (field == StandardField.OWNER) {

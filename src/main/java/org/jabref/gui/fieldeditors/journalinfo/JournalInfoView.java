@@ -16,8 +16,8 @@ public class JournalInfoView extends VBox {
     @FXML private LineChart<String, Double> snipChart;
     private final JournalInfoViewModel viewModel;
 
-    public JournalInfoView() {
-        this.viewModel = new JournalInfoViewModel();
+    public JournalInfoView(String issn) {
+        this.viewModel = new JournalInfoViewModel(issn);
 
         ViewLoader.view(this)
                   .root(this)
