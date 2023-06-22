@@ -25,7 +25,7 @@
        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
      </rowConstraints>
-        <LineChart fx:id="sjrChart" createSymbols="false" legendVisible="false" title="SJR">
+        <LineChart fx:id="sjrChart" legendVisible="false" title="SJR">
             <xAxis>
              <CategoryAxis label="%Year" side="BOTTOM" />
             </xAxis>
@@ -33,7 +33,7 @@
              <NumberAxis minorTickVisible="false" side="LEFT" />
             </yAxis>
         </LineChart>
-        <LineChart fx:id="snipChart" title="SNIP" createSymbols="false" legendVisible="false" GridPane.columnIndex="1">
+        <LineChart fx:id="snipChart" title="SNIP" legendVisible="false" GridPane.columnIndex="1">
             <xAxis>
               <CategoryAxis label="%Year" side="BOTTOM" />
             </xAxis>
