@@ -46,7 +46,7 @@ jobs:
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-            eaJDK: https://files.jabref.org/jdks/openjdk-21-jabref_windows-x64_bin.zip
+            eaJDK: https://files.jabref.org/jdks/jdk-windows-x64.zip
           - os: macos-latest
             displayName: macOS
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
