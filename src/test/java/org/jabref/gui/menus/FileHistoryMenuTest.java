@@ -36,7 +36,7 @@ public class FileHistoryMenuTest {
     }
 
     @Test
-    public void recentLibrariesAreCleared() {
+    void recentLibrariesAreCleared() {
         fileHistoryMenu.newFile(Path.of(BIBTEX_LIBRARY_PATH.concat("bibtexFiles/test.bib")));
         assertEquals(3, fileHistoryMenu.getItems().size());
 
