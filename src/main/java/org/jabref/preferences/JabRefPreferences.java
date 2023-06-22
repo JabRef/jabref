@@ -421,7 +421,6 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Cache variables
      */
-    private Map<String, Set<Field>> entryEditorTabList;
     private String userAndHost;
 
     private LibraryPreferences libraryPreferences;
@@ -1396,22 +1395,46 @@ public class JabRefPreferences implements PreferencesService {
     // EntryEditorPreferences
     //*************************************************************************************************************
 
-    /**
-     * Creates a list of defined tabs in the entry editor from cache
-     *
-     * @return a map of defined tabs and associated fields
-     */
-    private Map<String, Set<Field>> getEntryEditorTabList() {
-        if (entryEditorTabList == null) {
-            updateEntryEditorTabList();
+    @Override
+    public EntryEditorPreferences getEntryEditorPreferences() {
+        if (Objects.nonNull(entryEditorPreferences)) {
+            return entryEditorPreferences;
         }
-        return entryEditorTabList;
+
+        entryEditorPreferences = new EntryEditorPreferences(
+                getEntryEditorTabs(),
+                getDefaultEntryEditorTabs(),
+                getBoolean(AUTO_OPEN_FORM),
+                getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(ACCEPT_RECOMMENDATIONS),
+                getBoolean(SHOW_LATEX_CITATIONS),
+                getBoolean(DEFAULT_SHOW_SOURCE),
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
+                getDouble(ENTRY_EDITOR_HEIGHT),
+                getBoolean(AUTOLINK_FILES_ENABLED));
+
+        EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (obs, oldValue, newValue) -> storeEntryEditorTabs(newValue));
+        // defaultEntryEditorTabs are read-only
+        EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
+        EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
+        EasyBind.listen(entryEditorPreferences.isMrdlibAcceptedProperty(), (obs, oldValue, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
+        EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
+        EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (obs, oldValue, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
+        EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
+        EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (obs, oldValue, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
+        EasyBind.listen(entryEditorPreferences.dividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
+        EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
+
+        return entryEditorPreferences;
     }
 
     /**
-     * Reloads the list of the currently defined tabs  in the entry editor from scratch to cache
+     * Get a Map of defined tab names to default tab fields.
+     *
+     * @return A map of the currently defined tabs in the entry editor from scratch to cache
      */
-    private void updateEntryEditorTabList() {
+    private Map<String, Set<Field>> getEntryEditorTabs() {
         Map<String, Set<Field>> tabs = new LinkedHashMap<>();
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
         List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
@@ -1425,7 +1448,7 @@ public class JabRefPreferences implements PreferencesService {
         for (int i = 0; i < tabNames.size(); i++) {
             tabs.put(tabNames.get(i), FieldFactory.parseFieldList(tabFields.get(i)));
         }
-        entryEditorTabList = tabs;
+        return tabs;
     }
 
     /**
@@ -1433,7 +1456,7 @@ public class JabRefPreferences implements PreferencesService {
      *
      * @param customTabs a map of tab names and the corresponding set of fields to be displayed in
      */
-    private void storeEntryEditorTabList(Map<String, Set<Field>> customTabs) {
+    private void storeEntryEditorTabs(Map<String, Set<Field>> customTabs) {
         String[] names = customTabs.keySet().toArray(String[]::new);
         String[] fields = customTabs.values().stream()
                                     .map(set -> set.stream()
@@ -1449,16 +1472,10 @@ public class JabRefPreferences implements PreferencesService {
         purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
         purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
 
-        updateEntryEditorTabList();
+        getEntryEditorTabs();
     }
 
-    /**
-     * Get a Map of default tab names to default tab fields.
-     *
-     * @return A map of keys with tab names and a set of corresponding fields
-     */
-    @Override
-    public Map<String, Set<Field>> getDefaultTabNamesAndFields() {
+    private Map<String, Set<Field>> getDefaultEntryEditorTabs() {
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
 
         int defNumber = 0;
@@ -1475,61 +1492,6 @@ public class JabRefPreferences implements PreferencesService {
             defNumber++;
         }
         return customTabsMap;
-    }
-
-    /**
-     * Get a Map of default tab names to default tab fields.
-     *
-     * @return A map of keys with tab names and a set of corresponding fields
-     */
-    @Override
-    public List<Field> getAllDefaultTabFieldNames() {
-        List<Field> customFields = new ArrayList<>();
-
-        int defNumber = 0;
-        while (true) {
-            // saved as CUSTOMTABNAME_def{number} and ; separated
-            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
-
-            if (StringUtil.isNullOrEmpty(fields)) {
-                break;
-            }
-
-            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).toList());
-            defNumber++;
-        }
-        return customFields;
-    }
-
-    @Override
-    public EntryEditorPreferences getEntryEditorPreferences() {
-        if (Objects.nonNull(entryEditorPreferences)) {
-            return entryEditorPreferences;
-        }
-
-        entryEditorPreferences = new EntryEditorPreferences(getEntryEditorTabList(),
-                getBoolean(AUTO_OPEN_FORM),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(ACCEPT_RECOMMENDATIONS),
-                getBoolean(SHOW_LATEX_CITATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getDouble(ENTRY_EDITOR_HEIGHT),
-                getBoolean(AUTOLINK_FILES_ENABLED));
-
-        EasyBind.listen(entryEditorPreferences.entryEditorTabListProperty(), (obs, oldValue, newValue) -> storeEntryEditorTabList(newValue));
-        EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.isMrdlibAcceptedProperty(), (obs, oldValue, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (obs, oldValue, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
-        EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
-        EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (obs, oldValue, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
-        EasyBind.listen(entryEditorPreferences.dividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
-        EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
-
-        return entryEditorPreferences;
     }
 
     //*************************************************************************************************************

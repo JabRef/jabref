@@ -76,10 +76,11 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
                 ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(
                 newFieldToAdd,
-                input -> input != null && StringUtil.isNotBlank(input.getDisplayName()),
+                input -> (input != null) && StringUtil.isNotBlank(input.getDisplayName()),
                 ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
+    @Override
     public void setValues() {
         if (!this.entryTypesWithFields.isEmpty()) {
             this.entryTypesWithFields.clear();
@@ -97,6 +98,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         }
     }
 
+    @Override
     public void storeSettings() {
         Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {

@@ -242,7 +242,7 @@ public class GroupTreeView extends BorderPane {
                 .setOnDragExited(this::handleOnDragExited)
                 .setOnDragOver(this::handleOnDragOver)
                 .withPseudoClass(PSEUDOCLASS_ROOTELEMENT, row -> Bindings.createBooleanBinding(
-                        () -> (row != null) && (row.getItem() == groupTree.getRoot().getValue()), row.treeItemProperty()))
+                        () -> (row != null) && (groupTree.getRoot() != null) && (row.getItem() == groupTree.getRoot().getValue()), row.treeItemProperty()))
                 .withPseudoClass(PSEUDOCLASS_SUBELEMENT, row -> Bindings.createBooleanBinding(
                         () -> (row != null) && (groupTree.getTreeItemLevel(row.getTreeItem()) > 1), row.treeItemProperty()))
                 .install(groupTree);
@@ -419,6 +419,10 @@ public class GroupTreeView extends BorderPane {
 
     private Optional<TreeItem<GroupNodeViewModel>> getTreeItemByValue(TreeItem<GroupNodeViewModel> root,
                                                                       GroupNodeViewModel value) {
+        if (root == null) {
+            return Optional.empty();
+        }
+
         if (root.getValue().equals(value)) {
             return Optional.of(root);
         }
