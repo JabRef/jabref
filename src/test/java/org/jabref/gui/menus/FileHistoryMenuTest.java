@@ -14,7 +14,6 @@ import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 @ExtendWith(ApplicationExtension.class)
@@ -41,8 +40,6 @@ public class FileHistoryMenuTest {
 
         fileHistoryMenu.clearRecentLibraries.getOnAction().handle(null); //  retrieves the event handler
         assertTrue(fileHistoryMenu.isDisable());
-
-        verify(fileHistory).clear();
         assertEquals(0, fileHistory.size());
     }
 }
