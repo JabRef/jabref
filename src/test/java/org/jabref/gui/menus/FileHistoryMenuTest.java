@@ -38,7 +38,7 @@ public class FileHistoryMenuTest {
     void recentLibrariesAreCleared() {
         fileHistoryMenu.newFile(Path.of(BIBTEX_LIBRARY_PATH.concat("bibtexFiles/test.bib")));
 
-        fileHistoryMenu.clearRecentLibraries.getOnAction().handle(null); //  retrieves the event handler
+        fileHistoryMenu.clearLibrariesHistory();
         assertTrue(fileHistoryMenu.isDisable());
         assertEquals(0, fileHistory.size());
     }
