@@ -76,7 +76,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/publications-search");
         uriBuilder.addParameter("pg7", "ALLF"); // search all fields
         uriBuilder.addParameter("s7", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // query
         uriBuilder.addParameter("r", "1"); // start index
@@ -87,7 +87,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/publications-search");
         uriBuilder.addParameter("pg1", "MR"); // search MR number
         uriBuilder.addParameter("s1", identifier); // identifier
         uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
