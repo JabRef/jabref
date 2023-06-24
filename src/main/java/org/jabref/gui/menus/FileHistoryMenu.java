@@ -25,7 +25,7 @@ public class FileHistoryMenu extends Menu {
 
         this.clearRecentLibraries = new MenuItem();
         clearRecentLibraries.setText(Localization.lang("Clear recent libraries"));
-        clearRecentLibraries.setOnAction(event -> clearFilesHistory());
+        clearRecentLibraries.setOnAction(event -> clearLibrariesHistory());
 
         this.history = fileHistory;
         this.dialogService = dialogService;
@@ -102,7 +102,7 @@ public class FileHistoryMenu extends Menu {
         openDatabaseAction.openFile(file);
     }
 
-    public void clearFilesHistory() {
+    public void clearLibrariesHistory() {
         history.clear();
         setDisable(true);
     }
