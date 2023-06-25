@@ -313,7 +313,7 @@ public class ImportHandler {
                     preferencesService.getImportFormatPreferences(),
                     fileUpdateMonitor);
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
-            return unknownFormatImport.parserResult.getDatabase().getEntries();
+            return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
             dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
             return Collections.emptyList();

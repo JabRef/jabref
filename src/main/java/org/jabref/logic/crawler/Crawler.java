@@ -43,12 +43,12 @@ public class Crawler {
                 preferencesService,
                 fileUpdateMonitor,
                 bibEntryTypesManager);
-        StudyDatabaseToFetcherConverter studyDatabaseToFetcherConverter = new StudyDatabaseToFetcherConverter(
+        StudyCatalogToFetcherConverter studyCatalogToFetcherConverter = new StudyCatalogToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),
                 preferencesService.getImportFormatPreferences(),
                 preferencesService.getImporterPreferences());
         this.studyFetcher = new StudyFetcher(
-                studyDatabaseToFetcherConverter.getActiveFetchers(),
+                studyCatalogToFetcherConverter.getActiveFetchers(),
                 studyRepository.getSearchQueryStrings());
     }
 

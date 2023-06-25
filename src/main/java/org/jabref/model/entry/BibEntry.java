@@ -748,6 +748,16 @@ public class BibEntry implements Cloneable {
         this.changed = changed;
     }
 
+    /**
+     * Required to trigger new serialization of the entry.
+     * Reason: We don't have a <code>build()</code> command, we don't want to create a new serialization at each call,
+     * we need to construct a BibEntry with <code>changed=false</code> (which is the default) and thus we need a workaround.
+     */
+    public BibEntry withChanged(boolean changed) {
+        this.changed = changed;
+        return this;
+    }
+
     public Optional<FieldChange> putKeywords(List<String> keywords, Character delimiter) {
         Objects.requireNonNull(delimiter);
         return putKeywords(new KeywordList(keywords), delimiter);

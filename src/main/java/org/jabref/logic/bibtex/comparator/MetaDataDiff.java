@@ -42,7 +42,7 @@ public class MetaDataDiff {
     }
 
     /**
-     * @implNote Should be kept in sync with {@link MetaData#equals(Object)}
+     * Should be kept in sync with {@link MetaData#equals(Object)}
      */
     public EnumSet<Difference> getDifferences(PreferencesService preferences) {
         EnumSet<Difference> changes = EnumSet.noneOf(Difference.class);

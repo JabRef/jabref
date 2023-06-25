@@ -311,8 +311,7 @@ public class JabRefCLI {
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferencesService,
-                Globals.entryTypesManager,
-                Globals.journalAbbreviationRepository);
+                Globals.entryTypesManager);
         List<Pair<String, String>> exportFormats = exporterFactory
                 .getExporters().stream()
                 .map(format -> new Pair<>(format.getName(), format.getId()))

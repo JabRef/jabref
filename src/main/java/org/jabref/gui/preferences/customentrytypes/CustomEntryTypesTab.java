@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.customentrytypes;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -12,6 +13,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -142,7 +144,32 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     }
 
     private void setupFieldsTable() {
-        fieldNameColumn.setCellValueFactory(item -> item.getValue().nameProperty());
+        fieldNameColumn.setCellValueFactory(item -> item.getValue().displayNameProperty());
+        fieldNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        fieldNameColumn.setEditable(true);
+        fieldNameColumn.setOnEditCommit((TableColumn.CellEditEvent<FieldViewModel, String> event) -> {
+            String newDisplayName = event.getNewValue();
+            if (newDisplayName.isBlank()) {
+                dialogService.notify(Localization.lang("Name cannot be empty"));
+                event.getTableView().edit(-1, null);
+                event.getTableView().refresh();
+                return;
+            }
+
+            FieldViewModel fieldViewModel = event.getRowValue();
+            String currentDisplayName = fieldViewModel.displayNameProperty().getValue();
+            EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();
+            ObservableList<FieldViewModel> entryFields = selectedEntryType.fields();
+            // The first predicate will check if the user input the original field name or doesn't edit anything after double click
+            boolean fieldExists = !newDisplayName.equals(currentDisplayName) && viewModel.displayNameExists(newDisplayName);
+            if (fieldExists) {
+                dialogService.notify(Localization.lang("Unable to change field name. \"%0\" already in use.", newDisplayName));
+                event.getTableView().edit(-1, null);
+            } else {
+                fieldViewModel.displayNameProperty().setValue(newDisplayName);
+            }
+            event.getTableView().refresh();
+        });
 
         fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));
         fieldTypeColumn.setCellValueFactory(item -> item.getValue().requiredProperty());
@@ -155,7 +182,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         fieldTypeActionColumn.setSortable(false);
         fieldTypeActionColumn.setReorderable(false);
         fieldTypeActionColumn.setEditable(false);
-        fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().displayNameProperty());
 
         new ValueTableCellFactory<FieldViewModel, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())

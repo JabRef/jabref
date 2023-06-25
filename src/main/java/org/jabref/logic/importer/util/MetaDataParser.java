@@ -38,6 +38,8 @@ public class MetaDataParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataParser.class);
     private static FileUpdateMonitor fileMonitor;
 
+    private static final Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
+
     public MetaDataParser(FileUpdateMonitor fileMonitor) {
         MetaDataParser.fileMonitor = fileMonitor;
     }
@@ -58,11 +60,12 @@ public class MetaDataParser {
         EntryType type = EntryTypeFactory.parse(rest.substring(0, indexEndOfName));
         String reqFields = fieldsDescription.substring(4, indexEndOfRequiredFields);
         String optFields = fieldsDescription.substring(indexEndOfRequiredFields + 6, indexEndOfOptionalFields);
-
         BibEntryTypeBuilder entryTypeBuilder = new BibEntryTypeBuilder()
                 .withType(type)
-                .withImportantFields(FieldFactory.parseFieldList(optFields))
-                .withRequiredFields(FieldFactory.parseOrFieldsList(reqFields));
+                .withRequiredFields(FieldFactory.parseOrFieldsList(reqFields))
+                // Important fields are optional fields, but displayed first. Thus, they do not need to be separated by "/".
+                // See org.jabref.model.entry.field.FieldPriority for details on important optional fields.
+                .withImportantFields(FieldFactory.parseFieldList(optFields));
         return Optional.of(entryTypeBuilder.build());
     }
 
@@ -147,7 +150,6 @@ public class MetaDataParser {
      */
     static String parseDirectory(String value) {
         value = StringUtil.removeStringAtTheEnd(value, MetaData.SEPARATOR_STRING);
-        Pattern SINGLE_BACKSLASH = Pattern.compile("[^\\\\]\\\\[^\\\\]");
         if (value.contains("\\\\\\\\")) {
             // This is an escaped Windows UNC path
             return value.replace("\\\\", "\\");

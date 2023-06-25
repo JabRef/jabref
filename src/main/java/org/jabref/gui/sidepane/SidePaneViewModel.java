@@ -18,6 +18,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SidePanePreferences;
 
@@ -35,6 +36,7 @@ public class SidePaneViewModel extends AbstractViewModel {
     private final DialogService dialogService;
 
     public SidePaneViewModel(PreferencesService preferencesService,
+                             JournalAbbreviationRepository abbreviationRepository,
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
                              DialogService dialogService,
@@ -44,6 +46,7 @@ public class SidePaneViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.sidePaneContentFactory = new SidePaneContentFactory(
                 preferencesService,
+                abbreviationRepository,
                 taskExecutor,
                 dialogService,
                 stateManager,

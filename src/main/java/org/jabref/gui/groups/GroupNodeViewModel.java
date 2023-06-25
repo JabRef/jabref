@@ -32,9 +32,17 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
+import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.KeywordGroup;
+import org.jabref.model.groups.LastNameGroup;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
@@ -367,5 +375,136 @@ public class GroupNodeViewModel {
 
     private int getPositionInParent() {
         return groupNode.getPositionInParent();
+    }
+
+    public boolean hasSubgroups() {
+        return !getChildren().isEmpty();
+    }
+
+    public boolean canAddEntriesIn() {
+        AbstractGroup group = groupNode.getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
+            return groupNode.getParent()
+                            .map(parent -> parent.getGroup())
+                            .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
+                            .orElse(false);
+        } else if (group instanceof KeywordGroup) {
+            // also covers WordKeywordGroup
+            return true;
+        } else if (group instanceof SearchGroup) {
+            return false;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return false;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return false;
+        } else if (group instanceof TexGroup) {
+            return false;
+        } else {
+            throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean canBeDragged() {
+        AbstractGroup group = groupNode.getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof KeywordGroup) {
+            // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+            return groupNode.getParent()
+                            .map(parent -> parent.getGroup())
+                            .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
+                            .orElse(false);
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return true;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return true;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("canBeDragged method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean canAddGroupsIn() {
+        AbstractGroup group = groupNode.getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return true;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof KeywordGroup) {
+            // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+            return groupNode.getParent()
+                            .map(parent -> parent.getGroup())
+                            .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
+                            .orElse(false);
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return false;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return false;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean canRemove() {
+        AbstractGroup group = groupNode.getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof KeywordGroup) {
+            // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+            return groupNode.getParent()
+                            .map(parent -> parent.getGroup())
+                            .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
+                            .orElse(false);
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return true;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return true;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("canRemove method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    public boolean isEditable() {
+        AbstractGroup group = groupNode.getGroup();
+        if (group instanceof AllEntriesGroup) {
+            return false;
+        } else if (group instanceof ExplicitGroup) {
+            return true;
+        } else if (group instanceof KeywordGroup) {
+            // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+            return groupNode.getParent()
+                            .map(parent -> parent.getGroup())
+                            .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
+                            .orElse(false);
+        } else if (group instanceof SearchGroup) {
+            return true;
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return true;
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return true;
+        } else if (group instanceof TexGroup) {
+            return true;
+        } else {
+            throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
+        }
     }
 }

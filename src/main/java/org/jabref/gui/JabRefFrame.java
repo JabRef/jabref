@@ -253,9 +253,9 @@ public class JabRefFrame extends BorderPane {
 
                         Dragboard dragboard = tabDragEvent.getDragboard();
 
-                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
+                        if (DragAndDropHelper.hasBibFiles(dragboard)) {
                             tabbedPane.getTabs().remove(dndIndicator);
-                            List<Path> bibFiles = DragAndDropHelper.getBibFiles(tabDragEvent.getDragboard());
+                            List<Path> bibFiles = DragAndDropHelper.getBibFiles(dragboard);
                             OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
                             openDatabaseAction.openFiles(bibFiles);
                             tabDragEvent.setDropCompleted(true);
@@ -265,8 +265,8 @@ public class JabRefFrame extends BorderPane {
                                 if (libraryTab.getId().equals(destinationTabNode.getId()) &&
                                         !tabbedPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
                                     LibraryTab destinationLibraryTab = (LibraryTab) libraryTab;
-                                    if (DragAndDropHelper.hasGroups(tabDragEvent.getDragboard())) {
-                                        List<String> groupPathToSources = DragAndDropHelper.getGroups(tabDragEvent.getDragboard());
+                                    if (DragAndDropHelper.hasGroups(dragboard)) {
+                                        List<String> groupPathToSources = DragAndDropHelper.getGroups(dragboard);
 
                                         copyRootNode(destinationLibraryTab);
 
@@ -318,6 +318,10 @@ public class JabRefFrame extends BorderPane {
                         getCurrentLibraryTab().getMainTable().requestFocus();
                         event.consume();
                         break;
+                    case FOCUS_GROUP_LIST:
+                        sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus();
+                        event.consume();
+                    break;
                     case NEXT_LIBRARY:
                         tabbedPane.getSelectionModel().selectNext();
                         event.consume();
@@ -639,7 +643,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void init() {
-        sidePane = new SidePane(prefs, taskExecutor, dialogService, stateManager, undoManager);
+        sidePane = new SidePane(prefs, Globals.journalAbbreviationRepository, taskExecutor, dialogService, stateManager, undoManager);
         tabbedPane = new TabPane();
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
@@ -804,12 +808,12 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
                 factory.createSubMenu(StandardActions.COPY_MORE,
-                        factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_CITE_KEY, new CopyMoreAction(StandardActions.COPY_CITE_KEY, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, Globals.getClipboardManager(), Globals.TASK_EXECUTOR, prefs.getPreviewPreferences())),
+                        factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, Globals.getClipboardManager(), prefs, Globals.journalAbbreviationRepository)),
+                        factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, Globals.getClipboardManager(), prefs, Globals.journalAbbreviationRepository)),
+                        factory.createMenuItem(StandardActions.COPY_CITE_KEY, new CopyMoreAction(StandardActions.COPY_CITE_KEY, dialogService, stateManager, Globals.getClipboardManager(), prefs, Globals.journalAbbreviationRepository)),
+                        factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, Globals.getClipboardManager(), prefs, Globals.journalAbbreviationRepository)),
+                        factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, Globals.getClipboardManager(), prefs, Globals.journalAbbreviationRepository)),
+                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, Globals.getClipboardManager(), Globals.TASK_EXECUTOR, prefs, Globals.journalAbbreviationRepository)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, Globals.getClipboardManager(), Globals.TASK_EXECUTOR, prefs))),
 
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager)),
@@ -904,7 +908,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, this.prefs, stateManager)),
+                createSendSubMenu(factory, dialogService, stateManager, prefs),
                 pushToApplicationMenuItem,
 
                 new SeparatorMenuItem(),
@@ -1320,6 +1324,19 @@ public class JabRefFrame extends BorderPane {
         destinationLibraryTab.getBibDatabaseContext()
                              .getMetaData()
                              .setGroups(currentLibraryGroupRoot);
+    }
+
+    private Menu createSendSubMenu(ActionFactory factory,
+                                          DialogService dialogService,
+                                          StateManager stateManager,
+                                          PreferencesService preferencesService) {
+        Menu sendMenu = factory.createMenu(StandardActions.SEND);
+        sendMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager))
+        );
+
+        return sendMenu;
     }
 
     /**

@@ -2,7 +2,9 @@ package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -62,22 +64,23 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
             identifier = removeNewlinesAndSpacesFromIdentifier(identifier);
             bibEntry = openLibraryIsbnFetcher.performSearchById(identifier);
         } catch (FetcherException ex) {
+            LOGGER.debug("Got a fetcher exception for IBSN search", ex);
             if (retryIsbnFetcher.isEmpty()) {
                 throw ex;
-            } else {
-                LOGGER.debug("Got a fetcher exception for IBSN search", ex);
-                LOGGER.debug("Try using the alternate ISBN fetchers to find an entry.");
             }
         } finally {
-            while (bibEntry.isEmpty() && retryIsbnFetcher.iterator().hasNext()) {
-                AbstractIsbnFetcher fetcher = retryIsbnFetcher.iterator().next();
-                LOGGER.debug("No entry found for ISBN=" + identifier + "; trying " + fetcher.getName() + " next.");
+            LOGGER.debug("Trying using the alternate ISBN fetchers to find an entry.");
+            // do not move the iterator in the loop as this would always return a new one and thus create and endless loop
+            Iterator<AbstractIsbnFetcher> iterator = retryIsbnFetcher.iterator();
+            while (bibEntry.isEmpty() && iterator.hasNext()) {
+                AbstractIsbnFetcher fetcher = iterator.next();
+                LOGGER.debug("No entry found for ISBN {}; trying {} next.", identifier, fetcher.getName());
                 bibEntry = fetcher.performSearchById(identifier);
             }
         }
 
         if (bibEntry.isEmpty()) {
-            LOGGER.debug("Could not found a entry for ISBN=" + identifier);
+            LOGGER.debug("Could not found a entry for ISBN {}", identifier);
         }
 
         return bibEntry;
@@ -94,9 +97,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     }
 
     public IsbnFetcher addRetryFetcher(AbstractIsbnFetcher retryFetcher) {
-        if (retryFetcher == null) {
-            throw new IllegalArgumentException("Please provide a valid isbn fetcher.");
-        }
+        Objects.requireNonNull(retryFetcher, "Please provide a valid isbn fetcher.");
         retryIsbnFetcher.add(retryFetcher);
         return this;
     }

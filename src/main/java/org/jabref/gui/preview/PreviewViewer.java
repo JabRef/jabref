@@ -23,8 +23,8 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.WebViewStore;
@@ -249,7 +249,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
+        Number.serialExportNumber = 1; // Set entry number in case that is included in the preview layout.
 
         BackgroundTask
                 .wrap(() -> layout.generatePreview(entry.get(), database))

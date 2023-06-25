@@ -34,26 +34,26 @@ class ManageStudyDefinitionViewModelTest {
     public void emptyStudyConstructorFillsDatabasesCorrectly() {
         ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, dialogService);
         assertEquals(List.of(
-                new StudyDatabaseItem("ACM Portal", true),
-                new StudyDatabaseItem("ArXiv", false),
-                new StudyDatabaseItem("Bibliotheksverbund Bayern (Experimental)", false),
-                new StudyDatabaseItem("Biodiversity Heritage", false),
-                new StudyDatabaseItem("Collection of Computer Science Bibliographies", false),
-                new StudyDatabaseItem("Crossref", false),
-                new StudyDatabaseItem("DBLP", true),
-                new StudyDatabaseItem("DOAB", false),
-                new StudyDatabaseItem("DOAJ", false),
-                new StudyDatabaseItem("GVK", false),
-                new StudyDatabaseItem("IEEEXplore", true),
-                new StudyDatabaseItem("INSPIRE", false),
-                new StudyDatabaseItem("MathSciNet", false),
-                new StudyDatabaseItem("Medline/PubMed", false),
-                new StudyDatabaseItem("ResearchGate", false),
-                new StudyDatabaseItem("SAO/NASA ADS", false),
-                new StudyDatabaseItem("SemanticScholar", false),
-                new StudyDatabaseItem("Springer", true),
-                new StudyDatabaseItem("zbMATH", false)
-        ), manageStudyDefinitionViewModel.getDatabases());
+                new StudyCatalogItem("ACM Portal", true),
+                new StudyCatalogItem("ArXiv", false),
+                new StudyCatalogItem("Bibliotheksverbund Bayern (Experimental)", false),
+                new StudyCatalogItem("Biodiversity Heritage", false),
+                new StudyCatalogItem("Collection of Computer Science Bibliographies", false),
+                new StudyCatalogItem("Crossref", false),
+                new StudyCatalogItem("DBLP", true),
+                new StudyCatalogItem("DOAB", false),
+                new StudyCatalogItem("DOAJ", false),
+                new StudyCatalogItem("GVK", false),
+                new StudyCatalogItem("IEEEXplore", true),
+                new StudyCatalogItem("INSPIRE", false),
+                new StudyCatalogItem("MathSciNet", false),
+                new StudyCatalogItem("Medline/PubMed", false),
+                new StudyCatalogItem("ResearchGate", false),
+                new StudyCatalogItem("SAO/NASA ADS", false),
+                new StudyCatalogItem("SemanticScholar", false),
+                new StudyCatalogItem("Springer", true),
+                new StudyCatalogItem("zbMATH", false)
+        ), manageStudyDefinitionViewModel.getCatalogs());
     }
 
     @Test
@@ -74,25 +74,25 @@ class ManageStudyDefinitionViewModelTest {
                 importerPreferences,
                 dialogService);
         assertEquals(List.of(
-                new StudyDatabaseItem("ACM Portal", true),
-                new StudyDatabaseItem("ArXiv", false),
-                new StudyDatabaseItem("Bibliotheksverbund Bayern (Experimental)", false),
-                new StudyDatabaseItem("Biodiversity Heritage", false),
-                new StudyDatabaseItem("Collection of Computer Science Bibliographies", false),
-                new StudyDatabaseItem("Crossref", false),
-                new StudyDatabaseItem("DBLP", false),
-                new StudyDatabaseItem("DOAB", false),
-                new StudyDatabaseItem("DOAJ", false),
-                new StudyDatabaseItem("GVK", false),
-                new StudyDatabaseItem("IEEEXplore", false),
-                new StudyDatabaseItem("INSPIRE", false),
-                new StudyDatabaseItem("MathSciNet", false),
-                new StudyDatabaseItem("Medline/PubMed", false),
-                new StudyDatabaseItem("ResearchGate", false),
-                new StudyDatabaseItem("SAO/NASA ADS", false),
-                new StudyDatabaseItem("SemanticScholar", false),
-                new StudyDatabaseItem("Springer", false),
-                new StudyDatabaseItem("zbMATH", false)
-        ), manageStudyDefinitionViewModel.getDatabases());
+                new StudyCatalogItem("ACM Portal", true),
+                new StudyCatalogItem("ArXiv", false),
+                new StudyCatalogItem("Bibliotheksverbund Bayern (Experimental)", false),
+                new StudyCatalogItem("Biodiversity Heritage", false),
+                new StudyCatalogItem("Collection of Computer Science Bibliographies", false),
+                new StudyCatalogItem("Crossref", false),
+                new StudyCatalogItem("DBLP", false),
+                new StudyCatalogItem("DOAB", false),
+                new StudyCatalogItem("DOAJ", false),
+                new StudyCatalogItem("GVK", false),
+                new StudyCatalogItem("IEEEXplore", false),
+                new StudyCatalogItem("INSPIRE", false),
+                new StudyCatalogItem("MathSciNet", false),
+                new StudyCatalogItem("Medline/PubMed", false),
+                new StudyCatalogItem("ResearchGate", false),
+                new StudyCatalogItem("SAO/NASA ADS", false),
+                new StudyCatalogItem("SemanticScholar", false),
+                new StudyCatalogItem("Springer", false),
+                new StudyCatalogItem("zbMATH", false)
+        ), manageStudyDefinitionViewModel.getCatalogs());
     }
 }

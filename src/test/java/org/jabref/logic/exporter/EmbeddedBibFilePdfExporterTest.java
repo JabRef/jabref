@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -43,6 +44,7 @@ class EmbeddedBibFilePdfExporterTest {
 
     private BibDatabaseContext databaseContext;
     private BibDatabase dataBase;
+    private JournalAbbreviationRepository abbreviationRepository;
     private FilePreferences filePreferences;
 
     private static void initBibEntries() throws IOException {
@@ -93,8 +95,10 @@ class EmbeddedBibFilePdfExporterTest {
      */
     @BeforeEach
     void setUp() throws IOException {
+        abbreviationRepository = mock(JournalAbbreviationRepository.class);
+
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.getUser()).thenReturn(tempDir.toAbsolutePath().toString());
+        when(filePreferences.getUserAndHost()).thenReturn(tempDir.toAbsolutePath().toString());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
         BibDatabaseMode bibDatabaseMode = BibDatabaseMode.BIBTEX;
@@ -118,13 +122,13 @@ class EmbeddedBibFilePdfExporterTest {
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithValidPdfFileLinks")
     void successfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018)));
+        assertTrue(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018), abbreviationRepository));
     }
 
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithInvalidPdfFileLinks")
     void unsuccessfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
-        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018)));
+        assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018), abbreviationRepository));
     }
 
     public static Stream<Arguments> provideBibEntriesWithValidPdfFileLinks() {
@@ -138,13 +142,13 @@ class EmbeddedBibFilePdfExporterTest {
     @ParameterizedTest
     @MethodSource("providePathsToValidPDFs")
     void successfulExportToFileByPath(Path path) throws Exception {
-        assertTrue(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path));
+        assertTrue(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path, abbreviationRepository));
     }
 
     @ParameterizedTest
     @MethodSource("providePathsToInvalidPDFs")
     void unsuccessfulExportToFileByPath(Path path) throws Exception {
-        assertFalse(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path));
+        assertFalse(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path, abbreviationRepository));
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {

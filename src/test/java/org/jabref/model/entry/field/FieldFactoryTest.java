@@ -15,24 +15,27 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class FieldFactoryTest {
     @Test
     void testOrFieldsTwoTerms() {
-        assertEquals("aaa/bbb", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb")));
+        assertEquals("Aaa/Bbb", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb")));
     }
 
     @Test
     void testOrFieldsThreeTerms() {
-        assertEquals("aaa/bbb/ccc", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb"), new UnknownField("ccc")));
+        assertEquals("Aaa/Bbb/Ccc", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb"), new UnknownField("ccc")));
     }
 
-    private static Stream<Arguments> commentFields() {
+    private static Stream<Arguments> fieldsWithoutFieldProperties() {
         return Stream.of(
+                // comment fields
                 Arguments.of(new UserSpecificCommentField("user1"), "comment-user1"),
-                Arguments.of(new UserSpecificCommentField("other-user-id"), "comment-other-user-id")
+                Arguments.of(new UserSpecificCommentField("other-user-id"), "comment-other-user-id"),
+                // unknown field
+                Arguments.of(new UnknownField("cased", "cAsEd"), "cAsEd")
         );
     }
 
     @ParameterizedTest
     @MethodSource
-    void commentFields(Field expected, String name) {
+    void fieldsWithoutFieldProperties(Field expected, String name) {
         assertEquals(expected, FieldFactory.parseField(name));
     }
 

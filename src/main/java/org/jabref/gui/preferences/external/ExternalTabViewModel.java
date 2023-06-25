@@ -44,6 +44,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final StringProperty customTerminalCommandProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomFileBrowserProperty = new SimpleBooleanProperty();
     private final StringProperty customFileBrowserCommandProperty = new SimpleStringProperty("");
+    private final StringProperty kindleEmailProperty = new SimpleStringProperty("");
 
     private final Validator terminalCommandValidator;
     private final Validator fileBrowserCommandValidator;
@@ -100,6 +101,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         customTerminalCommandProperty.setValue(initialExternalApplicationPreferences.getCustomTerminalCommand());
         useCustomFileBrowserProperty.setValue(initialExternalApplicationPreferences.useCustomFileBrowser());
         customFileBrowserCommandProperty.setValue(initialExternalApplicationPreferences.getCustomFileBrowserCommand());
+        kindleEmailProperty.setValue(initialExternalApplicationPreferences.getKindleEmail());
     }
 
     public void storeSettings() {
@@ -111,6 +113,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         externalPreferences.setCustomTerminalCommand(customTerminalCommandProperty.getValue());
         externalPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());
         externalPreferences.setCustomFileBrowserCommand(customFileBrowserCommandProperty.getValue());
+        externalPreferences.setKindleEmail(kindleEmailProperty.getValue());
 
         PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
         pushPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());
@@ -180,6 +183,10 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty eMailReferenceSubjectProperty() {
         return this.eMailReferenceSubjectProperty;
+    }
+
+    public StringProperty kindleEmailProperty() {
+        return this.kindleEmailProperty;
     }
 
     public BooleanProperty autoOpenAttachedFoldersProperty() {

@@ -48,7 +48,7 @@ class StudyFetcher {
     }
 
     /**
-     * Queries all Databases on the given searchQuery.
+     * Queries all catalogs on the given searchQuery.
      *
      * @param searchQuery The query the search is performed for.
      * @return Mapping of each fetcher by name and all their retrieved publications as a BibDatabase

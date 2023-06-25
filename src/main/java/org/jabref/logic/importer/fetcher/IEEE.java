@@ -40,9 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for finding PDF URLs for entries on IEEE
- * Will first look for URLs of the type <code>https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&]arnumber=...</code>
- * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page
+ * Class for finding PDF URLs for entries on IEEE.
+ * Will first look for URLs of the type <code>https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&amp;]arnumber=...</code>.
+ * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page.
  *
  * @see <a href="https://developer.ieee.org/docs">API documentation</a>
  */

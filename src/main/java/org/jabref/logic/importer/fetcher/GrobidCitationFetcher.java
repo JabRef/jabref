@@ -16,10 +16,10 @@ import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.jooq.lambda.Unchecked;
 import org.jsoup.HttpStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zalando.fauxpas.FauxPas;
 
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 
@@ -73,7 +73,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                         .map(String::trim)
                         .filter(str -> !str.isBlank())
-                        .map(FauxPas.throwingFunction(this::parseUsingGrobid))
+                        .map(Unchecked.function(this::parseUsingGrobid))
                         .flatMap(Optional::stream)
                         .collect(Collectors.toList());
         return collect;
