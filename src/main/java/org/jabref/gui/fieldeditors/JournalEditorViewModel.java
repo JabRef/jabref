@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 
@@ -16,11 +17,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.PopOver;
 
 public class JournalEditorViewModel extends AbstractEditorViewModel {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final ReadOnlyBooleanWrapper isJournalInfoButtonVisible = new ReadOnlyBooleanWrapper();
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
 
@@ -30,11 +33,14 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
             JournalAbbreviationRepository journalAbbreviationRepository,
             FieldCheckers fieldCheckers,
             TaskExecutor taskExecutor,
-            DialogService dialogService) {
+            DialogService dialogService,
+            PreferencesService preferences) {
         super(field, suggestionProvider, fieldCheckers);
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+
+        isJournalInfoButtonVisibleProperty().bind(preferences.getJournalInformationPreferences().journalInfoOptOutProperty().not());
     }
 
     public void toggleAbbreviation() {
@@ -76,5 +82,17 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
         } else {
             dialogService.notify(Localization.lang("ISSN required for fetching journal information"));
         }
+    }
+
+    public boolean getIsJournalInfoButtonVisible() {
+        return isJournalInfoButtonVisible.get();
+    }
+
+    public ReadOnlyBooleanWrapper isJournalInfoButtonVisibleProperty() {
+        return isJournalInfoButtonVisible;
+    }
+
+    public void setIsJournalInfoButtonVisible(boolean isJournalInfoButtonVisible) {
+        this.isJournalInfoButtonVisible.set(isJournalInfoButtonVisible);
     }
 }

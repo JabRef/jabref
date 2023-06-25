@@ -23,6 +23,8 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML private JournalEditorViewModel viewModel;
     @FXML private EditorTextField textField;
     @FXML private Button journalInfoButton;
+    private final DialogService dialogService;
+    private final PreferencesService preferencesService;
 
     public JournalEditor(Field field,
                          TaskExecutor taskExecutor,
@@ -31,13 +33,17 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                          PreferencesService preferences,
                          SuggestionProvider<?> suggestionProvider,
                          FieldCheckers fieldCheckers) {
+        this.dialogService = dialogService;
+        this.preferencesService = preferences;
+
         this.viewModel = new JournalEditorViewModel(
                 field,
                 suggestionProvider,
                 journalAbbreviationRepository,
                 fieldCheckers,
                 taskExecutor,
-                dialogService);
+                dialogService,
+                preferences);
 
         ViewLoader.view(this)
                   .root(this)
@@ -72,6 +78,8 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void showJournalInfo() {
-        viewModel.showJournalInfo(journalInfoButton);
+        if (JournalInfoOptInDialogHelper.isJournalInfoEnabled(dialogService, preferencesService.getJournalInformationPreferences())) {
+            viewModel.showJournalInfo(journalInfoButton);
+        }
     }
 }
