@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -82,5 +84,27 @@ class CiteSeerTest {
             }
             recentEntry = laterEntry;
         }
+    }
+
+    @Test
+    void findByIdAsDOI() throws FetcherException, IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.DOI, "c16e0888b17cb2c689e5dfa4e2be4fdffb23869e");
+        Optional<URL> expected = Optional.of(new URL("https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=c16e0888b17cb2c689e5dfa4e2be4fdffb23869e"));
+        assertEquals(expected, fetcher.findFullText(entry));
+    }
+
+    @Test
+    void findBySourceURL() throws FetcherException, IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.DOI, "")
+                .withField(StandardField.URL, "http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf");
+        Optional<URL> expected = Optional.of(new URL("http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf"));
+        assertEquals(expected, fetcher.findFullText(entry));
+    }
+
+    @Test
+    void notFoundByIdOrURL() throws FetcherException, IOException {
+        assertEquals(Optional.empty(), fetcher.findFullText(new BibEntry()));
     }
 }
