@@ -61,6 +61,12 @@ public class JournalInformationFetcher {
         String coverageStartYear = "";
         String coverageEndYear = "";
         String subjectArea = "";
+        // TODO: extract from json
+        String country = "United States";
+        String categories = "Biology, Microbiology";
+        String scimagoId = "A12345";
+        String hIndex = "247";
+        String issn = "[15230864, 15577716]";
         List<Pair<Integer, Double>> sjrArray = new ArrayList<>();
         List<Pair<Integer, Double>> snipArray = new ArrayList<>();
 
@@ -104,6 +110,11 @@ public class JournalInformationFetcher {
                 coverageStartYear,
                 coverageEndYear,
                 subjectArea,
+                country,
+                categories,
+                scimagoId,
+                hIndex,
+                issn,
                 sjrArray,
                 snipArray
         );
