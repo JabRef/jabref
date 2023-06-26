@@ -153,7 +153,7 @@ jobs:
           --vendor JabRef \
           --mac-package-identifier Jabref \
           --mac-package-name JabRef \
-          --type pgk --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
           --mac-entitlements buildres/mac/jabref.entitlements \
           --icon src/main/resources/icons/jabref.icns \
