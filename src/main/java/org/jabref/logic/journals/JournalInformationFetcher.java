@@ -1,51 +1,49 @@
 package org.jabref.logic.journals;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
-import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.OS;
-
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fetches journal information from the Elsevier Scopus API
- *
- * @see <a href="https://dev.elsevier.com/sc_apis.html">API documentation</a> for further details
+ * Fetches journal information from the JabRef Web API
  */
 public class JournalInformationFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);
-    private static final String API_URL = "https://api.elsevier.com/content/serial/title/issn/";
-    private static final String API_KEY = "***";
-    private static final Integer YEAR_INTERVAL = 10;
+    private static final String API_URL = "https://mango-pebble-0224c3803-2067.westeurope.1.azurestaticapps.net/api";
 
     public JournalInformation getJournalInformation(String issn) {
         JournalInformation journalInformation = null;
 
         try {
-            URL urlForQuery = getURLForQuery(issn);
-            InputStream stream = new URLDownload(urlForQuery).asInputStream();
-            journalInformation = parseResponse(stream);
+            Integer issnInt = Integer.parseInt(issn);
+            JSONObject postData = buildPostData(issnInt);
+
+            HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
+                                                         .header("Content-Type", "application/json")
+                                                         .body(postData)
+                                                         .asJson();
+
+            if (httpResponse.getBody() != null) {
+                JSONObject responseJsonObject = httpResponse.getBody().getObject();
+                journalInformation = parseResponse(responseJsonObject);
+            }
         } catch (URISyntaxException | MalformedURLException e) {
-            LOGGER.error("Malformed Search URI.", e);
+            LOGGER.error("Malformed URI.", e);
         } catch (IOException e) {
             LOGGER.error("An IOException occurred when fetching journal info.", e);
         }
@@ -53,9 +51,7 @@ public class JournalInformationFetcher {
         return journalInformation;
     }
 
-    private JournalInformation parseResponse(InputStream inputStream) {
-        String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
-        JSONObject responseJsonObject = new JSONObject(response);
+    private JournalInformation parseResponse(JSONObject responseJsonObject) throws IOException, URISyntaxException {
         String title = "";
         String publisher = "";
         String coverageStartYear = "";
@@ -120,6 +116,44 @@ public class JournalInformationFetcher {
         );
     }
 
+    private JSONObject buildPostData(Integer issn) {
+        String query = """
+                query GetJournalByIssn($issn: Int) {
+                  journal(issn: $issn) {
+                    id
+                    name
+                    issn
+                    scimagoId
+                    country
+                    publisher
+                    areas
+                    categories
+                    citationInfo {
+                      year
+                      docsThisYear
+                      docsPrevious3Years
+                      citableDocsPrevious3Years
+                      citesOutgoing
+                      citesOutgoingPerDoc
+                      citesIncomingByRecentlyPublished
+                      citesIncomingPerDocByRecentlyPublished
+                      sjrIndex
+                    }
+                    hIndex
+                  }
+                }""";
+
+        JSONObject postData = new JSONObject();
+        postData.put("query", query);
+        postData.put("operationName", "GetJournalByIssn");
+
+        JSONObject variables = new JSONObject();
+        variables.put("issn", issn);
+        postData.put("variables", variables);
+
+        return postData;
+    }
+
     private List<Pair<Integer, Double>> parseYearlyArray(JSONArray jsonArray) {
         List<Pair<Integer, Double>> parsedArray = new ArrayList<>();
         Set<Integer> yearSet = new HashSet<>();
@@ -139,18 +173,5 @@ public class JournalInformationFetcher {
 
         parsedArray.sort(Comparator.comparing(Pair::getKey));
         return parsedArray;
-    }
-
-    private URL getURLForQuery(String issn) throws URISyntaxException, MalformedURLException {
-        int currentYear = Year.now().getValue();
-        int startingYear = currentYear - YEAR_INTERVAL;
-        String dateParameter = startingYear + "-" + currentYear;
-
-        URIBuilder uriBuilder = new URIBuilder(API_URL + issn);
-        uriBuilder.addParameter("apiKey", API_KEY);
-        uriBuilder.addParameter("view", "citescore");
-        uriBuilder.addParameter("date", dateParameter);
-
-        return uriBuilder.build().toURL();
     }
 }
