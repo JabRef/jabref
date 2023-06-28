@@ -42,6 +42,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox showAdvancedHints;
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
+    @FXML private CheckBox useKeyring;
     @FXML private CheckBox collectTelemetry;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
     @FXML private CheckBox alwaysReformatBib;
@@ -109,6 +110,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
+        useKeyring.selectedProperty().bindBidirectional(viewModel.useKeyringProperty());
 
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
 

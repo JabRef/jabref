@@ -76,6 +76,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
 
+    private final BooleanProperty useKeyringProperty = new SimpleBooleanProperty();
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
 
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
@@ -152,6 +153,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
         inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
+        useKeyringProperty.setValue(workspacePreferences.shouldUseKeyring());
 
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
 
@@ -187,6 +189,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
         workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
+        workspacePreferences.setUseKeyring(useKeyringProperty.getValue());
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
 
@@ -285,6 +288,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty confirmDeleteProperty() {
         return this.confirmDeleteProperty;
+    }
+
+    public BooleanProperty useKeyringProperty() {
+        return this.useKeyringProperty;
     }
 
     public BooleanProperty collectTelemetryProperty() {
