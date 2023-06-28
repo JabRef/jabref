@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javafx.util.Pair;
 
@@ -25,13 +26,13 @@ import org.slf4j.LoggerFactory;
 public class JournalInformationFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);
     private static final String API_URL = "https://mango-pebble-0224c3803-2067.westeurope.1.azurestaticapps.net/api";
+    private static final Pattern QUOTES_BRACKET_PATTERN = Pattern.compile("[\"\\[\\]]");
 
     public JournalInformation getJournalInformation(String issn) {
         JournalInformation journalInformation = null;
 
         try {
-            Integer issnInt = Integer.parseInt(issn);
-            JSONObject postData = buildPostData(issnInt);
+            JSONObject postData = buildPostData(issn);
 
             HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
                                                          .header("Content-Type", "application/json")
@@ -57,45 +58,47 @@ public class JournalInformationFetcher {
         String coverageStartYear = "";
         String coverageEndYear = "";
         String subjectArea = "";
-        // TODO: extract from json
-        String country = "United States";
-        String categories = "Biology, Microbiology";
-        String scimagoId = "A12345";
-        String hIndex = "247";
-        String issn = "[15230864, 15577716]";
+        String country = "";
+        String categories = "";
+        String scimagoId = "";
+        String hIndex = "";
+        String issn = "";
         List<Pair<Integer, Double>> sjrArray = new ArrayList<>();
         List<Pair<Integer, Double>> snipArray = new ArrayList<>();
+        List<Pair<Integer, Double>> docsThisYear = new ArrayList<>();
+        List<Pair<Integer, Double>> docsPrevious3Years = new ArrayList<>();
+        List<Pair<Integer, Double>> citableDocsPrevious3Years = new ArrayList<>();
+        List<Pair<Integer, Double>> citesOutgoing = new ArrayList<>();
+        List<Pair<Integer, Double>> citesOutgoingPerDoc = new ArrayList<>();
+        List<Pair<Integer, Double>> citesIncomingByRecentlyPublished = new ArrayList<>();
+        List<Pair<Integer, Double>> citesIncomingPerDocByRecentlyPublished = new ArrayList<>();
 
-        if (responseJsonObject.has("serial-metadata-response")) {
-            JSONObject serialMetadata = responseJsonObject.getJSONObject("serial-metadata-response");
-            if (serialMetadata.has("entry")) {
-                JSONArray entryArray = serialMetadata.getJSONArray("entry");
-                if (!entryArray.isEmpty()) {
-                    JSONObject entry = entryArray.getJSONObject(0);
+        if (responseJsonObject.has("data")) {
+            JSONObject data = responseJsonObject.getJSONObject("data");
+            if (data.has("journal")) {
+                JSONObject journalData = data.getJSONObject("journal");
 
-                    title = entry.optString("dc:title", "");
-                    publisher = entry.optString("dc:publisher", "");
-                    coverageStartYear = entry.optString("coverageStartYear", "");
-                    coverageEndYear = entry.optString("coverageEndYear", "");
+                title = journalData.optString("name", "");
+                publisher = journalData.optString("publisher", "");
+                coverageStartYear = journalData.optString("coverageStartYear", "");
+                coverageEndYear = journalData.optString("coverageEndYear", "");
+                scimagoId = journalData.optString("scimagoId", "");
+                country = journalData.optString("country", "");
+                issn = getConcatenatedString(journalData, "issn");
+                subjectArea = getConcatenatedString(journalData, "areas");
+                categories = getConcatenatedString(journalData, "categories");
+                hIndex = journalData.optString("hIndex", "");
 
-                    if (entry.has("subject-area")) {
-                        JSONArray subjectAreaArray = entry.getJSONArray("subject-area");
-                        if (!subjectAreaArray.isEmpty()) {
-                            JSONObject subjectAreaJsonObject = subjectAreaArray.getJSONObject(0);
-                            subjectArea = subjectAreaJsonObject.optString("@abbrev", "") + "-" +
-                                    subjectAreaJsonObject.optString("$", "");
-                        }
-                    }
-
-                    if (entry.has("SNIPList") && entry.getJSONObject("SNIPList").has("SNIP")) {
-                        JSONArray snipJsonArray = entry.getJSONObject("SNIPList").getJSONArray("SNIP");
-                        snipArray = parseYearlyArray(snipJsonArray);
-                    }
-
-                    if (entry.has("SJRList") && entry.getJSONObject("SJRList").has("SJR")) {
-                        JSONArray sjrJsonArray = entry.getJSONObject("SJRList").getJSONArray("SJR");
-                        sjrArray = parseYearlyArray(sjrJsonArray);
-                    }
+                JSONArray citationInfo = journalData.optJSONArray("citationInfo");
+                if (citationInfo != null) {
+                    docsThisYear = parseCitationInfo(citationInfo, "docsThisYear");
+                    docsPrevious3Years = parseCitationInfo(citationInfo, "docsPrevious3Years");
+                    citableDocsPrevious3Years = parseCitationInfo(citationInfo, "citableDocsPrevious3Years");
+                    citesOutgoing = parseCitationInfo(citationInfo, "citesOutgoing");
+                    citesOutgoingPerDoc = parseCitationInfo(citationInfo, "citesOutgoingPerDoc");
+                    citesIncomingByRecentlyPublished = parseCitationInfo(citationInfo, "citesIncomingByRecentlyPublished");
+                    citesIncomingPerDocByRecentlyPublished = parseCitationInfo(citationInfo, "citesIncomingPerDocByRecentlyPublished");
+                    sjrArray = parseCitationInfo(citationInfo, "sjrIndex");
                 }
             }
         }
@@ -112,13 +115,29 @@ public class JournalInformationFetcher {
                 hIndex,
                 issn,
                 sjrArray,
-                snipArray
+                snipArray,
+                docsThisYear,
+                docsPrevious3Years,
+                citableDocsPrevious3Years,
+                citesOutgoing,
+                citesOutgoingPerDoc,
+                citesIncomingByRecentlyPublished,
+                citesIncomingPerDocByRecentlyPublished
         );
     }
 
-    private JSONObject buildPostData(Integer issn) {
+    private static String getConcatenatedString(JSONObject jsonObject, String key) {
+        JSONArray jsonArray = jsonObject.optJSONArray(key);
+        if (jsonArray != null) {
+            return QUOTES_BRACKET_PATTERN.matcher(jsonArray.join(", ")).replaceAll("");
+        } else {
+            return "";
+        }
+    }
+
+    private JSONObject buildPostData(String issn) {
         String query = """
-                query GetJournalByIssn($issn: Int) {
+                query GetJournalByIssn($issn: String) {
                   journal(issn: $issn) {
                     id
                     name
@@ -154,16 +173,16 @@ public class JournalInformationFetcher {
         return postData;
     }
 
-    private List<Pair<Integer, Double>> parseYearlyArray(JSONArray jsonArray) {
+    private List<Pair<Integer, Double>> parseCitationInfo(JSONArray jsonArray, String key) {
         List<Pair<Integer, Double>> parsedArray = new ArrayList<>();
         Set<Integer> yearSet = new HashSet<>();
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject item = jsonArray.getJSONObject(i);
 
-            if (item.has("@year") && item.has("$")) {
-                int year = item.getInt("@year");
-                double value = item.getDouble("$");
+            if (item.has("year") && item.has(key)) {
+                int year = item.getInt("year");
+                double value = item.getDouble(key);
                 if (!yearSet.contains(year)) {
                     parsedArray.add(new Pair<>(year, value));
                     yearSet.add(year);
