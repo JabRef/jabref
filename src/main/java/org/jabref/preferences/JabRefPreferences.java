@@ -113,6 +113,7 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
+import com.github.javakeyring.Keyring;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1535,6 +1536,19 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(proxyPreferences.portProperty(), (obs, oldValue, newValue) -> put(PROXY_PORT, newValue));
         EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
         EasyBind.listen(proxyPreferences.usernameProperty(), (obs, oldValue, newValue) -> put(PROXY_USERNAME, newValue));
+        EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> {
+            if (getWorkspacePreferences().shouldUseKeyring()) {
+                try (final Keyring keyring = Keyring.create()) {
+                    if (StringUtil.isBlank(newValue)) {
+                        keyring.deletePassword("org.jabref", "proxy");
+                    } else {
+                        keyring.setPassword("org.jabref", "proxy", newValue.trim());
+                    }
+                } catch (Exception ex) {
+                    LOGGER.error("Unable to open key store");
+                }
+            }
+        });
 
         return proxyPreferences;
     }

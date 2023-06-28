@@ -106,6 +106,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         proxyPassword.textProperty().bindBidirectional(viewModel.proxyPasswordProperty());
         proxyPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
         proxyAttentionLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
+        proxyAttentionLabel.visibleProperty().bind(preferencesService.getWorkspacePreferences().useKeyringProperty().not());
 
         proxyPassword.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_PRESSED, this::proxyPasswordReveal);
