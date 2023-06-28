@@ -36,6 +36,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We enabled the user to change the name of a field in a custom entry type by double-clicking on it. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We integrated two mail actions ("As Email" and "To Kindle") under a new "Send" option in the right-click & Tools menus. The Kindle option creates an email targeted to the user's Kindle email, which can be set in preferences under "External programs" [#6186](https://github.com/JabRef/jabref/issues/6186)
 - We added an option to clear recent libraries' history. [#10003](https://github.com/JabRef/jabref/issues/10003)
+- We added an option to encrypt and remember the proxy password and the custom api keys between sessions. [#10044](https://github.com/JabRef/jabref/issues/10044) 
 
 ### Changed
 
