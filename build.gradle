@@ -47,6 +47,10 @@ java {
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
     modularity.inferModulePath.set(false)
+
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(20)
+    }
 }
 
 application {
