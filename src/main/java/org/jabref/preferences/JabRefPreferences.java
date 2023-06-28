@@ -114,6 +114,7 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -981,6 +982,7 @@ public class JabRefPreferences implements PreferencesService {
         clearAllBibEntryTypes();
         clearCitationKeyPatterns();
         clearTruststoreFromCustomCertificates();
+        clearCustomFetcherKeys();
         prefs.clear();
         new SharedDatabasePreferences().clear();
     }
@@ -2777,7 +2779,9 @@ public class JabRefPreferences implements PreferencesService {
 
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
-        List<String> keys = getStringList(FETCHER_CUSTOM_KEYS);
+        List<String> keys = getWorkspacePreferences().shouldUseKeyring()
+                ? getFetcherKeysFromKeyring(names)
+                : getStringList(FETCHER_CUSTOM_KEYS);
 
         for (int i = 0; i < names.size(); i++) {
             fetcherApiKeys.add(new FetcherApiKey(
@@ -2788,6 +2792,25 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         return fetcherApiKeys;
+    }
+
+    private List<String> getFetcherKeysFromKeyring(List<String> names) {
+        List<String> keys = new ArrayList<>();
+
+        try (final Keyring keyring = Keyring.create()) {
+            for (String fetcher : names) {
+                try {
+                    keys.add(keyring.getPassword("org.jabref.customapikeys", fetcher));
+                } catch (PasswordAccessException ex) {
+                    LOGGER.warn("No api key stored for {} fetcher", fetcher);
+                    keys.add("");
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("JabRef could not open the key store");
+        }
+
+        return keys;
     }
 
     private void storeFetcherKeys(Set<FetcherApiKey> fetcherApiKeys) {
@@ -2803,7 +2826,45 @@ public class JabRefPreferences implements PreferencesService {
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
-        putStringList(FETCHER_CUSTOM_KEYS, keys);
+        if (getWorkspacePreferences().shouldUseKeyring()) {
+            storeFetcherKeysToKeyring(names, keys);
+        } else {
+            putStringList(FETCHER_CUSTOM_KEYS, keys);
+        }
+    }
+
+    private void storeFetcherKeysToKeyring(List<String> names, List<String> keys) {
+        try (final Keyring keyring = Keyring.create()) {
+            for (int i = 0; i < names.size(); i++) {
+                if (StringUtil.isNullOrEmpty(keys.get(i))) {
+                    try {
+                        keyring.deletePassword("org.jabref.customapikeys", names.get(i));
+                    } catch (PasswordAccessException ex) {
+                        // Already removed
+                    }
+                } else {
+                    keyring.setPassword("org.jabref.customapikeys", names.get(i), keys.get(i));
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Unable to open key store");
+        }
+    }
+
+    /**
+     * Clears the custom fetcher keys in the backing store and in the credential store
+     */
+    private void clearCustomFetcherKeys() {
+        put(FETCHER_CUSTOM_KEYS, "");
+
+        List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
+        try (final Keyring keyring = Keyring.create()) {
+            for (String name : names) {
+                keyring.deletePassword("org.jabref.customapikeys", name);
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Unable to open key store");
+        }
     }
 
     @Override
