@@ -194,11 +194,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     private void storeRemoteSettings() {
-        RemotePreferences newRemotePreferences = new RemotePreferences(
-                remotePreferences.getPort(),
-                remoteServerProperty.getValue()
-        );
-
         getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
             if (remotePreferences.isDifferentPort(newPort)) {
                 remotePreferences.setPort(newPort);
