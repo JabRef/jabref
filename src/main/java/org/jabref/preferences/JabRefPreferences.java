@@ -2804,7 +2804,10 @@ public class JabRefPreferences implements PreferencesService {
         try (final Keyring keyring = Keyring.create()) {
             for (String fetcher : names) {
                 try {
-                    keys.add(keyring.getPassword("org.jabref.customapikeys", fetcher));
+                    keys.add(new Password(
+                            keyring.getPassword("org.jabref.customapikeys", fetcher),
+                            getInternalPreferences().getUserAndHost())
+                            .decrypt());
                 } catch (PasswordAccessException ex) {
                     LOGGER.warn("No api key stored for {} fetcher", fetcher);
                     keys.add("");
@@ -2847,7 +2850,10 @@ public class JabRefPreferences implements PreferencesService {
                         // Already removed
                     }
                 } else {
-                    keyring.setPassword("org.jabref.customapikeys", names.get(i), keys.get(i));
+                    keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
+                            keys.get(i),
+                            getInternalPreferences().getUserAndHost())
+                            .encrypt());
                 }
             }
         } catch (Exception ex) {
