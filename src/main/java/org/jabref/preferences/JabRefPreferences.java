@@ -94,6 +94,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -1544,7 +1545,10 @@ public class JabRefPreferences implements PreferencesService {
                     if (StringUtil.isBlank(newValue)) {
                         keyring.deletePassword("org.jabref", "proxy");
                     } else {
-                        keyring.setPassword("org.jabref", "proxy", newValue.trim());
+                        keyring.setPassword("org.jabref", "proxy", new Password(
+                                        newValue.trim(),
+                                        proxyPreferences.getUsername())
+                                        .encrypt());
                     }
                 } catch (Exception ex) {
                     LOGGER.error("Unable to open key store");

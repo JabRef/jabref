@@ -25,6 +25,7 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
+import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
@@ -98,7 +99,10 @@ public class JabRefGUI {
         }
 
         try (final Keyring keyring = Keyring.create()) {
-            String password = keyring.getPassword("org.jabref", "_proxy");
+            String password = new Password(
+                    keyring.getPassword("org.jabref", "proxy"),
+                    preferencesService.getProxyPreferences().getUsername())
+                    .decrypt();
             preferencesService.getProxyPreferences().setPassword(password);
             ProxyRegisterer.register(preferencesService.getProxyPreferences());
         } catch (PasswordAccessException ex) {
