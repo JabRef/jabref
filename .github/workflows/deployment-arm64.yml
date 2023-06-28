@@ -61,6 +61,20 @@ jobs:
           java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
+      - name: setup jdk JabRef-fix mac
+        shell: bash
+        run: |
+            mkdir ${{runner.temp}}/jdk
+            wget -qO- https://files.jabref.org/jdks/jdk-macos-aarch64.tar.gz | tar xz -C ${{runner.temp}}/jdk
+            mv ${{runner.temp}}/jdk/jdk-21.jdk ${{runner.temp}}/jdk/jdk-21
+            echo "JDK21=${{runner.temp}}/jdk/jdk-21" >> "$GITHUB_ENV"
+            ls ${{runner.temp}}/jdk
+
+            echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk/jdk-21" >> gradle.properties
+            echo "org.gradle.java.installations.auto-detect=false" >> gradle.properties
+            cat gradle.properties
+
+            sed -i'.bak' -e "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
       - name: Clean up keychain
         if: (matrix.os == 'self-hosted') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: |
