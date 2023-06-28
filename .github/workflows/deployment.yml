@@ -112,9 +112,6 @@ jobs:
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          ls -la build
-          ls -la build/jlinkbase
-          ls -la build/jlinkbase/jlinkjars
           $JAVA_HOME/bin/jpackage \
           --module org.jabref/org.jabref.cli.Launcher \
           --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
