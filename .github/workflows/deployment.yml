@@ -91,7 +91,7 @@ jobs:
          echo "JDK21=${{runner.temp}}\jdk\jdk-21" >> "$GITHUB_ENV"
          ls "$(cygpath -u "$RUNNER_TEMP\jdk\jdk-21")"
 
-         echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" >> gradle.properties
+         echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" | sed "s/\\\\/\\\\\\\\/" >> gradle.properties
          echo "org.gradle.java.installations.auto-detect=false" >> gradle.properties
          cat gradle.properties
 
@@ -143,10 +143,10 @@ jobs:
       - name: Build runtime image
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
-        run: ./gradlew -Porg.gradle.java.installations.paths="${{env.JDK21}}" -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
         if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -Porg.gradle.java.installations.paths="${{env.JDK21}}" -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
       - name: Resign app image for OSX and build dmg
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
