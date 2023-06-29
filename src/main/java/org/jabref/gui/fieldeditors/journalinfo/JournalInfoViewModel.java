@@ -24,6 +24,11 @@ public class JournalInfoViewModel extends AbstractViewModel {
     private final ReadOnlyStringWrapper issn = new ReadOnlyStringWrapper();
     private final ObservableList<XYChart.Series<String, Double>> sjrData = FXCollections.observableArrayList();
     private final ObservableList<XYChart.Series<String, Double>> snipData = FXCollections.observableArrayList();
+    private final ObservableList<XYChart.Series<String, Double>> citableDocsPrevious3YearsData = FXCollections.observableArrayList();
+    private final ObservableList<XYChart.Series<String, Double>> citesOutgoingData = FXCollections.observableArrayList();
+    private final ObservableList<XYChart.Series<String, Double>> citesOutgoingPerDocData = FXCollections.observableArrayList();
+    private final ObservableList<XYChart.Series<String, Double>> citesIncomingByRecentlyPublishedData = FXCollections.observableArrayList();
+    private final ObservableList<XYChart.Series<String, Double>> docsThisYearData = FXCollections.observableArrayList();
 
     public void populateJournalInformation(String issn) throws FetcherException {
         Optional<JournalInformation> journalInformationOptional = new JournalInformationFetcher().getJournalInformation(issn);
@@ -38,6 +43,11 @@ public class JournalInfoViewModel extends AbstractViewModel {
             setIssn(journalInformation.issn());
             sjrData.add(convertToSeries(journalInformation.sjrArray()));
             snipData.add(convertToSeries(journalInformation.snipArray()));
+            citableDocsPrevious3YearsData.add(convertToSeries(journalInformation.citableDocsPrevious3Years()));
+            citesOutgoingData.add(convertToSeries(journalInformation.citesOutgoing()));
+            citesOutgoingPerDocData.add(convertToSeries(journalInformation.citesOutgoingPerDoc()));
+            citesIncomingByRecentlyPublishedData.add(convertToSeries(journalInformation.citesIncomingByRecentlyPublished()));
+            docsThisYearData.add(convertToSeries(journalInformation.docsThisYear()));
         });
     }
 
@@ -131,6 +141,26 @@ public class JournalInfoViewModel extends AbstractViewModel {
 
     public ObservableList<XYChart.Series<String, Double>> getSnipData() {
         return snipData;
+    }
+
+    public ObservableList<XYChart.Series<String, Double>> getCitableDocsPrevious3YearsData() {
+        return citableDocsPrevious3YearsData;
+    }
+
+    public ObservableList<XYChart.Series<String, Double>> getCitesOutgoingData() {
+        return citesOutgoingData;
+    }
+
+    public ObservableList<XYChart.Series<String, Double>> getCitesOutgoingPerDocData() {
+        return citesOutgoingPerDocData;
+    }
+
+    public ObservableList<XYChart.Series<String, Double>> getCitesIncomingByRecentlyPublishedData() {
+        return citesIncomingByRecentlyPublishedData;
+    }
+
+    public ObservableList<XYChart.Series<String, Double>> getDocsThisYearData() {
+        return docsThisYearData;
     }
 
     public XYChart.Series<String, Double> convertToSeries(List<Pair<Integer, Double>> data) {

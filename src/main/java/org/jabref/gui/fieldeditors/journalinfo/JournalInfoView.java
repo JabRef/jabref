@@ -21,7 +21,11 @@ public class JournalInfoView extends VBox {
     @FXML private Label issn;
     @FXML private Label scimagoId;
     @FXML private LineChart<String, Double> sjrChart;
-    @FXML private LineChart<String, Double> snipChart;
+    @FXML private LineChart<String, Double> citableDocsPrevious3YearsChart;
+    @FXML private LineChart<String, Double> citesOutgoingChart;
+    @FXML private LineChart<String, Double> citesOutgoingPerDocChart;
+    @FXML private LineChart<String, Double> citesIncomingByRecentlyPublishedChart;
+    @FXML private LineChart<String, Double> docsThisYearChart;
     private final JournalInfoViewModel viewModel;
 
     public JournalInfoView() {
@@ -54,6 +58,10 @@ public class JournalInfoView extends VBox {
 
     private void bindChartProperties() {
         sjrChart.setData(viewModel.getSjrData());
-        snipChart.setData(viewModel.getSnipData());
+        citableDocsPrevious3YearsChart.setData(viewModel.getCitableDocsPrevious3YearsData());
+        citesOutgoingChart.setData(viewModel.getCitesOutgoingData());
+        citesOutgoingPerDocChart.setData(viewModel.getCitesOutgoingPerDocData());
+        citesIncomingByRecentlyPublishedChart.setData(viewModel.getCitesIncomingByRecentlyPublishedData());
+        docsThisYearChart.setData(viewModel.getDocsThisYearData());
     }
 }

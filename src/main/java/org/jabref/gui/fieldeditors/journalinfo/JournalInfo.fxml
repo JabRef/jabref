@@ -16,7 +16,7 @@
             <Insets bottom="1.0" right="10.0" top="10.0" />
         </opaqueInsets>
     </Label>
-    <GridPane VBox.vgrow="ALWAYS">
+    <GridPane maxHeight="175.0" VBox.vgrow="ALWAYS">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -27,7 +27,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
-        <VBox styleClass="grid-cell" prefHeight="200.0" prefWidth="100.0">
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell">
             <Label styleClass="info-label" text="%Country:">
                 <VBox.margin>
                     <Insets bottom="10.0" />
@@ -38,7 +38,7 @@
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
         </VBox>
-        <VBox styleClass="grid-cell" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell" GridPane.columnIndex="1">
             <Label styleClass="info-label" text="%Categories:">
                 <VBox.margin>
                     <Insets bottom="10.0" />
@@ -49,7 +49,7 @@
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
         </VBox>
-        <VBox styleClass="grid-cell" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2">
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell" GridPane.columnIndex="2">
             <Label styleClass="info-label" text="%Publisher:">
                 <VBox.margin>
                     <Insets bottom="10.0" />
@@ -60,18 +60,18 @@
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
         </VBox>
-        <VBox styleClass="grid-cell-r" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1">
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-r" GridPane.rowIndex="1">
             <Label styleClass="info-label" text="%h-index:">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>
             </Label>
-            <Label style="-fx-font-size: 24;" fx:id="hIndex" />
+            <Label fx:id="hIndex" style="-fx-font-size: 24;" />
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
         </VBox>
-        <VBox styleClass="grid-cell-b" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3">
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-b" GridPane.columnIndex="3">
             <Label styleClass="info-label" text="%ISSN:">
                 <VBox.margin>
                     <Insets bottom="10.0" />
@@ -82,7 +82,7 @@
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
         </VBox>
-        <VBox styleClass="grid-cell-r" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-r" GridPane.columnIndex="1" GridPane.rowIndex="1">
             <Label styleClass="info-label" text="%SCImago ID:">
                 <VBox.margin>
                     <Insets bottom="10.0" />
@@ -99,14 +99,15 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </VBox.margin>
     </GridPane>
-    <GridPane prefHeight="474.0" prefWidth="1180.0">
+    <GridPane prefHeight="525.0" prefWidth="1180.0">
      <columnConstraints>
-       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
      </columnConstraints>
      <rowConstraints>
-       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
      </rowConstraints>
         <LineChart fx:id="sjrChart" legendVisible="false" title="SJR">
             <xAxis>
@@ -116,12 +117,44 @@
              <NumberAxis minorTickVisible="false" side="LEFT" />
             </yAxis>
         </LineChart>
-        <LineChart fx:id="snipChart" legendVisible="false" title="SNIP" GridPane.columnIndex="1">
+        <LineChart fx:id="docsThisYearChart" legendVisible="false" title="%Docs (This Year)" GridPane.columnIndex="1">
             <xAxis>
               <CategoryAxis label="%Year" side="BOTTOM" />
             </xAxis>
             <yAxis>
               <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="citableDocsPrevious3YearsChart" legendVisible="false" title="%Citable Docs (Previous 3 Years)" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <xAxis>
+                <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="citesOutgoingChart" legendVisible="false" title="%Cites Outgoing" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <xAxis>
+                <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="citesOutgoingPerDocChart" legendVisible="false" title="%Cites Outgoing Per Document" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <xAxis>
+                <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="citesIncomingByRecentlyPublishedChart" legendVisible="false" title="%Cites Incoming By Recently Published" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <xAxis>
+                <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis minorTickVisible="false" side="LEFT" />
             </yAxis>
         </LineChart>
     </GridPane>

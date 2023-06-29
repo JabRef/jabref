@@ -96,6 +96,7 @@ public class JournalInformationFetcher {
                         citesIncomingByRecentlyPublished = parseCitationInfo(citationInfo, "citesIncomingByRecentlyPublished");
                         citesIncomingPerDocByRecentlyPublished = parseCitationInfo(citationInfo, "citesIncomingPerDocByRecentlyPublished");
                         sjrArray = parseCitationInfo(citationInfo, "sjrIndex");
+                        snipArray = parseCitationInfo(citationInfo, "snipIndex");
                     }
                 } else {
                     throw new FetcherException(Localization.lang("ISSN not found in database"));
