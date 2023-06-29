@@ -274,7 +274,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_DELETE = "confirmDelete";
-    public static final String USE_KEYRING = "useKeyring";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -360,9 +359,10 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROXY_PORT = "proxyPort";
     private static final String PROXY_HOSTNAME = "proxyHostname";
     private static final String PROXY_USE = "useProxy";
+    private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
     private static final String PROXY_USERNAME = "proxyUsername";
     private static final String PROXY_PASSWORD = "proxyPassword";
-    private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
+    private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
 
     // SSL
     private static final String TRUSTSTORE_PATH = "truststorePath";
@@ -541,6 +541,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_USE_AUTHENTICATION, Boolean.FALSE);
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
+        defaults.put(PROXY_PERSIST_PASSWORD, Boolean.FALSE);
 
         // SSL
         defaults.put(TRUSTSTORE_PATH, OS.getNativeDesktop()
@@ -661,7 +662,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
-        defaults.put(USE_KEYRING, Boolean.FALSE);
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^+");
         defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon");
@@ -1532,7 +1532,8 @@ public class JabRefPreferences implements PreferencesService {
                 get(PROXY_PORT),
                 getBoolean(PROXY_USE_AUTHENTICATION),
                 get(PROXY_USERNAME),
-                (String) defaults.get(PROXY_PASSWORD));
+                (String) defaults.get(PROXY_PASSWORD),
+                getBoolean(PROXY_PERSIST_PASSWORD));
 
         EasyBind.listen(proxyPreferences.useProxyProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE, newValue));
         EasyBind.listen(proxyPreferences.hostnameProperty(), (obs, oldValue, newValue) -> put(PROXY_HOSTNAME, newValue));
@@ -1540,7 +1541,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
         EasyBind.listen(proxyPreferences.usernameProperty(), (obs, oldValue, newValue) -> put(PROXY_USERNAME, newValue));
         EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> {
-            if (getWorkspacePreferences().shouldUseKeyring()) {
+            if (getProxyPreferences().shouldPersistPassword()) {
                 try (final Keyring keyring = Keyring.create()) {
                     if (StringUtil.isBlank(newValue)) {
                         keyring.deletePassword("org.jabref", "proxy");
@@ -1551,7 +1552,17 @@ public class JabRefPreferences implements PreferencesService {
                                         .encrypt());
                     }
                 } catch (Exception ex) {
-                    LOGGER.error("Unable to open key store");
+                    LOGGER.warn("Unable to open key store");
+                }
+            }
+        });
+        EasyBind.listen(proxyPreferences.persistPasswordProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(PROXY_PERSIST_PASSWORD, newValue);
+            if (!newValue) {
+                try (final Keyring keyring = Keyring.create()) {
+                    keyring.deletePassword("org.jabref", "proxy");
+                } catch (Exception ex) {
+                    LOGGER.warn("Unable to remove proxy credentials");
                 }
             }
         });
@@ -2031,8 +2042,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OPEN_LAST_EDITED),
                 getBoolean(SHOW_ADVANCED_HINTS),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
-                getBoolean(CONFIRM_DELETE),
-                getBoolean(USE_KEYRING));
+                getBoolean(CONFIRM_DELETE));
 
         EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -2048,7 +2058,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
         EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-        EasyBind.listen(workspacePreferences.useKeyringProperty(), (obs, oldValue, newValue) -> putBoolean(USE_KEYRING, newValue));
 
         return workspacePreferences;
     }
@@ -2783,9 +2792,7 @@ public class JabRefPreferences implements PreferencesService {
 
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
-        List<String> keys = getWorkspacePreferences().shouldUseKeyring()
-                ? getFetcherKeysFromKeyring(names)
-                : getStringList(FETCHER_CUSTOM_KEYS);
+        List<String> keys = getFetcherKeysFromKeyring(names);
 
         for (int i = 0; i < names.size(); i++) {
             fetcherApiKeys.add(new FetcherApiKey(
@@ -2833,11 +2840,7 @@ public class JabRefPreferences implements PreferencesService {
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
-        if (getWorkspacePreferences().shouldUseKeyring()) {
-            storeFetcherKeysToKeyring(names, keys);
-        } else {
-            putStringList(FETCHER_CUSTOM_KEYS, keys);
-        }
+        storeFetcherKeysToKeyring(names, keys);
     }
 
     private void storeFetcherKeysToKeyring(List<String> names, List<String> keys) {

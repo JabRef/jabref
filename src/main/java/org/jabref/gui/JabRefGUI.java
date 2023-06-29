@@ -83,7 +83,7 @@ public class JabRefGUI {
             return;
         }
 
-        if (!preferencesService.getWorkspacePreferences().shouldUseKeyring()) {
+        if (!preferencesService.getProxyPreferences().shouldPersistPassword()) {
             DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
             Optional<String> password = dialogService.showPasswordDialogAndWait(
                     Localization.lang("Proxy configuration"),

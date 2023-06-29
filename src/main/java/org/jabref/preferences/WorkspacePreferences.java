@@ -20,7 +20,6 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
-    private final BooleanProperty useKeyring;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -30,8 +29,7 @@ public class WorkspacePreferences {
                                 boolean shouldOpenLastEdited,
                                 boolean showAdvancedHints,
                                 boolean warnAboutDuplicatesInInspection,
-                                boolean confirmDelete,
-                                boolean useKeyring) {
+                                boolean confirmDelete) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
@@ -41,7 +39,6 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
-        this.useKeyring = new SimpleBooleanProperty(useKeyring);
     }
 
     public Language getLanguage() {
@@ -142,17 +139,5 @@ public class WorkspacePreferences {
 
     public void setConfirmDelete(boolean confirmDelete) {
         this.confirmDelete.set(confirmDelete);
-    }
-
-    public boolean shouldUseKeyring() {
-        return useKeyring.get();
-    }
-
-    public BooleanProperty useKeyringProperty() {
-        return useKeyring;
-    }
-
-    public void setUseKeyring(boolean useKeyring) {
-        this.useKeyring.set(useKeyring);
     }
 }

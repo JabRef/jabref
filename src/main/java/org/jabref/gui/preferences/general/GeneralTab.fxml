@@ -65,7 +65,6 @@
     <CheckBox fx:id="inspectionWarningDuplicate"
               text="%Warn about unresolved duplicates when closing inspection window"/>
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
-    <CheckBox fx:id="useKeyring" text="%Use OS credential store to store custom api keys and passwords (save and reopen preferences required)"/>
     <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>
 
     <Label styleClass="sectionHeader" text="%Libraries"/>
