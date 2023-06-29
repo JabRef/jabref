@@ -588,7 +588,8 @@ jlink {
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
-                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'    }
+                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
+    }
 
     jpackage {
         outputDir = "distribution"
