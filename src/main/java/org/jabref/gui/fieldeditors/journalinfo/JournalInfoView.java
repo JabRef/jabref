@@ -3,10 +3,12 @@ package org.jabref.gui.fieldeditors.journalinfo;
 import java.util.Objects;
 
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+
+import org.jabref.logic.importer.FetcherException;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -22,8 +24,8 @@ public class JournalInfoView extends VBox {
     @FXML private LineChart<String, Double> snipChart;
     private final JournalInfoViewModel viewModel;
 
-    public JournalInfoView(String issn) {
-        this.viewModel = new JournalInfoViewModel(issn);
+    public JournalInfoView() {
+        this.viewModel = new JournalInfoViewModel();
 
         ViewLoader.view(this)
                   .root(this)
@@ -41,7 +43,12 @@ public class JournalInfoView extends VBox {
         bindChartProperties();
     }
 
-    public Parent getNode() {
+    public Node populateJournalInformation(String issn) throws FetcherException {
+        viewModel.populateJournalInformation(issn);
+        return this;
+    }
+
+    public Node getNode() {
         return this;
     }
 

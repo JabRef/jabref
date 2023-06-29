@@ -20,8 +20,11 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.PopOver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JournalEditorViewModel extends AbstractEditorViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JournalEditorViewModel.class);
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final ReadOnlyBooleanWrapper isJournalInfoButtonVisible = new ReadOnlyBooleanWrapper();
     private final TaskExecutor taskExecutor;
@@ -73,10 +76,17 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
             popOver.show(journalInfoButton, 0);
 
             BackgroundTask
-                    .wrap(() -> new JournalInfoView(optionalIssn.get()).getNode())
+                    .wrap(() -> new JournalInfoView().populateJournalInformation(optionalIssn.get()))
                     .onSuccess(updatedNode -> {
                         popOver.setContentNode(updatedNode);
                         popOver.show(journalInfoButton, 0);
+                    })
+                    .onFailure(exception -> {
+                        popOver.hide();
+                        String message = Localization.lang("Error while fetching journal information: %0",
+                                exception.getMessage());
+                        LOGGER.warn(message, exception);
+                        dialogService.notify(message);
                     })
                     .executeWith(taskExecutor);
         } else {

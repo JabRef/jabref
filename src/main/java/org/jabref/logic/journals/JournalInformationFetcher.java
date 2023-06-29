@@ -1,21 +1,23 @@
 package org.jabref.logic.journals;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import javafx.util.Pair;
 
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.l10n.Localization;
+
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,31 +30,25 @@ public class JournalInformationFetcher {
     private static final String API_URL = "https://mango-pebble-0224c3803-2067.westeurope.1.azurestaticapps.net/api";
     private static final Pattern QUOTES_BRACKET_PATTERN = Pattern.compile("[\"\\[\\]]");
 
-    public JournalInformation getJournalInformation(String issn) {
-        JournalInformation journalInformation = null;
+    public Optional<JournalInformation> getJournalInformation(String issn) throws FetcherException {
+        Optional<JournalInformation> journalInformationOptional = Optional.empty();
 
-        try {
-            JSONObject postData = buildPostData(issn);
+        JSONObject postData = buildPostData(issn);
 
-            HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
-                                                         .header("Content-Type", "application/json")
-                                                         .body(postData)
-                                                         .asJson();
+        HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
+                                                     .header("Content-Type", "application/json")
+                                                     .body(postData)
+                                                     .asJson();
 
-            if (httpResponse.getBody() != null) {
-                JSONObject responseJsonObject = httpResponse.getBody().getObject();
-                journalInformation = parseResponse(responseJsonObject);
-            }
-        } catch (URISyntaxException | MalformedURLException e) {
-            LOGGER.error("Malformed URI.", e);
-        } catch (IOException e) {
-            LOGGER.error("An IOException occurred when fetching journal info.", e);
+        if (httpResponse.getBody() != null) {
+            JSONObject responseJsonObject = httpResponse.getBody().getObject();
+            journalInformationOptional = Optional.of(parseResponse(responseJsonObject));
         }
 
-        return journalInformation;
+        return journalInformationOptional;
     }
 
-    private JournalInformation parseResponse(JSONObject responseJsonObject) throws IOException, URISyntaxException {
+    private JournalInformation parseResponse(JSONObject responseJsonObject) throws FetcherException {
         String title = "";
         String publisher = "";
         String coverageStartYear = "";
@@ -73,34 +69,42 @@ public class JournalInformationFetcher {
         List<Pair<Integer, Double>> citesIncomingByRecentlyPublished = new ArrayList<>();
         List<Pair<Integer, Double>> citesIncomingPerDocByRecentlyPublished = new ArrayList<>();
 
-        if (responseJsonObject.has("data")) {
-            JSONObject data = responseJsonObject.getJSONObject("data");
-            if (data.has("journal")) {
-                JSONObject journalData = data.getJSONObject("journal");
+        try {
+            if (responseJsonObject.has("data")) {
+                JSONObject data = responseJsonObject.getJSONObject("data");
+                if (data.has("journal") && data.get("journal") != null) {
+                    JSONObject journalData = data.getJSONObject("journal");
 
-                title = journalData.optString("name", "");
-                publisher = journalData.optString("publisher", "");
-                coverageStartYear = journalData.optString("coverageStartYear", "");
-                coverageEndYear = journalData.optString("coverageEndYear", "");
-                scimagoId = journalData.optString("scimagoId", "");
-                country = journalData.optString("country", "");
-                issn = getConcatenatedString(journalData, "issn");
-                subjectArea = getConcatenatedString(journalData, "areas");
-                categories = getConcatenatedString(journalData, "categories");
-                hIndex = journalData.optString("hIndex", "");
+                    title = journalData.optString("name", "");
+                    publisher = journalData.optString("publisher", "");
+                    coverageStartYear = journalData.optString("coverageStartYear", "");
+                    coverageEndYear = journalData.optString("coverageEndYear", "");
+                    scimagoId = journalData.optString("scimagoId", "");
+                    country = journalData.optString("country", "");
+                    issn = getConcatenatedString(journalData, "issn");
+                    subjectArea = getConcatenatedString(journalData, "areas");
+                    categories = getConcatenatedString(journalData, "categories");
+                    hIndex = journalData.optString("hIndex", "");
 
-                JSONArray citationInfo = journalData.optJSONArray("citationInfo");
-                if (citationInfo != null) {
-                    docsThisYear = parseCitationInfo(citationInfo, "docsThisYear");
-                    docsPrevious3Years = parseCitationInfo(citationInfo, "docsPrevious3Years");
-                    citableDocsPrevious3Years = parseCitationInfo(citationInfo, "citableDocsPrevious3Years");
-                    citesOutgoing = parseCitationInfo(citationInfo, "citesOutgoing");
-                    citesOutgoingPerDoc = parseCitationInfo(citationInfo, "citesOutgoingPerDoc");
-                    citesIncomingByRecentlyPublished = parseCitationInfo(citationInfo, "citesIncomingByRecentlyPublished");
-                    citesIncomingPerDocByRecentlyPublished = parseCitationInfo(citationInfo, "citesIncomingPerDocByRecentlyPublished");
-                    sjrArray = parseCitationInfo(citationInfo, "sjrIndex");
+                    JSONArray citationInfo = journalData.optJSONArray("citationInfo");
+                    if (citationInfo != null) {
+                        docsThisYear = parseCitationInfo(citationInfo, "docsThisYear");
+                        docsPrevious3Years = parseCitationInfo(citationInfo, "docsPrevious3Years");
+                        citableDocsPrevious3Years = parseCitationInfo(citationInfo, "citableDocsPrevious3Years");
+                        citesOutgoing = parseCitationInfo(citationInfo, "citesOutgoing");
+                        citesOutgoingPerDoc = parseCitationInfo(citationInfo, "citesOutgoingPerDoc");
+                        citesIncomingByRecentlyPublished = parseCitationInfo(citationInfo, "citesIncomingByRecentlyPublished");
+                        citesIncomingPerDocByRecentlyPublished = parseCitationInfo(citationInfo, "citesIncomingPerDocByRecentlyPublished");
+                        sjrArray = parseCitationInfo(citationInfo, "sjrIndex");
+                    }
+                } else {
+                    throw new FetcherException(Localization.lang("ISSN not found in database"));
                 }
+            } else {
+                throw new FetcherException(Localization.lang("ISSN not found in database"));
             }
+        } catch (JSONException e) {
+            throw new FetcherException(Localization.lang("Parsing error"), e);
         }
 
         return new JournalInformation(
