@@ -8,13 +8,23 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefDialogService;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedEntryLink;
@@ -22,10 +32,19 @@ import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
+import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedEntriesEditor.class);
+
     @FXML public TagsField<ParsedEntryLink> entryLinkField;
+
+    @Inject private DialogService dialogService;
+    @Inject private ClipBoardManager clipBoardManager;
+    @Inject private KeyBindingRepository keyBindingRepository;
 
     private final LinkedEntriesEditorViewModel viewModel;
 
@@ -63,10 +82,19 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         tagLabel.getGraphic().setOnMouseClicked(event -> entryLinkField.removeTags(entryLink));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         tagLabel.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
+            if (event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY)) {
                 viewModel.jumpToEntry(entryLink);
             }
         });
+
+        ContextMenu contextMenu = new ContextMenu();
+        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.COPY, new TagContextAction(StandardActions.COPY, entryLink)),
+                factory.createMenuItem(StandardActions.CUT, new TagContextAction(StandardActions.CUT, entryLink)),
+                factory.createMenuItem(StandardActions.DELETE, new TagContextAction(StandardActions.DELETE, entryLink))
+        );
+        tagLabel.setContextMenu(contextMenu);
         return tagLabel;
     }
 
@@ -82,5 +110,36 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @Override
     public Parent getNode() {
         return this;
+    }
+
+    private class TagContextAction extends SimpleCommand {
+        private final StandardActions command;
+        private final ParsedEntryLink entryLink;
+
+        public TagContextAction(StandardActions command, ParsedEntryLink entryLink) {
+            this.command = command;
+            this.entryLink = entryLink;
+        }
+
+        @Override
+        public void execute() {
+            switch (command) {
+                case COPY -> {
+                    clipBoardManager.setContent(entryLink.getKey());
+                    dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
+                            JabRefDialogService.shortenDialogMessage(entryLink.getKey())));
+                }
+                case CUT -> {
+                    clipBoardManager.setContent(entryLink.getKey());
+                    dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
+                            JabRefDialogService.shortenDialogMessage(entryLink.getKey())));
+                    entryLinkField.removeTags(entryLink);
+                }
+                case DELETE ->
+                        entryLinkField.removeTags(entryLink);
+                default ->
+                        LOGGER.info("Action {} not defined", command.getText());
+            }
+        }
     }
 }
