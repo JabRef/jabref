@@ -91,7 +91,7 @@ jobs:
          echo "JDK21=${{runner.temp}}\jdk\jdk-21" >> "$GITHUB_ENV"
          ls "$(cygpath -u "$RUNNER_TEMP\jdk\jdk-21")"
 
-         echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" | sed "s/\\\\/\\\\\\\\/" >> gradle.properties
+         echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" | sed "s/\\\\/\\\\\\\\/g" >> gradle.properties
          echo "org.gradle.java.installations.auto-detect=false" >> gradle.properties
          cat gradle.properties
 
