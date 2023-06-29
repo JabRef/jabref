@@ -159,7 +159,7 @@ jobs:
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          ${{env.JDK21}}/bin/jpackage \
+          ${{env.JDK21}}/Contents/Home/bin/jpackage \
           --module org.jabref/org.jabref.cli.Launcher \
           --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
@@ -182,10 +182,7 @@ jobs:
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          ls -la build
-          ls -la build/jlinkbase
-          ls -la build/jlinkbase/jlinkjars
-          ${{env.JDK21}}/bin/jpackage \
+          ${{env.JDK21}}/Contents/Home/bin/jpackage \
           --module org.jabref/org.jabref.cli.Launcher \
           --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
