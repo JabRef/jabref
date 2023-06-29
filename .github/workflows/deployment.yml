@@ -96,7 +96,7 @@ jobs:
          echo "JDK21=${{runner.temp}}\jdk\jdk-21" >> "$GITHUB_ENV"
          ls "$(cygpath -u "$RUNNER_TEMP\jdk\jdk-21")"
 
-         echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" >> gradle.properties
+         echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" | sed "s/\\\\/\\\\\\\\/g" >> gradle.properties
          echo "org.gradle.java.installations.auto-detect=false" >> gradle.properties
          cat gradle.properties
 
@@ -147,14 +147,14 @@ jobs:
           keychain-password: jabref
       - name: Build runtime image (non-macos)
         if: (matrix.os != 'macos-latest')
-        run: ./gradlew -Porg.gradle.java.installations.paths="${{env.JDK21}}" -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Prepare merged jars and modules dir (macos)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew  -Porg.gradle.java.installations.paths="${{env.JDK21}}" -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir   
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Build installer (non-macos)
         if: (matrix.os != 'macos-latest')
         shell: bash
-        run: ./gradlew  -Porg.gradle.java.installations.paths="${{env.JDK21}}" -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
       - name: Build dmg (macos)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
