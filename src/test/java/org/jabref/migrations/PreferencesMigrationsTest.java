@@ -7,9 +7,15 @@ import java.util.prefs.Preferences;
 
 import org.jabref.preferences.JabRefPreferences;
 
+import com.github.javakeyring.Keyring;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,7 +33,7 @@ class PreferencesMigrationsTest {
 
     @BeforeEach
     void setUp() {
-        prefs = mock(JabRefPreferences.class);
+        prefs = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
         mainPrefsNode = mock(Preferences.class);
     }
 
@@ -187,5 +193,27 @@ class PreferencesMigrationsTest {
         verify(prefs).put("columnSortOrder", "");
 
         verify(prefs).putInt(JabRefPreferences.MAIN_FONT_SIZE, 11);
+    }
+
+    @Test
+    void testMoveApiKeysToKeyRing() throws Exception {
+        final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+        final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+        final Keyring keyring = mock(Keyring.class);
+
+        when(prefs.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
+        when(prefs.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
+        when(prefs.getInternalPreferences().getUserAndHost()).thenReturn("user-host");
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+
+            PreferencesMigrations.moveApiKeysToKeyring(prefs);
+
+            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherA"), any());
+            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherB"), any());
+            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherC"), any());
+            verify(prefs).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+        }
     }
 }

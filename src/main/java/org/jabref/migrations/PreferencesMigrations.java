@@ -30,7 +30,6 @@ import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.github.javakeyring.Keyring;
-import com.github.javakeyring.PasswordAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -521,7 +520,7 @@ public class PreferencesMigrations {
         }
     }
 
-    private static void moveApiKeysToKeyring(JabRefPreferences preferences) {
+    static void moveApiKeysToKeyring(JabRefPreferences preferences) {
         final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
         final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
 
@@ -531,20 +530,12 @@ public class PreferencesMigrations {
         if (keys.size() > 0) {
             try (final Keyring keyring = Keyring.create()) {
                 for (int i = 0; i < names.size(); i++) {
-                    if (StringUtil.isNullOrEmpty(keys.get(i))) {
-                        try {
-                            keyring.deletePassword("org.jabref.customapikeys", names.get(i));
-                        } catch (
-                                PasswordAccessException ex) {
-                            // Already removed
-                        }
-                    } else {
-                        keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
-                                keys.get(i),
-                                preferences.getInternalPreferences().getUserAndHost())
-                                .encrypt());
-                    }
+                    keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
+                            keys.get(i),
+                            preferences.getInternalPreferences().getUserAndHost())
+                            .encrypt());
                 }
+                preferences.deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
             } catch (
                     Exception ex) {
                 LOGGER.error("Unable to open key store");
