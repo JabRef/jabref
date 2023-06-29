@@ -10,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
@@ -26,9 +25,9 @@ import com.dlsc.gemsfx.TagsField;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final LinkedEntriesEditorViewModel viewModel;
+    @FXML public TagsField<ParsedEntryLink> entryLinkField;
 
-    private final SuggestionProvider<BibEntry> suggestionProvider;
+    private final LinkedEntriesEditorViewModel viewModel;
 
     public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<BibEntry> suggestionProvider, FieldCheckers fieldCheckers) {
         ViewLoader.view(this)
@@ -36,13 +35,39 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                   .load();
 
         this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
-        this.suggestionProvider = suggestionProvider;
 
-        ParsedEntryLinkField entryLinkField = new ParsedEntryLinkField();
-        HBox.setHgrow(entryLinkField, Priority.ALWAYS);
+        entryLinkField.setCellFactory(new ViewModelListCellFactory<ParsedEntryLink>().withText(ParsedEntryLink::getKey));
+        // Mind the .collect(Collectors.toList()) as the list needs to be mutable
+        entryLinkField.setSuggestionProvider(request ->
+                suggestionProvider.getPossibleSuggestions().stream()
+                                  .filter(suggestion -> suggestion.getCitationKey().orElse("").toLowerCase()
+                                                                  .contains(request.getUserText().toLowerCase()))
+                                  .map(ParsedEntryLink::new)
+                                  .collect(Collectors.toList()));
+        entryLinkField.setTagViewFactory(this::createTag);
+        entryLinkField.setConverter(viewModel.getStringConverter());
+        entryLinkField.setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
+        entryLinkField.setMatcher((entryLink, searchText) -> entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));
+        entryLinkField.setComparator(Comparator.comparing(ParsedEntryLink::getKey));
+        entryLinkField.setShowSearchIcon(false);
+        entryLinkField.getEditor().getStyleClass().clear();
+        entryLinkField.getEditor().getStyleClass().add("tags-field-editor");
+
         Bindings.bindContentBidirectional(entryLinkField.getTags(), viewModel.linkedEntriesProperty());
+    }
 
-        getChildren().add(entryLinkField);
+    private Node createTag(ParsedEntryLink entryLink) {
+        Label tagLabel = new Label();
+        tagLabel.setText(entryLinkField.getConverter().toString(entryLink));
+        tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
+        tagLabel.getGraphic().setOnMouseClicked(event -> entryLinkField.removeTags(entryLink));
+        tagLabel.setContentDisplay(ContentDisplay.RIGHT);
+        tagLabel.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                viewModel.jumpToEntry(entryLink);
+            }
+        });
+        return tagLabel;
     }
 
     public LinkedEntriesEditorViewModel getViewModel() {
@@ -57,41 +82,5 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @Override
     public Parent getNode() {
         return this;
-    }
-
-    public class ParsedEntryLinkField extends TagsField<ParsedEntryLink> {
-        public ParsedEntryLinkField() {
-            super();
-
-            setCellFactory(new ViewModelListCellFactory<ParsedEntryLink>().withText(ParsedEntryLink::getKey));
-            // Mind the .collect(Collectors.toList()) as the list needs to be mutable
-            setSuggestionProvider(request ->
-                    suggestionProvider.getPossibleSuggestions().stream()
-                                      .filter(suggestion -> suggestion.getCitationKey().orElse("").toLowerCase()
-                                                                      .contains(request.getUserText().toLowerCase()))
-                                      .map(ParsedEntryLink::new).collect(Collectors.toList()));
-            setTagViewFactory(this::createTag);
-            setConverter(viewModel.getStringConverter());
-            setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
-            setMatcher((entryLink, searchText) -> entryLink.getKey().toLowerCase().startsWith(searchText.toLowerCase()));
-            setComparator(Comparator.comparing(ParsedEntryLink::getKey));
-            setShowSearchIcon(false);
-            getEditor().getStyleClass().clear();
-            getEditor().getStyleClass().add("tags-field-editor");
-        }
-
-        private Node createTag(ParsedEntryLink entryLink) {
-            Label tagLabel = new Label();
-            tagLabel.setText(getConverter().toString(entryLink));
-            tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
-            tagLabel.getGraphic().setOnMouseClicked(event -> removeTags(entryLink));
-            tagLabel.setContentDisplay(ContentDisplay.RIGHT);
-            tagLabel.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2) {
-                    viewModel.jumpToEntry(entryLink);
-                }
-            });
-            return tagLabel;
-        }
     }
 }
