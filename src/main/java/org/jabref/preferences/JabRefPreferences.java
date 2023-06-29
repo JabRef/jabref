@@ -218,10 +218,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String BASE_DOI_URI = "baseDOIURI";
     public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
 
-    public static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
-    public static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
-    public static final String FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
-
     public static final String USE_OWNER = "useOwner";
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
@@ -363,6 +359,10 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROXY_USERNAME = "proxyUsername";
     private static final String PROXY_PASSWORD = "proxyPassword";
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
+
+    // Web search
+    private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+    private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
 
     // SSL
     private static final String TRUSTSTORE_PATH = "truststorePath";
@@ -655,7 +655,6 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
-        defaults.put(FETCHER_CUSTOM_KEYS, "");
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -2864,12 +2863,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    /**
-     * Clears the custom fetcher keys in the backing store and in the credential store
-     */
     private void clearCustomFetcherKeys() {
-        put(FETCHER_CUSTOM_KEYS, "");
-
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         try (final Keyring keyring = Keyring.create()) {
             for (String name : names) {
