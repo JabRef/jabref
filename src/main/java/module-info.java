@@ -13,7 +13,8 @@ open module org.jabref {
     requires javafx.web;
     requires javafx.fxml;
     requires afterburner.fx;
-    requires com.jfoenix;
+    requires com.dlsc.gemsfx;
+    uses com.dlsc.gemsfx.TagsField;
     requires de.saxsys.mvvmfx;
 
     requires org.kordamp.ikonli.core;

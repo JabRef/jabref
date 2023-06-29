@@ -201,7 +201,6 @@ JabRef makes heavy use of Properties and Bindings. These are wrappers around Obs
 * [Validation framework](https://github.com/sialcasa/mvvmFX/wiki/Validation)
 * [mvvm framework](https://github.com/sialcasa/mvvmFX/wiki)
 * [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
-* [JFoenix](https://github.com/jfoenixadmin/JFoenix) Material Designs look & feel
 * [JavaFX Documentation project](https://fxdocs.github.io/docs/html5/index.html): Collected information on JavaFX in a central place
 * [FXExperience](http://fxexperience.com) JavaFX Links of the week
 * [Foojay](https://foojay.io) Java and JavaFX tutorials

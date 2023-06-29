@@ -88,6 +88,7 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://sandec.jfrog.io/artifactory/repo' }
 }
 
 configurations {
@@ -176,7 +177,11 @@ dependencies {
     implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
     implementation 'org.fxmisc.flowless:flowless:0.7.0'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.0'
-    implementation 'com.jfoenix:jfoenix:9.0.10'
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.74.0') {
+        exclude module: 'javax.inject' // Split package, use only jakarta.inject
+        exclude group: 'org.apache.logging.log4j'
+    }
+
     implementation 'org.controlsfx:controlsfx:11.1.2'
 
     implementation 'org.jsoup:jsoup:1.16.1'
@@ -343,8 +348,6 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-
                 // Not sure why we need to restate the controlfx exports
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
@@ -365,12 +368,7 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
-                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
-
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.binding' : 'com.jfoenix',
-                'javafx.graphics/com.sun.javafx.stage' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.event' : 'com.jfoenix'
+                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
         ]
     }
 }
