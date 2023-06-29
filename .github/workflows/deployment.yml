@@ -162,7 +162,7 @@ jobs:
         run: |
           ${{env.JDK21}}/Contents/Home/bin/jpackage \
           --module org.jabref/org.jabref.cli.Launcher \
-          --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
+          --module-path ${{env.JDK21}}/Contents/Home/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
           --name JabRef \
@@ -185,7 +185,7 @@ jobs:
         run: |
           ${{env.JDK21}}/Contents/Home/bin/jpackage \
           --module org.jabref/org.jabref.cli.Launcher \
-          --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
+          --module-path ${{env.JDK21}}/Contents/Home/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
           --name JabRef \
