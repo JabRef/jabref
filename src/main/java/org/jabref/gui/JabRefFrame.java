@@ -770,7 +770,8 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, prefs, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, this, prefs, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(this, prefs)),
-
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
+                
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.IMPORT,
@@ -794,7 +795,6 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
                 factory.createMenuItem(StandardActions.QUIT, new CloseAction())
         );
 

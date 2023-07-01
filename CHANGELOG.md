@@ -39,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- We replaced "Close" by "Close library" and placed it after "Save all" in the File menu. [#10043](https://github.com/JabRef/jabref/pull/10043)
 - We upgraded to Lucene 9.5 for the fulltext search. The search index will be rebuild. [#9584](https://github.com/JabRef/jabref/pull/9584)
 - 'Get full text' now also checks the file url. [#568](https://github.com/koppor/jabref/issues/568)
 - JabRef writes a new backup file only if there is a change. Before, JabRef created a backup upon start. [#9679](https://github.com/JabRef/jabref/pull/9679)
