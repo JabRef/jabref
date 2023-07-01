@@ -1,40 +1,25 @@
 package org.jabref.logic.importer;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-import org.jabref.logic.importer.fileformat.MarcXmlParser;
-import org.jabref.model.entry.BibEntry;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.jabref.logic.importer.fileformat.ImporterTestEngine;
 
 public class MarcXmlParserTest {
 
-    private MarcXmlParser parser;
+    private static final String FILE_ENDING = ".xml";
 
-    @BeforeEach
-    public void setUp() {
-        parser = new MarcXmlParser();
+    private static final String MALFORMED_KEY_WORD = "Malformed";
+
+    private static Stream<String> fileNames() throws IOException {
+        Predicate<String> fileName = name -> name.startsWith("MarcXMLParserTest") && name.endsWith(FILE_ENDING)
+                && !name.contains(MALFORMED_KEY_WORD);
+        return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    @AfterEach
-    public void tearDown() {
-        parser = null;
-    }
-
-    @Test
-    public void testParseEntries() throws Exception {
-        String xmlData = "<xml>...</xml>";
-        InputStream inputStream = new ByteArrayInputStream(xmlData.getBytes());
-
-        List<BibEntry> entries = parser.parseEntries(inputStream);
-        List<BibEntry> expectedEntries = new ArrayList<>();
-        assertEquals(expectedEntries, entries);
+        private static Stream<String> invalidFileNames() throws IOException {
+            Predicate<String> fileName = name -> !name.startsWith("MarcXMLParserTest");
+            return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 }
