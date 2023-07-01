@@ -39,7 +39,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name and="text" delimiter-precedes-last="always" name-as-sort-order="all"/>
+      <name and="text" delimiter-precedes-last="always" name-as-sort-order="first"/>
       <label form="short" prefix=", "/>
       <substitute>
         <names variable="editor"/>
@@ -73,7 +73,7 @@
       <text variable="publisher-place"/>
       <text variable="publisher"/>
       <choose>
-        <if type="article-journal" match="none">
+        <if type="book chapter" match="any">
           <text macro="issued-year"/>
         </if>
       </choose>
@@ -104,6 +104,9 @@
       </if>
       <else-if type="webpage post post-weblog">
         <text variable="URL" prefix="&lt;" suffix="&gt;"/>
+      </else-if>
+      <else-if type="article-journal article-magazine article-newspaper book chapter webpage post post-weblog" match="none">
+        <text macro="issued-year"/>
       </else-if>
     </choose>
   </macro>
