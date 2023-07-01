@@ -117,7 +117,6 @@ jobs:
           --file-associations buildres/mac/bibtexAssociations.properties \
           --jlink-options --bind-services
       - name: Build pkg (macos)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           ${{env.JDK21}}/Contents/Home/bin/jpackage \
@@ -166,8 +165,7 @@ jobs:
         with:
           name: JabRef-${{ matrix.displayName }}
           path: build/distribution
-      - name: Deploy to builds.jabref.org
-        id: deploy
+      - name: Upload to builds.jabref.org (TODO - won't run on Mac, because Dockerized action)
         uses: Pendect/action-rsyncer@v2.0.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
