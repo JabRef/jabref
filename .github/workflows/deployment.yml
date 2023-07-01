@@ -328,3 +328,9 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+      - name: Comment PR
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>
