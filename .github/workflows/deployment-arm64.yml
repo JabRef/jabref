@@ -117,7 +117,6 @@ jobs:
           --file-associations buildres/mac/bibtexAssociations.properties \
           --jlink-options --bind-services
       - name: Build pkg (macos)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           ${{env.JDK21}}/Contents/Home/bin/jpackage \
@@ -161,13 +160,7 @@ jobs:
       - name: Package application image
         shell: bash
         run: ${{ matrix.archivePortable }}
-      - name: Upload to GitHub workflow artifacts store
-        uses: actions/upload-artifact@v3
-        with:
-          name: JabRef-${{ matrix.displayName }}
-          path: build/distribution
-      - name: Deploy to builds.jabref.org
-        id: deploy
+      - name: Upload to builds.jabref.org
         uses: Pendect/action-rsyncer@v2.0.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -178,3 +171,8 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+      - name: Upload to GitHub workflow artifacts store
+        uses: actions/upload-artifact@v3
+        with:
+          name: JabRef-${{ matrix.displayName }}
+          path: build/distribution

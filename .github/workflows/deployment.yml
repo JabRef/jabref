@@ -222,12 +222,18 @@ jobs:
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb  jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
-      - name: Upload to GitHub workflow artifacts store (non-macos)
-        if: (matrix.os != 'macos-latest')
-        uses: actions/upload-artifact@v3
+      - name: Upload to builds.jabref.org
+        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        uses: Pendect/action-rsyncer@v2.0.0
+        env:
+          DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
+          BRANCH: ${{ steps.gitversion.outputs.branchName }}
         with:
-          name: JabRef-${{ matrix.displayName }}
-          path: build/distribution
+          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
+          options: ''
+          ssh_options: '-p 9922'
+          src: 'build/distribution/'
+          dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store (macos)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: actions/upload-artifact@v3
@@ -293,65 +299,7 @@ jobs:
         with:
           name: JabRef-macOS
           path: build/distribution
-  deploy:
-    strategy:
-      fail-fast: false
-    name: Deploy binaries on builds.jabref.org
-    runs-on: ubuntu-latest
-    needs: [build, notarize]
-    steps:
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
-        run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-          else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-          fi
-        env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Checkout source
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/checkout@v3
-      - name: Fetch all history for all tags and branches
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        run: git fetch --prune --unshallow
-      - name: Install GitVersion
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: gittools/actions/gitversion/setup@v0.10.2
-        with:
-          versionSpec: '5.x'
-      - name: Run GitVersion
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.10.2
-      - name: Get linux binaries
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-linux
-          path: build/distribution
-      - name: Get windows binaries
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-windows
-          path: build/distribution
-      - name: Get macOS binaries unsigned
-        if: steps.checksecrets.outputs.secretspresent == 'YES' && ! (${{ inputs.notarization }})) && ! (startsWith(github.ref, 'refs/tags/') 
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-macOS-tbn
-          path: build/distribution/
-      - name: Get macOS binaries notarized
-        if: (startsWith(github.ref, 'refs/tags/') || (${{ inputs.notarization }})) && (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-macOS
-          path: build/distribution/
-      - name: Deploy to builds.jabref.org
-        id: deploy
+      - name: Upload to builds.jabref.org
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: Pendect/action-rsyncer@v2.0.0
         env:
@@ -363,6 +311,22 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+  notify:
+    name: notify
+    runs-on: ubuntu-latest
+    needs: [build, notarize]
+    steps:
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [[ -z "$BUILDJABREFPRIVATEKEY" && "${{ github.event_name }}" != "pull_request" ]]; then
+              echo "secretspresent=NO" >> $GITHUB_ENV
+          else
+              echo "secretspresent=YES" >> $GITHUB_ENV
+          fi
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Comment PR
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: thollander/actions-comment-pull-request@v2
