@@ -1531,7 +1531,7 @@ public class JabRefPreferences implements PreferencesService {
                 get(PROXY_PORT),
                 getBoolean(PROXY_USE_AUTHENTICATION),
                 get(PROXY_USERNAME),
-                (String) defaults.get(PROXY_PASSWORD),
+                getProxyPassword(),
                 getBoolean(PROXY_PERSIST_PASSWORD));
 
         EasyBind.listen(proxyPreferences.useProxyProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE, newValue));
@@ -1539,22 +1539,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(proxyPreferences.portProperty(), (obs, oldValue, newValue) -> put(PROXY_PORT, newValue));
         EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
         EasyBind.listen(proxyPreferences.usernameProperty(), (obs, oldValue, newValue) -> put(PROXY_USERNAME, newValue));
-        EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> {
-            if (getProxyPreferences().shouldPersistPassword()) {
-                try (final Keyring keyring = Keyring.create()) {
-                    if (StringUtil.isBlank(newValue)) {
-                        keyring.deletePassword("org.jabref", "proxy");
-                    } else {
-                        keyring.setPassword("org.jabref", "proxy", new Password(
-                                        newValue.trim(),
-                                        getInternalPreferences().getUserAndHost())
-                                        .encrypt());
-                    }
-                } catch (Exception ex) {
-                    LOGGER.warn("Unable to open key store", ex);
-                }
-            }
-        });
+        EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> setProxyPassword(newValue));
         EasyBind.listen(proxyPreferences.persistPasswordProperty(), (obs, oldValue, newValue) -> {
             putBoolean(PROXY_PERSIST_PASSWORD, newValue);
             if (!newValue) {
@@ -1567,6 +1552,39 @@ public class JabRefPreferences implements PreferencesService {
         });
 
         return proxyPreferences;
+    }
+
+    private String getProxyPassword() {
+        if (getBoolean(PROXY_PERSIST_PASSWORD)) {
+            try (final Keyring keyring = Keyring.create()) {
+                return new Password(
+                        keyring.getPassword("org.jabref", "proxy"),
+                        getInternalPreferences().getUserAndHost())
+                        .decrypt();
+            } catch (PasswordAccessException ex) {
+                LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
+            } catch (Exception ex) {
+                LOGGER.warn("JabRef could not open the key store");
+            }
+        }
+        return (String) defaults.get(PROXY_PASSWORD);
+    }
+
+    private void setProxyPassword(String password) {
+        if (getProxyPreferences().shouldPersistPassword()) {
+            try (final Keyring keyring = Keyring.create()) {
+                if (StringUtil.isBlank(password)) {
+                    keyring.deletePassword("org.jabref", "proxy");
+                } else {
+                    keyring.setPassword("org.jabref", "proxy", new Password(
+                            password.trim(),
+                            getInternalPreferences().getUserAndHost())
+                            .encrypt());
+                }
+            } catch (Exception ex) {
+                LOGGER.warn("Unable to open key store", ex);
+            }
+        }
     }
 
     @Override

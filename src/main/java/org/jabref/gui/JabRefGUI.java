@@ -25,16 +25,14 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.github.javakeyring.Keyring;
-import com.github.javakeyring.PasswordAccessException;
 import impl.org.controlsfx.skin.DecorationPane;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,36 +77,28 @@ public class JabRefGUI {
     }
 
     private void setupProxy() {
-        if (!preferencesService.getProxyPreferences().shouldUseProxy() || !preferencesService.getProxyPreferences().shouldUseAuthentication()) {
+        if (!preferencesService.getProxyPreferences().shouldUseProxy()
+                || !preferencesService.getProxyPreferences().shouldUseAuthentication()) {
             return;
         }
 
-        if (!preferencesService.getProxyPreferences().shouldPersistPassword()) {
-            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            Optional<String> password = dialogService.showPasswordDialogAndWait(
-                    Localization.lang("Proxy configuration"),
-                    Localization.lang("Proxy requires password"),
-                    Localization.lang("Password"));
-            if (password.isPresent()) {
-                preferencesService.getProxyPreferences().setPassword(password.get());
-                ProxyRegisterer.register(preferencesService.getProxyPreferences());
-            } else {
-                LOGGER.warn("No proxy password specified");
-            }
-            return;
-        }
-
-        try (final Keyring keyring = Keyring.create()) {
-            String password = new Password(
-                    keyring.getPassword("org.jabref", "proxy"),
-                    preferencesService.getInternalPreferences().getUserAndHost())
-                    .decrypt();
-            preferencesService.getProxyPreferences().setPassword(password);
+        if (preferencesService.getProxyPreferences().shouldPersistPassword()
+                && StringUtils.isNotBlank(preferencesService.getProxyPreferences().getPassword())) {
             ProxyRegisterer.register(preferencesService.getProxyPreferences());
-        } catch (PasswordAccessException ex) {
-            LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
-        } catch (Exception ex) {
-            LOGGER.warn("JabRef could not open the key store");
+            return;
+        }
+
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        Optional<String> password = dialogService.showPasswordDialogAndWait(
+                Localization.lang("Proxy configuration"),
+                Localization.lang("Proxy requires password"),
+                Localization.lang("Password"));
+
+        if (password.isPresent()) {
+            preferencesService.getProxyPreferences().setPassword(password.get());
+            ProxyRegisterer.register(preferencesService.getProxyPreferences());
+        } else {
+            LOGGER.warn("No proxy password specified");
         }
     }
 
