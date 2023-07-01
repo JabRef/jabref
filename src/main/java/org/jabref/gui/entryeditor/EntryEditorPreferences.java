@@ -17,6 +17,7 @@ import org.jabref.model.entry.field.Field;
 public class EntryEditorPreferences {
 
     private final MapProperty<String, Set<Field>> entryEditorTabList;
+    private final MapProperty<String, Set<Field>> defaultEntryEditorTabList;
     private final BooleanProperty shouldOpenOnNewEntry;
     private final BooleanProperty shouldShowRecommendationsTab;
     private final BooleanProperty isMrdlibAccepted;
@@ -28,6 +29,7 @@ public class EntryEditorPreferences {
     private final BooleanProperty autoLinkFiles;
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
+                                  Map<String, Set<Field>> defaultEntryEditorTabList,
                                   boolean shouldOpenOnNewEntry,
                                   boolean shouldShowRecommendationsTab,
                                   boolean isMrdlibAccepted,
@@ -39,6 +41,7 @@ public class EntryEditorPreferences {
                                   boolean autolinkFilesEnabled) {
 
         this.entryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
+        this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
         this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
         this.shouldShowRecommendationsTab = new SimpleBooleanProperty(shouldShowRecommendationsTab);
         this.isMrdlibAccepted = new SimpleBooleanProperty(isMrdlibAccepted);
@@ -50,16 +53,20 @@ public class EntryEditorPreferences {
         this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
     }
 
-    public ObservableMap<String, Set<Field>> getEntryEditorTabList() {
+    public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
         return entryEditorTabList.get();
     }
 
-    public MapProperty<String, Set<Field>> entryEditorTabListProperty() {
+    public MapProperty<String, Set<Field>> entryEditorTabs() {
         return entryEditorTabList;
     }
 
     public void setEntryEditorTabList(Map<String, Set<Field>> entryEditorTabList) {
         this.entryEditorTabList.set(FXCollections.observableMap(entryEditorTabList));
+    }
+
+    public ObservableMap<String, Set<Field>> getDefaultEntryEditorTabs() {
+        return defaultEntryEditorTabList.get();
     }
 
     public boolean shouldOpenOnNewEntry() {

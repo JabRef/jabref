@@ -53,7 +53,7 @@ public class WriteMetadataToPdfCommand extends SimpleCommand {
                         new XmpUtilWriter(preferences.getXmpPreferences()).writeXmp(file.get(), entry, databaseContext.getDatabase());
 
                         EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), Globals.entryTypesManager, preferences.getFieldPreferences());
-                        embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
+                        embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get(), Globals.journalAbbreviationRepository);
 
                         dialogService.notify(Localization.lang("Success! Finished writing metadata."));
                     } catch (IOException | TransformerException ex) {

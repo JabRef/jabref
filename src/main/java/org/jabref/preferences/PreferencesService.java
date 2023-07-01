@@ -1,9 +1,7 @@
 package org.jabref.preferences;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -18,12 +16,10 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.SaveConfiguration;
-import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
@@ -37,9 +33,18 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.Field;
 
 public interface PreferencesService {
+
+    void clear() throws BackingStoreException;
+
+    void deleteKey(String key) throws IllegalArgumentException;
+
+    void flush();
+
+    void exportPreferences(Path file) throws JabRefException;
+
+    void importPreferences(Path file) throws JabRefException;
 
     InternalPreferences getInternalPreferences();
 
@@ -61,21 +66,11 @@ public interface PreferencesService {
 
     Map<String, Object> getDefaults();
 
-    void exportPreferences(Path file) throws JabRefException;
-
-    void importPreferences(Path file) throws JabRefException;
-
-    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
+    LayoutFormatterPreferences getLayoutFormatterPreferences();
 
     ImportFormatPreferences getImportFormatPreferences();
 
     SaveConfiguration getExportConfiguration();
-
-    void clear() throws BackingStoreException;
-
-    void deleteKey(String key) throws IllegalArgumentException;
-
-    void flush();
 
     BibEntryTypesManager getCustomEntryTypesRepository();
 
@@ -95,25 +90,9 @@ public interface PreferencesService {
 
     TimestampPreferences getTimestampPreferences();
 
-    //*************************************************************************************************************
-    // GroupsPreferences
-    //*************************************************************************************************************
-
     GroupsPreferences getGroupsPreferences();
 
-    //*************************************************************************************************************
-    // EntryEditorPreferences
-    //*************************************************************************************************************
-
-    Map<String, Set<Field>> getDefaultTabNamesAndFields();
-
-    List<Field> getAllDefaultTabFieldNames();
-
     EntryEditorPreferences getEntryEditorPreferences();
-
-    //*************************************************************************************************************
-    // Network preferences
-    //*************************************************************************************************************
 
     RemotePreferences getRemotePreferences();
 
@@ -121,23 +100,11 @@ public interface PreferencesService {
 
     SSLPreferences getSSLPreferences();
 
-    //*************************************************************************************************************
-    // CitationKeyPatternPreferences
-    //*************************************************************************************************************
-
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
-
-    //*************************************************************************************************************
-    // ExternalApplicationsPreferences
-    //*************************************************************************************************************
 
     PushToApplicationPreferences getPushToApplicationPreferences();
 
     ExternalApplicationsPreferences getExternalApplicationsPreferences();
-
-    //*************************************************************************************************************
-    // MainTablePreferences
-    //*************************************************************************************************************
 
     ColumnPreferences getMainTableColumnPreferences();
 
@@ -145,59 +112,23 @@ public interface PreferencesService {
 
     NameDisplayPreferences getNameDisplayPreferences();
 
-    //*************************************************************************************************************
-    // SearchDialogColumnPreferences
-    //*************************************************************************************************************
-
     ColumnPreferences getSearchDialogColumnPreferences();
-
-    //*************************************************************************************************************
-    // AppearancePreferences
-    //*************************************************************************************************************
 
     WorkspacePreferences getWorkspacePreferences();
 
-    //*************************************************************************************************************
-    // File preferences
-    //*************************************************************************************************************
-
     AutoLinkPreferences getAutoLinkPreferences();
 
-    //*************************************************************************************************************
-    // Import/Export preferences
-    //*************************************************************************************************************
-
     ExportPreferences getExportPreferences();
-
-    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
-
-    void storeCustomExportFormats(List<TemplateExporter> exporters);
 
     ImporterPreferences getImporterPreferences();
 
     GrobidPreferences getGrobidPreferences();
 
-    //*************************************************************************************************************
-    // Preview preferences
-    //*************************************************************************************************************
-
     PreviewPreferences getPreviewPreferences();
-
-    //*************************************************************************************************************
-    // SidePanePreferences
-    //*************************************************************************************************************
 
     SidePanePreferences getSidePanePreferences();
 
-    //*************************************************************************************************************
-    // GuiPreferences
-    //*************************************************************************************************************
-
     GuiPreferences getGuiPreferences();
-
-    //*************************************************************************************************************
-    // Misc preferences
-    //*************************************************************************************************************
 
     XmpPreferences getXmpPreferences();
 

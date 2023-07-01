@@ -12,11 +12,11 @@ import org.jabref.model.study.StudyDatabase;
 /**
  * View representation of {@link StudyDatabase}
  */
-public class StudyDatabaseItem {
+public class StudyCatalogItem {
     private final StringProperty name;
     private final BooleanProperty enabled;
 
-    public StudyDatabaseItem(String name, boolean enabled) {
+    public StudyCatalogItem(String name, boolean enabled) {
         this.name = new SimpleStringProperty(Objects.requireNonNull(name));
         this.enabled = new SimpleBooleanProperty(enabled);
     }
@@ -47,7 +47,7 @@ public class StudyDatabaseItem {
 
     @Override
     public String toString() {
-        return "StudyDatabaseItem{" +
+        return "StudyCatalogItem{" +
                 "name=" + name.get() +
                 ", enabled=" + enabled.get() +
                 '}';
@@ -61,7 +61,7 @@ public class StudyDatabaseItem {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        StudyDatabaseItem that = (StudyDatabaseItem) o;
+        StudyCatalogItem that = (StudyCatalogItem) o;
         return Objects.equals(getName(), that.getName()) && Objects.equals(isEnabled(), that.isEnabled());
     }
 

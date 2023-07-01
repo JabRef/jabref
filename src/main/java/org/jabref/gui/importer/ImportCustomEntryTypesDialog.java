@@ -21,10 +21,12 @@ import org.controlsfx.control.CheckListView;
 public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
     private final List<BibEntryType> customEntryTypes;
-    @FXML private VBox boxDifferentCustomization;
-    @FXML private CheckListView<BibEntryType> unknownEntryTypesCheckList;
+
     @Inject private PreferencesService preferencesService;
-    @FXML private CheckListView<BibEntryType> differentCustomizationCheckList;
+    @FXML private VBox boxDifferentCustomization;
+
+    @FXML private CheckListView<BibEntryType> unknownEntryTypesCheckList;
+    @FXML private CheckListView<BibEntryTypePrefsAndFileViewModel> differentCustomizationCheckList;
 
     private final BibDatabaseMode mode;
     private ImportCustomEntryTypesDialogViewModel viewModel;
@@ -39,7 +41,11 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
         setResultConverter(btn -> {
             if (btn == ButtonType.OK) {
-                viewModel.importBibEntryTypes(unknownEntryTypesCheckList.getCheckModel().getCheckedItems(), differentCustomizationCheckList.getCheckModel().getCheckedItems());
+                viewModel.importBibEntryTypes(
+                        unknownEntryTypesCheckList.getCheckModel().getCheckedItems(),
+                        differentCustomizationCheckList.getCheckModel().getCheckedItems().stream()
+                                .map(BibEntryTypePrefsAndFileViewModel::customTypeFromPreferences)
+                                .toList());
             }
             return null;
         });

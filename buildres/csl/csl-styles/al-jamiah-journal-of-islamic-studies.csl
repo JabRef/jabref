@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" and="text" et-al-min="4" et-al-use-first="1" et-al-subsequent-min="4" et-al-subsequent-use-first="1" initialize="false" initialize-with="." page-range-format="minimal" demote-non-dropping-particle="sort-only" default-locale="en-GB">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" and="text" et-al-min="4" et-al-use-first="1" et-al-subsequent-min="4" et-al-subsequent-use-first="1" initialize="false" initialize-with="." page-range-format="minimal" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
     <title>Al-Jami'ah - Journal of Islamic Studies</title>
     <title-short>AJIS</title-short>

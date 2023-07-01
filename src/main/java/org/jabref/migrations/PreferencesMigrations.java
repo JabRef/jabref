@@ -52,14 +52,13 @@ public class PreferencesMigrations {
         upgradeStoredBibEntryTypes(preferences, mainPrefsNode);
         upgradeKeyBindingsToJavaFX(preferences);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
-        upgradePreviewStyleFromReviewToComment(preferences);
+        upgradePreviewStyle(preferences);
         // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
         // backwardcompatibility, as it copies the old values to new variable names and keeps th old sored with the old
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
         changeColumnVariableNamesFor51(preferences);
         upgradeColumnPreferences(preferences);
         restoreVariablesForBackwardCompatibility(preferences);
-        upgradePreviewStyleAllowMarkdown(preferences);
         upgradeCleanups(preferences);
     }
 
@@ -310,21 +309,21 @@ public class PreferencesMigrations {
         prefs.storeGlobalCitationKeyPattern(keyPattern);
     }
 
-    static void upgradePreviewStyleFromReviewToComment(JabRefPreferences prefs) {
-        String currentPreviewStyle = prefs.getPreviewStyle();
+    /**
+     * Customizable preview style migrations
+     * <ul>
+     *     <li> Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).</li>
+     *     <li> Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).</li>
+     *     <li> Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).</li>
+     * </ul>
+     */
+    protected static void upgradePreviewStyle(JabRefPreferences prefs) {
+        String currentPreviewStyle = prefs.get(JabRefPreferences.PREVIEW_STYLE);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}")
+                                                  .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
                                                   .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
                                                   .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__");
-        prefs.setPreviewStyle(migratedStyle);
-    }
-
-    static void upgradePreviewStyleAllowMarkdown(JabRefPreferences prefs) {
-        String currentPreviewStyle = prefs.getPreviewStyle();
-        String migratedStyle = currentPreviewStyle.replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
-                                                  .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
-                                                  .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__");
-
-        prefs.setPreviewStyle(migratedStyle);
+        prefs.put(JabRefPreferences.PREVIEW_STYLE, migratedStyle);
     }
 
     /**

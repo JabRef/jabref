@@ -75,8 +75,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferences,
-                Globals.entryTypesManager,
-                Globals.journalAbbreviationRepository);
+                Globals.entryTypesManager);
         List<Exporter> exporters = exporterFactory.getExporters().stream()
                                                   .sorted(Comparator.comparing(Exporter::getName))
                                                   .filter(exporter -> SUPPORTED_FILETYPES.contains(exporter.getFileType()))
@@ -118,7 +117,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             entries.addAll(stateManager.getSelectedEntries());
 
             // Write to file:
-            exporter.export(stateManager.getActiveDatabase().get(), tmp, entries, fileDirForDatabase);
+            exporter.export(stateManager.getActiveDatabase().get(), tmp, entries, fileDirForDatabase, Globals.journalAbbreviationRepository);
             // Read the file and put the contents on the clipboard:
 
             return new ExportResult(Files.readString(tmp), exporter.getFileType());

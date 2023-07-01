@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.FileType;
@@ -25,21 +26,21 @@ public class CustomImporter extends Importer {
 
     private final Importer importer;
 
-    public CustomImporter(String basePath, String className) throws ClassNotFoundException {
+    public CustomImporter(String basePath, String className) throws ImportException {
         this.basePath = Path.of(basePath);
         this.className = className;
         try {
             importer = load(this.basePath.toUri().toURL(), this.className);
-        } catch (IOException | InstantiationException | IllegalAccessException exception) {
-            throw new ClassNotFoundException("", exception);
+        } catch (IOException | ReflectiveOperationException exception) {
+            throw new ImportException(exception);
         }
     }
 
     private static Importer load(URL basePathURL, String className)
-            throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+            throws IOException, ReflectiveOperationException {
         try (URLClassLoader cl = new URLClassLoader(new URL[]{basePathURL})) {
             Class<?> clazz = Class.forName(className, true, cl);
-            return (Importer) clazz.newInstance();
+            return (Importer) clazz.getDeclaredConstructor().newInstance();
         }
     }
 

@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id("org.openrewrite.rewrite") version("6.0.0")
+    id 'org.openrewrite.rewrite' version '6.1.4'
 }
 
 // Enable following for debugging
@@ -47,6 +47,10 @@ java {
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
     modularity.inferModulePath.set(false)
+
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(20)
+    }
 }
 
 application {
@@ -84,6 +88,7 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://sandec.jfrog.io/artifactory/repo' }
 }
 
 configurations {
@@ -117,18 +122,18 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation 'org.apache.lucene:lucene-core:9.6.0'
-    implementation 'org.apache.lucene:lucene-queryparser:9.6.0'
-    implementation 'org.apache.lucene:lucene-queries:9.6.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.6.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.6.0'
+    implementation 'org.apache.lucene:lucene-core:9.7.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.7.0'
+    implementation 'org.apache.lucene:lucene-queries:9.7.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.7.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.7.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'com.h2database:h2-mvstore:2.1.214'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.73'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.74'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
@@ -141,7 +146,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.0'
     implementation 'org.antlr:antlr4-runtime:4.13.0'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.5.0.202303070854-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.6.0.202305301015-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.15.2'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.2'
@@ -155,7 +160,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:32.0.0-jre') {
+    implementation ('com.google.guava:guava:32.0.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -172,11 +177,15 @@ dependencies {
     implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
     implementation 'org.fxmisc.flowless:flowless:0.7.0'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.0'
-    implementation 'com.jfoenix:jfoenix:9.0.10'
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.74.0') {
+        exclude module: 'javax.inject' // Split package, use only jakarta.inject
+        exclude group: 'org.apache.logging.log4j'
+    }
+
     implementation 'org.controlsfx:controlsfx:11.1.2'
 
     implementation 'org.jsoup:jsoup:1.16.1'
-    implementation 'com.konghq:unirest-java:3.14.2'
+    implementation 'com.konghq:unirest-java:3.14.4'
 
     implementation 'org.slf4j:slf4j-api:2.0.7'
     implementation "org.tinylog:tinylog-api:2.6.2"
@@ -201,13 +210,14 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark:0.64.8'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
-    implementation group: 'org.zalando', name: 'faux-pas', version: '0.9.0'
+
+    implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.160'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.9.3'
 
-    testImplementation 'org.mockito:mockito-core:5.3.1'
+    testImplementation 'org.mockito:mockito-core:5.4.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.0.1'
@@ -216,12 +226,12 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.1'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.0.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.0.1"))
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
 }
@@ -338,8 +348,6 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-
                 // Not sure why we need to restate the controlfx exports
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
@@ -360,12 +368,7 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
-                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
-
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.binding' : 'com.jfoenix',
-                'javafx.graphics/com.sun.javafx.stage' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.event' : 'com.jfoenix'
+                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
         ]
     }
 }
@@ -583,7 +586,8 @@ jlink {
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
-                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'    }
+                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
+    }
 
     jpackage {
         outputDir = "distribution"

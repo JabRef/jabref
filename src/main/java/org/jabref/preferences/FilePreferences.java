@@ -25,7 +25,7 @@ public class FilePreferences {
 
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
 
-    private final StringProperty user = new SimpleStringProperty();
+    private final StringProperty userAndHost = new SimpleStringProperty();
     private final SimpleStringProperty mainFileDirectory = new SimpleStringProperty();
     private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
@@ -35,9 +35,9 @@ public class FilePreferences {
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
     private final ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(new TreeSet<>(Comparator.comparing(ExternalFileType::getName)));
     private final BooleanProperty createBackup = new SimpleBooleanProperty();
-    private final ObjectProperty<Path> backupDiretory = new SimpleObjectProperty<>();
+    private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
 
-    public FilePreferences(String user,
+    public FilePreferences(String userAndHost,
                            String mainFileDirectory,
                            boolean storeFilesRelativeToBibFile,
                            String fileNamePattern,
@@ -48,7 +48,7 @@ public class FilePreferences {
                            Set<ExternalFileType> externalFileTypes,
                            boolean createBackup,
                            Path backupDirectory) {
-        this.user.setValue(user);
+        this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
         this.fileNamePattern.setValue(fileNamePattern);
@@ -58,11 +58,11 @@ public class FilePreferences {
         this.workingDirectory.setValue(workingDirectory);
         this.externalFileTypes.addAll(externalFileTypes);
         this.createBackup.setValue(createBackup);
-        this.backupDiretory.setValue(backupDirectory);
+        this.backupDirectory.setValue(backupDirectory);
     }
 
-    public String getUser() {
-        return user.getValue();
+    public String getUserAndHost() {
+        return userAndHost.getValue();
     }
 
     public Optional<Path> getMainFileDirectory() {
@@ -170,14 +170,14 @@ public class FilePreferences {
     }
 
     public ObjectProperty<Path> backupDirectoryProperty() {
-        return this.backupDiretory;
+        return this.backupDirectory;
     }
 
     public void setBackupDirectory(Path backupPath) {
-        this.backupDiretory.set(backupPath);
+        this.backupDirectory.set(backupPath);
     }
 
     public Path getBackupDirectory() {
-        return this.backupDiretory.getValue();
+        return this.backupDirectory.getValue();
     }
 }

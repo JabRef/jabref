@@ -72,7 +72,6 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
                 dialogService.showErrorDialogAndWait(Localization.lang(
                         "A string with the label '%0' already exists.",
                         cellEvent.getNewValue()));
-
                 cellItem.setLabel(cellEvent.getOldValue());
             } else {
                 cellItem.setLabel(cellEvent.getNewValue());

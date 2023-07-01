@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -18,13 +17,6 @@ import org.jabref.preferences.PreferencesService;
 
 public class ExporterFactory {
 
-    /**
-     * Global variable that is used for counting output entries when exporting:
-     *
-     * @deprecated find a better way to do this
-     */
-    @Deprecated public static int entryNumber;
-
     private final List<Exporter> exporters;
 
     private ExporterFactory(List<Exporter> exporters) {
@@ -32,29 +24,16 @@ public class ExporterFactory {
     }
 
     public static ExporterFactory create(PreferencesService preferencesService,
-                                         BibEntryTypesManager entryTypesManager,
-                                         JournalAbbreviationRepository abbreviationRepository) {
-        return ExporterFactory.create(
-                preferencesService.getCustomExportFormats(abbreviationRepository),
-                preferencesService.getLayoutFormatterPreferences(abbreviationRepository),
-                preferencesService.getExportConfiguration(),
-                preferencesService.getXmpPreferences(),
-                preferencesService.getFieldPreferences(),
-                preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                entryTypesManager);
-    }
-
-    public static ExporterFactory create(List<TemplateExporter> customFormats,
-                                         LayoutFormatterPreferences layoutPreferences,
-                                         SaveConfiguration saveConfiguration,
-                                         XmpPreferences xmpPreferences,
-                                         FieldPreferences fieldPreferences,
-                                         BibDatabaseMode bibDatabaseMode,
                                          BibEntryTypesManager entryTypesManager) {
 
-        List<Exporter> exporters = new ArrayList<>();
+        List<TemplateExporter> customFormats = preferencesService.getExportPreferences().getCustomExporters();
+        LayoutFormatterPreferences layoutPreferences = preferencesService.getLayoutFormatterPreferences();
+        SaveConfiguration saveConfiguration = preferencesService.getExportConfiguration();
+        XmpPreferences xmpPreferences = preferencesService.getXmpPreferences();
+        FieldPreferences fieldPreferences = preferencesService.getFieldPreferences();
+        BibDatabaseMode bibDatabaseMode = preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode();
 
-        // Initialize build-in exporters
+        List<Exporter> exporters = new ArrayList<>();
 
         // Initialize build-in exporters
         exporters.add(new TemplateExporter("HTML", "html", "html", null, StandardFileType.HTML, layoutPreferences, saveConfiguration));

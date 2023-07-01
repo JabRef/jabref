@@ -55,11 +55,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
 
-        setFields(entryEditorPreferences.getEntryEditorTabList());
+        setFields(entryEditorPreferences.getEntryEditorTabs());
     }
 
     public void resetToDefaults() {
-        setFields(preferencesService.getDefaultTabNamesAndFields());
+        setFields(preferencesService.getEntryEditorPreferences().getDefaultEntryEditorTabs());
     }
 
     private void setFields(Map<String, Set<Field>> tabNamesAndFields) {

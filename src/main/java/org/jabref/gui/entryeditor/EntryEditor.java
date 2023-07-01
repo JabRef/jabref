@@ -260,7 +260,7 @@ public class EntryEditor extends BorderPane {
 
         // General fields from preferences
         // First, remove all tabs that are already handled above or below; except for the source tab (which has different titles for BibTeX and BibLaTeX mode)
-        Map<String, Set<Field>> entryEditorTabList = new HashMap<>(entryEditorPreferences.getEntryEditorTabList());
+        Map<String, Set<Field>> entryEditorTabList = new HashMap<>(entryEditorPreferences.getEntryEditorTabs());
         entryEditorTabList.remove(PreviewTab.NAME);
         entryEditorTabList.remove(RequiredFieldsTab.NAME);
         entryEditorTabList.remove(OptionalFieldsTab.NAME);

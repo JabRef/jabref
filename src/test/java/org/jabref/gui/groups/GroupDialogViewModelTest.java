@@ -46,7 +46,7 @@ class GroupDialogViewModelTest {
         when(preferencesService.getBibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
-        when(preferencesService.getFilePreferences().getUser()).thenReturn("MockedUser");
+        when(preferencesService.getFilePreferences().getUserAndHost()).thenReturn("MockedUser-mockedhost");
         when(preferencesService.getGroupsPreferences()).thenReturn(groupsPreferences);
 
         bibDatabaseContext.setMetaData(metaData);

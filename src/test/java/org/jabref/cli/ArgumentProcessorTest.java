@@ -39,7 +39,7 @@ class ArgumentProcessorTest {
 
     @BeforeEach()
     void setup() {
-        when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         when(preferencesService.getSearchPreferences()).thenReturn(
                 new SearchPreferences(null, EnumSet.noneOf(SearchRules.SearchFlags.class), false)
         );

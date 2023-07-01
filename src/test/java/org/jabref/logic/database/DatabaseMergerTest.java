@@ -10,7 +10,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -146,10 +145,10 @@ class DatabaseMergerTest {
     void mergeMetaDataWithoutAllEntriesGroup() {
         MetaData target = new MetaData();
         target.addContentSelector(new ContentSelector(StandardField.AUTHOR, List.of("Test Author")));
-        GroupTreeNode targetRootGroup = new GroupTreeNode(new TestGroup("targetGroup", GroupHierarchyType.INDEPENDENT));
+        GroupTreeNode targetRootGroup = new GroupTreeNode(new ExplicitGroup("targetGroup", GroupHierarchyType.INDEPENDENT, ','));
         target.setGroups(targetRootGroup);
         MetaData other = new MetaData();
-        GroupTreeNode otherRootGroup = new GroupTreeNode(new TestGroup("otherGroup", GroupHierarchyType.INCLUDING));
+        GroupTreeNode otherRootGroup = new GroupTreeNode(new ExplicitGroup("otherGroup", GroupHierarchyType.INCLUDING, ','));
         other.setGroups(otherRootGroup);
         other.addContentSelector(new ContentSelector(StandardField.TITLE, List.of("Test Title")));
         List<ContentSelector> expectedContentSelectors =
@@ -189,27 +188,5 @@ class DatabaseMergerTest {
         assertEquals(target.getGroups().get().getChildren().size(), 1);
         assertEquals(expectedImportedGroupNode, target.getGroups().get().getChildren().get(0));
         assertEquals(expectedContentSelectors, target.getContentSelectorList());
-    }
-
-    static class TestGroup extends AbstractGroup {
-
-        protected TestGroup(String name, GroupHierarchyType context) {
-            super(name, context);
-        }
-
-        @Override
-        public boolean contains(BibEntry entry) {
-            return false;
-        }
-
-        @Override
-        public boolean isDynamic() {
-            return false;
-        }
-
-        @Override
-        public AbstractGroup deepCopy() {
-            return null;
-        }
     }
 }
