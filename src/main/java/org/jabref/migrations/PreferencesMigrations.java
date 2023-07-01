@@ -20,6 +20,7 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
@@ -28,6 +29,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.github.javakeyring.Keyring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,7 @@ public class PreferencesMigrations {
         upgradeColumnPreferences(preferences);
         restoreVariablesForBackwardCompatibility(preferences);
         upgradeCleanups(preferences);
+        moveApiKeysToKeyring(preferences);
     }
 
     /**
@@ -514,6 +517,28 @@ public class PreferencesMigrations {
                     : Boolean.FALSE);
 
             prefs.put(V6_0_CLEANUP_FIELD_FORMATTERS, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
+        }
+    }
+
+    static void moveApiKeysToKeyring(JabRefPreferences preferences) {
+        final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+        final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+
+        List<String> names = preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES);
+        List<String> keys = preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS);
+
+        if (keys.size() > 0 && names.size() == keys.size()) {
+            try (final Keyring keyring = Keyring.create()) {
+                for (int i = 0; i < names.size(); i++) {
+                    keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
+                            keys.get(i),
+                            preferences.getInternalPreferences().getUserAndHost())
+                            .encrypt());
+                }
+                preferences.deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+            } catch (Exception ex) {
+                LOGGER.error("Unable to open key store", ex);
+            }
         }
     }
 }

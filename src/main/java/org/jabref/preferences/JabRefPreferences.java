@@ -94,6 +94,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -113,6 +114,8 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
+import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,10 +217,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String BASE_DOI_URI = "baseDOIURI";
     public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
-
-    public static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
-    public static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
-    public static final String FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
 
     public static final String USE_OWNER = "useOwner";
     public static final String DEFAULT_OWNER = "defaultOwner";
@@ -356,9 +355,14 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROXY_PORT = "proxyPort";
     private static final String PROXY_HOSTNAME = "proxyHostname";
     private static final String PROXY_USE = "useProxy";
+    private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
     private static final String PROXY_USERNAME = "proxyUsername";
     private static final String PROXY_PASSWORD = "proxyPassword";
-    private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
+    private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
+
+    // Web search
+    private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+    private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
 
     // SSL
     private static final String TRUSTSTORE_PATH = "truststorePath";
@@ -537,6 +541,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_USE_AUTHENTICATION, Boolean.FALSE);
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
+        defaults.put(PROXY_PERSIST_PASSWORD, Boolean.FALSE);
 
         // SSL
         defaults.put(TRUSTSTORE_PATH, OS.getNativeDesktop()
@@ -650,7 +655,6 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
-        defaults.put(FETCHER_CUSTOM_KEYS, "");
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -978,6 +982,7 @@ public class JabRefPreferences implements PreferencesService {
         clearAllBibEntryTypes();
         clearCitationKeyPatterns();
         clearTruststoreFromCustomCertificates();
+        clearCustomFetcherKeys();
         prefs.clear();
         new SharedDatabasePreferences().clear();
     }
@@ -1526,15 +1531,60 @@ public class JabRefPreferences implements PreferencesService {
                 get(PROXY_PORT),
                 getBoolean(PROXY_USE_AUTHENTICATION),
                 get(PROXY_USERNAME),
-                (String) defaults.get(PROXY_PASSWORD));
+                getProxyPassword(),
+                getBoolean(PROXY_PERSIST_PASSWORD));
 
         EasyBind.listen(proxyPreferences.useProxyProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE, newValue));
         EasyBind.listen(proxyPreferences.hostnameProperty(), (obs, oldValue, newValue) -> put(PROXY_HOSTNAME, newValue));
         EasyBind.listen(proxyPreferences.portProperty(), (obs, oldValue, newValue) -> put(PROXY_PORT, newValue));
         EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
         EasyBind.listen(proxyPreferences.usernameProperty(), (obs, oldValue, newValue) -> put(PROXY_USERNAME, newValue));
+        EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> setProxyPassword(newValue));
+        EasyBind.listen(proxyPreferences.persistPasswordProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(PROXY_PERSIST_PASSWORD, newValue);
+            if (!newValue) {
+                try (final Keyring keyring = Keyring.create()) {
+                    keyring.deletePassword("org.jabref", "proxy");
+                } catch (Exception ex) {
+                    LOGGER.warn("Unable to remove proxy credentials");
+                }
+            }
+        });
 
         return proxyPreferences;
+    }
+
+    private String getProxyPassword() {
+        if (getBoolean(PROXY_PERSIST_PASSWORD)) {
+            try (final Keyring keyring = Keyring.create()) {
+                return new Password(
+                        keyring.getPassword("org.jabref", "proxy"),
+                        getInternalPreferences().getUserAndHost())
+                        .decrypt();
+            } catch (PasswordAccessException ex) {
+                LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
+            } catch (Exception ex) {
+                LOGGER.warn("JabRef could not open the key store");
+            }
+        }
+        return (String) defaults.get(PROXY_PASSWORD);
+    }
+
+    private void setProxyPassword(String password) {
+        if (getProxyPreferences().shouldPersistPassword()) {
+            try (final Keyring keyring = Keyring.create()) {
+                if (StringUtil.isBlank(password)) {
+                    keyring.deletePassword("org.jabref", "proxy");
+                } else {
+                    keyring.setPassword("org.jabref", "proxy", new Password(
+                            password.trim(),
+                            getInternalPreferences().getUserAndHost())
+                            .encrypt());
+                }
+            } catch (Exception ex) {
+                LOGGER.warn("Unable to open key store", ex);
+            }
+        }
     }
 
     @Override
@@ -2759,7 +2809,7 @@ public class JabRefPreferences implements PreferencesService {
 
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
-        List<String> keys = getStringList(FETCHER_CUSTOM_KEYS);
+        List<String> keys = getFetcherKeysFromKeyring(names);
 
         for (int i = 0; i < names.size(); i++) {
             fetcherApiKeys.add(new FetcherApiKey(
@@ -2770,6 +2820,28 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         return fetcherApiKeys;
+    }
+
+    private List<String> getFetcherKeysFromKeyring(List<String> names) {
+        List<String> keys = new ArrayList<>();
+
+        try (final Keyring keyring = Keyring.create()) {
+            for (String fetcher : names) {
+                try {
+                    keys.add(new Password(
+                            keyring.getPassword("org.jabref.customapikeys", fetcher),
+                            getInternalPreferences().getUserAndHost())
+                            .decrypt());
+                } catch (PasswordAccessException ex) {
+                    LOGGER.warn("No api key stored for {} fetcher", fetcher);
+                    keys.add("");
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("JabRef could not open the key store");
+        }
+
+        return keys;
     }
 
     private void storeFetcherKeys(Set<FetcherApiKey> fetcherApiKeys) {
@@ -2785,7 +2857,39 @@ public class JabRefPreferences implements PreferencesService {
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
-        putStringList(FETCHER_CUSTOM_KEYS, keys);
+        storeFetcherKeysToKeyring(names, keys);
+    }
+
+    private void storeFetcherKeysToKeyring(List<String> names, List<String> keys) {
+        try (final Keyring keyring = Keyring.create()) {
+            for (int i = 0; i < names.size(); i++) {
+                if (StringUtil.isNullOrEmpty(keys.get(i))) {
+                    try {
+                        keyring.deletePassword("org.jabref.customapikeys", names.get(i));
+                    } catch (PasswordAccessException ex) {
+                        // Already removed
+                    }
+                } else {
+                    keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
+                            keys.get(i),
+                            getInternalPreferences().getUserAndHost())
+                            .encrypt());
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Unable to open key store");
+        }
+    }
+
+    private void clearCustomFetcherKeys() {
+        List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
+        try (final Keyring keyring = Keyring.create()) {
+            for (String name : names) {
+                keyring.deletePassword("org.jabref.customapikeys", name);
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Unable to open key store");
+        }
     }
 
     @Override

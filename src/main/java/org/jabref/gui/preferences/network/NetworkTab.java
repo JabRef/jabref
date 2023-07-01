@@ -50,8 +50,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TextField proxyUsername;
     @FXML private Label proxyPasswordLabel;
     @FXML private CustomPasswordField proxyPassword;
-    @FXML private Label proxyAttentionLabel;
     @FXML private Button checkConnectionButton;
+    @FXML private CheckBox proxyPersistPassword;
 
     @FXML private TableView<CustomCertificateViewModel> customCertificatesTable;
     @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
@@ -105,7 +105,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         proxyPasswordLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
         proxyPassword.textProperty().bindBidirectional(viewModel.proxyPasswordProperty());
         proxyPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
-        proxyAttentionLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
+        proxyPersistPassword.selectedProperty().bindBidirectional(viewModel.proxyPersistPasswordProperty());
+        proxyPersistPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
 
         proxyPassword.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_PRESSED, this::proxyPasswordReveal);

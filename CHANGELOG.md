@@ -36,6 +36,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We enabled the user to change the name of a field in a custom entry type by double-clicking on it. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We integrated two mail actions ("As Email" and "To Kindle") under a new "Send" option in the right-click & Tools menus. The Kindle option creates an email targeted to the user's Kindle email, which can be set in preferences under "External programs" [#6186](https://github.com/JabRef/jabref/issues/6186)
 - We added an option to clear recent libraries' history. [#10003](https://github.com/JabRef/jabref/issues/10003)
+- We added an option to encrypt and remember the proxy password. [#8055](https://github.com/JabRef/jabref/issues/8055)[#10044](https://github.com/JabRef/jabref/issues/10044)
 
 ### Changed
 
@@ -72,6 +73,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the error message when no terminal was found [#9607](https://github.com/JabRef/jabref/issues/9607)
 - In the context of the "systematic literature functionality", we changed the name "database" to "catalog" to use a separate term for online catalogs in comparison to SQL databases. [#9951](https://github.com/JabRef/jabref/pull/9951)
 - We now show more fields (including Special Fields) in the dropdown selection for "Save sort order" in the library properties and for "Export sort order" in the preferences. [#10010](https://github.com/JabRef/jabref/issues/10010)
+- We now encrypt and store the custom API keys in the OS native credential store. [#10044](https://github.com/JabRef/jabref/issues/10044)
 
 ### Fixed
 
@@ -83,7 +85,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where custom field in the custom entry types could not be set to mulitline. [#9609](https://github.com/JabRef/jabref/issues/9609)
 - We fixed an issue where the Office XML exporter did not resolve BibTeX-Strings when exporting entries. [forum#3741](https://discourse.jabref.org/t/exporting-bibtex-constant-strings-to-ms-office-2007-xml/3741)
 - We fixed an issue where the Merge Entries Toolbar configuration was not saved after hitting 'Merge Entries' button. [#9091](https://github.com/JabRef/jabref/issues/9091)
-- We fixed an issue where the password is saved locally if user wants to use proxy with authentication. [#8055](https://github.com/JabRef/jabref/issues/8055)
+- We fixed an issue where the password is stored in clear text if the user wants to use a proxy with authentication. [#8055](https://github.com/JabRef/jabref/issues/8055)
 - JabRef is now more relaxed when parsing field content: In case a field content ended with `\`, the combination `\}` was treated as plain `}`. [#9668](https://github.com/JabRef/jabref/issues/9668)
 - We resolved an issue that cut off the number of group entries when it exceeded four digits. [#8797](https://github.com/JabRef/jabref/issues/8797)
 - We fixed the issue where the size of the global search window was not retained after closing. [#9362](https://github.com/JabRef/jabref/issues/9362)

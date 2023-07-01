@@ -99,6 +99,8 @@ open module org.jabref {
 
     requires com.h2database.mvstore;
 
+    requires java.keyring;
+
     requires org.jooq.jool;
 
     // fulltext search
