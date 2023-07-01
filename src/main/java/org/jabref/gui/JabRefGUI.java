@@ -26,13 +26,13 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.WebViewStore;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import impl.org.controlsfx.skin.DecorationPane;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +83,7 @@ public class JabRefGUI {
         }
 
         if (preferencesService.getProxyPreferences().shouldPersistPassword()
-                && StringUtils.isNotBlank(preferencesService.getProxyPreferences().getPassword())) {
+                && StringUtil.isNotBlank(preferencesService.getProxyPreferences().getPassword())) {
             ProxyRegisterer.register(preferencesService.getProxyPreferences());
             return;
         }
