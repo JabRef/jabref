@@ -12,9 +12,14 @@
     <category citation-format="note"/>
     <category field="humanities"/>
     <summary>Style as prescribed in Diepeveen-Jansen, M./J. Kaarsemaker, 2004: Publicatiewijzer voor de archeologie, Amsterdam (Themata 1).</summary>
-    <updated>2022-11-28T02:10:01+00:00</updated>
+    <updated>2023-06-16T14:26:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="nl">
+    <terms>
+      <term name="et-al">et al.</term>
+    </terms>
+  </locale>
   <macro name="container-contributors">
     <choose>
       <if type="chapter paper-conference" match="any">
@@ -33,7 +38,7 @@
     <choose>
       <if type="chapter paper-conference" match="none">
         <names variable="translator" delimiter=", " prefix=" (" suffix=")">
-          <name and="symbol" initialize-with="." delimiter=", "/>
+          <name initialize-with="." delimiter=", "/>
           <label form="short" prefix=", " text-case="capitalize-first"/>
           <substitute>
             <names variable="editor"/>
@@ -65,7 +70,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="text">
+      <name form="short" delimiter="/">
         <name-part name="family" text-case="capitalize-first"/>
       </name>
       <substitute>

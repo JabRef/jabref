@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
+  <info>
+    <title>Turcica</title>
+    <id>http://www.zotero.org/styles/turcica</id>
+    <link href="http://www.zotero.org/styles/turcica" rel="self"/>
+    <link href="https://www.peeters-leuven.be/pdf/Turcica_Instructions_FR.pdf" rel="documentation"/>
+    <author>
+      <name>Lucas Equinoxe</name>
+      <email>lucas.equinoxe@college-de-france.fr</email>
+    </author>
+    <category citation-format="note"/>
+    <category field="humanities"/>
+    <issn>0082-6847</issn>
+    <eissn>1783-1822</eissn>
+    <updated>2022-09-23T07:46:36+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <macro name="short-author">
+    <names variable="author" suffix=", ">
+      <name form="short" sort-separator=","/>
+    </names>
+  </macro>
+  <macro name="author">
+    <names variable="author" suffix=", ">
+      <name name-as-sort-order="all" sort-separator=" ">
+        <name-part name="given" prefix="(" suffix=")"/>
+      </name>
+    </names>
+  </macro>
+  <macro name="locators">
+    <group prefix=", " delimiter=" ">
+      <label variable="locator" form="short"/>
+      <text variable="locator"/>
+    </group>
+  </macro>
+  <macro name="collection">
+    <group prefix="(" suffix=") ">
+      <text variable="collection-title"/>
+      <text variable="collection-number" prefix=", "/>
+    </group>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="book" match="any">
+        <text variable="title" form="short" font-style="italic"/>
+      </if>
+      <else>
+        <text variable="title" quotes="true"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="title-short">
+    <choose>
+      <if type="book" match="any">
+        <text variable="title" form="short" font-style="italic"/>
+      </if>
+      <else>
+        <text variable="title" form="short" quotes="true"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="year-date">
+    <date variable="issued" form="numeric" date-parts="year"/>
+  </macro>
+  <macro name="translator">
+    <names variable="translator">
+      <name name-as-sort-order="all" sort-separator=" ">
+        <name-part name="given" prefix="(" suffix=")"/>
+      </name>
+      <label form="short" prefix=" "/>
+    </names>
+  </macro>
+  <macro name="page-bibliography">
+    <choose>
+      <if type="article article-journal article-magazine article-newspaper chapter" match="any">
+        <text variable="page" prefix="p. "/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="Title-bibliography">
+    <choose>
+      <if type="chapter" match="all">
+        <group>
+          <text term="in" font-style="italic" prefix=", " suffix=" "/>
+          <group>
+            <names variable="editor">
+              <name name-as-sort-order="all" sort-separator=" ">
+                <name-part name="given" prefix="(" suffix=")"/>
+              </name>
+              <label form="short" prefix=" " suffix=", "/>
+            </names>
+            <group>
+              <text variable="container-title" font-style="italic" suffix=", "/>
+              <text variable="publisher-place" suffix=", "/>
+              <text variable="publisher" suffix=", "/>
+            </group>
+          </group>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <macro name="publisher-place">
+    <choose>
+      <if type="book" match="any">
+        <text variable="publisher-place"/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="publisher">
+    <choose>
+      <if type="book" match="any">
+        <text variable="publisher" form="short" suffix=", "/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="container-title">
+    <choose>
+      <if type="article article-journal article-magazine article-newspaper" match="any">
+        <text variable="container-title" font-style="italic" prefix=", " suffix=" "/>
+        <text variable="volume" form="short" suffix=" "/>
+        <date date-parts="year" form="text" variable="issued" prefix="(" suffix="), "/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="URL">
+    <choose>
+      <if match="any" variable="URL">
+        <text variable="URL" prefix=" URL : " suffix="."/>
+      </if>
+      <else-if match="none" variable="URL">
+        <text variable="DOI" prefix=" DOI : " suffix="."/>
+      </else-if>
+    </choose>
+  </macro>
+  <citation>
+    <layout delimiter="; " suffix=".">
+      <text macro="short-author"/>
+      <text macro="title-short"/>
+      <text macro="locators"/>
+    </layout>
+  </citation>
+  <bibliography>
+    <sort>
+      <key macro="author"/>
+      <key variable="issued"/>
+    </sort>
+    <layout>
+      <text macro="author"/>
+      <text macro="title"/>
+      <text macro="container-title"/>
+      <text macro="Title-bibliography"/>
+      <text macro="translator"/>
+      <text macro="publisher-place" suffix=", "/>
+      <text macro="publisher"/>
+      <text macro="year-date"/>
+      <text macro="collection"/>
+      <text macro="page-bibliography" suffix="."/>
+      <text macro="URL"/>
+    </layout>
+  </bibliography>
+</style>
