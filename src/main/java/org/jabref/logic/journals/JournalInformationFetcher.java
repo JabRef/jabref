@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import javafx.util.Pair;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.l10n.Localization;
 
 import kong.unirest.HttpResponse;
@@ -19,18 +20,26 @@ import kong.unirest.Unirest;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Fetches journal information from the JabRef Web API
  */
-public class JournalInformationFetcher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);
+public class JournalInformationFetcher implements WebFetcher {
+    public static final String NAME = "Journal Information";
     private static final String API_URL = "https://mango-pebble-0224c3803-2067.westeurope.1.azurestaticapps.net/api";
     private static final Pattern QUOTES_BRACKET_PATTERN = Pattern.compile("[\"\\[\\]]");
 
+    @Override
+    public String getName() {
+        return JournalInformationFetcher.NAME;
+    }
+
     public Optional<JournalInformation> getJournalInformation(String issn) throws FetcherException {
+        if (issn.isBlank()) {
+            throw new FetcherException(Localization.lang("ISSN cannot be blank"));
+        }
+        issn = issn.replaceAll("\\s", "");
+
         Optional<JournalInformation> journalInformationOptional = Optional.empty();
 
         JSONObject postData = buildPostData(issn);
