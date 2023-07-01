@@ -536,9 +536,8 @@ public class PreferencesMigrations {
                             .encrypt());
                 }
                 preferences.deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
-            } catch (
-                    Exception ex) {
-                LOGGER.error("Unable to open key store");
+            } catch (Exception ex) {
+                LOGGER.error("Unable to open key store", ex);
             }
         }
     }

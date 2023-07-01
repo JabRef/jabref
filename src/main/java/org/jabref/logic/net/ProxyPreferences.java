@@ -70,7 +70,7 @@ public class ProxyPreferences {
     }
 
     public final boolean shouldUseAuthentication() {
-        return useAuthentication.getValue();
+        return useAuthentication.get();
     }
 
     public BooleanProperty useAuthenticationProperty() {
@@ -106,7 +106,7 @@ public class ProxyPreferences {
     }
 
     public boolean shouldPersistPassword() {
-        return persistPassword.getValue();
+        return persistPassword.get();
     }
 
     public BooleanProperty persistPasswordProperty() {

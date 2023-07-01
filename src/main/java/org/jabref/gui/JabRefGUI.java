@@ -93,7 +93,7 @@ public class JabRefGUI {
                 preferencesService.getProxyPreferences().setPassword(password.get());
                 ProxyRegisterer.register(preferencesService.getProxyPreferences());
             } else {
-                    LOGGER.warn("No proxy password specified");
+                LOGGER.warn("No proxy password specified");
             }
             return;
         }
@@ -101,7 +101,7 @@ public class JabRefGUI {
         try (final Keyring keyring = Keyring.create()) {
             String password = new Password(
                     keyring.getPassword("org.jabref", "proxy"),
-                    preferencesService.getProxyPreferences().getUsername())
+                    preferencesService.getInternalPreferences().getUserAndHost())
                     .decrypt();
             preferencesService.getProxyPreferences().setPassword(password);
             ProxyRegisterer.register(preferencesService.getProxyPreferences());

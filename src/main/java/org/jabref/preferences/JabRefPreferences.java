@@ -1547,11 +1547,11 @@ public class JabRefPreferences implements PreferencesService {
                     } else {
                         keyring.setPassword("org.jabref", "proxy", new Password(
                                         newValue.trim(),
-                                        proxyPreferences.getUsername())
+                                        getInternalPreferences().getUserAndHost())
                                         .encrypt());
                     }
                 } catch (Exception ex) {
-                    LOGGER.warn("Unable to open key store");
+                    LOGGER.warn("Unable to open key store", ex);
                 }
             }
         });
