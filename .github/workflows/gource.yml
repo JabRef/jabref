@@ -78,8 +78,8 @@ jobs:
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
         with:
-          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/files.jabref.org/www/gource/ && rsync"
+          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial
           options: ''
           ssh_options: '-p 9922'
           src: 'gource-videos/'
-          dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+          dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/gource/
