@@ -82,4 +82,4 @@ jobs:
           options: ''
           ssh_options: '-p 9922'
           src: 'gource-videos/'
-          dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/gource/
+          dest: jrrsync@build-upload.jabref.org:/var/www/files.jabref.org/www/gource/
