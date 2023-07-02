@@ -6,7 +6,7 @@ on:
       - gource
       - fix-gource
   schedule:
-    - cron:  '15 3 1 1,4,7,10 *'
+    - cron:  '15 3 5 * *'
   workflow_dispatch:
 
 concurrency:
