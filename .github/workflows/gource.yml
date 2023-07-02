@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Gource
-          path: ./gource-videos/
+          path: gource-videos/
           retention-days: 80
       - name: Check secrets presence
         id: checksecrets
@@ -81,5 +81,5 @@ jobs:
           flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/files.jabref.org/www/gource/ && rsync"
           options: ''
           ssh_options: '-p 9922'
-          src: 'build/distribution/'
+          src: 'gource-videos/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
