@@ -48,7 +48,6 @@ jobs:
           gource_file_filter: buildres/csl
       - name: 'Store video'
         run: |
-          mkdir gource-videos
           mv ./gource/gource.mp4 ./gource-videos/jabref-v5.9.mp4
       - name: 'Complete development history'
         uses: nbprojekt/gource-action@v1
