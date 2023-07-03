@@ -13,11 +13,11 @@ jobs:
         name: automerge
         uses: "pascalgn/automerge-action@v0.15.6"
         env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           MERGE_METHOD: "squash"
           MERGE_LABELS: "dependencies"
           MERGE_REQUIRED_APPROVALS: 0
           MERGE_DELETE_BRANCH: true
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          UPDATE_RETRIES: 10
+          MERGE_RETRIES: 10
           # Our deployment runs take a long time to complete; check each 11 minutes
-          UPDATE_RETRY_SLEEP: 660000
+          MERGE_RETRY_SLEEP: 660000
