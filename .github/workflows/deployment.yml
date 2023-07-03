@@ -268,10 +268,12 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install GitVersion
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: gittools/actions/gitversion/setup@v0.10.2
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
       - name: Get macOS binaries
