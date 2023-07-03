@@ -20,4 +20,4 @@ jobs:
           MERGE_DELETE_BRANCH: true
           MERGE_RETRIES: 10
           # Our deployment runs take a long time to complete; check each 11 minutes
-          MERGE_RETRY_SLEEP: 660000
+          # MERGE_RETRY_SLEEP: 660000
