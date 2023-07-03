@@ -35,4 +35,4 @@ jobs:
         with:
           comment_tag: download-link
           message: The PR is integrated in the main branch. Head to <https://builds.jabref.org/main/> for the latest build.
-          mode: replace
+          mode: upsert
