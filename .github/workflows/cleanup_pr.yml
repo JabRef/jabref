@@ -34,5 +34,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           comment_tag: download-link
-          message: to-be-deleted
-          mode: delete
+          message: The PR is integrated in the main branch. Head to <https://builds.jabref.org/main/> for the latest build.
+          mode: replace
