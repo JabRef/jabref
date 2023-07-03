@@ -1,29 +1,28 @@
-name: automerge
+name: Automerge Pull Requests
 on:
   pull_request:
     types:
       - opened
+      - synchronize
       - reopened
-
 jobs:
   automerge:
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'dependencies')
     steps:
-      - name: Require-reviewers
-        uses: travelperk/label-requires-reviews-action@1.3.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Wait for status checks
+        uses: "WyriHaximus/github-action-wait-for-status@v1.8.0"
         with:
-          rules_yaml: |
-            dependencies: 0
-      - name: automerge
-        uses: "pascalgn/automerge-action@v0.15.6"
+          ignoreActions: Automerge Pull Requests
+          checkInterval: 333
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Merge pull requests
+        uses: pascalgn/automerge-action@v0.15.6
+        if: steps.waitforstatuschecks.outputs.status == 'success'
+        env:
           MERGE_METHOD: "squash"
-          MERGE_LABELS: "dependencies"
-          MERGE_REQUIRED_APPROVALS: 0
-          MERGE_DELETE_BRANCH: true
-          MERGE_RETRIES: 10
-          # Our deployment runs take a long time to complete; check each 11 minutes
-          MERGE_RETRY_SLEEP: 660000
+          MERGE_LABELS: ""
+          MERGE_FORKS: false
+          # We need a token from a maintainer who can merge even if not all requirements (e.g., reviews) are met
+          GITHUB_TOKEN: "${{ secrets.GH_TOKEN_COMMENT_ON_PR }}"
