@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: 'Development history of current build'
-        uses: nbprojekt/gource-action@v1
+        uses: BoundfoxStudios/action-gource@v2
         with:
           gource_title: 'JabRef v5.10 (in development) | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
@@ -36,7 +36,7 @@ jobs:
           mkdir gource-videos
           mv ./gource/gource.mp4 ./gource-videos/jabref-v5.10-dev.mp4
       - name: 'Development history of last release'
-        uses: nbprojekt/gource-action@v1
+        uses: BoundfoxStudios/action-gource@v2
         with:
           gource_title: 'JabRef v5.9 | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
@@ -50,7 +50,7 @@ jobs:
         run: |
           mv ./gource/gource.mp4 ./gource-videos/jabref-v5.9.mp4
       - name: 'Complete development history'
-        uses: nbprojekt/gource-action@v1
+        uses: BoundfoxStudios/action-gource@v2
         with:
           gource_title: 'JabRef | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
