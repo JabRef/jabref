@@ -6,6 +6,8 @@ on:
       - synchronize
       - reopened
       - labeled
+  workflow_dispatch:
+
 jobs:
   automerge:
     name: Automerge Dependency Updates
