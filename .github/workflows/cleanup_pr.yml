@@ -29,3 +29,9 @@ jobs:
           port: 9922
           username: jrrsync
           key: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Remove PR comment
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          comment_tag: download-link
+          mode: delete
