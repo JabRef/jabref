@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<DialogPane prefWidth="400.0" prefHeight="200.0"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.gdpr.GdprDialogView">
+    <header>
+        <HBox styleClass="info-section" spacing="4.0">
+            <Label>
+                <graphic>
+                    <JabRefIconView glyph="PRIVACY"/>
+                </graphic>
+            </Label>
+            <VBox>
+                <Label text="%JabRef enhances the user experience with remote services. Please Opt-In to the following services." wrapText="true"/>
+                <Hyperlink fx:id="moreInformation" text="%See also the privacy policy (external link)" />
+            </VBox>
+    </HBox>
+    </header>
+    <content>
+        <VBox spacing="4.0">
+            <CheckBox fx:id="version" text="Updates check"/>
+            <CheckBox fx:id="webSearch" text="Web search for references" />
+            <CheckBox fx:id="pdfMetaDataParser" text="PDF Metadata parser (Grobid)" />
+            <CheckBox fx:id="relatedArticles" text="Related articles suggestions (Mr. Dlib)" />
+        </VBox>
+    </content>
+    <ButtonType buttonData="APPLY" fx:id="btnApply" text="Apply selected"/>
+    <ButtonType buttonData="OK_DONE" fx:id="btnApplyAll" text="Apply all"/>
+</DialogPane>

@@ -1,0 +1,8 @@
+.info-section {
+    -fx-padding: 10px;
+    -fx-background-color: -fx-background;
+}
+
+.info-section .ikonli-font-icon {
+    -fx-font-size: 36.0;
+}

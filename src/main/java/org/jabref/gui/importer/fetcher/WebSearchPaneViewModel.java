@@ -17,6 +17,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.gdpr.GdprDialogView;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.ParserResult;
@@ -133,6 +134,15 @@ public class WebSearchPaneViewModel {
     }
 
     public void search() {
+        if (!preferencesService.getImporterPreferences().areImporterEnabled()) {
+            dialogService.showCustomDialogAndWait(new GdprDialogView());
+
+            if (!preferencesService.getImporterPreferences().areImporterEnabled()) {
+                dialogService.notify(Localization.lang("Web search disabled"));
+                return;
+            }
+        }
+
         String query = getQuery().trim();
         if (StringUtil.isBlank(query)) {
             dialogService.notify(Localization.lang("Please enter a search string"));

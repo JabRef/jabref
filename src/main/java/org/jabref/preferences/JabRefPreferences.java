@@ -262,6 +262,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
     public static final String SEARCH_WINDOW_HEIGHT = "searchWindowHeight";
     public static final String SEARCH_WINDOW_WIDTH = "searchWindowWidth";
+
+    public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
     public static final String GROBID_OPT_OUT = "grobidOptOut";
@@ -330,6 +332,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
+    public static final String VERSION_CHECK_ENABLED = "versionCheck";
     // KeyBindings - keys - public because needed for pref migration
     public static final String BINDINGS = "bindings";
 
@@ -495,7 +498,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);
         defaults.put(SEARCH_WINDOW_WIDTH, 600.0);
 
-        defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
+        defaults.put(IMPORTERS_ENABLED, false);
+        defaults.put(GENERATE_KEY_ON_IMPORT, true);
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
         defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
@@ -738,6 +742,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // version check defaults
         defaults.put(VERSION_IGNORED_UPDATE, "");
+        defaults.put(VERSION_CHECK_ENABLED, false);
 
         // preview
         defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
@@ -1411,7 +1416,6 @@ public class JabRefPreferences implements PreferencesService {
                 getDefaultEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM),
                 getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(ACCEPT_RECOMMENDATIONS),
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
@@ -1423,7 +1427,6 @@ public class JabRefPreferences implements PreferencesService {
         // defaultEntryEditorTabs are read-only
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
         EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.isMrdlibAcceptedProperty(), (obs, oldValue, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
         EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
         EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (obs, oldValue, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
@@ -2009,12 +2012,15 @@ public class JabRefPreferences implements PreferencesService {
 
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
+                getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
                 getUserAndHost(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
                 (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
+        EasyBind.listen(internalPreferences.versionCheckEnabledProperty(),
+                (obs, oldValue, newValue) -> putBoolean(VERSION_CHECK_ENABLED, newValue));
         EasyBind.listen(internalPreferences.lastPreferencesExportPathProperty(),
                 (obs, oldValue, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()));
         // user is a static value, should only be changed for debugging
@@ -2759,6 +2765,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         importerPreferences = new ImporterPreferences(
+                getBoolean(IMPORTERS_ENABLED),
                 getBoolean(GENERATE_KEY_ON_IMPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
@@ -2766,6 +2773,7 @@ public class JabRefPreferences implements PreferencesService {
                 getFetcherKeys()
         );
 
+        EasyBind.listen(importerPreferences.importerEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
         EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));

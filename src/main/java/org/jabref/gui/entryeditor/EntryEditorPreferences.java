@@ -20,7 +20,6 @@ public class EntryEditorPreferences {
     private final MapProperty<String, Set<Field>> defaultEntryEditorTabList;
     private final BooleanProperty shouldOpenOnNewEntry;
     private final BooleanProperty shouldShowRecommendationsTab;
-    private final BooleanProperty isMrdlibAccepted;
     private final BooleanProperty shouldShowLatexCitationsTab;
     private final BooleanProperty showSourceTabByDefault;
     private final BooleanProperty enableValidation;
@@ -32,7 +31,6 @@ public class EntryEditorPreferences {
                                   Map<String, Set<Field>> defaultEntryEditorTabList,
                                   boolean shouldOpenOnNewEntry,
                                   boolean shouldShowRecommendationsTab,
-                                  boolean isMrdlibAccepted,
                                   boolean shouldShowLatexCitationsTab,
                                   boolean showSourceTabByDefault,
                                   boolean enableValidation,
@@ -44,7 +42,6 @@ public class EntryEditorPreferences {
         this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
         this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
         this.shouldShowRecommendationsTab = new SimpleBooleanProperty(shouldShowRecommendationsTab);
-        this.isMrdlibAccepted = new SimpleBooleanProperty(isMrdlibAccepted);
         this.shouldShowLatexCitationsTab = new SimpleBooleanProperty(shouldShowLatexCitationsTab);
         this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
         this.enableValidation = new SimpleBooleanProperty(enableValidation);
@@ -91,18 +88,6 @@ public class EntryEditorPreferences {
 
     public void setShouldShowRecommendationsTab(boolean shouldShowRecommendationsTab) {
         this.shouldShowRecommendationsTab.set(shouldShowRecommendationsTab);
-    }
-
-    public boolean isMrdlibAccepted() {
-        return isMrdlibAccepted.get();
-    }
-
-    public BooleanProperty isMrdlibAcceptedProperty() {
-        return isMrdlibAccepted;
-    }
-
-    public void setIsMrdlibAccepted(boolean isMrdlibAccepted) {
-        this.isMrdlibAccepted.set(isMrdlibAccepted);
     }
 
     public boolean shouldShowLatexCitationsTab() {

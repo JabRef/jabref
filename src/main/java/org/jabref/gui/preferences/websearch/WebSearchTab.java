@@ -17,6 +17,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
 
+    @FXML private CheckBox enableWebSearch;
     @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
@@ -46,6 +47,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     public void initialize() {
         this.viewModel = new WebSearchTabViewModel(preferencesService, dialogService);
 
+        enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());

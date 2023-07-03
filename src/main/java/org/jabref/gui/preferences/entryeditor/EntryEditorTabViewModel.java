@@ -16,6 +16,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.preferences.MrDlibPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class EntryEditorTabViewModel implements PreferenceTabViewModel {
@@ -34,11 +35,13 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final EntryEditorPreferences entryEditorPreferences;
+    private final MrDlibPreferences mrDlibPreferences;
 
     public EntryEditorTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.mrDlibPreferences = preferencesService.getMrDlibPreferences();
     }
 
     @Override
@@ -49,7 +52,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
         enableRelatedArticlesTabProperty.setValue(entryEditorPreferences.shouldShowRecommendationsTab());
-        acceptRecommendationsProperty.setValue(entryEditorPreferences.isMrdlibAccepted());
+        acceptRecommendationsProperty.setValue(mrDlibPreferences.shouldAcceptRecommendations());
         enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
@@ -80,7 +83,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // entryEditorPreferences.setEntryEditorTabList();
         entryEditorPreferences.setShouldOpenOnNewEntry(openOnNewEntryProperty.getValue());
         entryEditorPreferences.setShouldShowRecommendationsTab(enableRelatedArticlesTabProperty.getValue());
-        entryEditorPreferences.setIsMrdlibAccepted(acceptRecommendationsProperty.getValue());
+        mrDlibPreferences.setAcceptRecommendations(acceptRecommendationsProperty.getValue());
         entryEditorPreferences.setShouldShowLatexCitationsTab(enableLatexCitationsTabProperty.getValue());
         entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
         entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());

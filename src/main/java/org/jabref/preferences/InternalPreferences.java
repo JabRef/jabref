@@ -14,15 +14,18 @@ import org.jabref.logic.util.Version;
 public class InternalPreferences {
 
     private final ObjectProperty<Version> ignoredVersion;
+    private final BooleanProperty versionCheckEnabled;
     private final ObjectProperty<Path> lastPreferencesExportPath;
     private final StringProperty userAndHost;
     private final BooleanProperty memoryStickMode;
 
     public InternalPreferences(Version ignoredVersion,
+                               boolean versionCheck,
                                Path exportPath,
                                String userAndHost,
                                boolean memoryStickMode) {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
+        this.versionCheckEnabled = new SimpleBooleanProperty(versionCheck);
         this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);
         this.userAndHost = new SimpleStringProperty(userAndHost);
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
@@ -38,6 +41,18 @@ public class InternalPreferences {
 
     public void setIgnoredVersion(Version ignoredVersion) {
         this.ignoredVersion.set(ignoredVersion);
+    }
+
+    public boolean isVersionCheckEnabled() {
+        return versionCheckEnabled.get();
+    }
+
+    public BooleanProperty versionCheckEnabledProperty() {
+        return versionCheckEnabled;
+    }
+
+    public void setVersionCheckEnabled(boolean versionCheckEnabled) {
+        this.versionCheckEnabled.set(versionCheckEnabled);
     }
 
     public Path getLastPreferencesExportPath() {

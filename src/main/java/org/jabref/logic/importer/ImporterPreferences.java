@@ -15,22 +15,37 @@ import org.jabref.logic.preferences.FetcherApiKey;
 
 public class ImporterPreferences {
 
+    private final BooleanProperty importerEnabled;
     private final BooleanProperty generateNewKeyOnImport;
     private final BooleanProperty warnAboutDuplicatesOnImport;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final ObservableSet<FetcherApiKey> apiKeys;
     private final ObservableSet<CustomImporter> customImporters;
 
-    public ImporterPreferences(boolean generateNewKeyOnImport,
+    public ImporterPreferences(boolean importerEnabled,
+                               boolean generateNewKeyOnImport,
                                Path importWorkingDirectory,
                                boolean warnAboutDuplicatesOnImport,
                                Set<CustomImporter> customImporters,
                                Set<FetcherApiKey> apiKeys) {
+        this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
         this.customImporters = FXCollections.observableSet(customImporters);
         this.apiKeys = FXCollections.observableSet(apiKeys);
+    }
+
+    public boolean areImporterEnabled() {
+        return importerEnabled.get();
+    }
+
+    public BooleanProperty importerEnabledProperty() {
+        return importerEnabled;
+    }
+
+    public void setImporterEnabled(boolean importerEnabled) {
+        this.importerEnabled.set(importerEnabled);
     }
 
     public boolean isGenerateNewKeyOnImport() {
