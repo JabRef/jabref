@@ -69,7 +69,10 @@ public class JabRefGUI {
 
         openWindow(mainStage);
 
-        mainFrame.getDialogService().showCustomDialogAndWait(new GdprDialogView());
+        if (!preferencesService.getInternalPreferences().isGdprSetup()) {
+            mainFrame.getDialogService().showCustomDialogAndWait(new GdprDialogView());
+            preferencesService.getInternalPreferences().setGdprSetup(true);
+        }
 
         EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {

@@ -351,6 +351,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CYCLE_PREVIEW = "cyclePreview";
     public static final String PREVIEW_AS_TAB = "previewAsTab";
 
+    // General
+    private static final String GDPR_SETUP = "gdprSetup";
+
     // UI
     private static final String FONT_FAMILY = "fontFamily";
 
@@ -519,6 +522,8 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
         defaults.put(BASE_DOI_URI, "https://doi.org");
+
+        defaults.put(GDPR_SETUP, Boolean.FALSE);
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -2011,12 +2016,15 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         internalPreferences = new InternalPreferences(
+                getBoolean(GDPR_SETUP),
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
                 getUserAndHost(),
                 getBoolean(MEMORY_STICK_MODE));
 
+        EasyBind.listen(internalPreferences.gdprSetupProperty(),
+                (obs, oldValue, newValue) -> putBoolean(GDPR_SETUP, newValue));
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
                 (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
         EasyBind.listen(internalPreferences.versionCheckEnabledProperty(),
