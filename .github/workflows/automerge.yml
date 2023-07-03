@@ -9,8 +9,14 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     steps:
-      - id: automerge
-        name: automerge
+      - name: Require-reviewers
+        uses: travelperk/label-requires-reviews-action@v1.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          rules_yaml:
+            dependencies: 0
+      - name: automerge
         uses: "pascalgn/automerge-action@v0.15.6"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -20,4 +26,4 @@ jobs:
           MERGE_DELETE_BRANCH: true
           MERGE_RETRIES: 10
           # Our deployment runs take a long time to complete; check each 11 minutes
-          # MERGE_RETRY_SLEEP: 660000
+          MERGE_RETRY_SLEEP: 660000
