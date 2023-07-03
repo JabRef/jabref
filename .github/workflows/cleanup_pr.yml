@@ -29,3 +29,10 @@ jobs:
           port: 9922
           username: jrrsync
           key: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Update PR comment
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          comment_tag: download-link
+          message: A build of this PR is not available. Head to <https://builds.jabref.org/main/> for the latest build.
+          mode: upsert
