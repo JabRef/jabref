@@ -133,7 +133,7 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:2.1.214'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.74'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.75'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
