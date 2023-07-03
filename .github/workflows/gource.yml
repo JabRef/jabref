@@ -30,7 +30,7 @@ jobs:
           # 5s * 365 / 4 = 7.5min
           gource_seconds_per_day: 3
           gource_start_date: '2023-01-06'
-          gource_file_filter: 'buildres/csl'
+          gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
           mkdir gource-videos
@@ -45,7 +45,7 @@ jobs:
           gource_seconds_per_day: 3
           gource_start_date: '2022-12-18'
           gource_stop_date: '2023-01-06'
-          gource_file_filter: 'buildres/csl'
+          gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
           mv ./gource/gource.mp4 ./gource-videos/jabref-v5.9.mp4
@@ -58,7 +58,7 @@ jobs:
           # 0.01 leads to a 45 second video for the complete history until end of 2020
           # 0.1 leads to a 8 minute video
           gource_seconds_per_day: 0.1
-          gource_file_filter: 'buildres/csl'
+          gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
           mv gource/gource.mp4 gource-videos/jabref-complete.mp4
