@@ -28,7 +28,7 @@ jobs:
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
           # 5s * 365 / 4 = 7.5min
-          gource_seconds_per_day: 3
+          gource_seconds_per_day: 1
           gource_start_date: '2023-01-06'
           gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
@@ -42,7 +42,7 @@ jobs:
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
           # 5s * 365 / 4 = 7.5min
-          gource_seconds_per_day: 3
+          gource_seconds_per_day: 2
           gource_start_date: '2022-12-18'
           gource_stop_date: '2023-01-06'
           gource_file_filter: 'buildres/csl|\.csl'
