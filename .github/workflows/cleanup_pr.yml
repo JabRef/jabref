@@ -34,5 +34,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           comment_tag: download-link
-          message: The PR is integrated in the main branch. Head to <https://builds.jabref.org/main/> for the latest build.
+          message: A build of this PR is not available. Head to <https://builds.jabref.org/main/> for the latest build.
           mode: upsert
