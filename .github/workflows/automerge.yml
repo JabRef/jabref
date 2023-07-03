@@ -28,4 +28,6 @@ jobs:
         env:
           MERGE_METHOD: "squash"
           MERGE_LABELS: "dependencies"
+          MERGE_REQUIRED_APPROVALS: 0
+          MERGE_DELETE_BRANCH: true
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
