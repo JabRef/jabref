@@ -31,7 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the option to unprotect a text selection, which strips all pairs of curly braces away. [#9950](https://github.com/JabRef/jabref/issues/9950)
 - We added drag and drop events for field 'Groups' in entry editor panel. [#569](https://github.com/koppor/jabref/issues/569)
 - We added support for parsing MathML in the Medline importer. [#4273](https://github.com/JabRef/jabref/issues/4273)
-- We added the ability to search for a DOI directly from 'Web Search'. [#9674](https://github.com/JabRef/jabref/issues/9674)
+- We added the ability to search for an identifier (DOI, ISBN, ArXiv ID) directly from 'Web Search'. [#7575](https://github.com/JabRef/jabref/issues/7575) [#9674](https://github.com/JabRef/jabref/issues/9674)
 - We added a cleanup activity that identifies a URL or a last-visited-date in the `note` field and moves it to the `url` and `urldate` field respectively. [koppor#216](https://github.com/koppor/jabref/issues/216)
 - We enabled the user to change the name of a field in a custom entry type by double-clicking on it. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We integrated two mail actions ("As Email" and "To Kindle") under a new "Send" option in the right-click & Tools menus. The Kindle option creates an email targeted to the user's Kindle email, which can be set in preferences under "External programs" [#6186](https://github.com/JabRef/jabref/issues/6186)

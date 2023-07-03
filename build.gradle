@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.1.4'
+    id 'org.openrewrite.rewrite' version '6.1.11'
 }
 
 // Enable following for debugging
@@ -133,7 +133,7 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:2.1.214'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.74'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.75'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
@@ -161,7 +161,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:32.0.1-jre') {
+    implementation ('com.google.guava:guava:32.1.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -176,7 +176,7 @@ dependencies {
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
-    implementation 'org.fxmisc.flowless:flowless:0.7.0'
+    implementation 'org.fxmisc.flowless:flowless:0.7.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.0'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.74.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
@@ -232,7 +232,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.0.1"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.0.5"))
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
 }
