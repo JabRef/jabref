@@ -3,9 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -14,14 +12,11 @@ import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
@@ -75,7 +70,7 @@ public class BvbFetcherTest {
     public void testGetName() {
         assertEquals("Bibliotheksverbund Bayern (Experimental)", fetcher.getName());
     }
-    
+
     @Test
     public void simpleSearchQueryURLCorrect() throws Exception {
         String query = "java jdk";
