@@ -50,7 +50,7 @@
         <TextField fx:id="proxyUsername" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
         <Label fx:id="proxyPasswordLabel" text="%Password" GridPane.rowIndex="5" />
         <CustomPasswordField fx:id="proxyPassword" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-        <Label fx:id="proxyAttentionLabel" styleClass="info-message" text="%Password kept for this session only." GridPane.columnIndex="2" GridPane.rowIndex="5" />
+        <CheckBox fx:id="proxyPersistPassword" text="%Persist password between sessions" GridPane.columnIndex="2" GridPane.rowIndex="5"/>
         <Button fx:id="checkConnectionButton" onAction="#checkConnection" prefWidth="200.0" text="%Check connection" GridPane.columnIndex="1" GridPane.rowIndex="6" />
     </GridPane>
    <Label styleClass="sectionHeader" text="%SSL Configuration" />

@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id("org.openrewrite.rewrite") version("6.1.4")
+    id 'org.openrewrite.rewrite' version '6.1.11'
 }
 
 // Enable following for debugging
@@ -47,6 +47,10 @@ java {
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
     modularity.inferModulePath.set(false)
+
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(20)
+    }
 }
 
 application {
@@ -84,6 +88,7 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://sandec.jfrog.io/artifactory/repo' }
 }
 
 configurations {
@@ -117,18 +122,18 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
 
-    implementation 'org.apache.lucene:lucene-core:9.6.0'
-    implementation 'org.apache.lucene:lucene-queryparser:9.6.0'
-    implementation 'org.apache.lucene:lucene-queries:9.6.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.6.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.6.0'
+    implementation 'org.apache.lucene:lucene-core:9.7.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.7.0'
+    implementation 'org.apache.lucene:lucene-queries:9.7.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.7.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.7.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation 'com.h2database:h2-mvstore:2.1.214'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.74'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.75'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
@@ -137,6 +142,7 @@ dependencies {
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
+    implementation 'com.github.javakeyring:java-keyring:1.0.2'
 
     antlr4 'org.antlr:antlr4:4.13.0'
     implementation 'org.antlr:antlr4-runtime:4.13.0'
@@ -155,7 +161,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:32.0.1-jre') {
+    implementation ('com.google.guava:guava:32.1.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -170,9 +176,13 @@ dependencies {
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
-    implementation 'org.fxmisc.flowless:flowless:0.7.0'
+    implementation 'org.fxmisc.flowless:flowless:0.7.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.0'
-    implementation 'com.jfoenix:jfoenix:9.0.10'
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.74.0') {
+        exclude module: 'javax.inject' // Split package, use only jakarta.inject
+        exclude group: 'org.apache.logging.log4j'
+    }
+
     implementation 'org.controlsfx:controlsfx:11.1.2'
 
     implementation 'org.jsoup:jsoup:1.16.1'
@@ -217,12 +227,12 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.1'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.0.1"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.0.5"))
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
 }
@@ -339,8 +349,6 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-
                 // Not sure why we need to restate the controlfx exports
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
@@ -361,12 +369,7 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
-                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
-
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.binding' : 'com.jfoenix',
-                'javafx.graphics/com.sun.javafx.stage' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.event' : 'com.jfoenix'
+                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
         ]
     }
 }
@@ -584,7 +587,8 @@ jlink {
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
-                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'    }
+                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
+    }
 
     jpackage {
         outputDir = "distribution"

@@ -31,13 +31,16 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the option to unprotect a text selection, which strips all pairs of curly braces away. [#9950](https://github.com/JabRef/jabref/issues/9950)
 - We added drag and drop events for field 'Groups' in entry editor panel. [#569](https://github.com/koppor/jabref/issues/569)
 - We added support for parsing MathML in the Medline importer. [#4273](https://github.com/JabRef/jabref/issues/4273)
-- We added the ability to search for a DOI directly from 'Web Search'. [#9674](https://github.com/JabRef/jabref/issues/9674)
+- We added the ability to search for an identifier (DOI, ISBN, ArXiv ID) directly from 'Web Search'. [#7575](https://github.com/JabRef/jabref/issues/7575) [#9674](https://github.com/JabRef/jabref/issues/9674)
 - We added a cleanup activity that identifies a URL or a last-visited-date in the `note` field and moves it to the `url` and `urldate` field respectively. [koppor#216](https://github.com/koppor/jabref/issues/216)
 - We enabled the user to change the name of a field in a custom entry type by double-clicking on it. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We integrated two mail actions ("As Email" and "To Kindle") under a new "Send" option in the right-click & Tools menus. The Kindle option creates an email targeted to the user's Kindle email, which can be set in preferences under "External programs" [#6186](https://github.com/JabRef/jabref/issues/6186)
+- We added an option to clear recent libraries' history. [#10003](https://github.com/JabRef/jabref/issues/10003)
+- We added an option to encrypt and remember the proxy password. [#8055](https://github.com/JabRef/jabref/issues/8055)[#10044](https://github.com/JabRef/jabref/issues/10044)
 
 ### Changed
 
+- We replaced "Close" by "Close library" and placed it after "Save all" in the File menu. [#10043](https://github.com/JabRef/jabref/pull/10043)
 - We upgraded to Lucene 9.5 for the fulltext search. The search index will be rebuild. [#9584](https://github.com/JabRef/jabref/pull/9584)
 - 'Get full text' now also checks the file url. [#568](https://github.com/koppor/jabref/issues/568)
 - JabRef writes a new backup file only if there is a change. Before, JabRef created a backup upon start. [#9679](https://github.com/JabRef/jabref/pull/9679)
@@ -57,6 +60,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the custom entry types dialog into the preferences dialog. [#9760](https://github.com/JabRef/jabref/pull/9760)
 - We moved the manage content selectors dialog to the library properties. [#9768](https://github.com/JabRef/jabref/pull/9768)
 - We moved the preferences menu command from the options menu to the file menu. [#9768](https://github.com/JabRef/jabref/pull/9768)
+- We reworked the cross ref labels in the entry editor and added a right click menu. [#10046](https://github.com/JabRef/jabref/pull/10046)
 - We reorganized the order of tabs and settings in the library properties. [#9836](https://github.com/JabRef/jabref/pull/9836)
 - We changed the handling of an "overflow" of authors at `[authIniN]`: JabRef uses `+` to indicate an overflow. Example: `[authIni2]` produces `A+` (instead of `AB`) for `Aachen and Berlin and Chemnitz`. [#9703](https://github.com/JabRef/jabref/pull/9703)
 - We moved the preferences option to open the last edited files on startup to the 'General' tab. [#9808](https://github.com/JabRef/jabref/pull/9808)
@@ -69,6 +73,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the error message when no terminal was found [#9607](https://github.com/JabRef/jabref/issues/9607)
 - In the context of the "systematic literature functionality", we changed the name "database" to "catalog" to use a separate term for online catalogs in comparison to SQL databases. [#9951](https://github.com/JabRef/jabref/pull/9951)
 - We now show more fields (including Special Fields) in the dropdown selection for "Save sort order" in the library properties and for "Export sort order" in the preferences. [#10010](https://github.com/JabRef/jabref/issues/10010)
+- We now encrypt and store the custom API keys in the OS native credential store. [#10044](https://github.com/JabRef/jabref/issues/10044)
 
 ### Fixed
 
@@ -80,7 +85,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where custom field in the custom entry types could not be set to mulitline. [#9609](https://github.com/JabRef/jabref/issues/9609)
 - We fixed an issue where the Office XML exporter did not resolve BibTeX-Strings when exporting entries. [forum#3741](https://discourse.jabref.org/t/exporting-bibtex-constant-strings-to-ms-office-2007-xml/3741)
 - We fixed an issue where the Merge Entries Toolbar configuration was not saved after hitting 'Merge Entries' button. [#9091](https://github.com/JabRef/jabref/issues/9091)
-- We fixed an issue where the password is saved locally if user wants to use proxy with authentication. [#8055](https://github.com/JabRef/jabref/issues/8055)
+- We fixed an issue where the password is stored in clear text if the user wants to use a proxy with authentication. [#8055](https://github.com/JabRef/jabref/issues/8055)
 - JabRef is now more relaxed when parsing field content: In case a field content ended with `\`, the combination `\}` was treated as plain `}`. [#9668](https://github.com/JabRef/jabref/issues/9668)
 - We resolved an issue that cut off the number of group entries when it exceeded four digits. [#8797](https://github.com/JabRef/jabref/issues/8797)
 - We fixed the issue where the size of the global search window was not retained after closing. [#9362](https://github.com/JabRef/jabref/issues/9362)

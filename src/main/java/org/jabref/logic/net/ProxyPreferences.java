@@ -15,22 +15,25 @@ public class ProxyPreferences {
     private final BooleanProperty useAuthentication;
     private final StringProperty username;
     private final StringProperty password;
+    private final BooleanProperty persistPassword;
 
     public ProxyPreferences(Boolean useProxy,
                             String hostname,
                             String port,
                             Boolean useAuthentication,
                             String username,
-                            String password) {
+                            String password,
+                            boolean persistPassword) {
         this.useProxy = new SimpleBooleanProperty(useProxy);
         this.hostname = new SimpleStringProperty(hostname);
         this.port = new SimpleStringProperty(port);
         this.useAuthentication = new SimpleBooleanProperty(useAuthentication);
         this.username = new SimpleStringProperty(username);
         this.password = new SimpleStringProperty(password);
+        this.persistPassword = new SimpleBooleanProperty(persistPassword);
     }
 
-    public final Boolean shouldUseProxy() {
+    public final boolean shouldUseProxy() {
         return useProxy.getValue();
     }
 
@@ -66,8 +69,8 @@ public class ProxyPreferences {
         this.port.set(port);
     }
 
-    public final Boolean shouldUseAuthentication() {
-        return useAuthentication.getValue();
+    public final boolean shouldUseAuthentication() {
+        return useAuthentication.get();
     }
 
     public BooleanProperty useAuthenticationProperty() {
@@ -102,6 +105,18 @@ public class ProxyPreferences {
         this.password.set(password);
     }
 
+    public boolean shouldPersistPassword() {
+        return persistPassword.get();
+    }
+
+    public BooleanProperty persistPasswordProperty() {
+        return persistPassword;
+    }
+
+    public void setPersistPassword(boolean persistPassword) {
+        this.persistPassword.set(persistPassword);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -118,7 +133,8 @@ public class ProxyPreferences {
                 && Objects.equals(port.getValue(), other.port.getValue())
                 && Objects.equals(useAuthentication.getValue(), other.useAuthentication.getValue())
                 && Objects.equals(username.getValue(), other.username.getValue())
-                && Objects.equals(password.getValue(), other.password.getValue());
+                && Objects.equals(password.getValue(), other.password.getValue())
+                && Objects.equals(persistPassword.getValue(), other.persistPassword.getValue());
     }
 
     @Override
@@ -129,6 +145,7 @@ public class ProxyPreferences {
                 port.getValue(),
                 useAuthentication.getValue(),
                 username.getValue(),
-                password.getValue());
+                password.getValue(),
+                persistPassword.getValue());
     }
 }

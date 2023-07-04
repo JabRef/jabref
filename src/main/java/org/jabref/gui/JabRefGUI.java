@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -25,6 +26,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.WebViewStore;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -71,13 +73,32 @@ public class JabRefGUI {
                 preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
 
-        if (preferencesService.getProxyPreferences().shouldUseProxy() && preferencesService.getProxyPreferences().shouldUseAuthentication()) {
-            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            dialogService.showPasswordDialogAndWait(Localization.lang("Proxy configuration"), Localization.lang("Proxy requires password"), Localization.lang("Password"))
-                .ifPresent(newPassword -> {
-                    preferencesService.getProxyPreferences().setPassword(newPassword);
-                    ProxyRegisterer.register(preferencesService.getProxyPreferences());
-                });
+        setupProxy();
+    }
+
+    private void setupProxy() {
+        if (!preferencesService.getProxyPreferences().shouldUseProxy()
+                || !preferencesService.getProxyPreferences().shouldUseAuthentication()) {
+            return;
+        }
+
+        if (preferencesService.getProxyPreferences().shouldPersistPassword()
+                && StringUtil.isNotBlank(preferencesService.getProxyPreferences().getPassword())) {
+            ProxyRegisterer.register(preferencesService.getProxyPreferences());
+            return;
+        }
+
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        Optional<String> password = dialogService.showPasswordDialogAndWait(
+                Localization.lang("Proxy configuration"),
+                Localization.lang("Proxy requires password"),
+                Localization.lang("Password"));
+
+        if (password.isPresent()) {
+            preferencesService.getProxyPreferences().setPassword(password.get());
+            ProxyRegisterer.register(preferencesService.getProxyPreferences());
+        } else {
+            LOGGER.warn("No proxy password specified");
         }
     }
 
