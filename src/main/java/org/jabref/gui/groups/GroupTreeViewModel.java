@@ -154,8 +154,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /**
-     * Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group while maintaining the
-     * alphabetical order
+     * Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
      */
     public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
         currentDatabase.ifPresent(database -> {
