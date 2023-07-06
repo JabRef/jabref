@@ -113,7 +113,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
         expectedJson.put("sortBy", "relevance");
 
         List<JSONObject> actualJSONObjects = new ArrayList<>();
-        withYearAndYearRange.forEach((requestStr) -> {
+        withYearAndYearRange.forEach(requestStr -> {
             QueryNode luceneQuery = null;
             try {
                 luceneQuery = new StandardSyntaxParser().parse(requestStr, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
