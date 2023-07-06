@@ -34,5 +34,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           comment_tag: download-link
-          message: A build of this PR is not available. Head to <https://builds.jabref.org/main/> for the latest build.
+          message: The build for this PR is no longer available. Please visit <https://builds.jabref.org/main/> for the latest build.
           mode: upsert
