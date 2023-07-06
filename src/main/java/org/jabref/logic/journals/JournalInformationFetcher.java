@@ -26,7 +26,7 @@ import kong.unirest.json.JSONObject;
  */
 public class JournalInformationFetcher implements WebFetcher {
     public static final String NAME = "Journal Information";
-    private static final String API_URL = "https://mango-pebble-0224c3803-2067.westeurope.1.azurestaticapps.net/api";
+    private static final String API_URL = "https://gentle-forest-03418aa03-2067.westeurope.3.azurestaticapps.net/api";
     private static final Pattern QUOTES_BRACKET_PATTERN = Pattern.compile("[\"\\[\\]]");
 
     @Override
