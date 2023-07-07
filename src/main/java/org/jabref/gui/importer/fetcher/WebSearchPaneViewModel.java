@@ -1,7 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.SortedSet;
 import java.util.concurrent.Callable;
 
@@ -19,12 +18,11 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
@@ -85,9 +83,8 @@ public class WebSearchPaneViewModel {
                         return null;
                     }
 
-                    Optional<DOI> doi = DOI.findInText(queryText);
-                    if (doi.isPresent()) {
-                        // in case the query contains a DOI, it is treated as valid
+                    if (CompositeIdFetcher.containsValidId(queryText)) {
+                        // in case the query contains any ID, it is treated as valid
                         return null;
                     }
 
@@ -147,11 +144,10 @@ public class WebSearchPaneViewModel {
         Callable<ParserResult> parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
         String fetcherName = activeFetcher.getName();
 
-        Optional<DOI> doi = DOI.findInText(query);
-        if (doi.isPresent()) {
-            DoiFetcher doiFetcher = new DoiFetcher(preferencesService.getImportFormatPreferences());
-            parserResultCallable = () -> new ParserResult(OptionalUtil.toList(doiFetcher.performSearchById(doi.get().getDOI())));
-            fetcherName = doiFetcher.getName();
+        if (CompositeIdFetcher.containsValidId(query)) {
+            CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferencesService.getImportFormatPreferences());
+            parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
+            fetcherName = compositeIdFetcher.getName();
         }
 
         final String finalFetcherName = fetcherName;

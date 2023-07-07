@@ -9,12 +9,12 @@ open module org.jabref {
     // JavaFX
     requires javafx.base;
     requires javafx.graphics;
-    requires javafx.swing;
     requires javafx.controls;
     requires javafx.web;
     requires javafx.fxml;
     requires afterburner.fx;
-    requires com.jfoenix;
+    requires com.dlsc.gemsfx;
+    uses com.dlsc.gemsfx.TagsField;
     requires de.saxsys.mvvmfx;
 
     requires org.kordamp.ikonli.core;
@@ -98,6 +98,8 @@ open module org.jabref {
     requires flexmark.util.data;
 
     requires com.h2database.mvstore;
+
+    requires java.keyring;
 
     requires org.jooq.jool;
 
