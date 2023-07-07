@@ -1,9 +1,24 @@
+"""
+This script downloads data for multiple years from the Scimago Journal Rank website
+(https://www.scimagojr.com/journalrank.php), parses the CSV files, and builds a consolidated
+dataset over all the years, in JSON format.
+The downloaded data includes various metrics for academic journals such as SJR,
+h-index, doc counts, citation counts, etc.
+
+Usage:
+- Update the `current_year` variable to the latest year of data available.
+- The script downloads data from the specified start year to the current year.
+- The consolidated dataset is saved as `scimagojr_combined_data.json`.
+"""
+
+
 import urllib.request
 import csv
 import os
 import json
 
-current_year = 2022  # update this year for future runs
+# current_year should be the latest year of data available at https://www.scimagojr.com/journalrank.php
+current_year = 2022
 start_year = 1999
 data_directory = 'data'
 

@@ -28,7 +28,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
         <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell">
-            <Label styleClass="info-label" text="%Country:">
+            <Label styleClass="info-label" text="%Country">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>
@@ -39,7 +39,7 @@
             </padding>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell" GridPane.columnIndex="1">
-            <Label styleClass="info-label" text="%Categories:">
+            <Label styleClass="info-label" text="%Categories">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>
@@ -50,7 +50,7 @@
             </padding>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell" GridPane.columnIndex="2">
-            <Label styleClass="info-label" text="%Publisher:">
+            <Label styleClass="info-label" text="%Publisher">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>
@@ -61,7 +61,7 @@
             </padding>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-r" GridPane.rowIndex="1">
-            <Label styleClass="info-label" text="%h-index:">
+            <Label styleClass="info-label" text="%h-index">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>
@@ -72,7 +72,7 @@
             </padding>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-b" GridPane.columnIndex="3">
-            <Label styleClass="info-label" text="%ISSN:">
+            <Label styleClass="info-label" text="%ISSN">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>
@@ -83,7 +83,7 @@
             </padding>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-r" GridPane.columnIndex="1" GridPane.rowIndex="1">
-            <Label styleClass="info-label" text="%SCImago ID:">
+            <Label styleClass="info-label" text="%SCImago ID">
                 <VBox.margin>
                     <Insets bottom="10.0" />
                 </VBox.margin>

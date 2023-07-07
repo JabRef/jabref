@@ -108,10 +108,10 @@ public class JournalInformationFetcher implements WebFetcher {
                         snipArray = parseCitationInfo(citationInfo, "snipIndex");
                     }
                 } else {
-                    throw new FetcherException(Localization.lang("ISSN not found in database"));
+                    throw new FetcherException(Localization.lang("ISSN not found in catalog"));
                 }
             } else {
-                throw new FetcherException(Localization.lang("ISSN not found in database"));
+                throw new FetcherException(Localization.lang("ISSN not found in catalog"));
             }
         } catch (JSONException e) {
             throw new FetcherException(Localization.lang("Parsing error"), e);
