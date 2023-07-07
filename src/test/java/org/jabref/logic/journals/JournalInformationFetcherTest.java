@@ -61,8 +61,8 @@ class JournalInformationFetcherTest {
     }
 
     @Test
-    public void getsJournalInfoExtraSpaceISSN() throws FetcherException {
-        assertEquals(Optional.of(antiOxidantsJournal), fetcher.getJournalInformation("1523 - 0864"));
+    public void getJournalInfoExtraSpaceISSN() {
+        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation("1523 - 0864"));
     }
 
     @Test

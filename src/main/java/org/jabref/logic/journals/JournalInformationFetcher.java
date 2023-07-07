@@ -13,6 +13,7 @@ import javafx.util.Pair;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.identifier.ISSN;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -34,15 +35,15 @@ public class JournalInformationFetcher implements WebFetcher {
         return JournalInformationFetcher.NAME;
     }
 
-    public Optional<JournalInformation> getJournalInformation(String issn) throws FetcherException {
-        if (issn.isBlank()) {
-            throw new FetcherException(Localization.lang("ISSN cannot be blank"));
+    public Optional<JournalInformation> getJournalInformation(String issnString) throws FetcherException {
+        ISSN issn = new ISSN(issnString);
+        if (!issn.isValidFormat() && !issn.isCanBeCleaned()) {
+            throw new FetcherException(Localization.lang("Incorrect ISSN format"));
         }
-        issn = issn.replaceAll("\\s", "");
 
         Optional<JournalInformation> journalInformationOptional = Optional.empty();
 
-        JSONObject postData = buildPostData(issn);
+        JSONObject postData = buildPostData(issn.getCleanedISSN());
 
         HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
                                                      .header("Content-Type", "application/json")
