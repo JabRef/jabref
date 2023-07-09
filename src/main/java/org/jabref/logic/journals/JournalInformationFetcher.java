@@ -21,12 +21,15 @@ import kong.unirest.Unirest;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fetches journal information from the JabRef Web API
  */
 public class JournalInformationFetcher implements WebFetcher {
     public static final String NAME = "Journal Information";
+    private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);
     private static final String API_URL = "https://gentle-forest-03418aa03-2067.westeurope.3.azurestaticapps.net/api";
     private static final Pattern QUOTES_BRACKET_PATTERN = Pattern.compile("[\"\\[\\]]");
 
@@ -80,6 +83,16 @@ public class JournalInformationFetcher implements WebFetcher {
         List<Pair<Integer, Double>> citesIncomingPerDocByRecentlyPublished = new ArrayList<>();
 
         try {
+            if (responseJsonObject.has("errors")) {
+                JSONArray errors = responseJsonObject.optJSONArray("errors");
+                if (errors != null && errors.length() > 0) {
+                    JSONObject error = errors.getJSONObject(0);
+                    String errorMessage = error.optString("message", "");
+                    LOGGER.error("Error accessing catalog: " + errorMessage);
+                }
+                throw new FetcherException(Localization.lang("Error accessing catalog"));
+            }
+
             if (responseJsonObject.has("data")) {
                 JSONObject data = responseJsonObject.getJSONObject("data");
                 if (data.has("journal") && data.get("journal") != null) {
