@@ -29,6 +29,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
+import org.jabref.logic.util.EnablementStatus;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -78,7 +79,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
-        journalInfoEnabledProperty.setValue(journalInfoPreferences.isJournalInfoEnabled());
+        journalInfoEnabledProperty.setValue(journalInfoPreferences.getEnablementStatus() == EnablementStatus.ENABLED);
 
         apiKeys.setValue(FXCollections.observableArrayList(preferencesService.getImporterPreferences().getApiKeys()));
     }
@@ -93,7 +94,11 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
 
-        journalInfoPreferences.setJournalInfoEnabled(journalInfoEnabledProperty.getValue());
+        if (journalInfoEnabledProperty.getValue()) {
+            journalInfoPreferences.setEnablementStatus(EnablementStatus.ENABLED);
+        } else {
+            journalInfoPreferences.setEnablementStatus(EnablementStatus.DISABLED);
+        }
 
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());

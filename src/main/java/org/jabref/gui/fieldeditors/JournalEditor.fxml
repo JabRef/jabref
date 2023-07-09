@@ -21,8 +21,7 @@
         </Button>
         <Button fx:id="journalInfoButton"
                 onAction="#showJournalInfo"
-                styleClass="icon-button"
-                visible="${controller.viewModel.isJournalInfoButtonVisible}">
+                styleClass="icon-button">
             <graphic>
                 <JabRefIconView glyph="VIEW_JOURNAL_INFO"/>
             </graphic>

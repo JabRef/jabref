@@ -96,6 +96,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.util.EnablementStatus;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -269,7 +270,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String GROBID_URL = "grobidURL";
 
     public static final String JOURNALINFO_ENABLED = "journalInfoEnabled";
-    public static final String JOURNALINFO_OPT_OUT = "journalInfoOptOut";
+    public static final String JOURNALINFO_DISABLED = "journalInfoDisabled";
 
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
@@ -506,7 +507,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
 
         defaults.put(JOURNALINFO_ENABLED, Boolean.FALSE);
-        defaults.put(JOURNALINFO_OPT_OUT, Boolean.FALSE);
+        defaults.put(JOURNALINFO_DISABLED, Boolean.FALSE);
 
         defaults.put(PUSH_TEXMAKER_PATH, OS.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, OS.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
@@ -2924,14 +2925,26 @@ public class JabRefPreferences implements PreferencesService {
             return journalInfoPreferences;
         }
 
-        journalInfoPreferences = new JournalInformationPreferences(
-                getBoolean(JOURNALINFO_ENABLED),
-                getBoolean(JOURNALINFO_OPT_OUT));
+        journalInfoPreferences = new JournalInformationPreferences(getJournalInfoEnablementStatus());
 
-        EasyBind.listen(journalInfoPreferences.journalInfoEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(JOURNALINFO_ENABLED, newValue));
-        EasyBind.listen(journalInfoPreferences.journalInfoOptOutProperty(), (obs, oldValue, newValue) -> putBoolean(JOURNALINFO_OPT_OUT, newValue));
+        EasyBind.listen(journalInfoPreferences.enablementStatusProperty(), (obs, oldValue, newValue) -> {
+            putBoolean(JOURNALINFO_ENABLED, newValue == EnablementStatus.ENABLED);
+            putBoolean(JOURNALINFO_DISABLED, newValue == EnablementStatus.DISABLED);
+        });
 
         return journalInfoPreferences;
+    }
+
+    private EnablementStatus getJournalInfoEnablementStatus() {
+        EnablementStatus enablementStatus = EnablementStatus.FIRST_START;
+
+        if (getBoolean(JOURNALINFO_ENABLED)) {
+            enablementStatus = EnablementStatus.ENABLED;
+        } else if (getBoolean(JOURNALINFO_DISABLED)) {
+            enablementStatus = EnablementStatus.DISABLED;
+        }
+
+        return enablementStatus;
     }
 
     @Override

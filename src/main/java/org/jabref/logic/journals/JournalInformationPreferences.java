@@ -1,38 +1,26 @@
 package org.jabref.logic.journals;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
+import org.jabref.logic.util.EnablementStatus;
 
 public class JournalInformationPreferences {
-    private final BooleanProperty journalInfoEnabled;
-    private final BooleanProperty journalInfoOptOut;
+    private final ObjectProperty<EnablementStatus> enablementStatus;
 
-    public JournalInformationPreferences(boolean journalInfoEnabled, boolean journalInfoOptOut) {
-        this.journalInfoEnabled = new SimpleBooleanProperty(journalInfoEnabled);
-        this.journalInfoOptOut = new SimpleBooleanProperty(journalInfoOptOut);
+    public JournalInformationPreferences(EnablementStatus enablementStatus) {
+        this.enablementStatus = new SimpleObjectProperty<>(enablementStatus);
     }
 
-    public boolean isJournalInfoEnabled() {
-        return journalInfoEnabled.get();
+    public EnablementStatus getEnablementStatus() {
+        return enablementStatus.get();
     }
 
-    public BooleanProperty journalInfoEnabledProperty() {
-        return journalInfoEnabled;
+    public ObjectProperty<EnablementStatus> enablementStatusProperty() {
+        return enablementStatus;
     }
 
-    public void setJournalInfoEnabled(boolean journalInfoEnabled) {
-        this.journalInfoEnabled.set(journalInfoEnabled);
-    }
-
-    public boolean isJournalInfoOptOut() {
-        return journalInfoOptOut.get();
-    }
-
-    public BooleanProperty journalInfoOptOutProperty() {
-        return journalInfoOptOut;
-    }
-
-    public void setJournalInfoOptOut(boolean journalInfoOptOut) {
-        this.journalInfoOptOut.set(journalInfoOptOut);
+    public void setEnablementStatus(EnablementStatus enablementStatus) {
+        this.enablementStatus.set(enablementStatus);
     }
 }

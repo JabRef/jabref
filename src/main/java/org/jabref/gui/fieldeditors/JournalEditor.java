@@ -42,8 +42,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                 journalAbbreviationRepository,
                 fieldCheckers,
                 taskExecutor,
-                dialogService,
-                preferences);
+                dialogService);
 
         ViewLoader.view(this)
                   .root(this)

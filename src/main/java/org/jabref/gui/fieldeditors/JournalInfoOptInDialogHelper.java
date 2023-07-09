@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.journals.JournalInformationPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.EnablementStatus;
 
 public class JournalInfoOptInDialogHelper {
 
@@ -10,20 +11,20 @@ public class JournalInfoOptInDialogHelper {
      * Using the journal information data fetcher service needs to be opt-in for GDPR compliance.
      */
     public static boolean isJournalInfoEnabled(DialogService dialogService, JournalInformationPreferences preferences) {
-        if (preferences.isJournalInfoEnabled()) {
+        if (preferences.getEnablementStatus() == EnablementStatus.ENABLED) {
             return true;
         }
 
-        if (preferences.isJournalInfoOptOut()) {
+        if (preferences.getEnablementStatus() == EnablementStatus.DISABLED) {
+            dialogService.notify(Localization.lang("Please enable journal information fetching in Preferences > Web search"));
             return false;
         }
 
-        boolean journalInfoEnabled = dialogService.showConfirmationDialogWithOptOutAndWait(
+        boolean journalInfoEnabled = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remote services"),
-                Localization.lang("Allow sending ISSN to a JabRef online service (SCimago) for fetching journal information"),
-                Localization.lang("Do not ask again"),
-                preferences::setJournalInfoOptOut);
-        preferences.journalInfoEnabledProperty().setValue(journalInfoEnabled);
+                Localization.lang("Allow sending ISSN to a JabRef online service (SCimago) for fetching journal information"));
+
+        preferences.setEnablementStatus(journalInfoEnabled ? EnablementStatus.ENABLED : EnablementStatus.DISABLED);
         return journalInfoEnabled;
     }
 }
