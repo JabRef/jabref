@@ -97,6 +97,8 @@ public class FieldEditors {
             return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences);
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
+        } else if (field == StandardField.ISSN) {
+            return new ISSNEditor(field, suggestionProvider, fieldCheckers, preferences, taskExecutor, dialogService);
         } else {
             // default
             return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine);
