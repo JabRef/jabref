@@ -3,8 +3,9 @@ name: Refresh Journal Lists
 on:
   push:
     paths:
-      - 'src/main/java/org/jabref/logic/journals/**'
+      - '.github/workflows/refresh-journal-lists.yml'
       - 'buildSrc/build.gradle'
+      - 'src/main/java/org/jabref/logic/journals/**'
   workflow_dispatch:
 
 permissions:
