@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'src/main/java/org/jabref/logic/journals/**'
+      - 'buildSrc/build.gradle'
   workflow_dispatch:
 
 permissions:
