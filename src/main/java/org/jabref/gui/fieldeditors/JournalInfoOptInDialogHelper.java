@@ -16,7 +16,11 @@ public class JournalInfoOptInDialogHelper {
         }
 
         if (preferences.getEnablementStatus() == EnablementStatus.DISABLED) {
-            dialogService.notify(Localization.lang("Please enable journal information fetching in Preferences > Web search"));
+            dialogService.notify(
+                    Localization.lang("Please enable journal information fetching in %0 > %1",
+                            Localization.lang("Preferences"),
+                            Localization.lang("Web search"))
+            );
             return false;
         }
 

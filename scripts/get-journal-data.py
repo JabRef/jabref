@@ -9,6 +9,10 @@ Usage:
 - Update the `current_year` variable to the latest year of data available.
 - The script downloads data from the specified start year to the current year.
 - The consolidated dataset is saved as `scimagojr_combined_data.json`.
+
+Note:
+The dataset is made available via a JabRef Online API, and is accessed at
+`org.jabref.logic.journals.JournalInformationFetcher.getJournalInformation()`
 """
 
 

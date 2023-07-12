@@ -141,7 +141,7 @@
                 <NumberAxis minorTickVisible="false" side="LEFT" />
             </yAxis>
         </LineChart>
-        <LineChart fx:id="citesOutgoingPerDocChart" legendVisible="false" title="%Cites Outgoing Per Document" GridPane.columnIndex="0" GridPane.rowIndex="2">
+        <LineChart fx:id="citesOutgoingPerDocChart" legendVisible="false" title="%Cites Outgoing per Document" GridPane.columnIndex="0" GridPane.rowIndex="2">
             <xAxis>
                 <CategoryAxis label="%Year" side="BOTTOM" />
             </xAxis>
@@ -149,7 +149,7 @@
                 <NumberAxis minorTickVisible="false" side="LEFT" />
             </yAxis>
         </LineChart>
-        <LineChart fx:id="citesIncomingByRecentlyPublishedChart" legendVisible="false" title="%Cites Incoming By Recently Published" GridPane.columnIndex="1" GridPane.rowIndex="2">
+        <LineChart fx:id="citesIncomingByRecentlyPublishedChart" legendVisible="false" title="%Cites Incoming by Recently Published" GridPane.columnIndex="1" GridPane.rowIndex="2">
             <xAxis>
                 <CategoryAxis label="%Year" side="BOTTOM" />
             </xAxis>
