@@ -1,7 +1,6 @@
 package org.jabref.logic.journals;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -62,6 +61,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), StandardCharsets.UTF_8, true));
+        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true));
     }
 }

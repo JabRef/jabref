@@ -7,8 +7,12 @@ on:
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-
     steps:
+      - name: Cancel deployment run
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          ignore_sha: true
+          workflow_id: 9813 # workflow "Deployment"
       - name: Check secrets presence
         id: checksecrets
         shell: bash

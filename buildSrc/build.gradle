@@ -1,4 +1,7 @@
-apply plugin: 'java'
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.14'
+}
 
 repositories {
     mavenLocal()
@@ -9,6 +12,11 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:2.2.220'
     implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation 'org.slf4j:slf4j-api:2.0.7'
+}
+
+javafx {
+    version = "20"
+    modules = [ 'javafx.base' ]
 }
 
 sourceSets{
