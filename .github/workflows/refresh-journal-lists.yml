@@ -1,7 +1,11 @@
 name: Refresh Journal Lists
 
 on:
-  # Allow to run manually
+  push:
+    paths:
+      - '.github/workflows/refresh-journal-lists.yml'
+      - 'buildSrc/build.gradle'
+      - 'src/main/java/org/jabref/logic/journals/**'
   workflow_dispatch:
 
 permissions:
@@ -58,13 +62,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update-journallist
-          title: "[Bot] Update Journal abbrev list"
-          commit-message: Update journal abbrev list
+          title: "[Bot] Update journal abbreviation lists"
+          commit-message: Update journal abbreviation lists
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v9
         if: github.ref != 'refs/heads/main'
         with:
-          message: 'Update journal abbrev list'
+          message: 'Update journal abbreviation lists'
           committer_email: actions@github.com
           fetch: false
           push: true
