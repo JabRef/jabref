@@ -48,7 +48,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
         stringsListProperty.addAll(databaseContext.getDatabase().getStringValues().stream()
                                                   .sorted(new BibtexStringComparator(false))
                                                   .map(this::convertFromBibTexString)
-                                                  .collect(Collectors.toSet()));
+                                                  .toList());
     }
 
     public void addNewString() {
