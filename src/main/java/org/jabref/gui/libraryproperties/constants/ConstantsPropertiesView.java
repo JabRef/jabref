@@ -79,8 +79,8 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
 
             // Resort the entries based on the keys and set the focus to the newly-created entry
             viewModel.resortStrings();
-            var selectionModel = cellEvent.getTableView().getSelectionModel();
             var tableView = cellEvent.getTableView();
+            var selectionModel = tableView.getSelectionModel();
             selectionModel.select(cellItem);
             selectionModel.focus(selectionModel.getSelectedIndex());
             tableView.refresh();
