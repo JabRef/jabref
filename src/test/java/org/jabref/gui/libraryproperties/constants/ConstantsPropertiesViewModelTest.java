@@ -38,4 +38,27 @@ class ConstantsPropertiesViewModelTest {
 
         assertEquals(expected, actual);
     }
+
+    @DisplayName("Check that the list of strings is sorted after resorting it")
+    @Test
+    void testStringsListPropertyResorting() {
+        BibDatabase db = new BibDatabase();
+        BibDatabaseContext context = new BibDatabaseContext(db);
+        DialogService service = mock(DialogService.class);
+        List<String> expected = List.of("ICSE", "TSE");
+
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service);
+        var stringsList = model.stringsListProperty();
+        stringsList.add(new ConstantsItemModel("TSE", "Transactions on Software Engineering"));
+        stringsList.add(new ConstantsItemModel("ICSE", "International Conference on Software Engineering"));
+
+        model.resortStrings();
+
+        List<String> actual = model.stringsListProperty().stream()
+                .map(ConstantsItemModel::labelProperty)
+                .map(StringProperty::getValue)
+                .toList();
+
+        assertEquals(expected, actual);
+    }
 }
