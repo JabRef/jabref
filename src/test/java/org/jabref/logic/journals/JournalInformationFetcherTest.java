@@ -47,31 +47,56 @@ class JournalInformationFetcherTest {
 
     @Test
     public void getsJournalInfoValidISSN() throws FetcherException {
-        assertEquals(Optional.of(antiOxidantsJournal), fetcher.getJournalInformation("1523-0864"));
+        assertEquals(Optional.of(antiOxidantsJournal), fetcher.getJournalInformation("1523-0864", ""));
+    }
+
+    @Test
+    public void getsJournalInfoUsingName() throws FetcherException {
+        assertEquals(Optional.of(antiOxidantsJournal), fetcher.getJournalInformation("", "Antioxidants & Redox Signaling"));
+    }
+
+    @Test
+    public void sameEntryReturnedFromISSNOrName() throws FetcherException {
+        assertEquals(fetcher.getJournalInformation("1523-0864", ""), fetcher.getJournalInformation("", "Antioxidants & Redox Signaling"));
     }
 
     @Test
     public void getsJournalInfoValidISSNWithoutHyphen() throws FetcherException {
-        assertEquals(Optional.of(antiOxidantsJournal), fetcher.getJournalInformation("15230864"));
+        assertEquals(Optional.of(antiOxidantsJournal), fetcher.getJournalInformation("15230864", ""));
     }
 
     @Test
     public void getsJournalInfoNonTrimmedISSN() throws FetcherException {
-        assertEquals(Optional.of(antiOxidantsJournal), fetcher.getJournalInformation(" 1523-0864   "));
+        assertEquals(Optional.of(antiOxidantsJournal), fetcher.getJournalInformation(" 1523-0864   ", ""));
     }
 
     @Test
     public void getJournalInfoExtraSpaceISSN() {
-        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation("1523 - 0864"));
+        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation("1523 - 0864", ""));
     }
 
     @Test
     public void getJournalInfoEmptyISSN() {
-        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation(""));
+        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation("", ""));
     }
 
     @Test
     public void getJournalInfoInvalidISSN() {
-        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation("123-123"));
+        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation("123-123", ""));
+    }
+
+    @Test
+    public void getJournalInfoInvalidISSNAndNoName() {
+        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation("123-123", ""));
+    }
+
+    @Test
+    public void getJournalInfoNoISSNAndNoName() {
+        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation("", ""));
+    }
+
+    @Test
+    public void getJournalInfoNoISSNAndInvalidName() {
+        assertThrows(FetcherException.class, () -> fetcher.getJournalInformation("", "zzz"));
     }
 }

@@ -47,8 +47,8 @@ public class JournalInfoView extends VBox {
         bindChartProperties();
     }
 
-    public Node populateJournalInformation(String issn) throws FetcherException {
-        viewModel.populateJournalInformation(issn);
+    public Node populateJournalInformation(String issn, String journalName) throws FetcherException {
+        viewModel.populateJournalInformation(issn, journalName);
         return this;
     }
 

@@ -38,15 +38,19 @@ public class JournalInformationFetcher implements WebFetcher {
         return JournalInformationFetcher.NAME;
     }
 
-    public Optional<JournalInformation> getJournalInformation(String issnString) throws FetcherException {
+    public Optional<JournalInformation> getJournalInformation(String issnString, String journalName) throws FetcherException {
         ISSN issn = new ISSN(issnString);
-        if (!issn.isValidFormat() && !issn.isCanBeCleaned()) {
-            throw new FetcherException(Localization.lang("Incorrect ISSN format"));
+        String cleanedISSN = "";
+
+        if (issn.isValidFormat() || issn.isCanBeCleaned()) {
+            cleanedISSN = issn.getCleanedISSN();
+        } else {
+            LOGGER.warn(Localization.lang("Incorrect ISSN format"));
         }
 
         Optional<JournalInformation> journalInformationOptional = Optional.empty();
 
-        JSONObject postData = buildPostData(issn.getCleanedISSN());
+        JSONObject postData = buildPostData(cleanedISSN, journalName);
 
         HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
                                                      .header("Content-Type", "application/json")
@@ -122,10 +126,10 @@ public class JournalInformationFetcher implements WebFetcher {
                         snipArray = parseCitationInfo(citationInfo, "snipIndex");
                     }
                 } else {
-                    throw new FetcherException(Localization.lang("ISSN not found in catalog"));
+                    throw new FetcherException(Localization.lang("ISSN and/or journal name not found in catalog"));
                 }
             } else {
-                throw new FetcherException(Localization.lang("ISSN not found in catalog"));
+                throw new FetcherException(Localization.lang("ISSN and/or journal name not found in catalog"));
             }
         } catch (JSONException e) {
             throw new FetcherException(Localization.lang("Parsing error"), e);
@@ -163,10 +167,10 @@ public class JournalInformationFetcher implements WebFetcher {
         }
     }
 
-    private JSONObject buildPostData(String issn) {
+    private JSONObject buildPostData(String issn, String journalName) {
         String query = """
-                query GetJournalByIssn($issn: String) {
-                  journal(issn: $issn) {
+                query GetJournal($issn: String, $name: String) {
+                  journal(issn: $issn, name: $name) {
                     id
                     name
                     issn
@@ -192,10 +196,11 @@ public class JournalInformationFetcher implements WebFetcher {
 
         JSONObject postData = new JSONObject();
         postData.put("query", query);
-        postData.put("operationName", "GetJournalByIssn");
+        postData.put("operationName", "GetJournal");
 
         JSONObject variables = new JSONObject();
         variables.put("issn", issn);
+        variables.put("name", journalName);
         postData.put("variables", variables);
 
         return postData;

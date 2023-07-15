@@ -30,8 +30,8 @@ public class JournalInfoViewModel extends AbstractViewModel {
     private final ObservableList<XYChart.Series<String, Double>> citesIncomingByRecentlyPublishedData = FXCollections.observableArrayList();
     private final ObservableList<XYChart.Series<String, Double>> docsThisYearData = FXCollections.observableArrayList();
 
-    public void populateJournalInformation(String issn) throws FetcherException {
-        Optional<JournalInformation> journalInformationOptional = new JournalInformationFetcher().getJournalInformation(issn);
+    public void populateJournalInformation(String issn, String journalName) throws FetcherException {
+        Optional<JournalInformation> journalInformationOptional = new JournalInformationFetcher().getJournalInformation(issn, journalName);
 
         journalInformationOptional.ifPresent(journalInformation -> {
             setTitle(journalInformation.title());

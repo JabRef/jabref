@@ -23,8 +23,9 @@ public class PopOverUtil {
 
     public static void showJournalInfo(Button button, BibEntry entry, DialogService dialogService, TaskExecutor taskExecutor) {
         Optional<String> optionalIssn = entry.getField(StandardField.ISSN);
+        Optional<String> optionalJournalName = entry.getField(StandardField.JOURNAL);
 
-        if (optionalIssn.isPresent()) {
+        if (optionalIssn.isPresent() || optionalJournalName.isPresent()) {
             PopOver popOver = new PopOver();
             ProgressIndicator progressIndicator = new ProgressIndicator();
             progressIndicator.setMaxSize(30, 30);
@@ -36,7 +37,7 @@ public class PopOverUtil {
             popOver.show(button, 0);
 
             BackgroundTask
-                    .wrap(() -> new JournalInfoView().populateJournalInformation(optionalIssn.get()))
+                    .wrap(() -> new JournalInfoView().populateJournalInformation(optionalIssn.orElse(""), optionalJournalName.orElse("")))
                     .onSuccess(updatedNode -> {
                         popOver.setContentNode(updatedNode);
                         popOver.show(button, 0);
@@ -50,7 +51,7 @@ public class PopOverUtil {
                     })
                     .executeWith(taskExecutor);
         } else {
-            dialogService.notify(Localization.lang("ISSN required for fetching journal information"));
+            dialogService.notify(Localization.lang("ISSN or journal name required for fetching journal information"));
         }
     }
 }
