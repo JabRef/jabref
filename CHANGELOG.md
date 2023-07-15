@@ -75,6 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We now show more fields (including Special Fields) in the dropdown selection for "Save sort order" in the library properties and for "Export sort order" in the preferences. [#10010](https://github.com/JabRef/jabref/issues/10010)
 - We now encrypt and store the custom API keys in the OS native credential store. [#10044](https://github.com/JabRef/jabref/issues/10044)
 - We changed the behavior of group addition/edit, so that sorting by alphabetical order is not performed by default after the modification [#10017](https://github.com/JabRef/jabref/issues/10017)
+- We fixed an issue with spacing in the cleanup dialogue. [#10081](https://github.com/JabRef/jabref/issues/10081)
 
 ### Fixed
 
@@ -118,6 +119,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where empty grey containers would remain in the groups panel, if displaying of group item count is turned off. [#9972](https://github.com/JabRef/jabref/issues/9972)
 - We fixed an issue where fetching an ISBN could lead to application freezing when the fetcher did not return any results. [#9979](https://github.com/JabRef/jabref/issues/9979)
 - We fixed an issue where closing a library containing groups and entries caused an exception [#9997](https://github.com/JabRef/jabref/issues/9997)
+- We fixed a bug where the editor for strings in a bibliography file did not sort the entries by their keys [#10083](https://github.com/JabRef/jabref/pull/10083)
 
 ### Removed
 
