@@ -39,6 +39,6 @@
               text="%Convert timestamp field to field 'creationdate'"/>
         <CheckBox fx:id="cleanUpTimestampToModificationDate"
               text="%Convert timestamp field to field 'modificationdate'"/>
-              <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel"/>
+        <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel"/>
     </VBox>
 </fx:root>
