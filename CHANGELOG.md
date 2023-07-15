@@ -118,6 +118,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where empty grey containers would remain in the groups panel, if displaying of group item count is turned off. [#9972](https://github.com/JabRef/jabref/issues/9972)
 - We fixed an issue where fetching an ISBN could lead to application freezing when the fetcher did not return any results. [#9979](https://github.com/JabRef/jabref/issues/9979)
 - We fixed an issue where closing a library containing groups and entries caused an exception [#9997](https://github.com/JabRef/jabref/issues/9997)
+- We fixed a bug where the editor for strings in a bibliography file did not sort the entries by their keys [#10083](https://github.com/JabRef/jabref/pull/10083)
 
 ### Removed
 
