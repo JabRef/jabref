@@ -77,7 +77,14 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
                 cellItem.setLabel(cellEvent.getNewValue());
             }
 
-            cellEvent.getTableView().refresh();
+            // Resort the entries based on the keys and set the focus to the newly-created entry
+            viewModel.resortStrings();
+            var selectionModel = cellEvent.getTableView().getSelectionModel();
+            var tableView = cellEvent.getTableView();
+            selectionModel.select(cellItem);
+            selectionModel.focus(selectionModel.getSelectedIndex());
+            tableView.refresh();
+            tableView.scrollTo(cellItem);
         });
 
         contentColumn.setSortable(true);
