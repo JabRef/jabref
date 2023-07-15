@@ -1,7 +1,9 @@
 package org.jabref.gui.fieldeditors.journalinfo;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -36,8 +38,8 @@ public class JournalInfoViewModel extends AbstractViewModel {
         journalInformationOptional.ifPresent(journalInformation -> {
             setTitle(journalInformation.title());
             setCountry(journalInformation.country());
-            setCategories(journalInformation.categories());
-            setPublisher(journalInformation.publisher());
+            setCategories(getFormattedCategories(journalInformation));
+            setPublisher(getFormattedPublisher(journalInformation));
             setScimagoId(journalInformation.scimagoId());
             sethIndex(journalInformation.hIndex());
             setIssn(journalInformation.issn());
@@ -169,5 +171,21 @@ public class JournalInfoViewModel extends AbstractViewModel {
             .map(pair -> new XYChart.Data<>(pair.getKey().toString(), pair.getValue()))
             .forEach(series.getData()::add);
         return series;
+    }
+
+    private static String getFormattedCategories(JournalInformation journalInformation) {
+        return Arrays.stream(journalInformation.categories().split(","))
+                     .map(String::trim)
+                     .collect(Collectors.joining("\n"));
+    }
+
+    private static String getFormattedPublisher(JournalInformation journalInformation) {
+        StringBuilder publisher = new StringBuilder();
+        publisher.append(journalInformation.publisher());
+        String country = journalInformation.country();
+        if (!country.isBlank()) {
+            publisher.append(" (").append(country).append(")");
+        }
+        return publisher.toString();
     }
 }

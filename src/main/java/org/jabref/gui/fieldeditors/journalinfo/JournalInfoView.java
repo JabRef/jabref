@@ -14,12 +14,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class JournalInfoView extends VBox {
     @FXML private Label title;
-    @FXML private Label country;
     @FXML private Label categories;
     @FXML private Label publisher;
     @FXML private Label hIndex;
     @FXML private Label issn;
-    @FXML private Label scimagoId;
     @FXML private LineChart<String, Double> sjrChart;
     @FXML private LineChart<String, Double> citableDocsPrevious3YearsChart;
     @FXML private LineChart<String, Double> citesOutgoingChart;
@@ -38,12 +36,10 @@ public class JournalInfoView extends VBox {
         this.getStylesheets().add(Objects.requireNonNull(JournalInfoView.class.getResource("JournalInfo.css")).toExternalForm());
 
         title.textProperty().bind(viewModel.titleProperty());
-        country.textProperty().bind(viewModel.countryProperty());
         categories.textProperty().bind(viewModel.categoriesProperty());
         publisher.textProperty().bind(viewModel.publisherProperty());
         hIndex.textProperty().bind(viewModel.hIndexProperty());
         this.issn.textProperty().bind(viewModel.issnProperty());
-        scimagoId.textProperty().bind(viewModel.scimagoIdProperty());
         bindChartProperties();
     }
 
