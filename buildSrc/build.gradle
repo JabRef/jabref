@@ -19,14 +19,6 @@ javafx {
     modules = [ 'javafx.base' ]
 }
 
-sourceSets{
-    main {
-        java {
-            srcDir "src/copied"
-        }
-    }
-}
-
 /**
  * This is a workaround for Entry org/jabref/build/JournalAbbreviationConverter$_convert_closure1$_closure2.class is a duplicate but no duplicate handling strategy has been set.
  *

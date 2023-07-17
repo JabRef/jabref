@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/refresh-journal-lists.yml'
       - 'buildSrc/build.gradle'
+      - 'buildSrc/src/main/java/**'
       - 'src/main/java/org/jabref/logic/journals/**'
   workflow_dispatch:
 
@@ -51,8 +52,7 @@ jobs:
           cp * $GITHUB_WORKSPACE/build/journals/
 
           # ensure that the .java classes are the most recent ones
-          mkdir -p $GITHUB_WORKSPACE/buildSrc/src/copied/java/org/jabref/logic/journals
-          cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/copied/java/org/jabref/logic/journals
+          cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/main/java/org/jabref/logic/journals
 
           # create .mv file
           cd $GITHUB_WORKSPACE
