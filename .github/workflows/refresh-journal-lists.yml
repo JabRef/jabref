@@ -52,7 +52,7 @@ jobs:
           cp * $GITHUB_WORKSPACE/build/journals/
 
           # ensure that the .java classes are the most recent ones
-          cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/java/org/jabref/logic/journals
+          cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/main/java/org/jabref/logic/journals
 
           # create .mv file
           cd $GITHUB_WORKSPACE
