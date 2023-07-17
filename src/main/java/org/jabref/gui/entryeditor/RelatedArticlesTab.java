@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RelatedArticlesTab extends EntryEditorTab {
 
+    public static final String NAME = "Related articles";
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
@@ -65,7 +66,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
-        MrDLibFetcher fetcher = new MrDLibFetcher(preferencesService.getGeneralPreferences().getLanguage().name(),
+        MrDLibFetcher fetcher = new MrDLibFetcher(preferencesService.getWorkspacePreferences().getLanguage().name(),
                 Globals.BUILD_INFO.version, preferencesService.getMrDlibPreferences());
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))

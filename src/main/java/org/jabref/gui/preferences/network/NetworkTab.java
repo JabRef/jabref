@@ -26,10 +26,12 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
@@ -48,8 +50,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TextField proxyUsername;
     @FXML private Label proxyPasswordLabel;
     @FXML private CustomPasswordField proxyPassword;
-    @FXML private Label proxyAttentionLabel;
     @FXML private Button checkConnectionButton;
+    @FXML private CheckBox proxyPersistPassword;
 
     @FXML private TableView<CustomCertificateViewModel> customCertificatesTable;
     @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
@@ -60,6 +62,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
     @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
 
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -78,9 +81,9 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor);
 
-        remoteLabel.setVisible(preferencesService.getGeneralPreferences().shouldShowAdvancedHints());
+        remoteLabel.setVisible(preferencesService.getWorkspacePreferences().shouldShowAdvancedHints());
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
@@ -102,7 +105,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         proxyPasswordLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
         proxyPassword.textProperty().bindBidirectional(viewModel.proxyPasswordProperty());
         proxyPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
-        proxyAttentionLabel.disableProperty().bind(proxyCustomAndAuthentication.not());
+        proxyPersistPassword.selectedProperty().bindBidirectional(viewModel.proxyPersistPasswordProperty());
+        proxyPersistPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
 
         proxyPassword.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_PRESSED, this::proxyPasswordReveal);

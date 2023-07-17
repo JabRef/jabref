@@ -23,7 +23,7 @@ import com.sun.javafx.scene.control.Properties;
 public class TextInputControlBehavior {
 
     /**
-     * @implNote taken from {@link com.sun.javafx.scene.control.behavior.TextFieldBehavior#contextMenuRequested(javafx.scene.input.ContextMenuEvent)}
+     * taken from {@link com.sun.javafx.scene.control.behavior.TextFieldBehavior#contextMenuRequested(javafx.scene.input.ContextMenuEvent)}
      */
     public static void showContextMenu(TextField textField, ContextMenu contextMenu, ContextMenuEvent e) {
         double screenX = e.getScreenX();
@@ -81,7 +81,7 @@ public class TextInputControlBehavior {
     }
 
     /**
-     * @implNote taken from {@link com.sun.javafx.scene.control.behavior.TextAreaBehavior#contextMenuRequested(javafx.scene.input.ContextMenuEvent)}
+     * taken from {@link com.sun.javafx.scene.control.behavior.TextAreaBehavior#contextMenuRequested(javafx.scene.input.ContextMenuEvent)}
      */
     public static void showContextMenu(TextArea textArea, ContextMenu contextMenu, ContextMenuEvent e) {
         double screenX = e.getScreenX();

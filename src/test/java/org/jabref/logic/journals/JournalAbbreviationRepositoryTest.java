@@ -26,7 +26,7 @@ class JournalAbbreviationRepositoryTest {
 
     private JournalAbbreviationRepository repository;
 
-    private BibDatabase bibDatabase = new BibDatabase();
+    private final BibDatabase bibDatabase = new BibDatabase();
     private UndoableUnabbreviator undoableUnabbreviator;
 
     @BeforeEach

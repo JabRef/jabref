@@ -12,12 +12,14 @@ public class ProxyTest {
    @Test
    public void testProxyPreferencesStorePassword() {
        // mock data
-       Boolean useProxy = true;
+       boolean useProxy = true;
        String hostname = "testName";
        String port = "8080";
-       Boolean useAuthentication = true;
+       boolean useAuthentication = true;
        String username = "testUserName";
        String password = "testPassword";
+       boolean persist = false;
+
        // Creates proxy preference
        ProxyPreferences proxyPref = new ProxyPreferences(
                useProxy,
@@ -25,7 +27,9 @@ public class ProxyTest {
                port,
                useAuthentication,
                username,
-               password);
+               password,
+               persist);
+
        // Check if mock data is stored in object memory and can be extracted
        assertEquals(proxyPref.shouldUseProxy(), true);
        assertEquals(proxyPref.getHostname(), hostname);
@@ -33,5 +37,6 @@ public class ProxyTest {
        assertEquals(proxyPref.shouldUseAuthentication(), true);
        assertEquals(proxyPref.getUsername(), username);
        assertEquals(proxyPref.getPassword(), password);
+       assertEquals(proxyPref.shouldPersistPassword(), persist);
    }
 }

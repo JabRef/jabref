@@ -66,7 +66,6 @@ public class ImportHandler {
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final ImportFormatReader importFormatReader;
     private final TaskExecutor taskExecutor;
 
     public ImportHandler(BibDatabaseContext database,
@@ -75,7 +74,6 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager,
                          DialogService dialogService,
-                         ImportFormatReader importFormatReader,
                          TaskExecutor taskExecutor) {
 
         this.bibDatabaseContext = database;
@@ -83,7 +81,6 @@ public class ImportHandler {
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.importFormatReader = importFormatReader;
         this.taskExecutor = taskExecutor;
 
         this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database);
@@ -311,8 +308,12 @@ public class ImportHandler {
 
     private List<BibEntry> tryImportFormats(String data) {
         try {
+            ImportFormatReader importFormatReader = new ImportFormatReader(
+                    preferencesService.getImporterPreferences(),
+                    preferencesService.getImportFormatPreferences(),
+                    fileUpdateMonitor);
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
-            return unknownFormatImport.parserResult.getDatabase().getEntries();
+            return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
             dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
             return Collections.emptyList();

@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
@@ -27,15 +28,19 @@ public class StyleLoader {
 
     private final OpenOfficePreferences openOfficePreferences;
     private final LayoutFormatterPreferences layoutFormatterPreferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
     // Lists of the internal
     // and external styles
     private final List<OOBibStyle> internalStyles = new ArrayList<>();
     private final List<OOBibStyle> externalStyles = new ArrayList<>();
 
-    public StyleLoader(OpenOfficePreferences openOfficePreferences, LayoutFormatterPreferences formatterPreferences) {
+    public StyleLoader(OpenOfficePreferences openOfficePreferences,
+                       LayoutFormatterPreferences formatterPreferences,
+                       JournalAbbreviationRepository abbreviationRepository) {
         this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);
         this.layoutFormatterPreferences = Objects.requireNonNull(formatterPreferences);
+        this.abbreviationRepository = Objects.requireNonNull(abbreviationRepository);
         loadInternalStyles();
         loadExternalStyles();
     }
@@ -55,7 +60,7 @@ public class StyleLoader {
     public boolean addStyleIfValid(String filename) {
         Objects.requireNonNull(filename);
         try {
-            OOBibStyle newStyle = new OOBibStyle(Path.of(filename), layoutFormatterPreferences);
+            OOBibStyle newStyle = new OOBibStyle(Path.of(filename), layoutFormatterPreferences, abbreviationRepository);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file {} already existing.", filename);
             } else if (newStyle.isValid()) {
@@ -80,7 +85,7 @@ public class StyleLoader {
         List<String> lists = openOfficePreferences.getExternalStyles();
         for (String filename : lists) {
             try {
-                OOBibStyle style = new OOBibStyle(Path.of(filename), layoutFormatterPreferences);
+                OOBibStyle style = new OOBibStyle(Path.of(filename), layoutFormatterPreferences, abbreviationRepository);
                 if (style.isValid()) { // Problem!
                     externalStyles.add(style);
                 } else {
@@ -99,7 +104,7 @@ public class StyleLoader {
         internalStyles.clear();
         for (String filename : internalStyleFiles) {
             try {
-                internalStyles.add(new OOBibStyle(filename, layoutFormatterPreferences));
+                internalStyles.add(new OOBibStyle(filename, layoutFormatterPreferences, abbreviationRepository));
             } catch (IOException e) {
                 LOGGER.info("Problem reading internal style file {}", filename, e);
             }

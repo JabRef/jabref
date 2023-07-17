@@ -69,7 +69,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.fileMonitor = fileMonitor;
-        this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUser())
+        this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
                                                                           .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()))
                                                                           .toAbsolutePath().toString());
         this.root = new SimpleObjectProperty<>();
@@ -204,7 +204,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(
                 databaseContext.getDatabase(),
-                preferencesService.getGeneralPreferences(),
+                preferencesService.getLibraryPreferences(),
                 preferencesService.getImportFormatPreferences(),
                 fileMonitor);
 

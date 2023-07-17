@@ -4,17 +4,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 
@@ -39,16 +34,13 @@ public class HtmlExportFormatTest {
         SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
 
-        ExporterFactory exporterFactory = ExporterFactory.create(
-                new ArrayList<>(),
+        exportFormat = new TemplateExporter("HTML",
+                "html",
+                "html",
+                null,
+                StandardFileType.HTML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                saveConfiguration,
-                mock(XmpPreferences.class),
-                mock(FieldPreferences.class),
-                BibDatabaseMode.BIBTEX,
-                mock(BibEntryTypesManager.class));
-
-        exportFormat = exporterFactory.getExporterByName("html").get();
+                saveConfiguration);
 
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
@@ -56,7 +48,7 @@ public class HtmlExportFormatTest {
         entry.setField(StandardField.TITLE, "my paper title");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb");
         entry.setCitationKey("mykey");
-        entries = Arrays.asList(entry);
+        entries = List.of(entry);
     }
 
     @AfterEach

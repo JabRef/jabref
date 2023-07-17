@@ -16,6 +16,8 @@ import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.jooq.lambda.Unchecked;
+import org.jsoup.HttpStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +42,19 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      * server has to look up the entry.
      *
      * @return A BibTeX string if extraction is successful
+     * @throws FetcherException
      */
-    private Optional<BibEntry> parseUsingGrobid(String plainText) throws RuntimeException {
+    private Optional<BibEntry> parseUsingGrobid(String plainText) throws FetcherException {
         try {
             return grobidService.processCitation(plainText, importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
+        } catch (HttpStatusException e) {
+            String msg = "Connection failure.";
+            LOGGER.debug(msg, e);
+            throw new FetcherException(msg, e.getCause());
         } catch (SocketTimeoutException e) {
             String msg = "Connection timed out.";
             LOGGER.debug(msg, e);
-            throw new RuntimeException(msg, e);
+            throw new FetcherException(msg, e.getCause());
         } catch (IOException | ParseException e) {
             String msg = "Could not process citation. " + e.getMessage();
             LOGGER.debug(msg, e);
@@ -63,16 +70,12 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     @Override
     public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
         List<BibEntry> collect;
-        try {
-            collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
-                            .map(String::trim)
-                            .filter(str -> !str.isBlank())
-                            .map(this::parseUsingGrobid)
-                            .flatMap(Optional::stream)
-                            .collect(Collectors.toList());
-        } catch (RuntimeException e) {
-            throw new FetcherException(e.getMessage(), e.getCause());
-        }
+        collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+                        .map(String::trim)
+                        .filter(str -> !str.isBlank())
+                        .map(Unchecked.function(this::parseUsingGrobid))
+                        .flatMap(Optional::stream)
+                        .collect(Collectors.toList());
         return collect;
     }
 

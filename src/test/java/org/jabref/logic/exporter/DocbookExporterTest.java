@@ -4,17 +4,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 
@@ -39,15 +35,14 @@ public class DocbookExporterTest {
         SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
 
-        ExporterFactory exporterFactory = ExporterFactory.create(
-                new ArrayList<>(),
+        exportFormat = new TemplateExporter(
+                "DocBook 4",
+                "docbook4",
+                "docbook4",
+                null,
+                StandardFileType.XML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                saveConfiguration,
-                mock(XmpPreferences.class),
-                mock(FieldPreferences.class),
-                BibDatabaseMode.BIBTEX,
-                mock(BibEntryTypesManager.class));
-        exportFormat = exporterFactory.getExporterByName("docbook4").get();
+                saveConfiguration);
     }
 
     @Test

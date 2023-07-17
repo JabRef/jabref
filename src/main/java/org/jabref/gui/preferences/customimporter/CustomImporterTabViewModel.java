@@ -12,10 +12,10 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.importer.ImporterViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -42,7 +42,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        Set<CustomImporter> importersLogic = preferences.getImporterPreferences().getCustomImportList();
+        Set<CustomImporter> importersLogic = preferences.getImporterPreferences().getCustomImporters();
         for (CustomImporter importer : importersLogic) {
             importers.add(new ImporterViewModel(importer));
         }
@@ -50,14 +50,9 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferences.getImporterPreferences().getCustomImportList().clear();
-        preferences.getImporterPreferences().getCustomImportList().addAll(importers.stream()
-                                                                                   .map(ImporterViewModel::getLogic)
-                                                                                   .collect(Collectors.toSet()));
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                preferences.getImporterPreferences(),
-                preferences.getImportFormatPreferences(),
-                Globals.getFileUpdateMonitor());
+        preferences.getImporterPreferences().setCustomImporters(importers.stream()
+                                                                         .map(ImporterViewModel::getLogic)
+                                                                         .collect(Collectors.toSet()));
     }
 
     /**
@@ -108,7 +103,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
                             Localization.lang("Could not open %0", selectedFile.get().toString()) + "\n"
                                     + Localization.lang("Have you chosen the correct package path?"),
                             exc);
-                } catch (ClassNotFoundException exc) {
+                } catch (ImportException exc) {
                     LOGGER.error("Could not instantiate importer", exc);
                     dialogService.showErrorDialogAndWait(
                             Localization.lang("Could not instantiate %0 %1", "importer"),

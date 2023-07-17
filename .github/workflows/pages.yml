@@ -43,7 +43,7 @@ jobs:
           cd docs
           bundle exec jekyll build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v2
         with:
           path: docs/_site/
 
