@@ -208,7 +208,6 @@ public class TrustStoreManager {
     private static X509TrustManager createMergedTrustManager(X509TrustManager jreTrustManager,
                                                              X509TrustManager customTrustManager) {
         return new X509TrustManager() {
-
             @Override
             public X509Certificate[] getAcceptedIssuers() {
                 // If you're planning to use client-cert auth,
