@@ -2,7 +2,6 @@ package org.jabref.logic.net.ssl;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -101,7 +100,7 @@ public class TrustStoreManager {
 
     public void flush() {
         try {
-            store.store(new FileOutputStream(storePath.toFile()), STORE_PASSWORD.toCharArray());
+            store.store(Files.newOutputStream(storePath), STORE_PASSWORD.toCharArray());
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
             LOGGER.warn("Error while flushing trust store", e);
         }
@@ -161,7 +160,6 @@ public class TrustStoreManager {
             } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException | CertificateException e) {
                 LOGGER.error("Error configuring trust store {}", storePath, e);
             }
-
         } catch (IOException e) {
             LOGGER.warn("Bad truststore path", e);
         } catch (URISyntaxException e) {
@@ -234,7 +232,6 @@ public class TrustStoreManager {
                 // do the same as checking the server.
                 jreTrustManager.checkClientTrusted(chain, authType);
             }
-
         };
     }
 
@@ -246,8 +243,6 @@ public class TrustStoreManager {
         // You don't have to set this as the default context,
         // it depends on the library you're using.
         SSLContext.setDefault(sslContext);
-
         HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
     }
-
 }
