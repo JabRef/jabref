@@ -15,6 +15,7 @@ public class PushToApplications {
     public static final String TEXSTUDIO = "TeXstudio";
     public static final String VIM = "Vim";
     public static final String WIN_EDT = "WinEdt";
+    public static final String SUBLIME_TEXT = "Sublime Text";
 
     private static final List<PushToApplication> APPLICATIONS = new ArrayList<>();
 

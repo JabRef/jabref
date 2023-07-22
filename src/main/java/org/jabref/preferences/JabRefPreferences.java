@@ -141,6 +141,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PUSH_TEXMAKER_PATH = "texmakerPath";
     public static final String PUSH_VIM_SERVER = "vimServer";
     public static final String PUSH_VIM = "vim";
+    public static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
@@ -503,6 +504,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PUSH_TEXMAKER_PATH, OS.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, OS.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
         defaults.put(PUSH_TEXSTUDIO_PATH, OS.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.getNativeDesktop().detectProgramPath("sublime", "Sublime"));
         defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(PUSH_VIM, "vim");
         defaults.put(PUSH_VIM_SERVER, "vim");
@@ -1722,6 +1724,7 @@ public class JabRefPreferences implements PreferencesService {
         applicationCommands.put(PushToApplications.TEXSTUDIO, get(PUSH_TEXSTUDIO_PATH));
         applicationCommands.put(PushToApplications.VIM, get(PUSH_VIM));
         applicationCommands.put(PushToApplications.WIN_EDT, get(PUSH_WINEDT_PATH));
+        applicationCommands.put(PushToApplications.SUBLIME_TEXT, get(PUSH_SUBLIME_TEXT_PATH));
 
         pushToApplicationPreferences = new PushToApplicationPreferences(
                 get(PUSH_TO_APPLICATION),
@@ -1753,6 +1756,8 @@ public class JabRefPreferences implements PreferencesService {
                         put(PUSH_VIM, value);
                 case PushToApplications.WIN_EDT ->
                         put(PUSH_WINEDT_PATH, value);
+                case PushToApplications.SUBLIME_TEXT ->
+                        put(PUSH_SUBLIME_TEXT_PATH, value);
             }
         });
     }

@@ -145,6 +145,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return preferencesService.getExternalApplicationsPreferences().getCiteCommand();
     }
 
+    @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
