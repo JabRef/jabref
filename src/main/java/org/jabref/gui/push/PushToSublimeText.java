@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
  */
 public class PushToSublimeText extends AbstractPushToApplication {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
-
     public static final String NAME = PushToApplications.SUBLIME_TEXT;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
 
     public PushToSublimeText(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
@@ -56,11 +56,10 @@ public class PushToSublimeText extends AbstractPushToApplication {
             ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
             Process process = processBuilder.start();
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::info);
-            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(),LOGGER::info);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::info);
 
             JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
             JabRefExecutorService.INSTANCE.execute(streamGobblerError);
-
         } catch (IOException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
