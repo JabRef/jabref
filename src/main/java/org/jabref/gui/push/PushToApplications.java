@@ -29,6 +29,7 @@ public class PushToApplications {
         APPLICATIONS.addAll(List.of(
                 new PushToEmacs(dialogService, preferencesService),
                 new PushToLyx(dialogService, preferencesService),
+                new PushToSublimeText(dialogService, preferencesService),
                 new PushToTexmaker(dialogService, preferencesService),
                 new PushToTeXstudio(dialogService, preferencesService),
                 new PushToVim(dialogService, preferencesService),
