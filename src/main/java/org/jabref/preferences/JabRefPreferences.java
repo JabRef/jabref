@@ -504,7 +504,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PUSH_TEXMAKER_PATH, OS.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, OS.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
         defaults.put(PUSH_TEXSTUDIO_PATH, OS.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
-        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.getNativeDesktop().detectProgramPath("sublime", "Sublime"));
+        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.getNativeDesktop().detectProgramPath("subl", "Sublime"));
         defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(PUSH_VIM, "vim");
         defaults.put(PUSH_VIM_SERVER, "vim");

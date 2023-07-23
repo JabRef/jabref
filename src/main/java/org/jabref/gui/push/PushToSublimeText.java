@@ -53,7 +53,11 @@ public class PushToSublimeText extends AbstractPushToApplication {
             return;
         }
         try {
+
+            LOGGER.info("Sublime string: {}", String.join(" ", getCommandLine(keyString)));
             ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
+            processBuilder.redirectOutput();
+            processBuilder.redirectError();
             Process process = processBuilder.start();
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::info);
             StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::info);
@@ -69,9 +73,9 @@ public class PushToSublimeText extends AbstractPushToApplication {
     @Override
     protected String[] getCommandLine(String keyString) {
         if (OS.WINDOWS) {
-            return new String[] {commandPath, "--command \"insert {\\\"characters\\\": \"\\" + getCiteCommand() + "{" + keyString + "}\\\"}\""};
+            return new String[] {commandPath, "--command", "\"insert {\\\"characters\\\": \"\\" + getCiteCommand() + "{" + keyString + "}\\\"}\""};
         } else {
-            return new String[] {commandPath, "--command 'insert {\"characters\": \"\\" + getCiteCommand() + "{" + keyString + "}\"}'"};
+            return new String[] {commandPath, "--command", "'insert {\"characters\": \"\\" + getCiteCommand() + "{" + keyString + "}\"}'"};
         }
     }
 }
