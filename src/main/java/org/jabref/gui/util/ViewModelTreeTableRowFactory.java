@@ -27,6 +27,10 @@ import org.reactfx.util.TriConsumer;
 
 public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S>, TreeTableRow<S>> {
     private BiConsumer<S, ? super MouseEvent> onMouseClickedEvent;
+
+    // True if listener should be at filter stage, otherwise use default Node method
+    private boolean onMousePressedEventCapturePhase;
+
     private BiConsumer<S, ? super MouseEvent> onMousePressedEvent;
     private Consumer<TreeTableRow<S>> toCustomInitializer;
     private Function<S, ContextMenu> contextMenuFactory;
@@ -44,7 +48,12 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
     }
 
     public ViewModelTreeTableRowFactory<S> withOnMousePressedEvent(BiConsumer<S, ? super MouseEvent> event) {
+        return withOnMousePressedEvent(event, false);
+    }
+
+    public ViewModelTreeTableRowFactory<S> withOnMousePressedEvent(BiConsumer<S, ? super MouseEvent> event, boolean capturePhase) {
         this.onMousePressedEvent = event;
+        this.onMousePressedEventCapturePhase = capturePhase;
         return this;
     }
 
@@ -165,7 +174,11 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
                     }
 
                     if (onMousePressedEvent != null) {
-                        setOnMousePressed(event -> onMousePressedEvent.accept(getItem(), event));
+                        if (onMousePressedEventCapturePhase) {
+                            addEventFilter(MouseEvent.MOUSE_PRESSED, event -> onMousePressedEvent.accept(getItem(), event));
+                        } else {
+                            setOnMousePressed(event -> onMousePressedEvent.accept(getItem(), event));
+                        }
                     }
 
                     if (toCustomInitializer != null) {

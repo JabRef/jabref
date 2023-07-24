@@ -230,7 +230,7 @@ public class GroupTreeView extends BorderPane {
                             event.consume();
                         }
                     }
-                })
+                }, true)
                 .withCustomInitializer(row -> {
                     // Remove disclosure node since we display custom version in separate column
                     // Simply setting to null is not enough since it would be replaced by the default node on every change
