@@ -1,7 +1,9 @@
 package org.jabref.gui.push;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
@@ -56,8 +58,10 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
             LOGGER.info("Sublime string: {}", String.join(" ", getCommandLine(keyString)));
             ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
-            processBuilder.redirectOutput();
-            processBuilder.redirectError();
+            processBuilder.inheritIO();
+            Map<String, String> envs = processBuilder.environment();
+            envs.put("PATH", Path.of(commandPath).getParent().toString());
+
             Process process = processBuilder.start();
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::info);
             StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::info);
@@ -73,9 +77,10 @@ public class PushToSublimeText extends AbstractPushToApplication {
     @Override
     protected String[] getCommandLine(String keyString) {
         if (OS.WINDOWS) {
-            return new String[] {commandPath, "--command", "\"insert {\\\"characters\\\": \"\\" + getCiteCommand() + "{" + keyString + "}\\\"}\""};
+            // TODO we might need to escape the inner double quotes with """ """
+            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCiteCommand() + "{" + keyString + "}\"}\""};
         } else {
-            return new String[] {commandPath, "--command", "'insert {\"characters\": \"\\" + getCiteCommand() + "{" + keyString + "}\"}'"};
+            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"\\" + getCiteCommand() + "{" + keyString + "}\"}'"};
         }
     }
 }
