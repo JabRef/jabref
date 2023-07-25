@@ -28,7 +28,8 @@ import org.reactfx.util.TriConsumer;
 public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S>, TreeTableRow<S>> {
     private BiConsumer<S, ? super MouseEvent> onMouseClickedEvent;
 
-    // True if listener should be at filter stage, otherwise use default Node method
+    // True if event capture should be at capture phase via an event filter, otherwise use default Node method to setup
+    // event handler (bubbling phase)
     private boolean onMousePressedEventCapturePhase;
 
     private BiConsumer<S, ? super MouseEvent> onMousePressedEvent;
