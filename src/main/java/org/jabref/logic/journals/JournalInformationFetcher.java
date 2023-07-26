@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class JournalInformationFetcher implements WebFetcher {
     public static final String NAME = "Journal Information";
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalInformationFetcher.class);
-    private static final String API_URL = "https://gentle-forest-03418aa03-2067.westeurope.3.azurestaticapps.net/api";
+    private static final String API_URL = "https://jabref.org/api";
     private static final Pattern QUOTES_BRACKET_PATTERN = Pattern.compile("[\"\\[\\]]");
 
     @Override
