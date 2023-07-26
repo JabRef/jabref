@@ -56,7 +56,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
         }
         try {
 
-            LOGGER.info("Sublime string: {}", String.join(" ", getCommandLine(keyString)));
+            LOGGER.debug("Sublime string: {}", String.join(" ", getCommandLine(keyString)));
             ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
             processBuilder.inheritIO();
             Map<String, String> envs = processBuilder.environment();

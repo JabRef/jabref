@@ -276,7 +276,7 @@ public class IconTheme {
         APPLICATION_TEXMAKER(JabRefMaterialDesignIcon.TEX_MAKER),
         APPLICATION_VIM(JabRefMaterialDesignIcon.VIM),
         APPLICATION_WINEDT(JabRefMaterialDesignIcon.WINEDT),
-        APPLICATION_SUBLIMETEXT(MaterialDesignA.APPLICATION),
+        APPLICATION_SUBLIMETEXT(JabRefMaterialDesignIcon.SUBLIME_TEXT),
         KEY_BINDINGS(MaterialDesignK.KEYBOARD),
         FIND_DUPLICATES(MaterialDesignC.CODE_EQUAL),
         CONNECT_DB(MaterialDesignC.CLOUD_UPLOAD),
