@@ -112,7 +112,6 @@ public class JabRefGUI {
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
 
-
         if (guiPreferences.isWindowFullscreen()) {
             mainStage.setFullScreen(true);
         }
