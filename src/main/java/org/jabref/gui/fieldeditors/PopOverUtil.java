@@ -14,12 +14,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.controlsfx.control.PopOver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PopOverUtil {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PopOverUtil.class);
 
     public static void showJournalInfo(Button button, BibEntry entry, DialogService dialogService, TaskExecutor taskExecutor) {
         Optional<String> optionalIssn = entry.getField(StandardField.ISSN);
@@ -46,7 +42,6 @@ public class PopOverUtil {
                         popOver.hide();
                         String message = Localization.lang("Error while fetching journal information: %0",
                                 exception.getMessage());
-                        LOGGER.warn(message, exception);
                         dialogService.notify(message);
                     })
                     .executeWith(taskExecutor);
