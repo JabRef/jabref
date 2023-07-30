@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.1.16'
+    id 'org.openrewrite.rewrite' version '6.1.19'
 }
 
 // Enable following for debugging
@@ -215,8 +215,8 @@ dependencies {
     implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.161'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.9.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.0'
 
     testImplementation 'org.mockito:mockito-core:5.4.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
@@ -232,7 +232,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.0.7"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.1.0"))
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
 }
