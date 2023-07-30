@@ -92,7 +92,7 @@ public class JournalInformationFetcher implements WebFetcher {
                 if (errors != null && errors.length() > 0) {
                     JSONObject error = errors.getJSONObject(0);
                     String errorMessage = error.optString("message", "");
-                    LOGGER.error("Error accessing catalog: " + errorMessage);
+                    LOGGER.error("Error accessing catalog: {}", errorMessage);
                 }
                 throw new FetcherException(Localization.lang("Error accessing catalog"));
             }

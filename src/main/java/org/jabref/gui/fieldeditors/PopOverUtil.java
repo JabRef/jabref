@@ -30,7 +30,7 @@ public class PopOverUtil {
             ProgressIndicator progressIndicator = new ProgressIndicator();
             progressIndicator.setMaxSize(30, 30);
             popOver.setContentNode(progressIndicator);
-            popOver.setDetachable(false);
+            popOver.setDetachable(true);
             popOver.setTitle(Localization.lang("Journal Information"));
             popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
             popOver.setArrowSize(0);
