@@ -121,6 +121,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where closing a library containing groups and entries caused an exception [#9997](https://github.com/JabRef/jabref/issues/9997)
 - We fixed a bug where the editor for strings in a bibliography file did not sort the entries by their keys [#10083](https://github.com/JabRef/jabref/pull/10083)
 - We fixed an issues where clicking on the empty space of specific context menu entries would not trigger the associated action. [#8388](https://github.com/JabRef/jabref/issues/8388)
+- We fixed an issue where JabRef would not remember if the window was in fullscreen or not [#4939](https://github.com/JabRef/jabref/issues/4939)
 
 ### Removed
 
