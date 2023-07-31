@@ -10,6 +10,8 @@ import java.util.function.Function;
 
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -36,6 +38,7 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
     private TriConsumer<TreeTableRow<S>, S, ? super DragEvent> toOnDragExited;
     private TriConsumer<TreeTableRow<S>, S, ? super DragEvent> toOnDragOver;
     private TriConsumer<TreeTableRow<S>, S, ? super MouseDragEvent> toOnMouseDragEntered;
+    private final Map<EventType<?>, BiConsumer<S, ? super Event>> eventFilters = new HashMap<>();
     private final Map<PseudoClass, Callback<TreeTableRow<S>, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
 
     public ViewModelTreeTableRowFactory<S> withOnMouseClickedEvent(BiConsumer<S, ? super MouseEvent> event) {
@@ -111,6 +114,11 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
 
     public ViewModelTreeTableRowFactory<S> withPseudoClass(PseudoClass pseudoClass, Callback<TreeTableRow<S>, ObservableValue<Boolean>> toCondition) {
         this.pseudoClasses.putIfAbsent(pseudoClass, toCondition);
+        return this;
+    }
+
+    public ViewModelTreeTableRowFactory<S> withEventFilter(EventType<?> event, BiConsumer<S, ? super Event> toCondition) {
+        this.eventFilters.putIfAbsent(event, toCondition);
         return this;
     }
 
@@ -190,6 +198,10 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
 
                     if (toOnMouseDragEntered != null) {
                         setOnMouseDragEntered(event -> toOnMouseDragEntered.accept(this, getItem(), event));
+                    }
+
+                    for (Map.Entry<EventType<?>, BiConsumer<S, ? super Event>> eventFilter : eventFilters.entrySet()) {
+                        addEventFilter(eventFilter.getKey(), event -> eventFilter.getValue().accept(getItem(), event));
                     }
 
                     for (Map.Entry<PseudoClass, Callback<TreeTableRow<S>, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
