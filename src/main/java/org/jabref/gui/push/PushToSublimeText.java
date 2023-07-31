@@ -19,7 +19,6 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class PushToSublimeText extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.SUBLIME_TEXT;
