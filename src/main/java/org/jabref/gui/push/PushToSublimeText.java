@@ -13,14 +13,13 @@ import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Class for pushing entries into SublimeText.
- */
+
 public class PushToSublimeText extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.SUBLIME_TEXT;
@@ -50,7 +49,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
         commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
-        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+        if (StringUtil.isNullOrEmpty(commandPath)) {
             notDefined = true;
             return;
         }
