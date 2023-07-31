@@ -34,7 +34,6 @@ jobs:
           - os: self-hosted
             displayName: macOS (Arm64)
             suffix: '_arm64'
-            archivePortable: tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos_arm64.tar.gz && rm -R build/distribution/JabRef.app
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
@@ -98,7 +97,7 @@ jobs:
           security create-keychain -p jabref ${{runner.temp}}/keychain/notarization.keychain
           security set-keychain-settings ${{runner.temp}}/keychain/notarization.keychain
       - name: Prepare merged jars and modules dir (macos)
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir   
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Build dmg (macos)
         shell: bash
         run: |
@@ -162,9 +161,6 @@ jobs:
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}" --keychain ${{runner.temp}}/keychain/notarization.keychain
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg
-      - name: Package application image
-        shell: bash
-        run: ${{ matrix.archivePortable }}
       - name: Upload to GitHub workflow artifacts store
         uses: actions/upload-artifact@v3
         with:
