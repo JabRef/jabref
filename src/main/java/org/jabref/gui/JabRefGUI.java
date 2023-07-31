@@ -112,10 +112,6 @@ public class JabRefGUI {
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
 
-
-        if (guiPreferences.isWindowFullscreen()) {
-            mainStage.setFullScreen(true);
-        }
         // Restore window location and/or maximised state
         if (guiPreferences.isWindowMaximised()) {
             mainStage.setMaximized(true);
@@ -275,7 +271,6 @@ public class JabRefGUI {
         preferences.setSizeX(mainStage.getWidth());
         preferences.setSizeY(mainStage.getHeight());
         preferences.setWindowMaximised(mainStage.isMaximized());
-        preferences.setWindowFullScreen(mainStage.isFullScreen());
         debugLogWindowState(mainStage);
     }
 
