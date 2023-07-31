@@ -224,13 +224,13 @@ public class GroupTreeView extends BorderPane {
 
         new ViewModelTreeTableRowFactory<GroupNodeViewModel>()
                 .withContextMenu(this::createContextMenuForGroup)
-                .withOnMousePressedEvent((row, event) -> {
+                .withEventFilter(MouseEvent.MOUSE_PRESSED, (row, event) -> {
                     if (event.getTarget() instanceof StackPane pane) {
                         if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
                             event.consume();
                         }
                     }
-                }, true)
+                })
                 .withCustomInitializer(row -> {
                     // Remove disclosure node since we display custom version in separate column
                     // Simply setting to null is not enough since it would be replaced by the default node on every change
