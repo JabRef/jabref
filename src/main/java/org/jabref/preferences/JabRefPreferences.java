@@ -141,6 +141,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PUSH_TEXMAKER_PATH = "texmakerPath";
     public static final String PUSH_VIM_SERVER = "vimServer";
     public static final String PUSH_VIM = "vim";
+    public static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
@@ -157,6 +158,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
     public static final String AUTO_RESIZE_MODE = "autoResizeMode";
     public static final String WINDOW_MAXIMISED = "windowMaximised";
+    public static final String WINDOW_FULLSCREEN = "windowFullscreen";
 
     public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
@@ -503,6 +505,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PUSH_TEXMAKER_PATH, OS.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, OS.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
         defaults.put(PUSH_TEXSTUDIO_PATH, OS.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.getNativeDesktop().detectProgramPath("subl", "Sublime"));
         defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(PUSH_VIM, "vim");
         defaults.put(PUSH_VIM_SERVER, "vim");
@@ -553,6 +556,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIZE_X, 1024);
         defaults.put(SIZE_Y, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.TRUE);
+        defaults.put(WINDOW_FULLSCREEN, Boolean.FALSE);
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE); // By default disable "Fit table horizontally on the screen"
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
@@ -1722,6 +1726,7 @@ public class JabRefPreferences implements PreferencesService {
         applicationCommands.put(PushToApplications.TEXSTUDIO, get(PUSH_TEXSTUDIO_PATH));
         applicationCommands.put(PushToApplications.VIM, get(PUSH_VIM));
         applicationCommands.put(PushToApplications.WIN_EDT, get(PUSH_WINEDT_PATH));
+        applicationCommands.put(PushToApplications.SUBLIME_TEXT, get(PUSH_SUBLIME_TEXT_PATH));
 
         pushToApplicationPreferences = new PushToApplicationPreferences(
                 get(PUSH_TO_APPLICATION),
@@ -1753,6 +1758,8 @@ public class JabRefPreferences implements PreferencesService {
                         put(PUSH_VIM, value);
                 case PushToApplications.WIN_EDT ->
                         put(PUSH_WINEDT_PATH, value);
+                case PushToApplications.SUBLIME_TEXT ->
+                        put(PUSH_SUBLIME_TEXT_PATH, value);
             }
         });
     }
@@ -2511,6 +2518,7 @@ public class JabRefPreferences implements PreferencesService {
                 getDouble(SIZE_X),
                 getDouble(SIZE_Y),
                 getBoolean(WINDOW_MAXIMISED),
+                getBoolean(WINDOW_FULLSCREEN),
                 getStringList(LAST_EDITED),
                 Path.of(get(LAST_FOCUSED)),
                 getFileHistory(),
@@ -2527,6 +2535,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
+        EasyBind.listen(guiPreferences.windowFullScreenProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_FULLSCREEN, newValue));
         guiPreferences.getLastFilesOpened().addListener((ListChangeListener<String>) change -> {
             if (change.getList().isEmpty()) {
                 prefs.remove(LAST_EDITED);

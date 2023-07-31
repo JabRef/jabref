@@ -37,6 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We integrated two mail actions ("As Email" and "To Kindle") under a new "Send" option in the right-click & Tools menus. The Kindle option creates an email targeted to the user's Kindle email, which can be set in preferences under "External programs" [#6186](https://github.com/JabRef/jabref/issues/6186)
 - We added an option to clear recent libraries' history. [#10003](https://github.com/JabRef/jabref/issues/10003)
 - We added an option to encrypt and remember the proxy password. [#8055](https://github.com/JabRef/jabref/issues/8055)[#10044](https://github.com/JabRef/jabref/issues/10044)
+- We added support for pushing citations to Sublime Text 3 [#10098](https://github.com/JabRef/jabref/issues/10098)
 
 ### Changed
 
@@ -121,6 +122,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where closing a library containing groups and entries caused an exception [#9997](https://github.com/JabRef/jabref/issues/9997)
 - We fixed a bug where the editor for strings in a bibliography file did not sort the entries by their keys [#10083](https://github.com/JabRef/jabref/pull/10083)
 - We fixed an issues where clicking on the empty space of specific context menu entries would not trigger the associated action. [#8388](https://github.com/JabRef/jabref/issues/8388)
+- We fixed an issue where JabRef would not remember if the window was in fullscreen or not [#4939](https://github.com/JabRef/jabref/issues/4939)
 
 ### Removed
 
