@@ -5,11 +5,12 @@ on:
     inputs:
       notarization:
         type: boolean
-        required: false
-        default: false
+        required: true
+        default: true
   push:
    branches:
     - arm64mac-release
+    - updateArm64Notarization
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
