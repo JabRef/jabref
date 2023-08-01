@@ -162,11 +162,6 @@ jobs:
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}" --keychain ${{runner.temp}}/keychain/notarization.keychain
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg
-      - name: Upload to GitHub workflow artifacts store
-        uses: actions/upload-artifact@v3
-        with:
-          name: JabRef-${{ matrix.displayName }}
-          path: build/distribution
       - name: Upload with rsync
         shell: bash
         run: |
@@ -176,3 +171,8 @@ jobs:
         env:
           # Feel free to rename this variable, but make sure to update it everywhere. You should paste your entire file in your secrets
           TEST_ENV_FILE : ${{secrets.buildJabRefPrivateKey}}
+      - name: Upload to GitHub workflow artifacts store
+        uses: actions/upload-artifact@v3
+        with:
+          name: JabRef-${{ matrix.displayName }}
+          path: build/distribution
