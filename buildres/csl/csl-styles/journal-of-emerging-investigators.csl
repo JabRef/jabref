@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="minimal-two">
+  <!-- STYLE META DATA -->
   <info>
-    <title>Modern Language Association 9th edition</title>
-    <title-short>MLA</title-short>
-    <id>http://www.zotero.org/styles/modern-language-association</id>
-    <link href="http://www.zotero.org/styles/modern-language-association" rel="self"/>
-    <link href="http://style.mla.org" rel="documentation"/>
-    <author>
-      <name>Sebastian Karcher</name>
-    </author>
+    <title>Journal of Emerging Investigators</title>
+    <title-short>JEI</title-short>
+    <id>http://www.zotero.org/styles/journal-of-emerging-investigators</id>
+    <link href="http://www.zotero.org/styles/journal-of-emerging-investigators" rel="self"/>
+    <link href="https://github.com/SirohiKumar/MANUSCRIPT-FORMATTING/blob/main/documentation.html" rel="documentation"/>
     <contributor>
-      <name>Patrick O'Brien</name>
+      <name>Sirohi Kumar</name>
+      <email>sirohigkumar@icloud.com</email>
     </contributor>
     <category citation-format="author"/>
     <category field="generic-base"/>
-    <summary>This style adheres to the MLA 9th edition handbook. Follows the structure of references as outlined in the MLA Manual closely</summary>
-    <updated>2023-07-21T20:05:10+00:00</updated>
+    <summary>This style is based on the MLA 9th edition handbook, with adaptations made to the in-text citation style, following the guidelines of the Journal of Emerging Investigators.</summary>
+    <updated>2023-07-07T23:56:30+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <!-- MACROS -->
   <locale xml:lang="en">
     <date form="text">
       <date-part name="day" suffix=" "/>
@@ -51,23 +51,6 @@
       </substitute>
     </names>
   </macro>
-  <macro name="author-short">
-    <group delimiter=", ">
-      <names variable="author">
-        <name form="short" initialize-with=". " and="text"/>
-        <substitute>
-          <names variable="editor"/>
-          <names variable="translator"/>
-          <text macro="title-short"/>
-        </substitute>
-      </names>
-      <choose>
-        <if disambiguate="true">
-          <text macro="title-short"/>
-        </if>
-      </choose>
-    </group>
-  </macro>
   <macro name="title">
     <choose>
       <if variable="container-title" match="any">
@@ -75,16 +58,6 @@
       </if>
       <else>
         <text variable="title" font-style="italic" text-case="title"/>
-      </else>
-    </choose>
-  </macro>
-  <macro name="title-short">
-    <choose>
-      <if variable="container-title" match="any">
-        <text variable="title" form="short" quotes="true" text-case="title"/>
-      </if>
-      <else>
-        <text variable="title" form="short" font-style="italic" text-case="title"/>
       </else>
     </choose>
   </macro>
@@ -198,18 +171,9 @@
   </macro>
   <macro name="publisher">
     <choose>
-      <if type="thesis" match="any">
-        <group delimiter=". ">
-          <date variable="issued" form="numeric" date-parts="year"/>
-          <group delimiter=", ">
-            <text variable="publisher"/>
-            <text variable="genre"/>
-          </group>
-        </group>
-      </if>
-      <else-if type="article-magazine article-newspaper article-journal" match="none">
+      <if type="article-magazine article-newspaper article-journal" match="none">
         <text variable="publisher"/>
-      </else-if>
+      </if>
     </choose>
   </macro>
   <macro name="publication-date">
@@ -220,7 +184,7 @@
       <else-if type="article-journal" match="any">
         <date variable="issued" form="text" date-parts="year-month"/>
       </else-if>
-      <else-if type="speech thesis" match="none">
+      <else-if type="speech" match="none">
         <date variable="issued" form="text"/>
       </else-if>
     </choose>
@@ -287,33 +251,52 @@
       </if>
     </choose>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true">
+  <macro name="citation-locator">
+    <group delimiter=" ">
+      <choose>
+        <if locator="page">
+          <label variable="locator" form="short"/>
+        </if>
+        <else>
+          <label variable="locator" form="short" text-case="capitalize-first"/>
+        </else>
+      </choose>
+      <text variable="locator"/>
+    </group>
+  </macro>
+  <!-- IN TEXT CITATION -->
+  <citation collapse="citation-number">
+    <sort>
+      <key variable="citation-number"/>
+    </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <choose>
         <if locator="page line" match="any">
           <group delimiter=" ">
-            <text macro="author-short"/>
-            <text variable="locator"/>
+            <text variable="citation-number"/>
+            <text macro="citation-locator"/>
           </group>
         </if>
         <else>
           <group delimiter=", ">
-            <text macro="author-short"/>
+            <text macro="citation-locator"/>
             <group>
-              <label variable="locator" form="short"/>
-              <text variable="locator"/>
+              <label variable="citation-number"/>
+              <text variable="citation-number"/>
             </group>
           </group>
         </else>
       </choose>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" et-al-min="3" et-al-use-first="1" line-spacing="2" entry-spacing="0" subsequent-author-substitute="---">
+  <!-- BIBLIOGRAPHY -->
+  <bibliography hanging-indent="true" et-al-min="2" et-al-use-first="1" line-spacing="2" entry-spacing="0" subsequent-author-substitute="---">
     <sort>
-      <key macro="author"/>
-      <key variable="title"/>
+      <key variable="citation-number"/>
+      <key macro="citation-locator"/>
     </sort>
     <layout suffix=".">
+      <text variable="citation-number" prefix="" suffix=") "/>
       <group delimiter=". ">
         <text macro="author"/>
         <text macro="title"/>
