@@ -171,7 +171,7 @@ jobs:
         run: |
           mkdir ${{runner.temp}}/sshkey
           echo $TEST_ENV_FILE >> ${{runner.temp}}/sshkey.key
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}" -e 'ssh -p 9922-i ${{runner.temp}}/sshkey.key' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}" -e 'ssh -p 9922 -i ${{runner.temp}}/sshkey.key' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
         env:
           # Feel free to rename this variable, but make sure to update it everywhere. You should paste your entire file in your secrets
           TEST_ENV_FILE : ${{secrets.buildJabRefPrivateKey}}
