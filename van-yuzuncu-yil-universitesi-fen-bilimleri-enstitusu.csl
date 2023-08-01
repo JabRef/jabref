@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="tr-TR">
+  <info>
+    <title>Van Yüzüncü Yıl Üniversitesi Fen Bilimleri Enstitüsü - Tez Yazım Stili (Türkçe)</title>
+    <title-short>vanyyufbetez</title-short>
+    <id>http://www.zotero.org/styles/van-yuzuncu-yil-universitesi-fen-bilimleri-enstitusu</id>
+    <link href="http://www.zotero.org/styles/van-yuzuncu-yil-universitesi-fen-bilimleri-enstitusu" rel="self"/>
+    <link href="http://www.zotero.org/styles/apa" rel="template"/>
+    <link href="https://www.yyu.edu.tr/images/files/Thesis_Writing_Rules(1).pdf" rel="documentation"/>
+    <contributor>
+      <name>Ömer Faruk Özdemir</name>
+      <email>ofozdemir@yyu.edu.tr</email>
+    </contributor>
+    <category citation-format="author-date"/>
+    <category field="psychology"/>
+    <category field="generic-base"/>
+    <summary>APA’nın Türkçeye uyarlandığı bu çalışma Kurbanoğlu (2004) tarafından hazırlanan “kaynakça gösterme el kitabı”ndan yararlanılmıştır. APA’da kullanılan “and, n.d., et al., p., pp., eds., trans., ed., unpublished” etiketleri sırasıyla “ve, t.y., ve diğerleri, s., ss., ed., çev., bs., yayımlanmamış” şeklinde tercümesi yapılmıştır. Üç ve daha fazla yazarlı eserlerde “and” etiketi önünde kullanılan “,” karakteri kullanılmamıştır. İngilizcede sırasal rakam ile birlikte kullanılan son ek yerine Türkçede geçerli olan “.” işareti kullanılmıştır. APA’da künye içerisinde eserin yayın tarihi, erişim tarihi verilmektedir. Bazı eserlerde yayın tarihi için kullanılan “yıl, ay gün” biçimi APA-TR’de “yıl, gün ay” şeklinde kullanılmıştır. Erişim tarihi için kullanılan “ay gün, yıl” biçimi yerine de “gün ay yıl” biçimi seçilmiştir. APA’da elektronik yayınlarda kullanılan “Retrieved ……… from……..” etiketi yerine “……… tarihinde ……… adresinden erişildi” etiketi kullanılmıştır. CSL dilinde “retrieved”, “from” etiketleri ayrı olduğu için çalışmamızda “retrieved” etiketi “tarihinde”, “from” etiketi ise “adresinden erişildi” şeklinde yerelleştirilmesi yapılmıştır. APA’da bir kitap içerisinde yayımlanan yayına yapılan atıflarda eser adında önce kullanılan “in” etiketi, Türkçeye “içinde” olarak tercümesi yapılmış ve eser adından sonra kullanılmıştır. Dolayısıyla “tarih”, “tarihinde”, “adresinden erişildi”, “içinde” etiketlerinin künye içerisindeki yerleri değiştirilmiştir. Öneriler: “vol., vols.” etiketleri “c.”; toplantı adından önce kullanılan “Presented at the……” ifadesi “…….., sunulmuş bildiri” olarak kullanılmıştır. Çalışmada elektronik kaynaklar ve diğer değişen kurallar için APA’nın 6. versiyondaki kurallar öngörülmüştür. Lütfen tespit ettiğiniz sorunlar ve öneriler için kbinici@atauni.edu.tr adresine yazınız. Kasım Binici.</summary>
+    <updated>2022-09-19T15:40:31+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="tr-TR">
+    <terms>
+      <term name="no date">t.y.</term>
+      <term name="et-al">vd.</term>
+      <term name="and">ve</term>
+      <term name="in">in</term>
+      <term name="retrieved">erişildi</term>
+      <term name="from">adresinden</term>
+      <term name="presented at">sunulmuş bildiri</term>
+      <term name="edition">basım</term>
+      <term name="edition" form="short">ed.</term>
+      <term name="page">
+        <single>page</single>
+        <multiple>pages</multiple>
+      </term>
+      <term name="page" form="short">
+        <single>p.</single>
+        <multiple>pp.</multiple>
+      </term>
+      <term name="volume" form="short">Vol.</term>
+      <term name="translator" form="short">çev.</term>
+      <term name="editor" form="short">ed.</term>
+      <term name="ordinal-01">.</term>
+      <term name="ordinal-02">.</term>
+      <term name="ordinal-03">.</term>
+      <term name="ordinal-04">.</term>
+      <term name="month-01">Ocak</term>
+      <term name="month-02">Şubat</term>
+      <term name="month-03">Mart</term>
+      <term name="month-04">Nisan</term>
+      <term name="month-05">Mayıs</term>
+      <term name="month-06">Haziran</term>
+      <term name="month-07">Temmuz</term>
+      <term name="month-08">Ağustos</term>
+      <term name="month-09">Eylül</term>
+      <term name="month-10">Ekim</term>
+      <term name="month-11">Kasım</term>
+      <term name="month-12">Aralık</term>
+    </terms>
+  </locale>
+  <macro name="container-contributors">
+    <choose>
+      <if type="chapter paper-conference" match="any">
+        <names variable="editor" delimiter=", " prefix=" In " suffix=", ">
+          <name and="text" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with=". "/>
+          <label form="short" prefix=" (" text-case="capitalize-first" suffix=")"/>
+          <substitute>
+            <names variable="translator"/>
+          </substitute>
+        </names>
+      </if>
+    </choose>
+  </macro>
+  <macro name="secondary-contributors">
+    <choose>
+      <if type="article-journal chapter paper-conference" match="none">
+        <names variable="translator" delimiter=", " prefix="(" suffix=").">
+          <name and="text" initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
+          <label form="short" prefix=", " text-case="capitalize-first"/>
+          <substitute>
+            <names variable="editor"/>
+          </substitute>
+        </names>
+      </if>
+    </choose>
+  </macro>
+  <macro name="author">
+    <names variable="author">
+      <name delimiter-precedes-et-al="never" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+      <label form="short" prefix=" (" suffix=")" text-case="capitalize-first"/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <choose>
+          <if type="report">
+            <text variable="publisher"/>
+            <text macro="title" text-case="capitalize-first"/>
+          </if>
+          <else>
+            <text macro="title" text-case="capitalize-first"/>
+          </else>
+        </choose>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author">
+      <name form="short" and="text" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with=". "/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <choose>
+          <if type="report">
+            <text variable="publisher"/>
+            <text variable="title" form="short" font-style="italic"/>
+          </if>
+          <else-if type="bill book graphic legal_case legislation motion_picture song" match="any">
+            <text variable="title" form="short" font-style="italic"/>
+          </else-if>
+          <else>
+            <text variable="title" form="short" quotes="true"/>
+          </else>
+        </choose>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="access">
+    <choose>
+      <if type="thesis">
+        <choose>
+          <if variable="archive" match="any">
+            <group>
+              <text variable="archive"/>
+              <text variable="archive_location" prefix=" (" suffix=")"/>
+            </group>
+          </if>
+          <else>
+            <group>
+              <text variable="URL"/>
+            </group>
+          </else>
+        </choose>
+      </if>
+      <else>
+        <choose>
+          <if variable="DOI">
+            <text variable="DOI" prefix="doi:"/>
+          </if>
+          <else>
+            <choose>
+              <if type="webpage">
+                <group delimiter=" " suffix=".">
+                  <group>
+                    <date variable="accessed" prefix="Erişim tarihi: " suffix=".">
+                      <date-part name="day" suffix=" "/>
+                      <date-part name="month" suffix=" "/>
+                      <date-part name="year"/>
+                    </date>
+                  </group>
+                  <text variable="URL" prefix="Erişim adresi: "/>
+                </group>
+              </if>
+              <else>
+                <group delimiter=" " suffix=".">
+                  <text variable="URL"/>
+                </group>
+              </else>
+            </choose>
+          </else>
+        </choose>
+      </else>
+    </choose>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="report">
+        <text variable="title" text-case="capitalize-first" font-style="italic" suffix="."/>
+        <group prefix=" (" suffix=")">
+          <text variable="collection-title" text-case="capitalize-first"/>
+          <text variable="genre"/>
+          <text variable="number" prefix=" No: "/>
+        </group>
+      </if>
+      <else-if type="graphic motion_picture report song manuscript speech" match="any">
+        <text variable="title" text-case="capitalize-first" font-style="italic" font-variant="normal" font-weight="bold"/>
+      </else-if>
+      <else-if type="chapter" match="any">
+        <group suffix=".">
+          <text variable="title" text-case="capitalize-first" font-variant="normal"/>
+        </group>
+      </else-if>
+      <else-if type="paper-conference" match="any">
+        <text variable="title" suffix=". "/>
+      </else-if>
+      <else-if type="thesis" match="any">
+        <text variable="title" font-style="italic"/>
+      </else-if>
+      <else-if type="book" match="any">
+        <group suffix=".">
+          <text variable="title" font-style="italic" font-weight="bold"/>
+          <choose>
+            <if match="any" is-numeric="edition">
+              <group prefix=" (" suffix=").">
+                <number suffix=". " variable="edition"/>
+                <text term="edition" form="short"/>
+              </group>
+            </if>
+          </choose>
+        </group>
+      </else-if>
+      <else>
+        <text variable="title" text-case="capitalize-first" font-style="normal" font-weight="normal" suffix="."/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="publisher">
+    <choose>
+      <if type="report">
+        <group delimiter=": ">
+          <text variable="publisher"/>
+          <text variable="publisher-place"/>
+        </group>
+      </if>
+      <else-if type="thesis">
+        <choose>
+          <if variable="archive URL" match="any">
+            <text variable="genre" text-case="capitalize-first" prefix=" (" suffix=")"/>
+          </if>
+          <else>
+            <text variable="genre" text-case="lowercase" prefix=" (" suffix="). "/>
+            <group delimiter=", ">
+              <text variable="publisher"/>
+              <text variable="publisher-place"/>
+            </group>
+          </else>
+        </choose>
+      </else-if>
+      <else>
+        <group delimiter=", ">
+          <choose>
+            <if variable="event" match="none">
+              <text variable="genre"/>
+            </if>
+          </choose>
+          <choose>
+            <if type="article-journal article-magazine" match="none">
+              <group delimiter=": ">
+                <text variable="publisher"/>
+                <text variable="publisher-place"/>
+              </group>
+            </if>
+          </choose>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <macro name="event">
+    <choose>
+      <if variable="event">
+        <choose>
+          <if variable="genre" match="none">
+            <text variable="event"/>
+            <text term="presented at" prefix=", "/>
+          </if>
+          <else>
+            <group delimiter=" ">
+              <text variable="event"/>
+              <text variable="genre"/>
+            </group>
+          </else>
+        </choose>
+      </if>
+    </choose>
+  </macro>
+  <macro name="issued">
+    <choose>
+      <if type="bill legal_case legislation" match="none">
+        <choose>
+          <if variable="issued">
+            <group prefix=" (" suffix=").">
+              <date variable="issued">
+                <date-part name="year"/>
+              </date>
+              <text variable="year-suffix"/>
+              <choose>
+                <if type="bill book graphic legal_case legislation motion_picture report song article-journal chapter paper-conference" match="none">
+                  <date variable="issued" prefix=",">
+                    <date-part prefix=" " name="day"/>
+                    <date-part prefix=" " name="month"/>
+                  </date>
+                </if>
+              </choose>
+            </group>
+          </if>
+          <else>
+            <group prefix=" (" suffix=").">
+              <text term="no date" form="short"/>
+              <text variable="year-suffix" prefix="-"/>
+            </group>
+          </else>
+        </choose>
+      </if>
+    </choose>
+  </macro>
+  <macro name="issued-sort">
+    <choose>
+      <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="none">
+        <date variable="issued">
+          <date-part name="year"/>
+          <date-part prefix=", " name="day"/>
+          <date-part prefix=" " name="month"/>
+        </date>
+      </if>
+      <else>
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </else>
+    </choose>
+  </macro>
+  <macro name="issued-year">
+    <choose>
+      <if variable="issued">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+        <text variable="year-suffix"/>
+      </if>
+      <else>
+        <text term="no date" form="short"/>
+        <text variable="year-suffix" prefix="-"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="edition">
+    <choose>
+      <if is-numeric="edition">
+        <group delimiter=" ">
+          <number variable="edition" form="ordinal"/>
+          <text term="edition" form="short"/>
+        </group>
+      </if>
+      <else>
+        <text variable="edition" suffix="."/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="locators">
+    <choose>
+      <if type="article-journal article-magazine" match="any">
+        <group delimiter=", " prefix=", ">
+          <group>
+            <text variable="volume" font-style="normal"/>
+            <text variable="issue" prefix="(" suffix=")"/>
+          </group>
+          <text variable="page"/>
+        </group>
+      </if>
+      <else-if type="article-newspaper">
+        <group delimiter=" " prefix=", ">
+          <label variable="page" form="short"/>
+          <text variable="page"/>
+        </group>
+      </else-if>
+      <else-if type="graphic motion_picture report song chapter" match="any">
+        <group delimiter=", " prefix=" (" suffix=").">
+          <text macro="edition"/>
+          <group>
+            <text term="volume" form="short" plural="true" text-case="capitalize-first" suffix=" "/>
+            <number variable="number-of-volumes" form="numeric" prefix="1-"/>
+          </group>
+          <group>
+            <text term="volume" form="short" text-case="capitalize-first" suffix=" "/>
+            <number variable="volume" form="numeric"/>
+          </group>
+          <group>
+            <label variable="page" form="short" suffix=" "/>
+            <text variable="page"/>
+          </group>
+        </group>
+      </else-if>
+      <else-if type="legal_case">
+        <group prefix=" (" suffix=")" delimiter=" ">
+          <text variable="authority"/>
+          <date variable="issued" delimiter=" ">
+            <date-part name="month" form="short"/>
+            <date-part name="day" suffix=","/>
+            <date-part name="year"/>
+          </date>
+        </group>
+      </else-if>
+      <else-if type="bill legislation" match="any">
+        <date variable="issued" prefix=" (" suffix=")">
+          <date-part name="year"/>
+        </date>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="citation-locator">
+    <group>
+      <label variable="locator" form="short"/>
+      <text variable="locator" prefix=" "/>
+    </group>
+  </macro>
+  <macro name="container">
+    <choose>
+      <if type="article-journal legal_case legislation thesis paper-conference" match="none">
+        <text variable="container-title" text-case="capitalize-first" font-style="italic" font-weight="bold" prefix=" "/>
+      </if>
+      <else-if type="paper-conference" match="any">
+        <group>
+          <text variable="container-title" font-weight="bold" suffix=","/>
+        </group>
+      </else-if>
+      <else>
+        <group delimiter=" " prefix=" ">
+          <choose>
+            <if variable="container-title">
+              <text variable="container-title" text-case="capitalize-first" font-style="italic" text-decoration="none"/>
+              <group delimiter=" ">
+                <text term="section" form="symbol"/>
+                <text variable="section"/>
+              </group>
+            </if>
+            <else>
+              <choose>
+                <if type="legal_case">
+                  <text variable="number" prefix="No. "/>
+                </if>
+                <else>
+                  <text variable="number" prefix="Pub. L. No. "/>
+                  <group delimiter=" ">
+                    <text term="section" form="symbol"/>
+                    <text variable="section"/>
+                  </group>
+                </else>
+              </choose>
+            </else>
+          </choose>
+        </group>
+      </else>
+    </choose>
+  </macro>
+  <citation and="text" et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year" cite-group-delimiter="; ">
+    <sort>
+      <key macro="issued"/>
+      <key macro="issued-sort"/>
+    </sort>
+    <layout prefix="(" suffix=")" delimiter="; ">
+      <group delimiter=", ">
+        <choose>
+          <if type="personal_communication interview" match="any">
+            <names variable="author">
+              <name form="short" and="text" et-al-min="3" et-al-use-first="1" initialize-with=". "/>
+            </names>
+            <text value="kişisel iletişim"/>
+            <date variable="issued">
+              <date-part prefix=" " name="day"/>
+              <date-part prefix=" " name="month"/>
+              <date-part prefix=" " name="year"/>
+            </date>
+          </if>
+          <else>
+            <text macro="author-short"/>
+            <text macro="issued-year"/>
+          </else>
+        </choose>
+        <text macro="citation-locator"/>
+      </group>
+    </layout>
+  </citation>
+  <bibliography et-al-min="8" et-al-use-first="6" et-al-use-last="true" entry-spacing="0" line-spacing="2" hanging-indent="true">
+    <sort>
+      <key macro="author"/>
+      <key macro="issued-sort" sort="ascending"/>
+    </sort>
+    <layout font-variant="normal">
+      <group suffix=".">
+        <text macro="author" suffix=". "/>
+        <text macro="issued"/>
+        <group>
+          <text macro="title" text-case="capitalize-first" font-variant="normal" prefix=" "/>
+          <text macro="container-contributors"/>
+          <group>
+            <group delimiter=",">
+              <text macro="container" text-case="capitalize-first"/>
+            </group>
+            <text macro="secondary-contributors"/>
+          </group>
+        </group>
+        <text macro="locators"/>
+        <group delimiter=", " prefix=" ">
+          <text macro="event"/>
+          <text macro="publisher"/>
+        </group>
+      </group>
+      <text macro="access" prefix=" "/>
+    </layout>
+  </bibliography>
+</style>

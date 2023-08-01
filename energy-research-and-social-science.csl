@@ -1,25 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" initialize-with-hyphen="false" page-range-format="minimal">
   <info>
-    <title>Vancouver</title>
-    <id>http://www.zotero.org/styles/vancouver</id>
-    <link href="http://www.zotero.org/styles/vancouver" rel="self"/>
-    <link href="http://www.nlm.nih.gov/bsd/uniform_requirements.html" rel="documentation"/>
+    <title>Energy Research &amp; Social Science</title>
+    <id>http://www.zotero.org/styles/energy-research-and-social-science</id>
+    <link rel="self" href="http://www.zotero.org/styles/energy-research-and-social-science"/>
+    <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
+    <link href="https://www.elsevier.com/journals/energy-research-and-social-science/2214-6296/guide-for-authors" rel="documentation"/>
     <author>
-      <name>Michael Berkowitz</name>
-      <email>mberkowi@gmu.edu</email>
+      <name>Patrick O'Brien</name>
     </author>
-    <contributor>
-      <name>Sean Takats</name>
-      <email>stakats@gmu.edu</email>
-    </contributor>
-    <contributor>
-      <name>Sebastian Karcher</name>
-    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
-    <summary>Vancouver style as outlined by International Committee of Medical Journal Editors Uniform Requirements for Manuscripts Submitted to Biomedical Journals: Sample References</summary>
-    <updated>2022-09-28T11:33:04+00:00</updated>
+    <issn>2214-6296</issn>
+    <updated>2023-06-07T13:49:12+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -50,7 +43,6 @@
       <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
       <label form="long" prefix=", "/>
       <substitute>
-        <text macro="webpage-title"/>
         <names variable="editor"/>
       </substitute>
     </names>
@@ -68,20 +60,8 @@
       </if>
     </choose>
   </macro>
-  <macro name="webpage-title">
-    <!--If a webpage has a container, we're assuming the citation is "part of a website" as per ch. 25 Citing Medicine https://www.ncbi.nlm.nih.gov/books/NBK7274/?report=reader -->
-    <choose>
-      <if type="webpage" variable="container-title" match="all">
-        <group delimiter=" ">
-          <text variable="container-title"/>
-          <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
-        </group>
-      </if>
-    </choose>
-  </macro>
   <macro name="publisher">
     <choose>
-      <!--discard publisher info for articles-->
       <if type="article-journal article-magazine article-newspaper" match="none">
         <group delimiter=": " suffix=";">
           <choose>
@@ -138,7 +118,6 @@
         </group>
         <text macro="edition" prefix=" "/>
       </if>
-      <!--add event-name and event-place once they become available-->
       <else-if type="bill legislation" match="any">
         <group delimiter=", ">
           <group delimiter=". ">
@@ -176,21 +155,16 @@
     </choose>
   </macro>
   <macro name="title">
+    <text variable="title"/>
     <choose>
-      <if type="webpage" variable="container-title" match="all"/>
-      <else>
-        <text variable="title"/>
+      <if type="article-journal article-magazine chapter paper-conference article-newspaper review review-book entry-dictionary entry-encyclopedia" match="none">
         <choose>
-          <if type="article-journal article-magazine chapter paper-conference article-newspaper review review-book entry-dictionary entry-encyclopedia" match="none">
-            <choose>
-              <if variable="URL">
-                <text term="internet" prefix=" [" suffix="]" text-case="capitalize-first"/>
-              </if>
-            </choose>
-            <text macro="edition" prefix=". "/>
+          <if variable="URL">
+            <text term="internet" prefix=" [" suffix="]" text-case="capitalize-first"/>
           </if>
         </choose>
-      </else>
+        <text macro="edition" prefix=". "/>
+      </if>
     </choose>
     <choose>
       <if type="thesis">
@@ -300,13 +274,6 @@
       </if>
     </choose>
   </macro>
-  <macro name="webpage-part">
-    <choose>
-      <if type="webpage" variable="container-title" match="all">
-        <text variable="title"/>
-      </if>
-    </choose>
-  </macro>
   <macro name="collection-details">
     <choose>
       <if type="article-journal article-magazine article-newspaper review review-book" match="none">
@@ -337,7 +304,7 @@
       </if>
     </choose>
   </macro>
-  <citation collapse="citation-number">
+  <citation>
     <sort>
       <key variable="citation-number"/>
     </sort>
@@ -366,7 +333,6 @@
           <text macro="journal-location"/>
           <text macro="pages"/>
         </group>
-        <text macro="webpage-part"/>
       </group>
       <text macro="collection-details" suffix=". "/>
       <text macro="report-details" suffix=". "/>

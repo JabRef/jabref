@@ -1,85 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="expanded">
   <info>
-    <title>American Psychological Association 7th edition (single-spaced bibliography)</title>
-    <title-short>APA (single-spaced)</title-short>
-    <id>http://www.zotero.org/styles/apa-single-spaced</id>
-    <link href="http://www.zotero.org/styles/apa-single-spaced" rel="self"/>
+    <title>American Psychological Association 7th edition (Basque/Euskara)</title>
+    <title-short>APA</title-short>
+    <id>http://www.zotero.org/styles/apa-eu</id>
+    <link href="http://www.zotero.org/styles/apa-eu" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="template"/>
     <link href="https://apastyle.apa.org/style-grammar-guidelines/references/examples" rel="documentation"/>
     <author>
       <name>Brenton M. Wiernik</name>
       <email>zotero@wiernik.org</email>
     </author>
+    <contributor>
+      <name>Miren Berasategi Zeberio</name>
+      <email>mail@miren.bz</email>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="psychology"/>
     <category field="generic-base"/>
     <updated>2022-01-31T14:30:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <locale xml:lang="en">
-    <terms>
-      <term name="editortranslator" form="short">
-        <single>ed. &amp; trans.</single>
-        <multiple>eds. &amp; trans.</multiple>
-      </term>
-      <term name="translator" form="short">trans.</term>
-      <term name="interviewer" form="short">
-        <single>interviewer</single>
-        <multiple>interviewers</multiple>
-      </term>
-      <term name="collection-editor" form="short">
-        <single>ed.</single>
-        <multiple>eds.</multiple>
-      </term>
-      <term name="circa" form="short">ca.</term>
-      <term name="bc"> B.C.E.</term>
-      <term name="ad"> C.E.</term>
-      <term name="issue" form="long">
-        <single>issue</single>
-        <multiple>issues</multiple>
-      </term>
-      <term name="software">computer software</term>
-    </terms>
-  </locale>
-  <locale xml:lang="da">
-    <terms>
-      <term name="et-al">et al.</term>
-    </terms>
-  </locale>
-  <locale xml:lang="de">
-    <terms>
-      <term name="et-al">et al.</term>
-    </terms>
-  </locale>
-  <locale xml:lang="es">
-    <terms>
-      <term name="from">de</term>
-    </terms>
-  </locale>
-  <locale xml:lang="fr">
-    <terms>
-      <term name="editor" form="short">
-        <single>éd.</single>
-        <multiple>éds.</multiple>
-      </term>
-    </terms>
-  </locale>
-  <locale xml:lang="nb">
-    <terms>
-      <term name="et-al">et al.</term>
-    </terms>
-  </locale>
-  <locale xml:lang="nl">
-    <terms>
-      <term name="et-al">et al.</term>
-    </terms>
-  </locale>
-  <locale xml:lang="nn">
-    <terms>
-      <term name="et-al">et al.</term>
-    </terms>
-  </locale>
+  <!-- Modifications with respect to 'basic' apa.csl:
+       - date-bib macro: fixed month prefix and added suffix
+       - citation-locator, container-periodical & volume-booklike macros: reversed variable and label for page no.s, added correct delimiter
+       - replaced all instances of and="symbol" with and="text" and changed/added delimiter-precedes-last="never" when necessary
+  -->
   <!-- General categories of item types:
        Periodical: article-journal article-magazine article-newspaper post-weblog review review-book
        Periodical or Booklike: paper-conference
@@ -93,12 +39,12 @@
   <!-- APA references contain four parts: author, date, title, source -->
   <macro name="author-bib">
     <names variable="composer" delimiter=", ">
-      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+      <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
       <substitute>
         <names variable="author"/>
         <names variable="illustrator"/>
         <names variable="director">
-          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+          <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
           <label form="long" prefix=" (" suffix=")" text-case="title"/>
         </names>
         <choose>
@@ -122,15 +68,15 @@
         </choose>
         <!-- Test for editortranslator and put that first as that becomes available -->
         <names variable="editor" delimiter=", ">
-          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+          <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
           <label form="short" prefix=" (" suffix=")" text-case="title"/>
         </names>
         <names variable="editorial-director">
-          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+          <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
           <label form="short" prefix=" (" suffix=")" text-case="title"/>
         </names>
         <names variable="collection-editor">
-          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+          <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
           <label form="short" prefix=" (" suffix=")" text-case="title"/>
         </names>
         <choose>
@@ -159,7 +105,7 @@
           <if variable="archive container-title DOI publisher URL" match="none">
             <group delimiter=", ">
               <names variable="author">
-                <name and="symbol" delimiter=", " initialize-with=". "/>
+                <name and="text" delimiter=", " initialize-with=". "/>
                 <substitute>
                   <text macro="title-intext"/>
                 </substitute>
@@ -169,7 +115,7 @@
           </if>
           <else>
             <names variable="author" delimiter=", ">
-              <name form="short" and="symbol" delimiter=", " initialize-with=". "/>
+              <name form="short" and="text" delimiter=", " initialize-with=". "/>
               <substitute>
                 <text macro="title-intext"/>
               </substitute>
@@ -179,7 +125,7 @@
       </else-if>
       <else>
         <names variable="composer" delimiter=", ">
-          <name form="short" and="symbol" delimiter=", " initialize-with=". "/>
+          <name form="short" and="text" delimiter=", " initialize-with=". "/>
           <substitute>
             <names variable="author"/>
             <names variable="illustrator"/>
@@ -219,7 +165,7 @@
               <if type="article-magazine article-newspaper broadcast interview motion_picture pamphlet personal_communication post post-weblog song speech webpage" match="any">
                 <!-- Many video and audio examples in manual give full dates. Err on the side of too much information. -->
                 <date variable="issued">
-                  <date-part prefix=", " name="month"/>
+                  <date-part prefix="(e)ko " name="month" suffix="k"/>
                   <date-part prefix=" " name="day"/>
                 </date>
               </if>
@@ -228,14 +174,14 @@
                 <choose>
                   <if variable="collection-editor editor editorial-director issue page volume" match="none">
                     <date variable="issued">
-                      <date-part prefix=", " name="month"/>
+                      <date-part prefix="(e)ko " name="month" suffix="k"/>
                       <date-part prefix=" " name="day"/>
                     </date>
                   </if>
                 </choose>
               </else-if>
               <!-- Only year: article article-journal book chapter entry entry-dictionary entry-encyclopedia dataset figure graphic
-                    manuscript map musical_score paper-conference[published] patent report review review-book thesis -->
+                   manuscript map musical_score paper-conference[published] patent report review review-book thesis -->
             </choose>
           </if>
           <else-if variable="status">
@@ -253,6 +199,7 @@
     </group>
   </macro>
   <macro name="date-sort-group">
+    <!-- APA sorts 1. no-date items, 2. items with dates, 3. in-press (status) items -->
     <choose>
       <if variable="issued">
         <text value="1"/>
@@ -264,6 +211,9 @@
         <text value="0"/>
       </else>
     </choose>
+  </macro>
+  <macro name="date-sort-date">
+    <date variable="issued" form="numeric"/>
   </macro>
   <macro name="date-intext">
     <choose>
@@ -291,7 +241,7 @@
                   <choose>
                     <if variable="archive container-title DOI publisher URL" match="none">
                       <!-- These variables indicate that the communication is retrievable by the reader.
-                            If not, then use the in-text-only personal communication format -->
+                           If not, then use the in-text-only personal communication format -->
                       <date variable="issued" form="text"/>
                     </if>
                     <else>
@@ -323,7 +273,7 @@
     </choose>
   </macro>
   <!-- APA has two description elements following the title:
-        title (parenthetical) [bracketed]  -->
+       title (parenthetical) [bracketed]  -->
   <macro name="title-and-descriptions">
     <choose>
       <if variable="title">
@@ -349,8 +299,8 @@
       </if>
       <else-if variable="container-title" match="any">
         <!-- Other types are italicized based on presence of container-title.
-              Assume that review and review-book are published in periodicals/blogs,
-              not just on a web page (ex. 69) -->
+             Assume that review and review-book are published in periodicals/blogs,
+             not just on a web page (ex. 69) -->
         <text variable="title"/>
       </else-if>
       <else>
@@ -561,7 +511,7 @@
               </group>
               <names variable="reviewed-author">
                 <label form="verb-short" suffix=" "/>
-                <name and="symbol" initialize-with=". " delimiter=", "/>
+                <name and="text" initialize-with=". " delimiter=", "/>
               </names>
             </group>
             <choose>
@@ -607,7 +557,7 @@
                   <group delimiter=" ">
                     <text term="author" form="verb"/>
                     <names variable="interviewer">
-                      <name and="symbol" initialize-with=". " delimiter=", "/>
+                      <name and="text" initialize-with=". " delimiter=", "/>
                     </names>
                   </group>
                 </group>
@@ -617,7 +567,7 @@
               <group delimiter="; ">
                 <names variable="interviewer">
                   <label form="verb" suffix=" " text-case="capitalize-first"/>
-                  <name and="symbol" initialize-with=". " delimiter=", "/>
+                  <name and="text" initialize-with=". " delimiter=", "/>
                 </names>
                 <text variable="medium" text-case="capitalize-first"/>
               </group>
@@ -660,7 +610,7 @@
                   </choose>
                   <names variable="recipient" delimiter=", ">
                     <label form="verb" suffix=" "/>
-                    <name and="symbol" delimiter=", "/>
+                    <name and="text" delimiter=", "/>
                   </names>
                 </group>
                 <choose>
@@ -690,20 +640,20 @@
                       <text variable="genre" text-case="capitalize-first"/>
                       <!-- Replace prefix with performer label as that becomes available -->
                       <names variable="author" prefix="recorded by ">
-                        <name and="symbol" initialize-with=". " delimiter=", "/>
+                        <name and="text" initialize-with=". " delimiter=", "/>
                       </names>
                     </if>
                     <else-if variable="medium">
                       <text variable="medium" text-case="capitalize-first"/>
                       <!-- Replace prefix with performer label as that becomes available -->
                       <names variable="author" prefix="recorded by ">
-                        <name and="symbol" initialize-with=". " delimiter=", "/>
+                        <name and="text" initialize-with=". " delimiter=", "/>
                       </names>
                     </else-if>
                     <else>
                       <!-- Replace prefix with performer label as that becomes available -->
                       <names variable="author" prefix="Recorded by ">
-                        <name and="symbol" initialize-with=". " delimiter=", "/>
+                        <name and="text" initialize-with=". " delimiter=", "/>
                       </names>
                     </else>
                   </choose>
@@ -716,13 +666,13 @@
                       <text variable="medium" text-case="capitalize-first"/>
                       <!-- Replace prefix with performer label as that becomes available -->
                       <names variable="author" prefix="recorded by ">
-                        <name and="symbol" initialize-with=". " delimiter=", "/>
+                        <name and="text" initialize-with=". " delimiter=", "/>
                       </names>
                     </if>
                     <else>
                       <!-- Replace prefix with performer label as that becomes available -->
                       <names variable="author" prefix="Recorded by ">
-                        <name and="symbol" initialize-with=". " delimiter=", "/>
+                        <name and="text" initialize-with=". " delimiter=", "/>
                       </names>
                     </else>
                   </choose>
@@ -774,7 +724,7 @@
         <else-if variable="interviewer" type="interview" match="any">
           <names variable="interviewer">
             <label form="verb" suffix=" " text-case="capitalize-first"/>
-            <name and="symbol" initialize-with=". " delimiter=", "/>
+            <name and="text" initialize-with=". " delimiter=", "/>
             <substitute>
               <text macro="format-intext"/>
             </substitute>
@@ -795,7 +745,7 @@
                 </choose>
                 <names variable="recipient" delimiter=", ">
                   <label form="verb" suffix=" "/>
-                  <name and="symbol" delimiter=", "/>
+                  <name and="text" delimiter=", "/>
                 </names>
               </group>
             </if>
@@ -857,13 +807,13 @@
       <choose>
         <if variable="title">
           <names variable="interviewer" delimiter="; ">
-            <name and="symbol" initialize-with=". " delimiter=", "/>
+            <name and="text" initialize-with=". " delimiter=", "/>
             <label form="short" prefix=", " text-case="title"/>
           </names>
         </if>
       </choose>
       <names variable="translator" delimiter="; ">
-        <name and="symbol" initialize-with=". " delimiter=", "/>
+        <name and="text" initialize-with=". " delimiter=", "/>
         <label form="short" prefix=", " text-case="title"/>
       </names>
     </group>
@@ -873,7 +823,7 @@
       <choose>
         <if variable="title">
           <names variable="interviewer">
-            <name and="symbol" initialize-with=". " delimiter=", "/>
+            <name and="text" initialize-with=". " delimiter=", "/>
             <label form="short" prefix=", " text-case="title"/>
           </names>
         </if>
@@ -887,10 +837,10 @@
               <group delimiter="; ">
                 <names variable="container-author">
                   <label form="verb-short" suffix=" " text-case="title"/>
-                  <name and="symbol" initialize-with=". " delimiter=", "/>
+                  <name and="text" initialize-with=". " delimiter=", "/>
                 </names>
                 <names variable="editor translator" delimiter="; ">
-                  <name and="symbol" initialize-with=". " delimiter=", "/>
+                  <name and="text" initialize-with=". " delimiter=", "/>
                   <label form="short" prefix=", " text-case="title"/>
                 </names>
               </group>
@@ -901,10 +851,10 @@
           <group delimiter="; ">
             <names variable="container-author">
               <label form="verb-short" suffix=" " text-case="title"/>
-              <name and="symbol" initialize-with=". " delimiter=", "/>
+              <name and="text" initialize-with=". " delimiter=", "/>
             </names>
             <names variable="editor translator" delimiter="; ">
-              <name and="symbol" initialize-with=". " delimiter=", "/>
+              <name and="text" initialize-with=". " delimiter=", "/>
               <label form="short" prefix=", " text-case="title"/>
             </names>
           </group>
@@ -1036,9 +986,9 @@
         <label variable="issue" text-case="capitalize-first"/>
         <text variable="issue"/>
       </group>
-      <group delimiter=" ">
-        <label variable="page" form="short" suffix=" "/>
+      <group delimiter=". ">
         <text variable="page"/>
+        <label variable="page" form="short" suffix=""/>
       </group>
     </group>
   </macro>
@@ -1132,7 +1082,7 @@
     </choose>
   </macro>
   <!-- APA 'source' element contains four parts:
-        container, event, publisher, access -->
+       container, event, publisher, access -->
   <macro name="container">
     <choose>
       <if type="article-journal article-magazine article-newspaper post-weblog review review-book" match="any">
@@ -1181,7 +1131,10 @@
             </group>
           </if>
           <else>
-            <text variable="page"/>
+            <group delimiter=". ">
+              <text variable="page"/>
+              <label variable="page" form="short" suffix=""/>
+            </group>
           </else>
         </choose>
       </group>
@@ -1202,9 +1155,9 @@
         <group delimiter=" ">
           <text term="in" text-case="capitalize-first"/>
           <group delimiter=", ">
-            <names variable="editor translator" delimiter=", &amp; ">
+            <names variable="editor translator" delimiter=" eta ">
               <!-- Change to editortranslator and move editor to substitute as that becomes available -->
-              <name and="symbol" initialize-with=". " delimiter=", "/>
+              <name and="text" initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
               <label form="short" text-case="title" prefix=" (" suffix=")"/>
               <substitute>
                 <names variable="editorial-director"/>
@@ -1339,13 +1292,13 @@
           <choose>
             <if variable="references">
               <!-- This provides the option for more elaborate description
-                    of publication history, such as full "reprinted" references
-                    (examples 11, 43, 44) or retracted references -->
+                   of publication history, such as full "reprinted" references
+                   (examples 11, 43, 44) or retracted references -->
               <text variable="references"/>
             </if>
             <else>
               <group delimiter=" ">
-                <text term="original-work-published" text-case="capitalize-first"/>
+                <text value="Original work published"/>
                 <choose>
                   <if is-uncertain-date="original-date">
                     <text term="circa" form="short"/>
@@ -1563,7 +1516,8 @@
     </choose>
   </macro>
   <macro name="citation-locator">
-    <group delimiter=" ">
+    <group delimiter=". ">
+      <text variable="locator"/>
       <choose>
         <if locator="chapter">
           <label variable="locator" text-case="capitalize-first"/>
@@ -1572,14 +1526,13 @@
           <label variable="locator" form="short"/>
         </else>
       </choose>
-      <text variable="locator"/>
     </group>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name-with-initials">
     <sort>
       <key macro="author-bib" names-min="3" names-use-first="1"/>
       <key macro="date-sort-group"/>
-      <key macro="date-bib" sort="ascending"/>
+      <key macro="date-sort-date" sort="ascending"/>
       <key variable="status"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
@@ -1590,11 +1543,11 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" et-al-min="21" et-al-use-first="19" et-al-use-last="true" entry-spacing="0" line-spacing="1">
+  <bibliography hanging-indent="true" et-al-min="21" et-al-use-first="19" et-al-use-last="true" entry-spacing="0" line-spacing="2">
     <sort>
       <key macro="author-bib"/>
       <key macro="date-sort-group"/>
-      <key macro="date-bib" sort="ascending"/>
+      <key macro="date-sort-date" sort="ascending"/>
       <key variable="status"/>
       <key macro="title"/>
     </sort>
