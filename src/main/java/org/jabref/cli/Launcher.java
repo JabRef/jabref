@@ -6,6 +6,7 @@ import java.net.Authenticator;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -43,8 +44,14 @@ public class Launcher {
     private static Logger LOGGER;
     private static String[] ARGUMENTS;
 
+    private static boolean isDebugEnabled = false;
+
     public static void main(String[] args) {
         ARGUMENTS = args;
+
+        if (Arrays.stream(ARGUMENTS).anyMatch("--debug"::equalsIgnoreCase)) {
+            isDebugEnabled = true;
+        }
 
         addLogToDisk();
         try {
@@ -105,7 +112,8 @@ public class Launcher {
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
                 "writerFile", "shared file",
-                "writerFile.level", "debug",
+                "writerFile.level", isDebugEnabled ? "debug" : "info",
+                "level", isDebugEnabled ? "debug" : "info",
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
 
