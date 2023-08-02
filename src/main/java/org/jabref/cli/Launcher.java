@@ -43,14 +43,19 @@ import org.tinylog.configuration.Configuration;
 public class Launcher {
     private static Logger LOGGER;
     private static String[] ARGUMENTS;
-
-    private static boolean isDebugEnabled = false;
+    private static boolean isDebugEnabled;
 
     public static void main(String[] args) {
         ARGUMENTS = args;
 
-        if (Arrays.stream(ARGUMENTS).anyMatch("--debug"::equalsIgnoreCase)) {
-            isDebugEnabled = true;
+        // We must configure logging as soon as possible, which is why we cannot wait for the usual
+        // argument parsing workflow to parse logging options .e.g. --debug
+        JabRefCLI jabRefCLI;
+        try {
+            jabRefCLI = new JabRefCLI(ARGUMENTS);
+            isDebugEnabled = jabRefCLI.isDebugLogging();
+        } catch (ParseException e) {
+            isDebugEnabled = false;
         }
 
         addLogToDisk();
