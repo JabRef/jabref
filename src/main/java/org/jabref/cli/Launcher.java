@@ -42,9 +42,20 @@ import org.tinylog.configuration.Configuration;
 public class Launcher {
     private static Logger LOGGER;
     private static String[] ARGUMENTS;
+    private static boolean isDebugEnabled;
 
     public static void main(String[] args) {
         ARGUMENTS = args;
+
+        // We must configure logging as soon as possible, which is why we cannot wait for the usual
+        // argument parsing workflow to parse logging options .e.g. --debug
+        JabRefCLI jabRefCLI;
+        try {
+            jabRefCLI = new JabRefCLI(ARGUMENTS);
+            isDebugEnabled = jabRefCLI.isDebugLogging();
+        } catch (ParseException e) {
+            isDebugEnabled = false;
+        }
 
         addLogToDisk();
         try {
@@ -105,7 +116,8 @@ public class Launcher {
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
                 "writerFile", "shared file",
-                "writerFile.level", "debug",
+                "writerFile.level", isDebugEnabled ? "debug" : "info",
+                "level", isDebugEnabled ? "debug" : "info",
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
 
