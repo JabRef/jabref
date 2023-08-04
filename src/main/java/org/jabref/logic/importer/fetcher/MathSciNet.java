@@ -65,20 +65,35 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             return getUrlForIdentifier(mrNumberInEntry.get());
         }
 
-        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mrlookup");
-        uriBuilder.addParameter("format", "bibtex");
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/api/freetools/mrlookup");
 
-        entry.getFieldOrAlias(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("ti", title));
-        entry.getFieldOrAlias(StandardField.AUTHOR).ifPresent(author -> uriBuilder.addParameter("au", author));
-        entry.getFieldOrAlias(StandardField.JOURNAL).ifPresent(journal -> uriBuilder.addParameter("jrnl", journal));
-        entry.getFieldOrAlias(StandardField.YEAR).ifPresent(year -> uriBuilder.addParameter("year", year));
+        entry.getFieldOrAlias(StandardField.AUTHOR).ifPresentOrElse(
+                author -> uriBuilder.addParameter("author", author),
+                () -> uriBuilder.addParameter("author", "")
+        );
+        entry.getFieldOrAlias(StandardField.TITLE).ifPresentOrElse(
+                title -> uriBuilder.addParameter("title", title),
+                () -> uriBuilder.addParameter("title", "")
+        );
+        entry.getFieldOrAlias(StandardField.JOURNAL).ifPresentOrElse(
+                journal -> uriBuilder.addParameter("journal", journal),
+                () -> uriBuilder.addParameter("journal", "")
+        );
+        entry.getFieldOrAlias(StandardField.YEAR).ifPresentOrElse(
+                year -> uriBuilder.addParameter("year", year),
+                () -> uriBuilder.addParameter("year", "")
+        );
+
+// Default empty parameters for firstPage and lastPage
+        uriBuilder.addParameter("firstPage", "");
+        uriBuilder.addParameter("lastPage", "");
 
         return uriBuilder.build().toURL();
     }
 
     @Override
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/publications-search");
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
         uriBuilder.addParameter("pg7", "ALLF"); // search all fields
         uriBuilder.addParameter("s7", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // query
         uriBuilder.addParameter("r", "1"); // start index
