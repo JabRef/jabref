@@ -151,8 +151,7 @@ public class ACMPortalParser implements Parser {
 
         if (jsonObject.has("author")) {
             JsonArray authors = jsonObject.getAsJsonArray("author");
-            String finalAuthors = AuthorList.of(getAuthors(authors)).getAsLastFirstNamesWithAnd(false);
-            bibEntry.setField(StandardField.AUTHOR, finalAuthors);
+            bibEntry.setField(StandardField.AUTHOR, getAuthorsLastFirst(authors));
         }
 
         if (jsonObject.has("issued")) {
@@ -223,7 +222,7 @@ public class ACMPortalParser implements Parser {
         return bibEntry;
     }
 
-    private List<Author> getAuthors(JsonArray authors) {
+    private String getAuthorsLastFirst(JsonArray authors) {
         List<Author> jabrefAuthors = new ArrayList<>();
 
         for (JsonElement author : authors) {
@@ -240,6 +239,6 @@ public class ACMPortalParser implements Parser {
             Author jabrefAuthor = new Author(given, null, null, family, null);
             jabrefAuthors.add(jabrefAuthor);
         }
-        return jabrefAuthors;
+        return AuthorList.of(jabrefAuthors).getAsLastFirstNamesWithAnd(false);
     }
 }
