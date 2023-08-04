@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ISSN {
+public class ISSN implements Identifier {
 
     private static final Pattern ISSN_PATTERN = Pattern.compile("^\\d{4}-\\d{3}[\\dxX]$");
     private static final Pattern ISSN_PATTERN_NODASH = Pattern.compile("^(\\d{4})(\\d{3}[\\dxX])$");
