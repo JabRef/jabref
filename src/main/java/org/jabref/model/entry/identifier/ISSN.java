@@ -1,8 +1,12 @@
 package org.jabref.model.entry.identifier;
 
+import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jabref.model.entry.field.Field;
 
 public class ISSN implements Identifier {
 
@@ -47,5 +51,20 @@ public class ISSN implements Identifier {
             control = '9' + 1;
         }
         return ((((sum % 11) + control) - '0') == 11) || ((sum % 11) == 0);
+    }
+
+    @Override
+    public String getNormalized() {
+        return issnString;
+    }
+
+    @Override
+    public Field getDefaultField() {
+        return null;
+    }
+
+    @Override
+    public Optional<URI> getExternalURI() {
+        return Optional.empty();
     }
 }
