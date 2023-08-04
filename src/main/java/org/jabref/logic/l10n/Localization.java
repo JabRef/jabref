@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -31,10 +32,9 @@ import org.slf4j.LoggerFactory;
  * The access to this is given by the functions {@link Localization#lang(String, String...)} and
  * that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
  */
+@AllowedToUseStandardStreams("Needs to have acess to System.err because it's called very early before our loggers")
 public class Localization {
     static final String RESOURCE_PREFIX = "l10n/JabRef";
-
-
     private static Locale locale;
     private static LocalizationBundle localizedMessages;
 
@@ -50,13 +50,10 @@ public class Localization {
      */
     public static String lang(String key, Object... params) {
         if (localizedMessages == null) {
-
-            // I'm logging this because it should never happen
             System.err.println("Messages are not initialized before accessing key: " + key);
             setLanguage(Language.ENGLISH);
         }
         var stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);
-
         return lookup(localizedMessages, key, stringParams);
     }
 
