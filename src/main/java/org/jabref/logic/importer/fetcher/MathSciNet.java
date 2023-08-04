@@ -104,31 +104,36 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/publications-search");
-        uriBuilder.addParameter("pg1", "MR"); // search MR number
-        uriBuilder.addParameter("s1", identifier); // identifier
-        uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/relay-station");
+        uriBuilder.addParameter("mr", identifier); // identifier
+
         return uriBuilder.build().toURL();
     }
 
     @Override
     public Parser getParser() {
-        // MathSciNet returns the BibTeX result embedded in HTML
-        // So we extract the BibTeX string from the <pre>bibtex</pre> tags and pass the content to the BibTeX parser
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
 
             List<BibEntry> entries = new ArrayList<>();
-            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
-            Pattern pattern = Pattern.compile("<pre>(?s)(.*)</pre>");
-            Matcher matcher = pattern.matcher(response);
-            while (matcher.find()) {
-                String bibtexEntryString = matcher.group();
-                entries.addAll(bibtexParser.parseEntries(bibtexEntryString));
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                JSONArray entriesArray = jsonResponse.getJSONObject("all").getJSONArray("results");
+
+                BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
+
+                for (int i = 0; i < entriesArray.length(); i++) {
+                    String bibTexFormat = entriesArray.getJSONObject(i).getString("bibTexFormat");
+                    entries.addAll(bibtexParser.parseEntries(String.valueOf(bibTexFormat)));
+                }
+            } catch (JSONException | TokenMgrException e) {
+                e.printStackTrace();
             }
+
             return entries;
         };
     }
+
 
     @Override
     public void doPostCleanup(BibEntry entry) {
