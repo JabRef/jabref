@@ -5,6 +5,7 @@ import java.nio.file.Path;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
@@ -14,12 +15,17 @@ import org.jabref.logic.util.io.FileHistory;
 
 public class FileHistoryMenu extends Menu {
 
+    protected final MenuItem clearRecentLibraries;
     private final FileHistory history;
     private final DialogService dialogService;
     private final OpenDatabaseAction openDatabaseAction;
 
     public FileHistoryMenu(FileHistory fileHistory, DialogService dialogService, OpenDatabaseAction openDatabaseAction) {
         setText(Localization.lang("Recent libraries"));
+
+        this.clearRecentLibraries = new MenuItem();
+        clearRecentLibraries.setText(Localization.lang("Clear recent libraries"));
+        clearRecentLibraries.setOnAction(event -> clearLibrariesHistory());
 
         this.history = fileHistory;
         this.dialogService = dialogService;
@@ -65,6 +71,10 @@ public class FileHistoryMenu extends Menu {
         for (int index = 0; index < history.size(); index++) {
             addItem(history.get(index), index + 1);
         }
+        getItems().addAll(
+                new SeparatorMenuItem(),
+                clearRecentLibraries
+        );
     }
 
     private void addItem(Path file, int num) {
@@ -90,5 +100,10 @@ public class FileHistoryMenu extends Menu {
             return;
         }
         openDatabaseAction.openFile(file);
+    }
+
+    public void clearLibrariesHistory() {
+        history.clear();
+        setDisable(true);
     }
 }

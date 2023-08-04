@@ -1,9 +1,8 @@
 package org.jabref.gui.libraryproperties.saving;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -65,11 +64,15 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             case TABLE -> saveInTableOrderProperty.setValue(true);
         }
 
-        List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
-        fieldNames.add(InternalField.TYPE_HEADER); // allow entrytype field as sort criterion
-        fieldNames.sort(Comparator.comparing(Field::getDisplayName));
         sortableFieldsProperty.clear();
-        sortableFieldsProperty.addAll(fieldNames);
+
+        Set<Field> fields = FieldFactory.getAllFieldsWithOutInternal();
+        fields.add(InternalField.INTERNAL_ALL_FIELD);
+        fields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
+        fields.add(InternalField.KEY_FIELD);
+        fields.add(InternalField.TYPE_HEADER);
+
+        sortableFieldsProperty.addAll(FieldFactory.getStandardFieldsWithCitationKey());
         sortCriteriaProperty.clear();
         sortCriteriaProperty.addAll(exportSaveOrder.getSortCriteria().stream()
                                                    .map(SortCriterionViewModel::new)

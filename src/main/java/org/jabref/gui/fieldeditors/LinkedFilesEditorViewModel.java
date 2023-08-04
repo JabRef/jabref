@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -109,10 +110,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences);
     }
 
-    public boolean isFulltextLookupInProgress() {
-        return fulltextLookupInProgress.get();
-    }
-
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
         return FileFieldParser.parse(stringValue).stream()
                               .map(linkedFile -> new LinkedFileViewModel(
@@ -158,7 +155,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
 
-        if (entry != null) {
+        if ((entry != null) && preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask
                     .wrap(() -> findAssociatedNotLinkedFiles(entry))
                     .onSuccess(files::addAll);
@@ -264,5 +261,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     public void removeFileLink(LinkedFileViewModel file) {
         files.remove(file);
+    }
+
+    public ReadOnlyBooleanProperty fulltextLookupInProgressProperty() {
+        return fulltextLookupInProgress;
     }
 }

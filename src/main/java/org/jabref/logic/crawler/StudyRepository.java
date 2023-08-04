@@ -279,7 +279,7 @@ public class StudyRepository {
      */
     private void setUpRepositoryStructureForQueriesAndFetchers() throws IOException {
         // Cannot use stream here since IOException has to be thrown
-        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(
+        StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
                 this.getActiveLibraryEntries(),
                 preferencesService.getImportFormatPreferences(),
                 preferencesService.getImporterPreferences());
@@ -427,7 +427,7 @@ public class StudyRepository {
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {
             SaveConfiguration saveConfiguration = new SaveConfiguration()
                     .withMetadataSaveOrder(true)
-                    .withReformatOnSave(preferencesService.getExportPreferences().shouldAlwaysReformatOnSave());
+                    .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                     bibWriter,

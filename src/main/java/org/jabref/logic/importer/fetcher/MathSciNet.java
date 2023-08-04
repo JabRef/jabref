@@ -83,8 +83,6 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                 year -> uriBuilder.addParameter("year", year),
                 () -> uriBuilder.addParameter("year", "")
         );
-
-// Default empty parameters for firstPage and lastPage
         uriBuilder.addParameter("firstPage", "");
         uriBuilder.addParameter("lastPage", "");
 
@@ -93,7 +91,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/publications-search");
         uriBuilder.addParameter("pg7", "ALLF"); // search all fields
         uriBuilder.addParameter("s7", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // query
         uriBuilder.addParameter("r", "1"); // start index
@@ -104,9 +102,10 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/relay-station");
-        uriBuilder.addParameter("mr", identifier); // identifier
-
+        URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/publications-search");
+        uriBuilder.addParameter("pg1", "MR"); // search MR number
+        uriBuilder.addParameter("s1", identifier); // identifier
+        uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
         return uriBuilder.build().toURL();
     }
 
@@ -129,11 +128,9 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             } catch (JSONException | TokenMgrException e) {
                 e.printStackTrace();
             }
-
             return entries;
         };
     }
-
 
     @Override
     public void doPostCleanup(BibEntry entry) {
@@ -147,3 +144,4 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         entry.setCommentsBeforeEntry("");
     }
 }
+

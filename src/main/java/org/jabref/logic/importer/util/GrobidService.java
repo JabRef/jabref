@@ -11,7 +11,6 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -71,7 +70,7 @@ public class GrobidService {
             throw new IOException("The GROBID server response does not contain anything.");
         }
 
-        return BibtexParser.singleFromString(httpResponse, importFormatPreferences, new DummyFileUpdateMonitor());
+        return BibtexParser.singleFromString(httpResponse, importFormatPreferences);
     }
 
     public List<BibEntry> processPDF(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
@@ -89,7 +88,7 @@ public class GrobidService {
             throw new IOException("The GROBID server response does not contain anything.");
         }
 
-        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
         List<BibEntry> result = parser.parseEntries(httpResponse);
         result.forEach(entry -> entry.setCitationKey(""));
         return result;

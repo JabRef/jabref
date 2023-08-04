@@ -1,8 +1,7 @@
 package org.jabref.gui.preferences.export;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -14,6 +13,7 @@ import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.ExportPreferences;
 
@@ -25,9 +25,6 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty exportInSpecifiedOrderProperty = new SimpleBooleanProperty();
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
-
-    private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
-    private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
     private final ExportPreferences exportPreferences;
 
@@ -47,12 +44,12 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
                                                    .map(SortCriterionViewModel::new)
                                                    .toList());
 
-        List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
-        fieldNames.sort(Comparator.comparing(Field::getDisplayName));
-        sortableFieldsProperty.addAll(fieldNames);
-
-        alwaysReformatBibProperty.setValue(exportPreferences.shouldAlwaysReformatOnSave());
-        autosaveLocalLibraries.setValue(exportPreferences.shouldAutoSave());
+        Set<Field> fields = FieldFactory.getAllFieldsWithOutInternal();
+        fields.add(InternalField.INTERNAL_ALL_FIELD);
+        fields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
+        fields.add(InternalField.KEY_FIELD);
+        fields.add(InternalField.TYPE_HEADER);
+        sortableFieldsProperty.addAll(FieldFactory.getStandardFieldsWithCitationKey());
     }
 
     @Override
@@ -61,9 +58,6 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
                 SaveOrder.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInOriginalProperty.getValue()),
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
         exportPreferences.setExportSaveOrder(newSaveOrder);
-
-        exportPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
-        exportPreferences.setAutoSave(autosaveLocalLibraries.getValue());
     }
 
     public BooleanProperty saveInOriginalProperty() {
@@ -84,13 +78,5 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
 
     public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
         return sortCriteriaProperty;
-    }
-
-    public BooleanProperty alwaysReformatBibProperty() {
-        return alwaysReformatBibProperty;
-    }
-
-    public BooleanProperty autosaveLocalLibrariesProperty() {
-        return autosaveLocalLibraries;
     }
 }

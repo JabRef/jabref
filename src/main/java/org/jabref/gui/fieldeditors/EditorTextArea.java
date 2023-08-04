@@ -76,7 +76,6 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
      */
     @FunctionalInterface
     public interface PasteActionHandler {
-
         void handle();
     }
 }

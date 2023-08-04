@@ -17,7 +17,7 @@ import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.LibraryPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +27,13 @@ public class TexBibEntriesResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(TexBibEntriesResolver.class);
 
     private final BibDatabase masterDatabase;
-    private final GeneralPreferences generalPreferences;
+    private final LibraryPreferences libraryPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
 
-    public TexBibEntriesResolver(BibDatabase masterDatabase, GeneralPreferences generalPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public TexBibEntriesResolver(BibDatabase masterDatabase, LibraryPreferences libraryPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.masterDatabase = masterDatabase;
-        this.generalPreferences = generalPreferences;
+        this.libraryPreferences = libraryPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
     }

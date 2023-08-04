@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class Date {
 
+    public static final String DATE_REGEX;
     private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
     private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
     private static final Logger LOGGER = LoggerFactory.getLogger(Date.class);
@@ -65,6 +66,18 @@ public class Date {
                                                    DateTimeFormatterBuilder::appendOptional,
                                                    (builder, formatterBuilder) -> builder.append(formatterBuilder.toFormatter()))
                                            .toFormatter(Locale.US);
+
+        /*
+         * There is also {@link org.jabref.model.entry.Date#parse(java.lang.String)}.
+         * The regex of that method cannot be used as we parse single dates here and that method parses:
+         * i) date ranges
+         * ii) two dates separated by '/'
+         * Additionally, parse method requires the reviewed String to hold only a date.
+         */
+        DATE_REGEX = "\\d{4}-\\d{1,2}-\\d{1,2}" + // covers YYYY-MM-DD, YYYY-M-DD, YYYY-MM-D, YYYY-M-D
+                "|\\d{4}\\.\\d{1,2}\\.\\d{1,2}|" + // covers YYYY.MM.DD, YYYY.M.DD, YYYY.MM.D, YYYY.M.D
+                "(January|February|March|April|May|June|July|August|September|" +
+                "October|November|December) \\d{1,2}, \\d{4}"; // covers Month DD, YYYY & Month D, YYYY
     }
 
     private final TemporalAccessor date;

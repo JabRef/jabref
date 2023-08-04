@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
@@ -25,6 +26,8 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.WebViewStore;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -39,6 +42,7 @@ public class JabRefGUI {
 
     private static JabRefFrame mainFrame;
     private final PreferencesService preferencesService;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     private final List<ParserResult> bibDatabases;
     private final boolean isBlank;
@@ -46,10 +50,15 @@ public class JabRefGUI {
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
-    public JabRefGUI(Stage mainStage, List<ParserResult> databases, boolean isBlank, PreferencesService preferencesService) {
+    public JabRefGUI(Stage mainStage,
+                     List<ParserResult> databases,
+                     boolean isBlank,
+                     PreferencesService preferencesService,
+                     FileUpdateMonitor fileUpdateMonitor) {
         this.bibDatabases = databases;
         this.isBlank = isBlank;
         this.preferencesService = preferencesService;
+        this.fileUpdateMonitor = fileUpdateMonitor;
         this.correctedWindowPos = false;
 
         WebViewStore.init();
@@ -64,13 +73,32 @@ public class JabRefGUI {
                 preferencesService.getInternalPreferences())
                 .checkForNewVersionDelayed();
 
-        if (preferencesService.getProxyPreferences().shouldUseProxy() && preferencesService.getProxyPreferences().shouldUseAuthentication()) {
-            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            dialogService.showPasswordDialogAndWait(Localization.lang("Proxy configuration"), Localization.lang("Proxy requires password"), Localization.lang("Password"))
-                .ifPresent(newPassword -> {
-                    preferencesService.getProxyPreferences().setPassword(newPassword);
-                    ProxyRegisterer.register(preferencesService.getProxyPreferences());
-                });
+        setupProxy();
+    }
+
+    private void setupProxy() {
+        if (!preferencesService.getProxyPreferences().shouldUseProxy()
+                || !preferencesService.getProxyPreferences().shouldUseAuthentication()) {
+            return;
+        }
+
+        if (preferencesService.getProxyPreferences().shouldPersistPassword()
+                && StringUtil.isNotBlank(preferencesService.getProxyPreferences().getPassword())) {
+            ProxyRegisterer.register(preferencesService.getProxyPreferences());
+            return;
+        }
+
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        Optional<String> password = dialogService.showPasswordDialogAndWait(
+                Localization.lang("Proxy configuration"),
+                Localization.lang("Proxy requires password"),
+                Localization.lang("Password"));
+
+        if (password.isPresent()) {
+            preferencesService.getProxyPreferences().setPassword(password.get());
+            ProxyRegisterer.register(preferencesService.getProxyPreferences());
+        } else {
+            LOGGER.warn("No proxy password specified");
         }
     }
 
@@ -132,7 +160,7 @@ public class JabRefGUI {
         });
         Platform.runLater(this::openDatabases);
 
-        if (!(Globals.getFileUpdateMonitor().isActive())) {
+        if (!(fileUpdateMonitor.isActive())) {
             getMainFrame().getDialogService()
                           .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
                                   "and processes and restart. You may encounter errors if you continue " +
@@ -142,7 +170,7 @@ public class JabRefGUI {
 
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && preferencesService.getGeneralPreferences().shouldOpenLastEdited()) {
+        if (!isBlank && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
 
@@ -173,7 +201,8 @@ public class JabRefGUI {
 
             if (pr.getDatabase().isShared()) {
                 try {
-                    new SharedDatabaseUIManager(mainFrame, preferencesService).openSharedDatabaseFromParserResult(pr);
+                    new SharedDatabaseUIManager(mainFrame, preferencesService, fileUpdateMonitor)
+                            .openSharedDatabaseFromParserResult(pr);
                 } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                         NotASharedDatabaseException e) {
                     pr.getDatabaseContext().clearDatabasePath(); // do not open the original file

@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
 public class PreviewTab extends EntryEditorTab {
+    public static final String NAME = "Preview";
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferences;

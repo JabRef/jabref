@@ -19,17 +19,17 @@ public class ImporterPreferences {
     private final BooleanProperty warnAboutDuplicatesOnImport;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final ObservableSet<FetcherApiKey> apiKeys;
-    private final ObservableSet<CustomImporter> customImportList;
+    private final ObservableSet<CustomImporter> customImporters;
 
     public ImporterPreferences(boolean generateNewKeyOnImport,
                                Path importWorkingDirectory,
                                boolean warnAboutDuplicatesOnImport,
-                               Set<CustomImporter> customImportList,
+                               Set<CustomImporter> customImporters,
                                Set<FetcherApiKey> apiKeys) {
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
-        this.customImportList = FXCollections.observableSet(customImportList);
+        this.customImporters = FXCollections.observableSet(customImporters);
         this.apiKeys = FXCollections.observableSet(apiKeys);
     }
 
@@ -73,7 +73,12 @@ public class ImporterPreferences {
         return apiKeys;
     }
 
-    public ObservableSet<CustomImporter> getCustomImportList() {
-        return customImportList;
+    public ObservableSet<CustomImporter> getCustomImporters() {
+        return customImporters;
+    }
+
+    public void setCustomImporters(Set<CustomImporter> importers) {
+        customImporters.clear();
+        customImporters.addAll(importers);
     }
 }

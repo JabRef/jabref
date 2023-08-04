@@ -14,6 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 
 public class SidePane extends VBox {
@@ -26,13 +27,14 @@ public class SidePane extends VBox {
     private final Map<SidePaneType, BooleanBinding> visibleBindings = new HashMap<>();
 
     public SidePane(PreferencesService preferencesService,
+                    JournalAbbreviationRepository abbreviationRepository,
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
                     StateManager stateManager,
                     UndoManager undoManager) {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
-        this.viewModel = new SidePaneViewModel(preferencesService, stateManager, taskExecutor, dialogService, undoManager);
+        this.viewModel = new SidePaneViewModel(preferencesService, abbreviationRepository, stateManager, taskExecutor, dialogService, undoManager);
 
         stateManager.getVisibleSidePaneComponents().addListener((ListChangeListener<SidePaneType>) c -> updateView());
         updateView();
@@ -56,5 +58,9 @@ public class SidePane extends VBox {
 
     public SimpleCommand getToggleCommandFor(SidePaneType sidePane) {
         return new TogglePaneAction(stateManager, sidePane, preferencesService.getSidePanePreferences());
+    }
+
+    public SidePaneComponent getSidePaneComponent(SidePaneType type) {
+        return viewModel.getSidePaneComponent(type);
     }
 }

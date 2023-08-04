@@ -16,6 +16,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
@@ -38,7 +39,7 @@ class ArgumentProcessorTest {
 
     @BeforeEach()
     void setup() {
-        when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         when(preferencesService.getSearchPreferences()).thenReturn(
                 new SearchPreferences(null, EnumSet.noneOf(SearchRules.SearchFlags.class), false)
         );
@@ -57,7 +58,11 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("--nogui", "--debug", "--aux", auxFile + "," + outputBibFile, originBib);
 
-        processor = new ArgumentProcessor(args.toArray(String[]::new), Mode.INITIAL_START, preferencesService);
+        processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class));
 
         assertTrue(Files.exists(outputBib));
     }
@@ -78,7 +83,11 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("-n", "--debug", "--exportMatches", "Author=Einstein," + outputBibFile, originBibFile);
 
-        processor = new ArgumentProcessor(args.toArray(String[]::new), Mode.INITIAL_START, preferencesService);
+        processor = new ArgumentProcessor(
+                args.toArray(String[]::new),
+                Mode.INITIAL_START,
+                preferencesService,
+                mock(FileUpdateMonitor.class));
 
         assertTrue(Files.exists(outputBib));
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);

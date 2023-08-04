@@ -1,7 +1,7 @@
 package org.jabref.logic.importer;
 
 /**
- *  Should be thrown when you encounter a http status code error >= 400 and < 500
+ * Should be thrown when you encounter an HTTP status code error &gt;= 400 and &lt; 500.
  */
 public class FetcherClientException extends FetcherException {
 

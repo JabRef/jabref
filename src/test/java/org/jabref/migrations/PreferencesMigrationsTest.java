@@ -7,9 +7,15 @@ import java.util.prefs.Preferences;
 
 import org.jabref.preferences.JabRefPreferences;
 
+import com.github.javakeyring.Keyring;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,7 +33,7 @@ class PreferencesMigrationsTest {
 
     @BeforeEach
     void setUp() {
-        prefs = mock(JabRefPreferences.class);
+        prefs = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
         mainPrefsNode = mock(Preferences.class);
     }
 
@@ -69,123 +75,24 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testPreviewStyle() {
-        String oldPreviewStyle = "<font face=\"sans-serif\">"
-                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                + "\\end{bibtexkey}</b><br>__NEWLINE__"
-                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
-                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
-                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
-                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
-                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
-                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-                // Include the booktitle field for @inproceedings, @proceedings, etc.
-                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
-                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
-                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
-                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
-                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
-                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
-                + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
-                + "</dd>__NEWLINE__<p></p></font>";
+    void testPreviewStyleReviewToComment() {
+        String oldPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
+                + "Customized preview style using reviews and comments:__NEWLINE__"
+                + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}__NEWLINE__"
+                + "\\begin{comment} Something: \\format[HTMLChars]{\\comment} special \\end{comment}__NEWLINE__"
+                + "</font>__NEWLINE__";
 
-        String newPreviewStyle = "<font face=\"sans-serif\">"
-                + "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>"
-                + "\\end{citationkey}</b><br>__NEWLINE__"
-                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
-                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
-                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
-                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
-                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
-                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-                // Include the booktitle field for @inproceedings, @proceedings, etc.
-                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
-                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
-                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
-                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
-                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
-                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
-                + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}"
-                + "</dd>__NEWLINE__<p></p></font>";
+        String newPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
+                + "Customized preview style using reviews and comments:__NEWLINE__"
+                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}__NEWLINE__"
+                + "\\begin{comment} Something: \\format[Markdown,HTMLChars]{\\comment} special \\end{comment}__NEWLINE__"
+                + "</font>__NEWLINE__";
 
-        prefs.setPreviewStyle(oldPreviewStyle);
-        when(prefs.getPreviewStyle()).thenReturn(oldPreviewStyle);
+        when(prefs.get(JabRefPreferences.PREVIEW_STYLE)).thenReturn(oldPreviewStyle);
 
-        PreferencesMigrations.upgradePreviewStyleFromReviewToComment(prefs);
+        PreferencesMigrations.upgradePreviewStyle(prefs);
 
-        verify(prefs).setPreviewStyle(newPreviewStyle);
-    }
-
-    @Test
-    void upgradePreviewStyleAllowMarkupDefault() {
-        String oldPreviewStyle = "<font face=\"sans-serif\">"
-                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                + "\\end{bibtexkey}</b><br>__NEWLINE__"
-                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
-                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
-                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
-                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
-                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
-                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-                // Include the booktitle field for @inproceedings, @proceedings, etc.
-                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
-                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
-                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
-                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
-                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
-                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
-                + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}"
-                + "</dd>__NEWLINE__<p></p></font>";
-
-        String newPreviewStyle = "<font face=\"sans-serif\">"
-                + "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>"
-                + "\\end{citationkey}</b><br>__NEWLINE__"
-                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
-                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
-                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
-                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
-                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
-                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-                // Include the booktitle field for @inproceedings, @proceedings, etc.
-                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
-                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
-                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
-                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
-                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
-                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
-                + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}"
-                + "</dd>__NEWLINE__<p></p></font>";
-
-        prefs.setPreviewStyle(oldPreviewStyle);
-        when(prefs.getPreviewStyle()).thenReturn(oldPreviewStyle);
-
-        PreferencesMigrations.upgradePreviewStyleAllowMarkdown(prefs);
-
-        verify(prefs).setPreviewStyle(newPreviewStyle);
-    }
-
-    @Test
-    void upgradePreviewStyleAllowMarkupCustomized() {
-        String oldPreviewStyle = "<font face=\"sans-serif\">"
-                + "My highly customized format only using comments:<br>"
-                + "\\begin{comment} Something: \\format[HTMLChars]{\\comment} special \\end{comment}"
-                + "</dd>__NEWLINE__<p></p></font>";
-
-        String newPreviewStyle = "<font face=\"sans-serif\">"
-                + "My highly customized format only using comments:<br>"
-                + "\\begin{comment} Something: \\format[Markdown,HTMLChars]{\\comment} special \\end{comment}"
-                + "</dd>__NEWLINE__<p></p></font>";
-
-        prefs.setPreviewStyle(oldPreviewStyle);
-        when(prefs.getPreviewStyle()).thenReturn(oldPreviewStyle);
-
-        PreferencesMigrations.upgradePreviewStyleAllowMarkdown(prefs);
-
-        verify(prefs).setPreviewStyle(newPreviewStyle);
+        verify(prefs).put(JabRefPreferences.PREVIEW_STYLE, newPreviewStyle);
     }
 
     @Test
@@ -286,5 +193,27 @@ class PreferencesMigrationsTest {
         verify(prefs).put("columnSortOrder", "");
 
         verify(prefs).putInt(JabRefPreferences.MAIN_FONT_SIZE, 11);
+    }
+
+    @Test
+    void testMoveApiKeysToKeyRing() throws Exception {
+        final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+        final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+        final Keyring keyring = mock(Keyring.class);
+
+        when(prefs.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
+        when(prefs.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
+        when(prefs.getInternalPreferences().getUserAndHost()).thenReturn("user-host");
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+
+            PreferencesMigrations.moveApiKeysToKeyring(prefs);
+
+            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherA"), any());
+            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherB"), any());
+            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherC"), any());
+            verify(prefs).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+        }
     }
 }

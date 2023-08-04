@@ -35,7 +35,6 @@ import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class ImportFormatReader {
@@ -48,15 +47,20 @@ public class ImportFormatReader {
      */
     private final List<Importer> formats = new ArrayList<>();
 
-    private ImportFormatPreferences importFormatPreferences;
+    private final ImporterPreferences importerPreferences;
+    private final ImportFormatPreferences importFormatPreferences;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
-    public void resetImportFormats(ImporterPreferences importerPreferences,
-                                   ImportFormatPreferences newImportFormatPreferences,
-                                   FileUpdateMonitor fileMonitor) {
-        this.importFormatPreferences = newImportFormatPreferences;
+    public ImportFormatReader(ImporterPreferences importerPreferences,
+                              ImportFormatPreferences importFormatPreferences,
+                              FileUpdateMonitor fileUpdateMonitor) {
+        this.importerPreferences = importerPreferences;
+        this.importFormatPreferences = importFormatPreferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        reset();
+    }
 
-        formats.clear();
-
+    public void reset() {
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter(importFormatPreferences));
         formats.add(new EndnoteXmlImporter(importFormatPreferences));
@@ -80,11 +84,11 @@ public class ImportFormatReader {
         formats.add(new SilverPlatterImporter());
         formats.add(new CffImporter());
         formats.add(new BiblioscapeImporter());
-        formats.add(new BibtexImporter(importFormatPreferences, fileMonitor));
+        formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
         formats.add(new CitaviXmlImporter());
 
         // Get custom import formats
-        formats.addAll(importerPreferences.getCustomImportList());
+        formats.addAll(importerPreferences.getCustomImporters());
     }
 
     /**
@@ -121,8 +125,7 @@ public class ImportFormatReader {
 
     /**
      * All importers.
-     * <p>
-     * <p>
+     *
      * Elements are sorted by name.
      * </p>
      *
@@ -132,40 +135,7 @@ public class ImportFormatReader {
         return new TreeSet<>(this.formats);
     }
 
-    /**
-     * Human readable list of all known import formats (name and CLI Id).
-     * <p>
-     * <p>List is sorted by importer name.</p>
-     *
-     * @return human readable list of all known import formats
-     */
-    public String getImportFormatList() {
-        StringBuilder sb = new StringBuilder();
-
-        for (Importer imFo : getImportFormats()) {
-            int pad = Math.max(0, 14 - imFo.getName().length());
-            sb.append("  ");
-            sb.append(imFo.getName());
-
-            sb.append(StringUtil.repeatSpaces(pad));
-
-            sb.append(" : ");
-            sb.append(imFo.getId());
-            sb.append('\n');
-        }
-
-        return sb.toString();
-    }
-
-    public static class UnknownFormatImport {
-
-        public final String format;
-        public final ParserResult parserResult;
-
-        public UnknownFormatImport(String format, ParserResult parserResult) {
-            this.format = format;
-            this.parserResult = parserResult;
-        }
+    public record UnknownFormatImport(String format, ParserResult parserResult) {
     }
 
     /**

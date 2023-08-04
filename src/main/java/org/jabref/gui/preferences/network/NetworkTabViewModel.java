@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,6 +33,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
@@ -42,12 +42,8 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import kong.unirest.UnirestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NetworkTabViewModel implements PreferenceTabViewModel {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkTabViewModel.class);
-
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final BooleanProperty proxyUseProperty = new SimpleBooleanProperty();
@@ -56,6 +52,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty proxyUseAuthenticationProperty = new SimpleBooleanProperty();
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
+    private final BooleanProperty proxyPersistPasswordProperty = new SimpleBooleanProperty();
     private final ListProperty<CustomCertificateViewModel> customCertificateListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final Validator remotePortValidator;
@@ -66,6 +63,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final FileUpdateMonitor fileUpdateMonitor;
+
     private final RemotePreferences remotePreferences;
     private final ProxyPreferences proxyPreferences;
     private final ProxyPreferences backupProxyPreferences;
@@ -75,9 +74,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
-    public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences, FileUpdateMonitor fileUpdateMonitor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.fileUpdateMonitor = fileUpdateMonitor;
         this.remotePreferences = preferences.getRemotePreferences();
         this.proxyPreferences = preferences.getProxyPreferences();
         this.sslPreferences = preferences.getSSLPreferences();
@@ -88,7 +88,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 proxyPreferences.getPort(),
                 proxyPreferences.shouldUseAuthentication(),
                 proxyPreferences.getUsername(),
-                proxyPreferences.getPassword());
+                proxyPreferences.getPassword(),
+                proxyPreferences.shouldPersistPassword());
 
         remotePortValidator = new FunctionBasedValidator<>(
                 remotePortProperty,
@@ -136,6 +137,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
+
         this.trustStoreManager = new TrustStoreManager(Path.of(sslPreferences.getTruststorePath()));
     }
 
@@ -155,6 +157,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyUseAuthenticationProperty.setValue(proxyPreferences.shouldUseAuthentication());
         proxyUsernameProperty.setValue(proxyPreferences.getUsername());
         proxyPasswordProperty.setValue(proxyPreferences.getPassword());
+        proxyPersistPasswordProperty.setValue(proxyPreferences.shouldPersistPassword());
     }
 
     private void setSSLValues() {
@@ -177,24 +180,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        storeRemoteSettings();
-        storeProxySettings(new ProxyPreferences(
-                proxyUseProperty.getValue(),
-                proxyHostnameProperty.getValue().trim(),
-                proxyPortProperty.getValue().trim(),
-                proxyUseAuthenticationProperty.getValue(),
-                proxyUsernameProperty.getValue().trim(),
-                proxyPasswordProperty.getValue()
-        ));
-        storeSSLSettings();
-    }
-
-    private void storeRemoteSettings() {
-        RemotePreferences newRemotePreferences = new RemotePreferences(
-                remotePreferences.getPort(),
-                remoteServerProperty.getValue()
-        );
-
         getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
             if (remotePreferences.isDifferentPort(newPort)) {
                 remotePreferences.setPort(newPort);
@@ -203,30 +188,21 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor), remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
             Globals.REMOTE_LISTENER.stop();
         }
-    }
 
-    private void storeProxySettings(ProxyPreferences newProxyPreferences) {
-        if (Objects.equals(newProxyPreferences, proxyPreferences)) {
-            // nothing changed; thus, nothing to store
-            return;
-        }
+        proxyPreferences.setUseProxy(proxyUseProperty.getValue());
+        proxyPreferences.setHostname(proxyHostnameProperty.getValue().trim());
+        proxyPreferences.setPort(proxyPortProperty.getValue().trim());
+        proxyPreferences.setUseAuthentication(proxyUseAuthenticationProperty.getValue());
+        proxyPreferences.setUsername(proxyUsernameProperty.getValue().trim());
+        proxyPreferences.setPersistPassword(proxyPersistPasswordProperty.getValue()); // Set before the password to actually persist
+        proxyPreferences.setPassword(proxyPasswordProperty.getValue());
+        ProxyRegisterer.register(proxyPreferences);
 
-        ProxyRegisterer.register(newProxyPreferences);
-
-        proxyPreferences.setUseProxy(newProxyPreferences.shouldUseProxy());
-        proxyPreferences.setHostname(newProxyPreferences.getHostname());
-        proxyPreferences.setPort(newProxyPreferences.getPort());
-        proxyPreferences.setUseAuthentication(newProxyPreferences.shouldUseAuthentication());
-        proxyPreferences.setUsername(newProxyPreferences.getUsername());
-        proxyPreferences.setPassword(newProxyPreferences.getPassword());
-    }
-
-    public void storeSSLSettings() {
         trustStoreManager.flush();
     }
 
@@ -295,15 +271,14 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
         final String testUrl = "http://jabref.org";
 
-        // Workaround for testing, since the URLDownload uses stored proxy settings, see
-        // preferences.storeProxyPreferences(...) below.
-        storeProxySettings(new ProxyPreferences(
+        ProxyRegisterer.register(new ProxyPreferences(
                 proxyUseProperty.getValue(),
                 proxyHostnameProperty.getValue().trim(),
                 proxyPortProperty.getValue().trim(),
                 proxyUseAuthenticationProperty.getValue(),
                 proxyUsernameProperty.getValue().trim(),
-                proxyPasswordProperty.getValue()
+                proxyPasswordProperty.getValue(),
+                proxyPersistPasswordProperty.getValue()
         ));
 
         URLDownload urlDownload;
@@ -320,7 +295,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
         }
 
-        storeProxySettings(backupProxyPreferences);
+        ProxyRegisterer.register(backupProxyPreferences);
     }
 
     @Override
@@ -362,6 +337,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty proxyPasswordProperty() {
         return proxyPasswordProperty;
+    }
+
+    public BooleanProperty proxyPersistPasswordProperty() {
+        return proxyPersistPasswordProperty;
     }
 
     public ListProperty<CustomCertificateViewModel> customCertificateListProperty() {

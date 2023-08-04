@@ -2,7 +2,9 @@ package org.jabref.preferences;
 
 import java.nio.file.Path;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -13,12 +15,17 @@ public class InternalPreferences {
 
     private final ObjectProperty<Version> ignoredVersion;
     private final ObjectProperty<Path> lastPreferencesExportPath;
-    private final StringProperty user;
+    private final StringProperty userAndHost;
+    private final BooleanProperty memoryStickMode;
 
-    public InternalPreferences(Version ignoredVersion, Path exportPath, String user) {
+    public InternalPreferences(Version ignoredVersion,
+                               Path exportPath,
+                               String userAndHost,
+                               boolean memoryStickMode) {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
         this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);
-        this.user = new SimpleStringProperty(user);
+        this.userAndHost = new SimpleStringProperty(userAndHost);
+        this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
     }
 
     public Version getIgnoredVersion() {
@@ -45,7 +52,19 @@ public class InternalPreferences {
         this.lastPreferencesExportPath.set(lastPreferencesExportPath);
     }
 
-    public String getUser() {
-        return user.get();
+    public String getUserAndHost() {
+        return userAndHost.get();
+    }
+
+    public boolean isMemoryStickMode() {
+        return memoryStickMode.get();
+    }
+
+    public BooleanProperty memoryStickModeProperty() {
+        return memoryStickMode;
+    }
+
+    public void setMemoryStickMode(boolean memoryStickMode) {
+        this.memoryStickMode.set(memoryStickMode);
     }
 }

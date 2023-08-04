@@ -14,7 +14,7 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
  */
 public enum StandardField implements Field {
 
-    ABSTRACT("abstract"),
+    ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
     ADDENDUM("addendum"),
     ADDRESS("address"),
     AFTERWORD("afterword", FieldProperty.PERSON_NAMES),
@@ -31,7 +31,7 @@ public enum StandardField implements Field {
     BOOKTITLEADDON("booktitleaddon"),
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
-    COMMENT("comment"),
+    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
     DAY("day"),
@@ -102,7 +102,7 @@ public enum StandardField implements Field {
     PRIMARYCLASS("primaryclass"),
     RELATED("related", FieldProperty.MULTIPLE_ENTRY_LINK),
     REPORTNO("reportno"),
-    REVIEW("review"),
+    REVIEW("review", FieldProperty.MULTILINE_TEXT),
     REVISION("revision"),
     SCHOOL("school"),
     SERIES("series"),
@@ -136,6 +136,8 @@ public enum StandardField implements Field {
     TIMESTAMP("timestamp", FieldProperty.DATE),
     CREATIONDATE("creationdate", FieldProperty.DATE),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
+
+    public static Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
 
     private final String name;
     private final String displayName;

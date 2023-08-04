@@ -27,6 +27,7 @@ public class EditExternalFileTypeViewModel {
             defaultApplicationSelectedProperty.setValue(true);
         } else {
             customApplicationSelectedProperty.setValue(true);
+            selectedApplicationProperty.setValue(fileTypeViewModel.applicationProperty().getValue());
         }
     }
 

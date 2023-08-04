@@ -2,6 +2,7 @@ package org.jabref.logic.citationstyle;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -147,7 +148,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
             }
         }
 
-        Set<Field> fields = entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields());
+        Set<Field> fields = new LinkedHashSet<>(entryType.map(BibEntryType::getAllFields).orElse(bibEntry.getFields()));
         fields.addAll(bibEntry.getFields());
         for (Field key : fields) {
             bibEntry.getResolvedFieldOrAlias(key, bibDatabaseContext.getDatabase())

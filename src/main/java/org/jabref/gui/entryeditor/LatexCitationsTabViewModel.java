@@ -68,7 +68,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
-        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUser())
+        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
                                                                    .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory())));
         this.citationList = FXCollections.observableArrayList();
         this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
@@ -130,7 +130,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     private Collection<Citation> searchAndParse(String citeKey) throws IOException {
         // we need to check whether the user meanwhile set the LaTeX file directory or the database changed locations
-        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUser())
+        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
                                            .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()));
 
         if (latexParserResult == null || !newDirectory.equals(directory.get())) {
@@ -172,7 +172,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 .withInitialDirectory(directory.get()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
-                databaseContext.getMetaData().setLatexFileDirectory(preferencesService.getFilePreferences().getUser(), selectedDirectory.toAbsolutePath()));
+                databaseContext.getMetaData().setLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath()));
 
         init(currentEntry);
     }

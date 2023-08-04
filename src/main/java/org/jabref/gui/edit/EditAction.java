@@ -46,45 +46,47 @@ public class EditAction extends SimpleCommand {
     public void execute() {
         stateManager.getFocusOwner().ifPresent(focusOwner -> {
             LOGGER.debug("focusOwner: {}; Action: {}", focusOwner, action.getText());
-
-            if (focusOwner instanceof TextInputControl) {
+            if (focusOwner instanceof TextInputControl textInput) {
                 // Focus is on text field -> copy/paste/cut selected text
-                TextInputControl textInput = (TextInputControl) focusOwner;
                 // DELETE_ENTRY in text field should do forward delete
                 switch (action) {
+                    case SELECT_ALL -> textInput.selectAll();
                     case COPY -> textInput.copy();
-                    case UNDO -> textInput.undo();
-                    case REDO -> textInput.redo();
                     case CUT -> textInput.cut();
                     case PASTE -> textInput.paste();
                     case DELETE -> textInput.clear();
-                    case SELECT_ALL -> textInput.selectAll();
                     case DELETE_ENTRY -> textInput.deleteNextChar();
-                    default -> throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
+                    case UNDO -> textInput.undo();
+                    case REDO -> textInput.redo();
+                    default -> {
+                        String message = "Only cut/copy/paste supported in TextInputControl but got " + action;
+                        LOGGER.error(message);
+                        throw new IllegalStateException(message);
+                    }
                 }
             } else if ((focusOwner instanceof CodeArea) || (focusOwner instanceof WebView)) {
+                LOGGER.debug("Ignoring request in CodeArea or WebView");
                 return;
             } else {
                 LOGGER.debug("Else: {}", focusOwner.getClass().getSimpleName());
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
-                // ToDo: Should be handled by BibDatabaseContext instead of LibraryTab
                 switch (action) {
                     case COPY -> frame.getCurrentLibraryTab().copy();
                     case CUT -> frame.getCurrentLibraryTab().cut();
                     case PASTE -> frame.getCurrentLibraryTab().paste();
                     case DELETE_ENTRY -> frame.getCurrentLibraryTab().delete(false);
-                    case REDO -> {
-                        if (frame.getUndoManager().canRedo()) {
-                            frame.getUndoManager().redo();
-                        }
-                    }
                     case UNDO -> {
                         if (frame.getUndoManager().canUndo()) {
                             frame.getUndoManager().undo();
                         }
                     }
-                    default -> LOGGER.debug("Only cut/copy/paste/delete supported but got: {} and focus owner {}", action, focusOwner);
+                    case REDO -> {
+                        if (frame.getUndoManager().canRedo()) {
+                            frame.getUndoManager().redo();
+                        }
+                    }
+                    default -> LOGGER.debug("Only cut/copy/paste/deleteEntry supported but got: {} and focus owner {}", action, focusOwner);
                 }
             }
         });
