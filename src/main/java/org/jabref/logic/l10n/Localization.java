@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
+
 import org.slf4j.LoggerFactory;
 
 /**
