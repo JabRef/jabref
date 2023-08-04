@@ -54,7 +54,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     }
 
     /**
-     * We use MR Lookup (http://www.ams.org/mrlookup) instead of the usual search since this tool is also available
+     * We use MR Lookup (https://mathscinet.ams.org/mathscinet/freetools/mrlookup) instead of the usual search since this tool is also available
      * without subscription and, moreover, is optimized for finding a publication based on partial information.
      */
     @Override
