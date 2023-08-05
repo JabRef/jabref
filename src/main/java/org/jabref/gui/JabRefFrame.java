@@ -529,7 +529,6 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-
     private void initLayout() {
         setId("frame");
 
@@ -803,7 +802,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, this, prefs, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(this, prefs)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                
+
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.IMPORT,
