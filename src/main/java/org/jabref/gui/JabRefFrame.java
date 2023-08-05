@@ -494,14 +494,14 @@ public class JabRefFrame extends BorderPane {
         waitForSaveFinishedDialog.showAndWait(getLibraryTabs());
 
         // We call saveWindow state here again because under Mac the windowClose listener on the stage isn't triggered when using cmd + q
-        saveWindowState(mainStage);
+        saveWindowState();
         // Good bye!
         tearDownJabRef(filenames);
         Platform.exit();
         return true;
     }
 
-    private void saveWindowState(Stage mainStage) {
+    public void saveWindowState() {
         GuiPreferences preferences = prefs.getGuiPreferences();
         preferences.setPositionX(mainStage.getX());
         preferences.setPositionY(mainStage.getY());
