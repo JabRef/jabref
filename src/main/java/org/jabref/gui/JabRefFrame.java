@@ -138,6 +138,7 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
@@ -492,11 +493,42 @@ public class JabRefFrame extends BorderPane {
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
         waitForSaveFinishedDialog.showAndWait(getLibraryTabs());
 
+        // We call saveWindow state here again because under Mac the windowClose listener on the stage isn't triggered when using cmd + q
+        saveWindowState(mainStage);
         // Good bye!
         tearDownJabRef(filenames);
         Platform.exit();
         return true;
     }
+
+    private void saveWindowState(Stage mainStage) {
+        GuiPreferences preferences = prefs.getGuiPreferences();
+        preferences.setPositionX(mainStage.getX());
+        preferences.setPositionY(mainStage.getY());
+        preferences.setSizeX(mainStage.getWidth());
+        preferences.setSizeY(mainStage.getHeight());
+        preferences.setWindowMaximised(mainStage.isMaximized());
+        preferences.setWindowFullScreen(mainStage.isFullScreen());
+        debugLogWindowState(mainStage);
+    }
+
+    /**
+     * outprints the Data from the Screen (only in debug mode)
+     *
+     * @param mainStage JabRefs stage
+     */
+    private void debugLogWindowState(Stage mainStage) {
+        if (LOGGER.isDebugEnabled()) {
+            String debugLogString = "SCREEN DATA:" +
+                    "mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n" +
+                    "mainStage.POS_X: " + mainStage.getX() + "\n" +
+                    "mainStage.POS_Y: " + mainStage.getY() + "\n" +
+                    "mainStage.SIZE_X: " + mainStage.getWidth() + "\n" +
+                    "mainStages.SIZE_Y: " + mainStage.getHeight() + "\n";
+            LOGGER.debug(debugLogString);
+        }
+    }
+
 
     private void initLayout() {
         setId("frame");
