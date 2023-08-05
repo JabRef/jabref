@@ -101,7 +101,7 @@ public class MarcXmlParser implements Parser {
             } else if ("100".equals(tag) || "700".equals(tag) || "710".equals(tag)) {
                 putPersonalName(bibEntry, datafield); // Author, Editor, Publisher
             } else if ("111".equals(tag)) {
-                //FixMe: Conference Information also in Subtitle (245) & Author (710)
+                // FixMe: Conference Information also in Subtitle (245) & Author (710)
                 putConferenceDetail(bibEntry, datafield);
             } else if ("245".equals(tag)) {
                 putTitle(bibEntry, datafield);
