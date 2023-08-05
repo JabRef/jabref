@@ -258,7 +258,7 @@ public class MarcXmlParser implements Parser {
             String date = getSubfield("c", datafield);
 
             if (StringUtil.isNotBlank(place)) {
-                bibEntry.setField(StandardField.LOCATION, place);
+                bibEntry.setField(StandardField.ADDRESS, place);
             }
 
             if (StringUtil.isNotBlank(name)) {
