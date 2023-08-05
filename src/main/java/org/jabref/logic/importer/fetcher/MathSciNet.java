@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -37,7 +36,6 @@ import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.xml.ParserException;
 import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +71,8 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/api/freetools/mrlookup");
 
         uriBuilder.addParameter("author", entry.getFieldOrAlias(StandardField.AUTHOR).orElse(""));
-	uriBuilder.addParameter("title", entry.getFieldOrAlias(StandardField.TITLE).orElse(""));
-	uriBuilder.addParameter("journal", entry.getFieldOrAlias(StandardField.JOURNAL).orElse(""));
+	    uriBuilder.addParameter("title", entry.getFieldOrAlias(StandardField.TITLE).orElse(""));
+	    uriBuilder.addParameter("journal", entry.getFieldOrAlias(StandardField.JOURNAL).orElse(""));
         uriBuilder.addParameter("year", entry.getFieldOrAlias(StandardField.YEAR).orElse(""));
         uriBuilder.addParameter("firstPage", "");
         uriBuilder.addParameter("lastPage", "");
@@ -90,6 +88,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         uriBuilder.addParameter("r", "1"); // start index
         uriBuilder.addParameter("extend", "1"); // should return up to 100 items (instead of default 10)
         uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
+
         return uriBuilder.build().toURL();
     }
 
@@ -99,6 +98,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         uriBuilder.addParameter("pg1", "MR"); // search MR number
         uriBuilder.addParameter("s1", identifier); // identifier
         uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
+
         return uriBuilder.build().toURL();
     }
 
