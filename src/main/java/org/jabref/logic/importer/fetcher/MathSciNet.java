@@ -72,22 +72,10 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/api/freetools/mrlookup");
 
-        entry.getFieldOrAlias(StandardField.AUTHOR).ifPresentOrElse(
-                author -> uriBuilder.addParameter("author", author),
-                () -> uriBuilder.addParameter("author", "")
-        );
-        entry.getFieldOrAlias(StandardField.TITLE).ifPresentOrElse(
-                title -> uriBuilder.addParameter("title", title),
-                () -> uriBuilder.addParameter("title", "")
-        );
-        entry.getFieldOrAlias(StandardField.JOURNAL).ifPresentOrElse(
-                journal -> uriBuilder.addParameter("journal", journal),
-                () -> uriBuilder.addParameter("journal", "")
-        );
-        entry.getFieldOrAlias(StandardField.YEAR).ifPresentOrElse(
-                year -> uriBuilder.addParameter("year", year),
-                () -> uriBuilder.addParameter("year", "")
-        );
+        uriBuilder.addParameter("author", entry.getFieldOrAlias(StandardField.AUTHOR).orElse(""));
+	uriBuilder.addParameter("title", entry.getFieldOrAlias(StandardField.TITLE).orElse(""));
+	uriBuilder.addParameter("journal", entry.getFieldOrAlias(StandardField.JOURNAL).orElse(""));
+        uriBuilder.addParameter("year", entry.getFieldOrAlias(StandardField.YEAR).orElse(""));
         uriBuilder.addParameter("firstPage", "");
         uriBuilder.addParameter("lastPage", "");
 
