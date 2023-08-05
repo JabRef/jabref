@@ -36,6 +36,8 @@ import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jbibtex.TokenMgrException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fetches data from the MathSciNet (http://www.ams.org/mathscinet)
@@ -111,6 +113,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public Parser getParser() {
+        Logger logger = LoggerFactory.getLogger(MathSciNet.class);
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
 
@@ -126,7 +129,8 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                     entries.addAll(bibtexParser.parseEntries(String.valueOf(bibTexFormat)));
                 }
             } catch (JSONException | TokenMgrException e) {
-                e.printStackTrace();
+                logger.error("An error occurred while parsing fetched data", e);
+                throw new FetcherException("Error parsing result", e);
             }
             return entries;
         };
