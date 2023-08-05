@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -19,6 +20,7 @@ import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
@@ -35,6 +37,7 @@ import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.xml.ParserException;
 import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +133,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                 }
             } catch (JSONException | TokenMgrException e) {
                 logger.error("An error occurred while parsing fetched data", e);
-                throw new FetcherException("Error parsing result", e);
+                throw new ParseException("Error when parsing entry", e);
             }
             return entries;
         };
