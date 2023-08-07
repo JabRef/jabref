@@ -201,3 +201,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: gradle/wrapper-validation-action@v1
+  # This ensures that no git merge conflict markers (<<<, ...) are contained
+  merge_conflict_job:
+    name: Find merge conflicts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Merge Conflict finder
+        uses: olivernybroe/action-conflict-finder@v4.0
