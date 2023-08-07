@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * Fetches data from the MathSciNet (http://www.ams.org/mathscinet)
  */
 public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFetcher, IdBasedParserFetcher {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MathSciNet.class);
     private final ImportFormatPreferences preferences;
 
     public MathSciNet(ImportFormatPreferences preferences) {
@@ -104,7 +104,6 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     @Override
     public Parser getParser() {
-        Logger logger = LoggerFactory.getLogger(MathSciNet.class);
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
 
@@ -120,7 +119,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                     entries.addAll(bibtexParser.parseEntries(String.valueOf(bibTexFormat)));
                 }
             } catch (JSONException | TokenMgrException e) {
-                logger.error("An error occurred while parsing fetched data", e);
+                LOGGER.error("An error occurred while parsing fetched data", e);
                 throw new ParseException("Error when parsing entry", e);
             }
             return entries;
