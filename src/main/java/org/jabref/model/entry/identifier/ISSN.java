@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 public class ISSN implements Identifier {
 
@@ -60,7 +61,7 @@ public class ISSN implements Identifier {
 
     @Override
     public Field getDefaultField() {
-        return null;
+        return StandardField.ISSN;
     }
 
     @Override

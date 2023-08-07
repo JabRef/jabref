@@ -15,18 +15,15 @@ import org.slf4j.LoggerFactory;
 public class IssnFetcher implements IdBasedFetcher, IdFetcher<ISSN> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IssnFetcher.class);
-    private static ISSN issnIdentifier;
-    private static final String API_URL = "https://doaj.org/api/v1/search/articles/";
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+
         if(StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
-        Optional<BibEntry> bibEntry = Optional.empty();
 
-        issnIdentifier = new ISSN(identifier);
-        return bibEntry; //temporary, thinking about the solution
+        return Optional.empty();
 
     }
 
