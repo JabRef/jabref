@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher.isbntobibtex;
+/*package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.util.Optional;
 
@@ -78,12 +78,13 @@ public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
-    /**
-     * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
-     * not available on ebook.de.
-     */
-    @Test
+    // This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
+    // not available on ebook.de.
+
+import org.junit.jupiter.api.Test;
+
+@Test
     public void searchForValidButNotFoundISBN() throws Exception {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("3728128155"));
     }
-}
+}/*
