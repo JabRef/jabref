@@ -32,7 +32,7 @@ public class CompositeIdFetcher {
         Optional<ISBN> isbn = ISBN.parse(identifier);
         if (isbn.isPresent()) {
             return new IsbnFetcher(importFormatPreferences)
-                    .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+                    // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
                     // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
                     .performSearchById(isbn.get().getNormalized());
         }

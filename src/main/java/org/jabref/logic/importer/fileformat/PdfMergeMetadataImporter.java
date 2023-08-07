@@ -97,7 +97,7 @@ public class PdfMergeMetadataImporter extends Importer {
             if (candidate.hasField(StandardField.ISBN)) {
                 try {
                     new IsbnFetcher(importFormatPreferences)
-                            .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+                            // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
                             // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
                             .performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
