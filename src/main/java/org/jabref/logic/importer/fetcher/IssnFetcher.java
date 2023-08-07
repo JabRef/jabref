@@ -1,22 +1,23 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISSN;
-import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.strings.StringUtil;
 
-public class IssnFetcher implements Identifier, IdBasedFetcher, IdFetcher<ISSN> {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class IssnFetcher implements IdBasedFetcher, IdFetcher<ISSN> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IssnFetcher.class);
     private static ISSN issnIdentifier;
+    private static final String API_URL = "https://doaj.org/api/v1/search/articles/";
+
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         if(StringUtil.isBlank(identifier)) {
@@ -44,23 +45,4 @@ public class IssnFetcher implements Identifier, IdBasedFetcher, IdFetcher<ISSN> 
         return "ISSN";
     }
 
-    @Override
-    public String getNormalized() {
-        return issnIdentifier.getNormalized();
-    }
-
-    @Override
-    public Field getDefaultField() {
-        return StandardField.ISSN;
-    }
-
-    @Override
-    public Optional<URI> getExternalURI() {
-        try {
-            return Optional.of(new URI("https://doaj.org/api/v1/search/articles/" + getNormalized()));
-        } catch (
-                URISyntaxException e) {
-            return Optional.empty();
-        }
-    }
 }
