@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.List;
 
 import javafx.collections.FXCollections;
 
@@ -92,18 +91,19 @@ public class BiodiversityLibraryTest {
 
     @Test
     public void testPerformSearch() throws FetcherException {
-        BibEntry expected = new BibEntry(StandardEntryType.Book)
-            .withField(StandardField.AUTHOR, "Ingersoll, Ernest, ")
-            .withField(StandardField.EDITOR, "University of Illinois Urbana-Champaign Alternates")
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+            .withField(StandardField.AUTHOR, "Clark, John L. (John Littner)  and Neill, David A. ")
+            .withField(StandardField.JOURNALTITLE, "PhytoKeys")
             .withField(StandardField.LANGUAGE, "English")
-            .withField(StandardField.PUBLISHER, "University Library, University of Illinois Urbana Champaign")
-            .withField(StandardField.LOCATION, "Chicago")
-            .withField(StandardField.TITLE, "Dogs")
-            .withField(StandardField.URL, "https://www.biodiversitylibrary.org/item/219826")
-            .withField(StandardField.YEAR, "1879");
+            .withField(StandardField.PUBLISHER, "Pensoft Publishers")
+            .withField(StandardField.TITLE, "\uFEFFAmanoa condorensis (Phyllanthaceae), a new shrubby species from the Cordillera del Condor in southern Ecuador")
+            .withField(StandardField.URL, "https://www.biodiversitylibrary.org/part/356490")
+            .withField(StandardField.DATE, "2023")
+            .withField(StandardField.VOLUME, "227")
+            .withField(StandardField.PAGES, "89-97")
+            .withField(StandardField.DOI, "10.3897/phytokeys.227.104703");
 
-        // fetcher returns more than entry, by default up to 200, but we only want to check one here
-        assertEquals(List.of(expected), fetcher.performSearch("dogs").subList(0, 1));
+        assertEquals(expected, fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").get(0));
     }
 
     @Test

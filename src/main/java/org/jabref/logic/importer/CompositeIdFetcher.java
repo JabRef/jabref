@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -32,7 +31,7 @@ public class CompositeIdFetcher {
         Optional<ISBN> isbn = ISBN.parse(identifier);
         if (isbn.isPresent()) {
             return new IsbnFetcher(importFormatPreferences)
-                    .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+                    // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
                     // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
                     .performSearchById(isbn.get().getNormalized());
         }

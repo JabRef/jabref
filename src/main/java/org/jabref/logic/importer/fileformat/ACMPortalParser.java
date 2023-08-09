@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -150,14 +151,7 @@ public class ACMPortalParser implements Parser {
 
         if (jsonObject.has("author")) {
             JsonArray authors = jsonObject.getAsJsonArray("author");
-            StringJoiner authorsJoiner = new StringJoiner(" and ");
-            for (JsonElement author : authors) {
-                JsonObject authorJsonObject = author.getAsJsonObject();
-                authorsJoiner.add(
-                        authorJsonObject.get("given").getAsString() + " " + authorJsonObject.get("family").getAsString()
-                );
-            }
-            bibEntry.setField(StandardField.AUTHOR, authorsJoiner.toString());
+            bibEntry.setField(StandardField.AUTHOR, getAuthorsLastFirst(authors));
         }
 
         if (jsonObject.has("issued")) {
@@ -226,5 +220,25 @@ public class ACMPortalParser implements Parser {
         }
 
         return bibEntry;
+    }
+
+    private String getAuthorsLastFirst(JsonArray authors) {
+        List<Author> jabrefAuthors = new ArrayList<>();
+
+        for (JsonElement author : authors) {
+            JsonObject authorJsonObject = author.getAsJsonObject();
+
+            String given = null;
+            String family = null;
+            if (authorJsonObject.has("given")) {
+                given = authorJsonObject.get("given").getAsString();
+            }
+            if (authorJsonObject.has("family")) {
+                family = authorJsonObject.get("family").getAsString();
+            }
+            Author jabrefAuthor = new Author(given, null, null, family, null);
+            jabrefAuthors.add(jabrefAuthor);
+        }
+        return AuthorList.of(jabrefAuthors).getAsLastFirstNamesWithAnd(false);
     }
 }
