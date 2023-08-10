@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
@@ -16,6 +17,10 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.LOBIDQueryTransformer;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -54,9 +59,9 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
 
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("q", new LOBIDQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Search query
-        uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber)); // From entry number, starts indexing at 0
-        uriBuilder.addParameter("size", String.valueOf(getPageSize())); // Page size
+        uriBuilder.addParameter("q", new LOBIDQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // search query
+        uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber)); // from entry number, starts indexing at 0
+        uriBuilder.addParameter("size", String.valueOf(getPageSize())); // page size
         uriBuilder.addParameter("format", "json"); // response format
         return uriBuilder.build().toURL();
     }
@@ -82,7 +87,25 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
     }
 
     private BibEntry parseJSONtoBibtex(JSONObject jsonEntry) {
-        return null;
+        BibEntry entry = new BibEntry();
+        Field nametype;
+
+        // Publication type
+        String isbn = Optional.ofNullable(jsonEntry.optJSONArray("isbn"))
+                              .map(array -> array.getString(0))
+                              .orElse("");
+        if (StringUtil.isNullOrEmpty(isbn)) {
+            // article
+            entry.setType(StandardEntryType.Article);
+            nametype = StandardField.JOURNAL;
+        } else {
+            // book chapter
+            entry.setType(StandardEntryType.InCollection);
+            nametype = StandardField.BOOKTITLE;
+            entry.setField(StandardField.ISBN, isbn);
+        }
+
+        return entry;
     }
 
     @Override
