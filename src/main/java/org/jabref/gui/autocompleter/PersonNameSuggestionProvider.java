@@ -64,7 +64,7 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> {
     @Override
     public Stream<Author> getSource() {
         return database.getEntries()
-                       .stream()
+                       .parallelStream()
                        .flatMap(this::getAuthors);
     }
 }
