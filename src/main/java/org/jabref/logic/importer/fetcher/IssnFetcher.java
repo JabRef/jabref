@@ -39,8 +39,7 @@ public class IssnFetcher implements IdBasedFetcher, IdFetcher<ISSN> {
 
         Optional<BibEntry> bibEntry = Optional.empty();
 
-        // need to create a queryString for ISSN
-        // take a look on arXiv API manual
+        // Aparently, to do a queryString in DOAJ, you only need to add issn:xxxx-xxxx after the base url
         List<BibEntry> bibEntries = doajFetcher.performSearch(identifier);
         for (BibEntry entry: bibEntries) {
             bibEntry = Optional.ofNullable(bibEntries.get(0));
