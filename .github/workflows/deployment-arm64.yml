@@ -5,11 +5,12 @@ on:
     inputs:
       notarization:
         type: boolean
-        required: false
-        default: false
+        required: true
+        default: true
   push:
    branches:
     - arm64mac-release
+    - updateArm64Notarization
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -161,6 +162,17 @@ jobs:
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}" --keychain ${{runner.temp}}/keychain/notarization.keychain
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg
+      - name: Upload with rsync
+        shell: bash
+        run: |
+          mkdir ${{runner.temp}}/sshkey
+          if [[ -z "${{ secrets.buildJabRefPrivateKey }}" ]]; then
+            echo "buildJabRefPrivateKey is empty, exiting"
+            exit 1
+          fi
+          echo  ${{ secrets.buildJabRefPrivateKey }} >> ${{runner.temp}}/sshkey.key
+          chmod 600 ${{runner.temp}}/sshkey.key
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}" -e 'ssh -p 9922 -i ${{runner.temp}}/sshkey.key' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store
         uses: actions/upload-artifact@v3
         with:
