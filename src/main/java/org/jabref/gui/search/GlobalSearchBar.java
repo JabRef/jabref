@@ -108,8 +108,6 @@ public class GlobalSearchBar extends HBox {
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
-    private final JabRefFrame frame;
-
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
         this.stateManager = stateManager;
@@ -117,7 +115,6 @@ public class GlobalSearchBar extends HBox {
         this.searchPreferences = preferencesService.getSearchPreferences();
         this.undoManager = undoManager;
         this.dialogService = dialogService;
-        this.frame = frame;
 
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
@@ -302,7 +299,7 @@ public class GlobalSearchBar extends HBox {
 
     public void performSearch() {
         LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
-        LOGGER.debug("Run search " + searchField.getText());
+        LOGGER.debug("Run search {}", searchField.getText());
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
