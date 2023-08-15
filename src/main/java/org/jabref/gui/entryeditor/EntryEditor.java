@@ -291,6 +291,7 @@ public class EntryEditor extends BorderPane {
                 fileMonitor,
                 dialogService,
                 stateManager,
+                bibEntryTypesManager,
                 keyBindingRepository);
         entryEditorTabs.add(sourceTab);
 

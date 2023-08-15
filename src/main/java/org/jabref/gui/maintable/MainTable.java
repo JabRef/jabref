@@ -49,6 +49,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -69,6 +70,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
     private final ClipBoardManager clipBoardManager;
+    private final BibEntryTypesManager entryTypesManager;
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
@@ -80,6 +82,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
                      ClipBoardManager clipBoardManager,
+                     BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
                      FileUpdateMonitor fileUpdateMonitor) {
         super();
@@ -90,6 +93,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.database = Objects.requireNonNull(database);
         this.model = model;
         this.clipBoardManager = clipBoardManager;
+        this.entryTypesManager = entryTypesManager;
         UndoManager undoManager = libraryTab.getUndoManager();
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
@@ -253,7 +257,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (!selectedEntries.isEmpty()) {
             try {
-                clipBoardManager.setContent(selectedEntries);
+                clipBoardManager.setContent(selectedEntries, entryTypesManager);
                 dialogService.notify(libraryTab.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
             } catch (IOException e) {
                 LOGGER.error("Error while copying selected entries to clipboard", e);

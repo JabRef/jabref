@@ -20,6 +20,7 @@ import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -141,9 +142,9 @@ public class ClipBoardManager {
         setPrimaryClipboardContent(content);
     }
 
-    public void setContent(List<BibEntry> entries) throws IOException {
+    public void setContent(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
         final ClipboardContent content = new ClipboardContent();
-        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), Globals.entryTypesManager);
+        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), entryTypesManager);
         String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
         // BibEntry is not Java serializable. Thus, we need to do the serialization manually
         // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here

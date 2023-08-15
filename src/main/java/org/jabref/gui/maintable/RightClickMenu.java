@@ -60,7 +60,7 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                createSendSubMenu(factory, dialogService, stateManager, preferencesService),
+                createSendSubMenu(factory, dialogService, stateManager, preferencesService, entryTypesManager),
 
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, libraryTab.frame(), dialogService, preferencesService, undoManager, stateManager),
@@ -128,10 +128,11 @@ public class RightClickMenu {
     private static Menu createSendSubMenu(ActionFactory factory,
                                           DialogService dialogService,
                                           StateManager stateManager,
-                                          PreferencesService preferencesService) {
+                                          PreferencesService preferencesService,
+                                          BibEntryTypesManager entryTypesManager) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager, entryTypesManager)),
                 factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager)),
                 new SeparatorMenuItem()
         );

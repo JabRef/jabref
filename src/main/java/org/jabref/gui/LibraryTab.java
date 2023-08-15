@@ -505,6 +505,7 @@ public class LibraryTab extends Tab {
                 stateManager,
                 Globals.getKeyPrefs(),
                 Globals.getClipboardManager(),
+                entryTypesManager,
                 Globals.TASK_EXECUTOR,
                 fileUpdateMonitor);
 
