@@ -155,7 +155,7 @@ public class JabRefGUI {
             if (!correctedWindowPos) {
                 // saves the window position only if its not  corrected -> the window will rest at the old Position,
                 // if the external Screen is connected again.
-                saveWindowState(mainStage);
+                getMainFrame().saveWindowState();
             }
             boolean reallyQuit = mainFrame.quit();
             if (!reallyQuit) {
