@@ -14,6 +14,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -34,6 +35,7 @@ class ArgumentProcessorTest {
     private ArgumentProcessor processor;
     private BibtexImporter bibtexImporter;
     private final PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+    private final BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
@@ -62,7 +64,8 @@ class ArgumentProcessorTest {
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
                 preferencesService,
-                mock(FileUpdateMonitor.class));
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
 
         assertTrue(Files.exists(outputBib));
     }
@@ -87,7 +90,8 @@ class ArgumentProcessorTest {
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
                 preferencesService,
-                mock(FileUpdateMonitor.class));
+                mock(FileUpdateMonitor.class),
+                entryTypesManager);
 
         assertTrue(Files.exists(outputBib));
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);

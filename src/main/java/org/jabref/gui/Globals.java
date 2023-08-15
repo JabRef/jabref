@@ -123,7 +123,7 @@ public class Globals {
         } */
         RemotePreferences remotePreferences = prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs, fileUpdateMonitor), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
         }
     }
 

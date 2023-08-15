@@ -60,12 +60,13 @@ public class Launcher {
 
         addLogToDisk();
         try {
-            Globals.entryTypesManager = new BibEntryTypesManager();
+            BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+            Globals.entryTypesManager = entryTypesManager;
 
             // Init preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
             Globals.prefs = preferences;
-            PreferencesMigrations.runMigrations(preferences, Globals.entryTypesManager);
+            PreferencesMigrations.runMigrations(preferences, entryTypesManager);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(ARGUMENTS, preferences)) {
@@ -85,7 +86,8 @@ public class Launcher {
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                         ARGUMENTS, ArgumentProcessor.Mode.INITIAL_START,
                         preferences,
-                        fileUpdateMonitor);
+                        fileUpdateMonitor,
+                        entryTypesManager);
                 if (argumentProcessor.shouldShutDown()) {
                     LOGGER.debug("JabRef shut down after processing command line arguments");
                     return;

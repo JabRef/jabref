@@ -26,6 +26,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -63,6 +64,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
 
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private BibEntryTypesManager entryTypesManager;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -81,7 +83,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor, entryTypesManager);
 
         remoteLabel.setVisible(preferencesService.getWorkspacePreferences().shouldShowAdvancedHints());
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());

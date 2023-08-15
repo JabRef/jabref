@@ -71,16 +71,19 @@ public class ArgumentProcessor {
     private final Mode startupMode;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final BibEntryTypesManager entryTypesManager;
     private boolean noGUINeeded;
 
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
                              PreferencesService preferencesService,
-                             FileUpdateMonitor fileUpdateMonitor) throws org.apache.commons.cli.ParseException {
+                             FileUpdateMonitor fileUpdateMonitor,
+                             BibEntryTypesManager entryTypesManager) throws org.apache.commons.cli.ParseException {
         this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
 
         this.parserResults = processArguments();
     }
@@ -604,7 +607,7 @@ public class ArgumentProcessor {
                         saveConfiguration,
                         preferencesService.getFieldPreferences(),
                         preferencesService.getCitationKeyPatternPreferences(),
-                        Globals.entryTypesManager);
+                        entryTypesManager);
                 databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
                 // Show just a warning message if encoding did not work for all characters:
