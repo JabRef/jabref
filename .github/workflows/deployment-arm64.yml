@@ -170,13 +170,9 @@ jobs:
             echo "buildJabRefPrivateKey is empty, exiting"
             exit 1
           fi
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --mkpath -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/updateArm64Notarization/
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store
         uses: actions/upload-artifact@v3
         with:
           name: JabRef-${{ matrix.displayName }}
           path: build/distribution
-      - name: Upload with rsync
-        shell: bash
-        run: |
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
