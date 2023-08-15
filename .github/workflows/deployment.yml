@@ -54,7 +54,6 @@ jobs:
             eaJDK: https://files.jabref.org/jdks/jdk-windows-x64.zip
           - os: macos-latest
             displayName: macOS
-            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
             eaJDK: https://files.jabref.org/jdks/jdk-macos-x64.tar.gz
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
@@ -297,7 +296,7 @@ jobs:
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg
       - name: Package application image
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (matrix.os != 'macos-latest')
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Upload to GitHub workflow artifacts store
