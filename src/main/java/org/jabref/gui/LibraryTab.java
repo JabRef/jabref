@@ -59,6 +59,7 @@ import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
@@ -86,6 +87,7 @@ public class LibraryTab extends Tab {
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final StateManager stateManager;
+    private final BibEntryTypesManager entryTypesManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
 
@@ -122,7 +124,8 @@ public class LibraryTab extends Tab {
                       JabRefFrame frame,
                       PreferencesService preferencesService,
                       StateManager stateManager,
-                      FileUpdateMonitor fileUpdateMonitor) {
+                      FileUpdateMonitor fileUpdateMonitor,
+                      BibEntryTypesManager entryTypesManager) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.undoManager = frame.getUndoManager();
@@ -130,6 +133,7 @@ public class LibraryTab extends Tab {
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -287,7 +291,7 @@ public class LibraryTab extends Tab {
     public void installAutosaveManagerAndBackupManager() {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
-            autosaveManager.registerListener(new AutosaveUiManager(this));
+            autosaveManager.registerListener(new AutosaveUiManager(this, preferencesService, entryTypesManager));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferencesService.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(bibDatabaseContext, Globals.entryTypesManager, preferencesService);
@@ -824,11 +828,12 @@ public class LibraryTab extends Tab {
                                               PreferencesService preferencesService,
                                               StateManager stateManager,
                                               JabRefFrame frame,
-                                              FileUpdateMonitor fileUpdateMonitor) {
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              BibEntryTypesManager entryTypesManager) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
-        LibraryTab newTab = new LibraryTab(context, frame, preferencesService, stateManager, fileUpdateMonitor);
+        LibraryTab newTab = new LibraryTab(context, frame, preferencesService, stateManager, fileUpdateMonitor, entryTypesManager);
 
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)

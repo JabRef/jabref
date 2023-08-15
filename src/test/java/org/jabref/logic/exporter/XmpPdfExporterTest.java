@@ -1,7 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleObjectProperty;
 
-import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -38,17 +36,13 @@ class XmpPdfExporterTest {
 
     @TempDir static Path tempDir;
 
-    private static BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
-    private static BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
-    private static BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
+    private static final BibEntry olly2018 = new BibEntry(StandardEntryType.Article);
+    private static final BibEntry toral2006 = new BibEntry(StandardEntryType.Article);
+    private static final BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
 
-    private PdfXmpImporter importer;
     private XmpPdfExporter exporter;
-    private XmpPreferences xmpPreferences;
-    private Charset encoding;
 
     private BibDatabaseContext databaseContext;
-    private BibDatabase dataBase;
     private JournalAbbreviationRepository abbreviationRepository;
     private FilePreferences filePreferences;
 
@@ -101,20 +95,15 @@ class XmpPdfExporterTest {
     @BeforeEach
     void setUp() throws IOException {
         abbreviationRepository = mock(JournalAbbreviationRepository.class);
-
-        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','));
-
-        encoding = Charset.defaultCharset();
-
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.getUserAndHost()).thenReturn(tempDir.toAbsolutePath().toString());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
-        importer = new PdfXmpImporter(xmpPreferences);
+        XmpPreferences xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','));
         exporter = new XmpPdfExporter(xmpPreferences);
 
         databaseContext = new BibDatabaseContext();
-        dataBase = databaseContext.getDatabase();
+        BibDatabase dataBase = databaseContext.getDatabase();
 
         initBibEntries();
         dataBase.insertEntry(olly2018);
@@ -145,13 +134,13 @@ class XmpPdfExporterTest {
     @ParameterizedTest
     @MethodSource("providePathsToValidPDFs")
     void successfulExportToFileByPath(Path path) throws Exception {
-        assertTrue(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path, abbreviationRepository));
+        assertTrue(exporter.exportToFileByPath(databaseContext, filePreferences, path, abbreviationRepository));
     }
 
     @ParameterizedTest
     @MethodSource("providePathsToInvalidPDFs")
     void unsuccessfulExportToFileByPath(Path path) throws Exception {
-        assertFalse(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path, abbreviationRepository));
+        assertFalse(exporter.exportToFileByPath(databaseContext, filePreferences, path, abbreviationRepository));
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {

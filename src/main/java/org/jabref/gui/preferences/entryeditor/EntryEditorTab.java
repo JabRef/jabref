@@ -59,7 +59,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 
         ActionFactory actionFactory = new ActionFactory(keyBindingRepository);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService), generalFieldsHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferencesService.getFilePreferences()), generalFieldsHelp);
     }
 
     @FXML

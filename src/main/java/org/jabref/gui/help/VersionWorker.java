@@ -11,7 +11,9 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.InternalPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,16 +38,17 @@ public class VersionWorker {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final InternalPreferences internalPreferences;
+    private final FilePreferences filePreferences;
 
     public VersionWorker(Version installedVersion,
-
                          DialogService dialogService,
                          TaskExecutor taskExecutor,
-                         InternalPreferences internalPreferences) {
+                         PreferencesService preferencesService) {
         this.installedVersion = Objects.requireNonNull(installedVersion);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.internalPreferences = internalPreferences;
+        this.internalPreferences = preferencesService.getInternalPreferences();
+        this.filePreferences = preferencesService.getFilePreferences();
     }
 
     /**
@@ -95,7 +98,8 @@ public class VersionWorker {
             }
         } else {
             // notify the user about a newer version
-            if (dialogService.showCustomDialogAndWait(new NewVersionDialog(installedVersion, newerVersion.get(), dialogService)).orElse(true)) {
+            if (dialogService.showCustomDialogAndWait(new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, filePreferences))
+                             .orElse(true)) {
                 internalPreferences.setIgnoredVersion(newerVersion.get());
             }
         }

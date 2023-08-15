@@ -70,7 +70,7 @@ public class Globals {
     public static ProtectedTermsLoader protectedTermsLoader;
 
     public static CountingUndoManager undoManager = new CountingUndoManager();
-    public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+    public static BibEntryTypesManager entryTypesManager;
 
     private static ClipBoardManager clipBoardManager = null;
     private static KeyBindingRepository keyBindingRepository;

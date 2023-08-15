@@ -55,7 +55,7 @@ public class RightClickMenu {
                 createCopySubMenu(factory, dialogService, stateManager, preferencesService, clipBoardManager, abbreviationRepository, taskExecutor),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService.getBibEntryPreferences())),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager)),
 
                 new SeparatorMenuItem(),

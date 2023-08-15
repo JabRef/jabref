@@ -23,6 +23,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -59,10 +60,12 @@ public class Launcher {
 
         addLogToDisk();
         try {
+            Globals.entryTypesManager = new BibEntryTypesManager();
+
             // Init preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
             Globals.prefs = preferences;
-            PreferencesMigrations.runMigrations(preferences);
+            PreferencesMigrations.runMigrations(preferences, Globals.entryTypesManager);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(ARGUMENTS, preferences)) {

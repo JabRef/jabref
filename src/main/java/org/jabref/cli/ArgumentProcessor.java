@@ -291,13 +291,12 @@ public class ArgumentProcessor {
         }
         ParserResult pr = loaded.get(loaded.size() - 1);
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
-        BibDatabase dataBase = pr.getDatabase();
 
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
         EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldPreferences);
 
         if ("all".equals(filesAndCitekeys)) {
-            for (BibEntry entry : dataBase.getEntries()) {
+            for (BibEntry entry : databaseContext.getEntries()) {
                 writeMetadataToPDFsOfEntry(
                         databaseContext,
                         entry.getCitationKey().orElse("<no cite key defined>"),
@@ -324,7 +323,6 @@ public class ArgumentProcessor {
 
         writeMetadataToPdfByCitekey(
                 databaseContext,
-                dataBase,
                 citeKeys,
                 filePreferences,
                 xmpPdfExporter,
@@ -334,7 +332,6 @@ public class ArgumentProcessor {
                 embeddBibfile);
         writeMetadataToPdfByFileNames(
                 databaseContext,
-                dataBase,
                 pdfs,
                 filePreferences,
                 xmpPdfExporter,
@@ -374,7 +371,6 @@ public class ArgumentProcessor {
     }
 
     private void writeMetadataToPdfByCitekey(BibDatabaseContext databaseContext,
-                                             BibDatabase dataBase,
                                              List<String> citeKeys,
                                              FilePreferences filePreferences,
                                              XmpPdfExporter xmpPdfExporter,
@@ -383,7 +379,7 @@ public class ArgumentProcessor {
                                              boolean writeXMP,
                                              boolean embeddBibfile) {
         for (String citeKey : citeKeys) {
-            List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
+            List<BibEntry> bibEntryList = databaseContext.getDatabase().getEntriesByCitationKey(citeKey);
             if (bibEntryList.isEmpty()) {
                 System.err.printf("Skipped - Cannot find %s in library.%n", citeKey);
                 continue;
@@ -395,7 +391,6 @@ public class ArgumentProcessor {
     }
 
     private void writeMetadataToPdfByFileNames(BibDatabaseContext databaseContext,
-                                               BibDatabase dataBase,
                                                List<String> pdfs,
                                                FilePreferences filePreferences,
                                                XmpPdfExporter xmpPdfExporter,
@@ -411,14 +406,14 @@ public class ArgumentProcessor {
             if (Files.exists(filePath)) {
                 try {
                     if (writeXMP) {
-                        if (xmpPdfExporter.exportToFileByPath(databaseContext, dataBase, filePreferences, filePath, abbreviationRepository)) {
+                        if (xmpPdfExporter.exportToFileByPath(databaseContext, filePreferences, filePath, abbreviationRepository)) {
                             System.out.printf("Successfully written XMP metadata of at least one entry to %s%n", fileName);
                         } else {
                             System.out.printf("File %s is not linked to any entry in database.%n", fileName);
                         }
                     }
                     if (embeddBibfile) {
-                        if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, dataBase, filePreferences, filePath, abbreviationRepository)) {
+                        if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, filePreferences, filePath, abbreviationRepository)) {
                             System.out.printf("Successfully embedded XMP metadata of at least one entry to %s%n", fileName);
                         } else {
                             System.out.printf("File %s is not linked to any entry in database.%n", fileName);

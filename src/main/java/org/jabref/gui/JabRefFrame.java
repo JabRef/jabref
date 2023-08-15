@@ -134,6 +134,7 @@ import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -173,6 +174,7 @@ public class JabRefFrame extends BorderPane {
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final BibEntryTypesManager entryTypesManager;
     private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
@@ -189,6 +191,7 @@ public class JabRefFrame extends BorderPane {
         this.dialogService = new JabRefDialogService(mainStage);
         this.undoManager = Globals.undoManager;
         this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
+        this.entryTypesManager = Globals.entryTypesManager;
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
         this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
@@ -413,7 +416,7 @@ public class JabRefFrame extends BorderPane {
      * The MacAdapter calls this method when "About" is selected from the application menu.
      */
     public void about() {
-        new HelpAction(HelpFile.CONTENTS, dialogService).execute();
+        new HelpAction(HelpFile.CONTENTS, dialogService, prefs.getFilePreferences()).execute();
     }
 
     /**
@@ -562,7 +565,7 @@ public class JabRefFrame extends BorderPane {
         ToolBar toolBar = new ToolBar(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(this, prefs)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor, entryTypesManager)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, prefs, stateManager))),
 
                 leftSpacer,
@@ -602,7 +605,7 @@ public class JabRefFrame extends BorderPane {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService))));
+                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, prefs.getFilePreferences()))));
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
@@ -771,7 +774,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, this, prefs, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(this, prefs)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                
+
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.IMPORT,
@@ -861,8 +864,8 @@ public class JabRefFrame extends BorderPane {
 
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager, prefs)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, prefs.getBibEntryPreferences())),
-                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this, stateManager, Globals.TASK_EXECUTOR)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, prefs)),
+                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this, prefs, dialogService, stateManager, Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, this.prefs, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -903,7 +906,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF, new WriteMetadataToPdfAction(stateManager, Globals.entryTypesManager, prefs.getFieldPreferences(), dialogService, taskExecutor, prefs.getFilePreferences(), prefs.getXmpPreferences())),
+                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF, new WriteMetadataToPdfAction(stateManager, Globals.entryTypesManager, prefs.getFieldPreferences(), dialogService, taskExecutor, prefs.getFilePreferences(), prefs.getXmpPreferences(), Globals.journalAbbreviationRepository)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, prefs, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -943,8 +946,8 @@ public class JabRefFrame extends BorderPane {
         );
 
         help.getItems().addAll(
-                factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService)),
-                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/", dialogService)),
+                factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService, prefs.getFilePreferences())),
+                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/", dialogService, prefs.getFilePreferences())),
 
                 new SeparatorMenuItem(),
 
@@ -952,19 +955,19 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org", dialogService)),
-                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(Globals.BUILD_INFO, prefs.getInternalPreferences(), dialogService, Globals.TASK_EXECUTOR)),
+                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org", dialogService, prefs.getFilePreferences())),
+                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(Globals.BUILD_INFO, prefs, dialogService, Globals.TASK_EXECUTOR)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
-                        factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService)),
+                        factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/", dialogService, prefs.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/", dialogService, prefs.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/", dialogService, prefs.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org", dialogService, prefs.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, prefs.getFilePreferences())),
 
                         new SeparatorMenuItem(),
 
-                        factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md", dialogService))
+                        factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/", dialogService, prefs.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md", dialogService, prefs.getFilePreferences()))
                 ),
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
@@ -1157,7 +1160,7 @@ public class JabRefFrame extends BorderPane {
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, fileUpdateMonitor);
+        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, fileUpdateMonitor, entryTypesManager);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }
@@ -1275,7 +1278,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
-        return new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor);
+        return new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor, entryTypesManager);
     }
 
     public GlobalSearchBar getGlobalSearchBar() {
@@ -1414,7 +1417,7 @@ public class JabRefFrame extends BorderPane {
         public void execute() {
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(path, prefs, dialogService);
+                    JabRefDesktop.openFolderAndSelectFile(path, prefs.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }
