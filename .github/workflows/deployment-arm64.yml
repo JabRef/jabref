@@ -170,9 +170,7 @@ jobs:
             echo "buildJabRefPrivateKey is empty, exiting"
             exit 1
           fi
-          echo  ${{ secrets.buildJabRefPrivateKey }} >> ${{runner.temp}}/sshkey.key
-          chmod 600 ${{runner.temp}}/sshkey.key
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}" -e 'ssh -p 9922 -i ${{runner.temp}}/sshkey.key' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --mkpath -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/updateArm64Notarization/
       - name: Upload to GitHub workflow artifacts store
         uses: actions/upload-artifact@v3
         with:
@@ -181,4 +179,4 @@ jobs:
       - name: Upload with rsync
         shell: bash
         run: |
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
