@@ -42,7 +42,6 @@ import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
-import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -66,8 +65,8 @@ public class WebFetchers {
         if (field == StandardField.DOI) {
             fetcher = new DoiFetcher(importFormatPreferences);
         } else if (field == ISBN) {
-            fetcher = new IsbnFetcher(importFormatPreferences)
-                    .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences));
+            fetcher = new IsbnFetcher(importFormatPreferences);
+                    // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences));
                     // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences));
         } else if (field == EPRINT) {
             fetcher = new ArXivFetcher(importFormatPreferences);
@@ -132,8 +131,8 @@ public class WebFetchers {
         SortedSet<IdBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new ArXivFetcher(importFormatPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
-        set.add(new IsbnFetcher(importFormatPreferences)
-                .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
+        set.add(new IsbnFetcher(importFormatPreferences));
+                // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
                 // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new DiVA(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
@@ -161,8 +160,8 @@ public class WebFetchers {
         set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
-        set.add(new IsbnFetcher(importFormatPreferences)
-                .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
+        set.add(new IsbnFetcher(importFormatPreferences));
+                // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
                 // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());

@@ -16,7 +16,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.StandardFileType;
@@ -97,7 +96,7 @@ public class PdfMergeMetadataImporter extends Importer {
             if (candidate.hasField(StandardField.ISBN)) {
                 try {
                     new IsbnFetcher(importFormatPreferences)
-                            .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+                            // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
                             // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
                             .performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {

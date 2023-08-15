@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.1.19'
+    id 'org.openrewrite.rewrite' version '6.1.22'
 }
 
 // Enable following for debugging
@@ -161,7 +161,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:32.1.1-jre') {
+    implementation ('com.google.guava:guava:32.1.2-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
