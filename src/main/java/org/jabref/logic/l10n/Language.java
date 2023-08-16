@@ -14,6 +14,7 @@ public enum Language {
     DANISH("Dansk", "da"),
     DUTCH("Nederlands", "nl"),
     ENGLISH("English", "en"),
+    FINNISH("Suomi", "fi"),
     FRENCH("Français", "fr"),
     GERMAN("Deutsch", "de"),
     GREEK("ελληνικά (Greek)", "el"),
