@@ -29,6 +29,7 @@ import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
+import org.jabref.logic.importer.fetcher.IssnFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
@@ -134,6 +135,7 @@ public class WebFetchers {
         set.add(new IsbnFetcher(importFormatPreferences));
                 // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
                 // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+        set.add(new IssnFetcher(importFormatPreferences));
         set.add(new DiVA(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new MedlineFetcher());

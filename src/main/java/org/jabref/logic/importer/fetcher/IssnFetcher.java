@@ -23,7 +23,7 @@ public class IssnFetcher implements IdBasedFetcher, IdFetcher<ISSN> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IssnFetcher.class);
     private final DOAJFetcher doajFetcher;
-    private final String SEARCH_URL = "https://doaj.org/api/search/journals/";
+    // private final String SEARCH_URL = "https://doaj.org/api/search/journals/";
     private final ISSNChecker issnChecker;
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -40,7 +40,6 @@ public class IssnFetcher implements IdBasedFetcher, IdFetcher<ISSN> {
         if (checkedId.isPresent()) {
             String queryString = concatenateIssnWithId(identifier);
             List<BibEntry> bibEntries = doajFetcher.performSearch(queryString);
-
             return bibEntries.stream().findFirst();
         } else {
             LOGGER.warn("Not a valid ISSN");
