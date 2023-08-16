@@ -6,40 +6,35 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class JournalEditor extends HBox implements FieldEditorFX {
-
-    @FXML private JournalEditorViewModel viewModel;
-    @FXML private EditorTextField textField;
+public class ISSNEditor extends HBox implements FieldEditorFX {
+    @FXML private ISSNEditorViewModel viewModel;
+    @FXML private EditorTextArea textArea;
     @FXML private Button journalInfoButton;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
 
-    public JournalEditor(Field field,
-                         TaskExecutor taskExecutor,
-                         DialogService dialogService,
-                         JournalAbbreviationRepository journalAbbreviationRepository,
-                         PreferencesService preferences,
-                         SuggestionProvider<?> suggestionProvider,
-                         FieldCheckers fieldCheckers) {
-        this.dialogService = dialogService;
+    public ISSNEditor(Field field,
+                      SuggestionProvider<?> suggestionProvider,
+                      FieldCheckers fieldCheckers,
+                      PreferencesService preferences,
+                      TaskExecutor taskExecutor,
+                      DialogService dialogService) {
         this.preferencesService = preferences;
+        this.dialogService = dialogService;
 
-        this.viewModel = new JournalEditorViewModel(
+        this.viewModel = new ISSNEditorViewModel(
                 field,
                 suggestionProvider,
-                journalAbbreviationRepository,
                 fieldCheckers,
                 taskExecutor,
                 dialogService);
@@ -48,15 +43,13 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        textField.textProperty().bindBidirectional(viewModel.textProperty());
-        textField.initContextMenu(new DefaultMenu(textField));
+        textArea.textProperty().bindBidirectional(viewModel.textProperty());
+        textArea.initContextMenu(new DefaultMenu(textArea));
 
-        AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);
-
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
-    public JournalEditorViewModel getViewModel() {
+    public ISSNEditorViewModel getViewModel() {
         return viewModel;
     }
 
@@ -70,9 +63,9 @@ public class JournalEditor extends HBox implements FieldEditorFX {
         return this;
     }
 
-    @FXML
-    private void toggleAbbreviation() {
-        viewModel.toggleAbbreviation();
+    @Override
+    public void requestFocus() {
+        textArea.requestFocus();
     }
 
     @FXML

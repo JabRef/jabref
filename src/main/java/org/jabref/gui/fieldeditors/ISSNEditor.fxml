@@ -3,22 +3,13 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
-<?import org.jabref.gui.fieldeditors.EditorTextField?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.fieldeditors.EditorTextArea?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
-         fx:controller="org.jabref.gui.fieldeditors.JournalEditor">
-    <EditorTextField fx:id="textField"/>
+         fx:controller="org.jabref.gui.fieldeditors.ISSNEditor">
+    <EditorTextArea fx:id="textArea"/>
     <VBox>
-        <Button onAction="#toggleAbbreviation"
-                styleClass="icon-button">
-            <graphic>
-                <JabRefIconView glyph="TOGGLE_ABBREVIATION"/>
-            </graphic>
-            <tooltip>
-                <Tooltip text="%Switches between full and abbreviated journal name if the journal name is known."/>
-            </tooltip>
-        </Button>
         <Button fx:id="journalInfoButton"
                 onAction="#showJournalInfo"
                 styleClass="icon-button">
