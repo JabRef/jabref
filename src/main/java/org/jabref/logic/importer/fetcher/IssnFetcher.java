@@ -37,30 +37,20 @@ public class IssnFetcher implements IdBasedFetcher, IdFetcher<ISSN> {
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
 
         Optional<String> checkedId = issnChecker.checkValue(identifier);
-        if (checkedId.isEmpty()) {
+        if (checkedId.isPresent()) {
+            String queryString = concatenateIssnWithId(identifier);
+            List<BibEntry> bibEntries = doajFetcher.performSearch(queryString);
+
+            return bibEntries.stream().findFirst();
+        } else {
             LOGGER.warn("Not a valid ISSN");
             return Optional.empty();
         }
-
-        Optional<BibEntry> bibEntry = Optional.empty();
-
-        String queryString = concatenateIssnWithId(identifier);
-        List<BibEntry> bibEntries = doajFetcher.performSearch(queryString);
-
-        if (!bibEntries.isEmpty()) {
-            for (int i = 0; i < bibEntries.size(); i++) {
-                bibEntry = Optional.ofNullable(bibEntries.get(0));
-            }
-        } else {
-            LOGGER.warn("ISSN search failed, no results found");
-        }
-
-        return bibEntry;
     }
 
     @Override
     public Optional<ISSN> findIdentifier(BibEntry entry) throws FetcherException {
-        // Need to create a getIssn() method in BibEntry that returns a Optional
+        // Need to create a getIssn() method in BibEntry that returns an Optional
         return Optional.empty();
     }
 
