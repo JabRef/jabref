@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.ScrollPane?>
+<fx:root VBox.vgrow="ALWAYS" alignment="TOP_CENTER" prefHeight="800.0" prefWidth="1200.0" spacing="10.0" styleClass="info-container" type="VBox" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.fieldeditors.journalinfo.JournalInfoView">
+    <Label fx:id="title" styleClass="info-heading">
+        <opaqueInsets>
+            <Insets bottom="1.0" right="10.0" top="10.0" />
+        </opaqueInsets>
+    </Label>
+    <GridPane maxHeight="150.0" VBox.vgrow="ALWAYS">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
+         <RowConstraints />
+        </rowConstraints>
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-r">
+            <Label styleClass="info-label" text="%h-index">
+                <VBox.margin>
+                    <Insets bottom="10.0" />
+                </VBox.margin>
+            </Label>
+            <Label fx:id="hIndex" style="-fx-font-size: 24;" />
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-r" GridPane.columnIndex="1">
+            <Label styleClass="info-label" text="%Categories">
+                <VBox.margin>
+                    <Insets bottom="10.0" />
+                </VBox.margin>
+            </Label>
+            <ScrollPane>
+                <Label fx:id="categories" />
+            </ScrollPane>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="grid-cell-r" GridPane.columnIndex="2">
+            <Label styleClass="info-label" text="%Publisher">
+                <VBox.margin>
+                    <Insets bottom="10.0" />
+                </VBox.margin>
+            </Label>
+            <Label fx:id="publisher" />
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3">
+            <Label styleClass="info-label" text="%ISSN">
+                <VBox.margin>
+                    <Insets bottom="10.0" />
+                </VBox.margin>
+            </Label>
+            <Label fx:id="issn" />
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </VBox>
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </GridPane>
+    <GridPane prefHeight="564.0" prefWidth="1180.0" VBox.vgrow="SOMETIMES">
+     <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+     </columnConstraints>
+     <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+     </rowConstraints>
+        <LineChart fx:id="sjrChart" legendVisible="false" title="SJR">
+            <xAxis>
+             <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+             <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="citesIncomingByRecentlyPublishedChart" legendVisible="false" title="%Cites Incoming by Recently Published" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <xAxis>
+                <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="citesOutgoingChart" legendVisible="false" title="%Cites Outgoing" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <xAxis>
+                <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="citesOutgoingPerDocChart" legendVisible="false" title="%Cites Outgoing per Document" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <xAxis>
+                <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="docsThisYearChart" legendVisible="false" title="%Docs (This Year)" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <xAxis>
+              <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+              <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+        <LineChart fx:id="citableDocsPrevious3YearsChart" legendVisible="false" title="%Citable Docs (Previous 3 Years)" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <xAxis>
+                <CategoryAxis label="%Year" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis minorTickVisible="false" side="LEFT" />
+            </yAxis>
+        </LineChart>
+    </GridPane>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+</fx:root>

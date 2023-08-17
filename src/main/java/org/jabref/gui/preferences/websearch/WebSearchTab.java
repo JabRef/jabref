@@ -27,6 +27,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
+    @FXML private CheckBox journalInfoEnabled;
+
     @FXML private ComboBox<FetcherApiKey> apiKeySelector;
     @FXML private TextField customApiKey;
     @FXML private CheckBox useCustomApiKey;
@@ -53,6 +55,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
         grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
+
+        journalInfoEnabled.selectedProperty().bindBidirectional(viewModel.journalInfoEnabledProperty());
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());

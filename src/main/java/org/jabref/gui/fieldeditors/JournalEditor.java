@@ -2,11 +2,14 @@ package org.jabref.gui.fieldeditors;
 
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
@@ -19,13 +22,27 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     @FXML private JournalEditorViewModel viewModel;
     @FXML private EditorTextField textField;
+    @FXML private Button journalInfoButton;
+    private final DialogService dialogService;
+    private final PreferencesService preferencesService;
 
     public JournalEditor(Field field,
+                         TaskExecutor taskExecutor,
+                         DialogService dialogService,
                          JournalAbbreviationRepository journalAbbreviationRepository,
                          PreferencesService preferences,
                          SuggestionProvider<?> suggestionProvider,
                          FieldCheckers fieldCheckers) {
-        this.viewModel = new JournalEditorViewModel(field, suggestionProvider, journalAbbreviationRepository, fieldCheckers);
+        this.dialogService = dialogService;
+        this.preferencesService = preferences;
+
+        this.viewModel = new JournalEditorViewModel(
+                field,
+                suggestionProvider,
+                journalAbbreviationRepository,
+                fieldCheckers,
+                taskExecutor,
+                dialogService);
 
         ViewLoader.view(this)
                   .root(this)
@@ -56,5 +73,12 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML
     private void toggleAbbreviation() {
         viewModel.toggleAbbreviation();
+    }
+
+    @FXML
+    private void showJournalInfo() {
+        if (JournalInfoOptInDialogHelper.isJournalInfoEnabled(dialogService, preferencesService.getJournalInformationPreferences())) {
+            viewModel.showJournalInfo(journalInfoButton);
+        }
     }
 }
