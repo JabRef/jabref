@@ -30,6 +30,7 @@
         <Label text="%Grobid URL" />
         <TextField fx:id="grobidURL" HBox.hgrow="ALWAYS"/>
     </HBox>
+    <CheckBox fx:id="journalInfoEnabled" text="%Allow sending ISSN to a JabRef online service (SCimago) for fetching journal information"/>
 
     <Label styleClass="sectionHeader" text="%Custom API key"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">

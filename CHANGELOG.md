@@ -37,6 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We integrated two mail actions ("As Email" and "To Kindle") under a new "Send" option in the right-click & Tools menus. The Kindle option creates an email targeted to the user's Kindle email, which can be set in preferences under "External programs" [#6186](https://github.com/JabRef/jabref/issues/6186)
 - We added an option to clear recent libraries' history. [#10003](https://github.com/JabRef/jabref/issues/10003)
 - We added an option to encrypt and remember the proxy password. [#8055](https://github.com/JabRef/jabref/issues/8055)[#10044](https://github.com/JabRef/jabref/issues/10044)
+- We added support for showing journal information, via info buttons next to the `Journal` and `ISSN` fields in the entry editor. [#6189](https://github.com/JabRef/jabref/issues/6189)
 - We added support for pushing citations to Sublime Text 3 [#10098](https://github.com/JabRef/jabref/issues/10098)
 
 ### Changed
@@ -127,6 +128,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where JabRef would not remember if the window was in fullscreen or not [#4939](https://github.com/JabRef/jabref/issues/4939)
 - We fixed an issue where the ACM Portal search sometimes would not return entries for some search queries when the article author had no given name [#10107](https://github.com/JabRef/jabref/issues/10107)
 - We fixed an issue that caused high CPU usage and a zombie process after quitting JabRef because of author names autocompletion [#10159](https://github.com/JabRef/jabref/pull/10159)
+- We added support for the Finnish language. [#10183](https://github.com/JabRef/jabref/pull/10183)
 
 ### Removed
 
