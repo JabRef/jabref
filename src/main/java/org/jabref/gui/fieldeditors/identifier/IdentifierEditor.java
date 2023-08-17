@@ -45,6 +45,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
             this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         } else if (StandardField.EPRINT == field) {
             this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+        } else if (StandardField.ISSN == field) {
+            this.viewModel = new ISSNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
         } else {
             throw new IllegalStateException(String.format("Unable to instantiate a view model for identifier field editor '%s'", field.getDisplayName()));
         }

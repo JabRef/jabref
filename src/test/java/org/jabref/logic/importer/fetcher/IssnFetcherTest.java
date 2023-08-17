@@ -6,6 +6,8 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.BibEntryPreferences;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 class IssnFetcherTest {
@@ -21,9 +24,13 @@ class IssnFetcherTest {
     private BibEntry bibEntry;
     @BeforeEach
     void setUp() {
-        fetcher = new IssnFetcher(mock(ImportFormatPreferences.class));
+        ImportFormatPreferences importPrefs = mock(ImportFormatPreferences.class);
+        BibEntryPreferences bibEntryPrefs = mock(BibEntryPreferences.class);
+        when(importPrefs.bibEntryPreferences()).thenReturn(bibEntryPrefs);
 
-        bibEntry = new BibEntry(BibEntry.DEFAULT_TYPE)
+        fetcher = new IssnFetcher(importPrefs);
+
+        bibEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.ISSN, "2579-5341")
                 .withField(StandardField.TITLE, "Query: Jurnal Sistem Informasi")
                 .withField(StandardField.INSTITUTION, "Univesitas Islam Negeri Sumatera Utara, Fakultas Sains dan Teknologi, Program Studi Sistem Informasi")
@@ -33,7 +40,7 @@ class IssnFetcherTest {
 
     @Test
     void performSearchById() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("1662-4548");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2579-5341");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
