@@ -37,7 +37,7 @@ public class IssnFetcher implements IdBasedFetcher, IdFetcher<ISSN> {
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
 
         Optional<String> checkedId = issnChecker.checkValue(identifier);
-        if (checkedId.equals(Optional.empty())) {
+        if (checkedId.isPresent()) {
             String queryString = concatenateIssnWithId(identifier);
             List<BibEntry> bibEntries = doajFetcher.performSearch(queryString);
             return bibEntries.stream().findFirst();

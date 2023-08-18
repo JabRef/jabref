@@ -6,7 +6,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.BibEntryPreferences;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -30,7 +29,7 @@ class IssnFetcherTest {
 
         fetcher = new IssnFetcher(importPrefs);
 
-        bibEntry = new BibEntry(StandardEntryType.Article)
+        bibEntry = new BibEntry(BibEntry.DEFAULT_TYPE)
                 .withField(StandardField.ISSN, "2579-5341")
                 .withField(StandardField.TITLE, "Query: Jurnal Sistem Informasi")
                 .withField(StandardField.INSTITUTION, "Univesitas Islam Negeri Sumatera Utara, Fakultas Sains dan Teknologi, Program Studi Sistem Informasi")
