@@ -62,8 +62,8 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
                 .install(labelColumn, new DefaultStringConverter());
         labelColumn.setOnEditCommit((TableColumn.CellEditEvent<ConstantsItemModel, String> cellEvent) -> {
 
-            ConstantsItemModel cellItem = cellEvent.getTableView()
-                                                   .getItems()
+            var tableView = cellEvent.getTableView();
+            ConstantsItemModel cellItem = tableView.getItems()
                                                    .get(cellEvent.getTablePosition().getRow());
 
             Optional<ConstantsItemModel> existingItem = viewModel.labelAlreadyExists(cellEvent.getNewValue());
@@ -77,7 +77,13 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
                 cellItem.setLabel(cellEvent.getNewValue());
             }
 
-            cellEvent.getTableView().refresh();
+            // Resort the entries based on the keys and set the focus to the newly-created entry
+            viewModel.resortStrings();
+            var selectionModel = tableView.getSelectionModel();
+            selectionModel.select(cellItem);
+            selectionModel.focus(selectionModel.getSelectedIndex());
+            tableView.refresh();
+            tableView.scrollTo(cellItem);
         });
 
         contentColumn.setSortable(true);

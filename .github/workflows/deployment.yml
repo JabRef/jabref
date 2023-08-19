@@ -54,7 +54,6 @@ jobs:
             eaJDK: https://files.jabref.org/jdks/jdk-windows-x64.zip
           - os: macos-latest
             displayName: macOS
-            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
             eaJDK: https://files.jabref.org/jdks/jdk-macos-x64.tar.gz
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
@@ -283,21 +282,21 @@ jobs:
           name: JabRef-macOS-tbn
           path: build/distribution/
       - name: Notarize dmg
-        if: (startsWith(github.ref, 'refs/tags/') || (${{ inputs.notarization }})) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') ||  inputs.notarization == true)
         shell: bash
         run: |
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg
       - name: Notarize pkg
-        if: (startsWith(github.ref, 'refs/tags/') || (${{ inputs.notarization }})) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') ||  inputs.notarization == true)
         shell: bash
         run: |
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg
       - name: Package application image
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (matrix.os != 'macos-latest')
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Upload to GitHub workflow artifacts store
@@ -346,13 +345,13 @@ jobs:
           name: JabRef-windows
           path: build/distribution
       - name: Get macOS binaries unsigned
-        if: (steps.checksecrets.outputs.secretspresent == 'YES') && ! (${{ inputs.notarization }})) && ! (startsWith(github.ref, 'refs/tags/')
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (inputs.notarization == false && ! startsWith(github.ref, 'refs/tags/'))
         uses: actions/download-artifact@master
         with:
           name: JabRef-macOS-tbn
           path: build/distribution/
       - name: Get macOS binaries notarized
-        if: (steps.checksecrets.outputs.secretspresent == 'YES') && ((${{ inputs.notarization }})) || (startsWith(github.ref, 'refs/tags/'))
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (inputs.notarization == true || startsWith(github.ref, 'refs/tags/'))
         uses: actions/download-artifact@master
         with:
           name: JabRef-macOS

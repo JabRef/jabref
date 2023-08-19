@@ -224,7 +224,7 @@ public class GroupTreeView extends BorderPane {
 
         new ViewModelTreeTableRowFactory<GroupNodeViewModel>()
                 .withContextMenu(this::createContextMenuForGroup)
-                .withOnMousePressedEvent((row, event) -> {
+                .withEventFilter(MouseEvent.MOUSE_PRESSED, (row, event) -> {
                     if (event.getTarget() instanceof StackPane pane) {
                         if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
                             event.consume();

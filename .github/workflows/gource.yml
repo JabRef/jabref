@@ -22,35 +22,35 @@ jobs:
         with:
           fetch-depth: 0
       - name: 'Development history of current build'
-        uses: nbprojekt/gource-action@v1
+        uses: BoundfoxStudios/action-gource@v2
         with:
           gource_title: 'JabRef v5.10 (in development) | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
           # 5s * 365 / 4 = 7.5min
-          gource_seconds_per_day: 3
+          gource_seconds_per_day: 1
           gource_start_date: '2023-01-06'
-          gource_file_filter: '.*buildres/csl/.*'
+          gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
           mkdir gource-videos
           mv ./gource/gource.mp4 ./gource-videos/jabref-v5.10-dev.mp4
       - name: 'Development history of last release'
-        uses: nbprojekt/gource-action@v1
+        uses: BoundfoxStudios/action-gource@v2
         with:
           gource_title: 'JabRef v5.9 | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
           # 5s * 365 / 4 = 7.5min
-          gource_seconds_per_day: 3
+          gource_seconds_per_day: 2
           gource_start_date: '2022-12-18'
           gource_stop_date: '2023-01-06'
-          gource_file_filter: '.*buildres/csl/.*'
+          gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
           mv ./gource/gource.mp4 ./gource-videos/jabref-v5.9.mp4
       - name: 'Complete development history'
-        uses: nbprojekt/gource-action@v1
+        uses: BoundfoxStudios/action-gource@v2
         with:
           gource_title: 'JabRef | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
@@ -58,7 +58,7 @@ jobs:
           # 0.01 leads to a 45 second video for the complete history until end of 2020
           # 0.1 leads to a 8 minute video
           gource_seconds_per_day: 0.1
-          gource_file_filter: '.*buildres/csl/.*'
+          gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
           mv gource/gource.mp4 gource-videos/jabref-complete.mp4
