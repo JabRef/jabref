@@ -4,7 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 
 public final class AbbreviationFormat {
 
-    public static final char DELIMITER = ';';
+    public static final char DELIMITER = ',';
     public static final char ESCAPE = '\\';
     public static final char QUOTE = '"';
 
