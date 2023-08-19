@@ -97,7 +97,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     }
 
     public BooleanProperty enableWebSearchProperty() {
-        return generateKeyOnImportProperty;
+        return enableWebSearchProperty;
     }
 
     public BooleanProperty generateKeyOnImportProperty() {
