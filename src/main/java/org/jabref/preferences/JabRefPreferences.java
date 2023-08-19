@@ -351,9 +351,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CYCLE_PREVIEW = "cyclePreview";
     public static final String PREVIEW_AS_TAB = "previewAsTab";
 
-    // General
-    private static final String GDPR_SETUP = "gdprSetup";
-
     // UI
     private static final String FONT_FAMILY = "fontFamily";
 
@@ -501,8 +498,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);
         defaults.put(SEARCH_WINDOW_WIDTH, 600.0);
 
-        defaults.put(IMPORTERS_ENABLED, false);
-        defaults.put(GENERATE_KEY_ON_IMPORT, true);
+        defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
+        defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
         defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
@@ -522,8 +519,6 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
         defaults.put(BASE_DOI_URI, "https://doi.org");
-
-        defaults.put(GDPR_SETUP, Boolean.FALSE);
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -747,7 +742,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // version check defaults
         defaults.put(VERSION_IGNORED_UPDATE, "");
-        defaults.put(VERSION_CHECK_ENABLED, false);
+        defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
         // preview
         defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
@@ -2016,15 +2011,12 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         internalPreferences = new InternalPreferences(
-                getBoolean(GDPR_SETUP),
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
                 getUserAndHost(),
                 getBoolean(MEMORY_STICK_MODE));
 
-        EasyBind.listen(internalPreferences.gdprSetupProperty(),
-                (obs, oldValue, newValue) -> putBoolean(GDPR_SETUP, newValue));
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
                 (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
         EasyBind.listen(internalPreferences.versionCheckEnabledProperty(),

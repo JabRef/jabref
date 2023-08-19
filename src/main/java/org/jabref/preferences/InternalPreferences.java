@@ -13,37 +13,22 @@ import org.jabref.logic.util.Version;
 
 public class InternalPreferences {
 
-    private final BooleanProperty gdprSetup;
     private final ObjectProperty<Version> ignoredVersion;
     private final BooleanProperty versionCheckEnabled;
     private final ObjectProperty<Path> lastPreferencesExportPath;
     private final StringProperty userAndHost;
     private final BooleanProperty memoryStickMode;
 
-    public InternalPreferences(boolean gdprSetup,
-                               Version ignoredVersion,
+    public InternalPreferences(Version ignoredVersion,
                                boolean versionCheck,
                                Path exportPath,
                                String userAndHost,
                                boolean memoryStickMode) {
-        this.gdprSetup = new SimpleBooleanProperty(gdprSetup);
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
         this.versionCheckEnabled = new SimpleBooleanProperty(versionCheck);
         this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);
         this.userAndHost = new SimpleStringProperty(userAndHost);
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
-    }
-
-    public boolean isGdprSetup() {
-        return gdprSetup.get();
-    }
-
-    public BooleanProperty gdprSetupProperty() {
-        return gdprSetup;
-    }
-
-    public void setGdprSetup(boolean gdprSetup) {
-        this.gdprSetup.set(gdprSetup);
     }
 
     public Version getIgnoredVersion() {

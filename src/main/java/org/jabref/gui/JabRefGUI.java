@@ -13,7 +13,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import org.jabref.gui.gdpr.GdprDialogView;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
@@ -68,11 +67,6 @@ public class JabRefGUI {
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
-
-        if (!preferencesService.getInternalPreferences().isGdprSetup()) {
-            mainFrame.getDialogService().showCustomDialogAndWait(new GdprDialogView());
-            preferencesService.getInternalPreferences().setGdprSetup(true);
-        }
 
         EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
