@@ -155,6 +155,18 @@ public class SearchFunctionalityTest {
         matches = new DatabaseSearcher(new SearchQuery("[/8]", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
+
+    @Test
+    public void testSensitiveRegularExpression() throws IOException, URISyntaxException {
+        initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-B.bib").toURI()));
+
+        //Positive search test
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("\\bCase\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(List.of(entry1B), matches);
+        //Negative search test
+        matches = new DatabaseSearcher(new SearchQuery("\\bCas\\b", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(Collections.emptyList(), matches);
+    }
 }
 
 
