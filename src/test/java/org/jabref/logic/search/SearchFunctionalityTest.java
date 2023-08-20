@@ -28,35 +28,29 @@ import static org.mockito.Mockito.mock;
 public class SearchFunctionalityTest {
 
     private BibDatabase database;
-    List<BibEntry> testLibraryA;
-    List<BibEntry> testLibraryB;
-    List<BibEntry> testLibraryC;
-    List<BibEntry> testLibraryD;
-
+    BibEntry entry1A = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry1")
+            .withField(StandardField.AUTHOR, "Test")
+            .withField(StandardField.TITLE, "cASe");
+    BibEntry entry2A = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry2")
+            .withField(StandardField.AUTHOR, "test")
+            .withField(StandardField.TITLE, "casE");
+    BibEntry entry3A = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry3")
+            .withField(StandardField.AUTHOR, "tESt")
+            .withField(StandardField.TITLE, "Case");
+    BibEntry entry4A = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry4")
+            .withField(StandardField.AUTHOR, "tesT")
+            .withField(StandardField.TITLE, "CASE");
+    BibEntry entry5A = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry5")
+            .withField(StandardField.AUTHOR, "TEST")
+            .withField(StandardField.TITLE, "case");
     @BeforeEach
     public void setUp() {
         database = new BibDatabase();
-        testLibraryA = List.of(
-                new BibEntry(StandardEntryType.Misc)
-                        .withCitationKey("entry1")
-                        .withField(StandardField.AUTHOR, "Test")
-                        .withField(StandardField.TITLE, "cASe"),
-                new BibEntry(StandardEntryType.Misc)
-                        .withCitationKey("entry2")
-                        .withField(StandardField.AUTHOR, "test")
-                        .withField(StandardField.TITLE, "casE"),
-                new BibEntry(StandardEntryType.Misc)
-                        .withCitationKey("entry3")
-                        .withField(StandardField.AUTHOR, "tESt")
-                        .withField(StandardField.TITLE, "Case"),
-                new BibEntry(StandardEntryType.Misc)
-                        .withCitationKey("entry4")
-                        .withField(StandardField.AUTHOR, "tesT")
-                        .withField(StandardField.TITLE, "CASE"),
-                new BibEntry(StandardEntryType.Misc)
-                        .withCitationKey("entry5")
-                        .withField(StandardField.AUTHOR, "TEST")
-                        .withField(StandardField.TITLE, "case"));
     }
 
     private void initializeDatabaseFromPath(Path testFile) throws IOException {
@@ -80,7 +74,7 @@ public class SearchFunctionalityTest {
 
         //Positive search test
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("Test", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
-        assertEquals(testLibraryA, matches);
+        assertEquals(List.of(entry1A, entry2A, entry3A, entry4A, entry5A), matches);
         //Negative search test
         matches = new DatabaseSearcher(new SearchQuery("Best", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
@@ -92,7 +86,7 @@ public class SearchFunctionalityTest {
 
         //Positive search test
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("author=Test", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
-        assertEquals(testLibraryA, matches);
+        assertEquals(List.of(entry1A, entry2A, entry3A, entry4A, entry5A), matches);
         //Negative search test
         matches = new DatabaseSearcher(new SearchQuery("author=Case", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
@@ -104,12 +98,23 @@ public class SearchFunctionalityTest {
 
         //Positive search test
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("author=Test and title=Case", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
-        assertEquals(testLibraryA, matches);
+        assertEquals(List.of(entry1A, entry2A, entry3A, entry4A, entry5A), matches);
         //Negative search test
         matches = new DatabaseSearcher(new SearchQuery("author=Test and title=Test", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
+    @Test
+    public void testSensitiveWordSearch() throws IOException, URISyntaxException {
+        initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-A.bib").toURI()));
+
+        //Positive search test
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("Test", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(List.of(entry1A), matches);
+        //Negative search test
+        matches = new DatabaseSearcher(new SearchQuery("TesT", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(Collections.emptyList(), matches);
+    }
 }
 
 
