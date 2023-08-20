@@ -115,6 +115,18 @@ public class SearchFunctionalityTest {
         matches = new DatabaseSearcher(new SearchQuery("TesT", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
+
+    @Test
+    public void testSensitiveMultipleFieldSearch() throws IOException, URISyntaxException {
+        initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-A.bib").toURI()));
+
+        //Positive search test
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("author=Test and title=cASe", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(List.of(entry1A), matches);
+        //Negative search test
+        matches = new DatabaseSearcher(new SearchQuery("author=Test and title=case", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(Collections.emptyList(), matches);
+    }
 }
 
 
