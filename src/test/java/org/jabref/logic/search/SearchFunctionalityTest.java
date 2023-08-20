@@ -19,6 +19,7 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -34,14 +35,16 @@ public class SearchFunctionalityTest {
         database = new BibDatabase();
     }
 
-    @Test
-    public void testEmptyLibrarySearch() throws IOException, URISyntaxException {
-
-        Path testFile = Path.of(SearchFunctionalityTest.class.getResource("empty.bib").toURI());
+    private void initializeDatabaseFromPath(Path testFile) throws IOException {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         database = context.getDatabase();
+    }
+
+    @Test
+    public void testEmptyLibrarySearch() throws IOException, URISyntaxException {
+        initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("empty.bib").toURI()));
 
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("Test", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
