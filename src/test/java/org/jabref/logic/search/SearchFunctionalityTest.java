@@ -48,6 +48,22 @@ public class SearchFunctionalityTest {
             .withCitationKey("entry5")
             .withField(StandardField.AUTHOR, "TEST")
             .withField(StandardField.TITLE, "case");
+    BibEntry entry1B = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry1")
+            .withField(StandardField.AUTHOR, "Test")
+            .withField(StandardField.TITLE, "Case");
+    BibEntry entry2B = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry2")
+            .withField(StandardField.AUTHOR, "User")
+            .withField(StandardField.TITLE, "case");
+    BibEntry entry3B = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry3")
+            .withField(StandardField.AUTHOR, "test")
+            .withField(StandardField.TITLE, "text");
+    BibEntry entry4B = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry4")
+            .withField(StandardField.AUTHOR, "Special")
+            .withField(StandardField.TITLE, "192? title.");
     @BeforeEach
     public void setUp() {
         database = new BibDatabase();
