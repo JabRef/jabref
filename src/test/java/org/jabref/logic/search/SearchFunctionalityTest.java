@@ -86,6 +86,19 @@ public class SearchFunctionalityTest {
         matches = new DatabaseSearcher(new SearchQuery("Best", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
+
+    @Test
+    public void testSimpleSingleFieldSearch() throws IOException, URISyntaxException {
+        initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-A.bib").toURI()));
+
+        //Positive search test
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("author=Test", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
+        assertEquals(testLibraryA, matches);
+
+        //Negative search test
+        matches = new DatabaseSearcher(new SearchQuery("author=Case", EnumSet.noneOf(SearchRules.SearchFlags.class)), database).getMatches();
+        assertEquals(Collections.emptyList(), matches);
+    }
 }
 
 
