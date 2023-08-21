@@ -120,7 +120,7 @@ dependencies {
 
     implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
     implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
-    implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
+    implementation 'org.apache.pdfbox:xmpbox:3.0.0'
 
     implementation 'org.apache.lucene:lucene-core:9.7.0'
     implementation 'org.apache.lucene:lucene-queryparser:9.7.0'
