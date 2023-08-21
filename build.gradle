@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.1.24'
+    id 'org.openrewrite.rewrite' version '6.1.25'
 }
 
 // Enable following for debugging
