@@ -19,7 +19,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class GvkFetcher implements SearchBasedParserFetcher {
 
-    private static final String URL_PATTERN = "http://sru.gbv.de/gvk?";
+    private static final String URL_PATTERN = "https://sru.k10plus.de/gvk?";
 
     /**
      * Searchkeys are used to specify a search request. For example "tit" stands for "title".
