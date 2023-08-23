@@ -83,7 +83,7 @@ public class ImportHandler {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database);
+        this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database, dialogService);
         this.contentImporter = new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }

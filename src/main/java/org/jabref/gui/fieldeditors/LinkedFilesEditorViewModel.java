@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -42,6 +44,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
+import org.tinylog.Logger;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
@@ -139,16 +142,41 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .build();
 
         List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration).forEach(newFile -> {
-            LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, preferences.getFilePreferences());
-            files.add(new LinkedFileViewModel(
-                    newLinkedFile,
-                    entry,
-                    databaseContext,
-                    taskExecutor,
-                    dialogService,
-                    preferences));
-        });
+        List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
+
+        for (Path fileToAdd : selectedFiles) {
+            if (FileUtil.detectBadFileName(fileToAdd.toString())) {
+                boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
+                        Localization.lang("Detected illegal characters in the file name.\nSelect \"Correct filename\" to automatically correct the filename and add it to JabRef.\nSelect cancel to not add the file"),
+                        Localization.lang("Correct filename"));
+
+                if (correctButtonPressed) {
+                    String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
+                    Path correctPath = fileToAdd.resolveSibling(newFilename);
+                    try {
+                        Files.move(fileToAdd, correctPath);
+                        addNewLinkedFile(correctPath, fileDirectories);
+                    } catch (IOException ex) {
+                        Logger.error("Error moving file", ex);
+                        dialogService.showErrorDialogAndWait(ex);
+                    }
+                }
+            }
+            else {
+                addNewLinkedFile(fileToAdd, fileDirectories);
+            }
+        }
+
+    }
+    private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
+        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
+        files.add(new LinkedFileViewModel(
+                newLinkedFile,
+                entry,
+                databaseContext,
+                taskExecutor,
+                dialogService,
+                preferences));
     }
 
     @Override
