@@ -111,7 +111,6 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-
     private List<Path> getValidFileNames(List<Path> filesToAdd) {
         List<Path> validFileNames = new ArrayList<>();
 

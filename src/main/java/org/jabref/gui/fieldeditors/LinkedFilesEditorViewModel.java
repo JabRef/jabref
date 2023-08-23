@@ -44,9 +44,12 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-import org.tinylog.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesEditorViewModel.class);
 
     private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
     private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
@@ -157,16 +160,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                         Files.move(fileToAdd, correctPath);
                         addNewLinkedFile(correctPath, fileDirectories);
                     } catch (IOException ex) {
-                        Logger.error("Error moving file", ex);
+                        LOGGER.error("Error moving file", ex);
                         dialogService.showErrorDialogAndWait(ex);
                     }
                 }
-            }
-            else {
+            } else {
                 addNewLinkedFile(fileToAdd, fileDirectories);
             }
         }
-
     }
     private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
         LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
