@@ -45,8 +45,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesEditorViewModel.class);
