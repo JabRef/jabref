@@ -73,6 +73,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Install pigz and cache (linux)
+        if: (matrix.os == 'ubuntu-latest')
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: pigz
+          version: 1.0
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.10.2
         with:
