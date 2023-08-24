@@ -116,12 +116,13 @@ public class ExternalFilesEntryLinker {
 
         for (Path fileToAdd : filesToAdd) {
             if (FileUtil.detectBadFileName(fileToAdd.toString())) {
+                String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
+
                 boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
-                        Localization.lang("Detected illegal characters in the file name.\nSelect \"Correct filename\" to automatically correct the filename and add it to JabRef.\nSelect cancel to not add the file"),
-                        Localization.lang("Correct filename"));
+                        Localization.lang("Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.", newFilename),
+                        Localization.lang("Rename and add"));
 
                 if (correctButtonPressed) {
-                    String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
                     Path correctPath = fileToAdd.resolveSibling(newFilename);
                     try {
                         Files.move(fileToAdd, correctPath);
