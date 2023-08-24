@@ -1,0 +1,109 @@
+# Privacy Policy
+Last updated: 2023-08-24
+
+Your privacy is a fundamental right JabRef e.V. respects and supports.
+By using JabRef and its related online services, you choose to share some of this information.
+In this Privacy Policy We explain how We collect, use, and share information about You, along with the choices you have.
+
+Please remember that no method of transmission over the Internet, or method of electronic storage is absolute secure.
+While We strive to use commercially acceptable means to protect Your Personal Data, We cannot guarantee its absolute security.
+Also, whenever somebody communicates through the internet, your IP-Address will be transmitted and retained by other parties for technical reasons.
+
+The term 'Personal information' in this policy means any information that either directly identifies you or can be somehow linked to you. 'JabRef' is the software application, JabRef e.V. provides.
+
+## JabRef
+
+### Collecting information
+JabRef does not collect any personal information directly linked to You.
+However, on certain occasions the software application will send some information to the online services of JabRef e.V.:
+- On application start, JabRef will check for the latest version online (by default *enabled*).
+- A pdf document You automatically want to extract citation information from, using our GROBID service (by default *disabled*).
+- Anonymized statistical data on the use of the graphical user interface for internal analysis purposes (by default *disabled*).
+
+### Storing information
+JabRef does not store any personal information, except:
+- Your proxy username and password, if You decide to store them (by default *disabled*).
+- Any personal API key You use to access third party online services (by default *disabled*). 
+
+### Sharing information
+Certain operations you perform in JabRef may trigger requests to public third-party services such as Zotero, Crossref or the Library of Congress for metadata retrieval.
+These third parties may log besides your IP address and the search terms (e.g., DOI, ISBN or the current URL) according to their privacy policies.
+
+These third-party services are the following:
+
+| Service                                                                                                         | Privacy Policy |
+|-----------------------------------------------------------------------------------------------------------------|----------------|
+| [ACM](https://www.acm.org/)                                                                                     | <https://www.acm.org/privacy-policy> |
+| [ACS Publications](https://pubs.acs.org/)                                                                       | <https://www.acs.org/privacy.html> |
+| [APS Advancing Physics](https://harvest.aps.org/)                                                               | <https://www.aps.org/about/privacy.cfm#privacy> |
+| [arXiv.org](https://arxiv.org/)                                                                                 | <https://info.arxiv.org/help/policies/privacy_policy.html> |
+| [Bibliotheksverbund Bayern](https://www.bib-bvb.de/)                                                            | <https://www.bib-bvb.de/web/guest/datenschutzerklaerung-bvb-homepage> |
+| [Biodiversity Heritage Library](https://www.biodiversitylibrary.org/)                                           | <https://www.si.edu/Privacy> |
+| [Collection of Computer Science Bibliographies](http://liinwww.ira.uka.de/)                                     | **currently unavailable**, offline  |
+| [CrossRef](https://www.crossref.org/)                                                                           | <https://www.crossref.org/operations-and-sustainability/privacy/> |
+| [dblp](https://dblp.uni-trier.de/)                                                                              | <https://dblp.uni-trier.de/db/about/privacy.html> |
+| [Directory of Open Access Books](https://www.doabooks.org/)                                                     | <https://www.doabooks.org/en/resources/accessibility> |
+| [Digitala Vetenskapliga Arkivet](https://www.diva-portal.org/)                                                  | <https://www.uu.se/en/about-uu/data-protection-policy/> |
+| [DOI Foundation](https://www.doi.org/)                                                                          | <https://www.doi.org/privacy-policy/> |
+| [Elsevier](https://www.elsevier.com/)                                                                           | <https://www.elsevier.com/legal/privacy-policy> |
+| [Google Scholar](https://scholar.google.com/)                                                                   | <https://policies.google.com/privacy> |
+| [Gemeinsamer Verbundkatalog](https://www.gbv.de/)                                                               | <https://www.gbv.de/datenschutz> |
+| [IACR](https://www.iacr.org/)                                                                                   | <https://www.iacr.org/privacy.html> |
+| [IEEEXplore](https://ieeexplore.ieee.org/Xplore/home.jsp)                                                       | <https://www.ieee.org/security-privacy.html> |
+| [INSPIRE](https://inspirehep.net/)                                                                              | <https://cern.service-now.com/service-portal?id=privacy_policy&se=INSPIRE-Online&notice=main> |
+| [JSTOR](https://www.jstor.org/)                                                                                 | <https://www.ithaka.org/privacypolicy/> |
+| [Library of Congress](https://lccn.loc.gov/)                                                                    | <https://www.loc.gov/legal/> |
+| [National Library of Medicine](https://www.ncbi.nlm.nih.gov/)                                                   | <https://www.nlm.nih.gov/web_policies.html> |
+| [MathSciNet](http://www.ams.org/mathscinet)                                                                     | <https://www.ams.org/about-us/privacy> |
+| [mEDRA](https://medra.org/)                                                                                     | <https://www.medra.org/stdoc/en/Servizio_DOI_Informativa_ENG.pdf> |
+| [Mr. DLib](https://mr-dlib.org/) &ast;                                                                          | <https://support.dataverse.harvard.edu/harvard-dataverse-privacy-policy> |
+| [Openlibrary](https://openlibrary.org)                                                                          | <https://archive.org/about/terms.php> |
+| [ResearchGate](https://www.researchgate.net/)                                                                   | <https://www.researchgate.net/privacy-policy> |
+| [IETF Datatracker](https://datatracker.ietf.org/)                                                               | <https://www.ietf.org/privacy-statement/> |
+| [Semantic Scholar](https://www.semanticscholar.org/), powered by [Allen Institute for AI](https://allenai.org/) | <https://allenai.org/privacy-policy> |
+| [Springer Nature](https://dev.springernature.com/)                                                              | <https://dev.springernature.com/privacypolicy> |
+| [The SAO/NASA Astrophysics Data System](https://ui.adsabs.harvard.edu/)                                         | <https://ui.adsabs.harvard.edu/help/privacy/> |
+| [Unpaywall](https://unpaywall.org/)                                                                             | <https://unpaywall.org/legal/privacy> |
+| [zbMATH Open](https://www.zbmath.org)                                                                           | <https://zbmath.org/privacy-policy/> |
+
+&ast; *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (by default *disabled*).* 
+
+## JabRef Browser Extension
+
+No personal data (like name, email address, billing address or credit card) is collected.
+By using the extension you will remain completely anonymous.
+
+### Collecting information
+
+When you access a website with your web browser, the Browser Extension is designed to save time by allowing you to quickly import bibliographic information into JabRef.
+Therefor the extension collects and analyzes some information concerning your browser activity.
+In particular, the following information is used:
+- the url of the current website you are visiting,
+- the content of the current website.
+
+### Storing information
+No data will be stored by the Browser Extension.
+
+### Sharing information
+The Browser Extension does not share any data except with the local instance of the JabRef software application, which stores the citation data as a new entry in its library.
+
+## Links to other Websites
+- Our Service may contain links to other websites that are not operated by Us. If You click on a third party link, You will be directed to that third party's site. We strongly advise You to review the Privacy Policy of every site You visit.
+- We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.
+
+## Changes to this Privacy Policy
+This privacy policy may be changed eventually. 
+We encourage you to check this Privacy Policy periodically for any changes.
+Any material change will be mentioned in the changelog and in our blog.
+
+This privacy policy is in effect as of the day mentioned as "last updated" above and will remain in effect except with respect to any changes in its provisions in the future, which will be in effect immediately after being posted on this page.
+
+## Contact
+For any questions or concerns regarding the privacy policy, please send us an email to <vorstand@jabref.org> or write to
+
+JabRef e.V.<br>
+Josef-Lanner-Str. 9<br>
+71069 Sindelfingen<br>
+Germany
+
+If you get in touch with us, We may aks You to provide Us with certain personal information (e.g. name and email address) that can be used to contact or identify You.
