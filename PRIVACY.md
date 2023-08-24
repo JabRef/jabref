@@ -89,8 +89,9 @@ No data will be stored by the Browser Extension.
 The Browser Extension does not share any data except with the local instance of the JabRef software application, which stores the citation data as a new entry in its library.
 
 ## Links to other Websites
-- Our Service may contain links to other websites that are not operated by Us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.
-- We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.
+Our Service may contain links to other websites that are not operated by Us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.
+
+We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.
 
 ## Changes to this Privacy Policy
 This privacy policy may be changed eventually. 
