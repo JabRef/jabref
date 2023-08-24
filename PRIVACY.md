@@ -3,10 +3,10 @@ Last updated: 2023-08-24
 
 Your privacy is a fundamental right JabRef e.V. respects and supports.
 By using JabRef and its related online services, you choose to share some of this information.
-In this Privacy Policy We explain how We collect, use, and share information about You, along with the choices you have.
+In this Privacy Policy We explain how We collect, use, and share information about you, along with the choices you have.
 
 Please remember that no method of transmission over the Internet, or method of electronic storage is absolute secure.
-While We strive to use commercially acceptable means to protect Your Personal Data, We cannot guarantee its absolute security.
+While We strive to use commercially acceptable means to protect your Personal Data, We cannot guarantee its absolute security.
 Also, whenever somebody communicates through the internet, your IP-Address will be transmitted and retained by other parties for technical reasons.
 
 The term 'Personal information' in this policy means any information that either directly identifies you or can be somehow linked to you. 'JabRef' is the software application, JabRef e.V. provides.
@@ -14,16 +14,17 @@ The term 'Personal information' in this policy means any information that either
 ## JabRef
 
 ### Collecting information
-JabRef does not collect any personal information directly linked to You.
+JabRef does not collect any personal information directly linked to you.
 However, on certain occasions the software application will send some information to the online services of JabRef e.V.:
 - On application start, JabRef will check for the latest version online (by default *enabled*).
-- A pdf document You automatically want to extract citation information from, using our GROBID service (by default *disabled*).
+- Information about a journal you are citing when looking for more information about this journal, using our journal database (by default *enabled*).
+- A pdf document you automatically want to extract citation information from, using our GROBID service (by default *disabled*).
 - Anonymized statistical data on the use of the graphical user interface for internal analysis purposes (by default *disabled*).
 
 ### Storing information
 JabRef does not store any personal information, except:
-- Your proxy username and password, if You decide to store them (by default *disabled*).
-- Any personal API key You use to access third party online services (by default *disabled*). 
+- Your proxy username and password, if you decide to store them (by default *disabled*).
+- Any personal API key you use to access third party online services (by default *disabled*). 
 
 ### Sharing information
 Certain operations you perform in JabRef may trigger requests to public third-party services such as Zotero, Crossref or the Library of Congress for metadata retrieval.
@@ -88,7 +89,7 @@ No data will be stored by the Browser Extension.
 The Browser Extension does not share any data except with the local instance of the JabRef software application, which stores the citation data as a new entry in its library.
 
 ## Links to other Websites
-- Our Service may contain links to other websites that are not operated by Us. If You click on a third party link, You will be directed to that third party's site. We strongly advise You to review the Privacy Policy of every site You visit.
+- Our Service may contain links to other websites that are not operated by Us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.
 - We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.
 
 ## Changes to this Privacy Policy
@@ -106,4 +107,4 @@ Josef-Lanner-Str. 9<br>
 71069 Sindelfingen<br>
 Germany
 
-If you get in touch with us, We may aks You to provide Us with certain personal information (e.g. name and email address) that can be used to contact or identify You.
+If you get in touch with us, We may aks you to provide Us with certain personal information (e.g. name and email address) that can be used to contact or identify you.
