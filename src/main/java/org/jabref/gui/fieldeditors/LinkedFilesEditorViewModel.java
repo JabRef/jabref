@@ -169,6 +169,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             }
         }
     }
+
     private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
         LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
         files.add(new LinkedFileViewModel(
