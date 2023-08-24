@@ -7,7 +7,7 @@ In this Privacy Policy We explain how We collect, use, and share information abo
 
 Please remember that no method of transmission over the Internet, or method of electronic storage is absolute secure.
 While We strive to use commercially acceptable means to protect your Personal Data, We cannot guarantee its absolute security.
-Also, whenever somebody communicates through the internet, your IP-Address will be transmitted and retained by other parties for technical reasons.
+Also, whenever you communicate through the internet, your IP-Address will be transmitted and retained by other parties for technical reasons.
 
 The term 'Personal information' in this policy means any information that either directly identifies you or can be somehow linked to you. 'JabRef' is the software application, JabRef e.V. provides.
 
