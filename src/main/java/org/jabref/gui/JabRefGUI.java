@@ -112,10 +112,14 @@ public class JabRefGUI {
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
 
+        if (guiPreferences.isWindowFullscreen()) {
+            mainStage.setFullScreen(true);
+        }
         // Restore window location and/or maximised state
         if (guiPreferences.isWindowMaximised()) {
             mainStage.setMaximized(true);
-        } else if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
+        }
+        if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
             // corrects the Window, if it is outside the mainscreen
             LOGGER.debug("The Jabref window is outside the main screen");
             mainStage.setX(0);
@@ -151,7 +155,7 @@ public class JabRefGUI {
             if (!correctedWindowPos) {
                 // saves the window position only if its not  corrected -> the window will rest at the old Position,
                 // if the external Screen is connected again.
-                saveWindowState(mainStage);
+                getMainFrame().saveWindowState();
             }
             boolean reallyQuit = mainFrame.quit();
             if (!reallyQuit) {
@@ -271,6 +275,7 @@ public class JabRefGUI {
         preferences.setSizeX(mainStage.getWidth());
         preferences.setSizeY(mainStage.getHeight());
         preferences.setWindowMaximised(mainStage.isMaximized());
+        preferences.setWindowFullScreen(mainStage.isFullScreen());
         debugLogWindowState(mainStage);
     }
 

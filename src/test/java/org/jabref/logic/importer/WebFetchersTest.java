@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
-import org.jabref.logic.importer.fetcher.CiteSeer;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
@@ -119,7 +118,6 @@ class WebFetchersTest {
             // Remove the following, because they don't work atm
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
-            expected.remove(CiteSeer.class);
 
             expected.remove(PagedSearchBasedParserFetcher.class);
             expected.remove(PagedSearchBasedFetcher.class);

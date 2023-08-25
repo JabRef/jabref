@@ -72,7 +72,7 @@ public class PushToApplicationCommand extends SimpleCommand {
     }
 
     private void setApplication(String applicationName) {
-        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        final ActionFactory factory = new ActionFactory(preferencesService.getKeyBindingRepository());
         PushToApplication application = PushToApplications.getApplicationByName(
                                                                   applicationName,
                                                                   dialogService,

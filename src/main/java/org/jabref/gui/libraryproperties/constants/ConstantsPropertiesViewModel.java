@@ -1,5 +1,7 @@
 package org.jabref.gui.libraryproperties.constants;
 
+import java.util.Comparator;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,7 +50,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
         stringsListProperty.addAll(databaseContext.getDatabase().getStringValues().stream()
                                                   .sorted(new BibtexStringComparator(false))
                                                   .map(this::convertFromBibTexString)
-                                                  .collect(Collectors.toSet()));
+                                                  .toList());
     }
 
     public void addNewString() {
@@ -68,6 +70,11 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
 
     public void removeString(ConstantsItemModel item) {
         stringsListProperty.remove(item);
+    }
+
+    public void resortStrings() {
+        // Resort the strings list in the same order as setValues() does
+        stringsListProperty.sort(Comparator.comparing(c -> c.labelProperty().get().toLowerCase(Locale.ROOT)));
     }
 
     private ConstantsItemModel convertFromBibTexString(BibtexString bibtexString) {

@@ -86,6 +86,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Please specify a file browser."))));
     }
 
+    @Override
     public void setValues() {
         eMailReferenceSubjectProperty.setValue(initialExternalApplicationPreferences.getEmailSubject());
         autoOpenAttachedFoldersProperty.setValue(initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
@@ -104,6 +105,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         kindleEmailProperty.setValue(initialExternalApplicationPreferences.getKindleEmail());
     }
 
+    @Override
     public void storeSettings() {
         ExternalApplicationsPreferences externalPreferences = preferences.getExternalApplicationsPreferences();
         externalPreferences.setEMailSubject(eMailReferenceSubjectProperty.getValue());
@@ -130,6 +132,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         return fileBrowserCommandValidator.getValidationStatus();
     }
 
+    @Override
     public boolean validateSettings() {
         CompositeValidator validator = new CompositeValidator();
 

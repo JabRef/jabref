@@ -5,11 +5,12 @@ on:
     inputs:
       notarization:
         type: boolean
-        required: false
-        default: false
+        required: true
+        default: true
   push:
    branches:
     - arm64mac-release
+    - updateArm64Notarization
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -34,7 +35,6 @@ jobs:
           - os: self-hosted
             displayName: macOS (Arm64)
             suffix: '_arm64'
-            archivePortable: tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos_arm64.tar.gz && rm -R build/distribution/JabRef.app
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
@@ -78,7 +78,7 @@ jobs:
             sed -i'.bak' -e "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
       - name: Clean up keychain
         run: |
-         security delete-keychain signing_temp.keychain || true
+         security delete-keychain signing_temp.keychain ${{runner.temp}}/keychain/notarization.keychain || true
       - name: Setup OSX key chain on OSX
         uses: apple-actions/import-codesign-certs@v2
         with:
@@ -92,8 +92,13 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
+      - name: Create notarization keychain
+        run: |
+          mkdir ${{runner.temp}}/keychain
+          security create-keychain -p jabref ${{runner.temp}}/keychain/notarization.keychain
+          security set-keychain-settings ${{runner.temp}}/keychain/notarization.keychain
       - name: Prepare merged jars and modules dir (macos)
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir   
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Build dmg (macos)
         shell: bash
         run: |
@@ -138,40 +143,36 @@ jobs:
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
           --jlink-options --bind-services
-      - name: Rename files
-        shell: pwsh
+      - name: Rename files with arm64 suffix as well
+        shell: bash
         run: |
-          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
-          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
+          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg
+          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
       - name: Notarize dmg
         if: (startsWith(github.ref, 'refs/tags/') || (${{ inputs.notarization }}))
         shell: bash
         run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}" --keychain ${{runner.temp}}/keychain/notarization.keychain
+          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
+          xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg
       - name: Notarize pkg
         if: (startsWith(github.ref, 'refs/tags/') || (${{ inputs.notarization }}))
         shell: bash
         run: |
-          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg
-      - name: Package application image
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}" --keychain ${{runner.temp}}/keychain/notarization.keychain
+          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
+          xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
+      - name: Upload with rsync
         shell: bash
-        run: ${{ matrix.archivePortable }}
+        run: |
+          mkdir ${{runner.temp}}/sshkey
+          if [[ -z "${{ secrets.buildJabRefPrivateKey }}" ]]; then
+            echo "buildJabRefPrivateKey is empty, exiting"
+            exit 1
+          fi
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store
         uses: actions/upload-artifact@v3
         with:
           name: JabRef-${{ matrix.displayName }}
           path: build/distribution
-      - name: Upload to builds.jabref.org (TODO - won't run on Mac, because Dockerized action)
-        uses: Pendect/action-rsyncer@v2.0.0
-        env:
-          DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
-        with:
-          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
-          options: ''
-          ssh_options: '-p 9922'
-          src: 'build/distribution/'
-          dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
