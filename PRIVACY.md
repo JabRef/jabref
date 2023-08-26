@@ -25,7 +25,7 @@ However, on certain occasions the software application will send some informatio
 
 ### Storing information
 
-JabRef does not store any personal information, except:
+JabRef only stores the following personal information locally on your computer:
 
 - Your proxy username and password, if you decide to store them (by default *disabled*).
 - Any personal API key you use to access third party online services (by default *disabled*). 
