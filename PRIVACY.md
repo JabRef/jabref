@@ -14,19 +14,24 @@ The term 'Personal information' in this policy means any information that either
 ## JabRef
 
 ### Collecting information
+
 JabRef does not collect any personal information directly linked to you.
 However, on certain occasions the software application will send some information to the online services of JabRef e.V.:
+
 - On application start, JabRef will check for the latest version online (by default *enabled*).
 - Information about a journal you are citing when looking for more information about this journal, using our journal database (by default *enabled*).
 - A pdf document you automatically want to extract citation information from, using our GROBID service (by default *disabled*).
 - Anonymized statistical data on the use of the graphical user interface for internal analysis purposes (by default *disabled*).
 
 ### Storing information
+
 JabRef does not store any personal information, except:
+
 - Your proxy username and password, if you decide to store them (by default *disabled*).
 - Any personal API key you use to access third party online services (by default *disabled*). 
 
 ### Sharing information
+
 Certain operations you perform in JabRef may trigger requests to public third-party services such as Zotero, Crossref or the Library of Congress for metadata retrieval.
 These third parties may log besides your IP address and the search terms (e.g., DOI, ISBN or the current URL) according to their privacy policies.
 
@@ -71,29 +76,35 @@ These third-party services are the following:
 
 ## JabRef Browser Extension
 
-No personal data (like name, email address, billing address or credit card) is collected.
-By using the extension you will remain completely anonymous.
+No personal data (like name, email address, billing address or credit card) is collected by the Browser Extension.
+The Browser Extension uses Zotero services, where [Zotero's Privacy Policy](https://www.zotero.org/support/privacy) applies.
 
 ### Collecting information
 
 When you access a website with your web browser, the Browser Extension is designed to save time by allowing you to quickly import bibliographic information into JabRef.
-Therefor the extension collects and analyzes some information concerning your browser activity.
+Therefore, the extension collects and analyzes some information concerning your browser activity.
+
 In particular, the following information is used:
+
 - the url of the current website you are visiting,
 - the content of the current website.
 
 ### Storing information
+
 No data will be stored by the Browser Extension.
 
 ### Sharing information
+
 The Browser Extension does not share any data except with the local instance of the JabRef software application, which stores the citation data as a new entry in its library.
 
 ## Links to other Websites
+
 Our Service may contain links to other websites that are not operated by Us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.
 
 We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.
 
 ## Changes to this Privacy Policy
+
 This privacy policy may be changed eventually. 
 We encourage you to check this Privacy Policy periodically for any changes.
 Any material change will be mentioned in the changelog and in our blog.
@@ -101,6 +112,7 @@ Any material change will be mentioned in the changelog and in our blog.
 This privacy policy is in effect as of the day mentioned as "last updated" above and will remain in effect except with respect to any changes in its provisions in the future, which will be in effect immediately after being posted on this page.
 
 ## Contact
+
 For any questions or concerns regarding the privacy policy, please send us an email to <vorstand@jabref.org> or write to
 
 JabRef e.V.<br>
