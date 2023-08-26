@@ -33,7 +33,7 @@ JabRef does not store any personal information, except:
 ### Sharing information
 
 Certain operations you perform in JabRef may trigger requests to public third-party services such as Zotero, Crossref or the Library of Congress for metadata retrieval.
-These third parties may log besides your IP address and the search terms (e.g., DOI, ISBN or the current URL) according to their privacy policies.
+These third parties may log additional information besides your IP address and the search terms (e.g., DOI, ISBN or the current URL) according to their privacy policies.
 
 These third-party services are the following:
 
