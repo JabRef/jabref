@@ -39,6 +39,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added an option to encrypt and remember the proxy password. [#8055](https://github.com/JabRef/jabref/issues/8055)[#10044](https://github.com/JabRef/jabref/issues/10044)
 - We added support for showing journal information, via info buttons next to the `Journal` and `ISSN` fields in the entry editor. [#6189](https://github.com/JabRef/jabref/issues/6189)
 - We added support for pushing citations to Sublime Text 3 [#10098](https://github.com/JabRef/jabref/issues/10098)
+- We added support for the Finnish language. [#10183](https://github.com/JabRef/jabref/pull/10183)
+- We added the option to automatically repleaces  illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
 
 ### Changed
 
@@ -78,6 +80,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We now encrypt and store the custom API keys in the OS native credential store. [#10044](https://github.com/JabRef/jabref/issues/10044)
 - We changed the behavior of group addition/edit, so that sorting by alphabetical order is not performed by default after the modification [#10017](https://github.com/JabRef/jabref/issues/10017)
 - We fixed an issue with spacing in the cleanup dialogue. [#10081](https://github.com/JabRef/jabref/issues/10081)
+- The GVK fetcher now uses the new [K10plus](https://www.bszgbv.de/services/k10plus/) database [#10189](https://github.com/JabRef/jabref/pull/10189)
 
 ### Fixed
 
@@ -128,7 +131,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where JabRef would not remember if the window was in fullscreen or not [#4939](https://github.com/JabRef/jabref/issues/4939)
 - We fixed an issue where the ACM Portal search sometimes would not return entries for some search queries when the article author had no given name [#10107](https://github.com/JabRef/jabref/issues/10107)
 - We fixed an issue that caused high CPU usage and a zombie process after quitting JabRef because of author names autocompletion [#10159](https://github.com/JabRef/jabref/pull/10159)
-- We added support for the Finnish language. [#10183](https://github.com/JabRef/jabref/pull/10183)
+- We fixed an issue where files with illegal characters in the filename could be added to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
 
 ### Removed
 
