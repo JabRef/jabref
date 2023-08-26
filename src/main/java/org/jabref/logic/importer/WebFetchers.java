@@ -99,7 +99,7 @@ public class WebFetchers {
         SortedSet<SearchBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new ArXivFetcher(importFormatPreferences));
         set.add(new INSPIREFetcher(importFormatPreferences));
-        set.add(new GvkFetcher());
+        set.add(new GvkFetcher(importFormatPreferences));
         set.add(new BvbFetcher());
         set.add(new MedlineFetcher());
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));

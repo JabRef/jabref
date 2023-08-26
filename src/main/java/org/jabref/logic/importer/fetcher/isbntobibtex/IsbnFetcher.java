@@ -13,9 +13,12 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
@@ -35,11 +38,14 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     protected final ImportFormatPreferences importFormatPreferences;
     private final OpenLibraryIsbnFetcher openLibraryIsbnFetcher;
     private final List<AbstractIsbnFetcher> retryIsbnFetcher;
+    private final GvkFetcher gvkIbsnFetcher;
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
+        this.gvkIbsnFetcher = new GvkFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
+        this.addRetryFetcher(openLibraryIsbnFetcher);
     }
 
     @Override
@@ -54,15 +60,14 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        if (StringUtil.isBlank(identifier)) {
-            return Optional.empty();
-        }
-
         Optional<BibEntry> bibEntry = Optional.empty();
 
         try {
             identifier = removeNewlinesAndSpacesFromIdentifier(identifier);
-            bibEntry = openLibraryIsbnFetcher.performSearchById(identifier);
+            Optional<ISBN> isbn = ISBN.parse(identifier);
+            if(isbn.isPresent()) {
+                bibEntry = gvkIbsnFetcher.performSearchById(isbn.get().getNormalized());
+            }
         } catch (FetcherException ex) {
             LOGGER.debug("Got a fetcher exception for IBSN search", ex);
             if (retryIsbnFetcher.isEmpty()) {
