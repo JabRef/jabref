@@ -2,21 +2,21 @@
 Last updated: 2023-08-24
 
 Your privacy is a fundamental right JabRef e.V. respects and supports.
-By using JabRef and its related online services, you choose to share some of this information.
-In this Privacy Policy We explain how We collect, use, and share information about you, along with the choices you have.
-
-Please remember that no method of transmission over the Internet, or method of electronic storage is absolute secure.
-While We strive to use commercially acceptable means to protect your Personal Data, We cannot guarantee its absolute security.
-Also, whenever you communicate through the internet, your IP-Address will be transmitted and retained by other parties for technical reasons.
+By using JabRef and its related online services, you choose to share some of your personal information.
+In this Privacy Policy we explain how we collect, use, and share information about you, along with the choices you have.
 
 The term 'Personal information' in this policy means any information that either directly identifies you or can be somehow linked to you. 'JabRef' refers to the desktop application that is provided by JabRef e.V.
+
+Please remember that no method of transmission over the Internet, or method of electronic storage is absolute secure.
+While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.
+Also, whenever you communicate through the internet, your IP-Address will always be transmitted and retained by third parties for technical and in some cases for legal reasons.
 
 ## JabRef Desktop Application 
 
 ### Collecting information
 
 JabRef does not collect any personal information directly linked to you.
-However, on certain occasions the software application will send some information to the online services of JabRef e.V.:
+However, on certain occasions JabRef will send some information to the online services of JabRef e.V.:
 
 - On application start, JabRef will check for the latest version online (by default *enabled*).
 - Information about a journal you are citing when looking for more information about this journal, using our journal database (by default *enabled*).
@@ -62,7 +62,7 @@ These third-party services are the following:
 | [National Library of Medicine](https://www.ncbi.nlm.nih.gov/)                                                   | <https://www.nlm.nih.gov/web_policies.html> |
 | [MathSciNet](http://www.ams.org/mathscinet)                                                                     | <https://www.ams.org/about-us/privacy> |
 | [mEDRA](https://medra.org/)                                                                                     | <https://www.medra.org/stdoc/en/Servizio_DOI_Informativa_ENG.pdf> |
-| [Mr. DLib](https://mr-dlib.org/) &ast;                                                                          | <https://support.dataverse.harvard.edu/harvard-dataverse-privacy-policy> |
+| [Mr. DLib](https://mr-dlib.org/) [1]                                                                            | <https://support.dataverse.harvard.edu/harvard-dataverse-privacy-policy> |
 | [Openlibrary](https://openlibrary.org)                                                                          | <https://archive.org/about/terms.php> |
 | [ResearchGate](https://www.researchgate.net/)                                                                   | <https://www.researchgate.net/privacy-policy> |
 | [IETF Datatracker](https://datatracker.ietf.org/)                                                               | <https://www.ietf.org/privacy-statement/> |
@@ -72,19 +72,16 @@ These third-party services are the following:
 | [Unpaywall](https://unpaywall.org/)                                                                             | <https://unpaywall.org/legal/privacy> |
 | [zbMATH Open](https://www.zbmath.org)                                                                           | <https://zbmath.org/privacy-policy/> |
 
-&ast; *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (by default *disabled*).* 
+[1]: *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (by default *disabled*).* 
 
 ## JabRef Browser Extension
 
-No personal data (like name, email address, billing address or credit card) is collected by the Browser Extension.
-The Browser Extension uses Zotero services, where [Zotero's Privacy Policy](https://www.zotero.org/support/privacy) applies.
+No personal data (like name, email address, billing address or credit card) is collected by the Browser Extension itself.
+But be aware that the browser Extension uses Zotero services, where [Zotero's Privacy Policy](https://www.zotero.org/support/privacy) applies.
 
 ### Collecting information
 
-When you access a website with your web browser, the Browser Extension is designed to save time by allowing you to quickly import bibliographic information into JabRef.
-Therefore, the extension collects and analyzes some information concerning your browser activity.
-
-In particular, the following information is used:
+When actively used, the extension has access to the current website and its content to process citation information. In particular, the following information is used:
 
 - the url of the current website you are visiting,
 - the content of the current website.
@@ -99,7 +96,7 @@ The Browser Extension does not share any data except with the local instance of 
 
 ## Links to other Websites
 
-Our Service may contain links to other websites that are not operated by Us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.
+Our Service may contain links to other websites that are not operated by us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.
 
 We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.
 
@@ -107,17 +104,16 @@ We have no control over and assume no responsibility for the content, privacy po
 
 This privacy policy may be changed eventually. 
 We encourage you to check this Privacy Policy periodically for any changes.
-Any material change will be mentioned in the changelog and in our blog.
+Any material change will be mentioned in the changelog of the desktop application and in our [blog](https://blog.jabref.org/).
 
 This privacy policy is in effect as of the day mentioned as "last updated" above and will remain in effect except with respect to any changes in its provisions in the future, which will be in effect immediately after being posted on this page.
 
 ## Contact
 
+If you get in touch with us, we may aks you to provide us with certain personal information (e.g. name and email address) to stay in contact with you.
 For any questions or concerns regarding the privacy policy, please send us an email to <vorstand@jabref.org> or write to
 
 JabRef e.V.<br>
 Josef-Lanner-Str. 9<br>
 71069 Sindelfingen<br>
 Germany
-
-If you get in touch with us, We may aks you to provide Us with certain personal information (e.g. name and email address) that can be used to contact or identify you.
