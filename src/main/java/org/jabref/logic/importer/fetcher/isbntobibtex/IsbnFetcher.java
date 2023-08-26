@@ -13,13 +13,11 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import org.slf4j.Logger;
@@ -65,7 +63,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         try {
             identifier = removeNewlinesAndSpacesFromIdentifier(identifier);
             Optional<ISBN> isbn = ISBN.parse(identifier);
-            if(isbn.isPresent()) {
+            if (isbn.isPresent()) {
                 bibEntry = gvkIbsnFetcher.performSearchById(isbn.get().getNormalized());
             }
         } catch (FetcherException ex) {

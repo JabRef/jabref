@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.util.Optional;
 
-import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcherTest;
@@ -46,7 +45,6 @@ public class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
                 .withField(StandardField.PAGETOTAL, "346")
                 .withField(new UnknownField("ppn_gvk"), "67954951X")
                 .withField(StandardField.SUBTITLE, "[revised and updated for Java SE 6]");
-
 
         fetcher = new GvkFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
