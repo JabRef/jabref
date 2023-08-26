@@ -11,7 +11,7 @@ Also, whenever you communicate through the internet, your IP-Address will be tra
 
 The term 'Personal information' in this policy means any information that either directly identifies you or can be somehow linked to you. 'JabRef' is the software application, JabRef e.V. provides.
 
-## JabRef
+## JabRef Desktop Application 
 
 ### Collecting information
 
