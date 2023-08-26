@@ -9,7 +9,7 @@ Please remember that no method of transmission over the Internet, or method of e
 While We strive to use commercially acceptable means to protect your Personal Data, We cannot guarantee its absolute security.
 Also, whenever you communicate through the internet, your IP-Address will be transmitted and retained by other parties for technical reasons.
 
-The term 'Personal information' in this policy means any information that either directly identifies you or can be somehow linked to you. 'JabRef' is the software application, JabRef e.V. provides.
+The term 'Personal information' in this policy means any information that either directly identifies you or can be somehow linked to you. 'JabRef' refers to the desktop application that is provided by JabRef e.V.
 
 ## JabRef Desktop Application 
 
