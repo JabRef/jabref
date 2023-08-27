@@ -36,6 +36,7 @@ import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
     @FXML private Label remoteLabel;
+    @FXML private CheckBox versionCheck;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
     @FXML private Button remoteHelp;
@@ -82,6 +83,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
 
     public void initialize() {
         this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor);
+
+        versionCheck.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
 
         remoteLabel.setVisible(preferencesService.getWorkspacePreferences().shouldShowAdvancedHints());
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
