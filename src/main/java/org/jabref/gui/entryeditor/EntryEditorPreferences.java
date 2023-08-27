@@ -6,15 +6,35 @@ import java.util.Set;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.MapProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleMapProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.model.entry.field.Field;
 
 public class EntryEditorPreferences {
+
+    /**
+     * Specifies the different possible enablement states for online services
+     */
+    public enum JournalPopupEnabled {
+        FIRST_START, // The first time a user uses this service
+        ENABLED,
+        DISABLED;
+
+        public static JournalPopupEnabled fromString(String status) {
+            for (JournalPopupEnabled value : JournalPopupEnabled.values()) {
+                if (value.toString().equalsIgnoreCase(status)) {
+                    return value;
+                }
+            }
+            throw new IllegalArgumentException("No enum found with value: " + status);
+        }
+    }
 
     private final MapProperty<String, Set<Field>> entryEditorTabList;
     private final MapProperty<String, Set<Field>> defaultEntryEditorTabList;
@@ -26,6 +46,7 @@ public class EntryEditorPreferences {
     private final BooleanProperty allowIntegerEditionBibtex;
     private final DoubleProperty dividerPosition;
     private final BooleanProperty autoLinkFiles;
+    private final ObjectProperty<JournalPopupEnabled> enablementStatus;
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
                                   Map<String, Set<Field>> defaultEntryEditorTabList,
@@ -36,7 +57,8 @@ public class EntryEditorPreferences {
                                   boolean enableValidation,
                                   boolean allowIntegerEditionBibtex,
                                   double dividerPosition,
-                                  boolean autolinkFilesEnabled) {
+                                  boolean autolinkFilesEnabled,
+                                  JournalPopupEnabled journalPopupEnabled) {
 
         this.entryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
         this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
@@ -48,6 +70,7 @@ public class EntryEditorPreferences {
         this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);
         this.dividerPosition = new SimpleDoubleProperty(dividerPosition);
         this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
+        this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
     }
 
     public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
@@ -160,5 +183,17 @@ public class EntryEditorPreferences {
 
     public void setAutoLinkFilesEnabled(boolean enabled) {
         this.autoLinkFiles.setValue(enabled);
+    }
+
+    public JournalPopupEnabled shouldEnableJournalPopup() {
+        return enablementStatus.get();
+    }
+
+    public ObjectProperty<JournalPopupEnabled> enableJournalPopupProperty() {
+        return enablementStatus;
+    }
+
+    public void setEnableJournalPopup(JournalPopupEnabled journalPopupEnabled) {
+        this.enablementStatus.set(journalPopupEnabled);
     }
 }

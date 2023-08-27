@@ -28,6 +28,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
     private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
+    private final BooleanProperty journalPopupProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
 
     private final StringProperty fieldsProperty = new SimpleStringProperty();
@@ -56,6 +57,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
+        journalPopupProperty.setValue(entryEditorPreferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED);
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
 
         setFields(entryEditorPreferences.getEntryEditorTabs());
@@ -88,6 +90,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
         entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
         entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
+        entryEditorPreferences.setEnableJournalPopup(journalPopupProperty.getValue()
+                ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
         // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
 
@@ -148,6 +153,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty allowIntegerEditionProperty() {
         return this.allowIntegerEditionProperty;
+    }
+
+    public BooleanProperty journalPopupProperty() {
+        return journalPopupProperty;
     }
 
     public StringProperty fieldsProperty() {
