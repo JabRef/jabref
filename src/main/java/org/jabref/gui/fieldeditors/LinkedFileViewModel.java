@@ -43,6 +43,8 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfContentImporter;
@@ -472,8 +474,24 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
             downloadTask.showToUser(true);
             downloadTask.onFailure(ex -> {
-                LOGGER.error("Error downloading", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Error downloading"), ex);
+                LOGGER.error("Error downloading from URL: " + urlDownload, ex);
+                String fetcherExceptionMessage = ex.getMessage();
+                int statusCode;
+                if (ex instanceof FetcherClientException clientException) {
+                    statusCode = clientException.getStatusCode();
+                    if (statusCode == 401) {
+                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.") + "\nURL: " + urlDownload + "\n" + fetcherExceptionMessage);
+                    } else if (statusCode == 403) {
+                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("403 Forbidden: Access Denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.") + "\nURL: " + urlDownload + "\n" + fetcherExceptionMessage);
+                    } else if (statusCode == 404) {
+                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("404 Not Found Error: The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.") + "\nURL: " + urlDownload + "\n" + fetcherExceptionMessage);
+                    }
+                } else if (ex instanceof FetcherServerException serverException) {
+                    statusCode = serverException.getStatusCode();
+                    dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("Error downloading form URL. Cause is likely the server side. HTTP Error ") + statusCode + "\n" + fetcherExceptionMessage + "\nURL: " + urlDownload + "\nPlease try again later or contact the server administrator.");
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("Failed to download from URL"), "Error message: " + fetcherExceptionMessage + "\nURL: " + urlDownload + "\nPlease check the URL and try again.");
+                }
             });
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
