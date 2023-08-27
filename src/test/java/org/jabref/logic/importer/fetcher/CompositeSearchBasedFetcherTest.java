@@ -100,7 +100,7 @@ public class CompositeSearchBasedFetcherTest {
         List<SearchBasedFetcher> list = List.of(
                 new ArXivFetcher(importFormatPreferences),
                 new INSPIREFetcher(importFormatPreferences),
-                new GvkFetcher(),
+                new GvkFetcher(importFormatPreferences),
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
                 new MathSciNet(importFormatPreferences),
                 new ZbMATH(importFormatPreferences),
