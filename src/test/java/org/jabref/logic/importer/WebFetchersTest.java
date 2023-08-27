@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
+import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
@@ -74,6 +75,7 @@ class WebFetchersTest {
             // Remove special ISBN fetcher since we don't want to expose them to the user
             expected.remove(OpenLibraryIsbnFetcher.class);
             expected.remove(EbookDeIsbnFetcher.class);
+            expected.remove(GvkFetcher.class);
             expected.remove(DoiToBibtexConverterComIsbnFetcher.class);
 
             // Remove the following, because they don't work at the moment
