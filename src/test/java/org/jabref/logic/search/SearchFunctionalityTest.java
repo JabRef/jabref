@@ -39,7 +39,6 @@ public class SearchFunctionalityTest {
     private BibDatabase database;
     private PdfSearcher search;
     private BibDatabaseContext context;
-    private FilePreferences filePreferences;
     BibEntry entry1A = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("entry1")
             .withField(StandardField.AUTHOR, "Test")
@@ -92,21 +91,19 @@ public class SearchFunctionalityTest {
 
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
-        filePreferences = mock(FilePreferences.class);
+        FilePreferences filePreferences = mock(FilePreferences.class);
         database = new BibDatabase();
         context = mock(BibDatabaseContext.class);
-        entry1C.setFiles(Collections.singletonList(new LinkedFile("Minimal", "minimal.pdf", StandardFileType.PDF.getName())));
-        entry1C.setFiles(Collections.singletonList(new LinkedFile("Minimal 1", "minimal1.pdf", StandardFileType.PDF.getName())));
-        entry1C.setFiles(Collections.singletonList(new LinkedFile("Minimal 2", "minimal2.pdf", StandardFileType.PDF.getName())));
-        entry1C.setFiles(Collections.singletonList(new LinkedFile("Minimalnote", "minimal-note.pdf", StandardFileType.PDF.getName())));
-        entry1C.setFiles(Collections.singletonList(new LinkedFile("Minimalnote 1", "minimal-note1.pdf", StandardFileType.PDF.getName())));
-        entry1C.setFiles(Collections.singletonList(new LinkedFile("Minimalnote 2", "minimal-note2.pdf", StandardFileType.PDF.getName())));
+        entry1C.addFile(new LinkedFile("Minimal", "minimal.pdf", StandardFileType.PDF.getName()));
+        entry2C.addFile(new LinkedFile("Minimal 1", "minimal1.pdf", StandardFileType.PDF.getName()));
+        entry3C.addFile(new LinkedFile("Minimal 2", "minimal2.pdf", StandardFileType.PDF.getName()));
+        entry4C.addFile(new LinkedFile("Minimalnote", "minimal-note.pdf", StandardFileType.PDF.getName()));
+        entry5C.addFile(new LinkedFile("Minimalnote 1", "minimal-note1.pdf", StandardFileType.PDF.getName()));
+        entry6C.addFile(new LinkedFile("Minimalnote 2", "minimal-note2.pdf", StandardFileType.PDF.getName()));
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/search")));
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
-
-        database.insertEntry(entry1C);
 
         PdfIndexer indexer = PdfIndexer.of(context, filePreferences);
         search = PdfSearcher.of(context);
