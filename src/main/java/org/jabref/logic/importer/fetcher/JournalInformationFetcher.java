@@ -1,4 +1,4 @@
-package org.jabref.logic.journals;
+package org.jabref.logic.importer.fetcher;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -12,6 +12,7 @@ import javafx.util.Pair;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetcher;
+import org.jabref.logic.journals.JournalInformation;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.ISSN;
 
