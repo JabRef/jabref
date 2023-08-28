@@ -1,4 +1,5 @@
 # Privacy Policy
+
 Last updated: 2023-08-24
 
 Your privacy is a fundamental right JabRef e.V. respects and supports.
@@ -11,7 +12,7 @@ Please remember that no method of transmission over the Internet, or method of e
 While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.
 Also, whenever you communicate through the internet, your IP-Address will always be transmitted and retained by third parties for technical and in some cases for legal reasons.
 
-## JabRef Desktop Application 
+## JabRef Desktop Application
 
 ### Collecting information
 
@@ -28,7 +29,7 @@ However, on certain occasions JabRef will send some information to the online se
 JabRef only stores the following personal information locally on your computer:
 
 - Your proxy username and password, if you decide to store them (by default *disabled*).
-- Any personal API key you use to access third party online services (by default *disabled*). 
+- Any personal API key you use to access third party online services (by default *disabled*).
 
 ### Sharing information
 
@@ -72,7 +73,7 @@ These third-party services are the following:
 | [Unpaywall](https://unpaywall.org/)                                                                             | <https://unpaywall.org/legal/privacy> |
 | [zbMATH Open](https://www.zbmath.org)                                                                           | <https://zbmath.org/privacy-policy/> |
 
-[1]: *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (by default *disabled*).* 
+[1]: *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (by default*disabled*).*
 
 ## JabRef Browser Extension
 
@@ -102,7 +103,7 @@ We have no control over and assume no responsibility for the content, privacy po
 
 ## Changes to this Privacy Policy
 
-This privacy policy may be changed eventually. 
+This privacy policy may be changed eventually.
 We encourage you to check this Privacy Policy periodically for any changes.
 Any material change will be mentioned in the changelog of the desktop application and in our [blog](https://blog.jabref.org/).
 
@@ -113,7 +114,7 @@ This privacy policy is in effect as of the day mentioned as "last updated" above
 If you get in touch with us, we may aks you to provide us with certain personal information (e.g. name and email address) to stay in contact with you.
 For any questions or concerns regarding the privacy policy, please send us an email to <vorstand@jabref.org> or write to
 
-JabRef e.V.<br>
-Josef-Lanner-Str. 9<br>
-71069 Sindelfingen<br>
+JabRef e.V.  
+Josef-Lanner-Str. 9  
+71069 Sindelfingen  
 Germany
