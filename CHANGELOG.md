@@ -83,6 +83,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the behavior of group addition/edit, so that sorting by alphabetical order is not performed by default after the modification [#10017](https://github.com/JabRef/jabref/issues/10017)
 - We fixed an issue with spacing in the cleanup dialogue. [#10081](https://github.com/JabRef/jabref/issues/10081)
 - The GVK fetcher now uses the new [K10plus](https://www.bszgbv.de/services/k10plus/) database [#10189](https://github.com/JabRef/jabref/pull/10189)
+- The SLR feature adds new entries sorted into the new bib file (and not at the end).
 
 ### Fixed
 
@@ -134,6 +135,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the ACM Portal search sometimes would not return entries for some search queries when the article author had no given name [#10107](https://github.com/JabRef/jabref/issues/10107)
 - We fixed an issue that caused high CPU usage and a zombie process after quitting JabRef because of author names autocompletion [#10159](https://github.com/JabRef/jabref/pull/10159)
 - We fixed an issue where files with illegal characters in the filename could be added to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
+- We fixed an issue with JabRef respecting the save order. [#9869](https://github.com/JabRef/jabref/issues/9869)
 
 ### Removed
 

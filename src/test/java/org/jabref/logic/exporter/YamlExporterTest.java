@@ -20,7 +20,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class YamlExporterTest {
 
@@ -29,9 +28,6 @@ public class YamlExporterTest {
 
     @BeforeAll
     static void setUp() {
-        SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
-        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-
         yamlExporter = new TemplateExporter(
                 "CSL YAML",
                 "yaml",
@@ -39,7 +35,7 @@ public class YamlExporterTest {
                 null,
                 StandardFileType.YAML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                saveConfiguration,
+                SaveOrder.getDefaultSaveOrder(),
                 BlankLineBehaviour.DELETE_BLANKS);
 
         databaseContext = new BibDatabaseContext();

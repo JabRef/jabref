@@ -587,7 +587,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EXPORT_SECONDARY_SORT_FIELD, StandardField.AUTHOR.getName());
         defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
         defaults.put(EXPORT_TERTIARY_SORT_FIELD, StandardField.TITLE.getName());
-        defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
 
         defaults.put(NEWLINE, System.lineSeparator());
 
@@ -2277,7 +2277,6 @@ public class JabRefPreferences implements PreferencesService {
 
         return new SaveConfiguration()
                 .withSaveOrder(saveOrder)
-                .withMetadataSaveOrder(false)
                 .withReformatOnSave(getLibraryPreferences().shouldAlwaysReformatOnSave());
     }
 
@@ -2293,7 +2292,7 @@ public class JabRefPreferences implements PreferencesService {
                     formatData.get(EXPORTER_FILENAME_INDEX),
                     formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
-                    saveConfiguration);
+                    saveConfiguration.getSaveOrder());
             format.setCustomExport(true);
             formats.add(format);
         }
