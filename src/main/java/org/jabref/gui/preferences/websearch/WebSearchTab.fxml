@@ -4,6 +4,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -39,8 +40,12 @@
         <CheckBox fx:id="useCustomApiKey" text="%Custom">
         </CheckBox>
     </HBox>
-    <HBox alignment="CENTER_LEFT" >
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Button fx:id="testCustomApiKey" text="%Check connection" onAction="#checkCustomApiKey"
                 prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        <SplitPane fx:id="persistentTooltipWrapper">
+            <CheckBox fx:id="persistApiKeys" text="%Persist api keys between sessions"/>
+        </SplitPane>
     </HBox>
 </fx:root>

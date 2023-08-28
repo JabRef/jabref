@@ -369,6 +369,7 @@ public class JabRefPreferences implements PreferencesService {
     // Web search
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
+    private static final String FETCHER_CUSTOM_KEY_PERSIST = "fetcherCustomKeyPersist";
 
     // SSL
     private static final String TRUSTSTORE_PATH = "truststorePath";
@@ -666,6 +667,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
+        defaults.put(FETCHER_CUSTOM_KEY_PERSIST, Boolean.FALSE);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -2779,12 +2781,13 @@ public class JabRefPreferences implements PreferencesService {
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getCustomImportFormats(),
-                getFetcherKeys()
-        );
+                getFetcherKeys(),
+                getBoolean(FETCHER_CUSTOM_KEY_PERSIST));
 
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
         EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (obs, oldValue, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
 
@@ -2873,7 +2876,12 @@ public class JabRefPreferences implements PreferencesService {
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
-        storeFetcherKeysToKeyring(names, keys);
+
+        if (getBoolean(FETCHER_CUSTOM_KEY_PERSIST)) {
+            storeFetcherKeysToKeyring(names, keys);
+        } else {
+            clearCustomFetcherKeys();
+        }
     }
 
     private void storeFetcherKeysToKeyring(List<String> names, List<String> keys) {
