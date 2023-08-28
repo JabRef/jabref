@@ -21,19 +21,22 @@ public class ImporterPreferences {
     private final ObjectProperty<Path> importWorkingDirectory;
     private final ObservableSet<FetcherApiKey> apiKeys;
     private final ObservableSet<CustomImporter> customImporters;
+    private final BooleanProperty persistCustomKeys;
 
     public ImporterPreferences(boolean importerEnabled,
                                boolean generateNewKeyOnImport,
                                Path importWorkingDirectory,
                                boolean warnAboutDuplicatesOnImport,
                                Set<CustomImporter> customImporters,
-                               Set<FetcherApiKey> apiKeys) {
+                               Set<FetcherApiKey> apiKeys,
+                               boolean persistCustomKeys) {
         this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
         this.customImporters = FXCollections.observableSet(customImporters);
         this.apiKeys = FXCollections.observableSet(apiKeys);
+        this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
     }
 
     public boolean areImporterEnabled() {
@@ -95,5 +98,17 @@ public class ImporterPreferences {
     public void setCustomImporters(Set<CustomImporter> importers) {
         customImporters.clear();
         customImporters.addAll(importers);
+    }
+
+    public boolean shouldPersistCustomKeys() {
+        return persistCustomKeys.get();
+    }
+
+    public BooleanProperty persistCustomKeysProperty() {
+        return persistCustomKeys;
+    }
+
+    public void setPersistCustomKeys(boolean persistCustomKeys) {
+        this.persistCustomKeys.set(persistCustomKeys);
     }
 }
