@@ -21,7 +21,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class HtmlExportFormatTest {
     public BibDatabaseContext databaseContext;
@@ -31,16 +30,13 @@ public class HtmlExportFormatTest {
 
     @BeforeEach
     public void setUp() {
-        SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
-        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-
         exportFormat = new TemplateExporter("HTML",
                 "html",
                 "html",
                 null,
                 StandardFileType.HTML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                saveConfiguration);
+                SaveOrder.getDefaultSaveOrder());
 
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;

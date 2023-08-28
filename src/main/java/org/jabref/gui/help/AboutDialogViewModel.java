@@ -29,6 +29,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
     private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE.md";
     private static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
+    private static final String PRIVACY_POLICY_URL = "https://github.com/JabRef/jabref/blob/main/PRIVACY.md";
     private final String changelogUrl;
     private final String versionInfo;
     private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
@@ -153,5 +154,9 @@ public class AboutDialogViewModel extends AbstractViewModel {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
             logger.error("Could not open default browser.", e);
         }
+    }
+
+    public void openPrivacyPolicy() {
+        openWebsite(PRIVACY_POLICY_URL);
     }
 }

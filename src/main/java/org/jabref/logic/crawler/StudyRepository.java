@@ -27,6 +27,8 @@ import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
@@ -59,6 +61,11 @@ public class StudyRepository {
     private static final String REMOTE = "origin";
     private static final String WORK_BRANCH = "work";
     private static final String SEARCH_BRANCH = "search";
+
+    private static final SaveOrder SAVE_ORDER = new SaveOrder(SaveOrder.OrderType.SPECIFIED,
+            List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
+                    new SaveOrder.SortCriterion(StandardField.YEAR, true),
+                    new SaveOrder.SortCriterion(StandardField.TITLE, false)));
 
     private final Path repositoryPath;
     private final Path studyDefinitionFile;
@@ -426,7 +433,7 @@ public class StudyRepository {
     private void writeResultToFile(Path pathToFile, BibDatabase entries) throws SaveException {
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {
             SaveConfiguration saveConfiguration = new SaveConfiguration()
-                    .withMetadataSaveOrder(true)
+                    .withSaveOrder(SAVE_ORDER)
                     .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(

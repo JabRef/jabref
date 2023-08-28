@@ -123,4 +123,6 @@ open module org.jabref {
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.GpgSigner;
+
+    requires static org.jspecify;
 }
