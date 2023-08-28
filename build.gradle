@@ -610,7 +610,7 @@ jlink {
                     '--win-menu-group', "JabRef",
                     '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/windows",
-                    '--license-file', "${projectDir}/buildres/LICENSE_With_Privacy.md",
+                    '--license-file', "${projectDir}/buildres/LICENSE_with_Privacy.md",
                     '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"
             ]
         }
