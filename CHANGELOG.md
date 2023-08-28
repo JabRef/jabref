@@ -34,13 +34,15 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the ability to search for an identifier (DOI, ISBN, ArXiv ID) directly from 'Web Search'. [#7575](https://github.com/JabRef/jabref/issues/7575) [#9674](https://github.com/JabRef/jabref/issues/9674)
 - We added a cleanup activity that identifies a URL or a last-visited-date in the `note` field and moves it to the `url` and `urldate` field respectively. [koppor#216](https://github.com/koppor/jabref/issues/216)
 - We enabled the user to change the name of a field in a custom entry type by double-clicking on it. [#9840](https://github.com/JabRef/jabref/issues/9840)
+- We added some preferences options to disable online activity. [#10064](https://github.com/JabRef/jabref/issues/10064)
 - We integrated two mail actions ("As Email" and "To Kindle") under a new "Send" option in the right-click & Tools menus. The Kindle option creates an email targeted to the user's Kindle email, which can be set in preferences under "External programs" [#6186](https://github.com/JabRef/jabref/issues/6186)
 - We added an option to clear recent libraries' history. [#10003](https://github.com/JabRef/jabref/issues/10003)
 - We added an option to encrypt and remember the proxy password. [#8055](https://github.com/JabRef/jabref/issues/8055)[#10044](https://github.com/JabRef/jabref/issues/10044)
 - We added support for showing journal information, via info buttons next to the `Journal` and `ISSN` fields in the entry editor. [#6189](https://github.com/JabRef/jabref/issues/6189)
 - We added support for pushing citations to Sublime Text 3 [#10098](https://github.com/JabRef/jabref/issues/10098)
 - We added support for the Finnish language. [#10183](https://github.com/JabRef/jabref/pull/10183)
-- We added the option to automatically repleaces  illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
+- We added the option to automatically replaces illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
+- We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
 
 ### Changed
 

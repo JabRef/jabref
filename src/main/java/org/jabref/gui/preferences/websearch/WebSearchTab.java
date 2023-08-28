@@ -17,6 +17,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
 
+    @FXML private CheckBox enableWebSearch;
     @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
@@ -26,8 +27,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
-
-    @FXML private CheckBox journalInfoEnabled;
 
     @FXML private ComboBox<FetcherApiKey> apiKeySelector;
     @FXML private TextField customApiKey;
@@ -48,6 +47,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     public void initialize() {
         this.viewModel = new WebSearchTabViewModel(preferencesService, dialogService);
 
+        enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
@@ -55,8 +55,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
         grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
-
-        journalInfoEnabled.selectedProperty().bindBidirectional(viewModel.journalInfoEnabledProperty());
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());

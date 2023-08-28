@@ -24,16 +24,15 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
-import org.jabref.logic.journals.JournalInformationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
-import org.jabref.logic.util.EnablementStatus;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
+    private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty warnAboutDuplicatesOnImportProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldDownloadLinkedOnlineFiles = new SimpleBooleanProperty();
@@ -44,8 +43,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidURLProperty = new SimpleStringProperty("");
 
-    private final BooleanProperty journalInfoEnabledProperty = new SimpleBooleanProperty();
-
     private final ListProperty<FetcherApiKey> apiKeys = new SimpleListProperty<>();
     private final ObjectProperty<FetcherApiKey> selectedApiKeyProperty = new SimpleObjectProperty<>();
 
@@ -55,7 +52,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
     private final FilePreferences filePreferences;
-    private final JournalInformationPreferences journalInfoPreferences;
 
     public WebSearchTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
         this.dialogService = dialogService;
@@ -64,11 +60,11 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         this.grobidPreferences = preferencesService.getGrobidPreferences();
         this.doiPreferences = preferencesService.getDOIPreferences();
         this.filePreferences = preferencesService.getFilePreferences();
-        this.journalInfoPreferences = preferencesService.getJournalInformationPreferences();
     }
 
     @Override
     public void setValues() {
+        enableWebSearchProperty.setValue(importerPreferences.areImporterEnabled());
         generateKeyOnImportProperty.setValue(importerPreferences.isGenerateNewKeyOnImport());
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
@@ -79,13 +75,12 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
-        journalInfoEnabledProperty.setValue(journalInfoPreferences.getEnablementStatus() == EnablementStatus.ENABLED);
-
         apiKeys.setValue(FXCollections.observableArrayList(preferencesService.getImporterPreferences().getApiKeys()));
     }
 
     @Override
     public void storeSettings() {
+        importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
         importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
@@ -94,17 +89,15 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidPreferences.setGrobidOptOut(grobidPreferences.isGrobidOptOut());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
 
-        if (journalInfoEnabledProperty.getValue()) {
-            journalInfoPreferences.setEnablementStatus(EnablementStatus.ENABLED);
-        } else {
-            journalInfoPreferences.setEnablementStatus(EnablementStatus.DISABLED);
-        }
-
         doiPreferences.setUseCustom(useCustomDOIProperty.get());
         doiPreferences.setDefaultBaseURI(useCustomDOINameProperty.getValue().trim());
 
         preferencesService.getImporterPreferences().getApiKeys().clear();
         preferencesService.getImporterPreferences().getApiKeys().addAll(apiKeys);
+    }
+
+    public BooleanProperty enableWebSearchProperty() {
+        return enableWebSearchProperty;
     }
 
     public BooleanProperty generateKeyOnImportProperty() {
@@ -125,10 +118,6 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty grobidURLProperty() {
         return grobidURLProperty;
-    }
-
-    public BooleanProperty journalInfoEnabledProperty() {
-        return journalInfoEnabledProperty;
     }
 
     public ListProperty<FetcherApiKey> fetcherApiKeys() {

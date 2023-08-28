@@ -14,6 +14,7 @@
     <Label styleClass="titleHeader" text="%Web search"/>
 
     <Label styleClass="sectionHeader" text="%General"/>
+    <CheckBox fx:id="enableWebSearch" text="%Enable web search"/>
     <CheckBox fx:id="generateNewKeyOnImport" text="%Generate a new key for imported entries (overwriting their default)"/>
     <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
     <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
@@ -30,7 +31,6 @@
         <Label text="%Grobid URL" />
         <TextField fx:id="grobidURL" HBox.hgrow="ALWAYS"/>
     </HBox>
-    <CheckBox fx:id="journalInfoEnabled" text="%Allow sending ISSN to a JabRef online service (SCimago) for fetching journal information"/>
 
     <Label styleClass="sectionHeader" text="%Custom API key"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">

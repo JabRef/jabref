@@ -34,6 +34,7 @@ import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.InternalPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
@@ -44,6 +45,7 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 import kong.unirest.UnirestException;
 
 public class NetworkTabViewModel implements PreferenceTabViewModel {
+    private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final BooleanProperty proxyUseProperty = new SimpleBooleanProperty();
@@ -69,6 +71,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final ProxyPreferences proxyPreferences;
     private final ProxyPreferences backupProxyPreferences;
     private final SSLPreferences sslPreferences;
+    private final InternalPreferences internalPreferences;
 
     private final TrustStoreManager trustStoreManager;
 
@@ -81,6 +84,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         this.remotePreferences = preferences.getRemotePreferences();
         this.proxyPreferences = preferences.getProxyPreferences();
         this.sslPreferences = preferences.getSSLPreferences();
+        this.internalPreferences = preferences.getInternalPreferences();
 
         backupProxyPreferences = new ProxyPreferences(
                 proxyPreferences.shouldUseProxy(),
@@ -143,6 +147,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        versionCheckProperty.setValue(internalPreferences.isVersionCheckEnabled());
         remoteServerProperty.setValue(remotePreferences.useRemoteServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
 
@@ -180,6 +185,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        internalPreferences.setVersionCheckEnabled(versionCheckProperty.getValue());
+
         getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
             if (remotePreferences.isDifferentPort(newPort)) {
                 remotePreferences.setPort(newPort);
@@ -305,6 +312,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    public BooleanProperty versionCheckProperty() {
+        return versionCheckProperty;
     }
 
     public BooleanProperty remoteServerProperty() {
