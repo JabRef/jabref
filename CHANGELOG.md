@@ -41,7 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added support for pushing citations to Sublime Text 3 [#10098](https://github.com/JabRef/jabref/issues/10098)
 - We added support for the Finnish language. [#10183](https://github.com/JabRef/jabref/pull/10183)
 - We added the option to automatically repleaces  illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
-- We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222#issuecomment-1695855103)
+- We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
 
 ### Changed
 
