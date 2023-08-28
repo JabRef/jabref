@@ -2859,7 +2859,7 @@ public class JabRefPreferences implements PreferencesService {
                             getInternalPreferences().getUserAndHost())
                             .decrypt());
                 } catch (PasswordAccessException ex) {
-                    LOGGER.warn("No api key stored for {} fetcher", fetcher);
+                    LOGGER.debug("No api key stored for {} fetcher", fetcher);
                     keys.add("");
                 }
             }
