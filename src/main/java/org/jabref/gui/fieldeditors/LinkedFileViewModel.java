@@ -480,27 +480,28 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 if (ex instanceof FetcherClientException clientException) {
                     statusCode = clientException.getStatusCode();
                     if (statusCode == 401) {
-                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.") + "\nURL: " + urlDownload + "\n" + fetcherExceptionMessage);
+                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
                     } else if (statusCode == 403) {
-                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("403 Forbidden: Access Denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.") + "\nURL: " + urlDownload + "\n" + fetcherExceptionMessage);
+                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("403 Forbidden: Access Denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
                     } else if (statusCode == 404) {
-                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("404 Not Found Error: The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.") + "\nURL: " + urlDownload + "\n" + fetcherExceptionMessage);
+                        dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("404 Not Found Error: The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
                     }
                 } else if (ex instanceof FetcherServerException serverException) {
                     statusCode = serverException.getStatusCode();
-                    dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("Error downloading form URL. Cause is likely the server side. HTTP Error ") + statusCode + "\n" + fetcherExceptionMessage + "\nURL: " + urlDownload + "\nPlease try again later or contact the server administrator.");
-                } else {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Failed to download from URL"), "Error message: " + fetcherExceptionMessage + "\nURL: " + urlDownload + "\nPlease check the URL and try again.");
-                }
-            });
-            taskExecutor.execute(downloadTask);
-        } catch (MalformedURLException exception) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
+                    dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"),
+                                Localization.lang("Error downloading form URL. Cause is likely the server side. HTTP Error %0 \n %1 \nURL: %2 \nPlease try again later or contact the server administrator.", statusCode, fetcherExceptionMessage, urlDownload.getSource()));
+                    } else {
+                        dialogService.showErrorDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("Error message: %0 \nURL: %1 \nPlease check the URL and try again.", fetcherExceptionMessage, urlDownload.getSource()));
+                    }
+                });
+                taskExecutor.execute(downloadTask);
+            } catch (MalformedURLException exception) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
+            }
         }
-    }
 
-    public boolean checkSSLHandshake(URLDownload urlDownload) {
-        try {
+        public boolean checkSSLHandshake(URLDownload urlDownload) {
+            try {
             urlDownload.canBeReached();
         } catch (kong.unirest.UnirestException ex) {
             if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
