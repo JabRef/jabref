@@ -14,7 +14,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
+import org.jabref.architecture.AllowedToUseStandardStreams;
+
 import org.slf4j.LoggerFactory;
 
 /**
@@ -32,11 +33,9 @@ import org.slf4j.LoggerFactory;
  * The access to this is given by the functions {@link Localization#lang(String, String...)} and
  * that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
  */
+@AllowedToUseStandardStreams("Needs to have acess to System.err because it's called very early before our loggers")
 public class Localization {
     static final String RESOURCE_PREFIX = "l10n/JabRef";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Localization.class);
-
     private static Locale locale;
     private static LocalizationBundle localizedMessages;
 
@@ -52,12 +51,10 @@ public class Localization {
      */
     public static String lang(String key, Object... params) {
         if (localizedMessages == null) {
-            // I'm logging this because it should never happen
-            LOGGER.error("Messages are not initialized before accessing key: {}", key);
+            System.err.println("Messages are not initialized before accessing key: " + key);
             setLanguage(Language.ENGLISH);
         }
         var stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);
-
         return lookup(localizedMessages, key, stringParams);
     }
 
@@ -71,7 +68,7 @@ public class Localization {
         Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
         if (knownLanguage.isEmpty()) {
-            LOGGER.warn("Language {} is not supported by JabRef (Default: {})", language, defaultLocale);
+            LoggerFactory.getLogger(Localization.class).warn("Language {} is not supported by JabRef (Default: {})", language, defaultLocale);
             setLanguage(Language.ENGLISH);
             return;
         }
@@ -87,7 +84,7 @@ public class Localization {
             createResourceBundles(locale);
         } catch (MissingResourceException ex) {
             // should not happen as we have scripts to enforce this
-            LOGGER.warn("Could not find bundles for language " + locale + ", switching to full english language", ex);
+            LoggerFactory.getLogger(Localization.class).warn("Could not find bundles for language " + locale + ", switching to full english language", ex);
             setLanguage(Language.ENGLISH);
         }
     }
@@ -148,7 +145,7 @@ public class Localization {
 
         String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
         if (translation.isEmpty()) {
-            LOGGER.warn("Warning: could not get translation for \"{}\" for locale {}", key, Locale.getDefault());
+            LoggerFactory.getLogger(Localization.class).warn("Warning: could not get translation for \"{}\" for locale {}", key, Locale.getDefault());
             translation = key;
         }
         return new LocalizationKeyParams(translation, params).replacePlaceholders();

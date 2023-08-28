@@ -58,17 +58,8 @@ jobs:
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
       - uses: peter-evans/create-pull-request@v5
-        if: github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update-journallist
           title: "[Bot] Update journal abbreviation lists"
           commit-message: Update journal abbreviation lists
-      - name: Commit and push changes
-        uses: EndBug/add-and-commit@v9
-        if: github.ref != 'refs/heads/main'
-        with:
-          message: 'Update journal abbreviation lists'
-          committer_email: actions@github.com
-          fetch: false
-          push: true

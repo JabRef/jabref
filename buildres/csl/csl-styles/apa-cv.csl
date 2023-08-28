@@ -35,295 +35,60 @@
       <term name="circa" form="short">ca.</term>
       <term name="bc"> B.C.E.</term>
       <term name="ad"> C.E.</term>
-      <term name="letter">personal communication</term>
-      <term name="letter" form="short">letter</term>
       <term name="issue" form="long">
         <single>issue</single>
         <multiple>issues</multiple>
       </term>
-    </terms>
-  </locale>
-  <locale xml:lang="af">
-    <terms>
-      <term name="letter">persoonlike kommunikasie</term>
-      <term name="letter" form="short">brief</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ar">
-    <terms>
-      <term name="letter">اتصال شخصي</term>
-      <term name="letter" form="short">خطاب</term>
-    </terms>
-  </locale>
-  <locale xml:lang="bg">
-    <terms>
-      <term name="letter">лична комуникация</term>
-      <term name="letter" form="short">писмо</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ca">
-    <terms>
-      <term name="letter">comunicació personal</term>
-      <term name="letter" form="short">carta</term>
-    </terms>
-  </locale>
-  <locale xml:lang="cs">
-    <terms>
-      <term name="letter">osobní komunikace</term>
-      <term name="letter" form="short">dopis</term>
-    </terms>
-  </locale>
-  <locale xml:lang="cy">
-    <terms>
-      <term name="letter">cyfathrebu personol</term>
-      <term name="letter" form="short">llythyr</term>
+      <term name="software">computer software</term>
     </terms>
   </locale>
   <locale xml:lang="da">
     <terms>
       <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikation</term>
-      <term name="letter" form="short">brev</term>
     </terms>
   </locale>
   <locale xml:lang="de">
     <terms>
       <term name="et-al">et al.</term>
-      <term name="letter">persönliche Kommunikation</term>
-      <term name="letter" form="short">Brief</term>
-    </terms>
-  </locale>
-  <locale xml:lang="el">
-    <terms>
-      <term name="letter">προσωπική επικοινωνία</term>
-      <term name="letter" form="short">επιστολή</term>
     </terms>
   </locale>
   <locale xml:lang="es">
     <terms>
       <term name="from">de</term>
-      <term name="letter">comunicación personal</term>
-      <term name="letter" form="short">carta</term>
-    </terms>
-  </locale>
-  <locale xml:lang="et">
-    <terms>
-      <term name="letter">isiklik suhtlus</term>
-      <term name="letter" form="short">kiri</term>
-    </terms>
-  </locale>
-  <locale xml:lang="eu">
-    <terms>
-      <term name="letter">komunikazio pertsonala</term>
-      <term name="letter" form="short">gutuna</term>
-    </terms>
-  </locale>
-  <locale xml:lang="fa">
-    <terms>
-      <term name="letter">ارتباط شخصی</term>
-      <term name="letter" form="short">نامه</term>
-    </terms>
-  </locale>
-  <locale xml:lang="fi">
-    <terms>
-      <term name="letter">henkilökohtainen viestintä</term>
-      <term name="letter" form="short">kirje</term>
     </terms>
   </locale>
   <locale xml:lang="fr">
     <terms>
-      <term name="letter">communication personnelle</term>
-      <term name="letter" form="short">lettre</term>
       <term name="editor" form="short">
         <single>éd.</single>
         <multiple>éds.</multiple>
       </term>
     </terms>
   </locale>
-  <locale xml:lang="he">
-    <terms>
-      <term name="letter">תקשורת אישית</term>
-      <term name="letter" form="short">מכתב</term>
-    </terms>
-  </locale>
-  <locale xml:lang="hr">
-    <terms>
-      <term name="letter">osobna komunikacija</term>
-      <term name="letter" form="short">pismo</term>
-    </terms>
-  </locale>
-  <locale xml:lang="hu">
-    <terms>
-      <term name="letter">személyes kommunikáció</term>
-      <term name="letter" form="short">levél</term>
-    </terms>
-  </locale>
-  <locale xml:lang="id">
-    <terms>
-      <term name="letter">komunikasi pribadi</term>
-      <term name="letter" form="short">surat</term>
-    </terms>
-  </locale>
-  <locale xml:lang="is">
-    <terms>
-      <term name="letter">persónuleg samskipti</term>
-      <term name="letter" form="short">bréf</term>
-    </terms>
-  </locale>
-  <locale xml:lang="it">
-    <terms>
-      <term name="letter">comunicazione personale</term>
-      <term name="letter" form="short">lettera</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ja">
-    <terms>
-      <term name="letter">個人的なやり取り</term>
-      <term name="letter" form="short">手紙</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ko">
-    <terms>
-      <term name="letter">개인 서신</term>
-      <term name="letter" form="short">편지</term>
-    </terms>
-  </locale>
-  <locale xml:lang="la">
-    <terms>
-      <term name="letter"/>
-      <term name="letter" form="short">epistula</term>
-    </terms>
-  </locale>
-  <locale xml:lang="lt">
-    <terms>
-      <term name="letter">communicationis personalis</term>
-      <term name="letter" form="short"/>
-    </terms>
-  </locale>
-  <locale xml:lang="lv">
-    <terms>
-      <term name="letter">personīga komunikācija</term>
-      <term name="letter" form="short">vēstule</term>
-    </terms>
-  </locale>
-  <locale xml:lang="mn">
-    <terms>
-      <term name="letter">хувийн харилцаа холбоо</term>
-      <term name="letter" form="short">захиа</term>
-    </terms>
-  </locale>
   <locale xml:lang="nb">
     <terms>
       <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikasjon</term>
-      <term name="letter" form="short">brev</term>
     </terms>
   </locale>
   <locale xml:lang="nl">
     <terms>
       <term name="et-al">et al.</term>
-      <term name="letter">persoonlijke communicatie</term>
-      <term name="letter" form="short">brief</term>
     </terms>
   </locale>
   <locale xml:lang="nn">
     <terms>
       <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikasjon</term>
-      <term name="letter" form="short">brev</term>
-    </terms>
-  </locale>
-  <locale xml:lang="pl">
-    <terms>
-      <term name="letter">osobista komunikacja</term>
-      <term name="letter" form="short">list</term>
-    </terms>
-  </locale>
-  <locale xml:lang="pt">
-    <terms>
-      <term name="letter">comunicação pessoal</term>
-      <term name="letter" form="short">carta</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ro">
-    <terms>
-      <term name="letter">comunicare personală</term>
-      <term name="letter" form="short">scrisoare</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ru">
-    <terms>
-      <term name="letter">личная переписка</term>
-      <term name="letter" form="short">письмо</term>
-    </terms>
-  </locale>
-  <locale xml:lang="sk">
-    <terms>
-      <term name="letter">osobná komunikácia</term>
-      <term name="letter" form="short">list</term>
-    </terms>
-  </locale>
-  <locale xml:lang="sl">
-    <terms>
-      <term name="letter">osebna komunikacija</term>
-      <term name="letter" form="short">pismo</term>
-    </terms>
-  </locale>
-  <locale xml:lang="sr">
-    <terms>
-      <term name="letter">лична комуникација</term>
-      <term name="letter" form="short">писмо</term>
-    </terms>
-  </locale>
-  <locale xml:lang="sv">
-    <terms>
-      <term name="letter">personlig kommunikation</term>
-      <term name="letter" form="short">brev</term>
-    </terms>
-  </locale>
-  <locale xml:lang="th">
-    <terms>
-      <term name="letter">การสื่อสารส่วนบุคคล</term>
-      <term name="letter" form="short">จดหมาย</term>
-    </terms>
-  </locale>
-  <locale xml:lang="tr">
-    <terms>
-      <term name="letter">kişisel iletişim</term>
-      <term name="letter" form="short">mektup</term>
-    </terms>
-  </locale>
-  <locale xml:lang="uk">
-    <terms>
-      <term name="letter">особисте спілкування</term>
-      <term name="letter" form="short">лист</term>
-    </terms>
-  </locale>
-  <locale xml:lang="vi">
-    <terms>
-      <term name="letter">giao tiếp cá nhân</term>
-      <term name="letter" form="short">thư</term>
-    </terms>
-  </locale>
-  <locale xml:lang="zh-CN">
-    <terms>
-      <term name="letter">的私人交流</term>
-      <term name="letter" form="short">信函</term>
-    </terms>
-  </locale>
-  <locale xml:lang="zh-TW">
-    <terms>
-      <term name="letter">私人通訊</term>
-      <term name="letter" form="short">信函</term>
     </terms>
   </locale>
   <!-- General categories of item types:
-        Periodical: article-journal article-magazine article-newspaper post-weblog review review-book
-        Periodical or Booklike: paper-conference
-        Booklike: article book broadcast chapter dataset entry entry-dictionary entry-encyclopedia figure
-                  graphic interview manuscript map motion_picture musical_score pamphlet patent
-                  personal_communication report song speech thesis post webpage
-        Legal: bill legal_case legislation treaty
+       Periodical: article-journal article-magazine article-newspaper post-weblog review review-book
+       Periodical or Booklike: paper-conference
+       Booklike: article book broadcast chapter classic collection dataset document
+                 entry entry-dictionary entry-encyclopedia event figure
+                 graphic interview manuscript map motion_picture musical_score pamphlet patent
+                 performance periodical personal_communication post report
+                 software song speech standard thesis webpage
+       Legal: bill hearing legal_case legislation regulation treaty
   -->
   <!-- APA references contain four parts: author, date, title, source -->
   <macro name="author-bib">
@@ -534,13 +299,11 @@
                 <text variable="genre" text-case="capitalize-first"/>
               </if>
               <else>
-                <!-- This should be localized -->
-                <text value="patent" text-case="capitalize-first"/>
+                <text term="patent" text-case="capitalize-first"/>
               </else>
             </choose>
             <group delimiter=" ">
-              <!-- Replace with label variable="number" if that becomes available -->
-              <text term="issue" form="short" text-case="capitalize-first"/>
+              <label variable="number" form="short" text-case="capitalize-first"/>
               <text variable="number"/>
             </group>
           </group>
@@ -718,7 +481,7 @@
                           <text variable="medium" text-case="capitalize-first"/>
                         </else-if>
                         <else>
-                          <text term="letter" form="short" text-case="capitalize-first"/>
+                          <text term="letter" text-case="capitalize-first"/>
                         </else>
                       </choose>
                     </if>
@@ -728,7 +491,7 @@
                           <text variable="medium" text-case="capitalize-first"/>
                         </if>
                         <else>
-                          <text term="letter" form="short" text-case="capitalize-first"/>
+                          <text term="letter" text-case="capitalize-first"/>
                         </else>
                       </choose>
                     </else>
@@ -829,14 +592,7 @@
                 </if>
               </choose>
             </if>
-            <else-if type="book">
-              <choose>
-                <if variable="version" match="none">
-                  <text macro="format"/>
-                </if>
-              </choose>
-            </else-if>
-            <else-if type="report" match="none">
+            <else-if type="report software" match="none">
               <text macro="format"/>
             </else-if>
           </choose>
@@ -855,7 +611,7 @@
             </if>
           </choose>
         </if>
-        <else-if type="book" variable="version" match="all">
+        <else-if type="software" match="all">
           <!-- For entries in mobile app reference works, place bracketed after the container-title -->
           <text macro="format"/>
         </else-if>
@@ -963,8 +719,7 @@
             <text variable="genre" text-case="title"/>
             <choose>
               <if is-numeric="number">
-                <!-- Replace with label variable="number" if that becomes available -->
-                <text term="issue" form="short" text-case="capitalize-first"/>
+                <label variable="number" form="short" text-case="capitalize-first"/>
                 <text variable="number"/>
               </if>
               <else>
@@ -1013,8 +768,7 @@
     <choose>
       <if is-numeric="version">
         <group delimiter=" ">
-          <!-- replace with label variable="version" if that becomes available -->
-          <text term="version" text-case="capitalize-first"/>
+          <label variable="version" text-case="capitalize-first"/>
           <text variable="version"/>
         </group>
       </if>
@@ -1062,8 +816,7 @@
         </if>
         <else>
           <group>
-            <!-- Replace with label variable="number-of-volumes" if that becomes available -->
-            <text term="volume" form="short" text-case="capitalize-first" suffix=" "/>
+            <label variable="number-of-volumes" form="short" text-case="capitalize-first" suffix=" "/>
             <text term="page-range-delimiter" prefix="1"/>
             <number variable="number-of-volumes" form="numeric"/>
           </group>
@@ -1105,18 +858,16 @@
         </group>
       </if>
       <!-- Generic labels for specific types -->
-      <!-- These should be localized when possible -->
       <else-if type="dataset">
-        <text value="Data set"/>
+        <text term="dataset"/>
       </else-if>
-      <else-if type="book" variable="version" match="all">
-        <!-- Replace with type="software" and term="software" as that becomes available -->
-        <text value="Computer software"/>
+      <else-if type="software">
+        <text term="software" text-case="capitalize-first"/>
       </else-if>
       <else-if type="interview personal_communication" match="any">
         <choose>
           <if variable="archive container-title DOI publisher URL" match="none">
-            <text term="letter" text-case="capitalize-first"/>
+            <text term="personal-communication" text-case="capitalize-first"/>
           </if>
           <else-if type="interview">
             <text term="interview" text-case="capitalize-first"/>
@@ -1124,7 +875,7 @@
         </choose>
       </else-if>
       <else-if type="map">
-        <text value="Map"/>
+        <text term="map" text-case="capitalize-first"/>
       </else-if>
     </choose>
   </macro>
@@ -1363,73 +1114,12 @@
   </macro>
   <!-- Legal citations have their own rules -->
   <macro name="legal-cites">
+    <!-- TODO: Add new item types -->
     <choose>
-      <if type="legal_case">
-        <group delimiter=". ">
-          <group delimiter=", ">
-            <text variable="title"/>
-            <group delimiter=" ">
-              <text macro="container-legal"/>
-              <text macro="date-legal"/>
-            </group>
-            <text variable="references"/>
-          </group>
-          <text macro="access"/>
-        </group>
-      </if>
-      <else-if type="bill">
-        <!-- Currently designed to handle bills, resolutions, hearings, rederal reports. -->
-        <group delimiter=". ">
-          <group delimiter=", ">
-            <choose>
-              <if variable="number container-title" match="none">
-                <!-- If no number or container-title, then assume it is a hearing -->
-                <text variable="title" font-style="italic"/>
-              </if>
-              <else>
-                <text variable="title"/>
-              </else>
-            </choose>
-            <group delimiter=" ">
-              <text macro="container-legal"/>
-              <text macro="date-legal"/>
-              <choose>
-                <if variable="number container-title" match="none">
-                  <!-- If no number or container-title, then assume it is a hearing -->
-                  <names variable="author" prefix="(testimony of " suffix=")">
-                    <name and="symbol" delimiter=", "/>
-                  </names>
-                </if>
-                <else>
-                  <text variable="status" prefix="(" suffix=")"/>
-                </else>
-              </choose>
-            </group>
-            <text variable="references"/>
-          </group>
-          <text macro="access"/>
-        </group>
-      </else-if>
-      <else-if type="legislation">
-        <!-- Currently designed to handle statutes, codified regulations, executive orders.
-              For uncodified regulations, assume future code section is in status. -->
-        <group delimiter=". ">
-          <group delimiter=", ">
-            <text variable="title"/>
-            <group delimiter=" ">
-              <text macro="container-legal"/>
-              <text macro="date-legal"/>
-              <text variable="status" prefix="(" suffix=")"/>
-            </group>
-            <text variable="references"/>
-          </group>
-          <text macro="access"/>
-        </group>
-      </else-if>
-      <else-if type="treaty">
+      <if type="treaty">
         <!-- APA generally defers to Bluebook for legal citations, but diverges without
-              explanation for treaty items. The Bluebook format that was used in APA 6th
-              ed. is used here. -->
+             explanation for treaty items. The Bluebook format that was used in APA 6th
+             ed. is used here. -->
         <group delimiter=", ">
           <text variable="title" text-case="title"/>
           <names variable="author">
@@ -1439,7 +1129,41 @@
           <text macro="container-legal"/>
           <text macro="access"/>
         </group>
-      </else-if>
+      </if>
+      <else>
+        <!-- For `bill`: currently designed to handle bills, resolutions, federal reports. -->
+        <!-- For `legislation`: currently designed to handle statutes, codified regulations, executive orders. -->
+        <group delimiter=". ">
+          <group delimiter=", ">
+            <choose>
+              <if type="bill legal_case legislation" match="any">
+                <text variable="title"/>
+              </if>
+              <else-if type="hearing">
+                <text variable="title" font-style="italic"/>
+              </else-if>
+            </choose>
+            <group delimiter=" ">
+              <text macro="container-legal"/>
+              <text macro="date-legal"/>
+              <choose>
+                <if type="hearing">
+                  <names variable="author" prefix="(testimony of " suffix=")">
+                    <!-- TODO: Localize this with the hearing term. -->
+                    <name and="symbol" delimiter=", "/>
+                  </names>
+                </if>
+                <else-if type="bill legislation" match="any">
+                  <!-- `legislation`: For uncodified regulations, assume future code section is in status. -->
+                  <text variable="status" prefix="(" suffix=")"/>
+                </else-if>
+              </choose>
+            </group>
+            <text variable="references"/>
+          </group>
+          <text macro="access"/>
+        </group>
+      </else>
     </choose>
   </macro>
   <macro name="date-legal">
@@ -1458,7 +1182,7 @@
           </choose>
         </group>
       </if>
-      <else-if type="bill legislation" match="any">
+      <else-if type="bill legislation hearing" match="any">
         <group prefix="(" suffix=")" delimiter=" ">
           <group delimiter=" ">
             <date variable="original-date">
@@ -1487,8 +1211,7 @@
                 <text variable="volume"/>
                 <text variable="container-title"/>
                 <group delimiter=" ">
-                  <!-- Change to label variable="section" as that becomes available -->
-                  <text term="section" form="symbol"/>
+                  <label variable="section" form="symbol"/>
                   <text variable="section"/>
                 </group>
                 <choose>
@@ -1505,8 +1228,7 @@
               <group delimiter=" ">
                 <choose>
                   <if is-numeric="number">
-                    <!-- Replace with label variable="number" if that becomes available -->
-                    <text term="issue" form="short" text-case="capitalize-first"/>
+                    <label variable="number" form="short" text-case="capitalize-first"/>
                   </if>
                 </choose>
                 <text variable="number"/>
@@ -1522,8 +1244,7 @@
             <group delimiter=" ">
               <choose>
                 <if variable="chapter-number container-title" match="none">
-                  <!-- Replace with label variable="number" as that becomes available -->
-                  <text term="issue" form="short"/>
+                  <label variable="number" form="short"/>
                 </if>
               </choose>
               <text variable="number"/>
@@ -1558,8 +1279,7 @@
               <choose>
                 <if variable="section">
                   <group delimiter=" ">
-                    <!-- Change to label variable="section" as that becomes available -->
-                    <text term="section" form="symbol"/>
+                    <label variable="section" form="symbol"/>
                     <text variable="section"/>
                   </group>
                 </if>
@@ -1581,8 +1301,7 @@
             </if>
             <else>
               <group delimiter=" ">
-                <!-- Replace with label variable="number" if that becomes available -->
-                <text term="issue" form="short" text-case="capitalize-first"/>
+                <label variable="number" form="short" text-case="capitalize-first"/>
                 <text variable="number"/>
               </group>
             </else>

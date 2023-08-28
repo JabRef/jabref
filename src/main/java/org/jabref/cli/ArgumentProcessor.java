@@ -187,10 +187,6 @@ public class ArgumentProcessor {
     }
 
     private List<ParserResult> processArguments() {
-        if (!cli.isBlank() && cli.isDebugLogging()) {
-            System.err.println("use java property -Dtinylog.level=debug");
-        }
-
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
         }

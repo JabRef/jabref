@@ -62,7 +62,7 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.EXTERNAL)) {
             return new UrlEditor(field, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(field, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
+            return new JournalEditor(field, taskExecutor, dialogService, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.DOI) || fieldProperties.contains(FieldProperty.EPRINT) || fieldProperties.contains(FieldProperty.ISBN)) {
             return new IdentifierEditor(field, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (field == StandardField.OWNER) {
@@ -97,6 +97,8 @@ public class FieldEditors {
             return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences);
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
+        } else if (field == StandardField.ISSN) {
+            return new ISSNEditor(field, suggestionProvider, fieldCheckers, preferences, taskExecutor, dialogService);
         } else {
             // default
             return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine);

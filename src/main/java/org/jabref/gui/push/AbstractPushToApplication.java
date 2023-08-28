@@ -13,6 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
@@ -64,7 +65,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
-        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+        if (StringUtil.isNullOrEmpty(commandPath)) {
             notDefined = true;
             return;
         }
@@ -145,6 +146,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return preferencesService.getExternalApplicationsPreferences().getCiteCommand();
     }
 
+    @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }
