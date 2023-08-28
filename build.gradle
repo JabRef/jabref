@@ -610,6 +610,7 @@ jlink {
                     '--win-menu-group', "JabRef",
                     '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/windows",
+                    '--license-file', "${projectDir}/buildres/LICENSE_with_Privacy.md",
                     '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"
             ]
         }
@@ -639,8 +640,7 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
                     '--resource-dir', "${projectDir}/buildres/mac"
             ]
-            // Due to a signing bug in jpackage we have to first resign the created app and therefore build the dmg manually
-            // See https://bugs.openjdk.java.net/browse/JDK-8251892 for details
+            // Notarized mac images and packages are built on the pipeline only
             skipInstaller = true
             installerOptions = [
                     '--verbose',
