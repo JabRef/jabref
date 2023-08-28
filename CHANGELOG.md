@@ -83,6 +83,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the behavior of group addition/edit, so that sorting by alphabetical order is not performed by default after the modification [#10017](https://github.com/JabRef/jabref/issues/10017)
 - We fixed an issue with spacing in the cleanup dialogue. [#10081](https://github.com/JabRef/jabref/issues/10081)
 - The GVK fetcher now uses the new [K10plus](https://www.bszgbv.de/services/k10plus/) database [#10189](https://github.com/JabRef/jabref/pull/10189)
+- The SLR feature adds new entries sorted into the new bib file (and not at the end).
 
 ### Fixed
 

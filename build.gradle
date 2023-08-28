@@ -214,6 +214,9 @@ dependencies {
 
     implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
 
+    compileOnly 'org.jspecify:jspecify:0.3.0'
+    testCompileOnly 'org.jspecify:jspecify:0.3.0'
+
     testImplementation 'io.github.classgraph:classgraph:4.8.162'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.0'
