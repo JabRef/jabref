@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
@@ -74,7 +75,7 @@ public class ACMPortalParserTest {
         for (BibEntry bibEntry : bibEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
-        assertEquals(searchEntryList.get(0), bibEntries.get(0));
+        assertEquals(Optional.of(searchEntryList.get(0)), bibEntries.stream().findFirst());
     }
 
     @Test

@@ -10,9 +10,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 
 import org.jabref.gui.Globals;
@@ -37,6 +39,7 @@ import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
     @FXML private Label remoteLabel;
+    @FXML private CheckBox versionCheck;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
     @FXML private Button remoteHelp;
@@ -53,6 +56,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private CustomPasswordField proxyPassword;
     @FXML private Button checkConnectionButton;
     @FXML private CheckBox proxyPersistPassword;
+    @FXML private SplitPane persistentTooltipWrapper; // The disabled persistPassword control does not show tooltips
 
     @FXML private TableView<CustomCertificateViewModel> customCertificatesTable;
     @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
@@ -85,6 +89,8 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     public void initialize() {
         this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor, entryTypesManager);
 
+        versionCheck.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
+
         remoteLabel.setVisible(preferencesService.getWorkspacePreferences().shouldShowAdvancedHints());
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
@@ -108,7 +114,15 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         proxyPassword.textProperty().bindBidirectional(viewModel.proxyPasswordProperty());
         proxyPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
         proxyPersistPassword.selectedProperty().bindBidirectional(viewModel.proxyPersistPasswordProperty());
-        proxyPersistPassword.disableProperty().bind(proxyCustomAndAuthentication.not());
+        proxyPersistPassword.disableProperty().bind(
+                proxyCustomAndAuthentication.and(viewModel.passwordPersistAvailable()).not());
+        EasyBind.subscribe(viewModel.passwordPersistAvailable(), available -> {
+            if (!available) {
+                persistentTooltipWrapper.setTooltip(new Tooltip(Localization.lang("Credential store not available.")));
+            } else {
+                persistentTooltipWrapper.setTooltip(null);
+            }
+        });
 
         proxyPassword.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_PRESSED, this::proxyPasswordReveal);

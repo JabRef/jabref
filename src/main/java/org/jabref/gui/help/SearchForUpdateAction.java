@@ -18,6 +18,8 @@ public class SearchForUpdateAction extends SimpleCommand {
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+
+        this.executable.bind(internalPreferences.versionCheckEnabledProperty());
     }
 
     @Override

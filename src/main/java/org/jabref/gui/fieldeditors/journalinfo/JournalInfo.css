@@ -1,0 +1,28 @@
+.info-container {
+    -fx-background-color: -jr-background-alt;
+}
+
+.info-heading {
+    -fx-font-size: 30;
+    -fx-text-fill: -jr-theme;
+}
+
+.info-label {
+    -fx-font-size: 15;
+    -fx-text-fill: -jr-theme;
+}
+
+.grid-cell {
+    -fx-border-color: transparent -fx-outer-border -fx-outer-border transparent;
+    -fx-border-width: 0 1px 1px 0;
+}
+
+.grid-cell-r {
+    -fx-border-color: transparent -fx-outer-border transparent transparent;
+    -fx-border-width: 0 1px 0 0;
+}
+
+.grid-cell-b {
+    -fx-border-color: transparent transparent -fx-outer-border transparent;
+    -fx-border-width: 0 0 1px 0;
+}

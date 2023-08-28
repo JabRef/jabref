@@ -61,6 +61,10 @@ public class VersionWorker {
     }
 
     public void checkForNewVersionAsync() {
+        if (!internalPreferences.isVersionCheckEnabled()) {
+            return;
+        }
+
         BackgroundTask.wrap(this::getNewVersion)
                       .onSuccess(version -> showUpdateInfo(version, true))
                       .onFailure(exception -> showConnectionError(exception, true))
@@ -68,6 +72,10 @@ public class VersionWorker {
     }
 
     public void checkForNewVersionDelayed() {
+        if (!internalPreferences.isVersionCheckEnabled()) {
+            return;
+        }
+
         BackgroundTask.wrap(this::getNewVersion)
                       .onSuccess(version -> showUpdateInfo(version, false))
                       .onFailure(exception -> showConnectionError(exception, false))

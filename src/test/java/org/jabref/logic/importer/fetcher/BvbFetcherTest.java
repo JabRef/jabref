@@ -52,7 +52,8 @@ public class BvbFetcherTest {
                 .withField(StandardField.FILE, "ParsedFileField{description='', link='http://search.ebscohost.com/login.aspx?direct=true&scope=site&db=nlebk&db=nlabk&AN=1906353', fileType='PDF'}")
                 .withField(StandardField.ISBN, "9783960886402")
                 .withField(StandardField.KEYWORDS, "Klassen, Interfaces, Generics, Enums, Annotationen, Lambdas, Streams, Module, parallel, Parallele Programmierung, Serialisierung, funktional, funktionale Programmierung, Java EE, Jakarta EE")
-                .withField(StandardField.LOCATION, "Heidelberg")
+                .withField(StandardField.ADDRESS, "Heidelberg")
+                .withField(StandardField.PAGETOTAL, "396")
                 .withField(StandardField.PUBLISHER, "{dpunkt.verlag} and {Dpunkt. Verlag (Heidelberg)}");
 
         bibEntryISBN0134685997 = new BibEntry(StandardEntryType.Misc)
@@ -62,7 +63,8 @@ public class BvbFetcherTest {
                 .withField(StandardField.TITLEADDON, "Joshua Bloch")
                 .withField(StandardField.EDITION, "Third edition")
                 .withField(StandardField.ISBN, "0134685997")
-                .withField(StandardField.LOCATION, "Boston")
+                .withField(StandardField.PAGETOTAL, "392")
+                .withField(StandardField.ADDRESS, "Boston")
                 .withField(StandardField.PUBLISHER, "{Addison-Wesley}");
     }
 

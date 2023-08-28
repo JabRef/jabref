@@ -88,4 +88,8 @@ public class AboutDialogView extends BaseDialog<Void> {
     public void openDonation() {
         viewModel.openDonation();
     }
+
+    public void openPrivacyPolicy() {
+        viewModel.openPrivacyPolicy();
+    }
 }

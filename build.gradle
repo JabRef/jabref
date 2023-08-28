@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.1.24'
+    id 'org.openrewrite.rewrite' version '6.1.25'
 }
 
 // Enable following for debugging
@@ -118,9 +118,9 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
-    implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
-    implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
+    implementation 'org.apache.pdfbox:pdfbox:3.0.0'
+    implementation 'org.apache.pdfbox:fontbox:3.0.0'
+    implementation 'org.apache.pdfbox:xmpbox:3.0.0'
 
     implementation 'org.apache.lucene:lucene-core:9.7.0'
     implementation 'org.apache.lucene:lucene-queryparser:9.7.0'
@@ -137,7 +137,7 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:unoloader:7.5.3'
+    implementation 'org.libreoffice:unoloader:7.6.0'
     implementation 'org.libreoffice:libreoffice:7.5.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
@@ -177,8 +177,8 @@ dependencies {
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
     implementation 'org.fxmisc.flowless:flowless:0.7.1'
-    implementation 'org.fxmisc.richtext:richtextfx:0.11.0'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.74.0') {
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.1'
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.77.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
     }
@@ -227,12 +227,12 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.2'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.3'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.1.1"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.2.1"))
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
 }
@@ -610,6 +610,7 @@ jlink {
                     '--win-menu-group', "JabRef",
                     '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/windows",
+                    '--license-file', "${projectDir}/buildres/LICENSE_with_Privacy.md",
                     '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"
             ]
         }
@@ -639,8 +640,7 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
                     '--resource-dir', "${projectDir}/buildres/mac"
             ]
-            // Due to a signing bug in jpackage we have to first resign the created app and therefore build the dmg manually
-            // See https://bugs.openjdk.java.net/browse/JDK-8251892 for details
+            // Notarized mac images and packages are built on the pipeline only
             skipInstaller = true
             installerOptions = [
                     '--verbose',
