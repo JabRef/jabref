@@ -8,6 +8,8 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.desktop.os.OSX;
 import org.jabref.gui.desktop.os.Windows;
 
+import com.github.javakeyring.Keyring;
+
 /**
  * Operating system (OS) detection
  *
@@ -41,5 +43,18 @@ public class OS {
             return new Linux();
         }
         return new DefaultDesktop();
+    }
+
+    public static boolean isKeyringAvailable() {
+        try (Keyring keyring = Keyring.create()) {
+            keyring.setPassword("JabRef", "keyringTest", "keyringTest");
+            if (!"keyringTest".equals(keyring.getPassword("JabRef", "keyringTest"))) {
+                return false;
+            }
+            keyring.deletePassword("JabRef", "keyringTest");
+        } catch (Exception ex) {
+            return false;
+        }
+        return true;
     }
 }
