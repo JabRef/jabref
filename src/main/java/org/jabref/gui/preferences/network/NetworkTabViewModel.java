@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -27,10 +28,10 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.net.ssl.SSLCertificate;
-import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -53,6 +54,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
     private final BooleanProperty proxyPersistPasswordProperty = new SimpleBooleanProperty();
+    private final BooleanProperty passwordPersistAvailable = new SimpleBooleanProperty();
     private final ListProperty<CustomCertificateViewModel> customCertificateListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final Validator remotePortValidator;
@@ -68,7 +70,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final RemotePreferences remotePreferences;
     private final ProxyPreferences proxyPreferences;
     private final ProxyPreferences backupProxyPreferences;
-    private final SSLPreferences sslPreferences;
 
     private final TrustStoreManager trustStoreManager;
 
@@ -80,7 +81,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.remotePreferences = preferences.getRemotePreferences();
         this.proxyPreferences = preferences.getProxyPreferences();
-        this.sslPreferences = preferences.getSSLPreferences();
 
         backupProxyPreferences = new ProxyPreferences(
                 proxyPreferences.shouldUseProxy(),
@@ -132,13 +132,13 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
         proxyPasswordValidator = new FunctionBasedValidator<>(
                 proxyPasswordProperty,
-                input -> input.length() > 0,
+                input -> !input.isBlank(),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
                         Localization.lang("Network"),
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
 
-        this.trustStoreManager = new TrustStoreManager(Path.of(sslPreferences.getTruststorePath()));
+        this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
     }
 
     @Override
@@ -158,6 +158,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyUsernameProperty.setValue(proxyPreferences.getUsername());
         proxyPasswordProperty.setValue(proxyPreferences.getPassword());
         proxyPersistPasswordProperty.setValue(proxyPreferences.shouldPersistPassword());
+        passwordPersistAvailable.setValue(OS.isKeyringAvailable());
     }
 
     private void setSSLValues() {
@@ -341,6 +342,10 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty proxyPersistPasswordProperty() {
         return proxyPersistPasswordProperty;
+    }
+
+    public ReadOnlyBooleanProperty passwordPersistAvailable() {
+        return passwordPersistAvailable;
     }
 
     public ListProperty<CustomCertificateViewModel> customCertificateListProperty() {
