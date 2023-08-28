@@ -137,7 +137,7 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:unoloader:7.5.3'
+    implementation 'org.libreoffice:unoloader:7.6.0'
     implementation 'org.libreoffice:libreoffice:7.5.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
@@ -178,7 +178,7 @@ dependencies {
     implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
     implementation 'org.fxmisc.flowless:flowless:0.7.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.1'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.74.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.77.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
     }
@@ -227,7 +227,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.2'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.3'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
