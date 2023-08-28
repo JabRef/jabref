@@ -1,5 +1,6 @@
 package org.jabref.gui.help;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
@@ -85,5 +86,9 @@ public class AboutDialogView extends BaseDialog<Void> {
     @FXML
     public void openDonation() {
         viewModel.openDonation();
+    }
+
+    public void openPrivacyPolicy() {
+        viewModel.openPrivacyPolicy();
     }
 }
