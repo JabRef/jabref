@@ -116,7 +116,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
                 for (int i = 0; i < entriesArray.length(); i++) {
                     String bibTexFormat = entriesArray.getJSONObject(i).getString("bibTexFormat");
-                    entries.addAll(bibtexParser.parseEntries(String.valueOf(bibTexFormat)));
+                    entries.addAll(bibtexParser.parseEntries(bibTexFormat));
                 }
             } catch (JSONException | TokenMgrException e) {
                 LOGGER.error("An error occurred while parsing fetched data", e);
