@@ -326,7 +326,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed a bug that prevented external group metadata changes from being merged. [#8873](https://github.com/JabRef/jabref/issues/8873)
 - We fixed the shared database opening dialog to remember autosave folder and tick. [#7516](https://github.com/JabRef/jabref/issues/7516)
 - We fixed an issue where name formatter could not be saved. [#9120](https://github.com/JabRef/jabref/issues/9120)
-- We fixed a bug where when export of Preferences, customImporterTabViewModel are duplicated [#10176](https://github.com/JabRef/jabref/issues/10176)
+- We fixed a bug where after export of Preferences, customImporterTabViewModel is duplicated [#10176](https://github.com/JabRef/jabref/issues/10176)
 
 ### Removed
 
