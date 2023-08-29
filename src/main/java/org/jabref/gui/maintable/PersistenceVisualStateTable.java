@@ -15,19 +15,24 @@ public class PersistenceVisualStateTable {
     protected final TableView<BibEntryTableViewModel> table;
     protected final ColumnPreferences preferences;
 
-    public PersistenceVisualStateTable(final TableView<BibEntryTableViewModel> table, ColumnPreferences preferences) {
+    public PersistenceVisualStateTable(TableView<BibEntryTableViewModel> table, ColumnPreferences preferences) {
         this.table = table;
         this.preferences = preferences;
+    }
 
+    public void addListeners() {
         table.getColumns().addListener((InvalidationListener) obs -> updateColumns());
         table.getSortOrder().addListener((InvalidationListener) obs -> updateSortOrder());
 
         // As we store the ColumnModels of the MainTable, we need to add the listener to the ColumnModel properties,
         // since the value is bound to the model after the listener to the column itself is called.
-        table.getColumns().forEach(col ->
-                ((MainTableColumn<?>) col).getModel().widthProperty().addListener(obs -> updateColumns()));
-        table.getColumns().forEach(col ->
-                ((MainTableColumn<?>) col).getModel().sortTypeProperty().addListener(obs -> updateColumns()));
+
+        table.getColumns().stream()
+             .map(col -> ((MainTableColumn<?>) col).getModel())
+             .forEach(model -> {
+                 model.widthProperty().addListener(obs -> updateColumns());
+                 model.sortTypeProperty().addListener(obs -> updateColumns());
+             });
     }
 
     /**
