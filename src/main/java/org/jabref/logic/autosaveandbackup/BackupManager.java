@@ -30,6 +30,7 @@ import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -225,7 +226,7 @@ public class BackupManager {
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
         SaveConfiguration saveConfiguration = new SaveConfiguration()
                 .withMakeBackup(false)
-                .withMetadataSaveOrder(true)
+                .withSaveOrder(bibDatabaseContext.getMetaData().getSaveOrder().orElse(SaveOrder.getDefaultSaveOrder()))
                 .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);

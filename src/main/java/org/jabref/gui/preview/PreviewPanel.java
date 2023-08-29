@@ -59,7 +59,7 @@ public class PreviewPanel extends VBox {
         this.stateManager = stateManager;
         this.previewPreferences = preferences.getPreviewPreferences();
         this.indexingTaskManager = indexingTaskManager;
-        this.fileLinker = new ExternalFilesEntryLinker(preferences.getFilePreferences(), database);
+        this.fileLinker = new ExternalFilesEntryLinker(preferences.getFilePreferences(), database, dialogService);
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         previewView = new PreviewViewer(database, dialogService, stateManager, themeManager);
@@ -90,7 +90,7 @@ public class PreviewPanel extends VBox {
 
                 if (event.getTransferMode() == TransferMode.MOVE) {
                     LOGGER.debug("Mode MOVE"); // shift on win or no modifier
-                    fileLinker.moveFilesToFileDirAndAddToEntry(entry, files, indexingTaskManager);
+                    fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, files, indexingTaskManager);
                 }
                 if (event.getTransferMode() == TransferMode.LINK) {
                     LOGGER.debug("Node LINK"); // alt on win
