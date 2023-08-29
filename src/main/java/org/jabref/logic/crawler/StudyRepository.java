@@ -27,7 +27,6 @@ import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
@@ -62,11 +61,6 @@ public class StudyRepository {
     private static final String WORK_BRANCH = "work";
     private static final String SEARCH_BRANCH = "search";
 
-    private static final SaveOrder SAVE_ORDER = new SaveOrder(SaveOrder.OrderType.SPECIFIED,
-            List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
-                    new SaveOrder.SortCriterion(StandardField.YEAR, true),
-                    new SaveOrder.SortCriterion(StandardField.TITLE, false)));
-
     private final Path repositoryPath;
     private final Path studyDefinitionFile;
     private final SlrGitHandler gitHandler;
@@ -82,7 +76,7 @@ public class StudyRepository {
      * @param gitHandler       The git handler that manages any interaction with the remote repository
      * @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not
      *                                  contain the study definition file.
-     * @throws IOException              Thrown if the given repository does not exists, or the study definition file
+     * @throws IOException              Thrown if the given repository does not exist, or the study definition file
      *                                  does not exist
      */
     public StudyRepository(Path pathToRepository,
@@ -405,21 +399,21 @@ public class StudyRepository {
                 // Aggregate each fetcher result into the query result
                 merger.merge(queryResultEntries, fetcherEntries);
 
-                writeResultToFile(getPathToFetcherResultFile(result.getQuery(), fetcherResult.getFetcherName()), existingFetcherResult.getDatabase());
+                writeResultToFile(getPathToFetcherResultFile(result.getQuery(), fetcherResult.getFetcherName()), existingFetcherResult);
             }
-            BibDatabase existingQueryEntries = getQueryResultEntries(result.getQuery()).getDatabase();
+            BibDatabaseContext existingQueryEntries = getQueryResultEntries(result.getQuery());
 
             // Merge new entries into query result file
-            merger.merge(existingQueryEntries, queryResultEntries);
+            merger.merge(existingQueryEntries.getDatabase(), queryResultEntries);
             // Aggregate all new entries for every query into the study result
             merger.merge(newStudyResultEntries, queryResultEntries);
 
             writeResultToFile(getPathToQueryResultFile(result.getQuery()), existingQueryEntries);
         }
-        BibDatabase existingStudyResultEntries = getStudyResultEntries().getDatabase();
+        BibDatabaseContext existingStudyResultEntries = getStudyResultEntries();
 
         // Merge new entries into study result file
-        merger.merge(existingStudyResultEntries, newStudyResultEntries);
+        merger.merge(existingStudyResultEntries.getDatabase(), newStudyResultEntries);
 
         writeResultToFile(getPathToStudyResultFile(), existingStudyResultEntries);
     }
@@ -430,10 +424,10 @@ public class StudyRepository {
         targetEntries.getEntries().stream().filter(bibEntry -> !bibEntry.hasCitationKey()).forEach(citationKeyGenerator::generateAndSetKey);
     }
 
-    private void writeResultToFile(Path pathToFile, BibDatabase entries) throws SaveException {
+    private void writeResultToFile(Path pathToFile, BibDatabaseContext context) throws SaveException {
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {
             SaveConfiguration saveConfiguration = new SaveConfiguration()
-                    .withSaveOrder(SAVE_ORDER)
+                    .withSaveOrder(context.getMetaData().getSaveOrder().orElse(SaveOrder.getDefaultSaveOrder()))
                     .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
@@ -442,7 +436,7 @@ public class StudyRepository {
                     preferencesService.getFieldPreferences(),
                     preferencesService.getCitationKeyPatternPreferences(),
                     bibEntryTypesManager);
-            databaseWriter.saveDatabase(new BibDatabaseContext(entries));
+            databaseWriter.saveDatabase(context);
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));
         } catch (IOException ex) {
