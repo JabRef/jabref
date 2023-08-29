@@ -2255,7 +2255,8 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
     }
 
-    private SaveOrder getTableSaveOrder() {
+    @Override
+    public SaveOrder getTableSaveOrder() {
         List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
         List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
 

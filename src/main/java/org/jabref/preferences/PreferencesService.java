@@ -33,6 +33,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.metadata.SaveOrder;
 
 public interface PreferencesService {
 
@@ -69,6 +70,8 @@ public interface PreferencesService {
     LayoutFormatterPreferences getLayoutFormatterPreferences();
 
     ImportFormatPreferences getImportFormatPreferences();
+
+    SaveOrder getTableSaveOrder();
 
     SaveConfiguration getExportConfiguration();
 

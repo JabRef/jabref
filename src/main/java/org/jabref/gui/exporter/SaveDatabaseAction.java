@@ -90,11 +90,24 @@ public class SaveDatabaseAction {
         return this.saveAs(file, SaveDatabaseMode.NORMAL);
     }
 
+    private SaveOrder getSaveOrder() {
+        return libraryTab.getBibDatabaseContext()
+                .getMetaData().getSaveOrder()
+                .map(so -> {
+                    if (so.getOrderType().equals(SaveOrder.OrderType.TABLE)) {
+                        // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
+                        return preferences.getTableSaveOrder();
+                    } else {
+                        return so;
+                    }
+                })
+                .orElse(SaveOrder.getDefaultSaveOrder());
+    }
+
     public void saveSelectedAsPlain() {
         askForSavePath().ifPresent(path -> {
             try {
-                saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX,
-                        libraryTab.getBibDatabaseContext().getMetaData().getSaveOrder().orElse(SaveOrder.getDefaultSaveOrder()));
+                saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder());
                 frame.getFileHistory().newFile(path);
                 dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
@@ -211,9 +224,7 @@ public class SaveDatabaseAction {
             // Make sure to remember which encoding we used
             libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
-            // Save the database
-            boolean success = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA,
-                    libraryTab.getBibDatabaseContext().getMetaData().getSaveOrder().orElse(SaveOrder.getDefaultSaveOrder()));
+            boolean success = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getSaveOrder());
 
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();

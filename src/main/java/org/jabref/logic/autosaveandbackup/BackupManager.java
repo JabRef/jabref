@@ -224,9 +224,20 @@ public class BackupManager {
         }
 
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
+        SaveOrder saveOrder = bibDatabaseContext
+                .getMetaData().getSaveOrder()
+                .map(so -> {
+                    if (so.getOrderType().equals(SaveOrder.OrderType.TABLE)) {
+                        // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
+                        return preferences.getTableSaveOrder();
+                    } else {
+                        return so;
+                    }
+                })
+                .orElse(SaveOrder.getDefaultSaveOrder());
         SaveConfiguration saveConfiguration = new SaveConfiguration()
                 .withMakeBackup(false)
-                .withSaveOrder(bibDatabaseContext.getMetaData().getSaveOrder().orElse(SaveOrder.getDefaultSaveOrder()))
+                .withSaveOrder(saveOrder)
                 .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
