@@ -325,7 +325,7 @@ public class GroupTreeView extends BorderPane {
             }
         }
 
-        if (groupsToMove.size() > 0) {
+        if (!groupsToMove.isEmpty()) {
             localDragboard.clearAll();
         }
 

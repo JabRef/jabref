@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
 public class BvbFetcherTest {
@@ -30,7 +30,7 @@ public class BvbFetcherTest {
     void testPerformTest() throws Exception {
         String searchquery = "effective java author:bloch";
         List<BibEntry> result = fetcher.performSearch(searchquery);
-        assertTrue(result.size() > 0);
+        assertFalse(result.isEmpty());
 
 //        System.out.println("Query:\n");
 //        System.out.println(fetcher.getURLForQuery(new StandardSyntaxParser().parse(searchquery, NO_EXPLICIT_FIELD)));

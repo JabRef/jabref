@@ -105,7 +105,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     }
 
     private String createFileTooltip(List<LinkedFile> linkedFiles) {
-        if (linkedFiles.size() > 0) {
+        if (!linkedFiles.isEmpty()) {
             return Localization.lang("Open file %0", linkedFiles.get(0).getLink());
         }
         return null;
