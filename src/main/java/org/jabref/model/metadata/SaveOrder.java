@@ -11,9 +11,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Stores the save order config from MetaData
+ * Stores the save order config for a library
  * <p>
- * Format: &lt;choice>, a pair of field + ascending (boolean)
+ * Format: &lt;choice> ({@link OrderType}, a pair of {@link Field} + descending (boolean)
+ * </p>
+ * <p>
+ * Note that {@link OrderType#TABLE} can only be used as "intermediate" setting. When passing <code>SaveOrder</code>
+ * to {@link org.jabref.logic.exporter.BibDatabaseWriter}, the orderType must be different. Reason: The writer
+ * does not have access to the UI.
+ * </p>
  */
 public class SaveOrder {
 

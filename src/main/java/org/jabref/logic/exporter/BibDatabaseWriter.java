@@ -70,6 +70,7 @@ public abstract class BibDatabaseWriter {
         this.saveConfiguration = saveConfiguration;
         this.keyPatternPreferences = keyPatternPreferences;
         this.entryTypesManager = entryTypesManager;
+        assert saveConfiguration.getSaveOrder().getOrderType() != SaveOrder.OrderType.TABLE;
     }
 
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
