@@ -188,6 +188,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 libraryTab.getUndoManager(),
                 dialogService,
                 stateManager);
+
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, rightClickMenuFactory).show(true);
     }
@@ -198,7 +199,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
      * @param sortedColumn The sorted column in {@link MainTable}
      * @param keyEvent     The pressed character
      */
-
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
         if ((keyEvent.getCharacter() == null) || (sortedColumn == null)) {
             return;

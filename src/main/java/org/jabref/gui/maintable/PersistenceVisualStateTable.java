@@ -1,8 +1,10 @@
 package org.jabref.gui.maintable;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.maintable.columns.MainTableColumn;
@@ -36,25 +38,28 @@ public class PersistenceVisualStateTable {
     }
 
     /**
-     * Stores shown columns, their width and their sortType in preferences.
+     * Stores shown columns, their width and their {@link TableColumn.SortType} in preferences.
+     * The conversion to the "real" string in the preferences is made at
+     * {@link org.jabref.preferences.JabRefPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
      */
     private void updateColumns() {
-        preferences.setColumns(
-                table.getColumns().stream()
-                     .filter(col -> col instanceof MainTableColumn<?>)
-                     .map(column -> ((MainTableColumn<?>) column).getModel())
-                     .collect(Collectors.toList()));
+        preferences.setColumns(toList(table.getColumns()));
     }
 
     /**
-     * Stores the SortOrder of the Table in the preferences. Cannot be combined with updateColumns, because JavaFX
-     * would provide just an empty list for the sort order on other changes.
+     * Stores the SortOrder of the Table in the preferences. This includes {@link TableColumn.SortType}.
+     * <br>
+     * Cannot be combined with updateColumns, because JavaFX would provide just an empty list for the sort order
+     * on other changes.
      */
     private void updateSortOrder() {
-        preferences.setColumnSortOrder(
-                table.getSortOrder().stream()
-                     .filter(col -> col instanceof MainTableColumn<?>)
-                     .map(column -> ((MainTableColumn<?>) column).getModel())
-                     .collect(Collectors.toList()));
+        preferences.setColumnSortOrder(toList(table.getSortOrder()));
+    }
+
+    private List<MainTableColumnModel> toList(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
+        return columns.stream()
+                .filter(col -> col instanceof MainTableColumn<?>)
+                .map(column -> ((MainTableColumn<?>) column).getModel())
+                .collect(Collectors.toList());
     }
 }
