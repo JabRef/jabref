@@ -72,6 +72,7 @@ class CrawlerTest {
         importerPreferences = mock(ImporterPreferences.class);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 

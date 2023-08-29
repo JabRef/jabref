@@ -120,7 +120,7 @@ public class MetaDataParser {
                     metaData.markAsNotProtected();
                 }
             } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
-                metaData.setSaveOrder(SaveOrder.parse(values));
+                metaData.setSaveOrderConfig(SaveOrder.parse(values));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
                 metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
             } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {

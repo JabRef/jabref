@@ -81,11 +81,11 @@ public class MetaData {
         // Do nothing
     }
 
-    public Optional<SaveOrder> getSaveOrder() {
+    public Optional<SaveOrder> getSaveOrderConfig() {
         return Optional.ofNullable(saveOrder);
     }
 
-    public void setSaveOrder(SaveOrder saveOrder) {
+    public void setSaveOrderConfig(SaveOrder saveOrder) {
         this.saveOrder = saveOrder;
         postChange();
     }
@@ -270,7 +270,7 @@ public class MetaData {
         postChange();
     }
 
-    public void clearSaveOrder() {
+    public void clearSaveOrderConfig() {
         saveOrder = null;
         postChange();
     }

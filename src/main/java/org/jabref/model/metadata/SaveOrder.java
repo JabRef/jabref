@@ -13,18 +13,49 @@ import org.slf4j.LoggerFactory;
 /**
  * Stores the save order config from MetaData
  * <p>
- * Format: &lt;choice>, a pair of field + ascending (boolean)
+ * Format: &lt;choice>, pair of field + ascending (boolean)
  */
 public class SaveOrder {
 
+    public enum OrderType {
+        SPECIFIED("specified"),
+        ORIGINAL("original"),
+        TABLE("table");
+
+        private final String name;
+
+        OrderType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        public static SaveOrder.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
+            SaveOrder.OrderType orderType = SaveOrder.OrderType.TABLE;
+            if (saveInSpecifiedOrder) {
+                orderType = SaveOrder.OrderType.SPECIFIED;
+            } else if (saveInOriginalOrder) {
+                orderType = SaveOrder.OrderType.ORIGINAL;
+            }
+
+            return orderType;
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrder.class);
 
-    private final OrderType orderType;
-    private final List<SortCriterion> sortCriteria;
+    private final List<SortCriterion> sortCriteria = new ArrayList<>();
+    private OrderType orderType;
+
+    private SaveOrder() {
+    }
 
     public SaveOrder(OrderType orderType, List<SortCriterion> sortCriteria) {
         this.orderType = orderType;
-        this.sortCriteria = sortCriteria;
+        this.sortCriteria.addAll(sortCriteria);
     }
 
     private SaveOrder(List<String> data) {
@@ -34,27 +65,22 @@ public class SaveOrder {
             throw new IllegalArgumentException();
         }
 
-        OrderType orderType;
         try {
-            orderType = OrderType.valueOf(data.get(0).toUpperCase());
+            this.orderType = OrderType.valueOf(data.get(0).toUpperCase());
         } catch (IllegalArgumentException ex) {
             if (data.size() > 1 && data.size() % 2 == 1) {
                 LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.get(0));
-                orderType = OrderType.SPECIFIED;
+                this.orderType = OrderType.SPECIFIED;
             } else {
                 LOGGER.warn("Could not parse sort order: {}", data.get(0));
-                this.sortCriteria = List.of();
                 this.orderType = OrderType.ORIGINAL;
                 return;
             }
         }
-        this.orderType = orderType;
 
-        List<SortCriterion> sortCriteria = new ArrayList<>(data.size() / 2);
         for (int index = 1; index < data.size(); index = index + 2) {
             sortCriteria.add(new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1)));
         }
-        this.sortCriteria = sortCriteria;
     }
 
     public static SaveOrder parse(List<String> orderedData) {
@@ -62,7 +88,9 @@ public class SaveOrder {
     }
 
     public static SaveOrder getDefaultSaveOrder() {
-        return new SaveOrder(OrderType.ORIGINAL, List.of());
+        SaveOrder standard = new SaveOrder();
+        standard.orderType = OrderType.ORIGINAL;
+        return standard;
     }
 
     public OrderType getOrderType() {
@@ -118,18 +146,12 @@ public class SaveOrder {
 
     public static class SortCriterion {
 
-        public final Field field;
+        public Field field;
 
-        public final boolean descending;
-
-        /**
-         * Given field sorted ascending
-         */
-        public SortCriterion(Field field) {
-            this(field, false);
-        }
+        public boolean descending;
 
         /**
+         *
          * @param field The field
          * @param descending Must be a boolean value as string, e.g. "true", "false"
          */
@@ -141,6 +163,9 @@ public class SaveOrder {
         public SortCriterion(Field field, boolean descending) {
             this.field = field;
             this.descending = descending;
+        }
+
+        public SortCriterion() {
         }
 
         @Override
@@ -166,34 +191,6 @@ public class SaveOrder {
         @Override
         public int hashCode() {
             return Objects.hash(field, descending);
-        }
-    }
-
-    public enum OrderType {
-        SPECIFIED("specified"),
-        ORIGINAL("original"),
-        TABLE("table");
-
-        private final String name;
-
-        OrderType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-        public static SaveOrder.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
-            SaveOrder.OrderType orderType = SaveOrder.OrderType.TABLE;
-            if (saveInSpecifiedOrder) {
-                orderType = SaveOrder.OrderType.SPECIFIED;
-            } else if (saveInOriginalOrder) {
-                orderType = SaveOrder.OrderType.ORIGINAL;
-            }
-
-            return orderType;
         }
     }
 }

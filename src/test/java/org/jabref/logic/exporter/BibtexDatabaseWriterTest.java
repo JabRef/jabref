@@ -84,6 +84,7 @@ public class BibtexDatabaseWriterTest {
         fieldPreferences = new FieldPreferences(true, Collections.emptyList(), Collections.emptyList());
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
         citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
         stringWriter = new StringWriter();
@@ -737,7 +738,7 @@ public class BibtexDatabaseWriterTest {
                 List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
                         new SaveOrder.SortCriterion(StandardField.YEAR, true),
                         new SaveOrder.SortCriterion(StandardField.ABSTRACT, false)));
-        metaData.setSaveOrder(saveOrder);
+        metaData.setSaveOrderConfig(saveOrder);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
@@ -798,7 +799,7 @@ public class BibtexDatabaseWriterTest {
                 List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
                         new SaveOrder.SortCriterion(StandardField.YEAR, true),
                         new SaveOrder.SortCriterion(StandardField.ABSTRACT, false)));
-        metaData.setSaveOrder(saveOrder);
+        metaData.setSaveOrderConfig(saveOrder);
 
         BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "A")

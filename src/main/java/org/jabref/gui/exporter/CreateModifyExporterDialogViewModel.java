@@ -67,7 +67,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
                 layoutFile.get(),
                 extension.get(),
                 preferences.getLayoutFormatterPreferences(),
-                preferences.getExportConfiguration().getSaveOrder());
+                preferences.getExportConfiguration());
         format.setCustomExport(true);
         return new ExporterViewModel(format);
     }

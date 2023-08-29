@@ -1,7 +1,6 @@
 package org.jabref.gui.libraryproperties.saving;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,21 +18,12 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.CleanupPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class SavingPropertiesViewModel implements PropertiesTabViewModel {
-
-    private static final SaveOrder UI_DEFAULT_SAVE_ORDER = new SaveOrder(SaveOrder.OrderType.ORIGINAL, List.of(
-            new SaveOrder.SortCriterion(StandardField.AUTHOR),
-            new SaveOrder.SortCriterion(StandardField.YEAR),
-            new SaveOrder.SortCriterion(StandardField.TITLE),
-            // Pro users generate their citation keys well. They can just delete the above three proposals and get a well-sorted library.
-            new SaveOrder.SortCriterion(InternalField.KEY_FIELD)
-    ));
 
     private final BooleanProperty protectDisableProperty = new SimpleBooleanProperty();
     private final BooleanProperty libraryProtectedProperty = new SimpleBooleanProperty();
@@ -51,23 +41,24 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
-    private final SaveOrder saveOrder;
+    private final SaveOrder exportSaveOrder;
     private final PreferencesService preferencesService;
 
     public SavingPropertiesViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService) {
         this.databaseContext = databaseContext;
         this.preferencesService = preferencesService;
         this.initialMetaData = databaseContext.getMetaData();
-        this.saveOrder = initialMetaData.getSaveOrder().orElse(UI_DEFAULT_SAVE_ORDER);
+        this.exportSaveOrder = initialMetaData.getSaveOrderConfig()
+                                              .orElseGet(() -> preferencesService.getExportPreferences().getExportSaveOrder());
     }
 
     @Override
     public void setValues() {
         libraryProtectedProperty.setValue(initialMetaData.isProtected());
 
-        // SaveOrderConfigPanel, included via <?import ...> in FXML
+        // SaveOrderConfigPanel
 
-        switch (saveOrder.getOrderType()) {
+        switch (exportSaveOrder.getOrderType()) {
             case SPECIFIED -> saveInSpecifiedOrderProperty.setValue(true);
             case ORIGINAL -> saveInOriginalProperty.setValue(true);
             case TABLE -> saveInTableOrderProperty.setValue(true);
@@ -83,11 +74,11 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         sortableFieldsProperty.addAll(FieldFactory.getStandardFieldsWithCitationKey());
         sortCriteriaProperty.clear();
-        sortCriteriaProperty.addAll(saveOrder.getSortCriteria().stream()
-                                             .map(SortCriterionViewModel::new)
-                                             .toList());
+        sortCriteriaProperty.addAll(exportSaveOrder.getSortCriteria().stream()
+                                                   .map(SortCriterionViewModel::new)
+                                                   .toList());
 
-        // FieldFormatterCleanupsPanel, included via <?import ...> in FXML
+        // FieldFormatterCleanupsPanel
 
         Optional<FieldFormatterCleanups> saveActions = initialMetaData.getSaveActions();
         saveActions.ifPresentOrElse(value -> {
@@ -129,11 +120,11 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
                 SaveOrder.OrderType.fromBooleans(saveInSpecifiedOrderProperty.getValue(), saveInOriginalProperty.getValue()),
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
 
-        if (!newSaveOrder.equals(saveOrder)) {
+        if (!newSaveOrder.equals(exportSaveOrder)) {
             if (newSaveOrder.equals(SaveOrder.getDefaultSaveOrder())) {
-                newMetaData.clearSaveOrder();
+                newMetaData.clearSaveOrderConfig();
             } else {
-                newMetaData.setSaveOrder(newSaveOrder);
+                newMetaData.setSaveOrderConfig(newSaveOrder);
             }
         }
 
