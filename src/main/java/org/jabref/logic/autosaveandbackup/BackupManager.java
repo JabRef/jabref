@@ -215,11 +215,11 @@ public class BackupManager {
 
         // We opted for "while" to delete backups in case there are more than 10
         while (backupFilesQueue.size() >= MAXIMUM_BACKUP_FILE_COUNT) {
-            Path lessRecentBackupFile = backupFilesQueue.poll();
+            Path oldestBackupFile = backupFilesQueue.poll();
             try {
-                Files.delete(lessRecentBackupFile);
+                Files.delete(oldestBackupFile);
             } catch (IOException e) {
-                LOGGER.error("Could not delete backup file {}", lessRecentBackupFile, e);
+                LOGGER.error("Could not delete backup file {}", oldestBackupFile, e);
             }
         }
 
