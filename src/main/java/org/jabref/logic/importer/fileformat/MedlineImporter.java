@@ -1208,7 +1208,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        if (collectiveNames.size() > 0) {
+        if (!collectiveNames.isEmpty()) {
             authorNames.addAll(collectiveNames);
         }
         if (!authorName.toString().isBlank()) {
