@@ -129,7 +129,7 @@ recipeList:
   - org.openrewrite.staticanalysis.IndexOfReplaceableByContains
 #  - org.openrewrite.staticanalysis.IndexOfShouldNotCompareGreaterThanZero
   - org.openrewrite.staticanalysis.InstanceOfPatternMatch
-#  - org.openrewrite.staticanalysis.IsEmptyCallOnCollections
+  - org.openrewrite.staticanalysis.IsEmptyCallOnCollections
 #  - org.openrewrite.staticanalysis.MissingOverrideAnnotation
 #  - org.openrewrite.staticanalysis.ModifierOrder
   - org.openrewrite.staticanalysis.MultipleVariableDeclarations
