@@ -32,6 +32,7 @@ import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,11 +68,15 @@ public class JabRefGUI {
 
         openWindow(mainStage);
 
-        new VersionWorker(Globals.BUILD_INFO.version,
-                mainFrame.getDialogService(),
-                Globals.TASK_EXECUTOR,
-                preferencesService.getInternalPreferences())
-                .checkForNewVersionDelayed();
+        EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
+            if (enabled) {
+                new VersionWorker(Globals.BUILD_INFO.version,
+                        mainFrame.getDialogService(),
+                        Globals.TASK_EXECUTOR,
+                        preferencesService.getInternalPreferences())
+                        .checkForNewVersionDelayed();
+            }
+        });
 
         setupProxy();
     }

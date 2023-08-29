@@ -212,9 +212,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vb.setSpacing(10);
 
         button.setOnAction(event -> {
-            preferences.setIsMrdlibAccepted(true);
-
             MrDlibPreferences mrDlibPreferences = preferencesService.getMrDlibPreferences();
+            mrDlibPreferences.setAcceptRecommendations(true);
             mrDlibPreferences.setSendLanguage(cbLanguage.isSelected());
             mrDlibPreferences.setSendOs(cbOS.isSelected());
             mrDlibPreferences.setSendTimezone(cbTimezone.isSelected());
@@ -237,7 +236,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         // Ask for consent to send data to Mr. DLib on first time to tab
-        if (preferences.isMrdlibAccepted()) {
+        if (preferencesService.getMrDlibPreferences().shouldAcceptRecommendations()) {
             setContent(getRelatedArticlesPane(entry));
         } else {
             setContent(getPrivacyDialog(entry));

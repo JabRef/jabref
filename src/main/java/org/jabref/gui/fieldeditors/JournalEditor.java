@@ -77,7 +77,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void showJournalInfo() {
-        if (JournalInfoOptInDialogHelper.isJournalInfoEnabled(dialogService, preferencesService.getJournalInformationPreferences())) {
+        if (JournalInfoOptInDialogHelper.isJournalInfoEnabled(dialogService, preferencesService.getEntryEditorPreferences())) {
             viewModel.showJournalInfo(journalInfoButton);
         }
     }

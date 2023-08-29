@@ -13,8 +13,8 @@ import javafx.util.Pair;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.fetcher.JournalInformationFetcher;
 import org.jabref.logic.journals.JournalInformation;
-import org.jabref.logic.journals.JournalInformationFetcher;
 
 public class JournalInfoViewModel extends AbstractViewModel {
     private final ReadOnlyStringWrapper title = new ReadOnlyStringWrapper();
