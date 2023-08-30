@@ -39,6 +39,8 @@ public class SearchFunctionalityTest {
     private BibDatabase database;
     private PdfSearcher search;
     private BibDatabaseContext context;
+    private FilePreferences filePreferences;
+    private PdfIndexer indexer;
     BibEntry entry1A = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("entry1")
             .withField(StandardField.AUTHOR, "Test")
@@ -91,9 +93,10 @@ public class SearchFunctionalityTest {
 
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
-        FilePreferences filePreferences = mock(FilePreferences.class);
+        filePreferences = mock(FilePreferences.class);
         database = new BibDatabase();
         context = mock(BibDatabaseContext.class);
+        indexer = PdfIndexer.of(context, filePreferences);
         entry1C.addFile(new LinkedFile("Minimal", "minimal.pdf", StandardFileType.PDF.getName()));
         entry2C.addFile(new LinkedFile("Minimal 1", "minimal1.pdf", StandardFileType.PDF.getName()));
         entry3C.addFile(new LinkedFile("Minimal 2", "minimal2.pdf", StandardFileType.PDF.getName()));
@@ -104,12 +107,6 @@ public class SearchFunctionalityTest {
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
-
-        PdfIndexer indexer = PdfIndexer.of(context, filePreferences);
-        search = PdfSearcher.of(context);
-
-        indexer.createIndex();
-        indexer.addToIndex(context);
     }
 
     private void initializeDatabaseFromPath(Path testFile) throws IOException {
@@ -118,6 +115,9 @@ public class SearchFunctionalityTest {
 
         database = context.getDatabase();
         search = PdfSearcher.of(context);
+
+        indexer.addToIndex(context);
+        indexer.createIndex();
     }
 
     @Test
@@ -216,8 +216,24 @@ public class SearchFunctionalityTest {
     public void testSimplePDFFulltextSearch() throws IOException, URISyntaxException {
         initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-C.bib").toURI()));
 
+        //Positive search test
         PdfSearchResults result = search.search("This is a short sentence, comma included.", 10);
         assertEquals(6, result.numSearchResults());
+        //Negative search test
+        PdfSearchResults emptyResult = search.search("This is a test.", 10);
+        assertEquals(0, emptyResult.numSearchResults());
+    }
+
+    @Test
+    public void testSimplePDFNoteFulltextSearch() throws IOException, URISyntaxException {
+        initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-C.bib").toURI()));
+
+        //Positive search test
+        PdfSearchResults result = search.search("Hello World", 10);
+        assertEquals(3, result.numSearchResults());
+        //Negative search test
+        PdfSearchResults emptyResult = search.search("User Test", 10);
+        assertEquals(0, emptyResult.numSearchResults());
     }
 }
 
