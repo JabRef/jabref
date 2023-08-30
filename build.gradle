@@ -386,6 +386,8 @@ javadoc {
             'javafx.controls/com.sun.javafx.scene.control=org.jabref',
             'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
         ])
+        docletpath = configurations.javadocTaglets.files.asType(List)
+        doclet = ["org.jdrupes.taglets.plantUml.PlantUml"]
     }
 }
 
@@ -393,8 +395,6 @@ task generateDocs(type: Javadoc) {
     group = 'documentation'
     source = sourceSets.main.allJava
     destinationDir = reporting.file("jabref-docs")
-    options.docletpath = configurations.javadocTaglets.files.asType(List)
-    options.doclet = ["org.jdrupes.taglets.plantUml.PlantUml"]
 }
 
 test {
