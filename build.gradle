@@ -99,6 +99,7 @@ configurations {
         extendsFrom implementation
         exclude group: "javax.activation"
     }
+    javadocTaglets
 }
 
 dependencyLocking {
@@ -235,6 +236,8 @@ dependencies {
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.2.1"))
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
+
+    javadocTaglets "org.jdrupes.taglets:plantuml-taglet:2.1.0"
 }
 
 clean {
@@ -379,11 +382,19 @@ javadoc {
         encoding = 'UTF-8'
         version = false
         author = false
-         addMultilineStringsOption("-add-exports").setValue([
+        addMultilineStringsOption("-add-exports").setValue([
             'javafx.controls/com.sun.javafx.scene.control=org.jabref',
             'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
         ])
     }
+}
+
+task generateDocs(type: Javadoc) {
+    group = 'documentation'
+    source = sourceSets.main.allJava
+    destinationDir = reporting.file("jabref-docs")
+    options.docletpath = configurations.javadocTaglets.files.asType(List)
+    options.doclet = ["org.jdrupes.taglets.plantUml.PlantUml"]
 }
 
 test {
