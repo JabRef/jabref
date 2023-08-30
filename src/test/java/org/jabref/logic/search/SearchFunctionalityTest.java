@@ -96,7 +96,6 @@ public class SearchFunctionalityTest {
         filePreferences = mock(FilePreferences.class);
         database = new BibDatabase();
         context = mock(BibDatabaseContext.class);
-        indexer = PdfIndexer.of(context, filePreferences);
         entry1C.addFile(new LinkedFile("Minimal", "minimal.pdf", StandardFileType.PDF.getName()));
         entry2C.addFile(new LinkedFile("Minimal 1", "minimal1.pdf", StandardFileType.PDF.getName()));
         entry3C.addFile(new LinkedFile("Minimal 2", "minimal2.pdf", StandardFileType.PDF.getName()));
@@ -107,6 +106,10 @@ public class SearchFunctionalityTest {
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
+
+        indexer = PdfIndexer.of(context, filePreferences);
+
+        indexer.createIndex();
     }
 
     private void initializeDatabaseFromPath(Path testFile) throws IOException {
@@ -117,7 +120,6 @@ public class SearchFunctionalityTest {
         search = PdfSearcher.of(context);
 
         indexer.addToIndex(context);
-        indexer.createIndex();
     }
 
     @Test
