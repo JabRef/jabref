@@ -86,4 +86,13 @@ public class ContentSelectors {
     public int hashCode() {
         return Objects.hash(contentSelectors);
     }
+
+    @Override
+    public String toString() {
+        return "ContentSelectors{" +
+                "contentSelectors=" + contentSelectors +
+                ", fieldsWithSelectors=" + getFieldsWithSelectors() +
+                '}';
+    }
+
 }

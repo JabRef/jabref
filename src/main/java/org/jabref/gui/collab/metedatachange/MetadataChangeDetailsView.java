@@ -17,8 +17,10 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         header.getStyleClass().add("sectionHeader");
         container.getChildren().add(header);
 
-        for (MetaDataDiff.Difference change : metadataChange.getMetaDataDiff().getDifferences(preferencesService)) {
-            container.getChildren().add(new Label(getDifferenceString(change)));
+        for (MetaDataDiff.Difference diff : metadataChange.getMetaDataDiff().getDifferences(preferencesService)) {
+            container.getChildren().add(new Label(getDifferenceString(diff.differenceType())));
+            container.getChildren().add(new Label(diff.originalObject().toString()));
+            container.getChildren().add(new Label(diff.newObject().toString()));
         }
 
         setLeftAnchor(container, 8d);
@@ -29,8 +31,8 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         getChildren().setAll(container);
     }
 
-    private String getDifferenceString(MetaDataDiff.Difference change) {
-        return switch (change) {
+    private String getDifferenceString(MetaDataDiff.DifferenceType changeType) {
+        return switch (changeType) {
             case PROTECTED ->
                     Localization.lang("Library protection");
             case GROUPS_ALTERED ->
