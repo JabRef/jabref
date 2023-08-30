@@ -70,6 +70,18 @@ jobs:
         with:
           args: CHANGELOG.md CONTRIBUTING.md README.md
           config: '.markdownlint.yml'
+  javadoc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 20
+          distribution: 'temurin'
+          cache: 'gradle'
+      - run: ./gradlew generateDocs
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
