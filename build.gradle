@@ -377,8 +377,8 @@ run {
 javadoc {
     options {
         encoding = 'UTF-8'
-        version = true
-        author = true
+        version = false
+        author = false
          addMultilineStringsOption("-add-exports").setValue([
             'javafx.controls/com.sun.javafx.scene.control=org.jabref',
             'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
