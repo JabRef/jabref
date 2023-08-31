@@ -135,7 +135,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the ACM Portal search sometimes would not return entries for some search queries when the article author had no given name [#10107](https://github.com/JabRef/jabref/issues/10107)
 - We fixed an issue that caused high CPU usage and a zombie process after quitting JabRef because of author names autocompletion [#10159](https://github.com/JabRef/jabref/pull/10159)
 - We fixed an issue where files with illegal characters in the filename could be added to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
-- We fixed that checked-out radio buttons under "specified keywords" were not displayed as checked after closing and reopening the "edit group" window
+- We fixed that checked-out radio buttons under "specified keywords" were not displayed as checked after closing and reopening the "edit group" window. [#10248](https://github.com/JabRef/jabref/issues/10248)
+  
 ### Removed
 
 - We removed the support of BibTeXML. [#9540](https://github.com/JabRef/jabref/issues/9540)
