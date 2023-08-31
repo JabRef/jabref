@@ -334,6 +334,7 @@ public class GroupDialogViewModel {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
                     char delimiter = ',';
                     char hierarDelimiter = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
+                    autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
                     // Modify values for delimiters if user provided customized values
                     if (!autoGroupKeywordsDelimiterProperty.getValue().isEmpty()) {
                         delimiter = autoGroupKeywordsDelimiterProperty.getValue().charAt(0);
@@ -423,11 +424,13 @@ public class GroupDialogViewModel {
 
                 if (editedGroup.getClass() == AutomaticKeywordGroup.class) {
                     AutomaticKeywordGroup group = (AutomaticKeywordGroup) editedGroup;
+                    autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
                     autoGroupKeywordsDelimiterProperty.setValue(group.getKeywordDelimiter().toString());
                     autoGroupKeywordsHierarchicalDelimiterProperty.setValue(group.getKeywordHierarchicalDelimiter().toString());
                     autoGroupKeywordsFieldProperty.setValue(group.getField().getName());
                 } else if (editedGroup.getClass() == AutomaticPersonsGroup.class) {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
+                    autoGroupPersonsOptionProperty.setValue(Boolean.TRUE);
                     autoGroupPersonsFieldProperty.setValue(group.getField().getName());
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
