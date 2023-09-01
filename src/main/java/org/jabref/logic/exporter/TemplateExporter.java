@@ -29,8 +29,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.metadata.SaveOrder;
-
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

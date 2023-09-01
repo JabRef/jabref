@@ -1,12 +1,12 @@
 package org.jabref.model.entry.field;
 
-import com.google.common.base.Objects;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.StringJoiner;
+
+import com.google.common.base.Objects;
 
 public class OrFields implements Comparable<OrFields> {
 
