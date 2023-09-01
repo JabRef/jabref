@@ -19,8 +19,8 @@ public class SelfContainedSaveOrder extends SaveOrder {
      * @throws IllegalArgumentException if {@code saveOrder} has {@link OrderType#TABLE}
      */
     public static SelfContainedSaveOrder of(SaveOrder saveOrder) {
-        if (saveOrder instanceof SelfContainedSaveOrder) {
-            return (SelfContainedSaveOrder) saveOrder;
+        if (saveOrder instanceof SelfContainedSaveOrder order) {
+            return order;
         }
         return new SelfContainedSaveOrder(saveOrder.getOrderType(), saveOrder.getSortCriteria());
     }

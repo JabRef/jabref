@@ -235,7 +235,7 @@ public class BackupManager {
         SelfContainedSaveOrder saveOrder = bibDatabaseContext
                 .getMetaData().getSaveOrder()
                 .map(so -> {
-                    if (so.getOrderType().equals(SaveOrder.OrderType.TABLE)) {
+                    if (so.getOrderType() == SaveOrder.OrderType.TABLE) {
                         // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
                         List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
                         return new SelfContainedSaveOrder(
