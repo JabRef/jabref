@@ -229,7 +229,7 @@ public class BackupManager {
                 .map(so -> {
                     if (so.getOrderType().equals(SaveOrder.OrderType.TABLE)) {
                         // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
-                        return preferences.getTableSaveOrder();
+                        return new SaveOrder(SaveOrder.OrderType.SPECIFIED, preferences.getTableSaveOrder().getSortCriteria());
                     } else {
                         return so;
                     }
