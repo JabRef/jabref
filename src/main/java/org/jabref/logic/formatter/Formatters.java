@@ -28,7 +28,6 @@ import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
@@ -81,7 +80,6 @@ public class Formatters {
                 new EscapeDollarSignFormatter(),
                 new ShortenDOIFormatter(),
                 new ReplaceUnicodeLigaturesFormatter(),
-                new ProtectTermsFormatter(),
                 new UnprotectTermsFormatter()
         );
     }
@@ -98,21 +96,16 @@ public class Formatters {
         Objects.requireNonNull(modifier);
 
         switch (modifier) {
-            case "lower" -> {
+            case "lower":
                 return Optional.of(new LowerCaseFormatter());
-            }
-            case "upper" -> {
+            case "upper":
                 return Optional.of(new UpperCaseFormatter());
-            }
-            case "capitalize" -> {
+            case "capitalize":
                 return Optional.of(new CapitalizeFormatter());
-            }
-            case "titlecase" -> {
+            case "titlecase":
                 return Optional.of(new TitleCaseFormatter());
-            }
-            case "sentencecase" -> {
+            case "sentencecase":
                 return Optional.of(new SentenceCaseFormatter());
-            }
         }
 
         if (modifier.startsWith(RegexFormatter.KEY)) {
