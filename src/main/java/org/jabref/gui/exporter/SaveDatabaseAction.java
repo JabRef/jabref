@@ -103,7 +103,7 @@ public class SaveDatabaseAction {
                     if (so.getOrderType().equals(SaveOrder.OrderType.TABLE)) {
                         // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
                         List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
-                        new SelfContainedSaveOrder(
+                        return new SelfContainedSaveOrder(
                                 SaveOrder.OrderType.SPECIFIED,
                                 sortOrder.stream()
                                          .filter(col -> col instanceof MainTableColumn<?>)
