@@ -100,9 +100,9 @@ public class FieldComparator implements Comparator<BibEntry> {
         if ((f1 == null) && (f2 == null)) {
             return 0;
         } else if (f1 == null) {
-            return multiplier;
-        } else if (f2 == null) {
             return -multiplier;
+        } else if (f2 == null) {
+            return +multiplier;
         }
 
         // Now we know that both f1 and f2 are != null
