@@ -480,4 +480,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
     }
+
+    public static List<MainTableColumnModel> toColumnModels(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
+        return columns.stream()
+                      .filter(col -> col instanceof MainTableColumn<?>)
+                      .map(column -> ((MainTableColumn<?>) column).getModel())
+                      .collect(Collectors.toList());
+    }
 }

@@ -18,7 +18,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import javafx.scene.control.TableColumn;
+
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
+import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -59,17 +66,19 @@ public class BackupManager {
     private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
+    private final LibraryTab libraryTab;
 
     // Contains a list of all backup paths
     // During a write, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
     private boolean needsBackup = false;
 
-    BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
+    BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.executor = new ScheduledThreadPoolExecutor(2);
+        this.libraryTab = libraryTab;
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -97,8 +106,8 @@ public class BackupManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static BackupManager start(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
-        BackupManager backupManager = new BackupManager(bibDatabaseContext, entryTypesManager, preferences);
+    public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
+        BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
         runningInstances.add(backupManager);
         return backupManager;
@@ -230,7 +239,14 @@ public class BackupManager {
                 .map(so -> {
                     if (so.getOrderType().equals(SaveOrder.OrderType.TABLE)) {
                         // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
-                        return new SelfContainedSaveOrder(SaveOrder.OrderType.SPECIFIED, preferences.getTableSaveOrder().getSortCriteria());
+                        List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
+                        return new SelfContainedSaveOrder(
+                                SaveOrder.OrderType.SPECIFIED,
+                                sortOrder.stream()
+                                         .filter(col -> col instanceof MainTableColumn<?>)
+                                         .map(column -> ((MainTableColumn<?>) column).getModel())
+                                         .map(MainTableColumnModel::getSortCriterion)
+                                         .collect(Collectors.toList()));
                     } else {
                         return SelfContainedSaveOrder.of(so);
                     }
