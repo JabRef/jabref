@@ -18,8 +18,8 @@ public class OrFields implements Comparable<OrFields> {
         Arrays.stream(fieldsToAdd).forEach(fields::add);
     }
 
-    public OrFields(Collection<Field> fields) {
-        fields.addAll(fields);
+    public OrFields(Collection<Field> fieldsToAdd) {
+        fields.addAll(fieldsToAdd);
     }
 
     public String getDisplayName() {
