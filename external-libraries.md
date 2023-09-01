@@ -99,13 +99,6 @@ License: BSD-3-Clause
 ```
 
 ```yaml
-Id:      com.github.jnr
-Project: The Java Native Runtime Project
-URL:     https://github.com/jnr
-License: BSD-3-Clause
-```
-
-```yaml
 Id:      com.github.JabRef
 Project: afterburner.fx
 URL:     https://github.com/JabRef/afterburner.fx
@@ -289,6 +282,13 @@ License: Apache-2.0
 ```
 
 ```yaml
+Id:      de.swiesend:secret-service
+Project: Secret Service
+URL:     https://github.com/swiesend/secret-service
+License: MIT
+```
+
+```yaml
 Id:      de.saxsys:mvvmfx-validation
 Project: mvvm(fx)
 URL:     https://github.com/sialcasa/mvvmFX
@@ -429,13 +429,6 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      org.apache.tika:tika-core
-Project: Apache Tika
-URL:     https://tika.apache.org/
-License: Apache-2.0
-```
-
-```yaml
 Id:      org.bouncycastle:bcprov-jdk15on
 Project: The Legion of the Bouncy Castle
 URL:     https://www.bouncycastle.org/
@@ -499,6 +492,13 @@ License: Unicode License (https://www.unicode.org/copyright.html)
 Note:    Our own fork https://github.com/JabRef/icu. Upstream PR: https://github.com/unicode-org/icu/pull/2127
 Path:    lib/icu4j.jar
 SourcePath: lib/ic4j-src.jar
+```
+
+```yaml
+Id:      org.jooq:jool
+Project: JOOλ
+URL:     https://github.com/jOOQ/jOOL
+License: Apache-2.0
 ```
 
 ```yaml
@@ -611,6 +611,27 @@ Id:      org.yaml:snakeyaml
 Project: SnakeYAML
 URL:     https://bitbucket.org/snakeyaml/snakeyaml-engine/src/master/
 License: Apache-2.0
+```
+
+```yaml
+Id:      pt.davidafsilva.apple:jkeychain
+Project: JKeyChain
+URL:     https://github.com/davidafsilva/jkeychain
+License: BSD-2-Clause
+```
+
+```yaml
+Id:      tech.units:indriya
+Project: Indriya - JSR 385 - Reference Implementation
+URL:     https://github.com/unitsofmeasurement/indriya
+License: BSD-3-Clause
+```
+
+```yaml
+Id:      tech.uom.lib:uom-lib-common
+Project: Units of Measurement Libraries - extending and complementing JSR 385
+URL:     https://github.com/unitsofmeasurement/uom-lib
+License: BSD-3-Clause
 ```
 
 ## Sorted list of runtime dependencies output by gradle
