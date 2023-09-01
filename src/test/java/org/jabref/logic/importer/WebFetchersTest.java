@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
@@ -77,10 +78,10 @@ class WebFetchersTest {
             expected.remove(EbookDeIsbnFetcher.class);
             expected.remove(GvkFetcher.class);
             expected.remove(DoiToBibtexConverterComIsbnFetcher.class);
-
             // Remove the following, because they don't work at the moment
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
+            expected.remove(CollectionOfComputerScienceBibliographiesFetcher.class);
 
             assertEquals(expected, getClasses(idFetchers));
         }
