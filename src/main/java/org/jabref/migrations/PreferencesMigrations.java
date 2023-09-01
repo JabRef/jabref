@@ -531,7 +531,7 @@ public class PreferencesMigrations {
         List<String> names = preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES);
         List<String> keys = preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS);
 
-        if (keys.size() > 0 && names.size() == keys.size()) {
+        if (!keys.isEmpty() && names.size() == keys.size()) {
             try (final Keyring keyring = Keyring.create()) {
                 for (int i = 0; i < names.size(); i++) {
                     keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(

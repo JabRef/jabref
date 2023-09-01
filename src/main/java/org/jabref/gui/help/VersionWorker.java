@@ -86,12 +86,12 @@ public class VersionWorker {
      * Prints the connection problem to the status bar and shows a dialog if it was executed manually
      */
     private void showConnectionError(Exception exception, boolean manualExecution) {
-        String couldNotConnect = Localization.lang("Could not connect to the update server.");
-        String tryLater = Localization.lang("Please try again later and/or check your network connection.");
         if (manualExecution) {
+            String couldNotConnect = Localization.lang("Could not connect to the update server.");
+            String tryLater = Localization.lang("Please try again later and/or check your network connection.");
             dialogService.showErrorDialogAndWait(Localization.lang("Error"), couldNotConnect + "\n" + tryLater, exception);
         }
-        LOGGER.warn(couldNotConnect + " " + tryLater, exception);
+        LOGGER.debug("Could not connect to the update server.", exception);
     }
 
     /**

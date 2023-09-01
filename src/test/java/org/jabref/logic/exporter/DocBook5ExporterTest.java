@@ -29,7 +29,6 @@ import org.xmlunit.matchers.CompareMatcher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class DocBook5ExporterTest {
 
@@ -42,9 +41,6 @@ public class DocBook5ExporterTest {
 
     @BeforeEach
     void setUp() throws URISyntaxException {
-        SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
-        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-
         exporter = new TemplateExporter(
                 "DocBook 5.1",
                 "docbook5",
@@ -52,19 +48,19 @@ public class DocBook5ExporterTest {
                 null,
                 StandardFileType.XML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                saveConfiguration);
+                SaveOrder.getDefaultSaveOrder());
 
         LocalDate myDate = LocalDate.of(2018, 1, 1);
 
         xmlFile = Path.of(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        BibEntry entry = new BibEntry(StandardEntryType.Book);
-        entry.setField(StandardField.TITLE, "my paper title");
-        entry.setField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez");
-        entry.setField(StandardField.ISBN, "1-2-34");
-        entry.setCitationKey("mykey");
-        entry.setDate(new org.jabref.model.entry.Date(myDate));
+        BibEntry entry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "my paper title")
+                .withField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez")
+                .withField(StandardField.ISBN, "1-2-34")
+                .withCitationKey("mykey")
+                .withDate(new org.jabref.model.entry.Date(myDate));
         entries = Collections.singletonList(entry);
     }
 

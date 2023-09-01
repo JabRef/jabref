@@ -56,7 +56,7 @@ public class MetaDataDiff {
         if (!Objects.equals(originalMetaData.getEncoding(), newMetaData.getEncoding())) {
             changes.add(Difference.ENCODING);
         }
-        if (!Objects.equals(originalMetaData.getSaveOrderConfig(), newMetaData.getSaveOrderConfig())) {
+        if (!Objects.equals(originalMetaData.getSaveOrder(), newMetaData.getSaveOrder())) {
             changes.add(Difference.SAVE_SORT_ORDER);
         }
         if (!Objects.equals(

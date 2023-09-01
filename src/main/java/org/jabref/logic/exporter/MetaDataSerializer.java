@@ -42,7 +42,7 @@ public class MetaDataSerializer {
         Map<String, List<String>> stringyMetaData = new HashMap<>();
 
         // First write all meta data except groups
-        metaData.getSaveOrderConfig().ifPresent(
+        metaData.getSaveOrder().ifPresent(
                 saveOrderConfig -> stringyMetaData.put(MetaData.SAVE_ORDER_CONFIG, saveOrderConfig.getAsStringList()));
         metaData.getSaveActions().ifPresent(
                 saveActions -> stringyMetaData.put(MetaData.SAVE_ACTIONS, saveActions.getAsStringList(OS.NEWLINE)));
