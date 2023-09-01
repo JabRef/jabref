@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -28,7 +29,7 @@ public class PersistenceVisualStateTable {
 
     public void addListeners() {
         table.getColumns().addListener((InvalidationListener) obs -> updateColumns());
-        table.getSortOrder().addListener((InvalidationListener) obs -> updateSortOrder());
+        table.getSortOrder().addListener((ListChangeListener) obs -> updateSortOrder());
 
         // As we store the ColumnModels of the MainTable, we need to add the listener to the ColumnModel properties,
         // since the value is bound to the model after the listener to the column itself is called.
