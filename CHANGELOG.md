@@ -43,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added support for the Finnish language. [#10183](https://github.com/JabRef/jabref/pull/10183)
 - We added the option to automatically replaces illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
 - We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
+- We added a tooltip to show the number of entries in a group [#10208](https://github.com/JabRef/jabref/issues/10208)
 
 ### Changed
 
@@ -135,6 +136,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the ACM Portal search sometimes would not return entries for some search queries when the article author had no given name [#10107](https://github.com/JabRef/jabref/issues/10107)
 - We fixed an issue that caused high CPU usage and a zombie process after quitting JabRef because of author names autocompletion [#10159](https://github.com/JabRef/jabref/pull/10159)
 - We fixed an issue where files with illegal characters in the filename could be added to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
+- We fixed that checked-out radio buttons under "specified keywords" were not displayed as checked after closing and reopening the "edit group" window. [#10248](https://github.com/JabRef/jabref/issues/10248)
 - We fixed that when editing groups, checked-out properties such as case sensitive and regular expression (under "Free search expression") were not displayed checked. [#10108](https://github.com/JabRef/jabref/issues/10108)
 - It is possible again to use "current table sort order" for the order of entries when saving. [#](isDebugEnabled)
 
@@ -144,6 +146,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We removed support for Markdown syntax for strikethrough and task lists in comment fields. [#9726](https://github.com/JabRef/jabref/pull/9726)
 - We removed the options menu, because the two contents were moved to the File menu or the properties of the library. [#9768](https://github.com/JabRef/jabref/pull/9768)
 - We removed the 'File' tab in the preferences and moved its contents to the 'Export' tab. [#9839](https://github.com/JabRef/jabref/pull/9839)
+- We removed the "[Collection of Computer Science Bibliographies](https://en.wikipedia.org/wiki/Collection_of_Computer_Science_Bibliographies)" fetcher the websits is no longer available. [#6638](https://github.com/JabRef/jabref/issues/6638)
 
 ## [5.9] - 2023-01-06
 
