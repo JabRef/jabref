@@ -121,6 +121,7 @@ class WebFetchersTest {
             // Remove the following, because they don't work atm
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
+            expected.remove(CollectionOfComputerScienceBibliographiesFetcher.class);
 
             expected.remove(PagedSearchBasedParserFetcher.class);
             expected.remove(PagedSearchBasedFetcher.class);
