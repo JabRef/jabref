@@ -1,12 +1,10 @@
-package org.jabref.logic.autosaveandbackup;
+package org.jabref.gui.autosaveandbackup;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import javafx.collections.FXCollections;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.exporter.AtomicFileWriter;
@@ -54,9 +52,6 @@ class BackupManagerDiscardedTest {
 
         bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
         bibDatabaseContext.setDatabasePath(testBib);
-        LibraryTab libraryTab = mock(LibraryTab.class);
-        when(libraryTab.getBibDatabaseContext()).thenReturn(bibDatabaseContext);
-        when(libraryTab.getMainTable().getSortOrder()).thenReturn(FXCollections.emptyObservableList());
 
         bibEntryTypesManager = new BibEntryTypesManager();
 
@@ -69,7 +64,7 @@ class BackupManagerDiscardedTest {
 
         saveDatabase();
 
-        backupManager = new BackupManager(libraryTab, bibDatabaseContext, bibEntryTypesManager, preferencesService);
+        backupManager = new BackupManager(mock(LibraryTab.class), bibDatabaseContext, bibEntryTypesManager, preferencesService);
         makeBackup();
     }
 

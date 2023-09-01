@@ -1,4 +1,4 @@
-package org.jabref.logic.autosaveandbackup;
+package org.jabref.gui.autosaveandbackup;
 
 import java.io.IOException;
 import java.io.Writer;
