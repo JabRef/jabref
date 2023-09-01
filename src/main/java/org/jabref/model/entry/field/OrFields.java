@@ -1,5 +1,7 @@
 package org.jabref.model.entry.field;
 
+import com.google.common.base.Objects;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -53,5 +55,29 @@ public class OrFields implements Comparable<OrFields> {
 
     public boolean isEmpty() {
         return this.fields.isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        OrFields orFields = (OrFields) o;
+        return Objects.equal(fields, orFields.fields);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(fields);
+    }
+
+    @Override
+    public String toString() {
+        return "OrFields{" +
+                "fields=" + fields +
+                '}';
     }
 }
