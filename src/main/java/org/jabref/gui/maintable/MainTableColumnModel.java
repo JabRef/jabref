@@ -15,6 +15,7 @@ import javafx.scene.control.TableColumn;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.metadata.SaveOrder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,6 +165,13 @@ public class MainTableColumnModel {
 
     public ObjectProperty<TableColumn.SortType> sortTypeProperty() {
         return sortTypeProperty;
+    }
+
+    public SaveOrder.SortCriterion getSortCriterion() {
+        boolean descending = getSortType() == TableColumn.SortType.DESCENDING;
+        return new SaveOrder.SortCriterion(
+                FieldFactory.parseField(getQualifier()),
+                descending);
     }
 
     @Override

@@ -9,6 +9,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.maintable.columns.MainTableColumn;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public class PersistenceVisualStateTable {
 
     public void addListeners() {
         table.getColumns().addListener((InvalidationListener) obs -> updateColumns());
-        table.getSortOrder().addListener((ListChangeListener) obs -> updateSortOrder());
+        table.getSortOrder().addListener((ListChangeListener<? super TableColumn<BibEntryTableViewModel, ?>>) obs -> updateSortOrder());
 
         // As we store the ColumnModels of the MainTable, we need to add the listener to the ColumnModel properties,
         // since the value is bound to the model after the listener to the column itself is called.

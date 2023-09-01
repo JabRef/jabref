@@ -290,7 +290,7 @@ public class LibraryTab extends Tab {
             autosaveManager.registerListener(new AutosaveUiManager(this));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferencesService.getFilePreferences().shouldCreateBackup()) {
-            BackupManager.start(bibDatabaseContext, Globals.entryTypesManager, preferencesService);
+            BackupManager.start(this, bibDatabaseContext, Globals.entryTypesManager, preferencesService);
         }
     }
 
