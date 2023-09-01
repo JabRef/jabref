@@ -245,8 +245,8 @@ public class BackupManager {
                                 sortOrder.stream()
                                          .filter(col -> col instanceof MainTableColumn<?>)
                                          .map(column -> ((MainTableColumn<?>) column).getModel())
-                                         .map(MainTableColumnModel::getSortCriterion)
-                                         .collect(Collectors.toList()));
+                                         .flatMap(model -> model.getSortCriteria().stream())
+                                         .toList());
                     } else {
                         return SelfContainedSaveOrder.of(so);
                     }

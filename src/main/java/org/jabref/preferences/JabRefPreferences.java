@@ -2260,7 +2260,7 @@ public class JabRefPreferences implements PreferencesService {
         List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
         return new SaveOrder(
                 SaveOrder.OrderType.TABLE,
-                sortOrder.stream().map(MainTableColumnModel::getSortCriterion).collect(Collectors.toList()));
+                sortOrder.stream().flatMap(model -> model.getSortCriteria().stream()).toList());
     }
 
     @Override

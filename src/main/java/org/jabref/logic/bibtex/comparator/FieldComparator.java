@@ -92,8 +92,6 @@ public class FieldComparator implements Comparator<BibEntry> {
             f1 = e1.getType().getDisplayName();
             f2 = e2.getType().getDisplayName();
         } else {
-            // If the field is author or editor, we rearrange names so they are
-            // sorted according to last name.
             f1 = getFieldValue(e1);
             f2 = getFieldValue(e2);
         }
