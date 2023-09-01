@@ -43,10 +43,52 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 (Sorted alphabetically by Id)
 
 ```yaml
+Id:      at.favre.lib
+Project: HMAC-based Key Derivation Function (HKDF) RFC 5869
+URL:     https://github.com/patrickfav/hkdf
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.dlsc.gemsfx:gemsfx
+Project: GemsFX
+URL:     https://github.com/dlsc-software-consulting-gmbh/GemsFX
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.dlsc.pickerfx:pickerfx
+Project: GemsFX
+URL:     https://github.com/dlsc-software-consulting-gmbh/PickerFX
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.dlsc.unitfx:unitfx
+Project: UnitFX
+URL:     https://github.com/dlsc-software-consulting-gmbh/UnitFX
+License: Apache-2.0
+```
+
+```yaml
 Id:      com.fasterxml.jackson
 Project: Jackson Project
 URL:     https://github.com/FasterXML/jackson
 License: Apache-2.0
+```
+
+```yaml
+Id:      com.github.hypfvieh.dbus-java
+Project: dbus-java
+URL:     https://github.com/hypfvieh/dbus-java
+License: MIT
+```
+
+```yaml
+Id:      com.github.hypfvieh.java-utils
+Project: java-utils
+URL:     https://github.com/hypfvieh/java-utils
+License: MIT
 ```
 
 ```yaml
