@@ -79,7 +79,6 @@ class ManageStudyDefinitionViewModelTest {
                 new StudyCatalogItem("Bibliotheksverbund Bayern (Experimental)", false),
                 new StudyCatalogItem("Biodiversity Heritage", false),
                 new StudyCatalogItem("CiteSeerX", false),
-                new StudyCatalogItem("Collection of Computer Science Bibliographies", false),
                 new StudyCatalogItem("Crossref", false),
                 new StudyCatalogItem("DBLP", false),
                 new StudyCatalogItem("DOAB", false),
