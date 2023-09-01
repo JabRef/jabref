@@ -8,11 +8,15 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Keep track of changes made to the columns (reordering, resorting, resizing).
  */
 public class PersistenceVisualStateTable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersistenceVisualStateTable.class);
 
     protected final TableView<BibEntryTableViewModel> table;
     protected final ColumnPreferences preferences;
@@ -43,6 +47,7 @@ public class PersistenceVisualStateTable {
      * {@link org.jabref.preferences.JabRefPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
      */
     private void updateColumns() {
+        LOGGER.debug("Updating columns");
         preferences.setColumns(toList(table.getColumns()));
     }
 
@@ -53,6 +58,7 @@ public class PersistenceVisualStateTable {
      * on other changes.
      */
     private void updateSortOrder() {
+        LOGGER.debug("Updating sort order");
         preferences.setColumnSortOrder(toList(table.getSortOrder()));
     }
 
