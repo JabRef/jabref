@@ -108,11 +108,7 @@ public class SaveOrder {
      */
     public List<String> getAsStringList() {
         List<String> res = new ArrayList<>(7);
-        if (orderType == OrderType.ORIGINAL) {
-            res.add(OrderType.ORIGINAL.toString());
-        } else {
-            res.add(OrderType.SPECIFIED.toString());
-        }
+        res.add(orderType.toString());
 
         for (SortCriterion sortCriterion : sortCriteria) {
             res.add(sortCriterion.field.getName());
