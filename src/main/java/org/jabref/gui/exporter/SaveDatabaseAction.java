@@ -93,15 +93,15 @@ public class SaveDatabaseAction {
         return this.saveAs(file, SaveDatabaseMode.NORMAL);
     }
 
-    private SaveOrder getSaveOrder() {
+    private SelfContainedSaveOrder getSaveOrder() {
         return libraryTab.getBibDatabaseContext()
                 .getMetaData().getSaveOrder()
                 .map(so -> {
                     if (so.getOrderType().equals(SaveOrder.OrderType.TABLE)) {
                         // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
-                        return new SaveOrder(SaveOrder.OrderType.SPECIFIED, preferences.getTableSaveOrder().getSortCriteria());
+                        return new SelfContainedSaveOrder(SaveOrder.OrderType.SPECIFIED, preferences.getTableSaveOrder().getSortCriteria());
                     } else {
-                        return so;
+                        return SelfContainedSaveOrder.of(so);
                     }
                 })
                 .orElse(SaveOrder.getDefaultSaveOrder());
@@ -283,7 +283,7 @@ public class SaveDatabaseAction {
         }
     }
 
-    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SaveOrder saveOrder) throws SaveException {
+    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
         DialogPane pane = new DialogPane();
         VBox vbox = new VBox();
         vbox.getChildren().addAll(

@@ -31,6 +31,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -224,14 +225,14 @@ public class BackupManager {
         }
 
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
-        SaveOrder saveOrder = bibDatabaseContext
+        SelfContainedSaveOrder saveOrder = bibDatabaseContext
                 .getMetaData().getSaveOrder()
                 .map(so -> {
                     if (so.getOrderType().equals(SaveOrder.OrderType.TABLE)) {
                         // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
-                        return new SaveOrder(SaveOrder.OrderType.SPECIFIED, preferences.getTableSaveOrder().getSortCriteria());
+                        return new SelfContainedSaveOrder(SaveOrder.OrderType.SPECIFIED, preferences.getTableSaveOrder().getSortCriteria());
                     } else {
-                        return so;
+                        return SelfContainedSaveOrder.of(so);
                     }
                 })
                 .orElse(SaveOrder.getDefaultSaveOrder());

@@ -1,6 +1,7 @@
 package org.jabref.logic.exporter;
 
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 public class SaveConfiguration {
 
@@ -8,11 +9,11 @@ public class SaveConfiguration {
     public static final String ENCODING_PREFIX = "Encoding: ";
 
     private boolean reformatFile;
-    private SaveOrder saveOrder;
+    private SelfContainedSaveOrder saveOrder;
     private boolean makeBackup;
     private BibDatabaseWriter.SaveType saveType;
 
-    public SaveConfiguration(SaveOrder saveOrder,
+    public SaveConfiguration(SelfContainedSaveOrder saveOrder,
                              Boolean makeBackup,
                              BibDatabaseWriter.SaveType saveType,
                              Boolean reformatFile) {
@@ -29,11 +30,11 @@ public class SaveConfiguration {
                 false);
     }
 
-    public SaveOrder getSaveOrder() {
+    public SelfContainedSaveOrder getSaveOrder() {
         return saveOrder;
     }
 
-    public SaveConfiguration withSaveOrder(SaveOrder newSaveOrder) {
+    public SaveConfiguration withSaveOrder(SelfContainedSaveOrder newSaveOrder) {
         this.saveOrder = newSaveOrder;
         return this;
     }

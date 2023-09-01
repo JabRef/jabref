@@ -12,4 +12,16 @@ public class SelfContainedSaveOrder extends SaveOrder {
             throw new IllegalArgumentException("TABLE requires external lookup.");
         }
     }
+
+    /**
+     * Converts a SaveOrder to a SelfContainedSaveOrder
+     *
+     * @throws IllegalArgumentException if {@code saveOrder} has {@link OrderType#TABLE}
+     */
+    public static SelfContainedSaveOrder of(SaveOrder saveOrder) {
+        if (saveOrder instanceof SelfContainedSaveOrder) {
+            return (SelfContainedSaveOrder) saveOrder;
+        }
+        return new SelfContainedSaveOrder(saveOrder.getOrderType(), saveOrder.getSortCriteria());
+    }
 }

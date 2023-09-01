@@ -111,6 +111,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
@@ -2279,7 +2280,7 @@ public class JabRefPreferences implements PreferencesService {
         };
 
         return new SaveConfiguration()
-                .withSaveOrder(saveOrder)
+                .withSaveOrder(SelfContainedSaveOrder.of(saveOrder))
                 .withReformatOnSave(getLibraryPreferences().shouldAlwaysReformatOnSave());
     }
 
