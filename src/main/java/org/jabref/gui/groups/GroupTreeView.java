@@ -285,6 +285,9 @@ public class GroupTreeView extends BorderPane {
                     if (shouldDisplayGroupCount) {
                         node.getStyleClass().add("hits");
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
+                        Tooltip tooltip = new Tooltip();
+                        tooltip.textProperty().bind(group.getHits().asString());
+                        Tooltip.install(text, tooltip);
                     }
                 });
         text.getStyleClass().setAll("text");
