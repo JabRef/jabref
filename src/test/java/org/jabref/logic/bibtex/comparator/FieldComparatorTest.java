@@ -16,6 +16,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FieldComparatorTest {
+
+    @Test void OrField() {
+
+    }
+
     @Test
     public void compareMonthFieldIdentity() throws Exception {
         FieldComparator comparator = new FieldComparator(StandardField.MONTH);

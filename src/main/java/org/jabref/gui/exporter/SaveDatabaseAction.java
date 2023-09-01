@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,8 +37,10 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -242,7 +245,7 @@ public class SaveDatabaseAction {
         }
     }
 
-    private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType, SaveOrder saveOrder) throws SaveException {
+    private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
         // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManager.performBackup
 
         SaveConfiguration saveConfiguration = new SaveConfiguration()

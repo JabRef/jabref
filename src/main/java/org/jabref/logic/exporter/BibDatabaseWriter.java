@@ -39,6 +39,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.strings.StringUtil;
 
 import org.jooq.lambda.Unchecked;
@@ -129,7 +130,7 @@ public abstract class BibDatabaseWriter {
      * non-database save operation (such as the exportDatabase call), we do not wish to use the global preference of
      * saving in standard order.
      */
-    public static List<BibEntry> getSortedEntries(List<BibEntry> entriesToSort, SaveOrder saveOrder) {
+    public static List<BibEntry> getSortedEntries(List<BibEntry> entriesToSort, SelfContainedSaveOrder saveOrder) {
         Objects.requireNonNull(entriesToSort);
         Objects.requireNonNull(saveOrder);
 

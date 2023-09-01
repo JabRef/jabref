@@ -67,8 +67,8 @@ public class SaveOrder {
         return new SaveOrder(orderedData);
     }
 
-    public static SaveOrder getDefaultSaveOrder() {
-        return new SaveOrder(OrderType.ORIGINAL, List.of());
+    public static SelfContainedSaveOrder getDefaultSaveOrder() {
+        return new SelfContainedSaveOrder(OrderType.ORIGINAL, List.of());
     }
 
     public OrderType getOrderType() {
