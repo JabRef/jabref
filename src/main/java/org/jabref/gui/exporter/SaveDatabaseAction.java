@@ -24,7 +24,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;

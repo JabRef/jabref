@@ -16,7 +16,6 @@ import javafx.scene.control.TableColumn;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.metadata.SaveOrder;
 
 import org.slf4j.Logger;

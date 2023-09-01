@@ -18,13 +18,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;

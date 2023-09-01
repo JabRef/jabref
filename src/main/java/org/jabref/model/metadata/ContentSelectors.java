@@ -94,5 +94,4 @@ public class ContentSelectors {
                 ", fieldsWithSelectors=" + getFieldsWithSelectors() +
                 '}';
     }
-
 }

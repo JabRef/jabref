@@ -45,7 +45,7 @@ public class MetaDataDiff {
         }
     }
 
-    private void addToListIfDiff(List<Difference> changes, DifferenceType differenceType,  Object originalObject, Object newObject) {
+    private void addToListIfDiff(List<Difference> changes, DifferenceType differenceType, Object originalObject, Object newObject) {
         if (!Objects.equals(originalObject, newObject)) {
             changes.add(new Difference(differenceType, originalObject, newObject));
         }
