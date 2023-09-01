@@ -92,6 +92,20 @@ License: MIT
 ```
 
 ```yaml
+Id:      com.github.javakeyring
+Project: Java Keyring
+URL:     https://github.com/javakeyring/java-keyring
+License: BSD-3-Clause
+```
+
+```yaml
+Id:      com.github.jnr
+Project: The Java Native Runtime Project
+URL:     https://github.com/jnr
+License: BSD-3-Clause
+```
+
+```yaml
 Id:      com.github.JabRef
 Project: afterburner.fx
 URL:     https://github.com/JabRef/afterburner.fx
@@ -170,6 +184,27 @@ License: Oracle Free Use Terms and Conditions (FUTC)
 ```
 
 ```yaml
+Id:      com.squareup.okhttp3:okhttp
+Project: OkHttp
+URL:     https://square.github.io/okhttp/
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.squareup.okio:okio
+Project: OkHttp
+URL:     https://github.com/square/okio/
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.squareup.retrofit2:retrofit
+Project: Retrofit 2
+URL:     https://github.com/square/retrofit
+License: Apache-2.0
+```
+
+```yaml
 Id:      com.sun.istack:istack-commons-runtime
 Project: iStack Common Utility Code
 URL:     https://github.com/eclipse-ee4j/jaxb-istack-commons
@@ -191,6 +226,13 @@ License: BSD-2-Clause
 ```
 
 ```yaml
+Id:      commons-beanutils:commons-beanutils
+Project: Apache Commons Beanutils
+URL:     https://commons.apache.org/proper/commons-beanutils/
+License: Apache-2.0
+```
+
+```yaml
 Id:      commons-cli:commons-cli
 Project: Apache Commons CLI
 URL:     http://commons.apache.org/cli/
@@ -205,6 +247,13 @@ License: Apache-2.0
 ```
 
 ```yaml
+Id:      commons-collections:commons-collections
+Project: Apache Commons Collections
+URL:     https://commons.apache.org/proper/commons-collections/
+License: Apache-2.0
+```
+
+```yaml
 Id:      commons-io:commons-io
 Project: Apache Commons IO
 URL:     https://commons.apache.org/proper/commons-io/
@@ -215,6 +264,20 @@ License: Apache-2.0
 Id:      commons-logging:commons-logging
 Project: Apache Commons Logging
 URL:     http://commons.apache.org/logging/
+License: Apache-2.0
+```
+
+```yaml
+Id:      commons-digester:commons-digester
+Project: Apache Commons Digester
+URL:     https://commons.apache.org/proper/commons-digester/
+License: Apache-2.0
+```
+
+```yaml
+Id:      commons-validator:commons-validator
+Project: Apache Commons Validator
+URL:     https://commons.apache.org/proper/commons-validator/
 License: Apache-2.0
 ```
 
@@ -567,17 +630,9 @@ com.fasterxml.jackson.core:jackson-databind:2.15.2
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2
 com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2
 com.fasterxml.jackson:jackson-bom:2.15.2
-com.github.hypfvieh:dbus-java:3.2.1
-com.github.hypfvieh:java-utils:1.0.6
-com.github.javakeyring:java-keyring:1.0.3
-com.github.jnr:jffi:1.2.19
-com.github.jnr:jnr-a64asm:1.0.0
-com.github.jnr:jnr-constants:0.9.12
-com.github.jnr:jnr-enxio:0.21
-com.github.jnr:jnr-ffi:2.1.10
-com.github.jnr:jnr-posix:3.0.50
-com.github.jnr:jnr-unixsocket:0.23
-com.github.jnr:jnr-x86asm:1.0.2
+com.github.hypfvieh:dbus-java-core:4.2.1
+com.github.hypfvieh:dbus-java-transport-native-unixsocket:4.2.1
+com.github.javakeyring:java-keyring:1.0.4
 com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9
 com.github.tomtung:latex2unicode_2.13:0.3.2
 com.google.code.gson:gson:2.10
@@ -605,7 +660,6 @@ com.oracle.ojdbc:osdt_cert:19.3.0.0
 com.oracle.ojdbc:osdt_core:19.3.0.0
 com.oracle.ojdbc:simplefan:19.3.0.0
 com.oracle.ojdbc:ucp:19.3.0.0
-compileClasspath - Compile classpath for source set
 com.squareup.okhttp3:okhttp:3.12.0
 com.squareup.okio:okio:1.15.0
 com.squareup.retrofit2:retrofit:2.6.1
@@ -624,10 +678,9 @@ com.vladsch.flexmark:flexmark-util-misc:0.64.8
 com.vladsch.flexmark:flexmark-util-sequence:0.64.8
 com.vladsch.flexmark:flexmark-util-visitor:0.64.8
 de.saxsys:mvvmfx:1.8.0
-de.swiesend:secret-service:1.0.0
+de.swiesend:secret-service:1.8.1-jdk17
 de.undercouch:citeproc-java:3.0.0-beta.2
 eu.lestard:doc-annotations:0.2
-implementation - Implementation dependencies for the 'main' feature.
 info.debatty:java-string-similarity:2.0.0
 io.github.java-diff-utils:java-diff-utils:4.12
 jakarta.annotation:jakarta.annotation-api:2.1.1
@@ -690,11 +743,6 @@ org.openjfx:javafx-graphics:20
 org.openjfx:javafx-media:20
 org.openjfx:javafx-swing:20
 org.openjfx:javafx-web:20
-org.ow2.asm:asm:7.1
-org.ow2.asm:asm-analysis:7.1
-org.ow2.asm:asm-commons:7.1
-org.ow2.asm:asm-tree:7.1
-org.ow2.asm:asm-util:7.1
 org.postgresql:postgresql:42.6.0
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.13.8
