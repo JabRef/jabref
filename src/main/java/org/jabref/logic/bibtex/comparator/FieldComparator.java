@@ -73,7 +73,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private String getFieldValue(BibEntry entry) {
-        for (Field aField : fields) {
+        for (Field aField : fields.getFields()) {
             Optional<String> o = entry.getFieldOrAliasLatexFree(aField);
             if (o.isPresent()) {
                 return o.get();

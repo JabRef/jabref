@@ -143,6 +143,7 @@ public class MainTableColumnModel {
                 || (typeProperty.getValue() == Type.INDEX)) {
             return typeProperty.getValue().getDisplayName();
         } else {
+            // When an OrField is used, `FieldFactory.parseField` returns UnknownField
             return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()));
         }
     }
