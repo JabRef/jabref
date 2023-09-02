@@ -8,7 +8,7 @@ plugins {
 
     id 'com.github.andygoossens.modernizer' version '1.8.0'
 
-    id 'me.champeau.gradle.jmh' version '0.5.3'
+    id 'me.champeau.jmh' version '0.7.1'
 
     id 'org.javamodularity.moduleplugin' version '1.8.12'
 
@@ -272,9 +272,10 @@ processResources {
     }
 }
 
-task generateSource(dependsOn: ["generateBstGrammarSource",
-                                "generateSearchGrammarSource",
-                                "generateCitaviSource"]) {
+tasks.register('generateSource') {
+    dependsOn("generateBstGrammarSource",
+            "generateSearchGrammarSource",
+            "generateCitaviSource")
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
@@ -302,8 +303,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
 }
 
 
-
-task generateCitaviSource(type: XjcTask) {
+tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
     description = "Generates java files for the citavi importer."
 
@@ -312,7 +312,7 @@ task generateCitaviSource(type: XjcTask) {
     javaPackage = "org.jabref.logic.importer.fileformat.citavi"
 }
 
-task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
+tasks.register('generateJournalAbbreviationList', JournalAbbreviationConverter) {
     group = 'JabRef'
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore."
 
@@ -323,7 +323,7 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
     outputDir = file("src/main/resources/journals")
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
