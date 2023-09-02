@@ -457,7 +457,7 @@ public class GroupDialogViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.GROUPS, dialogService).execute();
+        new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences()).execute();
     }
 
     private List<Path> getFileDirectoriesAsPaths() {

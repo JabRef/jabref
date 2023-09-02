@@ -49,7 +49,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
     }
 
     public void initialize() {
-        this.viewModel = new ConstantsPropertiesViewModel(databaseContext, dialogService);
+        this.viewModel = new ConstantsPropertiesViewModel(databaseContext, dialogService, preferencesService.getFilePreferences());
 
         addStringButton.setTooltip(new Tooltip(Localization.lang("New string")));
 

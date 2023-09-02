@@ -28,6 +28,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -67,6 +68,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
 
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private BibEntryTypesManager entryTypesManager;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -85,7 +87,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferencesService, fileUpdateMonitor, entryTypesManager);
 
         versionCheck.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
 
@@ -128,7 +130,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService), remoteHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()), remoteHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {

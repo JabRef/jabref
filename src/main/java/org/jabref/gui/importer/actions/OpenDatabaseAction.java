@@ -31,6 +31,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -56,17 +57,20 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
+    private final BibEntryTypesManager entryTypesManager;
 
     public OpenDatabaseAction(JabRefFrame frame,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               StateManager stateManager,
-                              FileUpdateMonitor fileUpdateMonitor) {
+                              FileUpdateMonitor fileUpdateMonitor,
+                              BibEntryTypesManager entryTypesManager) {
         this.frame = frame;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
     }
 
     /**
@@ -178,7 +182,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         // The backgroundTask is executed within the method createLibraryTab
-        LibraryTab newTab = LibraryTab.createLibraryTab(backgroundTask, file, preferencesService, stateManager, frame, fileUpdateMonitor);
+        LibraryTab newTab = LibraryTab.createLibraryTab(backgroundTask, file, preferencesService, stateManager, frame, fileUpdateMonitor, entryTypesManager);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 

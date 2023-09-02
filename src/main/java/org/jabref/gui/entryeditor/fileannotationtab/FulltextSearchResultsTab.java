@@ -127,7 +127,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         fileLinkText.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY.equals(event.getButton())) {
                 try {
-                    JabRefDesktop.openBrowser(resolvedPath.toUri());
+                    JabRefDesktop.openBrowser(resolvedPath.toUri(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
                     LOGGER.error("Cannot open {}.", resolvedPath.toString(), e);
                 }

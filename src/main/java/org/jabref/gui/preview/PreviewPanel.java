@@ -50,19 +50,19 @@ public class PreviewPanel extends VBox {
     public PreviewPanel(BibDatabaseContext database,
                         DialogService dialogService,
                         KeyBindingRepository keyBindingRepository,
-                        PreferencesService preferences,
+                        PreferencesService preferencesService,
                         StateManager stateManager,
                         ThemeManager themeManager,
                         IndexingTaskManager indexingTaskManager) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.previewPreferences = preferences.getPreviewPreferences();
+        this.previewPreferences = preferencesService.getPreviewPreferences();
         this.indexingTaskManager = indexingTaskManager;
-        this.fileLinker = new ExternalFilesEntryLinker(preferences.getFilePreferences(), database, dialogService);
+        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database, dialogService);
 
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(database, dialogService, stateManager, themeManager);
+        PreviewPreferences previewPreferences = preferencesService.getPreviewPreferences();
+        previewView = new PreviewViewer(database, dialogService, preferencesService, stateManager, themeManager);
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(event -> {

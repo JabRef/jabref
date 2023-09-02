@@ -33,6 +33,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.InternalPreferences;
@@ -68,6 +69,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final BibEntryTypesManager entryTypesManager;
 
     private final RemotePreferences remotePreferences;
     private final ProxyPreferences proxyPreferences;
@@ -78,10 +80,14 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
-    public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences, FileUpdateMonitor fileUpdateMonitor) {
+    public NetworkTabViewModel(DialogService dialogService,
+                               PreferencesService preferences,
+                               FileUpdateMonitor fileUpdateMonitor,
+                               BibEntryTypesManager entryTypesManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
         this.remotePreferences = preferences.getRemotePreferences();
         this.proxyPreferences = preferences.getProxyPreferences();
         this.internalPreferences = preferences.getInternalPreferences();
@@ -196,7 +202,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
             Globals.REMOTE_LISTENER.stop();
