@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added an error-specific message for when a download from a URL fails[#9826](https://github.com/JabRef/jabref/issues/9826).
+- We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
 
 ### Changed
 
@@ -53,7 +54,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added support for showing journal information, via info buttons next to the `Journal` and `ISSN` fields in the entry editor. [#6189](https://github.com/JabRef/jabref/issues/6189)
 - We added support for pushing citations to Sublime Text 3 [#10098](https://github.com/JabRef/jabref/issues/10098)
 - We added support for the Finnish language. [#10183](https://github.com/JabRef/jabref/pull/10183)
-- We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
 - We added the option to automatically replaces illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
 - We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
 - We added a tooltip to show the number of entries in a group [#10208](https://github.com/JabRef/jabref/issues/10208)
