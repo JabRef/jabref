@@ -1322,7 +1322,7 @@ class BibtexParserTest {
                 new StringReader(
                         "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"));
 
-        Optional<SaveOrder> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
+        Optional<SaveOrder> saveOrderConfig = result.getMetaData().getSaveOrder();
 
         assertEquals(new SaveOrder(SaveOrder.OrderType.SPECIFIED, List.of(
                         new SaveOrder.SortCriterion(StandardField.AUTHOR, false),

@@ -82,25 +82,26 @@ public class BibtexDatabaseWriterTest {
     @BeforeEach
     void setUp() {
         fieldPreferences = new FieldPreferences(true, Collections.emptyList(), Collections.emptyList());
-        saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
-        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(saveConfiguration.useMetadataSaveOrder()).thenReturn(true);
+        saveConfiguration = new SaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
         citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
+        initializeDatabaseWriter();
+        database = new BibDatabase();
+        metaData = new MetaData();
+        bibtexContext = new BibDatabaseContext(database, metaData);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.fieldPreferences()).thenReturn(fieldPreferences);
+    }
+
+    private void initializeDatabaseWriter() {
         databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
-
-        database = new BibDatabase();
-        metaData = new MetaData();
-        bibtexContext = new BibDatabaseContext(database, metaData);
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.fieldPreferences()).thenReturn(fieldPreferences);
     }
 
     @Test
@@ -673,14 +674,14 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void reformatEntryIfAskedToDoSo() throws Exception {
-        BibEntry entry = new BibEntry();
-        entry.setType(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "Mr. author");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Mr. author");
         entry.setParsedSerialization("wrong serialization");
         entry.setChanged(false);
         database.insertEntry(entry);
 
-        when(saveConfiguration.shouldReformatFile()).thenReturn(true);
+        saveConfiguration = new SaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, true);
+        initializeDatabaseWriter();
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
         assertEquals("@Article{," + OS.NEWLINE + "  author = {Mr. author}," + OS.NEWLINE + "}"
@@ -705,7 +706,8 @@ public class BibtexDatabaseWriterTest {
         string.setParsedSerialization("wrong serialization");
         database.addString(string);
 
-        when(saveConfiguration.shouldReformatFile()).thenReturn(true);
+        saveConfiguration = new SaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, true);
+        initializeDatabaseWriter();
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("@String{name = {content}}" + OS.NEWLINE, stringWriter.toString());
@@ -738,7 +740,7 @@ public class BibtexDatabaseWriterTest {
                 List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
                         new SaveOrder.SortCriterion(StandardField.YEAR, true),
                         new SaveOrder.SortCriterion(StandardField.ABSTRACT, false)));
-        metaData.setSaveOrderConfig(saveOrder);
+        metaData.setSaveOrder(saveOrder);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
@@ -799,7 +801,7 @@ public class BibtexDatabaseWriterTest {
                 List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
                         new SaveOrder.SortCriterion(StandardField.YEAR, true),
                         new SaveOrder.SortCriterion(StandardField.ABSTRACT, false)));
-        metaData.setSaveOrderConfig(saveOrder);
+        metaData.setSaveOrder(saveOrder);
 
         BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "A")

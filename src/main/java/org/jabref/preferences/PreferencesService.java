@@ -20,7 +20,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.logic.journals.JournalInformationPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
@@ -124,8 +123,6 @@ public interface PreferencesService {
     ImporterPreferences getImporterPreferences();
 
     GrobidPreferences getGrobidPreferences();
-
-    JournalInformationPreferences getJournalInformationPreferences();
 
     PreviewPreferences getPreviewPreferences();
 

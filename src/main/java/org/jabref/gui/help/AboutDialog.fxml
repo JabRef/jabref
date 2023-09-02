@@ -38,6 +38,7 @@
                         <Label styleClass="space-after" text="${controller.viewModel.license}" wrapText="true"/>
                         <Hyperlink onAction="#openLicense" text="MIT"/>
                     </HBox>
+                    <Hyperlink onAction="#openPrivacyPolicy" text="Privacy Policy"/>
                     <Hyperlink onAction="#openExternalLibrariesWebsite" text="%Used libraries"/>
                     <HBox alignment="CENTER_LEFT">
                         <Label styleClass="space-after" text="%Want to help?" wrapText="true"/>

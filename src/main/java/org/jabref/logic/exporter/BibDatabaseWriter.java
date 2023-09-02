@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,7 +53,7 @@ import org.jooq.lambda.Unchecked;
  */
 public abstract class BibDatabaseWriter {
 
-    public enum SaveType { ALL, PLAIN_BIBTEX }
+    public enum SaveType { WITH_JABREF_META_DATA, PLAIN_BIBTEX }
 
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     protected final BibWriter bibWriter;
@@ -102,21 +101,19 @@ public abstract class BibDatabaseWriter {
         return applySaveActions(Collections.singletonList(entry), metaData);
     }
 
-    private static List<Comparator<BibEntry>> getSaveComparators(MetaData metaData, SaveConfiguration preferences) {
+    private static List<Comparator<BibEntry>> getSaveComparators(SaveOrder saveOrder) {
         List<Comparator<BibEntry>> comparators = new ArrayList<>();
-        Optional<SaveOrder> saveOrder = getSaveOrder(metaData, preferences);
 
         // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
         // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
         comparators.add(new CrossRefEntryComparator());
 
-        if (saveOrder.isEmpty() || saveOrder.get().getOrderType() == SaveOrder.OrderType.ORIGINAL) {
+        if (saveOrder.getOrderType() == SaveOrder.OrderType.ORIGINAL) {
             // entries will be sorted based on their internal IDs
             comparators.add(new IdComparator());
         } else {
             // use configured sorting strategy
-            List<FieldComparator> fieldComparators = saveOrder.get()
-                                                              .getSortCriteria().stream()
+            List<FieldComparator> fieldComparators = saveOrder.getSortCriteria().stream()
                                                               .map(FieldComparator::new)
                                                               .toList();
             comparators.addAll(fieldComparators);
@@ -127,42 +124,20 @@ public abstract class BibDatabaseWriter {
     }
 
     /**
-     * We have begun to use getSortedEntries() for both database save operations and non-database save operations.  In a
+     * We have begun to use getSortedEntries() for both database save operations and non-database save operations. In a
      * non-database save operation (such as the exportDatabase call), we do not wish to use the global preference of
      * saving in standard order.
      */
-    public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entriesToSort, SaveConfiguration preferences) {
-        Objects.requireNonNull(bibDatabaseContext);
+    public static List<BibEntry> getSortedEntries(List<BibEntry> entriesToSort, SaveOrder saveOrder) {
         Objects.requireNonNull(entriesToSort);
+        Objects.requireNonNull(saveOrder);
 
-        // if no meta data are present, simply return in original order
-        if (bibDatabaseContext.getMetaData() == null) {
-            return new LinkedList<>(entriesToSort);
-        }
-
-        List<Comparator<BibEntry>> comparators = getSaveComparators(bibDatabaseContext.getMetaData(), preferences);
+        List<Comparator<BibEntry>> comparators = getSaveComparators(saveOrder);
         FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
 
         List<BibEntry> sorted = new ArrayList<>(entriesToSort);
         sorted.sort(comparatorStack);
         return sorted;
-    }
-
-    private static Optional<SaveOrder> getSaveOrder(MetaData metaData, SaveConfiguration saveConfiguration) {
-        /* two options:
-         * 1. order specified in metaData
-         * 2. original order
-         */
-
-        if (saveConfiguration.useMetadataSaveOrder()) {
-            return metaData.getSaveOrderConfig();
-        }
-
-        if (saveConfiguration.getSaveOrder().getOrderType() == SaveOrder.OrderType.ORIGINAL) {
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(saveConfiguration.getSaveOrder());
     }
 
     public List<FieldChange> getSaveActionsFieldChanges() {
@@ -190,7 +165,7 @@ public abstract class BibDatabaseWriter {
         sharedDatabaseIDOptional.ifPresent(Unchecked.consumer(id -> writeDatabaseID(id)));
 
         // Some file formats write something at the start of the file (like the encoding)
-        if (saveConfiguration.getSaveType() != SaveType.PLAIN_BIBTEX) {
+        if (saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
             writeProlog(bibDatabaseContext, charset);
         }
@@ -204,7 +179,7 @@ public abstract class BibDatabaseWriter {
         writeStrings(bibDatabaseContext.getDatabase());
 
         // Write database entries.
-        List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, saveConfiguration);
+        List<BibEntry> sortedEntries = getSortedEntries(entries, saveConfiguration.getSaveOrder());
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
         if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
@@ -228,7 +203,7 @@ public abstract class BibDatabaseWriter {
             writeEntry(entry, bibDatabaseContext.getMode());
         }
 
-        if (saveConfiguration.getSaveType() != SaveType.PLAIN_BIBTEX) {
+        if (saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
             // Write meta data.
             writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPattern());
 
