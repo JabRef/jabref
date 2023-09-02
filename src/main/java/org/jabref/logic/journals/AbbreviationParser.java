@@ -24,10 +24,10 @@ public class AbbreviationParser {
 
     /*
      * Read the given file, which should contain a list of journal names and their abbreviations. Each line should be
-     * formatted as: "Full Journal Name,Abbr. Journal Name;[Shortest Unique Abbreviation]"
+     * formatted as: "Full Journal Name,Abbr. Journal Name,[Shortest Unique Abbreviation]"
      * Tries to detect the delimiter, if comma or semicolon is used to ensure backwards compatibility
      *
-     * @param reader a given file into a BufferedReader object
+     * @param file Path the given file
      */
     void readJournalListFromFile(Path file) throws IOException {
         char delimiter = detectDelimiter(file);
@@ -52,6 +52,10 @@ public class AbbreviationParser {
     private char detectDelimiter(Path file) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             String line = reader.readLine();
+
+            if (line == null) {
+                return NO_DELIMITER;
+            }
             return Arrays.stream(DELIMITERS)
                          .filter(s -> line.contains(s.toString()))
                          .findFirst()
