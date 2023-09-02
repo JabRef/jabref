@@ -144,7 +144,6 @@ dependencies {
     implementation 'info.debatty:java-string-similarity:2.0.0'
     implementation 'com.github.javakeyring:java-keyring:1.0.4'
 
-
     antlr4 'org.antlr:antlr4:4.13.0'
     implementation 'org.antlr:antlr4-runtime:4.13.0'
 
