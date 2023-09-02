@@ -366,7 +366,7 @@ jobs:
       # Upload to build server using rsync
       # The action runs on linux only (because it is a Dockerized action), therefore it is embedded in a separate workflow
       - name: Upload to builds.jabref.org
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        if: ((steps.checksecrets.outputs.secretspresent == 'YES') && ! startsWith(steps.gitversion.outputs.branchName, 'gh-readonly-queue'))
         uses: Pendect/action-rsyncer@v2.0.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}

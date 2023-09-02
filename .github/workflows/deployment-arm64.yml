@@ -163,6 +163,7 @@ jobs:
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
       - name: Upload with rsync
+        if: ! startsWith(steps.gitversion.outputs.branchName, 'gh-readonly-queue')
         shell: bash
         run: |
           mkdir ${{runner.temp}}/sshkey
