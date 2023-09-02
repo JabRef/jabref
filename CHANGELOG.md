@@ -7,6 +7,10 @@ In case, there is no issue present, the pull request implementing the feature is
 
 Note that this project **does not** adhere to [Semantic Versioning](http://semver.org/).
 
+## Fixed
+
+- It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
+
 ## [Unreleased]
 
 ### Added
@@ -138,7 +142,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where files with illegal characters in the filename could be added to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
 - We fixed that checked-out radio buttons under "specified keywords" were not displayed as checked after closing and reopening the "edit group" window. [#10248](https://github.com/JabRef/jabref/issues/10248)
 - We fixed that when editing groups, checked-out properties such as case sensitive and regular expression (under "Free search expression") were not displayed checked. [#10108](https://github.com/JabRef/jabref/issues/10108)
-- It is possible again to use "current table sort order" for the order of entries when saving. [#](isDebugEnabled)
 
 ### Removed
 
