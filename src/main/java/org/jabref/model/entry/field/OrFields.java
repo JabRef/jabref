@@ -3,10 +3,9 @@ package org.jabref.model.entry.field;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
-
-import com.google.common.base.Objects;
 
 public class OrFields implements Comparable<OrFields> {
 
@@ -66,7 +65,7 @@ public class OrFields implements Comparable<OrFields> {
             return false;
         }
         OrFields orFields = (OrFields) o;
-        return Objects.equal(fields, orFields.fields);
+        return Objects.equals(fields, orFields.fields);
     }
 
     @Override
