@@ -8,7 +8,7 @@ plugins {
 
     id 'com.github.andygoossens.modernizer' version '1.8.0'
 
-    id "me.champeau.jmh" version "0.7.1"
+    id 'me.champeau.jmh' version "0.7.1"
 
     id 'org.javamodularity.moduleplugin' version '1.8.12'
 
