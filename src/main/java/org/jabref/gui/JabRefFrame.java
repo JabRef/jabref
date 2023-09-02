@@ -155,7 +155,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The main window of the application.
  */
-public class JabRefFrame extends BorderPane {
+public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     public static final String FRAME_TITLE = "JabRef";
 
@@ -1174,10 +1174,6 @@ public class JabRefFrame extends BorderPane {
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab, Globals.getKeyPrefs()));
 
-        if (raisePanel) {
-            tabbedPane.getSelectionModel().select(libraryTab);
-        }
-
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
@@ -1268,7 +1264,7 @@ public class JabRefFrame extends BorderPane {
         return false;
     }
 
-    private void closeTab(LibraryTab libraryTab) {
+    public void closeTab(LibraryTab libraryTab) {
         // empty tab without database
         if (libraryTab == null) {
             return;

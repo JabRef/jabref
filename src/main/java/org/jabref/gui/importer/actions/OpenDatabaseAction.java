@@ -182,10 +182,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 
-    /**
-     * This method is similar to {@link org.jabref.gui.JabRefGUI#openLastEditedDatabases()}.
-     * This method also has the capability to open remote shared databases
-     */
     private ParserResult loadDatabase(Path file) throws Exception {
         Path fileToLoad = file.toAbsolutePath();
 
