@@ -70,6 +70,9 @@ public interface PreferencesService {
 
     ImportFormatPreferences getImportFormatPreferences();
 
+    /**
+     * Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
+     */
     SaveConfiguration getExportConfiguration();
 
     BibEntryTypesManager getCustomEntryTypesRepository();

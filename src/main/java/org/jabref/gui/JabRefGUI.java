@@ -72,7 +72,7 @@ public class JabRefGUI {
                 new VersionWorker(Globals.BUILD_INFO.version,
                         mainFrame.getDialogService(),
                         Globals.TASK_EXECUTOR,
-                        preferencesService.getInternalPreferences())
+                        preferencesService)
                         .checkForNewVersionDelayed();
             }
         });

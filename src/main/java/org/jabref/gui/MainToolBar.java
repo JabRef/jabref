@@ -33,6 +33,7 @@ import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -50,6 +51,7 @@ public class MainToolBar extends ToolBar {
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
+    private final BibEntryTypesManager entryTypesManager;
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
@@ -61,7 +63,8 @@ public class MainToolBar extends ToolBar {
                        StateManager stateManager,
                        PreferencesService preferencesService,
                        FileUpdateMonitor fileUpdateMonitor,
-                       TaskExecutor taskExecutor) {
+                       TaskExecutor taskExecutor,
+                       BibEntryTypesManager entryTypesManager) {
         this.frame = frame;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
@@ -70,6 +73,7 @@ public class MainToolBar extends ToolBar {
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
+        this.entryTypesManager = entryTypesManager;
 
         createToolBar();
     }
@@ -88,7 +92,7 @@ public class MainToolBar extends ToolBar {
         getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame, preferencesService, stateManager))),
 
                 leftSpacer,
@@ -128,7 +132,7 @@ public class MainToolBar extends ToolBar {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService))));
+                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferencesService.getFilePreferences()))));
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);

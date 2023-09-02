@@ -388,6 +388,7 @@ public class GroupDialogViewModel {
             colorProperty.setValue(IconTheme.getDefaultGroupColor());
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
+            autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
         } else {
             nameProperty.setValue(editedGroup.getName());
             colorProperty.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));
@@ -456,7 +457,7 @@ public class GroupDialogViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.GROUPS, dialogService).execute();
+        new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences()).execute();
     }
 
     private List<Path> getFileDirectoriesAsPaths() {

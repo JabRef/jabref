@@ -37,6 +37,8 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.autosaveandbackup.AutosaveManager;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
@@ -56,8 +58,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autosaveandbackup.AutosaveManager;
-import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
@@ -69,6 +69,7 @@ import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -106,6 +107,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final BibEntryTypesManager entryTypesManager;
     private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
@@ -120,6 +122,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         this.dialogService = new JabRefDialogService(mainStage);
         this.undoManager = Globals.undoManager;
         this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
+        this.entryTypesManager = Globals.entryTypesManager;
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
         this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
         this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
@@ -344,7 +347,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      * The MacAdapter calls this method when "About" is selected from the application menu.
      */
     public void about() {
-        new HelpAction(HelpFile.CONTENTS, dialogService).execute();
+        new HelpAction(HelpFile.CONTENTS, dialogService, prefs.getFilePreferences()).execute();
     }
 
     /**
@@ -470,7 +473,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 stateManager,
                 prefs,
                 fileUpdateMonitor,
-                taskExecutor);
+                taskExecutor,
+                entryTypesManager);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -481,6 +485,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 taskExecutor,
                 dialogService,
+                Globals.journalAbbreviationRepository,
+                entryTypesManager,
                 undoManager);
 
         VBox head = new VBox(mainMenu, mainToolBar);
@@ -748,7 +754,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, fileUpdateMonitor);
+        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, fileUpdateMonitor, entryTypesManager);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }
@@ -866,7 +872,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
-        return new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor);
+        return new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor, entryTypesManager);
     }
 
     public GlobalSearchBar getGlobalSearchBar() {
@@ -1004,7 +1010,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         public void execute() {
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(path, prefs, dialogService);
+                    JabRefDesktop.openFolderAndSelectFile(path, prefs.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }

@@ -1,4 +1,4 @@
-package org.jabref.logic.autosaveandbackup;
+package org.jabref.gui.autosaveandbackup;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -19,6 +19,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.control.TableColumn;
+
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
+import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -31,6 +36,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -58,17 +64,19 @@ public class BackupManager {
     private final ScheduledThreadPoolExecutor executor;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
+    private final LibraryTab libraryTab;
 
     // Contains a list of all backup paths
     // During a write, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
     private boolean needsBackup = false;
 
-    BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
+    BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.executor = new ScheduledThreadPoolExecutor(2);
+        this.libraryTab = libraryTab;
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -96,8 +104,8 @@ public class BackupManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static BackupManager start(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
-        BackupManager backupManager = new BackupManager(bibDatabaseContext, entryTypesManager, preferences);
+    public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
+        BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
         runningInstances.add(backupManager);
         return backupManager;
@@ -215,18 +223,36 @@ public class BackupManager {
 
         // We opted for "while" to delete backups in case there are more than 10
         while (backupFilesQueue.size() >= MAXIMUM_BACKUP_FILE_COUNT) {
-            Path lessRecentBackupFile = backupFilesQueue.poll();
+            Path oldestBackupFile = backupFilesQueue.poll();
             try {
-                Files.delete(lessRecentBackupFile);
+                Files.delete(oldestBackupFile);
             } catch (IOException e) {
-                LOGGER.error("Could not delete backup file {}", lessRecentBackupFile, e);
+                LOGGER.error("Could not delete backup file {}", oldestBackupFile, e);
             }
         }
 
         // code similar to org.jabref.gui.exporter.SaveDatabaseAction.saveDatabase
+        SelfContainedSaveOrder saveOrder = bibDatabaseContext
+                .getMetaData().getSaveOrder()
+                .map(so -> {
+                    if (so.getOrderType() == SaveOrder.OrderType.TABLE) {
+                        // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
+                        List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
+                        return new SelfContainedSaveOrder(
+                                SaveOrder.OrderType.SPECIFIED,
+                                sortOrder.stream()
+                                         .filter(col -> col instanceof MainTableColumn<?>)
+                                         .map(column -> ((MainTableColumn<?>) column).getModel())
+                                         .flatMap(model -> model.getSortCriteria().stream())
+                                         .toList());
+                    } else {
+                        return SelfContainedSaveOrder.of(so);
+                    }
+                })
+                .orElse(SaveOrder.getDefaultSaveOrder());
         SaveConfiguration saveConfiguration = new SaveConfiguration()
                 .withMakeBackup(false)
-                .withSaveOrder(bibDatabaseContext.getMetaData().getSaveOrder().orElse(SaveOrder.getDefaultSaveOrder()))
+                .withSaveOrder(saveOrder)
                 .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
 
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);

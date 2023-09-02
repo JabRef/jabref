@@ -64,8 +64,10 @@ import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -79,6 +81,8 @@ public class MainMenu extends MenuBar {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
+    private final JournalAbbreviationRepository abbreviationRepository;
+    private final BibEntryTypesManager entryTypesManager;
     private final UndoManager undoManager;
 
     public MainMenu(JabRefFrame frame,
@@ -89,6 +93,8 @@ public class MainMenu extends MenuBar {
                     FileUpdateMonitor fileUpdateMonitor,
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
+                    JournalAbbreviationRepository abbreviationRepository,
+                    BibEntryTypesManager entryTypesManager,
                     UndoManager undoManager) {
         this.frame = frame;
         this.sidePane = sidePane;
@@ -98,6 +104,8 @@ public class MainMenu extends MenuBar {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.abbreviationRepository = abbreviationRepository;
+        this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
 
         createMenu();
@@ -212,8 +220,8 @@ public class MainMenu extends MenuBar {
 
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame, dialogService, stateManager, preferencesService)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService.getBibEntryPreferences())),
-                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame, stateManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService)),
+                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame, preferencesService, dialogService, stateManager, taskExecutor, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -254,7 +262,8 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF, new WriteMetadataToPdfAction(stateManager, Globals.entryTypesManager, preferencesService.getFieldPreferences(), dialogService, taskExecutor, preferencesService.getFilePreferences(), preferencesService.getXmpPreferences())),
+                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF,
+                        new WriteMetadataToPdfAction(stateManager, entryTypesManager, preferencesService.getFieldPreferences(), dialogService, taskExecutor, preferencesService.getFilePreferences(), preferencesService.getXmpPreferences(), abbreviationRepository)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, preferencesService, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -294,8 +303,8 @@ public class MainMenu extends MenuBar {
         );
 
         help.getItems().addAll(
-                factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService)),
-                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/", dialogService)),
+                factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService, preferencesService.getFilePreferences())),
+                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/", dialogService, preferencesService.getFilePreferences())),
 
                 new SeparatorMenuItem(),
 
@@ -303,19 +312,19 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org", dialogService)),
-                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(Globals.BUILD_INFO, preferencesService.getInternalPreferences(), dialogService, taskExecutor)),
+                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org", dialogService, preferencesService.getFilePreferences())),
+                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(Globals.BUILD_INFO, preferencesService, dialogService, taskExecutor)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
-                        factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService)),
+                        factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/", dialogService, preferencesService.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/", dialogService, preferencesService.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/", dialogService, preferencesService.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org", dialogService, preferencesService.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferencesService.getFilePreferences())),
 
                         new SeparatorMenuItem(),
 
-                        factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md", dialogService))
+                        factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/", dialogService, preferencesService.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md", dialogService, preferencesService.getFilePreferences()))
                 ),
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
@@ -340,7 +349,7 @@ public class MainMenu extends MenuBar {
                                    PreferencesService preferencesService) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager, entryTypesManager)),
                 factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager))
         );
 

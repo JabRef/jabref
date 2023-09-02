@@ -85,9 +85,9 @@ class JournalAbbreviationsViewModelTabTest {
         @Override
         public String toString() {
             if (showShortestUniqueAbbreviation) {
-                return this.getName() + ";" + this.getAbbreviation() + ";" + this.getShortestUniqueAbbreviation();
+                return this.getName() + "," + this.getAbbreviation() + "," + this.getShortestUniqueAbbreviation();
             }
-            return this.getName() + ";" + this.getAbbreviation();
+            return this.getName() + "," + this.getAbbreviation();
         }
     }
 

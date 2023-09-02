@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -92,6 +93,7 @@ public class ExportToClipboardActionTest {
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
         when(preferences.getExportPreferences().getLastExportExtension()).thenReturn("HTML");
+        when(preferences.getExportConfiguration().getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(stateManager.getSelectedEntries()).thenReturn(selectedEntries);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         // noinspection ConstantConditions since databaseContext is mocked
