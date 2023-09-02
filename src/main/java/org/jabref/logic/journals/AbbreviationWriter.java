@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 /**
@@ -37,5 +36,4 @@ public final class AbbreviationWriter {
             }
         }
     }
-
 }
