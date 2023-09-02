@@ -42,37 +42,36 @@ import org.slf4j.LoggerFactory;
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 /**
- * Perform import operation
+ * Perform an import action
  */
 public class ImportCommand extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportCommand.class);
 
+    public enum ImportMethod { AS_NEW, TO_EXISTING }
+
     private final JabRefFrame frame;
-    private final boolean openInNew;
+    private final ImportMethod importMethod;
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
-    /**
-     * @param openInNew Indicate whether the entries should import into a new database or into the currently open one.
-     */
     public ImportCommand(JabRefFrame frame,
-                         boolean openInNew,
+                         ImportMethod importMethod,
                          PreferencesService preferencesService,
                          StateManager stateManager,
                          FileUpdateMonitor fileUpdateMonitor,
                          TaskExecutor taskExecutor,
                          DialogService dialogService) {
         this.frame = frame;
-        this.openInNew = openInNew;
+        this.importMethod = importMethod;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
 
-        if (!openInNew) {
+        if (importMethod == ImportMethod.TO_EXISTING) {
             this.executable.bind(needsDatabase(stateManager));
         }
     }
@@ -92,16 +91,17 @@ public class ImportCommand extends SimpleCommand {
                 .withInitialDirectory(preferencesService.getImporterPreferences().getImportWorkingDirectory())
                 .build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
-                     .ifPresent(path -> automatedImport(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
+                     .ifPresent(path -> importSingleFile(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
     }
 
-    private void automatedImport(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
+    private void importSingleFile(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
         if (!Files.exists(file)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Import"),
                     Localization.lang("File not found") + ": '" + file.getFileName() + "'.");
 
             return;
         }
+
         Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
 
         List<String> filenames = Collections.singletonList(file.toString());
@@ -111,7 +111,7 @@ public class ImportCommand extends SimpleCommand {
         List<Path> files = filenames.stream().map(Path::of).collect(Collectors.toList());
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null)));
 
-        if (openInNew) {
+        if (importMethod == ImportMethod.AS_NEW) {
             task.onSuccess(parserResult -> {
                     frame.addTab(parserResult.getDatabaseContext(), true);
                     dialogService.notify(Localization.lang("Imported entries") + ": " + parserResult.getDatabase().getEntries().size());
