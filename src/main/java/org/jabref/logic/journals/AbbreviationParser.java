@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
@@ -18,9 +17,7 @@ import org.apache.commons.csv.CSVRecord;
  */
 public class AbbreviationParser {
     private static final Character[] DELIMITERS = {';', ','};
-    private static final char ESCAPE = '\\';
-    private static final char QUOTE = '"';
-    private static final char NO_DELIMITER = '\0'; //empty char
+    private static final char NO_DELIMITER = '\0'; // empty char
 
     // Ensures ordering while preventing duplicates
     private final LinkedHashSet<Abbreviation> abbreviations = new LinkedHashSet<>();
@@ -35,7 +32,7 @@ public class AbbreviationParser {
     void readJournalListFromFile(Path file) throws IOException {
         char delimiter = detectDelimiter(file);
 
-        try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(file, StandardCharsets.UTF_8), getCSVFormat(delimiter))) {
+        try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(file, StandardCharsets.UTF_8), AbbreviationFormat.getCSVFormatWithDelimiter(delimiter))) {
             for (CSVRecord csvRecord : csvParser) {
                 String name = csvRecord.size() > 0 ? csvRecord.get(0) : "";
                 String abbreviation = csvRecord.size() > 1 ? csvRecord.get(1) : "";
@@ -64,15 +61,5 @@ public class AbbreviationParser {
 
     public Collection<Abbreviation> getAbbreviations() {
         return abbreviations;
-    }
-
-    private CSVFormat getCSVFormat(char delimiter) {
-        return CSVFormat.DEFAULT.builder()
-                                .setIgnoreEmptyLines(true)
-                                .setDelimiter(delimiter)
-                                .setEscape(ESCAPE)
-                                .setQuote(QUOTE)
-                                .setTrim(true)
-                                .build();
     }
 }
