@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
-import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
@@ -103,13 +102,8 @@ public class ImportCommand extends SimpleCommand {
         }
 
         Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
-
-        List<String> filenames = Collections.singletonList(file.toString());
-
-        ////////////////
-
-        List<Path> files = filenames.stream().map(Path::of).collect(Collectors.toList());
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null)));
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(
+                () -> doImport(Collections.singletonList(file), format.orElse(null)));
 
         if (importMethod == ImportMethod.AS_NEW) {
             task.onSuccess(parserResult -> {
@@ -128,8 +122,6 @@ public class ImportCommand extends SimpleCommand {
             dialog.setTitle(Localization.lang("Import"));
             dialogService.showCustomDialogAndWait(dialog);
         }
-
-        ///////////////////////
 
         // Set last working dir for import
         preferencesService.getImporterPreferences().setImportWorkingDirectory(file.getParent());
