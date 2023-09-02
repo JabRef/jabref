@@ -22,7 +22,6 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -31,7 +30,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -56,8 +54,6 @@ public class ImportCommand extends SimpleCommand {
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
-
-    private Exception importError;
 
     /**
      * @param openInNew Indicate whether the entries should import into a new database or into the currently open one.
@@ -113,7 +109,7 @@ public class ImportCommand extends SimpleCommand {
         ////////////////
 
         List<Path> files = filenames.stream().map(Path::of).collect(Collectors.toList());
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> getParserResult(files, format));
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null)));
 
         if (openInNew) {
             task.onSuccess(parserResult -> {
@@ -139,35 +135,10 @@ public class ImportCommand extends SimpleCommand {
         preferencesService.getImporterPreferences().setImportWorkingDirectory(file.getParent());
     }
 
-    private ParserResult getParserResult(List<Path> files, Optional<Importer> format) throws Exception {
-        List<ImportFormatReader.UnknownFormatImport> imports = doImport(files, format.orElse(null));
-        // Ok, done. Then try to gather in all we have found. Since we might
-        // have found
-        // one or more bibtex results, it's best to gather them in a
-        // BibDatabase.
-        ParserResult bibtexResult = mergeImportResults(imports);
-
-        // TODO: show parserwarnings, if any (not here)
-        // for (ImportFormatReader.UnknownFormatImport p : imports) {
-        //    ParserResultWarningDialog.showParserResultWarningDialog(p.parserResult, frame);
-        // }
-        if (bibtexResult.isEmpty()) {
-            if (importError == null) {
-                // TODO: No control flow using exceptions
-                throw new JabRefException(Localization.lang("No entries found. Please make sure you are using the correct import filter."));
-            } else if (importError instanceof ImportException) {
-                String content = Localization.lang("Please check your library file for wrong syntax.") + "\n\n"
-                        + importError.getLocalizedMessage();
-                DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Import error"), content));
-            } else {
-                throw importError;
-            }
-        }
-
-        return bibtexResult;
-    }
-
-    public List<ImportFormatReader.UnknownFormatImport> doImport(List<Path> files, Importer importFormat) {
+    /**
+     * @throws IOException of a specified importer
+     */
+    private ParserResult doImport(List<Path> files, Importer importFormat) throws IOException {
         Optional<Importer> importer = Optional.ofNullable(importFormat);
         // We import all files and collect their results
         List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
@@ -180,7 +151,7 @@ public class ImportCommand extends SimpleCommand {
                 if (importer.isEmpty()) {
                     // Unknown format
                     DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                        if (fileIsPdf(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences())) {
+                        if (FileUtil.isPDFFile(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences())) {
                             importFormatReader.reset();
                         }
                         dialogService.notify(Localization.lang("Importing in unknown format") + "...");
@@ -200,15 +171,26 @@ public class ImportCommand extends SimpleCommand {
                     ParserResult pr = importer.get().importDatabase(filename);
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));
                 }
-            } catch (ImportException |
-                     IOException e) {
-                // This indicates that a specific importer was specified, and that
-                // this importer has thrown an IOException. We store the exception,
-                // so a relevant error message can be displayed.
-                importError = e;
+            } catch (ImportException ex) {
+                DefaultTaskExecutor.runAndWaitInJavaFXThread(
+                        () -> dialogService.showWarningDialogAndWait(
+                                Localization.lang("Import error"),
+                                Localization.lang("Please check your library file for wrong syntax.")
+                                + "\n\n"
+                                + ex.getLocalizedMessage()));
             }
         }
-        return imports;
+
+        if (imports.isEmpty()) {
+            DefaultTaskExecutor.runAndWaitInJavaFXThread(
+                    () -> dialogService.showWarningDialogAndWait(
+                            Localization.lang("Import error"),
+                            Localization.lang("No entries found. Please make sure you are using the correct import filter.")));
+
+            return new ParserResult();
+        }
+
+        return mergeImportResults(imports);
     }
 
     /**
@@ -240,10 +222,5 @@ public class ImportCommand extends SimpleCommand {
         UpdateField.setAutomaticFields(resultDatabase.getEntries(), preferencesService.getOwnerPreferences(), preferencesService.getTimestampPreferences()); // set timestamp and owner
 
         return result;
-    }
-
-    private boolean fileIsPdf(Path filename) {
-        Optional<String> extension = FileUtil.getFileExtension(filename);
-        return extension.isPresent() && StandardFileType.PDF.getExtensions().contains(extension.get());
     }
 }
