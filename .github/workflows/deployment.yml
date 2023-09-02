@@ -22,6 +22,7 @@ on:
       - 'docs/**'
       - 'src/test/**'
       - 'README.md'
+  merge_group:
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}

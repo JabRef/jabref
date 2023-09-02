@@ -479,3 +479,6 @@ lib/ojdbc.jar
 !src/main/java/org/jabref/gui/icon
 
 !**/autosaveandbackup/*.bak
+
+# generated during release process
+CHANGELOG.html
