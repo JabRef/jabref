@@ -113,33 +113,7 @@ public class ImportCommand extends SimpleCommand {
         ////////////////
 
         List<Path> files = filenames.stream().map(Path::of).collect(Collectors.toList());
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> {
-            List<ImportFormatReader.UnknownFormatImport> imports = doImport(files, format.orElse(null));
-            // Ok, done. Then try to gather in all we have found. Since we might
-            // have found
-            // one or more bibtex results, it's best to gather them in a
-            // BibDatabase.
-            ParserResult bibtexResult = mergeImportResults(imports);
-
-            // TODO: show parserwarnings, if any (not here)
-            // for (ImportFormatReader.UnknownFormatImport p : imports) {
-            //    ParserResultWarningDialog.showParserResultWarningDialog(p.parserResult, frame);
-            // }
-            if (bibtexResult.isEmpty()) {
-                if (importError == null) {
-                    // TODO: No control flow using exceptions
-                    throw new JabRefException(Localization.lang("No entries found. Please make sure you are using the correct import filter."));
-                } else if (importError instanceof ImportException) {
-                    String content = Localization.lang("Please check your library file for wrong syntax.") + "\n\n"
-                            + importError.getLocalizedMessage();
-                    DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Import error"), content));
-                } else {
-                    throw importError;
-                }
-            }
-
-            return bibtexResult;
-        });
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> getParserResult(files, format));
 
         if (openInNew) {
             task.onSuccess(parserResult -> {
@@ -163,6 +137,34 @@ public class ImportCommand extends SimpleCommand {
 
         // Set last working dir for import
         preferencesService.getImporterPreferences().setImportWorkingDirectory(file.getParent());
+    }
+
+    private ParserResult getParserResult(List<Path> files, Optional<Importer> format) throws Exception {
+        List<ImportFormatReader.UnknownFormatImport> imports = doImport(files, format.orElse(null));
+        // Ok, done. Then try to gather in all we have found. Since we might
+        // have found
+        // one or more bibtex results, it's best to gather them in a
+        // BibDatabase.
+        ParserResult bibtexResult = mergeImportResults(imports);
+
+        // TODO: show parserwarnings, if any (not here)
+        // for (ImportFormatReader.UnknownFormatImport p : imports) {
+        //    ParserResultWarningDialog.showParserResultWarningDialog(p.parserResult, frame);
+        // }
+        if (bibtexResult.isEmpty()) {
+            if (importError == null) {
+                // TODO: No control flow using exceptions
+                throw new JabRefException(Localization.lang("No entries found. Please make sure you are using the correct import filter."));
+            } else if (importError instanceof ImportException) {
+                String content = Localization.lang("Please check your library file for wrong syntax.") + "\n\n"
+                        + importError.getLocalizedMessage();
+                DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> dialogService.showWarningDialogAndWait(Localization.lang("Import error"), content));
+            } else {
+                throw importError;
+            }
+        }
+
+        return bibtexResult;
     }
 
     public List<ImportFormatReader.UnknownFormatImport> doImport(List<Path> files, Importer importFormat) {
