@@ -17,37 +17,24 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.geometry.Orientation;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -83,8 +70,6 @@ import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.help.SearchForUpdateAction;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.importer.GenerateEntryFromIdDialog;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.NewDatabaseAction;
@@ -146,8 +131,6 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import com.tobiasdiez.easybind.Subscription;
-import org.controlsfx.control.PopOver;
-import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,8 +160,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
-    private PopOver progressViewPopOver;
-    private PopOver entryFromIdPopOver;
 
     private Subscription dividerSubscription;
 
@@ -532,7 +513,16 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private void initLayout() {
         setId("frame");
 
-        VBox head = new VBox(createMenu(), createToolbar());
+        MainToolBar mainToolBar = new MainToolBar(
+                this,
+                pushToApplicationCommand,
+                globalSearchBar,
+                dialogService,
+                stateManager,
+                prefs,
+                fileUpdateMonitor,
+                taskExecutor);
+        VBox head = new VBox(createMenu(), mainToolBar);
         head.setSpacing(0d);
         setTop(head);
 
@@ -577,73 +567,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
             dividerSubscription = EasyBind.subscribe(sidePane.widthProperty(), width -> prefs.getGuiPreferences().setSidePaneWidth(width.doubleValue()));
         }
-    }
-
-    private Node createToolbar() {
-        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-
-        final Region leftSpacer = new Region();
-        final Region rightSpacer = new Region();
-
-        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
-        pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
-
-        // Setup Toolbar
-
-        ToolBar toolBar = new ToolBar(
-                new HBox(
-                        factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(this, prefs)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor)),
-                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, prefs, stateManager))),
-
-                leftSpacer,
-
-                globalSearchBar,
-
-                rightSpacer,
-
-                new HBox(
-                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager)),
-                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, prefs, stateManager)),
-                        createNewEntryFromIdButton(),
-                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, prefs, stateManager)),
-                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager))),
-
-                new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, this, stateManager)),
-                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
-                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager))),
-
-                new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        pushToApplicationButton,
-                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(this, dialogService, stateManager, taskExecutor, prefs)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, prefs, dialogService, stateManager))),
-
-                new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        createTaskIndicator()),
-
-                new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService))));
-
-        leftSpacer.setPrefWidth(50);
-        leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
-        leftSpacer.setMaxWidth(Region.USE_PREF_SIZE);
-        HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
-        HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
-
-        toolBar.getStyleClass().add("mainToolbar");
-
-        return toolBar;
     }
 
     /**
@@ -1016,93 +939,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return menu;
     }
 
-    private Button createNewEntryFromIdButton() {
-        Button newEntryFromIdButton = new Button();
-
-        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
-        newEntryFromIdButton.getStyleClass().setAll("icon-button");
-        newEntryFromIdButton.setFocusTraversable(false);
-        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
-        newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs, taskExecutor, stateManager);
-
-            if (entryFromIdPopOver == null) {
-                entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
-                entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
-                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
-                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(newEntryFromIdButton);
-                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
-            } else if (entryFromIdPopOver.isShowing()) {
-                entryFromIdPopOver.hide();
-            } else {
-                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(newEntryFromIdButton);
-                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
-            }
-        });
-        newEntryFromIdButton.setTooltip(new Tooltip(Localization.lang("Import by ID")));
-
-        return newEntryFromIdButton;
-    }
-
-    private Group createTaskIndicator() {
-        ProgressIndicator indicator = new ProgressIndicator();
-        indicator.getStyleClass().add("progress-indicatorToolbar");
-        indicator.progressProperty().bind(stateManager.getTasksProgress());
-
-        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
-        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
-        indicator.setTooltip(noTasksRunning);
-        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                indicator.setTooltip(someTasksRunning);
-            } else {
-                indicator.setTooltip(noTasksRunning);
-            }
-        });
-
-        /*
-        The label of the indicator cannot be removed with styling. Therefore,
-        hide it and clip it to a square of (width x width) each time width is updated.
-         */
-        indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
-            /*
-            The indeterminate spinner is wider than the determinate spinner.
-            We must make sure they are the same width for the clipping to result in a square of the same size always.
-             */
-            if (!indicator.isIndeterminate()) {
-                indicator.setPrefWidth(newValue.doubleValue());
-            }
-            if (newValue.doubleValue() > 0) {
-                Rectangle clip = new Rectangle(newValue.doubleValue(), newValue.doubleValue());
-                indicator.setClip(clip);
-            }
-        });
-
-        indicator.setOnMouseClicked(event -> {
-            TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-            EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
-            taskProgressView.setRetainTasks(true);
-            taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
-
-            if (progressViewPopOver == null) {
-                progressViewPopOver = new PopOver(taskProgressView);
-                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
-                progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
-                progressViewPopOver.setContentNode(taskProgressView);
-                progressViewPopOver.show(indicator);
-            } else if (progressViewPopOver.isShowing()) {
-                progressViewPopOver.hide();
-            } else {
-                progressViewPopOver.setContentNode(taskProgressView);
-                progressViewPopOver.show(indicator);
-            }
-        });
-
-        return new Group(indicator);
-    }
-
     /**
      * Might be called when a user asks JabRef at the command line
      * i) to import a file or
@@ -1364,6 +1200,26 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         );
 
         return sendMenu;
+    }
+
+    public StateManager getStateManager() {
+        return stateManager;
+    }
+
+    public FileUpdateMonitor getFileUpdateMonitor() {
+        return fileUpdateMonitor;
+    }
+
+    public PreferencesService getPrefs() {
+        return prefs;
+    }
+
+    public PushToApplicationCommand getPushToApplicationCommand() {
+        return pushToApplicationCommand;
+    }
+
+    public TaskExecutor getTaskExecutor() {
+        return taskExecutor;
     }
 
     /**
