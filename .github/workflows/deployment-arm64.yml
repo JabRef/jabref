@@ -163,7 +163,7 @@ jobs:
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
       - name: Upload with rsync
-        if: ! startsWith(steps.gitversion.outputs.branchName, 'gh-readonly-queue')
+        if: ! startsWith(github.ref, 'refs/heads/gh-readonly-queue')
         shell: bash
         run: |
           mkdir ${{runner.temp}}/sshkey
@@ -173,6 +173,7 @@ jobs:
           fi
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store
+        if: ! startsWith(github.ref, 'refs/heads/gh-readonly-queue')
         uses: actions/upload-artifact@v3
         with:
           name: JabRef-${{ matrix.displayName }}
