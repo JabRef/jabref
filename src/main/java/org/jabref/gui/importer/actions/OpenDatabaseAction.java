@@ -222,19 +222,23 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (parserResult.getDatabase().isShared()) {
-            try {
-                new SharedDatabaseUIManager(frame, preferencesService, fileUpdateMonitor)
-                        .openSharedDatabaseFromParserResult(parserResult);
-            } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                    NotASharedDatabaseException e) {
-                parserResult.getDatabaseContext().clearDatabasePath(); // do not open the original file
-                parserResult.getDatabase().clearSharedDatabaseID();
-                LOGGER.error("Connection error", e);
-
-                throw e;
-            }
+            openSharedDatabase(parserResult, frame, preferencesService, fileUpdateMonitor);
         }
         return parserResult;
+    }
+
+    public static void openSharedDatabase(ParserResult parserResult, JabRefFrame frame, PreferencesService preferencesService, FileUpdateMonitor fileUpdateMonitor) throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
+        try {
+            new SharedDatabaseUIManager(frame, preferencesService, fileUpdateMonitor)
+                    .openSharedDatabaseFromParserResult(parserResult);
+        } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                NotASharedDatabaseException e) {
+            parserResult.getDatabaseContext().clearDatabasePath(); // do not open the original file
+            parserResult.getDatabase().clearSharedDatabaseID();
+            LOGGER.error("Connection error", e);
+
+            throw e;
+        }
     }
 
     private void trackOpenNewDatabase(LibraryTab libraryTab) {
