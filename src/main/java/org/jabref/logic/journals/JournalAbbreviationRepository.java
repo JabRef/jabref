@@ -44,8 +44,6 @@ public class JournalAbbreviationRepository {
                 shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
             });
         }
-
-
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
