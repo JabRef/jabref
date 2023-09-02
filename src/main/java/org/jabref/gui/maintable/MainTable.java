@@ -148,25 +148,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
-        /* KEEP for debugging purposes
-        for (var colModel : mainTablePreferences.getColumnPreferences().getColumnSortOrder()) {
-            for (var col : this.getColumns()) {
-                var tablecColModel = ((MainTableColumn<?>) col).getModel();
-                if (tablecColModel.equals(colModel)) {
-                    LOGGER.debug("Adding sort order for col {} ", col);
-                    this.getSortOrder().add(col);
-                    break;
-                }
-            }
-        }
-        */
-
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
                     .findFirst()
-                    .ifPresent(column -> this.getSortOrder().add(column)));
+                    .ifPresent(column -> {
+                        LOGGER.debug("Adding sort order for col {} ", column);
+                        this.getSortOrder().add(column);
+                    }));
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -182,7 +172,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences());
+        new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
 
         setupKeyBindings(keyBindingRepository);
 
@@ -202,6 +192,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 libraryTab.getUndoManager(),
                 dialogService,
                 stateManager);
+
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, rightClickMenuFactory).show(true);
     }
@@ -212,7 +203,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
      * @param sortedColumn The sorted column in {@link MainTable}
      * @param keyEvent     The pressed character
      */
-
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
         if ((keyEvent.getCharacter() == null) || (sortedColumn == null)) {
             return;
@@ -493,5 +483,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .stream()
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
+    }
+
+    public static List<MainTableColumnModel> toColumnModels(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
+        return columns.stream()
+                      .filter(col -> col instanceof MainTableColumn<?>)
+                      .map(column -> ((MainTableColumn<?>) column).getModel())
+                      .collect(Collectors.toList());
     }
 }

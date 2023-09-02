@@ -8,13 +8,13 @@ import java.util.Optional;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;

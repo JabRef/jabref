@@ -1,4 +1,4 @@
-package org.jabref.logic.autosaveandbackup;
+package org.jabref.gui.autosaveandbackup;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jabref.gui.LibraryTab;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -63,7 +64,7 @@ class BackupManagerDiscardedTest {
 
         saveDatabase();
 
-        backupManager = new BackupManager(bibDatabaseContext, bibEntryTypesManager, preferencesService);
+        backupManager = new BackupManager(mock(LibraryTab.class), bibDatabaseContext, bibEntryTypesManager, preferencesService);
         makeBackup();
     }
 

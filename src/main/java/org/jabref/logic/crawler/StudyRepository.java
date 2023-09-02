@@ -28,6 +28,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
@@ -427,7 +428,7 @@ public class StudyRepository {
     private void writeResultToFile(Path pathToFile, BibDatabaseContext context) throws SaveException {
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {
             SaveConfiguration saveConfiguration = new SaveConfiguration()
-                    .withSaveOrder(context.getMetaData().getSaveOrder().orElse(SaveOrder.getDefaultSaveOrder()))
+                    .withSaveOrder(context.getMetaData().getSaveOrder().map(so -> SelfContainedSaveOrder.of(so)).orElse(SaveOrder.getDefaultSaveOrder()))
                     .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
