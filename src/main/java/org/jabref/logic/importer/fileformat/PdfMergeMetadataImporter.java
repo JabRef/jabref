@@ -76,7 +76,7 @@ public class PdfMergeMetadataImporter extends Importer {
 
         for (Importer metadataImporter : metadataImporters) {
             List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath).getDatabase().getEntries();
-            if (extractedEntries.size() == 0) {
+            if (extractedEntries.isEmpty()) {
                 continue;
             }
             candidates.add(extractedEntries.get(0));

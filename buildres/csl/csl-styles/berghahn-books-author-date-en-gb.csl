@@ -6,14 +6,14 @@
     <link href="http://www.zotero.org/styles/berghahn-books-author-date-en-gb" rel="self"/>
     <link href="http://www.zotero.org/styles/development-and-change" rel="template"/>
     <link href="https://www.berghahnbooks.com/authors/" rel="documentation"/>
+    <link href="https://www.berghahnbooks.com/uploads/authors/doc_style_UK.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
-      <email>obrienpat86@gmail.com</email>
     </author>
     <category citation-format="author-date"/>
     <category field="humanities"/>
     <category field="social_science"/>
-    <updated>2019-06-25T08:15:30+00:00</updated>
+    <updated>2023-08-13T15:57:25+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-GB">
@@ -33,7 +33,7 @@
       <if type="chapter paper-conference" match="any">
         <text term="in" suffix=" "/>
         <names variable="editor" delimiter=", ">
-          <name and="text" et-al-min="3" et-al-use-first="1" initialize-with="."/>
+          <name and="text" et-al-min="3" et-al-use-first="1"/>
           <label form="short" prefix=" (" suffix=")"/>
           <substitute>
             <names variable="translator"/>
@@ -57,7 +57,7 @@
   </macro>
   <macro name="author">
     <names variable="author" font-variant="normal">
-      <name and="text" delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1" initialize-with="." name-as-sort-order="first"/>
+      <name and="text" delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1" name-as-sort-order="first"/>
       <label form="short" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
