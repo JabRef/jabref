@@ -460,7 +460,7 @@ task fetcherTest(type: Test) {
     }
 }
 
-task guiTest(type: Test) {
+tasks.register('guiTest', Test) {
     useJUnitPlatform {
         includeTags 'GUITest'
     }
@@ -473,7 +473,7 @@ task guiTest(type: Test) {
 }
 
 // Test result tasks
-task copyTestResources(type: Copy) {
+tasks.register('copyTestResources', Copy) {
     from "${projectDir}/src/test/resources"
     into "${buildDir}/classes/test"
 }
@@ -483,11 +483,13 @@ tasks.withType(Test) {
     reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
 }
 
-task jacocoPrepare() {
+tasks.register('jacocoPrepare') {
     doFirst {
         // Ignore failures of tests
-        tasks.withType(Test) {
-            ignoreFailures = true
+        tasks.withType(Test).tap {
+            configureEach {
+                ignoreFailures = true
+            }
         }
     }
 }

@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
-import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;

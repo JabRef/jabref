@@ -137,5 +137,6 @@ open module org.jabref {
     // other libraries
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires de.saxsys.mvvmfx.validation;
 
 }
