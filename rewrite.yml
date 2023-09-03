@@ -172,7 +172,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.UseListSort
   - org.openrewrite.staticanalysis.UseObjectNotifyAll
   - org.openrewrite.staticanalysis.UseStandardCharset
-#  - org.openrewrite.staticanalysis.UseStringReplace
+  - org.openrewrite.staticanalysis.UseStringReplace
   - org.openrewrite.staticanalysis.UseSystemLineSeparator
   - org.openrewrite.staticanalysis.WhileInsteadOfFor
 #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
