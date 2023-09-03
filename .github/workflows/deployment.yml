@@ -22,6 +22,7 @@ on:
       - 'docs/**'
       - 'src/test/**'
       - 'README.md'
+  merge_group:
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -228,7 +229,7 @@ jobs:
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb  jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
       - name: Upload to builds.jabref.org (ubuntu)
-        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: Pendect/action-rsyncer@v2.0.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -239,13 +240,13 @@ jobs:
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store (windows)
-        if: (matrix.os == 'windows-latest')
+        if: (matrix.os == 'windows-latest') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: actions/upload-artifact@v3
         with:
           name: JabRef-${{ matrix.displayName }}
           path: build/distribution
       - name: Upload to GitHub workflow artifacts store (macos)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: actions/upload-artifact@v3
         with:
           # tbn = to-be-notarized
@@ -306,7 +307,7 @@ jobs:
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Upload to GitHub workflow artifacts store
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: actions/upload-artifact@v3
         with:
           name: JabRef-macOS
@@ -317,6 +318,7 @@ jobs:
     name: Upload binaries on builds.jabref.org
     runs-on: ubuntu-latest
     needs: [build, notarize]
+    if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -351,7 +353,7 @@ jobs:
           name: JabRef-windows
           path: build/distribution
       - name: Get macOS binaries unsigned
-        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (inputs.notarization == false && ! startsWith(github.ref, 'refs/tags/'))
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (inputs.notarization == false && !startsWith(github.ref, 'refs/tags/'))
         uses: actions/download-artifact@master
         with:
           name: JabRef-macOS-tbn

@@ -13,6 +13,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.FilePreferences;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class NativeDesktop {
 
-    public abstract void openFile(String filePath, String fileType) throws IOException;
+    public abstract void openFile(String filePath, String fileType, FilePreferences filePreferences) throws IOException;
 
     /**
      * Opens a file on an Operating System, using the given application.

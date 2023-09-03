@@ -21,7 +21,6 @@ import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -49,6 +48,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -72,8 +72,9 @@ public class SourceTab extends EntryEditorTab {
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private Optional<Pattern> searchHighlightPattern = Optional.empty();
+    private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
+    private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private CodeArea codeArea;
 
     private BibEntry previousEntry;
@@ -98,7 +99,15 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, FieldPreferences fieldPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager, KeyBindingRepository keyBindingRepository) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext,
+                     CountingUndoManager undoManager,
+                     FieldPreferences fieldPreferences,
+                     ImportFormatPreferences importFormatPreferences,
+                     FileUpdateMonitor fileMonitor,
+                     DialogService dialogService,
+                     StateManager stateManager,
+                     BibEntryTypesManager entryTypesManager,
+                     KeyBindingRepository keyBindingRepository) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -109,6 +118,7 @@ public class SourceTab extends EntryEditorTab {
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
@@ -133,7 +143,7 @@ public class SourceTab extends EntryEditorTab {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
-        new BibEntryWriter(fieldWriter, Globals.entryTypesManager).write(entry, bibWriter, type);
+        new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
         return writer.toString();
     }
 

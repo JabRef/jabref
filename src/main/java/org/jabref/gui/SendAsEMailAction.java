@@ -104,7 +104,7 @@ public abstract class SendAsEMailAction extends SimpleCommand {
             attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferencesService, dialogService);
+                    JabRefDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferencesService.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
                     LOGGER.debug("Cannot open file", e);
                 }

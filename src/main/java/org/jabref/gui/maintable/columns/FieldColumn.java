@@ -31,9 +31,9 @@ public class FieldColumn extends MainTableColumn<String> {
                 .withText(text -> text)
                 .install(this);
 
-        if (fields.size() == 1) {
+        if (fields.hasExactlyOne()) {
             // comparator can't parse more than one value
-            Field field = fields.stream().collect(MoreCollectors.onlyElement());
+            Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
 
             if ((field instanceof UnknownField) || field.isNumeric()) {
                 this.setComparator(new NumericFieldComparator());

@@ -30,8 +30,8 @@ public class UrlEditor extends HBox implements FieldEditorFX {
                      DialogService dialogService,
                      SuggestionProvider<?> suggestionProvider,
                      FieldCheckers fieldCheckers,
-                     PreferencesService preferences) {
-        this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, fieldCheckers);
+                     PreferencesService preferencesService) {
+        this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, preferencesService, fieldCheckers);
 
         ViewLoader.view(this)
                   .root(this)
@@ -44,7 +44,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
         // init paste handler for UrlEditor to format pasted url link in textArea
         textArea.setPasteActionHandler(() -> textArea.setText(new CleanupUrlFormatter().format(new TrimWhitespaceFormatter().format(textArea.getText()))));
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public UrlEditorViewModel getViewModel() {

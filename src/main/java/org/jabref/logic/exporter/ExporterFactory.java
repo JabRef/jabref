@@ -13,7 +13,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.preferences.PreferencesService;
 
 public class ExporterFactory {
@@ -29,7 +29,7 @@ public class ExporterFactory {
 
         List<TemplateExporter> customFormats = preferencesService.getExportPreferences().getCustomExporters();
         LayoutFormatterPreferences layoutPreferences = preferencesService.getLayoutFormatterPreferences();
-        SaveOrder saveOrder = preferencesService.getExportConfiguration().getSaveOrder();
+        SelfContainedSaveOrder saveOrder = SelfContainedSaveOrder.of(preferencesService.getSelfContainedExportConfiguration().getSaveOrder());
         XmpPreferences xmpPreferences = preferencesService.getXmpPreferences();
         FieldPreferences fieldPreferences = preferencesService.getFieldPreferences();
         BibDatabaseMode bibDatabaseMode = preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode();

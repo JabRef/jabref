@@ -66,7 +66,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new PersistenceVisualStateTable(this, preferencesService.getSearchDialogColumnPreferences());
+        new PersistenceVisualStateTable(this, preferencesService.getSearchDialogColumnPreferences()).addListeners();
 
         database.getDatabase().registerListener(this);
     }

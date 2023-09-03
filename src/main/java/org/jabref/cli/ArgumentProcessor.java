@@ -25,7 +25,7 @@ import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.XmpPdfExporter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
@@ -71,16 +71,19 @@ public class ArgumentProcessor {
     private final Mode startupMode;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final BibEntryTypesManager entryTypesManager;
     private boolean noGUINeeded;
 
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
                              PreferencesService preferencesService,
-                             FileUpdateMonitor fileUpdateMonitor) throws org.apache.commons.cli.ParseException {
+                             FileUpdateMonitor fileUpdateMonitor,
+                             BibEntryTypesManager entryTypesManager) throws org.apache.commons.cli.ParseException {
         this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
 
         this.parserResults = processArguments();
     }
@@ -291,13 +294,12 @@ public class ArgumentProcessor {
         }
         ParserResult pr = loaded.get(loaded.size() - 1);
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
-        BibDatabase dataBase = pr.getDatabase();
 
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
         EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldPreferences);
 
         if ("all".equals(filesAndCitekeys)) {
-            for (BibEntry entry : dataBase.getEntries()) {
+            for (BibEntry entry : databaseContext.getEntries()) {
                 writeMetadataToPDFsOfEntry(
                         databaseContext,
                         entry.getCitationKey().orElse("<no cite key defined>"),
@@ -324,7 +326,6 @@ public class ArgumentProcessor {
 
         writeMetadataToPdfByCitekey(
                 databaseContext,
-                dataBase,
                 citeKeys,
                 filePreferences,
                 xmpPdfExporter,
@@ -334,7 +335,6 @@ public class ArgumentProcessor {
                 embeddBibfile);
         writeMetadataToPdfByFileNames(
                 databaseContext,
-                dataBase,
                 pdfs,
                 filePreferences,
                 xmpPdfExporter,
@@ -374,7 +374,6 @@ public class ArgumentProcessor {
     }
 
     private void writeMetadataToPdfByCitekey(BibDatabaseContext databaseContext,
-                                             BibDatabase dataBase,
                                              List<String> citeKeys,
                                              FilePreferences filePreferences,
                                              XmpPdfExporter xmpPdfExporter,
@@ -383,7 +382,7 @@ public class ArgumentProcessor {
                                              boolean writeXMP,
                                              boolean embeddBibfile) {
         for (String citeKey : citeKeys) {
-            List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
+            List<BibEntry> bibEntryList = databaseContext.getDatabase().getEntriesByCitationKey(citeKey);
             if (bibEntryList.isEmpty()) {
                 System.err.printf("Skipped - Cannot find %s in library.%n", citeKey);
                 continue;
@@ -395,7 +394,6 @@ public class ArgumentProcessor {
     }
 
     private void writeMetadataToPdfByFileNames(BibDatabaseContext databaseContext,
-                                               BibDatabase dataBase,
                                                List<String> pdfs,
                                                FilePreferences filePreferences,
                                                XmpPdfExporter xmpPdfExporter,
@@ -411,14 +409,14 @@ public class ArgumentProcessor {
             if (Files.exists(filePath)) {
                 try {
                     if (writeXMP) {
-                        if (xmpPdfExporter.exportToFileByPath(databaseContext, dataBase, filePreferences, filePath, abbreviationRepository)) {
+                        if (xmpPdfExporter.exportToFileByPath(databaseContext, filePreferences, filePath, abbreviationRepository)) {
                             System.out.printf("Successfully written XMP metadata of at least one entry to %s%n", fileName);
                         } else {
                             System.out.printf("File %s is not linked to any entry in database.%n", fileName);
                         }
                     }
                     if (embeddBibfile) {
-                        if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, dataBase, filePreferences, filePath, abbreviationRepository)) {
+                        if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, filePreferences, filePath, abbreviationRepository)) {
                             System.out.printf("Successfully embedded XMP metadata of at least one entry to %s%n", fileName);
                         } else {
                             System.out.printf("File %s is not linked to any entry in database.%n", fileName);
@@ -600,14 +598,14 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
-                SaveConfiguration saveConfiguration = new SaveConfiguration()
+                SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                         .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,
                         saveConfiguration,
                         preferencesService.getFieldPreferences(),
                         preferencesService.getCitationKeyPatternPreferences(),
-                        Globals.entryTypesManager);
+                        entryTypesManager);
                 databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
                 // Show just a warning message if encoding did not work for all characters:

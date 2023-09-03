@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.FileType;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -103,7 +102,6 @@ public abstract class Exporter {
      * If it extends existing information, all found bib-entries will be exported.
      *
      * @param databaseContext        the database-context to export from
-     * @param dataBase               the database to export from
      * @param filePreferences        the filePreferences to use for resolving paths
      * @param filePath               the path to the file we want to write on
      * @param abbreviationRepository the opened repository of journal abbreviations
@@ -111,7 +109,6 @@ public abstract class Exporter {
      * @throws Exception if the writing fails
      */
     public boolean exportToFileByPath(BibDatabaseContext databaseContext,
-                                      BibDatabase dataBase,
                                       FilePreferences filePreferences,
                                       Path filePath,
                                       JournalAbbreviationRepository abbreviationRepository) throws Exception {
@@ -119,7 +116,7 @@ public abstract class Exporter {
             return false;
         }
         boolean writtenABibEntry = false;
-        for (BibEntry entry : dataBase.getEntries()) {
+        for (BibEntry entry : databaseContext.getEntries()) {
             for (LinkedFile linkedFile : entry.getFiles()) {
                 if (linkedFile.getFileType().equals(fileType.getName())) {
                     Optional<Path> linkedFilePath = linkedFile.findIn(databaseContext.getFileDirectories(filePreferences));

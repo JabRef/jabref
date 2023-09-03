@@ -27,6 +27,7 @@ import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class StyleSelectDialogViewModel {
@@ -34,13 +35,13 @@ public class StyleSelectDialogViewModel {
     private final DialogService dialogService;
     private final StyleLoader styleLoader;
     private final OpenOfficePreferences openOfficePreferences;
-    private final PreferencesService preferencesService;
+    private final FilePreferences filePreferences;
     private final ListProperty<StyleSelectItemViewModel> styles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
 
     public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.filePreferences = preferencesService.getFilePreferences();
         this.openOfficePreferences = preferencesService.getOpenOfficePreferences();
         this.styleLoader = styleLoader;
 
@@ -62,7 +63,7 @@ public class StyleSelectDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
                 .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
+                .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
@@ -93,9 +94,9 @@ public class StyleSelectDialogViewModel {
 
     public void editStyle() {
         OOBibStyle style = selectedItem.getValue().getStyle();
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", preferencesService.getFilePreferences());
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", filePreferences);
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferencesService, style.getPath(), type);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, style.getPath(), type);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(e);
         }
