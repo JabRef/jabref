@@ -60,9 +60,9 @@
             <Label text="%Start character for cite command" GridPane.rowIndex="3"/>
             <TextField fx:id="startCharacter" prefWidth="50.0" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
             <Label text="%End character for cite command" GridPane.rowIndex="4"/>
-            <TextField fx:id="endCharacter" prefWidth="50.0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-            <Label text="%Delimiter" GridPane.rowIndex="4"/>
-            <TextField fx:id="delimiter" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+            <TextField fx:id="endCharacter" prefWidth="50.0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+            <Label text="%Delimiter" GridPane.rowIndex="5"/>
+            <TextField fx:id="delimiter" prefWidth="50.0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
         </GridPane>
     </HBox>
 

@@ -108,6 +108,18 @@ public class ExternalApplicationsPreferences {
         this.citeCommand.set(citeCommand);
     }
 
+    public void setStartCharacter(String startCharacter) {
+        this.startCharacter.setValue(startCharacter);
+    }
+
+    public void setEndCharacter(String endCharacter) {
+        this.endCharacter.setValue(endCharacter);
+    }
+
+    public void setDelimiter(String delimiter) {
+        this.delimiter.setValue(delimiter);
+    }
+
     public boolean useCustomTerminal() {
         return useCustomTerminal.get();
     }

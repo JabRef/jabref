@@ -5,7 +5,6 @@ import java.util.HashMap;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -43,7 +42,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final StringProperty citeCommandProperty = new SimpleStringProperty("");
     private final StringProperty startCharacterProperty = new SimpleStringProperty("");
     private final StringProperty endCharacterProperty = new SimpleStringProperty("");
-    private final StringProperty delimiter = new SimpleStringProperty("");
+    private final StringProperty delimiterProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomTerminalProperty = new SimpleBooleanProperty();
     private final StringProperty customTerminalCommandProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomFileBrowserProperty = new SimpleBooleanProperty();
@@ -107,6 +106,10 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         useCustomFileBrowserProperty.setValue(initialExternalApplicationPreferences.useCustomFileBrowser());
         customFileBrowserCommandProperty.setValue(initialExternalApplicationPreferences.getCustomFileBrowserCommand());
         kindleEmailProperty.setValue(initialExternalApplicationPreferences.getKindleEmail());
+
+        startCharacterProperty.setValue(initialExternalApplicationPreferences.getStartCharacter());
+        endCharacterProperty.setValue(initialExternalApplicationPreferences.getEndCharacter());
+        delimiterProperty.setValue(initialExternalApplicationPreferences.getDelimiter());
     }
 
     @Override
@@ -120,6 +123,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         externalPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());
         externalPreferences.setCustomFileBrowserCommand(customFileBrowserCommandProperty.getValue());
         externalPreferences.setKindleEmail(kindleEmailProperty.getValue());
+        externalPreferences.setDelimiter(delimiterProperty.getValue());
+        externalPreferences.setStartCharacter(startCharacterProperty.getValue());
+        externalPreferences.setEndCharacter(endCharacterProperty.getValue());
 
         PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
         pushPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());
@@ -215,7 +221,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public StringProperty startCharacterProperty() {
-        return this.endCharacterProperty;
+        return this.startCharacterProperty;
     }
 
     public StringProperty endCharacterProperty() {
@@ -223,7 +229,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public StringProperty delimiterProperty() {
-        return this.delimiter;
+        return this.delimiterProperty;
     }
 
     public BooleanProperty useCustomTerminalProperty() {

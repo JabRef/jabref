@@ -706,6 +706,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CITE_COMMAND, "\\cite");
         defaults.put(CITE_COMMAND_START_CHARACTER, "{");
         defaults.put(CITE_COMMAND_END_CHARACTER, "}");
+        defaults.put(CITE_COMMAND_DELIMITER, ",");
 
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);

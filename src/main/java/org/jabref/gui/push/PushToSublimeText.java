@@ -1,7 +1,9 @@
 package org.jabref.gui.push;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -74,11 +76,19 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     @Override
     protected String[] getCommandLine(String keyString) {
+
+        String citeCommand = getCiteCommand();
+        // we need to escape the extra slashses
+        if (getCiteCommand().contains("\\")){
+            citeCommand = "\"\\" + getCiteCommand();
+        }
+
         if (OS.WINDOWS) {
             // TODO we might need to escape the inner double quotes with """ """
-            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCiteCommand() + "{" + keyString + "}\"}\""};
+            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCiteCommand() + getStartCharacter() + keyString + getEndCharacter() +"\"}\""};
         } else {
-            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"\\" + getCiteCommand() + "{" + keyString + "}\"}'"};
+            var x = new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + getStartCharacter() + keyString + getEndCharacter() +"\"}'"};
+            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + getStartCharacter() + keyString + getEndCharacter() +"\"}'"};
         }
     }
 }

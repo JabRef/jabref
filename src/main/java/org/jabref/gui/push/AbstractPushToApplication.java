@@ -146,6 +146,18 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return preferencesService.getExternalApplicationsPreferences().getCiteCommand();
     }
 
+    protected String getDelimiter() {
+        return preferencesService.getExternalApplicationsPreferences().getDelimiter();
+    }
+
+    protected String getStartCharacter() {
+        return preferencesService.getExternalApplicationsPreferences().getStartCharacter();
+    }
+
+    protected String getEndCharacter() {
+        return preferencesService.getExternalApplicationsPreferences().getEndCharacter();
+    }
+
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);

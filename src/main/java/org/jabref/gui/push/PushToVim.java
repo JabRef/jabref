@@ -59,7 +59,7 @@ public class PushToVim extends AbstractPushToApplication {
             String[] com = new String[]{commandPath, "--servername",
                     preferencesService.getPushToApplicationPreferences().getVimServer(), "--remote-send",
                     "<C-\\><C-N>a" + getCiteCommand() +
-                            "{" + keys + "}"};
+                            getStartCharacter() + keys + getEndCharacter()};
 
             final Process p = Runtime.getRuntime().exec(com);
 
