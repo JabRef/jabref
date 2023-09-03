@@ -21,6 +21,7 @@
 package org.jabref.gui.openoffice;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -326,7 +327,7 @@ public class Bootstrap {
             throw e;
         } catch (java.lang.RuntimeException e) {
             throw e;
-        } catch (java.lang.Exception e) {
+        } catch (Exception e) {
             throw new BootstrapException(e);
         }
 
@@ -349,7 +350,7 @@ public class Bootstrap {
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace(System.err);
-                } catch (java.io.IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace(System.err);
                 }
             }

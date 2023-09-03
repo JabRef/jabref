@@ -99,6 +99,8 @@ recipeList:
   # We voted against it
   #  - org.openrewrite.staticanalysis.ExplicitInitialization
 
+  - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
+
   - org.openrewrite.staticanalysis.AtomicPrimitiveEqualsUsesGet
   - org.openrewrite.staticanalysis.BigDecimalRoundingConstantsToEnums
   - org.openrewrite.staticanalysis.BooleanChecksNotInverted
