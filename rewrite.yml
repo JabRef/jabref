@@ -158,6 +158,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.RenameLocalVariablesToCamelCase
   - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrTostring
   - org.openrewrite.staticanalysis.ReplaceRedundantFormatWithPrintf
+  - org.openrewrite.staticanalysis.ReplaceStringBuilderWithString
 #  - org.openrewrite.staticanalysis.ShortenFullyQualifiedTypeReferences
 #  - org.openrewrite.staticanalysis.SimplifyConsecutiveAssignments
 #  - org.openrewrite.staticanalysis.SimplifyCompoundStatement
