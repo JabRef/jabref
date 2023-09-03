@@ -18,3 +18,7 @@ Howto for Windows - other operating systems work similar:
 Note: If you do not do this, you get following error message:
 
     Could not find server key store C:\Users\USERNAME\AppData\Local\org.jabref\jabref\ssl\server.p12.
+
+## Start http server
+
+The class starting the server is `org.jabref.http.server.Server`.
