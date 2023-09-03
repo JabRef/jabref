@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
 
 import javafx.beans.Observable;
@@ -500,7 +501,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             try {
             urlDownload.canBeReached();
         } catch (kong.unirest.UnirestException ex) {
-            if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
+            if (ex.getCause() instanceof SSLHandshakeException) {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
                                           urlDownload.getSource().toString()))) {

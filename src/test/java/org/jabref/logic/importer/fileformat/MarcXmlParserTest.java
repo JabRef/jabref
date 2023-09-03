@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -26,7 +27,7 @@ public class MarcXmlParserTest {
     private void doTest(String xmlName, String bibName) throws Exception {
         try (InputStream is = MarcXmlParserTest.class.getResourceAsStream(xmlName)) {
             MarcXmlParser parser = new MarcXmlParser();
-            java.util.List<BibEntry> entries = parser.parseEntries(is);
+            List<BibEntry> entries = parser.parseEntries(is);
             assertNotNull(entries);
             BibEntryAssert.assertEquals(MarcXmlParserTest.class, bibName, entries.get(0));
         }
