@@ -1,9 +1,7 @@
 package org.jabref.gui.push;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +66,8 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
             JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
             JabRefExecutorService.INSTANCE.execute(streamGobblerError);
-        } catch (IOException excep) {
+        } catch (
+                IOException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
         }
