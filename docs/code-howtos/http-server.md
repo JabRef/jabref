@@ -60,3 +60,8 @@ INFO: [HttpServer] Started.
 2023-04-22 11:44:59 [ForkJoinPool.commonPool-worker-1] org.jabref.http.server.Server.lambda$startServer$4()
 DEBUG: Server started.
 ```
+
+## Developing with IntelliJ
+
+IntelliJ Ultimate offers a Markdown-based http-client. One has to open the file `src/test/java/org/jabref/testutils/interactive/http/rest-api.http`.
+Then, there are play buttons appearing for interacting with the server.
