@@ -16,6 +16,8 @@ open module org.jabref {
     requires com.dlsc.gemsfx;
     uses com.dlsc.gemsfx.TagsField;
     requires de.saxsys.mvvmfx;
+    requires reactfx;
+    requires org.fxmisc.flowless;
 
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
