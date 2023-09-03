@@ -10,7 +10,7 @@ description: |
   `snap connect jabref:removable-media`
 grade: stable
 confinement: strict
-base: core20
+base: core22
 compression: lzo
 architectures:
   - build-on: amd64
