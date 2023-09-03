@@ -1,0 +1,58 @@
+name: Refresh Journal Lists
+
+on:
+  push:
+    branches:
+      - update-workflow
+  schedule:
+    # Run on the first of each month at 9:00 AM (See https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07)
+    - cron: "0 9 1 * *"
+  workflow_dispatch:
+
+jobs:
+  update-aea:
+    name: Update AEA
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - run: wget https://raw.github.com/jrnold/jabref-econ-journal-abbrevs/master/aea-abbrevs.txt -O journals/journal_abbreviations_aea.txt
+      - run: pip install pandas
+      - run: python scripts/convert_txt2csv.py
+      - run: rm journals/journal_abbreviations_aea.txt
+      - uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-aea
+          title: "[Bot] Update AEA Journal abbreviation list"
+          commit-message: "Update AEA journal abbreviation list"
+  update-astronomy:
+    name: Update Astronomy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - run: wget https://raw.githubusercontent.com/timstaley/jabref-astro-abbreviations/master/MNRAS_abbreviations.txt -O journals/journal_abbreviations_astronomy.txt
+      - run: pip install pandas
+      - run: python scripts/convert_txt2csv.py
+      - run: rm journals/journal_abbreviations_astronomy.txt
+      - uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-astronomy
+          title: "[Bot] Update Astronomy Journal abbreviation list"
+          commit-message: "Update Astronomy journal abbreviation list"
+  update-mathscinet:
+    name: Update MathSciNet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - run: pip install pandas
+      - run: python scripts/update_mathscinet.py
+      - uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-mathscinet
+          title: "[Bot] Update MathSciNet Journal abbreviation list"
+          commit-message: "Update MathSciNet journal abbreviation list"

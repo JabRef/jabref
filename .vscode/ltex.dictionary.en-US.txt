@@ -1,0 +1,3 @@
+unabbreviating
+unabbreviation
+JabRef
