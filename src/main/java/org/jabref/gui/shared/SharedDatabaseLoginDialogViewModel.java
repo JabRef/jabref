@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -22,8 +24,9 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -40,6 +43,7 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -72,11 +76,14 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
     private final StringProperty serverTimezone = new SimpleStringProperty("");
 
-    private final LibraryTabContainer tabContainer;
+    private final JabRefFrame frame;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
+    private final StateManager stateManager;
+    private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final UndoManager undoManager;
 
     private final Validator databaseValidator;
     private final Validator hostValidator;
@@ -86,14 +93,20 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator keystoreValidator;
     private final CompositeValidator formValidator;
 
-    public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
+    public SharedDatabaseLoginDialogViewModel(JabRefFrame frame,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
-                                              FileUpdateMonitor fileUpdateMonitor) {
-        this.tabContainer = tabContainer;
+                                              StateManager stateManager,
+                                              BibEntryTypesManager entryTypesManager,
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              UndoManager undoManager) {
+        this.frame = frame;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.undoManager = undoManager;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
 
@@ -163,7 +176,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         loading.set(true);
 
         try {
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(tabContainer, dialogService, preferencesService, fileUpdateMonitor);
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame, dialogService, preferencesService, stateManager, entryTypesManager, fileUpdateMonitor, undoManager);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 
@@ -265,7 +278,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
-        List<LibraryTab> libraryTabs = tabContainer.getLibraryTabs();
+        List<LibraryTab> libraryTabs = frame.getLibraryTabs();
         return libraryTabs.parallelStream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
 

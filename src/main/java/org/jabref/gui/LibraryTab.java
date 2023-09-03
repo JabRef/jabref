@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -855,6 +857,29 @@ public class LibraryTab extends Tab {
                        .executeWith(Globals.TASK_EXECUTOR);
 
         return newTab;
+    }
+
+    public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
+                                              JabRefFrame frame,
+                                              DialogService dialogService,
+                                              PreferencesService preferencesService,
+                                              StateManager stateManager,
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              BibEntryTypesManager entryTypesManager,
+                                              UndoManager undoManager) {
+        Objects.requireNonNull(databaseContext);
+
+        LibraryTab libraryTab = new LibraryTab(
+                databaseContext,
+                frame,
+                dialogService,
+                preferencesService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                (CountingUndoManager) undoManager);
+
+        return libraryTab;
     }
 
     private class GroupTreeListener {

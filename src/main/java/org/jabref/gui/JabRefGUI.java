@@ -177,6 +177,9 @@ public class JabRefGUI {
         }
     }
 
+    /**
+     * ToDo: This should be part of JabRefFrame
+     */
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
         if (!isBlank && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
@@ -210,7 +213,15 @@ public class JabRefGUI {
 
             if (parserResult.getDatabase().isShared()) {
                 try {
-                    OpenDatabase.openSharedDatabase(parserResult, mainFrame, mainFrame.getDialogService(), preferencesService, fileUpdateMonitor);
+                    OpenDatabase.openSharedDatabase(
+                            parserResult,
+                            mainFrame,
+                            mainFrame.getDialogService(),
+                            preferencesService,
+                            Globals.stateManager,
+                            Globals.entryTypesManager,
+                            fileUpdateMonitor,
+                            mainFrame.getUndoManager());
                 } catch (SQLException |
                         DatabaseNotSupportedException |
                         InvalidDBMSConnectionPropertiesException |
@@ -228,14 +239,14 @@ public class JabRefGUI {
                 // add them to the list
                 toOpenTab.add(parserResult);
             } else {
-                mainFrame.addParserResult(parserResult, first);
+                mainFrame.addTab(parserResult, first);
                 first = false;
             }
         }
 
         // finally add things to the currently opened tab
-        for (ParserResult pr : toOpenTab) {
-            mainFrame.addParserResult(pr, first);
+        for (ParserResult parserResult : toOpenTab) {
+            mainFrame.addTab(parserResult, first);
             first = false;
         }
 

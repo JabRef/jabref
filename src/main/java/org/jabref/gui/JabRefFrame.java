@@ -675,37 +675,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     /**
-     * Might be called when a user asks JabRef at the command line
-     * i) to import a file or
-     * ii) to open a .bib file
-     */
-    public void addParserResult(ParserResult parserResult, boolean focusPanel) {
-        if (parserResult.toOpenTab()) {
-            // Add the entries to the open tab.
-            LibraryTab libraryTab = getCurrentLibraryTab();
-            if (libraryTab == null) {
-                // There is no open tab to add to, so we create a new tab:
-                addTab(parserResult.getDatabaseContext(), focusPanel);
-            } else {
-                addImportedEntries(libraryTab, parserResult);
-            }
-        } else {
-            // only add tab if library is not already open
-            Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
-                                                              .filter(p -> p.getBibDatabaseContext()
-                                                                            .getDatabasePath()
-                                                                            .equals(parserResult.getPath()))
-                                                              .findFirst();
-
-            if (libraryTab.isPresent()) {
-                tabbedPane.getSelectionModel().select(libraryTab.get());
-            } else {
-                addTab(parserResult.getDatabaseContext(), focusPanel);
-            }
-        }
-    }
-
-    /**
      * This method causes all open LibraryTabs to set up their tables anew. When called from PreferencesDialogViewModel,
      * this updates to the new settings. We need to notify all tabs about the changes to avoid problems when changing
      * the column set.
@@ -752,10 +721,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
      * Opens a new tab with existing data.
      * Asynchronous loading is done at {@link org.jabref.gui.LibraryTab#createLibraryTab(BackgroundTask, Path, PreferencesService, StateManager, JabRefFrame, ThemeManager)}.
      */
-    public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
+    public void addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(
+        LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 databaseContext,
                 this,
                 dialogService,
@@ -764,8 +733,39 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager);
+
         addTab(libraryTab, raisePanel);
-        return libraryTab;
+    }
+
+    /**
+     * Might be called when a user asks JabRef at the command line
+     * i) to import a file or
+     * ii) to open a .bib file
+     */
+    public void addTab(ParserResult parserResult, boolean raisePanel) {
+        if (parserResult.toOpenTab()) {
+            // Add the entries to the open tab.
+            LibraryTab libraryTab = getCurrentLibraryTab();
+            if (libraryTab == null) {
+                // There is no open tab to add to, so we create a new tab:
+                addTab(parserResult.getDatabaseContext(), raisePanel);
+            } else {
+                addImportedEntries(libraryTab, parserResult);
+            }
+        } else {
+            // only add tab if library is not already open
+            Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
+                                                              .filter(p -> p.getBibDatabaseContext()
+                                                                            .getDatabasePath()
+                                                                            .equals(parserResult.getPath()))
+                                                              .findFirst();
+
+            if (libraryTab.isPresent()) {
+                tabbedPane.getSelectionModel().select(libraryTab.get());
+            } else {
+                addTab(parserResult.getDatabaseContext(), raisePanel);
+            }
+        }
     }
 
     /**

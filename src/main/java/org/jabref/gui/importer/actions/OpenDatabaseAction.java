@@ -230,7 +230,15 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (parserResult.getDatabase().isShared()) {
-                         OpenDatabase.openSharedDatabase(parserResult, frame, dialogService, preferencesService, fileUpdateMonitor);
+                         OpenDatabase.openSharedDatabase(
+                                 parserResult,
+                                 frame,
+                                 dialogService,
+                                 preferencesService,
+                                 stateManager,
+                                 entryTypesManager,
+                                 fileUpdateMonitor,
+                                 undoManager);
         }
         return parserResult;
     }
