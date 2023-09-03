@@ -209,12 +209,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
         WriteMetadataToPdfCommand writeMetadataToPdfCommand = new WriteMetadataToPdfCommand(
                 linkedFile.getFile(),
-                bibEntry.getValueOrElse(new BibEntry()), databaseContext,
+                bibEntry.getValueOrElse(new BibEntry()),
+                preferencesService.getFieldPreferences(),
+                databaseContext,
                 dialogService,
-                preferencesService,
                 bibEntryTypesManager,
                 abbreviationRepository,
-                taskExecutor);
+                taskExecutor,
+                preferencesService.getFilePreferences(),
+                preferencesService.getXmpPreferences());
         writeMetadataToPdf.disableProperty().bind(writeMetadataToPdfCommand.executableProperty().not());
         writeMetadataToPdf.setOnAction(event -> writeMetadataToPdfCommand.execute());
 

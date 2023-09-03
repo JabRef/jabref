@@ -52,15 +52,14 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     private final JournalAbbreviationRepository abbreviationRepository;
 
     private OptionsDialog optionsDialog;
-
-    private BibDatabase database;
+    private BibDatabaseContext databaseContext;
     private Collection<BibEntry> entries;
 
     private boolean shouldContinue = true;
     private int skipped;
     private int entriesChanged;
     private int errors;
-
+// used by menu
     public WriteMetadataToPdfAction(StateManager stateManager,
                                     BibEntryTypesManager entryTypesManager,
                                     FieldPreferences fieldPreferences,
@@ -93,7 +92,8 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
             return;
         }
 
-        database = stateManager.getActiveDatabase().get().getDatabase();
+        databaseContext = stateManager.getActiveDatabase().get();
+        BibDatabase database = databaseContext.getDatabase();
         // Get entries and check if it makes sense to perform this operation
         entries = stateManager.getSelectedEntries();
 
@@ -152,7 +152,7 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
-                            writeMetadataToFile(file, entry, stateManager.getActiveDatabase().get(), database);
+                            writeMetadataToFile(file, entry);
                             Platform.runLater(() ->
                                     optionsDialog.getProgressArea()
                                                  .appendText("  " + Localization.lang("OK") + ".\n"));
@@ -202,11 +202,18 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     /**
      * This writes both XMP data and embeds a corresponding .bib file
      */
-    synchronized private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
-        new XmpUtilWriter(xmpPreferences).writeXmp(file, entry, database);
+    synchronized private void writeMetadataToFile(Path file, BibEntry entry) throws Exception {
+        new XmpUtilWriter(xmpPreferences).writeXmp(file, entry, databaseContext.getDatabase());
 
-        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), entryTypesManager, fieldPreferences);
-        embeddedBibExporter.exportToFileByPath(databaseContext, filePreferences, file, abbreviationRepository);
+        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(
+                databaseContext.getMode(),
+                entryTypesManager,
+                fieldPreferences);
+        embeddedBibExporter.exportToFileByPath(
+                databaseContext,
+                filePreferences,
+                file,
+                abbreviationRepository);
     }
 
     class OptionsDialog extends FXDialog {
