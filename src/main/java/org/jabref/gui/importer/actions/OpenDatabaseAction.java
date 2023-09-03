@@ -3,7 +3,6 @@ package org.jabref.gui.importer.actions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,16 +19,12 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.menus.FileHistoryMenu;
-import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -222,23 +217,9 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (parserResult.getDatabase().isShared()) {
-            openSharedDatabase(parserResult, frame, preferencesService, fileUpdateMonitor);
+            OpenDatabase.openSharedDatabase(parserResult, frame, preferencesService, fileUpdateMonitor);
         }
         return parserResult;
-    }
-
-    public static void openSharedDatabase(ParserResult parserResult, JabRefFrame frame, PreferencesService preferencesService, FileUpdateMonitor fileUpdateMonitor) throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
-        try {
-            new SharedDatabaseUIManager(frame, preferencesService, fileUpdateMonitor)
-                    .openSharedDatabaseFromParserResult(parserResult);
-        } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                NotASharedDatabaseException e) {
-            parserResult.getDatabaseContext().clearDatabasePath(); // do not open the original file
-            parserResult.getDatabase().clearSharedDatabaseID();
-            LOGGER.error("Connection error", e);
-
-            throw e;
-        }
     }
 
     private void trackOpenNewDatabase(LibraryTab libraryTab) {

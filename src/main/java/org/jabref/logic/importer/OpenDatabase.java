@@ -2,15 +2,22 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
 import org.jabref.migrations.PostOpenMigration;
 import org.jabref.migrations.SpecialFieldsToSeparateFields;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 public class OpenDatabase {
 
@@ -41,6 +48,19 @@ public class OpenDatabase {
 
         for (PostOpenMigration migration : postOpenMigrations) {
             migration.performMigration(parserResult);
+        }
+    }
+
+    public static void openSharedDatabase(ParserResult parserResult, JabRefFrame frame, PreferencesService preferencesService, FileUpdateMonitor fileUpdateMonitor) throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
+        try {
+            new SharedDatabaseUIManager(frame, preferencesService, fileUpdateMonitor)
+                    .openSharedDatabaseFromParserResult(parserResult);
+        } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                NotASharedDatabaseException e) {
+            parserResult.getDatabaseContext().clearDatabasePath(); // do not open the original file
+            parserResult.getDatabase().clearSharedDatabaseID();
+
+            throw e;
         }
     }
 }
