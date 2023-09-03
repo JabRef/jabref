@@ -33,6 +33,7 @@ import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.cleanup.CleanupSingleAction;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
+import org.jabref.gui.entryeditor.semanticscholar.CitationRelationsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.GrobidOptInDialogHelper;
@@ -282,6 +283,8 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new MathSciNetTab());
         entryEditorTabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
         entryEditorTabs.add(new RelatedArticlesTab(this, entryEditorPreferences, preferencesService, dialogService));
+        entryEditorTabs.add(new CitationRelationsTab(entryEditorPreferences, dialogService, databaseContext,
+                undoManager, stateManager, fileMonitor, preferencesService, libraryTab));
 
         sourceTab = new SourceTab(
                 databaseContext,
