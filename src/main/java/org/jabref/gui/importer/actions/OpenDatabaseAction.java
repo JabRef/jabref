@@ -18,7 +18,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
-import org.jabref.gui.menus.FileHistoryMenu;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -26,6 +26,7 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -53,19 +54,22 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
+    private final CountingUndoManager undoManager;
 
     public OpenDatabaseAction(JabRefFrame frame,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
-                              BibEntryTypesManager entryTypesManager) {
+                              BibEntryTypesManager entryTypesManager,
+                              CountingUndoManager undoManager) {
         this.frame = frame;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
+        this.undoManager = undoManager;
     }
 
     /**
@@ -99,7 +103,7 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @return Path of current panel database directory or the working directory
      */
     private Path getInitialDirectory() {
-        if (frame.getBasePanelCount() == 0) {
+        if (frame.getLibraryTabs().isEmpty()) {
             return preferencesService.getFilePreferences().getWorkingDirectory();
         } else {
             Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
@@ -131,7 +135,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
-            for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
+            for (int i = 0; i < frame.getLibraryTabs().size(); i++) {
                 LibraryTab libraryTab = frame.getLibraryTabAt(i);
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
@@ -151,7 +155,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
-            FileHistoryMenu fileHistory = frame.getFileHistory();
+            FileHistory fileHistory = preferencesService.getGuiPreferences().getFileHistory();
             filesToOpen.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
@@ -177,7 +181,16 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         // The backgroundTask is executed within the method createLibraryTab
-        LibraryTab newTab = LibraryTab.createLibraryTab(backgroundTask, file, preferencesService, stateManager, frame, fileUpdateMonitor, entryTypesManager);
+        LibraryTab newTab = LibraryTab.createLibraryTab(
+                backgroundTask,
+                file,
+                dialogService,
+                preferencesService,
+                stateManager,
+                frame,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 
@@ -217,7 +230,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (parserResult.getDatabase().isShared()) {
-            OpenDatabase.openSharedDatabase(parserResult, frame, preferencesService, fileUpdateMonitor);
+                         OpenDatabase.openSharedDatabase(parserResult, frame, dialogService, preferencesService, fileUpdateMonitor);
         }
         return parserResult;
     }

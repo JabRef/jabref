@@ -22,8 +22,8 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -72,7 +72,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
     private final StringProperty serverTimezone = new SimpleStringProperty("");
 
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
@@ -86,11 +86,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator keystoreValidator;
     private final CompositeValidator formValidator;
 
-    public SharedDatabaseLoginDialogViewModel(JabRefFrame frame,
+    public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
                                               FileUpdateMonitor fileUpdateMonitor) {
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -163,13 +163,13 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         loading.set(true);
 
         try {
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame, preferencesService, fileUpdateMonitor);
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(tabContainer, dialogService, preferencesService, fileUpdateMonitor);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 
             if (!folder.getValue().isEmpty() && autosave.get()) {
                 try {
-                    new SaveDatabaseAction(libraryTab, preferencesService, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
+                    new SaveDatabaseAction(libraryTab, dialogService, preferencesService, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }
@@ -177,7 +177,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             return true;
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
+            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"), exception);
         } catch (DatabaseNotSupportedException exception) {
             ButtonType openHelp = new ButtonType("Open Help", ButtonData.OTHER);
 
@@ -265,8 +265,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
-        List<LibraryTab> panels = frame.getLibraryTabs();
-        return panels.parallelStream().anyMatch(panel -> {
+        List<LibraryTab> libraryTabs = tabContainer.getLibraryTabs();
+        return libraryTabs.parallelStream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
 
             return (context.getLocation() == DatabaseLocation.SHARED) &&

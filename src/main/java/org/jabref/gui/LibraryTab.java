@@ -122,14 +122,16 @@ public class LibraryTab extends Tab {
 
     public LibraryTab(BibDatabaseContext bibDatabaseContext,
                       JabRefFrame frame,
+                      DialogService dialogService,
                       PreferencesService preferencesService,
                       StateManager stateManager,
                       FileUpdateMonitor fileUpdateMonitor,
-                      BibEntryTypesManager entryTypesManager) {
+                      BibEntryTypesManager entryTypesManager,
+                      CountingUndoManager undoManager) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.undoManager = frame.getUndoManager();
-        this.dialogService = frame.getDialogService();
+        this.undoManager = undoManager;
+        this.dialogService = dialogService;
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -291,7 +293,7 @@ public class LibraryTab extends Tab {
     public void installAutosaveManagerAndBackupManager() {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
-            autosaveManager.registerListener(new AutosaveUiManager(this, preferencesService, entryTypesManager));
+            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferencesService, entryTypesManager));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferencesService.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, Globals.entryTypesManager, preferencesService);
@@ -657,7 +659,7 @@ public class LibraryTab extends Tab {
      */
 
     public synchronized void markChangedOrUnChanged() {
-        if (getUndoManager().hasChanged()) {
+        if (undoManager.hasChanged()) {
             this.changedProperty.setValue(true);
         } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
             this.changedProperty.setValue(false);
@@ -826,15 +828,25 @@ public class LibraryTab extends Tab {
      */
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
+                                              DialogService dialogService,
                                               PreferencesService preferencesService,
                                               StateManager stateManager,
                                               JabRefFrame frame,
                                               FileUpdateMonitor fileUpdateMonitor,
-                                              BibEntryTypesManager entryTypesManager) {
+                                              BibEntryTypesManager entryTypesManager,
+                                              CountingUndoManager undoManager) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
-        LibraryTab newTab = new LibraryTab(context, frame, preferencesService, stateManager, fileUpdateMonitor, entryTypesManager);
+        LibraryTab newTab = new LibraryTab(
+                context,
+                frame,
+                dialogService,
+                preferencesService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager);
 
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)

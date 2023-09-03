@@ -11,7 +11,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -26,9 +26,6 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
-
-    private final JabRefFrame frame;
-
     @FXML private ComboBox<DBMSType> databaseType;
     @FXML private TextField host;
     @FXML private TextField database;
@@ -50,11 +47,12 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private PreferencesService preferencesService;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
+    private final LibraryTabContainer tabContainer;
     private SharedDatabaseLoginDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public SharedDatabaseLoginDialogView(JabRefFrame frame) {
-        this.frame = frame;
+    public SharedDatabaseLoginDialogView(LibraryTabContainer tabContainer) {
+        this.tabContainer = tabContainer;
         this.setTitle(Localization.lang("Connect to shared database"));
 
         ViewLoader.view(this)
@@ -81,7 +79,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
 
-        viewModel = new SharedDatabaseLoginDialogViewModel(frame, dialogService, preferencesService, fileUpdateMonitor);
+        viewModel = new SharedDatabaseLoginDialogViewModel(tabContainer, dialogService, preferencesService, fileUpdateMonitor);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 

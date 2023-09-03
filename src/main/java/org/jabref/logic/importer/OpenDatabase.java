@@ -6,7 +6,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
@@ -39,7 +40,8 @@ public class OpenDatabase {
         return result;
     }
 
-    private static void performLoadDatabaseMigrations(ParserResult parserResult, Character keywordDelimited) {
+    private static void performLoadDatabaseMigrations(ParserResult parserResult,
+                                                      Character keywordDelimited) {
         List<PostOpenMigration> postOpenMigrations = Arrays.asList(
                 new ConvertLegacyExplicitGroups(),
                 new ConvertMarkingToGroups(),
@@ -51,9 +53,14 @@ public class OpenDatabase {
         }
     }
 
-    public static void openSharedDatabase(ParserResult parserResult, JabRefFrame frame, PreferencesService preferencesService, FileUpdateMonitor fileUpdateMonitor) throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
+    public static void openSharedDatabase(ParserResult parserResult,
+                                          LibraryTabContainer tabContainer,
+                                          DialogService dialogService,
+                                          PreferencesService preferencesService,
+                                          FileUpdateMonitor fileUpdateMonitor)
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
-            new SharedDatabaseUIManager(frame, preferencesService, fileUpdateMonitor)
+            new SharedDatabaseUIManager(tabContainer, dialogService, preferencesService, fileUpdateMonitor)
                     .openSharedDatabaseFromParserResult(parserResult);
         } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                 NotASharedDatabaseException e) {

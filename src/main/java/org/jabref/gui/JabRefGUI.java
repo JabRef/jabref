@@ -210,7 +210,7 @@ public class JabRefGUI {
 
             if (parserResult.getDatabase().isShared()) {
                 try {
-                    OpenDatabase.openSharedDatabase(parserResult, mainFrame, preferencesService, fileUpdateMonitor);
+                    OpenDatabase.openSharedDatabase(parserResult, mainFrame, mainFrame.getDialogService(), preferencesService, fileUpdateMonitor);
                 } catch (SQLException |
                         DatabaseNotSupportedException |
                         InvalidDBMSConnectionPropertiesException |

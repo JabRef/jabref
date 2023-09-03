@@ -474,7 +474,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 prefs,
                 fileUpdateMonitor,
                 taskExecutor,
-                entryTypesManager);
+                entryTypesManager,
+                undoManager);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -754,7 +755,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, fileUpdateMonitor, entryTypesManager);
+        LibraryTab libraryTab = new LibraryTab(
+                databaseContext,
+                this,
+                dialogService,
+                prefs,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager);
         addTab(libraryTab, raisePanel);
         return libraryTab;
     }
@@ -812,7 +821,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         if (buttonType.equals(saveChanges)) {
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, dialogService, prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
                     return true;
                 }
@@ -872,7 +881,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
-        return new OpenDatabaseAction(this, prefs, dialogService, stateManager, fileUpdateMonitor, entryTypesManager);
+        return new OpenDatabaseAction(
+                this,
+                prefs,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager);
     }
 
     public GlobalSearchBar getGlobalSearchBar() {

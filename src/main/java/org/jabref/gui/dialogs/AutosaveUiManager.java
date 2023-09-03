@@ -1,5 +1,6 @@
 package org.jabref.gui.dialogs;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.model.database.event.AutosaveEvent;
@@ -19,8 +20,8 @@ public class AutosaveUiManager {
 
     private final SaveDatabaseAction saveDatabaseAction;
 
-    public AutosaveUiManager(LibraryTab libraryTab, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
-        this.saveDatabaseAction = new SaveDatabaseAction(libraryTab, preferencesService, entryTypesManager);
+    public AutosaveUiManager(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
+        this.saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferencesService, entryTypesManager);
     }
 
     @Subscribe
