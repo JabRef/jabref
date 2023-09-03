@@ -393,8 +393,8 @@ run {
         ]
     }
 
-    if (project.hasProperty('application')){
-        if (application == 'httpserver'){
+    if (project.hasProperty('component')){
+        if (component == 'httpserver'){
             main = 'org.jabref.http.server.Server'
         }
     }
