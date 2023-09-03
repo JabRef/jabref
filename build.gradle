@@ -1,5 +1,4 @@
 import org.gradle.internal.os.OperatingSystem
-import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
@@ -302,6 +301,14 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
+tasks.register("generateJournalAbbreviationList", JavaExec) {
+    group = "JabRef"
+    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "org.jabref.cli.JournalListMvGenerator"
+}
+jar.dependsOn "generateJournalAbbreviationList"
+test.dependsOn "generateJournalAbbreviationList"
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
@@ -310,17 +317,6 @@ tasks.register('generateCitaviSource', XjcTask) {
     schemaFile = "src/main/resources/xjc/citavi/citavi.xsd"
     outputDirectory = "src-gen/main/java/"
     javaPackage = "org.jabref.logic.importer.fileformat.citavi"
-}
-
-tasks.register('generateJournalAbbreviationList', JournalAbbreviationConverter) {
-    group = 'JabRef'
-    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore."
-
-    // This directory is filled by "refresh-journal-lists.yml"
-    // It takes the contents of https://github.com/JabRef/abbrv.jabref.org.git
-    inputDir = file("build/journals")
-
-    outputDir = file("src/main/resources/journals")
 }
 
 tasks.withType(JavaCompile).configureEach {
