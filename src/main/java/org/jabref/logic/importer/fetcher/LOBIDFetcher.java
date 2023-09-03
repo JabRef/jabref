@@ -57,7 +57,6 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
      */
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
-
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new LOBIDQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // search query
         uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber)); // from entry number, starts indexing at 0
@@ -91,9 +90,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
         Field nametype;
 
         // Publication type
-        String isbn = Optional.ofNullable(jsonEntry.optJSONArray("isbn"))
-                              .map(array -> array.getString(0))
-                              .orElse("");
+        String isbn = getFirstArrayElement(jsonEntry, "isbn");
         if (StringUtil.isNullOrEmpty(isbn)) {
             // article
             entry.setType(StandardEntryType.Article);
@@ -105,7 +102,46 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
             entry.setField(StandardField.ISBN, isbn);
         }
 
+        entry.setField(StandardField.ISSN, getFirstArrayElement(jsonEntry, "issn"));
+        entry.setField(StandardField.TITLE, jsonEntry.optString("title", ""));
+
+        // authors
+        JSONArray authors = jsonEntry.optJSONArray("contribution");
+        if (authors != null) {
+            List<String> authorList = new ArrayList<>();
+            for (int i = 0; i < authors.length(); i++) {
+                JSONObject authorObject = authors.getJSONObject(i).optJSONObject("agent");
+                String authorType = getFirstArrayElement(authorObject, "type");
+
+                if (authorType.equals("Person")) {
+                    authorList.add(authorObject.optString("label", ""));
+                }
+            }
+
+            if (!authors.isEmpty()) {
+                entry.setField(StandardField.AUTHOR, String.join(" and ", authorList));
+            }
+        } else {
+            LOGGER.info("No author found.");
+        }
+
+        // publication
+        Optional.ofNullable(jsonEntry.optJSONArray("publication"))
+                .map(array -> array.getJSONObject(0))
+                .ifPresent(publication -> {
+                    entry.setField(nametype, getFirstArrayElement(publication, "publishedBy"));
+                    String date = publication.optString("startDate");
+                    entry.setField(StandardField.DATE, date);
+                    entry.setField(StandardField.YEAR, date);
+                });
+
         return entry;
+    }
+
+    private static String getFirstArrayElement(JSONObject jsonEntry, String key) {
+        return Optional.ofNullable(jsonEntry.optJSONArray(key))
+                       .map(array -> array.getString(0))
+                       .orElse("");
     }
 
     @Override

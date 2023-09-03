@@ -28,6 +28,12 @@ class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         System.out.println(fetchedEntries);
     }
 
+    @Test
+    void searchByQueryFindsEntryPeriodical() throws Exception {
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Décidé");
+        System.out.println(fetchedEntries);
+    }
+
     @Override
     public PagedSearchBasedFetcher getPagedFetcher() {
         return null;
