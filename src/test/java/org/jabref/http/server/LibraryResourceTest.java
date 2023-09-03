@@ -2,6 +2,7 @@ package org.jabref.http.server;
 
 import org.jabref.http.MediaType;
 
+import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class LibraryResourceTest extends ServerTest {
 
     @Override
-    protected jakarta.ws.rs.core.Application configure() {
+    protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(LibraryResource.class, LibrariesResource.class);
         addPreferencesToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
