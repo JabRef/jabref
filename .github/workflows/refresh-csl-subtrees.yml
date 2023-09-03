@@ -30,7 +30,7 @@ jobs:
       - name: Update buildres/csl/csl-styles
         run: |
           cd buildres/csl/csl-styles
-          git checkout main
+          git checkout master
           git pull
           cd ..
           cd ..
@@ -41,7 +41,7 @@ jobs:
       - name: Update buildres/csl/csl-locales
         run: |
           cd buildres/csl/csl-locales
-          git checkout main
+          git checkout master
           git pull
           cd ..
           cd ..
