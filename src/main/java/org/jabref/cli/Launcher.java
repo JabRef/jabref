@@ -21,14 +21,13 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,19 +44,34 @@ import org.tinylog.configuration.Configuration;
 public class Launcher {
     private static Logger LOGGER;
     private static String[] ARGUMENTS;
+    private static boolean isDebugEnabled;
 
     public static void main(String[] args) {
         routeLoggingToSlf4J();
         ARGUMENTS = args;
+
+        // We must configure logging as soon as possible, which is why we cannot wait for the usual
+        // argument parsing workflow to parse logging options .e.g. --debug
+        JabRefCLI jabRefCLI;
+        try {
+            jabRefCLI = new JabRefCLI(ARGUMENTS);
+            isDebugEnabled = jabRefCLI.isDebugLogging();
+        } catch (ParseException e) {
+            isDebugEnabled = false;
+        }
+
         addLogToDisk();
         try {
+            BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+            Globals.entryTypesManager = entryTypesManager;
+
             // Init preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
             Globals.prefs = preferences;
-            PreferencesMigrations.runMigrations(preferences);
+            PreferencesMigrations.runMigrations(preferences, entryTypesManager);
 
             // Early exit in case another instance is already running
-            if (!handleMultipleAppInstances(args, preferences)) {
+            if (!handleMultipleAppInstances(ARGUMENTS, preferences)) {
                 return;
             }
 
@@ -68,15 +82,20 @@ public class Launcher {
             clearOldSearchIndices();
 
             try {
+                FileUpdateMonitor fileUpdateMonitor = Globals.getFileUpdateMonitor();
+
                 // Process arguments
-                ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START,
-                        preferences);
+                ArgumentProcessor argumentProcessor = new ArgumentProcessor(
+                        ARGUMENTS, ArgumentProcessor.Mode.INITIAL_START,
+                        preferences,
+                        fileUpdateMonitor,
+                        entryTypesManager);
                 if (argumentProcessor.shouldShutDown()) {
                     LOGGER.debug("JabRef shut down after processing command line arguments");
                     return;
                 }
 
-                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, ARGUMENTS);
+                MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, fileUpdateMonitor, ARGUMENTS);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage(preferences);
@@ -97,12 +116,7 @@ public class Launcher {
      * the log configuration programmatically anymore.
      */
     private static void addLogToDisk() {
-        Path directory = Path.of(AppDirsFactory.getInstance()
-                                               .getUserDataDir(
-                                                       OS.APP_DIR_APP_NAME,
-                                                       "logs",
-                                                       OS.APP_DIR_APP_AUTHOR))
-                             .resolve(new BuildInfo().version.toString());
+        Path directory = OS.getNativeDesktop().getLogDirectory();
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -114,7 +128,8 @@ public class Launcher {
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
                 "writerFile", "shared file",
-                "writerFile.level", "debug",
+                "writerFile.level", isDebugEnabled ? "debug" : "info",
+                "level", isDebugEnabled ? "debug" : "info",
                 "writerFile.file", directory.resolve("log.txt").toString(),
                 "writerFile.charset", "UTF-8");
 
@@ -151,12 +166,6 @@ public class Launcher {
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
 
-        // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                preferences.getImporterPreferences(),
-                preferences.getImportFormatPreferences(),
-                Globals.getFileUpdateMonitor());
-
         Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
     }
@@ -175,7 +184,7 @@ public class Launcher {
     }
 
     private static void clearOldSearchIndices() {
-        Path currentIndexPath = BibDatabaseContext.getFulltextIndexBasePath();
+        Path currentIndexPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
         Path appData = currentIndexPath.getParent();
 
         try {
@@ -190,9 +199,9 @@ public class Launcher {
                         && !path.equals(currentIndexPath)) {
                     LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
                     Files.walk(path)
-                         .sorted(Comparator.reverseOrder())
-                         .map(Path::toFile)
-                         .forEach(File::delete);
+                            .sorted(Comparator.reverseOrder())
+                            .map(Path::toFile)
+                            .forEach(File::delete);
                 }
             }
         } catch (IOException e) {

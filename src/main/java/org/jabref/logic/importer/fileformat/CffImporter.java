@@ -100,8 +100,8 @@ public class CffImporter extends Importer {
         for (Map.Entry<String, String> property : citation.values.entrySet()) {
             if (fieldMap.containsKey(property.getKey())) {
                 entryMap.put(fieldMap.get(property.getKey()), property.getValue());
-            } else if (property.getKey().equals("type")) {
-                if (property.getValue().equals("dataset")) {
+            } else if ("type".equals(property.getKey())) {
+                if ("dataset".equals(property.getValue())) {
                     entryType = StandardEntryType.Dataset;
                 }
             } else if (getUnmappedFields().contains(property.getKey())) {
@@ -111,8 +111,8 @@ public class CffImporter extends Importer {
 
         // Translate CFF author format to JabRef author format
         String authorStr = citation.authors.stream()
-                        .map((author) -> author.values)
-                        .map((vals) -> vals.get("name") != null ?
+                        .map(author -> author.values)
+                        .map(vals -> vals.get("name") != null ?
                                 new Author(vals.get("name"), "", "", "", "") :
                                 new Author(vals.get("given-names"), null, vals.get("name-particle"),
                                         vals.get("family-names"), vals.get("name-suffix")))
@@ -123,7 +123,7 @@ public class CffImporter extends Importer {
         // Select DOI to keep
         if ((entryMap.get(StandardField.DOI) == null) && (citation.ids != null)) {
             List<CffIdentifier> doiIds = citation.ids.stream()
-                            .filter(id -> id.type.equals("doi"))
+                            .filter(id -> "doi".equals(id.type))
                             .collect(Collectors.toList());
             if (doiIds.size() == 1) {
                 entryMap.put(StandardField.DOI, doiIds.get(0).value);
@@ -133,7 +133,7 @@ public class CffImporter extends Importer {
         // Select SWHID to keep
         if (citation.ids != null) {
             List<String> swhIds = citation.ids.stream()
-                                           .filter(id -> id.type.equals("swh"))
+                                           .filter(id -> "swh".equals(id.type))
                                            .map(id -> id.value)
                                            .collect(Collectors.toList());
 
@@ -142,7 +142,7 @@ public class CffImporter extends Importer {
             } else if (swhIds.size() > 1) {
                 List<String> relSwhIds = swhIds.stream()
                                                .filter(id -> id.split(":").length > 3) // quick filter for invalid swhids
-                                               .filter(id -> id.split(":")[2].equals("rel"))
+                                               .filter(id -> "rel".equals(id.split(":")[2]))
                                                .collect(Collectors.toList());
                 if (relSwhIds.size() == 1) {
                     entryMap.put(BiblatexSoftwareField.SWHID, relSwhIds.get(0));

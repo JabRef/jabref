@@ -41,7 +41,7 @@ public class OpenFolderAction extends SimpleCommand {
     public void execute() {
             stateManager.getActiveDatabase().ifPresent(databaseContext -> {
                 if (entry == null) {
-                    stateManager.getSelectedEntries().stream().filter((entry) -> !entry.getFiles().isEmpty()).forEach(entry -> {
+                    stateManager.getSelectedEntries().stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(entry -> {
                         LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
                                 entry.getFiles().get(0),
                                 entry,

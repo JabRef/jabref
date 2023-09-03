@@ -46,7 +46,7 @@ public class JournalAbbreviationLoader {
 
         // Read external lists
         List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
-        if (!(lists.isEmpty())) {
+        if (lists != null && !(lists.isEmpty())) {
             // reversing ensures that the latest lists overwrites the former one
             Collections.reverse(lists);
             for (String filename : lists) {

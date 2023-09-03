@@ -5,7 +5,7 @@ import java.io.StringWriter;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +28,7 @@ public record BibEntryDTO(SharedBibEntryData sharingMetadata, String userComment
 
     public static final Logger LOGGER = LoggerFactory.getLogger(BibEntryDTO.class);
 
-    public BibEntryDTO(BibEntry bibEntry, BibDatabaseMode bibDatabaseMode, FieldWriterPreferences fieldWriterPreferences, BibEntryTypesManager bibEntryTypesManager) {
+    public BibEntryDTO(BibEntry bibEntry, BibDatabaseMode bibDatabaseMode, FieldPreferences fieldWriterPreferences, BibEntryTypesManager bibEntryTypesManager) {
         this(bibEntry.getSharedBibEntryData(),
                 bibEntry.getUserComments(),
                 bibEntry.getCitationKey().orElse(""),
@@ -36,7 +36,7 @@ public record BibEntryDTO(SharedBibEntryData sharingMetadata, String userComment
         );
     }
 
-    private static String convertToString(BibEntry entry, BibDatabaseMode bibDatabaseMode, FieldWriterPreferences fieldWriterPreferences, BibEntryTypesManager bibEntryTypesManager) {
+    private static String convertToString(BibEntry entry, BibDatabaseMode bibDatabaseMode, FieldPreferences fieldWriterPreferences, BibEntryTypesManager bibEntryTypesManager) {
         StringWriter rawEntry = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntry, "\n");
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(fieldWriterPreferences), bibEntryTypesManager);

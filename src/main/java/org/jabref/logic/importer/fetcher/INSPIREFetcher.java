@@ -26,7 +26,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -83,7 +82,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(importFormatPreferences);
     }
 
     @Override
@@ -94,7 +93,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         Optional<String> eprint = entry.getField(StandardField.EPRINT);
         String url;
 
-        if (archiveprefix.get() == "arXiv" && !eprint.isEmpty()) {
+        if ("arXiv".equals(archiveprefix.get()) && !eprint.isEmpty()) {
             url = INSPIRE_ARXIV_HOST + eprint.get();
         } else if (!doi.isEmpty()) {
             url = INSPIRE_DOI_HOST + doi.get();
@@ -108,7 +107,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
             results.forEach(this::doPostCleanup);
             return results;
         } catch (IOException | ParseException e) {
-            throw new FetcherException("Error occured during fetching", e);
+            throw new FetcherException("Error occurred during fetching", e);
         }
     }
 }

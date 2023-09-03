@@ -1,34 +1,22 @@
-name: Automerge Pull Requests
-on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - labeled
+name: Dependabot auto-merge
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
-  automerge:
-    name: Automerge Dependency Updates
+  dependabot:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || contains(github.event.pull_request.labels.*.name, 'dependencies')
+    if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
-      - name: 'Wait for status checks'
-        id: waitforstatuschecks
-        uses: "WyriHaximus/github-action-wait-for-status@v1.7.1"
-        with:
-          ignoreActions: Automerge Dependabot,Code coverage,Create snapcraft image,Deploy binaries on builds.jabref.org,codecov/project,markdown-link-check
-          checkInterval: 13
+      - name: Approve PR
+        run: gh pr review --approve "$PR_URL"
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Auto approve
-        uses: hmarr/auto-approve-action@v3.2.1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Merge pull requests
-        uses: pascalgn/automerge-action@v0.15.6
-        if: steps.waitforstatuschecks.outputs.status == 'success'
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Merge PR
+        run: gh pr merge --auto "$PR_URL"
         env:
-          MERGE_METHOD: "merge"
-          MERGE_LABELS: ""
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

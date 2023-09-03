@@ -445,8 +445,8 @@ public class PicaXmlParser implements Parser {
         List<Element> liste = getChildren("subfield", datafield);
 
         for (Element subfield : liste) {
-            if (subfield.getAttribute("code").equals(a)) {
-                return (subfield.getTextContent());
+            if (subfield.getAttribute("code").equalsIgnoreCase(a)) {
+                return subfield.getTextContent();
             }
         }
         return null;

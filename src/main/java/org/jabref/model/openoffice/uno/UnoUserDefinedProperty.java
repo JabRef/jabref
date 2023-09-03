@@ -39,9 +39,9 @@ public class UnoUserDefinedProperty {
     }
 
     public static List<String> getListOfNames(XTextDocument doc) {
-        return (UnoUserDefinedProperty.getPropertyContainer(doc)
+        return UnoUserDefinedProperty.getPropertyContainer(doc)
                                       .map(UnoProperties::getPropertyNames)
-                                      .orElse(new ArrayList<>()));
+                                      .orElse(new ArrayList<>());
     }
 
     /**
@@ -52,8 +52,8 @@ public class UnoUserDefinedProperty {
     public static Optional<String> getStringValue(XTextDocument doc, String property)
             throws
             WrappedTargetException {
-        Optional<XPropertySet> propertySet = (UnoUserDefinedProperty.getPropertyContainer(doc)
-                                                                    .flatMap(UnoProperties::asPropertySet));
+        Optional<XPropertySet> propertySet = UnoUserDefinedProperty.getPropertyContainer(doc)
+                                                                    .flatMap(UnoProperties::asPropertySet);
         if (propertySet.isEmpty()) {
             throw new java.lang.IllegalArgumentException("getting UserDefinedProperties as XPropertySet failed");
         }

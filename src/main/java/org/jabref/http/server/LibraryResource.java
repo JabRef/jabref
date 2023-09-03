@@ -43,11 +43,8 @@ public class LibraryResource {
     public String getJson(@PathParam("id") String id) {
         ParserResult parserResult = getParserResult(id);
         List<BibEntryDTO> list = parserResult.getDatabase().getEntries().stream()
-                                             .map(bibEntry -> {
-                                                 bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry));
-                                                 return bibEntry;
-                                             })
-                                             .map(entry -> new BibEntryDTO(entry, parserResult.getDatabaseContext().getMode(), preferences.getFieldWriterPreferences(), Globals.entryTypesManager))
+                                             .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
+                                             .map(entry -> new BibEntryDTO(entry, parserResult.getDatabaseContext().getMode(), preferences.getFieldPreferences(), Globals.entryTypesManager))
                                              .toList();
         return gson.toJson(list);
     }
@@ -90,12 +87,11 @@ public class LibraryResource {
     }
 
     private java.nio.file.Path getLibraryPath(String id) {
-        java.nio.file.Path library = preferences.getGuiPreferences().getLastFilesOpened()
-                                                .stream()
-                                                .map(java.nio.file.Path::of)
-                                                .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
-                                                .findAny()
-                                                .orElseThrow(() -> new NotFoundException());
-        return library;
+        return preferences.getGuiPreferences().getLastFilesOpened()
+                          .stream()
+                          .map(java.nio.file.Path::of)
+                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
+                          .findAny()
+                          .orElseThrow(NotFoundException::new);
     }
 }

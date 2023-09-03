@@ -7,36 +7,50 @@ import java.util.Optional;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WriteMetadataToPdfCommand extends SimpleCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WriteMetadataToPdfCommand.class);
+
     private final LinkedFile linkedFile;
+    private final BibEntry entry;
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferences;
     private final DialogService dialogService;
-    private final BibEntry entry;
-    private final Logger logger;
+    private final BibEntryTypesManager bibEntryTypesManager;
+    private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
 
-    public WriteMetadataToPdfCommand(LinkedFile linkedFile, BibDatabaseContext databaseContext, PreferencesService preferences, DialogService dialogService, BibEntry entry, Logger logger, TaskExecutor taskExecutor) {
+    public WriteMetadataToPdfCommand(LinkedFile linkedFile,
+                                     BibEntry entry,
+                                     BibDatabaseContext databaseContext,
+                                     DialogService dialogService,
+                                     PreferencesService preferences,
+                                     BibEntryTypesManager bibEntryTypesManager,
+                                     JournalAbbreviationRepository abbreviationRepository,
+                                     TaskExecutor taskExecutor) {
         this.linkedFile = linkedFile;
+        this.entry = entry;
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.entry = entry;
-        this.logger = logger;
+        this.bibEntryTypesManager = bibEntryTypesManager;
+        this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
     }
 
@@ -52,13 +66,20 @@ public class WriteMetadataToPdfCommand extends SimpleCommand {
                         // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
                         new XmpUtilWriter(preferences.getXmpPreferences()).writeXmp(file.get(), entry, databaseContext.getDatabase());
 
-                        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), Globals.entryTypesManager, preferences.getFieldWriterPreferences());
-                        embeddedBibExporter.exportToFileByPath(databaseContext, databaseContext.getDatabase(), preferences.getFilePreferences(), file.get());
+                        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(
+                                databaseContext.getMode(),
+                                bibEntryTypesManager,
+                                preferences.getFieldPreferences());
+                        embeddedBibExporter.exportToFileByPath(
+                                databaseContext,
+                                preferences.getFilePreferences(),
+                                file.get(),
+                                abbreviationRepository);
 
                         dialogService.notify(Localization.lang("Success! Finished writing metadata."));
                     } catch (IOException | TransformerException ex) {
                         dialogService.notify(Localization.lang("Error while writing metadata. See the error log for details."));
-                        logger.error("Error while writing metadata to {}", file.map(Path::toString).orElse(""), ex);
+                        LOGGER.error("Error while writing metadata to {}", file.map(Path::toString).orElse(""), ex);
                     }
                 }
             }

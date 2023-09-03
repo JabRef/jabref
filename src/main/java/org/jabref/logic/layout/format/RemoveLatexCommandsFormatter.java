@@ -59,7 +59,7 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
                     }
                     if (incommand) {
                         // eat up all whitespace characters
-                        while ((currentFieldPosition + 1 < field.length() && Character.isWhitespace(field.charAt(currentFieldPosition + 1)))) {
+                        while (currentFieldPosition + 1 < field.length() && Character.isWhitespace(field.charAt(currentFieldPosition + 1))) {
                             currentFieldPosition++;
                         }
                     }

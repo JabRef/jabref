@@ -3,6 +3,8 @@ src/main/gen/
 src/main/generated/
 src-gen/
 
+structure101-settings.java.hsw
+
 # private data
 /buildres/jabref-cert-2016.p12
 
@@ -475,3 +477,8 @@ lib/ojdbc.jar
 
 # do not ignore JabRef icons (they are ignored by the macos setting above)
 !src/main/java/org/jabref/gui/icon
+
+!**/autosaveandbackup/*.bak
+
+# generated during release process
+CHANGELOG.html

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" name-as-sort-order="all" sort-separator=" " demote-non-dropping-particle="sort-only" default-locale="fr-FR">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
+  <info>
+    <title>la Nouvelle Revue du Travail (Français)</title>
+    <title-short>NRT</title-short>
+    <id>http://www.zotero.org/styles/la-nouvelle-revue-du-travail</id>
+    <link href="http://www.zotero.org/styles/la-nouvelle-revue-du-travail" rel="self"/>
+    <link href="http://www.zotero.org/styles/revista-portuguesa-de-arqueologia" rel="template"/>
+    <link href="https://journals.openedition.org/nrt/531" rel="documentation"/>
+    <author>
+      <name>Célia Bouchet</name>
+      <email>celia.bouchet@sciencespo.fr</email>
+    </author>
+    <category citation-format="author-date"/>
+    <category field="sociology"/>
+    <issn>2495-7593</issn>
+    <eissn>2263-8989</eissn>
+    <updated>2023-02-07T12:40:26+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <macro name="container-contributors">
+    <choose>
+      <if type="chapter paper-conference" match="any">
+        <text value="dans" text-case="lowercase" suffix=" "/>
+        <names variable="director editor" delimiter=", " suffix=",">
+          <name and="symbol" delimiter-precedes-last="never" name-as-sort-order="all">
+            <name-part name="family" text-case="capitalize-first" font-variant="small-caps"/>
+            <name-part name="given"/>
+          </name>
+          <label form="short" prefix=" (" suffix=")"/>
+        </names>
+      </if>
+    </choose>
+  </macro>
+  <macro name="author">
+    <names variable="author" font-variant="normal">
+      <name and="symbol" delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" ">
+        <name-part name="family" text-case="capitalize-first" font-variant="small-caps"/>
+      </name>
+      <label form="short" text-case="capitalize-first" prefix=" (" suffix=")"/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <text variable="title" quotes="true"/>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="author-short">
+    <names variable="author" suffix=", ">
+      <name form="short" and="symbol" delimiter=", " initialize-with=". "/>
+      <substitute>
+        <names variable="editor"/>
+        <names variable="translator"/>
+        <choose>
+          <if type="book" match="any">
+            <text variable="title" form="short" font-style="italic"/>
+          </if>
+          <else>
+            <text variable="title" form="short"/>
+          </else>
+        </choose>
+      </substitute>
+    </names>
+  </macro>
+  <macro name="publisher">
+    <group delimiter=", ">
+      <text variable="publisher-place"/>
+      <text variable="publisher"/>
+    </group>
+  </macro>
+  <macro name="issued">
+    <choose>
+      <if variable="issued">
+        <group>
+          <date variable="issued">
+            <date-part name="year"/>
+          </date>
+          <choose>
+            <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="none">
+              <date variable="issued">
+                <date-part prefix=", " name="month"/>
+                <date-part prefix=" " name="day"/>
+              </date>
+            </if>
+          </choose>
+          <choose>
+            <if match="any" variable="original-date">
+              <date date-parts="year" form="text" variable="original-date" prefix="[" suffix="]"/>
+            </if>
+          </choose>
+        </group>
+      </if>
+      <else>
+        <text term="no date" form="short"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="issued-year">
+    <choose>
+      <if variable="issued">
+        <group>
+          <date variable="issued" prefix=" ">
+            <date-part name="year"/>
+          </date>
+          <choose>
+            <if match="any" variable="original-date">
+              <date date-parts="year" form="numeric" variable="original-date" prefix="[" suffix="]"/>
+            </if>
+          </choose>
+        </group>
+      </if>
+      <else>
+        <text term="no date" form="short"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="title">
+    <choose>
+      <if type="book">
+        <text variable="title" font-style="italic"/>
+      </if>
+      <else>
+        <text variable="title" quotes="true"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="locators">
+    <choose>
+      <if type="article-journal article-magazine article-newspaper" match="any">
+        <group delimiter=", ">
+          <text variable="container-title" font-style="italic"/>
+          <group delimiter=", ">
+            <group>
+              <label variable="volume" form="short"/>
+              <text variable="volume" prefix=" " suffix=", "/>
+              <label variable="issue" form="short"/>
+              <text variable="issue"/>
+            </group>
+            <group delimiter=" ">
+              <text variable="page"/>
+            </group>
+          </group>
+        </group>
+      </if>
+      <else-if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="any">
+        <group delimiter=" ">
+          <text macro="container-contributors"/>
+          <text variable="container-title" font-style="italic" suffix=","/>
+          <group delimiter=", ">
+            <text macro="publisher"/>
+            <text variable="page"/>
+          </group>
+        </group>
+      </else-if>
+      <else-if type="webpage" match="any">
+        <group>
+          <text term="online" text-case="capitalize-first" prefix="[" suffix="], "/>
+          <choose>
+            <if match="any" variable="available-date">
+              <text value="Mis en ligne le"/>
+              <date form="text" variable="available-date" suffix=","/>
+            </if>
+          </choose>
+          <text term="accessed" text-case="capitalize-first" suffix=" "/>
+          <date form="text" variable="accessed" suffix=","/>
+          <text variable="URL" prefix=" URL : "/>
+        </group>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="citation-locator">
+    <group>
+      <label variable="locator" form="short"/>
+      <text variable="locator" prefix=" "/>
+    </group>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
+    <sort>
+      <key variable="issued"/>
+      <key macro="author"/>
+    </sort>
+    <layout prefix="(" suffix=")" delimiter=", ">
+      <group delimiter=" ">
+        <text macro="author-short"/>
+        <text macro="issued-year"/>
+        <text macro="citation-locator"/>
+      </group>
+    </layout>
+  </citation>
+  <bibliography hanging-indent="true" entry-spacing="0">
+    <sort>
+      <key macro="author"/>
+      <key variable="issued"/>
+    </sort>
+    <layout suffix=".">
+      <group delimiter=", ">
+        <group delimiter=" ">
+          <text macro="author"/>
+          <text macro="issued" prefix="(" suffix=")"/>
+        </group>
+        <text macro="title"/>
+      </group>
+      <text macro="locators" prefix=", "/>
+    </layout>
+  </bibliography>
+</style>

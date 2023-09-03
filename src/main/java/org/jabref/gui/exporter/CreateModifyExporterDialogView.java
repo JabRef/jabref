@@ -7,7 +7,6 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
@@ -16,7 +15,6 @@ import jakarta.inject.Inject;
 
 public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel> {
 
-    @Inject private JournalAbbreviationRepository repository;
     private final ExporterViewModel exporter;
     @FXML private TextField name;
     @FXML private TextField fileName;
@@ -45,7 +43,7 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new CreateModifyExporterDialogViewModel(exporter, dialogService, preferences, repository);
+        viewModel = new CreateModifyExporterDialogViewModel(exporter, dialogService, preferences);
         name.textProperty().bindBidirectional(viewModel.getName());
         fileName.textProperty().bindBidirectional(viewModel.getLayoutFileName());
         extension.textProperty().bindBidirectional(viewModel.getExtension());

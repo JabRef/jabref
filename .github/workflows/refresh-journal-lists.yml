@@ -1,7 +1,12 @@
 name: Refresh Journal Lists
 
 on:
-  # Allow to run manually
+  push:
+    paths:
+      - '.github/workflows/refresh-journal-lists.yml'
+      - 'buildSrc/build.gradle'
+      - 'buildSrc/src/main/java/**'
+      - 'src/main/java/org/jabref/logic/journals/**'
   workflow_dispatch:
 
 permissions:
@@ -47,24 +52,14 @@ jobs:
           cp * $GITHUB_WORKSPACE/build/journals/
 
           # ensure that the .java classes are the most recent ones
-          mkdir -p $GITHUB_WORKSPACE/buildSrc/src/copied/java/org/jabref/logic/journals
-          cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/copied/java/org/jabref/logic/journals
+          cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/main/java/org/jabref/logic/journals
 
           # create .mv file
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
       - uses: peter-evans/create-pull-request@v5
-        if: github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update-journallist
-          title: "[Bot] Update Journal abbrev list"
-          commit-message: Update journal abbrev list
-      - name: Commit and push changes
-        uses: EndBug/add-and-commit@v9
-        if: github.ref != 'refs/heads/main'
-        with:
-          message: 'Update journal abbrev list'
-          committer_email: actions@github.com
-          fetch: false
-          push: true
+          title: "[Bot] Update journal abbreviation lists"
+          commit-message: Update journal abbreviation lists

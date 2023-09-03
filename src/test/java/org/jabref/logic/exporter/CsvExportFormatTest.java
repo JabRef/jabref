@@ -3,17 +3,14 @@ package org.jabref.logic.exporter;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,14 +28,14 @@ public class CsvExportFormatTest {
 
     @BeforeEach
     public void setUp() {
-        List<TemplateExporter> customFormats = new ArrayList<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        SavePreferences savePreferences = mock(SavePreferences.class);
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
-
-        exportFormat = exporterFactory.getExporterByName("oocsv").get();
+        exportFormat = new TemplateExporter(
+                "OpenOffice/LibreOffice CSV",
+                "oocsv",
+                "openoffice-csv",
+                "openoffice",
+                StandardFileType.CSV,
+                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                SaveOrder.getDefaultSaveOrder());
 
         databaseContext = new BibDatabaseContext();
     }
@@ -52,9 +49,8 @@ public class CsvExportFormatTest {
     public void testPerformExportForSingleAuthor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "Someone, Van Something");
-        List<BibEntry> entries = Arrays.asList(entry);
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Someone, Van Something");
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, path, entries);
 
@@ -69,9 +65,8 @@ public class CsvExportFormatTest {
     public void testPerformExportForMultipleAuthors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "von Neumann, John and Smith, John and Black Brown, Peter");
-        List<BibEntry> entries = Arrays.asList(entry);
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "von Neumann, John and Smith, John and Black Brown, Peter");
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, path, entries);
 
@@ -86,9 +81,8 @@ public class CsvExportFormatTest {
     public void testPerformExportForSingleEditor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.EDITOR, "Someone, Van Something");
-        List<BibEntry> entries = Arrays.asList(entry);
+        BibEntry entry = new BibEntry().withField(StandardField.EDITOR, "Someone, Van Something");
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, tmpFile.toPath(), entries);
 
@@ -103,9 +97,9 @@ public class CsvExportFormatTest {
     public void testPerformExportForMultipleEditors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.EDITOR, "von Neumann, John and Smith, John and Black Brown, Peter");
-        List<BibEntry> entries = Arrays.asList(entry);
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.EDITOR, "von Neumann, John and Smith, John and Black Brown, Peter");
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, tmpFile.toPath(), entries);
 

@@ -147,10 +147,10 @@ class OOBibBase {
     }
 
     OOVoidResult<OOError> collectResults(String errorTitle, List<OOVoidResult<OOError>> results) {
-        String msg = (results.stream()
+        String msg = results.stream()
                              .filter(OOVoidResult::isError)
                              .map(e -> e.getError().getLocalizedMessage())
-                             .collect(Collectors.joining("\n\n")));
+                             .collect(Collectors.joining("\n\n"));
         if (msg.isEmpty()) {
             return OOVoidResult.ok();
         } else {
@@ -191,7 +191,7 @@ class OOBibBase {
             String msg =
                     Localization.lang("Please move the cursor"
                             + " to the location for the new citation.") + "\n"
-                            + Localization.lang("I cannot insert to the cursors current location.");
+                            + Localization.lang("I cannot insert to the cursor's current location.");
             return OOResult.error(new OOError(errorTitle, msg, ex));
         }
         return OOResult.ok(cursor);
@@ -219,11 +219,11 @@ class OOBibBase {
         boolean requireSeparation = false;
         int maxReportedOverlaps = 10;
         try {
-            return (frontend.checkRangeOverlaps(doc,
+            return frontend.checkRangeOverlaps(doc,
                                     new ArrayList<>(),
                                     requireSeparation,
                                     maxReportedOverlaps)
-                            .mapError(OOError::from));
+                            .mapError(OOError::from);
         } catch (NoDocumentException ex) {
             return OOVoidResult.error(OOError.from(ex).setTitle(errorTitle));
         } catch (WrappedTargetException ex) {

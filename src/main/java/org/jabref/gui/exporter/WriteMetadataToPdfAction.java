@@ -25,8 +25,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -43,11 +44,12 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
 
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
-    private final FieldWriterPreferences fieldWriterPreferences;
+    private final FieldPreferences fieldPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
     private final XmpPreferences xmpPreferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
     private OptionsDialog optionsDialog;
 
@@ -59,14 +61,22 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     private int entriesChanged;
     private int errors;
 
-    public WriteMetadataToPdfAction(StateManager stateManager, BibEntryTypesManager entryTypesManager, FieldWriterPreferences fieldWriterPreferences, DialogService dialogService, TaskExecutor taskExecutor, FilePreferences filePreferences, XmpPreferences xmpPreferences) {
+    public WriteMetadataToPdfAction(StateManager stateManager,
+                                    BibEntryTypesManager entryTypesManager,
+                                    FieldPreferences fieldPreferences,
+                                    DialogService dialogService,
+                                    TaskExecutor taskExecutor,
+                                    FilePreferences filePreferences,
+                                    XmpPreferences xmpPreferences,
+                                    JournalAbbreviationRepository abbreviationRepository) {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
-        this.fieldWriterPreferences = fieldWriterPreferences;
+        this.fieldPreferences = fieldPreferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.filePreferences = filePreferences;
         this.xmpPreferences = xmpPreferences;
+        this.abbreviationRepository = abbreviationRepository;
 
         this.executable.bind(needsDatabase(stateManager));
     }
@@ -195,8 +205,8 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     synchronized private void writeMetadataToFile(Path file, BibEntry entry, BibDatabaseContext databaseContext, BibDatabase database) throws Exception {
         new XmpUtilWriter(xmpPreferences).writeXmp(file, entry, database);
 
-        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), entryTypesManager, fieldWriterPreferences);
-        embeddedBibExporter.exportToFileByPath(databaseContext, database, filePreferences, file);
+        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(databaseContext.getMode(), entryTypesManager, fieldPreferences);
+        embeddedBibExporter.exportToFileByPath(databaseContext, filePreferences, file, abbreviationRepository);
     }
 
     class OptionsDialog extends FXDialog {

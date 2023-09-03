@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -150,26 +150,27 @@ public class BibtexImporter extends Importer {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-
+                // % = char 37, we might have some bom chars in front that we need to skip, so we use index of
+                var percentPos = line.indexOf('%', 0);
                 // Line does not start with %, so there are no comment lines for us and we can stop parsing
-                if (!line.startsWith("%")) {
+                if (percentPos == -1) {
                     return Optional.empty();
                 }
 
                 // Only keep the part after %
-                line = line.substring(1).trim();
+                line = line.substring(percentPos + 1).trim();
 
                 if (line.startsWith(BibtexImporter.SIGNATURE)) {
                     // Signature line, so keep reading and skip to next line
-                } else if (line.startsWith(SavePreferences.ENCODING_PREFIX)) {
+                } else if (line.startsWith(SaveConfiguration.ENCODING_PREFIX)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
                     // Except if there is already a @ symbol signaling the starting of a BibEntry
                     Integer atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
-                        encoding = line.substring(SavePreferences.ENCODING_PREFIX.length(), atSymbolIndex);
+                        encoding = line.substring(SaveConfiguration.ENCODING_PREFIX.length(), atSymbolIndex);
                     } else {
-                        encoding = line.substring(SavePreferences.ENCODING_PREFIX.length());
+                        encoding = line.substring(SaveConfiguration.ENCODING_PREFIX.length());
                     }
 
                     return Optional.of(Charset.forName(encoding));

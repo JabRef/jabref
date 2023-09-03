@@ -70,16 +70,15 @@ public class ExportCommand extends SimpleCommand {
         // Get list of exporters and sort before adding to file dialog
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferences,
-                Globals.entryTypesManager,
-                Globals.journalAbbreviationRepository);
+                Globals.entryTypesManager);
         List<Exporter> exporters = exporterFactory.getExporters().stream()
                                                   .sorted(Comparator.comparing(Exporter::getName))
                                                   .collect(Collectors.toList());
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
-                .withDefaultExtension(preferences.getImportExportPreferences().getLastExportExtension())
-                .withInitialDirectory(preferences.getImportExportPreferences().getExportWorkingDirectory())
+                .withDefaultExtension(preferences.getExportPreferences().getLastExportExtension())
+                .withInitialDirectory(preferences.getExportPreferences().getExportWorkingDirectory())
                 .build();
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), exporters));
@@ -110,8 +109,8 @@ public class ExportCommand extends SimpleCommand {
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
-        preferences.getImportExportPreferences().setLastExportExtension(format.getName());
-        preferences.getImportExportPreferences().setExportWorkingDirectory(file.getParent());
+        preferences.getExportPreferences().setLastExportExtension(format.getName());
+        preferences.getExportPreferences().setExportWorkingDirectory(file.getParent());
 
         final List<BibEntry> finEntries = entries;
 
@@ -120,7 +119,8 @@ public class ExportCommand extends SimpleCommand {
                     format.export(stateManager.getActiveDatabase().get(),
                             file,
                             finEntries,
-                            fileDirForDatabase);
+                            fileDirForDatabase,
+                            Globals.journalAbbreviationRepository);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {
@@ -130,7 +130,7 @@ public class ExportCommand extends SimpleCommand {
                             Localization.lang("Export operation finished successfully."),
                             List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
                                 try {
-                                    JabRefDesktop.openFolderAndSelectFile(file, preferences, dialogService);
+                                    JabRefDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
                                 } catch (IOException e) {
                                     LOGGER.error("Could not open export folder.", e);
                                 }

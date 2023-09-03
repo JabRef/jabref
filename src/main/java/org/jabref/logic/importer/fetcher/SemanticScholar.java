@@ -102,7 +102,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             metaLinks = html.getElementsByClass("flex-paper-actions__button--primary");
             link = metaLinks.select("a").attr("href");
         }
-        LOGGER.info("Fulltext PDF found @ SemanticScholar.");
+        if (link.isBlank()) {
+            return Optional.empty();
+        }
+        LOGGER.info("Fulltext PDF found @ SemanticScholar. Link: {}", link);
         return Optional.of(new URL(link));
     }
 
@@ -185,7 +188,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             entry.setField(StandardField.AUTHOR,
                     IntStream.range(0, item.optJSONArray("authors").length())
                              .mapToObj(item.optJSONArray("authors")::getJSONObject)
-                             .map((author) -> author.has("name") ? author.getString("name") : "")
+                             .map(author -> author.has("name") ? author.getString("name") : "")
                              .collect(Collectors.joining(" and ")));
 
             JSONObject externalIds = item.optJSONObject("externalIds");

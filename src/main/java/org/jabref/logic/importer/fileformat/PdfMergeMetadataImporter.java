@@ -16,7 +16,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.StandardFileType;
@@ -77,7 +76,7 @@ public class PdfMergeMetadataImporter extends Importer {
 
         for (Importer metadataImporter : metadataImporters) {
             List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath).getDatabase().getEntries();
-            if (extractedEntries.size() == 0) {
+            if (extractedEntries.isEmpty()) {
                 continue;
             }
             candidates.add(extractedEntries.get(0));
@@ -97,7 +96,7 @@ public class PdfMergeMetadataImporter extends Importer {
             if (candidate.hasField(StandardField.ISBN)) {
                 try {
                     new IsbnFetcher(importFormatPreferences)
-                            .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+                            // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
                             // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
                             .performSearchById(candidate.getField(StandardField.ISBN).get()).ifPresent(fetchedCandidates::add);
                 } catch (FetcherException e) {
@@ -115,7 +114,7 @@ public class PdfMergeMetadataImporter extends Importer {
             for (Map.Entry<Field, String> fieldEntry : candidate.getFieldMap().entrySet()) {
                 // Don't merge FILE fields that point to a stored file as we set that to filePath anyway.
                 // Nevertheless, retain online links.
-                if (StandardField.FILE.equals(fieldEntry.getKey()) &&
+                if (StandardField.FILE == fieldEntry.getKey() &&
                         FileFieldParser.parse(fieldEntry.getValue()).stream().noneMatch(LinkedFile::isOnlineLink)) {
                     continue;
                 }

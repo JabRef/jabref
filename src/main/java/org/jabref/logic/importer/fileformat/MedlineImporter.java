@@ -29,6 +29,7 @@ import org.jabref.logic.importer.fileformat.medline.Investigator;
 import org.jabref.logic.importer.fileformat.medline.MeshHeading;
 import org.jabref.logic.importer.fileformat.medline.OtherId;
 import org.jabref.logic.importer.fileformat.medline.PersonalNameSubject;
+import org.jabref.logic.importer.util.MathMLParser;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -324,10 +325,10 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void handleElocationId(Map<Field, String> fields, XMLStreamReader reader, String eidType) {
-        if (eidType.equals("doi")) {
+        if ("doi".equals(eidType)) {
             fields.put(StandardField.DOI, reader.getText());
         }
-        if (eidType.equals("pii")) {
+        if ("pii".equals(eidType)) {
             fields.put(new UnknownField("pii"), reader.getText());
         }
     }
@@ -353,7 +354,7 @@ public class MedlineImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Section")) {
+            if (isEndXMLEvent(reader) && "Section".equals(reader.getName().getLocalPart())) {
                 if (sectionLevel == 0) {
                     break;
                 } else {
@@ -664,7 +665,7 @@ public class MedlineImporter extends Importer implements Parser {
             reader.next();
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
-                if (elementName.equals("GeneSymbol")) {
+                if ("GeneSymbol".equals(elementName)) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         geneSymbols.add(reader.getText());
@@ -690,7 +691,7 @@ public class MedlineImporter extends Importer implements Parser {
             reader.next();
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
-                if (elementName.equals("NameOfSubstance")) {
+                if ("NameOfSubstance".equals(elementName)) {
                     reader.next();
                     if (isCharacterXMLEvent(reader)) {
                         chemicalNames.add(reader.getText());
@@ -782,7 +783,7 @@ public class MedlineImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Article")) {
+            if (isEndXMLEvent(reader) && "Article".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -828,7 +829,7 @@ public class MedlineImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Journal")) {
+            if (isEndXMLEvent(reader) && "Journal".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
@@ -1082,6 +1083,9 @@ public class MedlineImporter extends Importer implements Parser {
             if (isStartXMLEvent(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
+                    case "math" -> {
+                        result.append(MathMLParser.parse(reader));
+                    }
                     case "sup", "sub" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
@@ -1199,12 +1203,12 @@ public class MedlineImporter extends Importer implements Parser {
                 }
             }
 
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals("Author")) {
+            if (isEndXMLEvent(reader) && "Author".equals(reader.getName().getLocalPart())) {
                 break;
             }
         }
 
-        if (collectiveNames.size() > 0) {
+        if (!collectiveNames.isEmpty()) {
             authorNames.addAll(collectiveNames);
         }
         if (!authorName.toString().isBlank()) {

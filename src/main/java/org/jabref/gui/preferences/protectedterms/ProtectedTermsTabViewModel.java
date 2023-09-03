@@ -27,6 +27,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -37,17 +38,17 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     private final ProtectedTermsLoader termsLoader;
     private final ListProperty<ProtectedTermsListItemModel> termsFilesProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final PreferencesService preferences;
+    private final FilePreferences filePreferences;
     private final DialogService dialogService;
     private final ProtectedTermsPreferences protectedTermsPreferences;
 
     public ProtectedTermsTabViewModel(ProtectedTermsLoader termsLoader,
                                       DialogService dialogService,
-                                      PreferencesService preferences) {
+                                      PreferencesService preferencesService) {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.protectedTermsPreferences = preferences.getProtectedTermsPreferences();
+        this.filePreferences = preferencesService.getFilePreferences();
+        this.protectedTermsPreferences = preferencesService.getProtectedTermsPreferences();
     }
 
     @Override
@@ -92,7 +93,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
                 .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
-                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration)
@@ -116,18 +117,18 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
     }
 
     public void createNewFile() {
-        dialogService.showCustomDialogAndWait(new NewProtectedTermsFileDialog(termsFilesProperty, dialogService, preferences.getFilePreferences()));
+        dialogService.showCustomDialogAndWait(new NewProtectedTermsFileDialog(termsFilesProperty, dialogService, filePreferences));
     }
 
     public void edit(ProtectedTermsListItemModel file) {
         Optional<ExternalFileType> termsFileType = OptionalUtil.<ExternalFileType>orElse(
-                ExternalFileTypes.getExternalFileTypeByExt("terms", preferences.getFilePreferences()),
-                ExternalFileTypes.getExternalFileTypeByExt("txt", preferences.getFilePreferences())
+                ExternalFileTypes.getExternalFileTypeByExt("terms", filePreferences),
+                ExternalFileTypes.getExternalFileTypeByExt("txt", filePreferences)
         );
 
         String fileName = file.getTermsList().getLocation();
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), preferences, fileName, termsFileType);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, fileName, termsFileType);
         } catch (IOException e) {
             LOGGER.warn("Problem open protected terms file editor", e);
         }

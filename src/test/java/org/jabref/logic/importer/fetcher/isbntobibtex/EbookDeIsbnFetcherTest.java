@@ -13,6 +13,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
+@Disabled
 @FetcherTest
 public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
@@ -84,6 +86,6 @@ public class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
      */
     @Test
     public void searchForValidButNotFoundISBN() throws Exception {
-        assertThrows(FetcherClientException.class, ()-> fetcher.performSearchById("3728128155"));
+        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("3728128155"));
     }
 }

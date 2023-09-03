@@ -24,7 +24,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -52,6 +51,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
@@ -109,18 +109,18 @@ public class GroupDialogViewModel {
     private final PreferencesService preferencesService;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
-    private final GroupDialogHeader groupDialogHeader;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
                                 PreferencesService preferencesService,
                                 AbstractGroup editedGroup,
-                                GroupDialogHeader groupDialogHeader) {
+                                FileUpdateMonitor fileUpdateMonitor) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
-        this.groupDialogHeader = groupDialogHeader;
+        this.fileUpdateMonitor = fileUpdateMonitor;
 
         setupValidation();
         setValues();
@@ -279,7 +279,7 @@ public class GroupDialogViewModel {
      * @return an absolute path if LatexFileDirectory exists; otherwise, returns input
      */
     private Path getAbsoluteTexGroupPath(String input) {
-        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUser());
+        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost());
         return latexFileDirectory.map(path -> path.resolve(input)).orElse(Path.of(input));
     }
 
@@ -334,6 +334,7 @@ public class GroupDialogViewModel {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
                     char delimiter = ',';
                     char hierarDelimiter = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
+                    autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
                     // Modify values for delimiters if user provided customized values
                     if (!autoGroupKeywordsDelimiterProperty.getValue().isEmpty()) {
                         delimiter = autoGroupKeywordsDelimiterProperty.getValue().charAt(0);
@@ -359,7 +360,7 @@ public class GroupDialogViewModel {
                         groupHierarchySelectedProperty.getValue(),
                         Path.of(texGroupFilePathProperty.getValue().trim()),
                         new DefaultAuxParser(new BibDatabase()),
-                        Globals.getFileUpdateMonitor(),
+                        fileUpdateMonitor,
                         currentDatabase.getMetaData());
             }
 
@@ -387,6 +388,7 @@ public class GroupDialogViewModel {
             colorProperty.setValue(IconTheme.getDefaultGroupColor());
             typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
+            autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
         } else {
             nameProperty.setValue(editedGroup.getName());
             colorProperty.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));
@@ -423,11 +425,13 @@ public class GroupDialogViewModel {
 
                 if (editedGroup.getClass() == AutomaticKeywordGroup.class) {
                     AutomaticKeywordGroup group = (AutomaticKeywordGroup) editedGroup;
+                    autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
                     autoGroupKeywordsDelimiterProperty.setValue(group.getKeywordDelimiter().toString());
                     autoGroupKeywordsHierarchicalDelimiterProperty.setValue(group.getKeywordHierarchicalDelimiter().toString());
                     autoGroupKeywordsFieldProperty.setValue(group.getField().getName());
                 } else if (editedGroup.getClass() == AutomaticPersonsGroup.class) {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
+                    autoGroupPersonsOptionProperty.setValue(Boolean.TRUE);
                     autoGroupPersonsFieldProperty.setValue(group.getField().getName());
                 }
             } else if (editedGroup.getClass() == TexGroup.class) {
@@ -444,7 +448,7 @@ public class GroupDialogViewModel {
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
                 .withInitialDirectory(currentDatabase.getMetaData()
-                                                     .getLatexFileDirectory(preferencesService.getFilePreferences().getUser())
+                                                     .getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
                                                      .orElse(FileUtil.getInitialDirectory(currentDatabase, preferencesService.getFilePreferences().getWorkingDirectory()))).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
@@ -453,13 +457,13 @@ public class GroupDialogViewModel {
     }
 
     public void openHelpPage() {
-        new HelpAction(HelpFile.GROUPS, dialogService).execute();
+        new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences()).execute();
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
         List<Path> fileDirs = new ArrayList<>();
         MetaData metaData = currentDatabase.getMetaData();
-        metaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUser()).ifPresent(fileDirs::add);
+        metaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost()).ifPresent(fileDirs::add);
 
         return fileDirs;
     }

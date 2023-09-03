@@ -1,9 +1,11 @@
 package org.jabref.logic.layout;
 
+import java.io.Serializable;
+
 /**
  * String and integer value.
  */
-public class StringInt implements java.io.Serializable {
+public class StringInt implements Serializable {
 
     /**
      * Description of the Field

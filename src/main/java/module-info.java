@@ -9,16 +9,13 @@ open module org.jabref {
     // JavaFX
     requires javafx.base;
     requires javafx.graphics;
-    requires javafx.swing;
     requires javafx.controls;
     requires javafx.web;
     requires javafx.fxml;
     requires afterburner.fx;
-    requires com.jfoenix;
+    requires com.dlsc.gemsfx;
+    uses com.dlsc.gemsfx.TagsField;
     requires de.saxsys.mvvmfx;
-    requires reactfx;
-    requires de.saxsys.mvvmfx.validation;
-    requires org.fxmisc.flowless;
 
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
@@ -51,6 +48,7 @@ open module org.jabref {
     with org.jabref.gui.logging.GuiWriter,
          org.jabref.gui.logging.ApplicationInsightsWriter;
 
+    // Preferences and XML
     requires java.prefs;
 
     // Annotations (@PostConstruct)
@@ -104,13 +102,19 @@ open module org.jabref {
     requires jbibtex;
     requires citeproc.java;
 
-    requires pdfbox;
-    requires xmpbox;
+    requires org.apache.pdfbox;
+    requires org.apache.xmpbox;
     requires com.ibm.icu;
 
     requires flexmark;
     requires flexmark.util.ast;
     requires flexmark.util.data;
+
+    requires com.h2database.mvstore;
+
+    requires java.keyring;
+
+    requires org.jooq.jool;
 
     // fulltext search
     requires org.apache.lucene.core;
@@ -131,7 +135,6 @@ open module org.jabref {
     uses org.eclipse.jgit.lib.GpgSigner;
 
     // other libraries
-    requires com.h2database.mvstore;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
 

@@ -16,7 +16,7 @@
     <category citation-format="author-date"/>
     <category field="sociology"/>
     <summary>The ASA style following the 6th edition of the Style Guide</summary>
-    <updated>2022-05-08T21:48:56+00:00</updated>
+    <updated>2023-07-16T21:48:56+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -38,8 +38,7 @@
       <name and="text" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always" initialize="false" initialize-with=". "/>
       <label form="short" prefix=", "/>
       <substitute>
-        <names variable="editor"/>
-        <names variable="translator"/>
+        <names variable="editor translator director"/>
         <choose>
           <if type="report">
             <text variable="publisher"/>
@@ -53,8 +52,7 @@
     <names variable="author">
       <name form="short" and="text" delimiter=", " initialize-with=". "/>
       <substitute>
-        <names variable="editor"/>
-        <names variable="translator"/>
+        <names variable="editor director translator"/>
         <choose>
           <if type="report">
             <text variable="publisher"/>

@@ -7,6 +7,8 @@ on:
     paths:
       - 'src/main/java/org/jabref/logic/importer/fetcher/**'
       - 'src/test/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/main/java/org/jabref/logic/crawler/**'
+      - 'src/test/java/org/jabref/logic/crawler/**'
       - '.github/workflows/tests-fetchers.yml'
       - 'build.gradle'
   pull_request:

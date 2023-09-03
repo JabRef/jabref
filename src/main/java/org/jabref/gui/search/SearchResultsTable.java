@@ -41,7 +41,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                                    dialogService,
                                    stateManager).createColumns();
 
-        if (allCols.stream().noneMatch(col -> col instanceof LibraryColumn)) {
+        if (allCols.stream().noneMatch(LibraryColumn.class::isInstance)) {
             allCols.add(0, new LibraryColumn());
         }
         this.getColumns().addAll(allCols);
@@ -66,7 +66,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new PersistenceVisualStateTable(this, preferencesService.getSearchDialogColumnPreferences());
+        new PersistenceVisualStateTable(this, preferencesService.getSearchDialogColumnPreferences()).addListeners();
 
         database.getDatabase().registerListener(this);
     }

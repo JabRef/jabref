@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -33,6 +35,7 @@ import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -42,7 +45,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesEditorViewModel.class);
 
     private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
     private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
@@ -109,10 +116,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences);
     }
 
-    public boolean isFulltextLookupInProgress() {
-        return fulltextLookupInProgress.get();
-    }
-
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
         return FileFieldParser.parse(stringValue).stream()
                               .map(linkedFile -> new LinkedFileViewModel(
@@ -142,23 +145,48 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .build();
 
         List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration).forEach(newFile -> {
-            LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, preferences.getFilePreferences());
-            files.add(new LinkedFileViewModel(
-                    newLinkedFile,
-                    entry,
-                    databaseContext,
-                    taskExecutor,
-                    dialogService,
-                    preferences));
-        });
+        List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
+
+        for (Path fileToAdd : selectedFiles) {
+            if (FileUtil.detectBadFileName(fileToAdd.toString())) {
+                String newFilename = FileNameCleaner.cleanFileName(fileToAdd.getFileName().toString());
+
+                boolean correctButtonPressed = dialogService.showConfirmationDialogAndWait(Localization.lang("File \"%0\" cannot be added!", fileToAdd.getFileName()),
+                        Localization.lang("Illegal characters in the file name detected.\nFile will be renamed to \"%0\" and added.", newFilename),
+                        Localization.lang("Rename and add"));
+
+                if (correctButtonPressed) {
+                    Path correctPath = fileToAdd.resolveSibling(newFilename);
+                    try {
+                        Files.move(fileToAdd, correctPath);
+                        addNewLinkedFile(correctPath, fileDirectories);
+                    } catch (IOException ex) {
+                        LOGGER.error("Error moving file", ex);
+                        dialogService.showErrorDialogAndWait(ex);
+                    }
+                }
+            } else {
+                addNewLinkedFile(fileToAdd, fileDirectories);
+            }
+        }
+    }
+
+    private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
+        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
+        files.add(new LinkedFileViewModel(
+                newLinkedFile,
+                entry,
+                databaseContext,
+                taskExecutor,
+                dialogService,
+                preferences));
     }
 
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
 
-        if (entry != null) {
+        if ((entry != null) && preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask
                     .wrap(() -> findAssociatedNotLinkedFiles(entry))
                     .onSuccess(files::addAll);
@@ -264,5 +292,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     public void removeFileLink(LinkedFileViewModel file) {
         files.remove(file);
+    }
+
+    public ReadOnlyBooleanProperty fulltextLookupInProgressProperty() {
+        return fulltextLookupInProgress;
     }
 }

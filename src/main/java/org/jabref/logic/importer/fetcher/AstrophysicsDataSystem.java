@@ -38,7 +38,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
@@ -156,7 +155,7 @@ public class AstrophysicsDataSystem
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(preferences);
     }
 
     @Override
@@ -172,7 +171,7 @@ public class AstrophysicsDataSystem
         // Move adsurl to url field
         new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
         entry.getField(StandardField.ABSTRACT)
-             .filter(abstractText -> abstractText.equals("Not Available <P />"))
+             .filter(abstractText -> "Not Available <P />".equals(abstractText))
              .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
 
         entry.getField(StandardField.ABSTRACT)

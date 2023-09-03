@@ -43,10 +43,59 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 (Sorted alphabetically by Id)
 
 ```yaml
+Id:      at.favre.lib
+Project: HMAC-based Key Derivation Function (HKDF) RFC 5869
+URL:     https://github.com/patrickfav/hkdf
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.dlsc.gemsfx:gemsfx
+Project: GemsFX
+URL:     https://github.com/dlsc-software-consulting-gmbh/GemsFX
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.dlsc.pickerfx:pickerfx
+Project: GemsFX
+URL:     https://github.com/dlsc-software-consulting-gmbh/PickerFX
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.dlsc.unitfx:unitfx
+Project: UnitFX
+URL:     https://github.com/dlsc-software-consulting-gmbh/UnitFX
+License: Apache-2.0
+```
+
+```yaml
 Id:      com.fasterxml.jackson
 Project: Jackson Project
 URL:     https://github.com/FasterXML/jackson
 License: Apache-2.0
+```
+
+```yaml
+Id:      com.github.hypfvieh.dbus-java
+Project: dbus-java
+URL:     https://github.com/hypfvieh/dbus-java
+License: MIT
+```
+
+```yaml
+Id:      com.github.hypfvieh.java-utils
+Project: java-utils
+URL:     https://github.com/hypfvieh/java-utils
+License: MIT
+```
+
+```yaml
+Id:      com.github.javakeyring
+Project: Java Keyring
+URL:     https://github.com/javakeyring/java-keyring
+License: BSD-3-Clause
 ```
 
 ```yaml
@@ -100,13 +149,6 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      com.jfoenix:jfoenix
-Project: JavaFX MAterial Design Library
-URL:     https://github.com/jfoenixadmin/JFoenix
-License: Apache-2.0
-```
-
-```yaml
 Id:      com.konghq.unirest
 Project: Unirest for Java
 URL:     https://github.com/Kong/unirest-java
@@ -135,6 +177,27 @@ License: Oracle Free Use Terms and Conditions (FUTC)
 ```
 
 ```yaml
+Id:      com.squareup.okhttp3:okhttp
+Project: OkHttp
+URL:     https://square.github.io/okhttp/
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.squareup.okio:okio
+Project: OkHttp
+URL:     https://github.com/square/okio/
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.squareup.retrofit2:retrofit
+Project: Retrofit 2
+URL:     https://github.com/square/retrofit
+License: Apache-2.0
+```
+
+```yaml
 Id:      com.sun.istack:istack-commons-runtime
 Project: iStack Common Utility Code
 URL:     https://github.com/eclipse-ee4j/jaxb-istack-commons
@@ -156,6 +219,13 @@ License: BSD-2-Clause
 ```
 
 ```yaml
+Id:      commons-beanutils:commons-beanutils
+Project: Apache Commons Beanutils
+URL:     https://commons.apache.org/proper/commons-beanutils/
+License: Apache-2.0
+```
+
+```yaml
 Id:      commons-cli:commons-cli
 Project: Apache Commons CLI
 URL:     http://commons.apache.org/cli/
@@ -166,6 +236,13 @@ License: Apache-2.0
 Id:      commons-codec:commons-codec
 Project: Apache Commons Codec
 URL:     https://commons.apache.org/proper/commons-codec/
+License: Apache-2.0
+```
+
+```yaml
+Id:      commons-collections:commons-collections
+Project: Apache Commons Collections
+URL:     https://commons.apache.org/proper/commons-collections/
 License: Apache-2.0
 ```
 
@@ -184,10 +261,31 @@ License: Apache-2.0
 ```
 
 ```yaml
+Id:      commons-digester:commons-digester
+Project: Apache Commons Digester
+URL:     https://commons.apache.org/proper/commons-digester/
+License: Apache-2.0
+```
+
+```yaml
+Id:      commons-validator:commons-validator
+Project: Apache Commons Validator
+URL:     https://commons.apache.org/proper/commons-validator/
+License: Apache-2.0
+```
+
+```yaml
 Id:      de.saxsys:mvvmfx
 Project: mvvm(fx)
 URL:     https://github.com/sialcasa/mvvmFX
 License: Apache-2.0
+```
+
+```yaml
+Id:      de.swiesend:secret-service
+Project: Secret Service
+URL:     https://github.com/swiesend/secret-service
+License: MIT
 ```
 
 ```yaml
@@ -331,13 +429,6 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      org.apache.tika:tika-core
-Project: Apache Tika
-URL:     https://tika.apache.org/
-License: Apache-2.0
-```
-
-```yaml
 Id:      org.bouncycastle:bcprov-jdk15on
 Project: The Legion of the Bouncy Castle
 URL:     https://www.bouncycastle.org/
@@ -401,6 +492,13 @@ License: Unicode License (https://www.unicode.org/copyright.html)
 Note:    Our own fork https://github.com/JabRef/icu. Upstream PR: https://github.com/unicode-org/icu/pull/2127
 Path:    lib/icu4j.jar
 SourcePath: lib/ic4j-src.jar
+```
+
+```yaml
+Id:      org.jooq:jool
+Project: JOOλ
+URL:     https://github.com/jOOQ/jOOL
+License: Apache-2.0
 ```
 
 ```yaml
@@ -511,8 +609,29 @@ License: Apache-2.0
 ```yaml
 Id:      org.yaml:snakeyaml
 Project: SnakeYAML
-URL:     https://bitbucket.org/asomov/snakeyaml-engine/src/master/
+URL:     https://bitbucket.org/snakeyaml/snakeyaml-engine/src/master/
 License: Apache-2.0
+```
+
+```yaml
+Id:      pt.davidafsilva.apple:jkeychain
+Project: JKeyChain
+URL:     https://github.com/davidafsilva/jkeychain
+License: BSD-2-Clause
+```
+
+```yaml
+Id:      tech.units:indriya
+Project: Indriya - JSR 385 - Reference Implementation
+URL:     https://github.com/unitsofmeasurement/indriya
+License: BSD-3-Clause
+```
+
+```yaml
+Id:      tech.uom.lib:uom-lib-common
+Project: Units of Measurement Libraries - extending and complementing JSR 385
+URL:     https://github.com/unitsofmeasurement/uom-lib
+License: BSD-3-Clause
 ```
 
 ## Sorted list of runtime dependencies output by gradle
@@ -522,122 +641,138 @@ License: Apache-2.0
 3. (on WSL) `sed 's/[^a-z]*//' < build/dependencies.txt | sed "s/\(.*\) .*/\1/" | grep -v "\->" | sort | uniq > build/dependencies-for-external-libraries.txt`
 
 ```text
-com.fasterxml.jackson.core:jackson-annotations:2.14.1
-com.fasterxml.jackson.core:jackson-core:2.14.1
-com.fasterxml.jackson.core:jackson-databind:2.14.1
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1
-com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1
-com.fasterxml.jackson:jackson-bom:2.14.1
-com.github.JabRef:afterburner.fx:testmoduleinfo-SNAPSHOT
+at.favre.lib:hkdf:1.1.0
+com.dlsc.gemsfx:gemsfx:1.77.0
+com.dlsc.pickerfx:pickerfx:1.2.0
+com.dlsc.unitfx:unitfx:1.0.10
+com.fasterxml.jackson.core:jackson-annotations:2.15.2
+com.fasterxml.jackson.core:jackson-core:2.15.2
+com.fasterxml.jackson.core:jackson-databind:2.15.2
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2
+com.fasterxml.jackson:jackson-bom:2.15.2
+com.github.hypfvieh:dbus-java-core:4.2.1
+com.github.hypfvieh:dbus-java-transport-native-unixsocket:4.2.1
+com.github.javakeyring:java-keyring:1.0.4
 com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9
 com.github.tomtung:latex2unicode_2.13:0.3.2
-com.google.code.gson:gson:2.9.0
-com.google.errorprone:error_prone_annotations:2.11.0
+com.google.code.gson:gson:2.10
+com.googlecode.javaewah:JavaEWAH:1.2.3
+com.google.errorprone:error_prone_annotations:2.18.0
 com.google.guava:failureaccess:1.0.1
-com.google.guava:guava:31.1-jre
+com.google.guava:guava:32.1.2-jre
+com.google.guava:guava-parent:32.1.2-jre
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
-com.google.j2objc:j2objc-annotations:1.3
-com.googlecode.javaewah:JavaEWAH:1.1.13
-com.h2database:h2-mvstore:2.1.214
-com.jfoenix:jfoenix:9.0.10
-com.konghq:unirest-java:3.14.1
+com.google.j2objc:j2objc-annotations:2.8
+com.h2database:h2-mvstore:2.2.220
+com.konghq:unirest-java:3.14.5
 com.microsoft.azure:applicationinsights-core:2.4.1
 com.microsoft.azure:applicationinsights-logging-log4j2:2.4.1
+commons-beanutils:commons-beanutils:1.9.4
+commons-cli:commons-cli:1.5.0
+commons-codec:commons-codec:1.15
+commons-collections:commons-collections:3.2.2
+commons-digester:commons-digester:2.1
+commons-logging:commons-logging:1.2
+commons-validator:commons-validator:1.7
 com.oracle.ojdbc:ojdbc10:19.3.0.0
 com.oracle.ojdbc:ons:19.3.0.0
 com.oracle.ojdbc:osdt_cert:19.3.0.0
 com.oracle.ojdbc:osdt_core:19.3.0.0
 com.oracle.ojdbc:simplefan:19.3.0.0
 com.oracle.ojdbc:ucp:19.3.0.0
+com.squareup.okhttp3:okhttp:3.12.0
+com.squareup.okio:okio:1.15.0
+com.squareup.retrofit2:retrofit:2.6.1
 com.sun.activation:jakarta.activation:2.0.1
 com.sun.istack:istack-commons-runtime:4.0.1
 com.tobiasdiez:easybind:2.2.1-SNAPSHOT
-com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.0
-com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.64.0
-com.vladsch.flexmark:flexmark-util-ast:0.64.0
-com.vladsch.flexmark:flexmark-util-builder:0.64.0
-com.vladsch.flexmark:flexmark-util-collection:0.64.0
-com.vladsch.flexmark:flexmark-util-data:0.64.0
-com.vladsch.flexmark:flexmark-util-dependency:0.64.0
-com.vladsch.flexmark:flexmark-util-format:0.64.0
-com.vladsch.flexmark:flexmark-util-html:0.64.0
-com.vladsch.flexmark:flexmark-util-misc:0.64.0
-com.vladsch.flexmark:flexmark-util-options:0.64.0
-com.vladsch.flexmark:flexmark-util-sequence:0.64.0
-com.vladsch.flexmark:flexmark-util-visitor:0.64.0
-com.vladsch.flexmark:flexmark-util:0.64.0
-com.vladsch.flexmark:flexmark:0.64.0
-commons-cli:commons-cli:1.5.0
-commons-codec:commons-codec:1.15
-commons-io:commons-io:2.11.0
-commons-logging:commons-logging:1.2
+com.vladsch.flexmark:flexmark:0.64.8
+com.vladsch.flexmark:flexmark-util-ast:0.64.8
+com.vladsch.flexmark:flexmark-util-builder:0.64.8
+com.vladsch.flexmark:flexmark-util-collection:0.64.8
+com.vladsch.flexmark:flexmark-util-data:0.64.8
+com.vladsch.flexmark:flexmark-util-dependency:0.64.8
+com.vladsch.flexmark:flexmark-util-format:0.64.8
+com.vladsch.flexmark:flexmark-util-html:0.64.8
+com.vladsch.flexmark:flexmark-util-misc:0.64.8
+com.vladsch.flexmark:flexmark-util-sequence:0.64.8
+com.vladsch.flexmark:flexmark-util-visitor:0.64.8
 de.saxsys:mvvmfx:1.8.0
-de.undercouch:citeproc-java:3.0.0-alpha.6
+de.swiesend:secret-service:1.8.1-jdk17
+de.undercouch:citeproc-java:3.0.0-beta.2
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
 io.github.java-diff-utils:java-diff-utils:4.12
 jakarta.annotation:jakarta.annotation-api:2.1.1
 jakarta.inject:jakarta.inject-api:2.0.1
 jakarta.xml.bind:jakarta.xml.bind-api:3.0.1
+javax.measure:unit-api:2.1.2
 net.harawata:appdirs:1.2.1
-net.java.dev.jna:jna-platform:5.6.0
-net.java.dev.jna:jna:5.6.0
+net.java.dev.jna:jna:5.13.0
+net.java.dev.jna:jna-platform:5.13.0
 net.jcip:jcip-annotations:1.0
 net.jodah:typetools:0.6.1
-org.antlr:antlr4-runtime:4.9.3
-org.apache.commons:commons-csv:1.9.0
-org.apache.commons:commons-lang3:3.12.0
+one.jpro.jproutils:tree-showing:0.2.2
+org.antlr:antlr4-runtime:4.13.0
+org.apache.commons:commons-csv:1.10.0
+org.apache.commons:commons-lang3:3.13.0
 org.apache.httpcomponents:httpasyncclient:4.1.5
 org.apache.httpcomponents:httpclient:4.5.13
-org.apache.httpcomponents:httpcore-nio:4.4.13
 org.apache.httpcomponents:httpcore:4.4.13
+org.apache.httpcomponents:httpcore-nio:4.4.13
 org.apache.httpcomponents:httpmime:4.5.13
-org.apache.lucene:lucene-analysis-common:9.4.2
-org.apache.lucene:lucene-core:9.4.1
-org.apache.lucene:lucene-core:9.4.2
-org.apache.lucene:lucene-highlighter:9.4.2
-org.apache.lucene:lucene-queries:9.4.1
-org.apache.lucene:lucene-queries:9.4.2
-org.apache.lucene:lucene-queryparser:9.4.2
-org.apache.lucene:lucene-sandbox:9.4.2
-org.apache.pdfbox:fontbox:3.0.0-RC1
-org.apache.pdfbox:pdfbox:3.0.0-RC1
-org.apache.pdfbox:xmpbox:3.0.0-RC1
-org.apache.tika:tika-core:2.6.0
-org.bouncycastle:bcprov-jdk18on:1.71.1
-org.checkerframework:checker-qual:3.12.0
-org.codehaus.mojo:animal-sniffer-annotations:1.18
+org.apache.lucene:lucene-analysis-common:9.7.0
+org.apache.lucene:lucene-core:9.7.0
+org.apache.lucene:lucene-highlighter:9.7.0
+org.apache.lucene:lucene-queries:9.7.0
+org.apache.lucene:lucene-queryparser:9.7.0
+org.apache.lucene:lucene-sandbox:9.7.0
+org.apache.pdfbox:fontbox:3.0.0
+org.apache.pdfbox:pdfbox:3.0.0
+org.apache.pdfbox:pdfbox-io:3.0.0
+org.apache.pdfbox:xmpbox:3.0.0
+org.bouncycastle:bcprov-jdk18on:1.76
+org.checkerframework:checker-qual:3.33.0
 org.controlsfx:controlsfx:11.1.2
-org.eclipse.jgit:org.eclipse.jgit:6.3.0.202209071007-r
-org.fxmisc.flowless:flowless:0.7.0
-org.fxmisc.richtext:richtextfx:0.11.0
+org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r
+org.fxmisc.flowless:flowless:0.7.1
+org.fxmisc.richtext:richtextfx:0.11.1
 org.fxmisc.undo:undofx:2.1.1
 org.fxmisc.wellbehaved:wellbehavedfx:0.3.3
 org.glassfish.jaxb:jaxb-core:3.0.2
 org.glassfish.jaxb:jaxb-runtime:3.0.2
 org.glassfish.jaxb:txw2:3.0.2
-org.jbibtex:jbibtex:1.0.19
-org.jetbrains:annotations:15.0
-org.jsoup:jsoup:1.15.3
+org.jabref:afterburner.fx:1.1.0-SNAPSHOT
+org.jbibtex:jbibtex:1.0.20
+org.jetbrains:annotations:24.0.1
+org.jooq:jool:0.9.15
+org.jsoup:jsoup:1.16.1
+org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.3.1
 org.kordamp.ikonli:ikonli-core:12.3.1
 org.kordamp.ikonli:ikonli-javafx:12.3.1
 org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1
-org.libreoffice:libreoffice:7.4.1
-org.libreoffice:unoloader:7.4.1
-org.mariadb.jdbc:mariadb-java-client:2.7.7
-org.openjfx:javafx-base:19
-org.openjfx:javafx-controls:19
-org.openjfx:javafx-fxml:19
-org.openjfx:javafx-graphics:19
-org.openjfx:javafx-media:19
-org.openjfx:javafx-swing:19
-org.openjfx:javafx-web:19
-org.postgresql:postgresql:42.5.1
+org.kordamp.ikonli:ikonli-materialdesign-pack:12.3.1
+org.kordamp.ikonli:ikonli-material-pack:12.3.1
+org.libreoffice:libreoffice:7.5.3
+org.libreoffice:unoloader:7.6.0
+org.mariadb.jdbc:mariadb-java-client:2.7.9
+org.openjfx:javafx-base:20
+org.openjfx:javafx-controls:20
+org.openjfx:javafx-fxml:20
+org.openjfx:javafx-graphics:20
+org.openjfx:javafx-media:20
+org.openjfx:javafx-swing:20
+org.openjfx:javafx-web:20
+org.postgresql:postgresql:42.6.0
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.13.8
-org.slf4j:slf4j-api:2.0.5
-org.tinylog:slf4j-tinylog:2.5.0
-org.tinylog:tinylog-api:2.5.0
-org.tinylog:tinylog-impl:2.5.0
-org.yaml:snakeyaml:1.33
+org.slf4j:slf4j-api:2.0.7
+org.tinylog:slf4j-tinylog:2.6.2
+org.tinylog:tinylog-api:2.6.2
+org.tinylog:tinylog-impl:2.6.2
+org.yaml:snakeyaml:2.0
+pt.davidafsilva.apple:jkeychain:1.1.0
+tech.units:indriya:2.1.2
+tech.uom.lib:uom-lib-common:2.1
 ```

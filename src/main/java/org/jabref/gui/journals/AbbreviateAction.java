@@ -110,13 +110,14 @@ public class AbbreviateAction extends SimpleCommand {
             }
         }).count();
 
-        if (count > 0) {
-            ce.end();
-            frame.getUndoManager().addEdit(ce);
-            frame.getCurrentLibraryTab().markBaseChanged();
-            return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
+        if (count == 0) {
+            return Localization.lang("No journal names could be abbreviated.");
         }
-        return Localization.lang("No journal names could be abbreviated.");
+
+        ce.end();
+        frame.getUndoManager().addEdit(ce);
+        frame.getCurrentLibraryTab().markBaseChanged();
+        return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
     }
 
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
@@ -126,12 +127,13 @@ public class AbbreviateAction extends SimpleCommand {
         int count = entries.stream().mapToInt(entry ->
                 (int) FieldFactory.getJournalNameFields().stream().filter(journalField ->
                         undoableAbbreviator.unabbreviate(databaseContext.getDatabase(), entry, journalField, ce)).count()).sum();
-        if (count > 0) {
-            ce.end();
-            frame.getUndoManager().addEdit(ce);
-            frame.getCurrentLibraryTab().markBaseChanged();
-            return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
+        if (count == 0) {
+            return Localization.lang("No journal names could be unabbreviated.");
         }
-        return Localization.lang("No journal names could be unabbreviated.");
+
+        ce.end();
+        frame.getUndoManager().addEdit(ce);
+        frame.getCurrentLibraryTab().markBaseChanged();
+        return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
     }
 }
