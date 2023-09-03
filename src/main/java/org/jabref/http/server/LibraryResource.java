@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.gui.Globals;
-import org.jabref.http.MediaType;
+import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.importer.ParserResult;
@@ -51,7 +51,7 @@ public class LibraryResource {
     }
 
     @GET
-    @Produces(MediaType.JSON_CSL_ITEM)
+    @Produces(JabrefMediaType.JSON_CSL_ITEM)
     public String getClsItemJson(@PathParam("id") String id) {
         ParserResult parserResult = getParserResult(id);
         JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
@@ -72,7 +72,7 @@ public class LibraryResource {
     }
 
     @GET
-    @Produces(MediaType.BIBTEX)
+    @Produces(JabrefMediaType.BIBTEX)
     public Response getBibtex(@PathParam("id") String id) {
         java.nio.file.Path library = getLibraryPath(id);
         String libraryAsString;

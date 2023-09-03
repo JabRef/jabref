@@ -1,6 +1,6 @@
 package org.jabref.http.server;
 
-import org.jabref.http.MediaType;
+import org.jabref.http.JabrefMediaType;
 
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -28,12 +28,12 @@ class LibraryResourceTest extends ServerTest {
                 }
 
                 @Comment{jabref-meta: databaseType:bibtex;}
-                """, target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(MediaType.BIBTEX).get(String.class));
+                """, target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.BIBTEX).get(String.class));
     }
 
     @Test
     void getClsItemJson() {
         assertEquals("""
-                [{"id":"Author2023test","type":"article","author":[{"family":"Author","given":"Demo"}],"event-date":{"date-parts":[[2023]]},"issued":{"date-parts":[[2023]]},"title":"Demo Title"}]""", target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(MediaType.JSON_CSL_ITEM).get(String.class));
+                [{"id":"Author2023test","type":"article","author":[{"family":"Author","given":"Demo"}],"event-date":{"date-parts":[[2023]]},"issued":{"date-parts":[[2023]]},"title":"Demo Title"}]""", target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.JSON_CSL_ITEM).get(String.class));
     }
 }
