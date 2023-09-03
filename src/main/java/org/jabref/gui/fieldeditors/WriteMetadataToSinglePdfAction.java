@@ -74,7 +74,7 @@ public class WriteMetadataToSinglePdfAction extends SimpleCommand {
             } else {
                     try {
 
-                        writeMetadataToFile(file.get(), entry);
+                        writeMetadataToFile(file.get(), entry, databaseContext, abbreviationRepository, bibEntryTypesManager, fieldPreferences, filePreferences, xmpPreferences);
 
                         dialogService.notify(Localization.lang("Success! Finished writing metadata."));
                     } catch (IOException | TransformerException ex) {
@@ -90,7 +90,14 @@ public class WriteMetadataToSinglePdfAction extends SimpleCommand {
         taskExecutor.execute(writeTask);
     }
 
-    synchronized private void writeMetadataToFile(Path file, BibEntry entry) throws Exception {
+    public static synchronized void writeMetadataToFile(Path file,
+                                                        BibEntry entry,
+                                                        BibDatabaseContext databaseContext,
+                                                        JournalAbbreviationRepository abbreviationRepository,
+                                                        BibEntryTypesManager bibEntryTypesManager,
+                                                        FieldPreferences fieldPreferences,
+                                                        FilePreferences filePreferences,
+                                                        XmpPreferences xmpPreferences) throws Exception {
         // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
         new XmpUtilWriter(xmpPreferences).writeXmp(file, entry, databaseContext.getDatabase());
 

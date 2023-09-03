@@ -23,15 +23,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.fieldeditors.WriteMetadataToSinglePdfAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.FieldPreferences;
-import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -155,7 +154,15 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
-                            writeMetadataToFile(file, entry);
+                            WriteMetadataToSinglePdfAction.writeMetadataToFile(
+                                    file,
+                                    entry,
+                                    databaseContext,
+                                    abbreviationRepository,
+                                    entryTypesManager,
+                                    fieldPreferences,
+                                    filePreferences,
+                                    xmpPreferences);
                             Platform.runLater(() ->
                                     optionsDialog.getProgressArea()
                                                  .appendText("  " + Localization.lang("OK") + ".\n"));
@@ -200,23 +207,6 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Finished writing metadata for %0 file (%1 skipped, %2 errors).",
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
-    }
-
-    /**
-     * This writes both XMP data and embeds a corresponding .bib file
-     */
-    synchronized private void writeMetadataToFile(Path file, BibEntry entry) throws Exception {
-        new XmpUtilWriter(xmpPreferences).writeXmp(file, entry, databaseContext.getDatabase());
-
-        EmbeddedBibFilePdfExporter embeddedBibExporter = new EmbeddedBibFilePdfExporter(
-                databaseContext.getMode(),
-                entryTypesManager,
-                fieldPreferences);
-        embeddedBibExporter.exportToFileByPath(
-                databaseContext,
-                filePreferences,
-                file,
-                abbreviationRepository);
     }
 
     class OptionsDialog extends FXDialog {
