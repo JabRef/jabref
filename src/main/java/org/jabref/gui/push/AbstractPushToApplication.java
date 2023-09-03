@@ -64,8 +64,8 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         }
 
         cachedCitePrefix = preferencesCiteCommand.substring(0, indexKey1);
-        cachedCiteDelimiter = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY1), indexKey2);
-        cachedCiteSuffix = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY2));
+        cachedCiteDelimiter = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY1) + CITE_KEY1.length(), indexKey2);
+        cachedCiteSuffix = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY2) + CITE_KEY2.length());
     }
 
     @Override
