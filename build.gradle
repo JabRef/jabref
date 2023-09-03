@@ -307,7 +307,8 @@ tasks.register("generateJournalAbbreviationList", JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "org.jabref.cli.JournalListMvGenerator"
 }
-build.dependsOn "generateJournalAbbreviationList"
+assemble.dependsOn "generateJournalAbbreviationList"
+test.dependsOn "generateJournalAbbreviationList"
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
