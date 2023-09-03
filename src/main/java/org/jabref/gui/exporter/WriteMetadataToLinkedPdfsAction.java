@@ -2,25 +2,11 @@ package org.jabref.gui.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FXDialog;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.WriteMetadataToSinglePdfAction;
@@ -31,11 +17,13 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.FilePreferences;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -43,6 +31,7 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
  * Writes XMP Metadata to all the linked pdfs of the selected entries according to the linking entry
  */
 public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WriteMetadataToLinkedPdfsAction.class);
 
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -52,15 +41,6 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
     private final FilePreferences filePreferences;
     private final XmpPreferences xmpPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
-
-    private OptionsDialog optionsDialog;
-    private BibDatabaseContext databaseContext;
-    private Collection<BibEntry> entries;
-
-    private boolean shouldContinue = true;
-    private int skipped;
-    private int entriesChanged;
-    private int errors;
 
     public WriteMetadataToLinkedPdfsAction(DialogService dialogService,
                                            FieldPreferences fieldPreferences,
@@ -84,196 +64,144 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        init();
-        BackgroundTask.wrap(this::writeMetadata)
-                      .executeWith(taskExecutor);
-    }
-
-    public void init() {
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
 
-        databaseContext = stateManager.getActiveDatabase().get();
-        BibDatabase database = databaseContext.getDatabase();
-        // Get entries and check if it makes sense to perform this operation
-        entries = stateManager.getSelectedEntries();
-
+        List<BibEntry> entries = stateManager.getSelectedEntries();
         if (entries.isEmpty()) {
-            entries = database.getEntries();
+            entries = databaseContext.getDatabase().getEntries();
 
             if (entries.isEmpty()) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Write metadata to PDF files"),
-                        Localization.lang("This operation requires one or more entries to be selected."));
-                shouldContinue = false;
+                LOGGER.warn("No entry selected for fulltext download.");
+                dialogService.notify(Localization.lang("This operation requires one or more entries to be selected."));
                 return;
             } else {
                 boolean confirm = dialogService.showConfirmationDialogAndWait(
                         Localization.lang("Write metadata to PDF files"),
                         Localization.lang("Write metadata for all PDFs in current library?"));
-                if (confirm) {
-                    shouldContinue = false;
+                if (!confirm) {
                     return;
                 }
             }
         }
 
-        errors = entriesChanged = skipped = 0;
-
-        if (optionsDialog == null) {
-            optionsDialog = new OptionsDialog();
-        }
-        optionsDialog.open();
-
         dialogService.notify(Localization.lang("Writing metadata..."));
+
+        new WriteMetaDataTask(
+                databaseContext,
+                entries,
+                abbreviationRepository,
+                entryTypesManager,
+                fieldPreferences,
+                filePreferences,
+                xmpPreferences,
+                stateManager,
+                dialogService)
+                .executeWith(taskExecutor);
     }
 
-    private void writeMetadata() {
-        if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
-            return;
+    private static class WriteMetaDataTask extends BackgroundTask<Void> {
+
+        private final BibDatabaseContext databaseContext;
+        private final List<BibEntry> entries;
+        private final JournalAbbreviationRepository abbreviationRepository;
+        private final BibEntryTypesManager entryTypesManager;
+        private final FieldPreferences fieldPreferences;
+        private final FilePreferences filePreferences;
+        private final XmpPreferences xmpPreferences;
+        private final StateManager stateManager;
+        private final DialogService dialogService;
+
+        private final List<Path> failedWrittenFiles = new ArrayList<>();
+        private int skipped = 0;
+        private int entriesChanged = 0;
+        private int errors = 0;
+
+        public WriteMetaDataTask(BibDatabaseContext databaseContext,
+                                 List<BibEntry> entries,
+                                 JournalAbbreviationRepository abbreviationRepository,
+                                 BibEntryTypesManager entryTypesManager,
+                                 FieldPreferences fieldPreferences,
+                                 FilePreferences filePreferences,
+                                 XmpPreferences xmpPreferences,
+                                 StateManager stateManager,
+                                 DialogService dialogService) {
+            this.databaseContext = databaseContext;
+            this.entries = entries;
+            this.abbreviationRepository = abbreviationRepository;
+            this.entryTypesManager = entryTypesManager;
+            this.fieldPreferences = fieldPreferences;
+            this.filePreferences = filePreferences;
+            this.xmpPreferences = xmpPreferences;
+            this.stateManager = stateManager;
+            this.dialogService = dialogService;
+
+            updateMessage(Localization.lang("Writing metadata..."));
         }
 
-        for (BibEntry entry : entries) {
-            // Make a list of all PDFs linked from this entry:
-            List<Path> files = entry.getFiles().stream()
-                                    .map(file -> file.findIn(stateManager.getActiveDatabase().get(), filePreferences))
-                                    .filter(Optional::isPresent)
-                                    .map(Optional::get)
-                                    .filter(FileUtil::isPDFFile)
-                                    .toList();
+        @Override
+        protected Void call() throws Exception {
+            if (stateManager.getActiveDatabase().isEmpty()) {
+                return null;
+            }
 
-            Platform.runLater(() -> optionsDialog.getProgressArea()
-                                                 .appendText(entry.getCitationKey().orElse(Localization.lang("undefined")) + "\n"));
+            for (int i = 0; i < entries.size(); i++) {
+                BibEntry entry = entries.get(i);
+                updateProgress(i, entries.size());
 
-            if (files.isEmpty()) {
-                skipped++;
-                Platform.runLater(() -> optionsDialog.getProgressArea()
-                                                     .appendText("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
-            } else {
-                for (Path file : files) {
-                    if (Files.exists(file)) {
-                        try {
-                            WriteMetadataToSinglePdfAction.writeMetadataToFile(
-                                    file,
-                                    entry,
-                                    databaseContext,
-                                    abbreviationRepository,
-                                    entryTypesManager,
-                                    fieldPreferences,
-                                    filePreferences,
-                                    xmpPreferences);
-                            Platform.runLater(() ->
-                                    optionsDialog.getProgressArea()
-                                                 .appendText("  " + Localization.lang("OK") + ".\n"));
-                            entriesChanged++;
-                        } catch (Exception e) {
-                            Platform.runLater(() -> {
-                                optionsDialog.getProgressArea()
-                                             .appendText("  " + Localization.lang("Error while writing") + " '" + file + "':\n");
-                                optionsDialog.getProgressArea().appendText("    " + e.getLocalizedMessage() + "\n");
-                            });
-                            errors++;
+                // Make a list of all PDFs linked from this entry:
+                List<Path> files = entry.getFiles().stream()
+                                        .map(file -> file.findIn(stateManager.getActiveDatabase().get(), filePreferences))
+                                        .filter(Optional::isPresent)
+                                        .map(Optional::get)
+                                        .filter(FileUtil::isPDFFile)
+                                        .toList();
+                if (files.isEmpty()) {
+                    LOGGER.debug("Skipped empty entry '{}'",
+                            entry.getCitationKey().orElse(entry.getAuthorTitleYear(16)));
+                    skipped++;
+                } else {
+                    for (Path file : files) {
+                        updateMessage(Localization.lang("Writing metadata to {}", file.getFileName()));
+
+                        if (Files.exists(file)) {
+                            try {
+                                WriteMetadataToSinglePdfAction.writeMetadataToFile(
+                                        file,
+                                        entry,
+                                        databaseContext,
+                                        abbreviationRepository,
+                                        entryTypesManager,
+                                        fieldPreferences,
+                                        filePreferences,
+                                        xmpPreferences);
+                                entriesChanged++;
+                            } catch (Exception e) {
+                                LOGGER.error("Error while writing XMP data to pdf '{}'", file, e);
+                                failedWrittenFiles.add(file);
+                                errors++;
+                            }
+                        } else {
+                            LOGGER.debug("Skipped non existing pdf '{}'", file);
+                            skipped++;
                         }
-                    } else {
-                        skipped++;
-                        Platform.runLater(() -> {
-                            optionsDialog.getProgressArea()
-                                         .appendText("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
-                            optionsDialog.getProgressArea()
-                                         .appendText("    " + file + "\n");
-                        });
                     }
                 }
+                updateMessage(Localization.lang("Processing..."));
             }
 
-            if (optionsDialog.isCanceled()) {
-                Platform.runLater(() ->
-                        optionsDialog.getProgressArea().appendText("\n" + Localization.lang("Operation canceled.") + "\n"));
-                break;
+            updateMessage(Localization.lang("Finished"));
+            dialogService.notify(Localization.lang("Finished writing metadata for database %0 (%1 succeeded, %2 skipped, %3 errors).",
+                    databaseContext.getDatabasePath().map(Path::toString).orElse("undefined"),
+                    String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
+
+            if (!failedWrittenFiles.isEmpty()) {
+                LOGGER.error("Failed to write XMP data to PDFs:\n" + failedWrittenFiles);
             }
-        }
-        Platform.runLater(() -> {
-            optionsDialog.getProgressArea()
-                         .appendText("\n"
-                                 + Localization.lang("Finished writing metadata for %0 file (%1 skipped, %2 errors).",
-                                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
-            optionsDialog.done();
-        });
 
-        if (!shouldContinue) {
-            return;
-        }
-
-        dialogService.notify(Localization.lang("Finished writing metadata for %0 file (%1 skipped, %2 errors).",
-                String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
-    }
-
-    class OptionsDialog extends FXDialog {
-
-        private final Button okButton = new Button(Localization.lang("OK"));
-        private final Button cancelButton = new Button(Localization.lang("Cancel"));
-
-        private boolean isCancelled;
-
-        private final TextArea progressArea;
-
-        public OptionsDialog() {
-            super(AlertType.NONE, Localization.lang("Writing metadata for selected entries..."), false);
-            okButton.setDisable(true);
-            okButton.setOnAction(e -> dispose());
-            okButton.setPrefSize(100, 30);
-            cancelButton.setOnAction(e -> isCancelled = true);
-            cancelButton.setOnKeyPressed(e -> {
-                if (e.getCode() == KeyCode.ESCAPE) {
-                    isCancelled = true;
-                }
-            });
-            cancelButton.setPrefSize(100, 30);
-            progressArea = new TextArea();
-            ScrollPane scrollPane = new ScrollPane(progressArea);
-            progressArea.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-            progressArea.setEditable(false);
-            progressArea.setText("");
-
-            GridPane tmpPanel = new GridPane();
-            getDialogPane().setContent(tmpPanel);
-            tmpPanel.setHgap(450);
-            tmpPanel.setVgap(10);
-            tmpPanel.add(scrollPane, 0, 0, 2, 1);
-            tmpPanel.add(okButton, 0, 1);
-            tmpPanel.add(cancelButton, 1, 1);
-            tmpPanel.setGridLinesVisible(false);
-            this.setResizable(false);
-        }
-
-        private void dispose() {
-            ((Stage) (getDialogPane().getScene().getWindow())).close();
-        }
-
-        public void done() {
-            okButton.setDisable(false);
-            cancelButton.setDisable(true);
-        }
-
-        public void open() {
-            progressArea.setText("");
-            isCancelled = false;
-
-            okButton.setDisable(true);
-            cancelButton.setDisable(false);
-
-            okButton.requestFocus();
-
-            optionsDialog.show();
-        }
-
-        public boolean isCanceled() {
-            return isCancelled;
-        }
-
-        public TextArea getProgressArea() {
-            return progressArea;
+            return null;
         }
     }
 }
