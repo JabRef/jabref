@@ -15,11 +15,13 @@ jobs:
     permissions:
       contents: write  # for peter-evans/create-pull-request to create branch
       pull-requests: write  # for peter-evans/create-pull-request to create a PR
+    if: github.repository == 'JabRef/jabref'
     steps:
       - uses: actions/checkout@v3
         with:
           persist-credentials: true
           fetch-depth: 0
+          submodules: 'true'
       - name: Initialize git
         run: |
           git config --local core.editor /usr/bin/cat
@@ -27,7 +29,8 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Update buildres/abbrv.jabref.org
         run: |
-          git subtree pull --prefix buildres/abbrv.jabref.org https://github.com/JabRef/abbrv.jabref.org.git main --squash
+          cd buildres/abbrv.jabref.org
+          git pull
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:

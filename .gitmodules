@@ -1,0 +1,3 @@
+[submodule "buildres/abbrv.jabref.org"]
+	path = buildres/abbrv.jabref.org
+	url = https://github.com/JabRef/abbrv.jabref.org.git
