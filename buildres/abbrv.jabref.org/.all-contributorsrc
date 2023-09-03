@@ -1,0 +1,43 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "jlaehne",
+      "name": "Jonas Lähnemann",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/7076057?v=4",
+      "profile": "https://github.com/jlaehne",
+      "contributions": [
+        "content",
+        "doc"
+      ]
+    },
+    {
+      "login": "dominicelse",
+      "name": "dominicelse",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/17165189?v=4",
+      "profile": "https://github.com/dominicelse",
+      "contributions": [
+        "content"
+      ]
+    },
+    {
+      "login": "wolfgang-noichl",
+      "name": "Wolfgang Noichl",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/294780?v=4",
+      "profile": "https://github.com/wolfgang-noichl",
+      "contributions": [
+        "content"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "abbrv.jabref.org",
+  "projectOwner": "JabRef",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}

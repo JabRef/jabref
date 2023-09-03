@@ -1,0 +1,6 @@
+# unix  line endings at unix files
+*.sh eol=lf
+
+# ensure that line endings of text files are normalized
+*.md txt
+*.txt text
