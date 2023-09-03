@@ -134,6 +134,7 @@ public class PushToApplicationCommand extends SimpleCommand {
         // All set, call the operation in a new thread:
         BackgroundTask.wrap(this::pushEntries)
                       .onSuccess(s -> application.onOperationCompleted())
+                      .onFailure(ex -> LOGGER.error("Error pushing citation", ex))
                       .executeWith(taskExecutor);
     }
 
