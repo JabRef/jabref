@@ -31,28 +31,8 @@ import org.jbibtex.DigitStringValue;
 import org.jbibtex.Key;
 
 /**
- * Custom
- * {@link
- * ItemDataProvider}
- * that
- * allows
- * to
- * set
- * the
- * data
- * so
- * that
- * we
- * don't
- * have
- * to
- * instantiate
- * a
- * new
- * CSL
- * object
- * every
- * time.
+ * Custom {@link ItemDataProvider} that allows to set the data so that we don't have to instantiate a new CSL object
+ * every time.
  */
 public class JabRefItemDataProvider implements ItemDataProvider {
 
@@ -71,13 +51,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
     }
 
     /**
-     * Converts
-     * the
-     * {@link
-     * BibEntry}
-     * into
-     * {@link
-     * CSLItemData}.
+     * Converts the {@link BibEntry} into {@link CSLItemData}.
      *
      * <br>
      * <table>
@@ -193,15 +167,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
     }
 
     /**
-     * Fills
-     * the
-     * data
-     * with
-     * all
-     * entries
-     * in
-     * given
-     * bibDatabaseContext
+     * Fills the data with all entries in given bibDatabaseContext
      */
     public void setData(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
         this.setData(bibDatabaseContext.getEntries(), bibDatabaseContext, entryTypesManager);
