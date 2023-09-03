@@ -29,7 +29,7 @@ public class JournalListMvGenerator {
             System.out.println("Target " + journalListMvFile.toAbsolutePath() + " already exists.");
             System.out.println("Skipping generation.");
             System.out.println("If you really want to re-generate, please delete the file.");
-            System.exit(2);
+            System.exit(0);
         }
 
         Set<String> ignoredNames = Set.of(
