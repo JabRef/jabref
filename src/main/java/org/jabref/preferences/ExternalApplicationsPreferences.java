@@ -11,12 +11,6 @@ public class ExternalApplicationsPreferences {
     private final BooleanProperty shouldAutoOpenEmailAttachmentsFolder;
     private final StringProperty citeCommand;
 
-    private final StringProperty startCharacter;
-
-    private final StringProperty endCharacter;
-
-    private final StringProperty delimiter;
-
     private final BooleanProperty useCustomTerminal;
     private final StringProperty customTerminalCommand;
     private final BooleanProperty useCustomFileBrowser;
@@ -30,10 +24,7 @@ public class ExternalApplicationsPreferences {
                                            String customTerminalCommand,
                                            boolean useCustomFileBrowser,
                                            String customFileBrowserCommand,
-                                           String kindleEmail,
-                                           String startCharacter,
-                                           String endCharacter,
-                                           String delimiter) {
+                                           String kindleEmail) {
 
         this.eMailSubject = new SimpleStringProperty(eMailSubject);
         this.shouldAutoOpenEmailAttachmentsFolder = new SimpleBooleanProperty(shouldAutoOpenEmailAttachmentsFolder);
@@ -43,10 +34,6 @@ public class ExternalApplicationsPreferences {
         this.useCustomFileBrowser = new SimpleBooleanProperty(useCustomFileBrowser);
         this.customFileBrowserCommand = new SimpleStringProperty(customFileBrowserCommand);
         this.kindleEmail = new SimpleStringProperty(kindleEmail);
-
-        this.startCharacter = new SimpleStringProperty(startCharacter);
-        this.endCharacter = new SimpleStringProperty(endCharacter);
-        this.delimiter = new SimpleStringProperty(delimiter);
     }
 
     public String getEmailSubject() {
@@ -77,48 +64,12 @@ public class ExternalApplicationsPreferences {
         return citeCommand.get();
     }
 
-    public String getDelimiter() {
-        return this.delimiter.getValue();
-    }
-
-    public String getStartCharacter() {
-        return this.startCharacter.getValue();
-    }
-
-    public String getEndCharacter() {
-        return this.endCharacter.getValue();
-    }
-
-    public StringProperty delimiterProperty() {
-        return this.delimiter;
-    }
-
-    public StringProperty startCharacterProperty() {
-        return this.startCharacter;
-    }
-
-    public StringProperty endCharacterProperty() {
-        return this.endCharacter;
-    }
-
     public StringProperty citeCommandProperty() {
         return citeCommand;
     }
 
     public void setCiteCommand(String citeCommand) {
         this.citeCommand.set(citeCommand);
-    }
-
-    public void setStartCharacter(String startCharacter) {
-        this.startCharacter.setValue(startCharacter);
-    }
-
-    public void setEndCharacter(String endCharacter) {
-        this.endCharacter.setValue(endCharacter);
-    }
-
-    public void setDelimiter(String delimiter) {
-        this.delimiter.setValue(delimiter);
     }
 
     public boolean useCustomTerminal() {

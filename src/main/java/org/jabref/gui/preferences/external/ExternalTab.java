@@ -23,9 +23,6 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     @FXML private CheckBox autoOpenAttachedFolders;
     @FXML private ComboBox<PushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
-    @FXML private TextField endCharacter;
-    @FXML private TextField startCharacter;
-    @FXML private TextField delimiter;
 
     @FXML private CheckBox useCustomTerminal;
     @FXML private TextField customTerminalCommand;
@@ -62,9 +59,6 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         pushToApplicationCombo.itemsProperty().bind(viewModel.pushToApplicationsListProperty());
         pushToApplicationCombo.valueProperty().bindBidirectional(viewModel.selectedPushToApplication());
         citeCommand.textProperty().bindBidirectional(viewModel.citeCommandProperty());
-        startCharacter.textProperty().bindBidirectional(viewModel.startCharacterProperty());
-        endCharacter.textProperty().bindBidirectional(viewModel.endCharacterProperty());
-        delimiter.textProperty().bindBidirectional(viewModel.delimiterProperty());
 
         useCustomTerminal.selectedProperty().bindBidirectional(viewModel.useCustomTerminalProperty());
         customTerminalCommand.textProperty().bindBidirectional(viewModel.customTerminalCommandProperty());

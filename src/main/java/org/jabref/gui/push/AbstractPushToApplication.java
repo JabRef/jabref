@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushToApplication.class);
+    private static final String CITE_KEY1 = "key1";
+    private static final String CITE_KEY2 = "key2";
 
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
     protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
@@ -36,9 +38,33 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected final DialogService dialogService;
     protected final PreferencesService preferencesService;
 
+    private String cachedCiteCommand;
+    private String cachedCitePrefix;
+    private String cachedCiteSuffix;
+    private String cachedCiteDelimiter;
+
     public AbstractPushToApplication(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+    }
+
+    private void dissectCiteCommand() {
+        String preferencesCiteCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+
+        if (cachedCiteCommand != null && preferencesCiteCommand != null && preferencesCiteCommand.equals(cachedCiteCommand)) {
+            return;
+        }
+
+        int indexKey1 = cachedCiteCommand.indexOf(CITE_KEY1);
+        int indexKey2 = cachedCiteCommand.indexOf(CITE_KEY2);
+        if (indexKey1 < 0 || indexKey2 < 0 || indexKey2 < (indexKey1 + CITE_KEY1.length())) {
+            return;
+        }
+
+        cachedCiteCommand = preferencesCiteCommand;
+        cachedCitePrefix = preferencesCiteCommand.substring(0, indexKey1);
+        cachedCiteDelimiter = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY1), indexKey2);
+        cachedCiteSuffix = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY2));
     }
 
     @Override
@@ -142,20 +168,19 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return null;
     }
 
-    protected String getCiteCommand() {
-        return preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+    protected String getCitePrefix() {
+        dissectCiteCommand();
+        return cachedCitePrefix;
     }
 
-    protected String getDelimiter() {
-        return preferencesService.getExternalApplicationsPreferences().getDelimiter();
+    public String getDelimiter() {
+        dissectCiteCommand();
+        return cachedCiteDelimiter;
     }
 
-    protected String getStartCharacter() {
-        return preferencesService.getExternalApplicationsPreferences().getStartCharacter();
-    }
-
-    protected String getEndCharacter() {
-        return preferencesService.getExternalApplicationsPreferences().getEndCharacter();
+    protected String getCiteSuffix() {
+        dissectCiteCommand();
+        return cachedCiteSuffix;
     }
 
     @Override

@@ -139,6 +139,6 @@ public class PushToApplicationCommand extends SimpleCommand {
 
     private void pushEntries() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        application.pushEntries(database, stateManager.getSelectedEntries(), getKeyString(stateManager.getSelectedEntries(), preferencesService.getExternalApplicationsPreferences().getDelimiter()));
+        application.pushEntries(database, stateManager.getSelectedEntries(), getKeyString(stateManager.getSelectedEntries(), application.getDelimiter()));
     }
 }

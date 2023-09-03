@@ -40,9 +40,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<PushToApplication> pushToApplicationsListProperty = new SimpleListProperty<>();
     private final ObjectProperty<PushToApplication> selectedPushToApplicationProperty = new SimpleObjectProperty<>();
     private final StringProperty citeCommandProperty = new SimpleStringProperty("");
-    private final StringProperty startCharacterProperty = new SimpleStringProperty("");
-    private final StringProperty endCharacterProperty = new SimpleStringProperty("");
-    private final StringProperty delimiterProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomTerminalProperty = new SimpleBooleanProperty();
     private final StringProperty customTerminalCommandProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomFileBrowserProperty = new SimpleBooleanProperty();
@@ -106,10 +103,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         useCustomFileBrowserProperty.setValue(initialExternalApplicationPreferences.useCustomFileBrowser());
         customFileBrowserCommandProperty.setValue(initialExternalApplicationPreferences.getCustomFileBrowserCommand());
         kindleEmailProperty.setValue(initialExternalApplicationPreferences.getKindleEmail());
-
-        startCharacterProperty.setValue(initialExternalApplicationPreferences.getStartCharacter());
-        endCharacterProperty.setValue(initialExternalApplicationPreferences.getEndCharacter());
-        delimiterProperty.setValue(initialExternalApplicationPreferences.getDelimiter());
     }
 
     @Override
@@ -123,9 +116,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         externalPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());
         externalPreferences.setCustomFileBrowserCommand(customFileBrowserCommandProperty.getValue());
         externalPreferences.setKindleEmail(kindleEmailProperty.getValue());
-        externalPreferences.setDelimiter(delimiterProperty.getValue());
-        externalPreferences.setStartCharacter(startCharacterProperty.getValue());
-        externalPreferences.setEndCharacter(endCharacterProperty.getValue());
 
         PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
         pushPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());
@@ -218,18 +208,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty citeCommandProperty() {
         return this.citeCommandProperty;
-    }
-
-    public StringProperty startCharacterProperty() {
-        return this.startCharacterProperty;
-    }
-
-    public StringProperty endCharacterProperty() {
-        return this.endCharacterProperty;
-    }
-
-    public StringProperty delimiterProperty() {
-        return this.delimiterProperty;
     }
 
     public BooleanProperty useCustomTerminalProperty() {

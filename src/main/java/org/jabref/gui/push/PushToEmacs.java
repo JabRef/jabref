@@ -63,7 +63,7 @@ public class PushToEmacs extends AbstractPushToApplication {
             prefix = "(with-current-buffer (window-buffer) (insert ";
             suffix = "))";
 
-            String citeCommand = getCiteCommand();
+            String citeCommand = getCitePrefix();
 
             if (OS.WINDOWS) {
                 // Windows gnuclient/emacsclient escaping:
@@ -72,20 +72,20 @@ public class PushToEmacs extends AbstractPushToApplication {
                 // so emacs receives: (insert "\cite{Blah2001}")
 
                 if (citeCommand.contains("\\")) {
-                    com[com.length - 1] = prefix.concat("\\\"\\" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix);
+                    com[com.length - 1] = prefix.concat("\\\"\\" + getCitePrefix().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix);
                 }
 
-                com[com.length - 1] = prefix.concat("\"" + getCiteCommand() + getStartCharacter() + keys + getEndCharacter() + "\"").concat(suffix);
+                com[com.length - 1] = prefix.concat("\"" + getCitePrefix() + keys + getCiteSuffix() + "\"").concat(suffix);
             } else {
                 if (citeCommand.contains("\\")) {
-                    com[com.length - 1] = prefix.concat("\"" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
+                    com[com.length - 1] = prefix.concat("\"" + getCitePrefix().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
                 }
 
                 // Linux gnuclient/emacslient escaping:
                 // java string: "(insert \"\\\\cite{Blah2001}\")"
                 // so sh receives: (insert "\\cite{Blah2001}")
                 // so emacs receives: (insert "\cite{Blah2001}")
-                com[com.length - 1] = prefix.concat("\"" + getCiteCommand() + getStartCharacter() + keys + getEndCharacter() + "\"").concat(suffix);
+                com[com.length - 1] = prefix.concat("\"" + getCitePrefix() + keys + getCiteSuffix() + "\"").concat(suffix);
             }
 
             final Process p = Runtime.getRuntime().exec(com);

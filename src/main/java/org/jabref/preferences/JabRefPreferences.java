@@ -285,9 +285,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
 
     public static final String CITE_COMMAND = "citeCommand";
-    public static final String CITE_COMMAND_START_CHARACTER = "citeCommandStartCharacter";
-    public static final String CITE_COMMAND_END_CHARACTER = "citeCommandEndCharacter";
-    public static final String CITE_COMMAND_DELIMITER = "citeCommandDelimiter";
 
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String EMAIL_SUBJECT = "emailSubject";
@@ -1798,10 +1795,7 @@ public class JabRefPreferences implements PreferencesService {
                 get(CONSOLE_COMMAND),
                 !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION), // mind the !
                 get(FILE_BROWSER_COMMAND),
-                get(KINDLE_EMAIL),
-                get(CITE_COMMAND_START_CHARACTER),
-                get(CITE_COMMAND_END_CHARACTER),
-                get(CITE_COMMAND_DELIMITER));
+                get(KINDLE_EMAIL));
 
         EasyBind.listen(externalApplicationsPreferences.eMailSubjectProperty(),
                 (obs, oldValue, newValue) -> put(EMAIL_SUBJECT, newValue));
@@ -1819,12 +1813,6 @@ public class JabRefPreferences implements PreferencesService {
                 (obs, oldValue, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
         EasyBind.listen(externalApplicationsPreferences.kindleEmailProperty(),
                 (obs, oldValue, newValue) -> put(KINDLE_EMAIL, newValue));
-        EasyBind.listen(externalApplicationsPreferences.delimiterProperty(),
-                (obs, oldValue, newValue) -> put(CITE_COMMAND_DELIMITER, newValue));
-        EasyBind.listen(externalApplicationsPreferences.startCharacterProperty(),
-                (obs, oldValue, newValue) -> put(CITE_COMMAND_START_CHARACTER, newValue));
-        EasyBind.listen(externalApplicationsPreferences.endCharacterProperty(),
-                (obs, oldValue, newValue) -> put(CITE_COMMAND_END_CHARACTER, newValue));
 
         return externalApplicationsPreferences;
     }
