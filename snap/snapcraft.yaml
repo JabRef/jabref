@@ -45,10 +45,10 @@ layout:
 apps:
   jabref:
     command: bin/JabRef
-    extensions: [gnome-3-38]
+    extensions: [gnome]
   browser-proxy:
     command: lib/jabrefHost.py
-    extensions: [gnome-3-38]
+    extensions: [gnome]
 
 environment:
   _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
