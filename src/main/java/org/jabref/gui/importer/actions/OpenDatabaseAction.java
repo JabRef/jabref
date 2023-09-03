@@ -3,12 +3,15 @@ package org.jabref.gui.importer.actions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -18,6 +21,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -25,6 +29,9 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -230,7 +237,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (parserResult.getDatabase().isShared()) {
-                         OpenDatabase.openSharedDatabase(
+                         openSharedDatabase(
                                  parserResult,
                                  frame,
                                  dialogService,
@@ -248,5 +255,33 @@ public class OpenDatabaseAction extends SimpleCommand {
                 "OpenNewDatabase",
                 Map.of(),
                 Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
+    }
+
+    public static void openSharedDatabase(ParserResult parserResult,
+                                          JabRefFrame frame,
+                                          DialogService dialogService,
+                                          PreferencesService preferencesService,
+                                          StateManager stateManager,
+                                          BibEntryTypesManager entryTypesManager,
+                                          FileUpdateMonitor fileUpdateMonitor,
+                                          UndoManager undoManager)
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
+        try {
+            new SharedDatabaseUIManager(
+                    frame,
+                    dialogService,
+                    preferencesService,
+                    stateManager,
+                    entryTypesManager,
+                    fileUpdateMonitor,
+                    undoManager)
+                    .openSharedDatabaseFromParserResult(parserResult);
+        } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                 NotASharedDatabaseException e) {
+            parserResult.getDatabaseContext().clearDatabasePath(); // do not open the original file
+            parserResult.getDatabase().clearSharedDatabaseID();
+
+            throw e;
+        }
     }
 }

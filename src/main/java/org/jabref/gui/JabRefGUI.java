@@ -18,7 +18,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
-import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -213,7 +212,7 @@ public class JabRefGUI {
 
             if (parserResult.getDatabase().isShared()) {
                 try {
-                    OpenDatabase.openSharedDatabase(
+                    OpenDatabaseAction.openSharedDatabase(
                             parserResult,
                             mainFrame,
                             mainFrame.getDialogService(),
