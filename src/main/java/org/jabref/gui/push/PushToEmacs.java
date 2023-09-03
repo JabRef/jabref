@@ -63,18 +63,29 @@ public class PushToEmacs extends AbstractPushToApplication {
             prefix = "(with-current-buffer (window-buffer) (insert ";
             suffix = "))";
 
+            String citeCommand = getCiteCommand();
+
             if (OS.WINDOWS) {
                 // Windows gnuclient/emacsclient escaping:
                 // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
                 // so cmd receives: (insert \"\\cite{Blah2001}\")
                 // so emacs receives: (insert "\cite{Blah2001}")
-                com[com.length - 1] = prefix.concat("\\\"\\" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix);
+
+                if(citeCommand.contains("\\")) {
+                    com[com.length - 1] = prefix.concat("\\\"\\" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix);
+                }
+
+                com[com.length - 1] = prefix.concat("\"" + getCiteCommand() + getStartCharacter() + keys + getEndCharacter() + "\"").concat(suffix);
             } else {
+                if(citeCommand.contains("\\")) {
+                    com[com.length - 1] = prefix.concat("\"" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
+                }
+
                 // Linux gnuclient/emacslient escaping:
                 // java string: "(insert \"\\\\cite{Blah2001}\")"
                 // so sh receives: (insert "\\cite{Blah2001}")
                 // so emacs receives: (insert "\cite{Blah2001}")
-                com[com.length - 1] = prefix.concat("\"" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
+                com[com.length - 1] = prefix.concat("\"" + getCiteCommand() + getStartCharacter() + keys + getEndCharacter() +"\"").concat(suffix);
             }
 
             final Process p = Runtime.getRuntime().exec(com);
