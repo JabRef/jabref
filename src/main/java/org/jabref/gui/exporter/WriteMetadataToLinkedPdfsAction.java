@@ -40,7 +40,10 @@ import org.jabref.preferences.FilePreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
-public class WriteMetadataToPdfAction extends SimpleCommand {
+/**
+ * Writes XMP Metadata to all the linked pdfs of the selected entries according to the linking entry
+ */
+public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
 
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -59,15 +62,15 @@ public class WriteMetadataToPdfAction extends SimpleCommand {
     private int skipped;
     private int entriesChanged;
     private int errors;
-// used by menu
-    public WriteMetadataToPdfAction(StateManager stateManager,
-                                    BibEntryTypesManager entryTypesManager,
-                                    FieldPreferences fieldPreferences,
-                                    DialogService dialogService,
-                                    TaskExecutor taskExecutor,
-                                    FilePreferences filePreferences,
-                                    XmpPreferences xmpPreferences,
-                                    JournalAbbreviationRepository abbreviationRepository) {
+
+    public WriteMetadataToLinkedPdfsAction(DialogService dialogService,
+                                           FieldPreferences fieldPreferences,
+                                           FilePreferences filePreferences,
+                                           XmpPreferences xmpPreferences,
+                                           BibEntryTypesManager entryTypesManager,
+                                           JournalAbbreviationRepository abbreviationRepository,
+                                           TaskExecutor taskExecutor,
+                                           StateManager stateManager) {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fieldPreferences = fieldPreferences;

@@ -25,9 +25,12 @@ import org.jabref.preferences.FilePreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WriteMetadataToPdfCommand extends SimpleCommand {
+/**
+ * Writes XMP metadata to the selected file according to the linking entry
+ */
+public class WriteMetadataToSinglePdfAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WriteMetadataToPdfCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WriteMetadataToSinglePdfAction.class);
 
     private final LinkedFile linkedFile;
     private final BibEntry entry;
@@ -40,17 +43,16 @@ public class WriteMetadataToPdfCommand extends SimpleCommand {
     private final FilePreferences filePreferences;
     private final XmpPreferences xmpPreferences;
 
-    // used by LinkedFilesEditor
-    public WriteMetadataToPdfCommand(LinkedFile linkedFile,
-                                     BibEntry entry,
-                                     FieldPreferences fieldPreferences,
-                                     BibDatabaseContext databaseContext,
-                                     DialogService dialogService,
-                                     BibEntryTypesManager bibEntryTypesManager,
-                                     JournalAbbreviationRepository abbreviationRepository,
-                                     TaskExecutor taskExecutor,
-                                     FilePreferences filePreferences,
-                                     XmpPreferences xmpPreferences) {
+    public WriteMetadataToSinglePdfAction(LinkedFile linkedFile,
+                                          BibEntry entry,
+                                          BibDatabaseContext databaseContext,
+                                          DialogService dialogService,
+                                          FieldPreferences fieldPreferences,
+                                          FilePreferences filePreferences,
+                                          XmpPreferences xmpPreferences,
+                                          JournalAbbreviationRepository abbreviationRepository,
+                                          BibEntryTypesManager bibEntryTypesManager,
+                                          TaskExecutor taskExecutor) {
         this.linkedFile = linkedFile;
         this.entry = entry;
         this.fieldPreferences = fieldPreferences;
