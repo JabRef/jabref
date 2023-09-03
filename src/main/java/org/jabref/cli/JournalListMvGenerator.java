@@ -22,7 +22,7 @@ public class JournalListMvGenerator {
         Path abbreviationsDirectory = Path.of("buildres", "abbrv.jabref.org", "journals");
         if (!Files.exists(abbreviationsDirectory)) {
             System.out.println("Path " + abbreviationsDirectory.toAbsolutePath() + " does not exist");
-            System.exit(1);
+            System.exit(0);
         }
         Path journalListMvFile = Path.of("build", "resources", "main", "journals", "journal-list.mv");
         if (Files.exists(journalListMvFile)) {
