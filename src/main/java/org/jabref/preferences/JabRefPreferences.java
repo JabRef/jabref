@@ -283,7 +283,12 @@ public class JabRefPreferences implements PreferencesService {
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
+
     public static final String CITE_COMMAND = "citeCommand";
+    public static final String CITE_COMMAND_START_CHARACTER = "citeCommandStartCharacter";
+    public static final String CITE_COMMAND_END_CHARACTER = "citeCommandEndCharacter";
+    public static final String CITE_COMMAND_DELIMITER = "citeCommandDelimiter";
+
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String EMAIL_SUBJECT = "emailSubject";
     public static final String KINDLE_EMAIL = "kindleEmail";
@@ -698,7 +703,9 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
-        defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
+        defaults.put(CITE_COMMAND, "\\cite");
+        defaults.put(CITE_COMMAND_START_CHARACTER, "{");
+        defaults.put(CITE_COMMAND_END_CHARACTER, "}");
 
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);
@@ -1752,7 +1759,6 @@ public class JabRefPreferences implements PreferencesService {
         pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -> storePushToApplicationPath(newValue));
         EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
         EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));
-
         return pushToApplicationPreferences;
     }
 
@@ -1791,7 +1797,10 @@ public class JabRefPreferences implements PreferencesService {
                 get(CONSOLE_COMMAND),
                 !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION), // mind the !
                 get(FILE_BROWSER_COMMAND),
-                get(KINDLE_EMAIL));
+                get(KINDLE_EMAIL),
+                get(CITE_COMMAND_START_CHARACTER),
+                get(CITE_COMMAND_END_CHARACTER),
+                get(CITE_COMMAND_DELIMITER));
 
         EasyBind.listen(externalApplicationsPreferences.eMailSubjectProperty(),
                 (obs, oldValue, newValue) -> put(EMAIL_SUBJECT, newValue));
@@ -1809,6 +1818,12 @@ public class JabRefPreferences implements PreferencesService {
                 (obs, oldValue, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
         EasyBind.listen(externalApplicationsPreferences.kindleEmailProperty(),
                 (obs, oldValue, newValue) -> put(KINDLE_EMAIL, newValue));
+        EasyBind.listen(externalApplicationsPreferences.delimiterProperty(),
+                (obs, oldValue, newValue) -> put(CITE_COMMAND_DELIMITER, newValue));
+        EasyBind.listen(externalApplicationsPreferences.startCharacterProperty(),
+                (obs, oldValue, newValue) -> put(CITE_COMMAND_START_CHARACTER, newValue));
+        EasyBind.listen(externalApplicationsPreferences.endCharacterProperty(),
+                (obs, oldValue, newValue) -> put(CITE_COMMAND_END_CHARACTER, newValue));
 
         return externalApplicationsPreferences;
     }
