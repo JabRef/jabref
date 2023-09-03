@@ -24,6 +24,14 @@ public class JournalListMvGenerator {
             System.out.println("Path " + abbreviationsDirectory.toAbsolutePath() + " does not exist");
             System.exit(1);
         }
+        Path journalListMvFile = Path.of("build", "resources", "main", "journals", "journal-list.mv");
+        if (Files.exists(journalListMvFile)) {
+            System.out.println("Target " + journalListMvFile.toAbsolutePath() + " already exists.");
+            System.out.println("Skipping generation.");
+            System.out.println("If you really want to re-generate, please delete the file.");
+            System.exit(2);
+        }
+
         Set<String> ignoredNames = Set.of(
                 // remove all lists without dot in them:
                 // we use abbreviation lists containing dots in them only (to be consistent)
@@ -35,8 +43,6 @@ public class JournalListMvGenerator {
                 "journal_abbreviations_ieee_strings.csv"
                 );
 
-        Path journalListMvFile = Path.of("build", "resources", "main", "journals", "journal-list.mv");
-        Files.deleteIfExists(journalListMvFile);
         Files.createDirectories(journalListMvFile.getParent());
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(abbreviationsDirectory, "*.csv");
