@@ -7,8 +7,7 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 
 import org.jabref.http.dto.GsonFactory;
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.preferences.BibEntryPreferences;
 import org.jabref.preferences.GuiPreferences;
@@ -82,15 +81,14 @@ abstract class ServerTest extends JerseyTest {
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(bibEntryPreferences);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
 
-        FieldWriterPreferences fieldWriterPreferences = mock(FieldWriterPreferences.class);
-        when(preferencesService.getFieldWriterPreferences()).thenReturn(fieldWriterPreferences);
-        when(fieldWriterPreferences.isResolveStrings()).thenReturn(false);
+        FieldPreferences fieldWriterPreferences = mock(FieldPreferences.class);
+        when(preferencesService.getFieldPreferences()).thenReturn(fieldWriterPreferences);
+        when(fieldWriterPreferences.shouldResolveStrings()).thenReturn(false);
 
         // defaults are in {@link org.jabref.preferences.JabRefPreferences.NON_WRAPPABLE_FIELDS}
-        FieldContentFormatterPreferences fieldContentFormatterPreferences = new FieldContentFormatterPreferences(List.of());
+        FieldPreferences fieldContentFormatterPreferences = new  FieldPreferences(false, List.of(), List.of());
         // used twice, once for reading and once for writing
-        when(importFormatPreferences.fieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
-        when(preferencesService.getFieldWriterPreferences().getFieldContentFormatterPreferences()).thenReturn(fieldContentFormatterPreferences);
+        when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
 
         guiPreferences = mock(GuiPreferences.class);
         when(preferencesService.getGuiPreferences()).thenReturn(guiPreferences);
