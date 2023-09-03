@@ -76,6 +76,7 @@ public class ExternalApplicationsPreferences {
     public String getCiteCommand() {
         return citeCommand.get();
     }
+
     public String getDelimiter() {
         return this.delimiter.getValue();
     }

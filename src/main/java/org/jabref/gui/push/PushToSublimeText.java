@@ -79,16 +79,15 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
         String citeCommand = getCiteCommand();
         // we need to escape the extra slashses
-        if (getCiteCommand().contains("\\")){
+        if (getCiteCommand().contains("\\")) {
             citeCommand = "\"\\" + getCiteCommand();
         }
 
         if (OS.WINDOWS) {
             // TODO we might need to escape the inner double quotes with """ """
-            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCiteCommand() + getStartCharacter() + keyString + getEndCharacter() +"\"}\""};
+            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCiteCommand() + getStartCharacter() + keyString + getEndCharacter() + "\"}\""};
         } else {
-            var x = new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + getStartCharacter() + keyString + getEndCharacter() +"\"}'"};
-            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + getStartCharacter() + keyString + getEndCharacter() +"\"}'"};
+            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + getStartCharacter() + keyString + getEndCharacter() + "\"}'"};
         }
     }
 }
