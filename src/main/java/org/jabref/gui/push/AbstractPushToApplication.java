@@ -51,9 +51,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     private void dissectCiteCommand() {
         String preferencesCiteCommand = preferencesService.getExternalApplicationsPreferences().getCiteCommand();
 
-        if (cachedCiteCommand != null && preferencesCiteCommand != null && preferencesCiteCommand.equals(cachedCiteCommand)) {
+        if (preferencesCiteCommand != null && preferencesCiteCommand.equals(cachedCiteCommand)) {
             return;
         }
+
+        cachedCiteCommand = preferencesCiteCommand;
 
         int indexKey1 = cachedCiteCommand.indexOf(CITE_KEY1);
         int indexKey2 = cachedCiteCommand.indexOf(CITE_KEY2);
@@ -61,7 +63,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             return;
         }
 
-        cachedCiteCommand = preferencesCiteCommand;
         cachedCitePrefix = preferencesCiteCommand.substring(0, indexKey1);
         cachedCiteDelimiter = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY1), indexKey2);
         cachedCiteSuffix = preferencesCiteCommand.substring(preferencesCiteCommand.lastIndexOf(CITE_KEY2));
