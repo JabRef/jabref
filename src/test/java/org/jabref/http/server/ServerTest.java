@@ -86,7 +86,7 @@ abstract class ServerTest extends JerseyTest {
         when(fieldWriterPreferences.shouldResolveStrings()).thenReturn(false);
 
         // defaults are in {@link org.jabref.preferences.JabRefPreferences.NON_WRAPPABLE_FIELDS}
-        FieldPreferences fieldContentFormatterPreferences = new  FieldPreferences(false, List.of(), List.of());
+        FieldPreferences fieldContentFormatterPreferences = new FieldPreferences(false, List.of(), List.of());
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
 
