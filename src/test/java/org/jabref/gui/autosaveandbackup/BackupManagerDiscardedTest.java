@@ -11,6 +11,7 @@ import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -38,7 +39,7 @@ class BackupManagerDiscardedTest {
     private BibDatabaseContext bibDatabaseContext;
     private BackupManager backupManager;
     private Path testBib;
-    private SaveConfiguration saveConfiguration;
+    private SelfContainedSaveConfiguration saveConfiguration;
     private PreferencesService preferencesService;
     private BibEntryTypesManager bibEntryTypesManager;
     private Path backupDir;
@@ -55,7 +56,7 @@ class BackupManagerDiscardedTest {
 
         bibEntryTypesManager = new BibEntryTypesManager();
 
-        saveConfiguration = mock(SaveConfiguration.class);
+        saveConfiguration = mock(SelfContainedSaveConfiguration.class);
         when(saveConfiguration.shouldMakeBackup()).thenReturn(false);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(saveConfiguration.withMakeBackup(anyBoolean())).thenReturn(saveConfiguration);
