@@ -30,6 +30,7 @@ jobs:
       - name: Update buildres/abbrv.jabref.org
         run: |
           cd buildres/abbrv.jabref.org
+          git checkout main
           git pull
       - name: Set up JDK
         uses: actions/setup-java@v3
