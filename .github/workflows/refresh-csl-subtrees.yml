@@ -22,6 +22,7 @@ jobs:
           persist-credentials: true
           fetch-depth: 0
           submodules: 'true'
+          show-progress: 'false'
       - name: Initialize git
         run: |
           git config --local core.editor /usr/bin/cat

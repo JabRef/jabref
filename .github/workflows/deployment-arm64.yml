@@ -50,6 +50,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: 'true'
+          show-progress: 'false'
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.10.2
         with:
