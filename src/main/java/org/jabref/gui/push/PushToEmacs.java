@@ -71,13 +71,13 @@ public class PushToEmacs extends AbstractPushToApplication {
                 // so cmd receives: (insert \"\\cite{Blah2001}\")
                 // so emacs receives: (insert "\cite{Blah2001}")
 
-                if(citeCommand.contains("\\")) {
+                if (citeCommand.contains("\\")) {
                     com[com.length - 1] = prefix.concat("\\\"\\" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix);
                 }
 
                 com[com.length - 1] = prefix.concat("\"" + getCiteCommand() + getStartCharacter() + keys + getEndCharacter() + "\"").concat(suffix);
             } else {
-                if(citeCommand.contains("\\")) {
+                if (citeCommand.contains("\\")) {
                     com[com.length - 1] = prefix.concat("\"" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
                 }
 
@@ -85,7 +85,7 @@ public class PushToEmacs extends AbstractPushToApplication {
                 // java string: "(insert \"\\\\cite{Blah2001}\")"
                 // so sh receives: (insert "\\cite{Blah2001}")
                 // so emacs receives: (insert "\cite{Blah2001}")
-                com[com.length - 1] = prefix.concat("\"" + getCiteCommand() + getStartCharacter() + keys + getEndCharacter() +"\"").concat(suffix);
+                com[com.length - 1] = prefix.concat("\"" + getCiteCommand() + getStartCharacter() + keys + getEndCharacter() + "\"").concat(suffix);
             }
 
             final Process p = Runtime.getRuntime().exec(com);

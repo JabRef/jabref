@@ -249,5 +249,4 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     public StringProperty customFileBrowserCommandProperty() {
         return this.customFileBrowserCommandProperty;
     }
-
 }
