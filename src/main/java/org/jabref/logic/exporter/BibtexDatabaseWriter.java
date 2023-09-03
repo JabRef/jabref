@@ -35,7 +35,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     private final FieldPreferences fieldPreferences;
 
     public BibtexDatabaseWriter(BibWriter bibWriter,
-                                SaveConfiguration saveConfiguration,
+                                SelfContainedSaveConfiguration saveConfiguration,
                                 FieldPreferences fieldPreferences,
                                 CitationKeyPatternPreferences citationKeyPatternPreferences,
                                 BibEntryTypesManager entryTypesManager) {
@@ -49,7 +49,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
     public BibtexDatabaseWriter(Writer writer,
                                 String newline,
-                                SaveConfiguration saveConfiguration,
+                                SelfContainedSaveConfiguration saveConfiguration,
                                 FieldPreferences fieldPreferences,
                                 CitationKeyPatternPreferences citationKeyPatternPreferences,
                                 BibEntryTypesManager entryTypesManager) {
