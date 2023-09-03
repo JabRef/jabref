@@ -700,11 +700,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
-        defaults.put(CITE_COMMAND, "\\cite");
-        defaults.put(CITE_COMMAND_START_CHARACTER, "{");
-        defaults.put(CITE_COMMAND_END_CHARACTER, "}");
-        defaults.put(CITE_COMMAND_DELIMITER, ",");
-
+        defaults.put(CITE_COMMAND, "\\cite{key1,key2}");
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);
 
