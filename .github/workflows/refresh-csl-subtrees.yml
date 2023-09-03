@@ -35,6 +35,7 @@ jobs:
           git pull
           cd ..
           cd ..
+          cd ..
           cp buildres/csl/csl-styles/acm-siggraph.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/apa.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
@@ -44,6 +45,7 @@ jobs:
           cd buildres/csl/csl-locales
           git checkout master
           git pull
+          cd ..
           cd ..
           cd ..
           cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
