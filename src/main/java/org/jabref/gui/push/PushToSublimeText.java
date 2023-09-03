@@ -66,8 +66,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
             JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
             JabRefExecutorService.INSTANCE.execute(streamGobblerError);
-        } catch (
-                IOException excep) {
+        } catch (IOException excep) {
             LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
         }
@@ -75,7 +74,6 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     @Override
     protected String[] getCommandLine(String keyString) {
-
         String citeCommand = getCiteCommand();
         // we need to escape the extra slashses
         if (getCiteCommand().contains("\\")) {
