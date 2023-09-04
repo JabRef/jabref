@@ -99,6 +99,8 @@ recipeList:
   # We voted against it
   #  - org.openrewrite.staticanalysis.ExplicitInitialization
 
+  - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
+
   - org.openrewrite.staticanalysis.AtomicPrimitiveEqualsUsesGet
   - org.openrewrite.staticanalysis.BigDecimalRoundingConstantsToEnums
   - org.openrewrite.staticanalysis.BooleanChecksNotInverted
@@ -156,13 +158,14 @@ recipeList:
 #  - org.openrewrite.staticanalysis.RenameLocalVariablesToCamelCase
   - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrTostring
   - org.openrewrite.staticanalysis.ReplaceRedundantFormatWithPrintf
+  - org.openrewrite.staticanalysis.ReplaceStringBuilderWithString
 #  - org.openrewrite.staticanalysis.ShortenFullyQualifiedTypeReferences
 #  - org.openrewrite.staticanalysis.SimplifyConsecutiveAssignments
 #  - org.openrewrite.staticanalysis.SimplifyCompoundStatement
   - org.openrewrite.staticanalysis.SimplifyBooleanExpression
   - org.openrewrite.staticanalysis.SimplifyBooleanReturn
   - org.openrewrite.staticanalysis.SimplifyDurationCreationUnits
-#  - org.openrewrite.staticanalysis.StaticMethodNotFinal
+  - org.openrewrite.staticanalysis.StaticMethodNotFinal
   - org.openrewrite.staticanalysis.StringLiteralEquality
   - org.openrewrite.staticanalysis.TypecastParenPad
   - org.openrewrite.staticanalysis.UnwrapRepeatableAnnotations
@@ -172,7 +175,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.UseListSort
   - org.openrewrite.staticanalysis.UseObjectNotifyAll
   - org.openrewrite.staticanalysis.UseStandardCharset
-#  - org.openrewrite.staticanalysis.UseStringReplace
+  - org.openrewrite.staticanalysis.UseStringReplace
   - org.openrewrite.staticanalysis.UseSystemLineSeparator
   - org.openrewrite.staticanalysis.WhileInsteadOfFor
 #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
