@@ -12,6 +12,7 @@ import javax.net.ssl.SSLContext;
 
 import javafx.collections.ObservableList;
 
+import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+@AllowedToUseStandardStreams("This is a CLI application. It resides in the package http.server to be close to the other http server related classes.")
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
