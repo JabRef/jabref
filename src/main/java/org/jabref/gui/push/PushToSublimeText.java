@@ -41,7 +41,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
-        couldNotConnect = false;
+        couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 

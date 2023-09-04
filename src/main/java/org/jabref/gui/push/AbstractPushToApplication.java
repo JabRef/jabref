@@ -30,7 +30,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     private static final String CITE_KEY2 = "key2";
 
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
-    protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
+    protected boolean couldNotPush; // Set to true in case the tunnel to the program (if one is used) does not operate
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
 
     protected String commandPath;
@@ -85,7 +85,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
-        couldNotConnect = false;
+        couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
@@ -135,7 +135,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
                     Localization.lang("Could not call executable") + " '" + commandPath + "'.");
-        } else if (couldNotConnect) {
+        } else if (couldNotPush) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to %0", getDisplayName()) + ".");

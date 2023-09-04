@@ -40,7 +40,7 @@ public class PushToEmacs extends AbstractPushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keys) {
-        couldNotConnect = false;
+        couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
@@ -103,22 +103,22 @@ public class PushToEmacs extends AbstractPushToApplication {
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
-                        LOGGER.warn("Push to Emacs error: " + sb);
-                        couldNotConnect = true;
+                        LOGGER.warn("Push to Emacs error: {}", sb);
+                        couldNotPush = true;
                     }
                 } catch (IOException e) {
                     LOGGER.warn("File problem.", e);
                 }
             });
         } catch (IOException excep) {
-            couldNotCall = true;
             LOGGER.warn("Problem pushing to Emacs.", excep);
+            couldNotCall = true;
         }
     }
 
     @Override
     public void onOperationCompleted() {
-        if (couldNotConnect) {
+        if (couldNotPush) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not push to a running emacs daemon."));
         } else if (couldNotCall) {

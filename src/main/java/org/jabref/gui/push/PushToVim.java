@@ -44,7 +44,7 @@ public class PushToVim extends AbstractPushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keys) {
-        couldNotConnect = false;
+        couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
@@ -76,7 +76,7 @@ public class PushToVim extends AbstractPushToApplication {
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
                         LOGGER.warn("Push to Vim error: " + sb);
-                        couldNotConnect = true;
+                        couldNotPush = true;
                     }
                 } catch (IOException e) {
                     LOGGER.warn("File problem.", e);
@@ -90,7 +90,7 @@ public class PushToVim extends AbstractPushToApplication {
 
     @Override
     public void onOperationCompleted() {
-        if (couldNotConnect) {
+        if (couldNotPush) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to Vim server. Make sure that Vim is running with correct server name."));
         } else if (couldNotCall) {
