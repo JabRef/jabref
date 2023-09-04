@@ -5,7 +5,6 @@ import java.util.HashMap;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -41,9 +40,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<PushToApplication> pushToApplicationsListProperty = new SimpleListProperty<>();
     private final ObjectProperty<PushToApplication> selectedPushToApplicationProperty = new SimpleObjectProperty<>();
     private final StringProperty citeCommandProperty = new SimpleStringProperty("");
-    private final StringProperty startCharacterProperty = new SimpleStringProperty("");
-    private final StringProperty endCharacterProperty = new SimpleStringProperty("");
-    private final StringProperty delimiter = new SimpleStringProperty("");
     private final BooleanProperty useCustomTerminalProperty = new SimpleBooleanProperty();
     private final StringProperty customTerminalCommandProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomFileBrowserProperty = new SimpleBooleanProperty();
@@ -212,18 +208,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty citeCommandProperty() {
         return this.citeCommandProperty;
-    }
-
-    public StringProperty startCharacterProperty() {
-        return this.endCharacterProperty;
-    }
-
-    public StringProperty endCharacterProperty() {
-        return this.endCharacterProperty;
-    }
-
-    public StringProperty delimiterProperty() {
-        return this.delimiter;
     }
 
     public BooleanProperty useCustomTerminalProperty() {
