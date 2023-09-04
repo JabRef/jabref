@@ -43,6 +43,7 @@ import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -825,7 +826,7 @@ public class LibraryTab extends Tab {
     /**
      * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
      *
-     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link org.jabref.gui.Globals.TASK_EXECUTOR}.
+     * @param dataLoadingTask The task to execute to load the data asynchronously.
      * @param file the path to the file (loaded by the dataLoadingTask)
      */
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
@@ -836,7 +837,8 @@ public class LibraryTab extends Tab {
                                               JabRefFrame frame,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              CountingUndoManager undoManager) {
+                                              CountingUndoManager undoManager,
+                                              TaskExecutor taskExecutor) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
@@ -854,7 +856,7 @@ public class LibraryTab extends Tab {
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
                        .onSuccess(newTab::onDatabaseLoadingSucceed)
                        .onFailure(newTab::onDatabaseLoadingFailed)
-                       .executeWith(Globals.TASK_EXECUTOR);
+                       .executeWith(taskExecutor);
 
         return newTab;
     }

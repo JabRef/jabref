@@ -96,7 +96,7 @@ public class MainToolBar extends ToolBar {
         getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, taskExecutor)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame, dialogService, preferencesService, stateManager))),
 
                 leftSpacer,

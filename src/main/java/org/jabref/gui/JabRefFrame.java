@@ -53,7 +53,6 @@ import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -723,7 +722,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     /**
      * Opens a new tab with existing data.
-     * Asynchronous loading is done at {@link org.jabref.gui.LibraryTab#createLibraryTab(BackgroundTask, Path, PreferencesService, StateManager, JabRefFrame, ThemeManager)}.
+     * Asynchronous loading is done at  {@link org.jabref.gui.LibraryTab#createLibraryTab(BackgroundTask, Path, DialogService, PreferencesService, StateManager, JabRefFrame, FileUpdateMonitor, BibEntryTypesManager, CountingUndoManager)}.
      */
     public void addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
@@ -892,7 +891,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager);
+                undoManager,
+                taskExecutor);
     }
 
     public GlobalSearchBar getGlobalSearchBar() {

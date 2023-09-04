@@ -26,6 +26,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -62,6 +63,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final CountingUndoManager undoManager;
+    private final TaskExecutor taskExecutor;
 
     public OpenDatabaseAction(JabRefFrame frame,
                               PreferencesService preferencesService,
@@ -69,7 +71,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
-                              CountingUndoManager undoManager) {
+                              CountingUndoManager undoManager,
+                              TaskExecutor taskExecutor) {
         this.frame = frame;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
@@ -77,6 +80,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
+        this.taskExecutor = taskExecutor;
     }
 
     /**
@@ -197,7 +201,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                 frame,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager);
+                undoManager,
+                taskExecutor);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 
