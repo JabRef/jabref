@@ -329,8 +329,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
-    @Disabled
-    //Book entries can have the same ISBN due to different chapters. The Test fails as crossref identifies both entries as the same.
+    @Disabled("Book entries can have the same ISBN due to different chapters. The Test fails as crossref identifies both entries as the same.")
     @Test
     void differentArticlesFromTheSameBookAreNotDuplicates() {
         BibEntry entryOne = new BibEntry(StandardEntryType.Article)
