@@ -15,12 +15,12 @@ import java.util.Optional;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.cli.Launcher;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +56,8 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    public void openFile(String filePath, String fileType) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, Globals.prefs.getFilePreferences());
+    public void openFile(String filePath, String fileType, FilePreferences filePreferences) throws IOException {
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, filePreferences);
         String viewer;
 
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {

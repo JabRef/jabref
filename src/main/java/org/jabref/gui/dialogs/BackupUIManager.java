@@ -8,13 +8,13 @@ import java.util.Optional;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -23,6 +23,7 @@ import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -41,7 +42,11 @@ public class BackupUIManager {
                                                                  Path originalPath,
                                                                  PreferencesService preferencesService,
                                                                  FileUpdateMonitor fileUpdateMonitor) {
-        var actionOpt = showBackupResolverDialog(dialogService, originalPath, preferencesService.getFilePreferences().getBackupDirectory());
+        var actionOpt = showBackupResolverDialog(
+                dialogService,
+                preferencesService.getExternalApplicationsPreferences(),
+                originalPath,
+                preferencesService.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
                 BackupManager.restoreBackup(originalPath, preferencesService.getFilePreferences().getBackupDirectory());
@@ -53,8 +58,12 @@ public class BackupUIManager {
         });
     }
 
-    private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService, Path originalPath, Path backupDir) {
-        return DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir)));
+    private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
+                                                                 ExternalApplicationsPreferences externalApplicationsPreferences,
+                                                                 Path originalPath,
+                                                                 Path backupDir) {
+        return DefaultTaskExecutor.runInJavaFXThread(
+                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)));
     }
 
     private static Optional<ParserResult> showReviewBackupDialog(
@@ -73,7 +82,7 @@ public class BackupUIManager {
             Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferencesService.getFilePreferences().getBackupDirectory()).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
-            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferencesService.getBibEntryPreferences());
+            DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferencesService);
 
             return DefaultTaskExecutor.runInJavaFXThread(() -> {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);

@@ -23,6 +23,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -30,6 +31,7 @@ import org.jabref.preferences.PreferencesService;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.tinylog.configuration.Configuration;
 
 /**
@@ -45,6 +47,7 @@ public class Launcher {
     private static boolean isDebugEnabled;
 
     public static void main(String[] args) {
+        routeLoggingToSlf4J();
         ARGUMENTS = args;
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
@@ -59,10 +62,13 @@ public class Launcher {
 
         addLogToDisk();
         try {
+            BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+            Globals.entryTypesManager = entryTypesManager;
+
             // Init preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
             Globals.prefs = preferences;
-            PreferencesMigrations.runMigrations(preferences);
+            PreferencesMigrations.runMigrations(preferences, entryTypesManager);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(ARGUMENTS, preferences)) {
@@ -82,7 +88,8 @@ public class Launcher {
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                         ARGUMENTS, ArgumentProcessor.Mode.INITIAL_START,
                         preferences,
-                        fileUpdateMonitor);
+                        fileUpdateMonitor,
+                        entryTypesManager);
                 if (argumentProcessor.shouldShutDown()) {
                     LOGGER.debug("JabRef shut down after processing command line arguments");
                     return;
@@ -96,6 +103,11 @@ public class Launcher {
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
         }
+    }
+
+    private static void routeLoggingToSlf4J() {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
     }
 
     /**
@@ -167,8 +179,6 @@ public class Launcher {
 
     private static void configureSSL(SSLPreferences sslPreferences) {
         TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
-        System.setProperty("javax.net.ssl.trustStore", sslPreferences.getTruststorePath());
-        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
     }
 
     private static void clearOldSearchIndices() {

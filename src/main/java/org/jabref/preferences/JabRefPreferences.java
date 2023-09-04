@@ -65,8 +65,9 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
-import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -75,7 +76,6 @@ import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.logic.journals.JournalInformationPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -96,7 +96,6 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
-import org.jabref.logic.util.EnablementStatus;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -113,12 +112,15 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Singleton;
+import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,6 +134,8 @@ import org.slf4j.LoggerFactory;
  * There are still some similar preferences classes ({@link org.jabref.logic.openoffice.OpenOfficePreferences} and {@link org.jabref.logic.shared.prefs.SharedDatabasePreferences}) which also use
  * the {@code java.util.prefs} API.
  */
+@Singleton
+@Service
 public class JabRefPreferences implements PreferencesService {
 
     // Push to application preferences
@@ -266,12 +270,14 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
     public static final String SEARCH_WINDOW_HEIGHT = "searchWindowHeight";
     public static final String SEARCH_WINDOW_WIDTH = "searchWindowWidth";
+
+    public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
     public static final String GROBID_OPT_OUT = "grobidOptOut";
     public static final String GROBID_URL = "grobidURL";
 
-    public static final String JOURNALINFO_ENABLEMENT_STATUS = "journalInfoEnablementStatus";
+    public static final String JOURNAL_POPUP = "journalPopup";
 
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
@@ -281,7 +287,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String AUTOLINK_FILES_ENABLED = "autoLinkFilesEnabled";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
+
     public static final String CITE_COMMAND = "citeCommand";
+
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String EMAIL_SUBJECT = "emailSubject";
     public static final String KINDLE_EMAIL = "kindleEmail";
@@ -336,6 +344,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
+    public static final String VERSION_CHECK_ENABLED = "versionCheck";
     // KeyBindings - keys - public because needed for pref migration
     public static final String BINDINGS = "bindings";
 
@@ -369,6 +378,7 @@ public class JabRefPreferences implements PreferencesService {
     // Web search
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
+    private static final String FETCHER_CUSTOM_KEY_PERSIST = "fetcherCustomKeyPersist";
 
     // SSL
     private static final String TRUSTSTORE_PATH = "truststorePath";
@@ -472,7 +482,6 @@ public class JabRefPreferences implements PreferencesService {
     private ColumnPreferences searchDialogColumnPreferences;
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
-    private JournalInformationPreferences journalInfoPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -502,12 +511,13 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);
         defaults.put(SEARCH_WINDOW_WIDTH, 600.0);
 
+        defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
         defaults.put(GROBID_OPT_OUT, Boolean.FALSE);
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
 
-        defaults.put(JOURNALINFO_ENABLEMENT_STATUS, EnablementStatus.FIRST_START.toString());
+        defaults.put(JOURNAL_POPUP, EntryEditorPreferences.JournalPopupEnabled.FIRST_START.toString());
 
         defaults.put(PUSH_TEXMAKER_PATH, OS.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, OS.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
@@ -586,7 +596,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EXPORT_SECONDARY_SORT_FIELD, StandardField.AUTHOR.getName());
         defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
         defaults.put(EXPORT_TERTIARY_SORT_FIELD, StandardField.TITLE.getName());
-        defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
+        defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
 
         defaults.put(NEWLINE, System.lineSeparator());
 
@@ -666,6 +676,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
+        defaults.put(FETCHER_CUSTOM_KEY_PERSIST, Boolean.FALSE);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -693,8 +704,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
-        defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
-
+        defaults.put(CITE_COMMAND, "\\cite{key1,key2}");
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);
 
@@ -749,6 +759,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // version check defaults
         defaults.put(VERSION_IGNORED_UPDATE, "");
+        defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
         // preview
         defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
@@ -1422,25 +1433,25 @@ public class JabRefPreferences implements PreferencesService {
                 getDefaultEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM),
                 getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(ACCEPT_RECOMMENDATIONS),
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getDouble(ENTRY_EDITOR_HEIGHT),
-                getBoolean(AUTOLINK_FILES_ENABLED));
+                getBoolean(AUTOLINK_FILES_ENABLED),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)));
 
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (obs, oldValue, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
         EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.isMrdlibAcceptedProperty(), (obs, oldValue, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
         EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
         EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (obs, oldValue, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
         EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (obs, oldValue, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
         EasyBind.listen(entryEditorPreferences.dividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
         EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
+        EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (obs, oldValue, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
 
         return entryEditorPreferences;
     }
@@ -1690,9 +1701,9 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
                 (obs, oldValue, newValue) -> putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));
         EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (obs, oldValue, newValue) -> {
-                    putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
-                    putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
-                });
+            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
+            putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
+        });
         EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
                 (obs, oldValue, newValue) -> put(KEY_PATTERN_REGEX, newValue));
         EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
@@ -1746,7 +1757,6 @@ public class JabRefPreferences implements PreferencesService {
         pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -> storePushToApplicationPath(newValue));
         EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
         EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));
-
         return pushToApplicationPreferences;
     }
 
@@ -2023,12 +2033,15 @@ public class JabRefPreferences implements PreferencesService {
 
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
+                getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
                 getUserAndHost(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
                 (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
+        EasyBind.listen(internalPreferences.versionCheckEnabledProperty(),
+                (obs, oldValue, newValue) -> putBoolean(VERSION_CHECK_ENABLED, newValue));
         EasyBind.listen(internalPreferences.lastPreferencesExportPathProperty(),
                 (obs, oldValue, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()));
         // user is a static value, should only be changed for debugging
@@ -2176,10 +2189,10 @@ public class JabRefPreferences implements PreferencesService {
                 bibEntryPreferences.keywordSeparatorProperty());
 
         EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (obs, oldValue, newValue) -> {
-                    // Starts bibtex only omitted, as it is not being saved
-                    putBoolean(AUTOLINK_EXACT_KEY_ONLY, newValue == AutoLinkPreferences.CitationKeyDependency.EXACT);
-                    putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, newValue == AutoLinkPreferences.CitationKeyDependency.REGEX);
-                });
+            // Starts bibtex only omitted, as it is not being saved
+            putBoolean(AUTOLINK_EXACT_KEY_ONLY, newValue == AutoLinkPreferences.CitationKeyDependency.EXACT);
+            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, newValue == AutoLinkPreferences.CitationKeyDependency.REGEX);
+        });
         EasyBind.listen(autoLinkPreferences.askAutoNamingPdfsProperty(),
                 (obs, oldValue, newValue) -> putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));
         EasyBind.listen(autoLinkPreferences.regularExpressionProperty(),
@@ -2248,37 +2261,33 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
     }
 
-    private SaveOrder getTableSaveOrder() {
+    /**
+     * For the export configuration, generates the SelfContainedSaveOrder having the reference to TABLE resolved.
+     */
+    public SelfContainedSaveOrder getSelfContainedTableSaveOrder() {
         List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
-        List<SaveOrder.SortCriterion> criteria = new ArrayList<>();
-
-        for (var column : sortOrder) {
-            boolean descending = column.getSortType() == SortType.DESCENDING;
-            criteria.add(new SaveOrder.SortCriterion(
-                    FieldFactory.parseField(column.getQualifier()),
-                    descending));
-        }
-
-        return new SaveOrder(SaveOrder.OrderType.TABLE, criteria);
+        return new SelfContainedSaveOrder(
+                SaveOrder.OrderType.SPECIFIED,
+                sortOrder.stream().flatMap(model -> model.getSortCriteria().stream()).toList());
     }
 
     @Override
-    public SaveConfiguration getExportConfiguration() {
-        SaveOrder saveOrder = switch (getExportSaveOrder().getOrderType()) {
-            case TABLE -> this.getTableSaveOrder();
-            case SPECIFIED -> this.getExportSaveOrder();
+    public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
+        SaveOrder exportSaveOrder = getExportSaveOrder();
+        SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
+            case TABLE -> this.getSelfContainedTableSaveOrder();
+            case SPECIFIED -> SelfContainedSaveOrder.of(exportSaveOrder);
             case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
         };
 
-        return new SaveConfiguration()
-                .withSaveOrder(saveOrder)
-                .withMetadataSaveOrder(false)
-                .withReformatOnSave(getLibraryPreferences().shouldAlwaysReformatOnSave());
+        return new SelfContainedSaveConfiguration(
+                saveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getLibraryPreferences()
+                .shouldAlwaysReformatOnSave());
     }
 
     private List<TemplateExporter> getCustomExportFormats() {
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences();
-        SaveConfiguration saveConfiguration = getExportConfiguration();
+        SelfContainedSaveConfiguration saveConfiguration = getSelfContainedExportConfiguration();
         List<TemplateExporter> formats = new ArrayList<>();
 
         for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {
@@ -2288,7 +2297,7 @@ public class JabRefPreferences implements PreferencesService {
                     formatData.get(EXPORTER_FILENAME_INDEX),
                     formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
-                    saveConfiguration);
+                    saveConfiguration.getSelfContainedSaveOrder());
             format.setCustomExport(true);
             formats.add(format);
         }
@@ -2775,16 +2784,19 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         importerPreferences = new ImporterPreferences(
+                getBoolean(IMPORTERS_ENABLED),
                 getBoolean(GENERATE_KEY_ON_IMPORT),
                 Path.of(get(IMPORT_WORKING_DIRECTORY)),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getCustomImportFormats(),
-                getFetcherKeys()
-        );
+                getFetcherKeys(),
+                getBoolean(FETCHER_CUSTOM_KEY_PERSIST));
 
+        EasyBind.listen(importerPreferences.importerEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
         EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
         EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
         EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (obs, oldValue, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
         importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
         importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
 
@@ -2849,7 +2861,7 @@ public class JabRefPreferences implements PreferencesService {
                             getInternalPreferences().getUserAndHost())
                             .decrypt());
                 } catch (PasswordAccessException ex) {
-                    LOGGER.warn("No api key stored for {} fetcher", fetcher);
+                    LOGGER.debug("No api key stored for {} fetcher", fetcher);
                     keys.add("");
                 }
             }
@@ -2873,7 +2885,12 @@ public class JabRefPreferences implements PreferencesService {
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
-        storeFetcherKeysToKeyring(names, keys);
+
+        if (getBoolean(FETCHER_CUSTOM_KEY_PERSIST)) {
+            storeFetcherKeysToKeyring(names, keys);
+        } else {
+            clearCustomFetcherKeys();
+        }
     }
 
     private void storeFetcherKeysToKeyring(List<String> names, List<String> keys) {
@@ -2924,19 +2941,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(grobidPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
 
         return grobidPreferences;
-    }
-
-    @Override
-    public JournalInformationPreferences getJournalInformationPreferences() {
-        if (Objects.nonNull(journalInfoPreferences)) {
-            return journalInfoPreferences;
-        }
-
-        journalInfoPreferences = new JournalInformationPreferences(EnablementStatus.fromString(get(JOURNALINFO_ENABLEMENT_STATUS)));
-
-        EasyBind.listen(journalInfoPreferences.enablementStatusProperty(), (obs, oldValue, newValue) -> put(JOURNALINFO_ENABLEMENT_STATUS, newValue.toString()));
-
-        return journalInfoPreferences;
     }
 
     @Override

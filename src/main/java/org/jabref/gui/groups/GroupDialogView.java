@@ -158,6 +158,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         keywordGroupRegex.selectedProperty().bindBidirectional(viewModel.keywordGroupRegexProperty());
 
         searchGroupSearchTerm.textProperty().bindBidirectional(viewModel.searchGroupSearchTermProperty());
+        searchGroupCaseSensitive.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.CASE_SENSITIVE));
         searchGroupCaseSensitive.selectedProperty().addListener((observable, oldValue, newValue) -> {
             EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
             if (newValue) {
@@ -167,6 +168,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             }
             viewModel.searchFlagsProperty().set(searchFlags);
         });
+        searchGroupRegex.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.REGULAR_EXPRESSION));
         searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> {
             EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
             if (newValue) {

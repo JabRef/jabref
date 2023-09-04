@@ -230,7 +230,7 @@ class OOBibStyleGetCitationMarker {
         Objects.requireNonNull(entry, "Entry cannot be null");
         Objects.requireNonNull(database, "database cannot be null");
 
-        for (Field field : fields /* FieldFactory.parseOrFields(fields)*/) {
+        for (Field field : fields.getFields() /* FieldFactory.parseOrFields(fields)*/) {
             Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
             final boolean foundSomething = optionalContent.isPresent()
                                             && !optionalContent.get().trim().isEmpty();

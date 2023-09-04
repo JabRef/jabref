@@ -130,7 +130,7 @@ public class ExportCommand extends SimpleCommand {
                             Localization.lang("Export operation finished successfully."),
                             List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
                                 try {
-                                    JabRefDesktop.openFolderAndSelectFile(file, preferences, dialogService);
+                                    JabRefDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
                                 } catch (IOException e) {
                                     LOGGER.error("Could not open export folder.", e);
                                 }

@@ -25,6 +25,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.preferences.ExternalApplicationsPreferences;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -81,10 +83,10 @@ public class JabRefDesktop {
                 }
             }
         } else if (StandardField.DOI == field) {
-            openDoi(link);
+            openDoi(link, preferencesService);
             return;
         } else if (StandardField.ISBN == field) {
-            openIsbn(link);
+            openIsbn(link, preferencesService);
             return;
         } else if (StandardField.EPRINT == field) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
@@ -106,16 +108,16 @@ public class JabRefDesktop {
         }
 
         if (StandardField.URL == field) {
-            openBrowser(link);
+            openBrowser(link, preferencesService.getFilePreferences());
         } else if (StandardField.PS == field) {
             try {
-                NATIVE_DESKTOP.openFile(link, StandardField.PS.getName());
+                NATIVE_DESKTOP.openFile(link, StandardField.PS.getName(), preferencesService.getFilePreferences());
             } catch (IOException e) {
                 LOGGER.error("An error occurred on the command: " + link, e);
             }
         } else if (StandardField.PDF == field) {
             try {
-                NATIVE_DESKTOP.openFile(link, StandardField.PDF.getName());
+                NATIVE_DESKTOP.openFile(link, StandardField.PDF.getName(), preferencesService.getFilePreferences());
             } catch (IOException e) {
                 LOGGER.error("An error occurred on the command: " + link, e);
             }
@@ -124,9 +126,9 @@ public class JabRefDesktop {
         }
     }
 
-    private static void openDoi(String doi) throws IOException {
+    private static void openDoi(String doi, PreferencesService preferencesService) throws IOException {
         String link = DOI.parse(doi).map(DOI::getURIAsASCIIString).orElse(doi);
-        openBrowser(link);
+        openBrowser(link, preferencesService.getFilePreferences());
     }
 
     public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
@@ -134,16 +136,16 @@ public class JabRefDesktop {
            .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
            .ifPresent(uri -> {
                try {
-                   JabRefDesktop.openBrowser(uri);
+                   JabRefDesktop.openBrowser(uri, preferences.getFilePreferences());
                } catch (IOException e) {
                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
                }
            });
     }
 
-    private static void openIsbn(String isbn) throws IOException {
+    private static void openIsbn(String isbn, PreferencesService preferencesService) throws IOException {
         String link = "https://openlibrary.org/isbn/" + isbn;
-        openBrowser(link);
+        openBrowser(link, preferencesService.getFilePreferences());
     }
 
     /**
@@ -154,40 +156,42 @@ public class JabRefDesktop {
      * @return false if the link couldn't be resolved, true otherwise.
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
-                                                    PreferencesService preferencesService,
+                                                    FilePreferences filePreferences,
                                                     String link,
                                                     final Optional<ExternalFileType> type) throws IOException {
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
-            openExternalFilePlatformIndependent(type, link);
+            openExternalFilePlatformIndependent(type, link, filePreferences);
             return true;
         }
-        Optional<Path> file = FileUtil.find(databaseContext, link, preferencesService.getFilePreferences());
+        Optional<Path> file = FileUtil.find(databaseContext, link, filePreferences);
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
-            openExternalFilePlatformIndependent(type, filePath);
+            openExternalFilePlatformIndependent(type, filePath, filePreferences);
             return true;
         }
 
         // No file matched the name, try to open it directly using the given app
-        openExternalFilePlatformIndependent(type, link);
+        openExternalFilePlatformIndependent(type, link, filePreferences);
         return true;
     }
 
-    private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
+    private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType,
+                                                            String filePath,
+                                                            FilePreferences filePreferences)
             throws IOException {
         if (fileType.isPresent()) {
             String application = fileType.get().getOpenWithApplication();
 
             if (application.isEmpty()) {
-                NATIVE_DESKTOP.openFile(filePath, fileType.get().getExtension());
+                NATIVE_DESKTOP.openFile(filePath, fileType.get().getExtension(), filePreferences);
             } else {
                 NATIVE_DESKTOP.openFileWithApplication(filePath, application);
             }
         } else {
             // File type is not given and therefore no application specified
             // Let the OS handle the opening of the file
-            NATIVE_DESKTOP.openFile(filePath, "");
+            NATIVE_DESKTOP.openFile(filePath, "", filePreferences);
         }
     }
 
@@ -197,18 +201,20 @@ public class JabRefDesktop {
      * @param fileLink the location of the file
      * @throws IOException if the default file browser cannot be opened
      */
-    public static void openFolderAndSelectFile(Path fileLink, PreferencesService preferencesService, DialogService dialogService) throws IOException {
+    public static void openFolderAndSelectFile(Path fileLink,
+                                               ExternalApplicationsPreferences externalApplicationsPreferences,
+                                               DialogService dialogService) throws IOException {
         if (fileLink == null) {
             return;
         }
 
-        boolean useCustomFileBrowser = preferencesService.getExternalApplicationsPreferences().useCustomFileBrowser();
+        boolean useCustomFileBrowser = externalApplicationsPreferences.useCustomFileBrowser();
         if (!useCustomFileBrowser) {
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
             return;
         }
         String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-        String command = preferencesService.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
+        String command = externalApplicationsPreferences.getCustomFileBrowserCommand();
         if (command.isEmpty()) {
             LOGGER.info("No custom file browser command defined");
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
@@ -271,13 +277,13 @@ public class JabRefDesktop {
      *
      * @param url the URL to open
      */
-    public static void openBrowser(String url) throws IOException {
-        Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", Globals.prefs.getFilePreferences());
-        openExternalFilePlatformIndependent(fileType, url);
+    public static void openBrowser(String url, FilePreferences filePreferences) throws IOException {
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", filePreferences);
+        openExternalFilePlatformIndependent(fileType, url, filePreferences);
     }
 
-    public static void openBrowser(URI url) throws IOException {
-        openBrowser(url.toASCIIString());
+    public static void openBrowser(URI url, FilePreferences filePreferences) throws IOException {
+        openBrowser(url.toASCIIString(), filePreferences);
     }
 
     /**
@@ -285,9 +291,9 @@ public class JabRefDesktop {
      *
      * @param url the URL to open
      */
-    public static void openBrowserShowPopup(String url, DialogService dialogService) {
+    public static void openBrowserShowPopup(String url, DialogService dialogService, FilePreferences filePreferences) {
         try {
-            openBrowser(url);
+            openBrowser(url, filePreferences);
         } catch (IOException exception) {
             Globals.getClipboardManager().setContent(url);
             LOGGER.error("Could not open browser", exception);

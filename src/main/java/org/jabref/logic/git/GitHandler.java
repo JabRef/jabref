@@ -71,7 +71,7 @@ public class GitHandler {
                 FileUtil.copyFile(Path.of(this.getClass().getResource("git.gitignore").toURI()), gitignore, false);
             }
         } catch (URISyntaxException e) {
-            LOGGER.error("Error occurred during copying of the gitignore file into the git repository.");
+            LOGGER.error("Error occurred during copying of the gitignore file into the git repository.", e);
         }
     }
 

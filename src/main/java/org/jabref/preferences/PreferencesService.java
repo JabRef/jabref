@@ -15,12 +15,11 @@ import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.logic.journals.JournalInformationPreferences;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
@@ -35,6 +34,9 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import org.jvnet.hk2.annotations.Contract;
+
+@Contract
 public interface PreferencesService {
 
     void clear() throws BackingStoreException;
@@ -71,7 +73,10 @@ public interface PreferencesService {
 
     ImportFormatPreferences getImportFormatPreferences();
 
-    SaveConfiguration getExportConfiguration();
+    /**
+     * Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
+     */
+    SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
 
     BibEntryTypesManager getCustomEntryTypesRepository();
 
@@ -124,8 +129,6 @@ public interface PreferencesService {
     ImporterPreferences getImporterPreferences();
 
     GrobidPreferences getGrobidPreferences();
-
-    JournalInformationPreferences getJournalInformationPreferences();
 
     PreviewPreferences getPreviewPreferences();
 

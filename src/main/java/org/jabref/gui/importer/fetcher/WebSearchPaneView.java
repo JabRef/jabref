@@ -1,5 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
+import javafx.beans.binding.BooleanExpression;
 import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -53,7 +54,7 @@ public class WebSearchPaneView extends VBox {
         ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
         EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
             if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
-                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService));
+                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, preferences.getFilePreferences()));
                 helpButtonContainer.getChildren().setAll(helpButton);
             } else {
                 helpButtonContainer.getChildren().clear();
@@ -86,10 +87,12 @@ public class WebSearchPaneView extends VBox {
         });
 
         // Create button that triggers search
+        BooleanExpression importerEnabled = preferences.getImporterPreferences().importerEnabledProperty();
         Button search = new Button(Localization.lang("Search"));
         search.setDefaultButton(false);
         search.setOnAction(event -> viewModel.search());
         search.setMaxWidth(Double.MAX_VALUE);
+        search.disableProperty().bind(importerEnabled.not());
         getChildren().addAll(fetcherContainer, query, search);
     }
 }

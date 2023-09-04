@@ -16,6 +16,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
     private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE.md";
     private static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
+    private static final String PRIVACY_POLICY_URL = "https://github.com/JabRef/jabref/blob/main/PRIVACY.md";
     private final String changelogUrl;
     private final String versionInfo;
     private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
@@ -38,11 +40,13 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
     private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
 
-    public AboutDialogViewModel(DialogService dialogService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
+    public AboutDialogViewModel(DialogService dialogService, PreferencesService preferencesService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
+        this.preferencesService = Objects.requireNonNull(preferencesService);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         String[] version = buildInfo.version.getFullVersion().split("--");
         heading.set("JabRef " + version[0]);
@@ -148,10 +152,14 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private void openWebsite(String url) {
         try {
-            JabRefDesktop.openBrowser(url);
+            JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
             logger.error("Could not open default browser.", e);
         }
+    }
+
+    public void openPrivacyPolicy() {
+        openWebsite(PRIVACY_POLICY_URL);
     }
 }

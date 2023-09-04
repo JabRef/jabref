@@ -7,6 +7,7 @@ on:
       - main-release
   pull_request:
     # always run on pull requests
+  merge_group:
   workflow_dispatch:
 
 env:
@@ -28,6 +29,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -76,6 +80,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -108,6 +115,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -142,6 +152,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -180,6 +193,9 @@ jobs:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -200,6 +216,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          show-progress: 'false'
       - uses: gradle/wrapper-validation-action@v1
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
@@ -207,5 +225,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          show-progress: 'false'
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0

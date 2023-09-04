@@ -26,6 +26,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     @FXML private CheckBox enableLatexCitationsTab;
     @FXML private CheckBox enableValidation;
     @FXML private CheckBox allowIntegerEdition;
+    @FXML private CheckBox journalPopupEnabled;
     @FXML private CheckBox autoLinkFilesEnabled;
 
     @FXML private Button generalFieldsHelp;
@@ -54,12 +55,13 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         enableLatexCitationsTab.selectedProperty().bindBidirectional(viewModel.enableLatexCitationsTabProperty());
         enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
         allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
+        journalPopupEnabled.selectedProperty().bindBidirectional(viewModel.journalPopupProperty());
         autoLinkFilesEnabled.selectedProperty().bindBidirectional(viewModel.autoLinkFilesEnabledProperty());
 
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 
         ActionFactory actionFactory = new ActionFactory(keyBindingRepository);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService), generalFieldsHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferencesService.getFilePreferences()), generalFieldsHelp);
     }
 
     @FXML

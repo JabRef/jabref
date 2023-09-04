@@ -158,7 +158,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<String> getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
-        for (Field field : fields) {
+        for (Field field : fields.getFields()) {
             Optional<String> value = getResolvedFieldOrAlias(field, database);
             if (value.isPresent()) {
                 return value;

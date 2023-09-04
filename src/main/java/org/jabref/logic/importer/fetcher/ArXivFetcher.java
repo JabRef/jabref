@@ -392,7 +392,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      */
     protected class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.logic.importer.fetcher.ArXivFetcher.ArXiv.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(ArXivFetcher.ArXiv.class);
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
 

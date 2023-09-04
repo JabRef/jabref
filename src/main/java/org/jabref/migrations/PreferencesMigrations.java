@@ -22,6 +22,7 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.OS;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -43,7 +44,7 @@ public class PreferencesMigrations {
     /**
      * Perform checks and changes for users with a preference set from an older JabRef version.
      */
-    public static void runMigrations(JabRefPreferences preferences) {
+    public static void runMigrations(JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
         Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
@@ -51,7 +52,7 @@ public class PreferencesMigrations {
         upgradeFaultyEncodingStrings(preferences);
         upgradeLabelPatternToCitationKeyPattern(preferences, mainPrefsNode);
         upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
-        upgradeStoredBibEntryTypes(preferences, mainPrefsNode);
+        upgradeStoredBibEntryTypes(preferences, mainPrefsNode, entryTypesManager);
         upgradeKeyBindingsToJavaFX(preferences);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
@@ -89,7 +90,7 @@ public class PreferencesMigrations {
         for (String key : from.keys()) {
             String newValue = from.get(key, "");
             if (newValue.contains("net.sf")) {
-                newValue = newValue.replaceAll("net\\.sf", "org");
+                newValue = newValue.replace("net.sf", "org");
             }
             to.put(key, newValue);
         }
@@ -169,14 +170,17 @@ public class PreferencesMigrations {
     /**
      * Migrate all customized entry types from versions <=3.7
      */
-    private static void upgradeStoredBibEntryTypes(JabRefPreferences prefs, Preferences mainPrefsNode) {
+    private static void upgradeStoredBibEntryTypes(JabRefPreferences prefs, Preferences mainPrefsNode, BibEntryTypesManager entryTypesManager) {
         try {
             if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
                     mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
-                CustomEntryTypePreferenceMigration.upgradeStoredBibEntryTypes(prefs.getLibraryPreferences().getDefaultBibDatabaseMode());
+                CustomEntryTypePreferenceMigration.upgradeStoredBibEntryTypes(
+                        prefs.getLibraryPreferences().getDefaultBibDatabaseMode(),
+                        prefs,
+                        entryTypesManager);
             }
         } catch (BackingStoreException ex) {
             LOGGER.error("Migrating old custom entry types failed.", ex);
@@ -527,7 +531,7 @@ public class PreferencesMigrations {
         List<String> names = preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES);
         List<String> keys = preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS);
 
-        if (keys.size() > 0 && names.size() == keys.size()) {
+        if (!keys.isEmpty() && names.size() == keys.size()) {
             try (final Keyring keyring = Keyring.create()) {
                 for (int i = 0; i < names.size(); i++) {
                     keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
