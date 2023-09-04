@@ -27,7 +27,10 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
 
-    public SendAsStandardEmailAction(DialogService dialogService, PreferencesService preferencesService, StateManager stateManager, BibEntryTypesManager entryTypesManager) {
+    public SendAsStandardEmailAction(DialogService dialogService,
+                                     PreferencesService preferencesService,
+                                     StateManager stateManager,
+                                     BibEntryTypesManager entryTypesManager) {
         super(dialogService, preferencesService, stateManager);
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;

@@ -6,7 +6,6 @@ on:
       - main
       - main-release
   pull_request:
-    # always run on pull requests
   merge_group:
   workflow_dispatch:
 

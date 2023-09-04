@@ -1,12 +1,6 @@
 name: Deployment
 
 on:
-  workflow_dispatch:
-    inputs:
-      notarization:
-        type: boolean
-        required: false
-        default: false
   push:
     branches:
       - main
@@ -18,11 +12,13 @@ on:
     tags:
        - '*'
   pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - 'src/test/**'
-      - 'README.md'
   merge_group:
+  workflow_dispatch:
+    inputs:
+      notarization:
+        type: boolean
+        required: false
+        default: false
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -35,7 +31,7 @@ env:
   JDK21: ""
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

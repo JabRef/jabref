@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -448,7 +449,8 @@ public class FileUtil {
      * @return True if file extension is ".pdf", false otherwise
      */
     public static boolean isPDFFile(Path file) {
-        return getFileExtension(file).filter("pdf"::equals).isPresent();
+        Optional<String> extension = FileUtil.getFileExtension(file);
+        return extension.isPresent() && StandardFileType.PDF.getExtensions().contains(extension.get());
     }
 
     /**
