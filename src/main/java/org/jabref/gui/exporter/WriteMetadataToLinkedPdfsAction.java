@@ -193,7 +193,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
             }
 
             updateMessage(Localization.lang("Finished"));
-            dialogService.notify(Localization.lang("Finished writing metadata for database %0 (%1 succeeded, %2 skipped, %3 errors).",
+            dialogService.notify(Localization.lang("Finished writing metadata for library %0 (%1 succeeded, %2 skipped, %3 errors).",
                     databaseContext.getDatabasePath().map(Path::toString).orElse("undefined"),
                     String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
 
