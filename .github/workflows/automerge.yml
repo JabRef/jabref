@@ -8,7 +8,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ (github.actor == 'dependabot[bot]') || (github.actor == 'koppor' && startsWith(github.event.pull_request.title, '[Bot]')) }}
     steps:
       - name: Approve PR
         run: gh pr review --approve "$PR_URL"

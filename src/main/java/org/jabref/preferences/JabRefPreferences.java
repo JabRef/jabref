@@ -65,8 +65,9 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
-import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -118,6 +119,8 @@ import org.jabref.model.strings.StringUtil;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Singleton;
+import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,6 +134,8 @@ import org.slf4j.LoggerFactory;
  * There are still some similar preferences classes ({@link org.jabref.logic.openoffice.OpenOfficePreferences} and {@link org.jabref.logic.shared.prefs.SharedDatabasePreferences}) which also use
  * the {@code java.util.prefs} API.
  */
+@Singleton
+@Service
 public class JabRefPreferences implements PreferencesService {
 
     // Push to application preferences
@@ -1695,9 +1700,9 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
                 (obs, oldValue, newValue) -> putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));
         EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (obs, oldValue, newValue) -> {
-                    putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
-                    putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
-                });
+            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
+            putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
+        });
         EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
                 (obs, oldValue, newValue) -> put(KEY_PATTERN_REGEX, newValue));
         EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
@@ -2184,10 +2189,10 @@ public class JabRefPreferences implements PreferencesService {
                 bibEntryPreferences.keywordSeparatorProperty());
 
         EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (obs, oldValue, newValue) -> {
-                    // Starts bibtex only omitted, as it is not being saved
-                    putBoolean(AUTOLINK_EXACT_KEY_ONLY, newValue == AutoLinkPreferences.CitationKeyDependency.EXACT);
-                    putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, newValue == AutoLinkPreferences.CitationKeyDependency.REGEX);
-                });
+            // Starts bibtex only omitted, as it is not being saved
+            putBoolean(AUTOLINK_EXACT_KEY_ONLY, newValue == AutoLinkPreferences.CitationKeyDependency.EXACT);
+            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, newValue == AutoLinkPreferences.CitationKeyDependency.REGEX);
+        });
         EasyBind.listen(autoLinkPreferences.askAutoNamingPdfsProperty(),
                 (obs, oldValue, newValue) -> putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));
         EasyBind.listen(autoLinkPreferences.regularExpressionProperty(),
@@ -2256,29 +2261,33 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
     }
 
-    public SaveOrder getTableSaveOrder() {
+    /**
+     * For the export configuration, generates the SelfContainedSaveOrder having the reference to TABLE resolved.
+     */
+    public SelfContainedSaveOrder getSelfContainedTableSaveOrder() {
         List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
-        return new SaveOrder(
-                SaveOrder.OrderType.TABLE,
+        return new SelfContainedSaveOrder(
+                SaveOrder.OrderType.SPECIFIED,
                 sortOrder.stream().flatMap(model -> model.getSortCriteria().stream()).toList());
     }
 
     @Override
-    public SaveConfiguration getExportConfiguration() {
-        SaveOrder saveOrder = switch (getExportSaveOrder().getOrderType()) {
-            case TABLE -> this.getTableSaveOrder();
-            case SPECIFIED -> this.getExportSaveOrder();
+    public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
+        SaveOrder exportSaveOrder = getExportSaveOrder();
+        SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
+            case TABLE -> this.getSelfContainedTableSaveOrder();
+            case SPECIFIED -> SelfContainedSaveOrder.of(exportSaveOrder);
             case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
         };
 
-        return new SaveConfiguration()
-                .withSaveOrder(SelfContainedSaveOrder.of(saveOrder))
-                .withReformatOnSave(getLibraryPreferences().shouldAlwaysReformatOnSave());
+        return new SelfContainedSaveConfiguration(
+                saveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getLibraryPreferences()
+                .shouldAlwaysReformatOnSave());
     }
 
     private List<TemplateExporter> getCustomExportFormats() {
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences();
-        SaveConfiguration saveConfiguration = getExportConfiguration();
+        SelfContainedSaveConfiguration saveConfiguration = getSelfContainedExportConfiguration();
         List<TemplateExporter> formats = new ArrayList<>();
 
         for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {
@@ -2288,7 +2297,7 @@ public class JabRefPreferences implements PreferencesService {
                     formatData.get(EXPORTER_FILENAME_INDEX),
                     formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
-                    saveConfiguration.getSaveOrder());
+                    saveConfiguration.getSelfContainedSaveOrder());
             format.setCustomExport(true);
             formats.add(format);
         }

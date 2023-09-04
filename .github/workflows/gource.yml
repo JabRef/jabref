@@ -12,7 +12,7 @@ on:
 concurrency:
   group: gource
   cancel-in-progress: true
-  
+
 jobs:
   action:
     runs-on: ubuntu-latest
@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          show-progress: 'false'
       - name: 'Development history of current build'
         uses: BoundfoxStudios/action-gource@v2
         with:

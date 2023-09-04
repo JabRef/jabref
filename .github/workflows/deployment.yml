@@ -74,6 +74,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - name: Install pigz and cache (linux)
         if: (matrix.os == 'ubuntu-latest')
         uses: awalsh128/cache-apt-pkgs-action@latest
@@ -273,6 +275,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - name: Install GitVersion
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: gittools/actions/gitversion/setup@v0.10.2
@@ -334,9 +338,10 @@ jobs:
       - name: Checkout source
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: actions/checkout@v3
-      - name: Fetch all history for all tags and branches
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        run: git fetch --prune --unshallow
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - name: Install GitVersion
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: gittools/actions/gitversion/setup@v0.10.2
