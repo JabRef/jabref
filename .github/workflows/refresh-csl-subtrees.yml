@@ -17,7 +17,7 @@ jobs:
       pull-requests: write  # for peter-evans/create-pull-request to create a PR
     if: (github.repository == 'JabRef/jabref' || github.repository == 'koppor/jabref')
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           persist-credentials: true
           fetch-depth: 0
