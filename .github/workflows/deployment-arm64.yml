@@ -22,7 +22,7 @@ env:
   JAVA_OPTS: -Xmx4g
 
 concurrency:
-  group: ${{ github.ref }}-arm64mac
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
