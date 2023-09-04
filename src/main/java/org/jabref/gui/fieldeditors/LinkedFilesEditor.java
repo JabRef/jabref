@@ -207,16 +207,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
-        WriteMetadataToPdfCommand writeMetadataToPdfCommand = new WriteMetadataToPdfCommand(
+        WriteMetadataToSinglePdfAction writeMetadataToSinglePdfAction = new WriteMetadataToSinglePdfAction(
                 linkedFile.getFile(),
-                bibEntry.getValueOrElse(new BibEntry()), databaseContext,
-                dialogService,
-                preferencesService,
-                bibEntryTypesManager,
-                abbreviationRepository,
-                taskExecutor);
-        writeMetadataToPdf.disableProperty().bind(writeMetadataToPdfCommand.executableProperty().not());
-        writeMetadataToPdf.setOnAction(event -> writeMetadataToPdfCommand.execute());
+                bibEntry.getValueOrElse(new BibEntry()),
+                databaseContext, dialogService, preferencesService.getFieldPreferences(),
+                preferencesService.getFilePreferences(), preferencesService.getXmpPreferences(), abbreviationRepository, bibEntryTypesManager,
+                taskExecutor
+        );
+        writeMetadataToPdf.disableProperty().bind(writeMetadataToSinglePdfAction.executableProperty().not());
+        writeMetadataToPdf.setOnAction(event -> writeMetadataToSinglePdfAction.execute());
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
