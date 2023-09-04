@@ -90,7 +90,7 @@ public class PreferencesMigrations {
         for (String key : from.keys()) {
             String newValue = from.get(key, "");
             if (newValue.contains("net.sf")) {
-                newValue = newValue.replaceAll("net\\.sf", "org");
+                newValue = newValue.replace("net.sf", "org");
             }
             to.put(key, newValue);
         }

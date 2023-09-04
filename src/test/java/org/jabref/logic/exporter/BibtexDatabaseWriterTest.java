@@ -72,7 +72,7 @@ public class BibtexDatabaseWriterTest {
     private MetaData metaData;
     private BibDatabaseContext bibtexContext;
     private ImportFormatPreferences importFormatPreferences;
-    private SaveConfiguration saveConfiguration;
+    private SelfContainedSaveConfiguration saveConfiguration;
     private FieldPreferences fieldPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
     private BibEntryTypesManager entryTypesManager;
@@ -82,7 +82,7 @@ public class BibtexDatabaseWriterTest {
     @BeforeEach
     void setUp() {
         fieldPreferences = new FieldPreferences(true, Collections.emptyList(), Collections.emptyList());
-        saveConfiguration = new SaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
+        saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
         citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
         stringWriter = new StringWriter();
@@ -680,7 +680,7 @@ public class BibtexDatabaseWriterTest {
         entry.setChanged(false);
         database.insertEntry(entry);
 
-        saveConfiguration = new SaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, true);
+        saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, true);
         initializeDatabaseWriter();
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
@@ -706,7 +706,7 @@ public class BibtexDatabaseWriterTest {
         string.setParsedSerialization("wrong serialization");
         database.addString(string);
 
-        saveConfiguration = new SaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, true);
+        saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, true);
         initializeDatabaseWriter();
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 

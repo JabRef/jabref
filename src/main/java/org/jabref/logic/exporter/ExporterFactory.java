@@ -29,7 +29,7 @@ public class ExporterFactory {
 
         List<TemplateExporter> customFormats = preferencesService.getExportPreferences().getCustomExporters();
         LayoutFormatterPreferences layoutPreferences = preferencesService.getLayoutFormatterPreferences();
-        SelfContainedSaveOrder saveOrder = SelfContainedSaveOrder.of(preferencesService.getExportConfiguration().getSaveOrder());
+        SelfContainedSaveOrder saveOrder = SelfContainedSaveOrder.of(preferencesService.getSelfContainedExportConfiguration().getSaveOrder());
         XmpPreferences xmpPreferences = preferencesService.getXmpPreferences();
         FieldPreferences fieldPreferences = preferencesService.getFieldPreferences();
         BibDatabaseMode bibDatabaseMode = preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode();
