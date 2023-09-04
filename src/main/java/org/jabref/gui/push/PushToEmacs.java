@@ -58,10 +58,10 @@ public class PushToEmacs extends AbstractPushToApplication {
             String[] com = new String[addParams.length + 2];
             com[0] = commandPath;
             System.arraycopy(addParams, 0, com, 1, addParams.length);
-            String prefix;
-            String suffix;
-            prefix = "(with-current-buffer (window-buffer) (insert ";
-            suffix = "))";
+
+            // Surrounding with is handled below
+            String prefix = "(with-current-buffer (window-buffer (selected-window)) (insert ";
+            String suffix = "))";
 
             String citeCommand = getCitePrefix();
 
@@ -88,6 +88,8 @@ public class PushToEmacs extends AbstractPushToApplication {
                 com[com.length - 1] = prefix.concat("\"" + getCitePrefix() + keys + getCiteSuffix() + "\"").concat(suffix);
             }
 
+            LOGGER.debug("Executing command {}", com);
+
             final Process p = Runtime.getRuntime().exec(com);
 
             JabRefExecutorService.INSTANCE.executeAndWait(() -> {
@@ -107,7 +109,7 @@ public class PushToEmacs extends AbstractPushToApplication {
                         couldNotPush = true;
                     }
                 } catch (IOException e) {
-                    LOGGER.warn("File problem.", e);
+                    LOGGER.warn("Error handling std streams", e);
                 }
             });
         } catch (IOException excep) {
