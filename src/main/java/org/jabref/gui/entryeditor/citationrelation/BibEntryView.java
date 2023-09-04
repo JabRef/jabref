@@ -60,7 +60,8 @@ public class BibEntryView {
      * @return Icon corresponding to {@link EntryType}
      */
     private static IconTheme.JabRefIcons getIcon(EntryType type) {
-        EnumSet<StandardEntryType> crossRefTypes = EnumSet.of(StandardEntryType.InBook, StandardEntryType.InProceedings, StandardEntryType.InCollection);
+        EnumSet<StandardEntryType> crossRefTypes = EnumSet.of(StandardEntryType.InBook,
+                StandardEntryType.InProceedings, StandardEntryType.InCollection);
         if (type == StandardEntryType.Book) {
             return IconTheme.JabRefIcons.BOOK;
         } else if (crossRefTypes.contains(type)) {

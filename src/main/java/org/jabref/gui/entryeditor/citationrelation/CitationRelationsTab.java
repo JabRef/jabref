@@ -365,7 +365,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .executeWith(Globals.TASK_EXECUTOR);
     }
 
-    private void onSearchForRelationsSucceed(BibEntry entry, CheckListView<CitationRelationItem> listView, Button abortButton, Button refreshButton, CitationFetcher.SearchType searchType, Button importButton, ProgressIndicator progress, List<BibEntry> fetchedList, ObservableList<CitationRelationItem> observableList) {
+    private void onSearchForRelationsSucceed(BibEntry entry, CheckListView<CitationRelationItem> listView,
+                                             Button abortButton, Button refreshButton,
+                                             CitationFetcher.SearchType searchType, Button importButton,
+                                             ProgressIndicator progress, List<BibEntry> fetchedList,
+                                             ObservableList<CitationRelationItem> observableList) {
         hideNodes(abortButton, progress);
 
         observableList.setAll(fetchedList.stream().map(entr -> new CitationRelationItem(entr, false))

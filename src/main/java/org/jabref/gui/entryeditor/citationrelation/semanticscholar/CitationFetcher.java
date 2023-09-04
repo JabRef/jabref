@@ -23,13 +23,6 @@ public interface CitationFetcher {
             this.label = label;
         }
 
-/*        public StandardField toStandardField() {
-            if (this == SearchType.CITING) {
-                return StandardField.CITING;
-            } else {
-                return StandardField.CITED_BY;
-            }
-        }*/
     }
 
     /**
