@@ -23,6 +23,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     @FXML private CheckBox autoOpenAttachedFolders;
     @FXML private ComboBox<PushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
+
     @FXML private CheckBox useCustomTerminal;
     @FXML private TextField customTerminalCommand;
     @FXML private Button customTerminalBrowse;

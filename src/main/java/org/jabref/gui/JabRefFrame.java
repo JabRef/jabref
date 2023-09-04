@@ -123,9 +123,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
         this.entryTypesManager = Globals.entryTypesManager;
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
-        this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
-        this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
+        this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs, taskExecutor);
+        this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {

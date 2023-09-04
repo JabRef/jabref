@@ -41,7 +41,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
-        couldNotConnect = false;
+        couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
@@ -74,11 +74,17 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     @Override
     protected String[] getCommandLine(String keyString) {
+        String citeCommand = getCitePrefix();
+        // we need to escape the extra slashses
+        if (getCitePrefix().contains("\\")) {
+            citeCommand = "\"\\" + getCitePrefix();
+        }
+
         if (OS.WINDOWS) {
             // TODO we might need to escape the inner double quotes with """ """
-            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCiteCommand() + "{" + keyString + "}\"}\""};
+            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCitePrefix() + keyString + getCiteSuffix() + "\"}\""};
         } else {
-            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"\\" + getCiteCommand() + "{" + keyString + "}\"}'"};
+            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + keyString + getCiteSuffix() + "\"}'"};
         }
     }
 }

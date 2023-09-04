@@ -28,6 +28,6 @@ public class PushToTexmaker extends AbstractPushToApplication {
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        return new String[] {commandPath, "-insert", getCiteCommand() + "{" + keyString + "}"};
+        return new String[] {commandPath, "-insert", getCitePrefix() + keyString + getCiteSuffix()};
     }
 }
