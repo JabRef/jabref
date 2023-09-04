@@ -2,6 +2,7 @@ package org.jabref.gui.push;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -60,6 +61,11 @@ public class PushToVim extends AbstractPushToApplication {
                     preferencesService.getPushToApplicationPreferences().getVimServer(), "--remote-send",
                     "<C-\\><C-N>a" + getCitePrefix() + keys + getCiteSuffix()};
 
+            LOGGER.atDebug()
+                  .setMessage("Executing command {}")
+                  .addArgument(() -> Arrays.toString(com))
+                  .log();
+
             final Process p = Runtime.getRuntime().exec(com);
 
             JabRefExecutorService.INSTANCE.executeAndWait(() -> {
@@ -75,16 +81,16 @@ public class PushToVim extends AbstractPushToApplication {
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
-                        LOGGER.warn("Push to Vim error: " + sb);
+                        LOGGER.warn("Push to Vim error: {}", sb);
                         couldNotPush = true;
                     }
                 } catch (IOException e) {
-                    LOGGER.warn("File problem.", e);
+                    LOGGER.warn("Error handling std streams", e);
                 }
             });
         } catch (IOException excep) {
-            couldNotCall = true;
             LOGGER.warn("Problem pushing to Vim.", excep);
+            couldNotCall = true;
         }
     }
 
@@ -92,7 +98,7 @@ public class PushToVim extends AbstractPushToApplication {
     public void onOperationCompleted() {
         if (couldNotPush) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
-                    Localization.lang("Could not connect to Vim server. Make sure that Vim is running with correct server name."));
+                    Localization.lang("Could not push to a running Vim server."));
         } else if (couldNotCall) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not run the 'vim' program."));
