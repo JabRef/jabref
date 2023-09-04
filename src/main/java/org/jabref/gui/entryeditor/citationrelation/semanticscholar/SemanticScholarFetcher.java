@@ -22,8 +22,8 @@ public class SemanticScholarFetcher implements CitationFetcher {
                     .append("DOI:").append(entry.getDOI().get().getDOI())
                     .append("/citations")
                     .append("?fields=").append("title,authors,year,citationCount,referenceCount")
-                    .append("&limit=10");
-            System.out.println(urlBuilder.toString());
+                    .append("&limit=1000");
+
             try {
                 URL citationsUrl = URI.create(urlBuilder.toString()).toURL();
 
@@ -32,18 +32,15 @@ public class SemanticScholarFetcher implements CitationFetcher {
                         .fromJson(urlDownload.asString(), CitationsResponse.class);
 
                 return citationsResponse.getData()
-                        .stream().map(citationDataItem -> {
-                    PaperDetails citingPaperDetails = citationDataItem.getCitingPaper();
-                    if (citingPaperDetails != null) {
-                        BibEntry bibEntry = new BibEntry();
-                        bibEntry.setField(StandardField.TITLE, citingPaperDetails.getTitle());
-                        bibEntry.setField(StandardField.YEAR, citingPaperDetails.getYear());
+                        .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
+                        .map(citationDataItem -> {
+                            PaperDetails citingPaperDetails = citationDataItem.getCitingPaper();
+                            BibEntry bibEntry = new BibEntry();
+                            bibEntry.setField(StandardField.TITLE, citingPaperDetails.getTitle());
+                            // TODO: year could return null
+                            bibEntry.setField(StandardField.YEAR, citingPaperDetails.getYear());
 
-                        return bibEntry;
-                    } else {
-                        System.out.println("Warning !");
-                        return null;
-                    }
+                            return bibEntry;
                 }).toList();
 
             } catch (IOException e) {
@@ -62,7 +59,7 @@ public class SemanticScholarFetcher implements CitationFetcher {
                     .append("DOI:").append(entry.getDOI().get().getDOI())
                     .append("/references")
                     .append("?fields=").append("title,authors,year,citationCount,referenceCount")
-                    .append("&limit=100");
+                    .append("&limit=1000");
             try {
                 URL citationsUrl = URI.create(urlBuilder.toString()).toURL();
 
@@ -71,18 +68,15 @@ public class SemanticScholarFetcher implements CitationFetcher {
                         .fromJson(urlDownload.asString(), ReferencesResponse.class);
 
                 return referencesResponse.getData()
-                        .stream().map(referenceDataItem -> {
+                        .stream().filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
+                        .map(referenceDataItem -> {
                             PaperDetails citedPaperDetails = referenceDataItem.getCitedPaper();
-                            if (citedPaperDetails != null) {
-                                BibEntry bibEntry = new BibEntry();
-                                bibEntry.setField(StandardField.TITLE, citedPaperDetails.getTitle());
-                                bibEntry.setField(StandardField.YEAR, citedPaperDetails.getYear());
+                            BibEntry bibEntry = new BibEntry();
+                            bibEntry.setField(StandardField.TITLE, citedPaperDetails.getTitle());
+                            // TODO: year could return null
+                            bibEntry.setField(StandardField.YEAR, citedPaperDetails.getYear());
 
-                                return bibEntry;
-                            } else {
-                                System.out.println("Warning !");
-                                return null;
-                            }
+                            return bibEntry;
                         }).toList();
 
             } catch (IOException e) {
