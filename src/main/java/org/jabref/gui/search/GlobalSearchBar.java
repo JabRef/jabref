@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -108,8 +109,6 @@ public class GlobalSearchBar extends HBox {
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
 
-    private final JabRefFrame frame;
-
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService, CountingUndoManager undoManager, DialogService dialogService) {
         super();
         this.stateManager = stateManager;
@@ -117,7 +116,6 @@ public class GlobalSearchBar extends HBox {
         this.searchPreferences = preferencesService.getSearchPreferences();
         this.undoManager = undoManager;
         this.dialogService = dialogService;
-        this.frame = frame;
 
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
@@ -203,7 +201,7 @@ public class GlobalSearchBar extends HBox {
         this.setSpacing(4.0);
         this.setAlignment(Pos.CENTER_LEFT);
 
-        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
+        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), this::performSearch);
         BindingsHelper.bindBidirectional(
                 stateManager.activeSearchQueryProperty(),
                 searchField.textProperty(),
@@ -302,7 +300,7 @@ public class GlobalSearchBar extends HBox {
 
     public void performSearch() {
         LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
-        LOGGER.debug("Run search " + searchField.getText());
+        LOGGER.debug("Run search {}", searchField.getText());
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {

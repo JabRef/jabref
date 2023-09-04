@@ -20,7 +20,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class CsvExportFormatTest {
 
@@ -29,9 +28,6 @@ public class CsvExportFormatTest {
 
     @BeforeEach
     public void setUp() {
-        SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
-        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-
         exportFormat = new TemplateExporter(
                 "OpenOffice/LibreOffice CSV",
                 "oocsv",
@@ -39,7 +35,7 @@ public class CsvExportFormatTest {
                 "openoffice",
                 StandardFileType.CSV,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                saveConfiguration);
+                SaveOrder.getDefaultSaveOrder());
 
         databaseContext = new BibDatabaseContext();
     }
@@ -101,8 +97,8 @@ public class CsvExportFormatTest {
     public void testPerformExportForMultipleEditors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.EDITOR, "von Neumann, John and Smith, John and Black Brown, Peter");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.EDITOR, "von Neumann, John and Smith, John and Black Brown, Peter");
         List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, tmpFile.toPath(), entries);

@@ -128,7 +128,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
             titleLink.setOnAction(event -> {
                 if (entry.getField(StandardField.URL).isPresent()) {
                     try {
-                        JabRefDesktop.openBrowser(entry.getField(StandardField.URL).get());
+                        JabRefDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferencesService.getFilePreferences());
                     } catch (IOException e) {
                         LOGGER.error("Error opening the browser to: " + entry.getField(StandardField.URL).get(), e);
                         dialogService.showErrorDialogAndWait(e);
@@ -192,7 +192,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr. DLib for JabRef users."));
         mdlLink.setOnAction(event -> {
             try {
-                JabRefDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/");
+                JabRefDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/", preferencesService.getFilePreferences());
             } catch (IOException e) {
                 LOGGER.error("Error opening the browser to Mr. DLib information page.", e);
                 dialogService.showErrorDialogAndWait(e);
@@ -212,9 +212,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vb.setSpacing(10);
 
         button.setOnAction(event -> {
-            preferences.setIsMrdlibAccepted(true);
-
             MrDlibPreferences mrDlibPreferences = preferencesService.getMrDlibPreferences();
+            mrDlibPreferences.setAcceptRecommendations(true);
             mrDlibPreferences.setSendLanguage(cbLanguage.isSelected());
             mrDlibPreferences.setSendOs(cbOS.isSelected());
             mrDlibPreferences.setSendTimezone(cbTimezone.isSelected());
@@ -237,7 +236,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         // Ask for consent to send data to Mr. DLib on first time to tab
-        if (preferences.isMrdlibAccepted()) {
+        if (preferencesService.getMrDlibPreferences().shouldAcceptRecommendations()) {
             setContent(getRelatedArticlesPane(entry));
         } else {
             setContent(getPrivacyDialog(entry));

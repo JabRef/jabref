@@ -1,0 +1,122 @@
+<zs:searchRetrieveResponse>
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>1</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>info:srw/schema/1/marcxml-v1.1</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <record>
+                    <leader>07543nmm a2200397zc 4500</leader>
+                    <controlfield tag="001">BV049020376</controlfield>
+                    <controlfield tag="003">DE-604</controlfield>
+                    <controlfield tag="005">00000000000000.0</controlfield>
+                    <controlfield tag="007">cr|uuu---uuuuu</controlfield>
+                    <controlfield tag="008">230626s2023 |||| o||u| ||||||eng d</controlfield>
+                    <datafield tag="020" ind1=" " ind2=" ">
+                        <subfield code="a">9781800567566</subfield>
+                        <subfield code="9">978-1-80056-756-6</subfield>
+                    </datafield>
+                    <datafield tag="040" ind1=" " ind2=" ">
+                        <subfield code="a">DE-604</subfield>
+                        <subfield code="b">ger</subfield>
+                        <subfield code="e">rda</subfield>
+                    </datafield>
+                    <datafield tag="100" ind1="1" ind2=" ">
+                        <subfield code="a">Caraballo, Margarita J.</subfield>
+                        <subfield code="e">Verfasser</subfield>
+                        <subfield code="4">aut</subfield>
+                    </datafield>
+                    <datafield tag="245" ind1="1" ind2="0">
+                        <subfield code="a">Marketing Automation with Mailchimp</subfield>
+                        <subfield code="b">Expert Tips, Techniques, and Best Practices for Scaling Marketing Strategies and ROI for Your Business</subfield>
+                    </datafield>
+                    <datafield tag="250" ind1=" " ind2=" ">
+                        <subfield code="a">1st ed</subfield>
+                    </datafield>
+                    <datafield tag="264" ind1=" " ind2="1">
+                        <subfield code="a">Birmingham</subfield>
+                        <subfield code="b">Packt Publishing, Limited</subfield>
+                        <subfield code="c">2023</subfield>
+                    </datafield>
+                    <datafield tag="264" ind1=" " ind2="4">
+                        <subfield code="c">©2023</subfield>
+                    </datafield>
+                    <datafield tag="300" ind1=" " ind2=" ">
+                        <subfield code="a">1 Online-Ressource (304 Seiten)</subfield>
+                    </datafield>
+                    <datafield tag="505" ind1="8" ind2=" ">
+                        <subfield code="a">Cover -- Title Page -- Copyright and Credits -- Contributors -- About the reviewer -- Table of Contents -- Preface -- Part 1:Introduction to Mailchimp -- Chapter 1: Welcome to Marketing with Mailchimp -- A glance at Mailchimp's journey -- Understanding and using online marketing with Mailchimp -- Mailchimp-specific terms -- Channels -- Campaigns -- Classic Automations -- Customer Journey Builder -- Common utilizations -- Digital content creators -- Brick and mortar -- Service providers -- Mensa marketers -- E-commerce marketers -- Creating an account -- Summary -- Further reading -- Part 2:Getting Set Up -- Chapter 2: Basics of Account Management and Audiences -- Account management and setting an industry -- Details -- Help us improve your stats -- Default Email Builder -- Email from Mailchimp -- Manage automatic replies -- Setting up an audience -- Why is it important to know about different contact statuses? -- Information you need to make your first list -- The purpose behind using a central versus various list -- Summary -- Further reading -- Chapter 3: Importing and Combining Audiences -- Merge Tags -- Put this tag in your content -- Default merge tag value -- How to import a list -- Combining audiences -- How to combine audiences -- The Combine Audiences tool -- Exporting and importing -- Summary -- Further reading -- Chapter 4: Understanding the Difference between Groups, Tags, and Segments -- How targeting can lead to higher engagement -- What are groups and tags? -- Groups -- Tags -- Importing to groups or tags -- Segmenting tools -- Basics of segmenting logic -- Summary -- Further reading -- Chapter 5: Strategies and Tools for Managing Inactive Contacts -- What are inactive contacts? -- How to develop our own definition -- To unsubscribe or archive? That is the question -- When do I delete? -- Summary -- Further reading</subfield>
+                    </datafield>
+                    <datafield tag="505" ind1="8" ind2=" ">
+                        <subfield code="a">Part 3:Basic Channels -- Chapter 6: Setting Up and Customizing Various Form Types -- Why are forms necessary? -- Hosted forms -- Navigating to the hosted form builder -- Categories of hosted forms you can edit -- Creating a form on a landing page -- Embedded and pop-up forms -- Embedded forms -- Pop-up forms -- Summary -- Further reading -- Chapter 7: Establishing Your Brand with the Content Studio -- What is the Content Studio? -- Individual features and channels nested under Content Studio -- Creative Assistant -- My Files -- Products -- Giphy -- Instagram -- My Logo -- Summary -- Further reading -- Chapter 8: Outreach Marketing with Templates and Campaigns -- Templates and how to start them -- What is a Template? -- Template Editor -- Choosing a template -- Using the Campaign Editor -- Campaign scheduling -- Types of emails to pair with targeted segments -- Summary -- Further reading -- Chapter 9: Setting Up Your Marketing Presence with Websites -- What is a domain? -- An additional entry point and sign-up portal -- Personalizing your domain settings -- Improving deliverability -- Having an authentic appearance -- Where do I get one and what if I have one? -- Making a website -- Editing settings -- Summary -- Further reading -- Part 4:Refine and Automate -- Chapter 10: Understanding Reports and Analytics -- Technical requirements -- The types of information that are accessible in Mailchimp's reporting -- Why opens and clicks? -- General stats overview -- Click performance interface -- Predicted Demographics interface -- How you can use and interpret these reports -- Expanded/advanced reporting features -- Comparative Reports -- Summary -- Further reading -- Chapter 11: Implementing A/B and Multivariate Testing -- Why experiment with engagement? -- Multivariate options and what elements you can experiment with</subfield>
+                    </datafield>
+                    <datafield tag="505" ind1="8" ind2=" ">
+                        <subfield code="a">How do you take information from the results to better understand your audience? -- Summary -- Further reading -- Chapter 12: Strategies for Automating Using the Customer Journey Builder -- Technical requirements -- The basics of automation and events -- Types of automation, journeys, and their logic -- Common use cases and recipes -- Audience/contact activity -- E-commerce activity -- Date-based events and data -- Marketing channel activity -- Integration and API events -- Setting up a Classic Automation or Customer Journey Builder -- Summary -- Further reading -- Chapter 13: Setting Up a Mailchimp E-Commerce Store -- Technical requirements -- What is a commerce feature? -- Setting up a Mailchimp store -- The expansion of a contact dataset to include commerce/purchasing data -- Setting up automations specific to e-commerce -- Summary -- Further reading -- Part 5:Get Smarter and Connect -- Chapter 14: E-Commerce Integrations -- Technical requirements -- Featured commerce integrations -- Movement of information between these platforms -- How to expand your marketing efforts with your commerce data -- Summary -- Further reading -- Chapter 15: Form and Survey Integrations -- Technical requirements -- Using form and survey integrations to build your audience -- How to find the right integration and connect it -- Summary -- Further reading -- Chapter 16: CRM and Connectivity Integrations -- Technical requirements -- Popular CRM and connectivity integrations and why to connect them -- What the various integration paths are and how to find and use them -- Browsing for integrations -- Sample integration walk-throughs -- Zapier integration -- Understanding where data is present when syncing is initiated and associated advanced features -- Summary -- Further reading -- Chapter 17: Use Cases and Real-World Examples -- Starting a business or online presence</subfield>
+                    </datafield>
+                    <datafield tag="505" ind1="8" ind2=" ">
+                        <subfield code="a">
+                            Type of business -- Background of the business -- Next goals and vision for growth -- Ideal Mailchimp usage for this business -- From bricks and mortar to a digital presence -- Type of business -- Background of the business -- Next goals and vision for growth -- Ideal Mailchimp usage for this business -- Service-based business model -- Type of business -- Background of the business -- Next goals and vision for growth -- Ideal Mailchimp usage for this business -- Summary -- Index -- Other Books You May Enjoy
+                        </subfield>
+                    </datafield>
+                    <datafield tag="776" ind1="0" ind2="8">
+                        <subfield code="i">Erscheint auch als</subfield>
+                        <subfield code="n">Druck-Ausgabe</subfield>
+                        <subfield code="a">Caraballo, Margarita J.</subfield>
+                        <subfield code="t">Marketing Automation with Mailchimp</subfield>
+                        <subfield code="d">Birmingham : Packt Publishing, Limited,c2023</subfield>
+                        <subfield code="z">9781800561731</subfield>
+                    </datafield>
+                    <datafield tag="912" ind1=" " ind2=" ">
+                        <subfield code="a">ZDB-30-PQE</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(ZDB-30-PQE)EBC30553734</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(ZDB-30-PAD)EBC30553734</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(ZDB-89-EBL)EBL30553734</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(OCoLC)1380745037</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(DE-599)BVBBV049020376</subfield>
+                    </datafield>
+                    <datafield tag="041" ind1="0" ind2=" ">
+                        <subfield code="a">eng</subfield>
+                    </datafield>
+                    <datafield tag="049" ind1=" " ind2=" ">
+                        <subfield code="a">DE-2070s</subfield>
+                    </datafield>
+                    <datafield tag="336" ind1=" " ind2=" ">
+                        <subfield code="b">txt</subfield>
+                        <subfield code="2">rdacontent</subfield>
+                    </datafield>
+                    <datafield tag="337" ind1=" " ind2=" ">
+                        <subfield code="b">c</subfield>
+                        <subfield code="2">rdamedia</subfield>
+                    </datafield>
+                    <datafield tag="338" ind1=" " ind2=" ">
+                        <subfield code="b">cr</subfield>
+                        <subfield code="2">rdacarrier</subfield>
+                    </datafield>
+                    <datafield tag="500" ind1=" " ind2=" ">
+                        <subfield code="a">Description based on publisher supplied metadata and other sources</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://ebookcentral.proquest.com/lib/hwr/detail.action?docID=30553734</subfield>
+                        <subfield code="l">DE-2070s</subfield>
+                        <subfield code="p">ZDB-30-PQE</subfield>
+                        <subfield code="q">HWR_PDA_PQE</subfield>
+                        <subfield code="x">Aggregator</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                </record>
+            </zs:recordData>
+            <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

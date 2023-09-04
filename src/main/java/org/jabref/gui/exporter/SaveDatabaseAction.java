@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,22 +14,25 @@ import java.util.stream.Collectors;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.TableColumn;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.autosaveandbackup.AutosaveManager;
+import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
+import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.autosaveandbackup.AutosaveManager;
-import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.SaveException;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -37,6 +41,8 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -79,7 +85,7 @@ public class SaveDatabaseAction {
     }
 
     /**
-     * Asks the user for the path and saves afterwards
+     * Asks the user for the path and saves afterward
      */
     public void saveAs() {
         askForSavePath().ifPresent(this::saveAs);
@@ -89,10 +95,31 @@ public class SaveDatabaseAction {
         return this.saveAs(file, SaveDatabaseMode.NORMAL);
     }
 
+    private SelfContainedSaveOrder getSaveOrder() {
+        return libraryTab.getBibDatabaseContext()
+                .getMetaData().getSaveOrder()
+                .map(so -> {
+                    if (so.getOrderType() == SaveOrder.OrderType.TABLE) {
+                        // We need to "flatten out" SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
+                        List<TableColumn<BibEntryTableViewModel, ?>> sortOrder = libraryTab.getMainTable().getSortOrder();
+                        return new SelfContainedSaveOrder(
+                                SaveOrder.OrderType.SPECIFIED,
+                                sortOrder.stream()
+                                         .filter(col -> col instanceof MainTableColumn<?>)
+                                         .map(column -> ((MainTableColumn<?>) column).getModel())
+                                         .flatMap(model -> model.getSortCriteria().stream())
+                                         .toList());
+                    } else {
+                        return SelfContainedSaveOrder.of(so);
+                    }
+                })
+                .orElse(SaveOrder.getDefaultSaveOrder());
+    }
+
     public void saveSelectedAsPlain() {
         askForSavePath().ifPresent(path -> {
             try {
-                saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX);
+                saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder());
                 frame.getFileHistory().newFile(path);
                 dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
@@ -209,8 +236,7 @@ public class SaveDatabaseAction {
             // Make sure to remember which encoding we used
             libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
-            // Save the database
-            boolean success = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.ALL);
+            boolean success = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getSaveOrder());
 
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
@@ -228,13 +254,10 @@ public class SaveDatabaseAction {
         }
     }
 
-    private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType) throws SaveException {
+    private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
         // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManager.performBackup
-
-        SaveConfiguration saveConfiguration = new SaveConfiguration()
-                .withSaveType(saveType)
-                .withMetadataSaveOrder(true)
-                .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
+        SelfContainedSaveConfiguration saveConfiguration
+                = new SelfContainedSaveConfiguration(saveOrder, false, saveType, preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
         BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
@@ -255,7 +278,7 @@ public class SaveDatabaseAction {
                 libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
 
                 if (fileWriter.hasEncodingProblems()) {
-                    saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType);
+                    saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);
                 }
             } catch (UnsupportedCharsetException ex) {
                 throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
@@ -266,7 +289,7 @@ public class SaveDatabaseAction {
         }
     }
 
-    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType) throws SaveException {
+    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
         DialogPane pane = new DialogPane();
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
@@ -288,7 +311,7 @@ public class SaveDatabaseAction {
                 // Make sure to remember which encoding we used.
                 libraryTab.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);
 
-                saveDatabase(file, selectedOnly, newEncoding.get(), saveType);
+                saveDatabase(file, selectedOnly, newEncoding.get(), saveType, saveOrder);
             }
         }
     }

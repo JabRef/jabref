@@ -11,6 +11,21 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added an error-specific message for when a download from a URL fails[#9826](https://github.com/JabRef/jabref/issues/9826).
+- We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
+
+### Changed
+
+### Fixed
+
+- It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
+
+### Removed
+
+## [5.10] - 2023-09-02
+
+### Added
+
 - We added a field showing the BibTeX/biblatex source for added and deleted entries in the "External Changes Resolver" dialog. [#9509](https://github.com/JabRef/jabref/issues/9509)
 - We added user-specific comment field so that multiple users can make separate comments. [#543](https://github.com/koppor/jabref/issues/543)
 - We added a search history list in the search field's right click menu. [#7906](https://github.com/JabRef/jabref/issues/7906)
@@ -18,7 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added "Attach file from URL" to right-click context menu to download and store a file with the reference library. [#9646](https://github.com/JabRef/jabref/issues/9646)
 - We enabled updating an existing entry with data from InspireHEP. [#9351](https://github.com/JabRef/jabref/issues/9351)
 - We added a fetcher for the Bibliotheksverbund Bayern (experimental). [#9641](https://github.com/JabRef/jabref/pull/9641)
-- We added support for more biblatex date formats for parsing dates [#2753](https://github.com/JabRef/issues/2753).
+- We added support for more biblatex date formats for parsing dates. [#2753](https://github.com/JabRef/issues/2753)
 - We added support for multiple languages for exporting to and importing references from MS Office. [#9699](https://github.com/JabRef/jabref/issues/9699)
 - We enabled scrolling in the groups list when dragging a group on another group. [#2869](https://github.com/JabRef/jabref/pull/2869)
 - We added the option to automatically download online files when a new entry is created from an existing ID (e.g., DOI). The option can be disabled in the preferences under "Import and Export". [#9756](https://github.com/JabRef/jabref/issues/9756)
@@ -34,20 +49,27 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the ability to search for an identifier (DOI, ISBN, ArXiv ID) directly from 'Web Search'. [#7575](https://github.com/JabRef/jabref/issues/7575) [#9674](https://github.com/JabRef/jabref/issues/9674)
 - We added a cleanup activity that identifies a URL or a last-visited-date in the `note` field and moves it to the `url` and `urldate` field respectively. [koppor#216](https://github.com/koppor/jabref/issues/216)
 - We enabled the user to change the name of a field in a custom entry type by double-clicking on it. [#9840](https://github.com/JabRef/jabref/issues/9840)
+- We added some preferences options to disable online activity. [#10064](https://github.com/JabRef/jabref/issues/10064)
 - We integrated two mail actions ("As Email" and "To Kindle") under a new "Send" option in the right-click & Tools menus. The Kindle option creates an email targeted to the user's Kindle email, which can be set in preferences under "External programs" [#6186](https://github.com/JabRef/jabref/issues/6186)
 - We added an option to clear recent libraries' history. [#10003](https://github.com/JabRef/jabref/issues/10003)
 - We added an option to encrypt and remember the proxy password. [#8055](https://github.com/JabRef/jabref/issues/8055)[#10044](https://github.com/JabRef/jabref/issues/10044)
+- We added support for showing journal information, via info buttons next to the `Journal` and `ISSN` fields in the entry editor. [#6189](https://github.com/JabRef/jabref/issues/6189)
+- We added support for pushing citations to Sublime Text 3 [#10098](https://github.com/JabRef/jabref/issues/10098)
+- We added support for the Finnish language. [#10183](https://github.com/JabRef/jabref/pull/10183)
+- We added the option to automatically replaces illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
+- We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
+- We added a tooltip to show the number of entries in a group [#10208](https://github.com/JabRef/jabref/issues/10208)
 
 ### Changed
 
 - We replaced "Close" by "Close library" and placed it after "Save all" in the File menu. [#10043](https://github.com/JabRef/jabref/pull/10043)
-- We upgraded to Lucene 9.5 for the fulltext search. The search index will be rebuild. [#9584](https://github.com/JabRef/jabref/pull/9584)
+- We upgraded to Lucene 9.7 for the fulltext search. The search index will be rebuild. [#9584](https://github.com/JabRef/jabref/pull/10036)
 - 'Get full text' now also checks the file url. [#568](https://github.com/koppor/jabref/issues/568)
 - JabRef writes a new backup file only if there is a change. Before, JabRef created a backup upon start. [#9679](https://github.com/JabRef/jabref/pull/9679)
 - We modified the `Add Group` dialog to use the most recently selected group hierarchical context. [#9141](https://github.com/JabRef/jabref/issues/9141)
 - We refined the 'main directory not found' error message. [#9625](https://github.com/JabRef/jabref/pull/9625)
 - JabRef writes a new backup file only if there is a change. Before, JabRef created a backup upon start. [#9679](https://github.com/JabRef/jabref/pull/9679)
-- Backups of libraries are not stored per JabRef version, but collected together.
+- Backups of libraries are not stored per JabRef version, but collected together. [#9676](https://github.com/JabRef/jabref/pull/9676)
 - We streamlined the paths for logs and backups: The parent path fragment is always `logs` or `backups`.
 - `log.txt` now contains an entry if a BibTeX entry could not be parsed.
 - `log.txt` now contains debug messages. Debugging needs to be enabled explicitly. [#9678](https://github.com/JabRef/jabref/pull/9678)
@@ -70,15 +92,17 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We moved the option to run JabRef in memory stick mode into the preferences dialog toolbar. [#9866](https://github.com/JabRef/jabref/pull/9866)
 - In case the library contains empty entries, they are not written to disk. [#8645](https://github.com/JabRef/jabref/issues/8645)
 - The formatter `remove_unicode_ligatures` is now called `replace_unicode_ligatures`. [#9890](https://github.com/JabRef/jabref/pull/9890)
-- We improved the error message when no terminal was found [#9607](https://github.com/JabRef/jabref/issues/9607)
+- We improved the error message when no terminal was found. [#9607](https://github.com/JabRef/jabref/issues/9607)
 - In the context of the "systematic literature functionality", we changed the name "database" to "catalog" to use a separate term for online catalogs in comparison to SQL databases. [#9951](https://github.com/JabRef/jabref/pull/9951)
 - We now show more fields (including Special Fields) in the dropdown selection for "Save sort order" in the library properties and for "Export sort order" in the preferences. [#10010](https://github.com/JabRef/jabref/issues/10010)
 - We now encrypt and store the custom API keys in the OS native credential store. [#10044](https://github.com/JabRef/jabref/issues/10044)
-- We changed the behavior of group addition/edit, so that sorting by alphabetical order is not performed by default after the modification [#10017](https://github.com/JabRef/jabref/issues/10017)
+- We changed the behavior of group addition/edit, so that sorting by alphabetical order is not performed by default after the modification. [#10017](https://github.com/JabRef/jabref/issues/10017)
 - We fixed an issue with spacing in the cleanup dialogue. [#10081](https://github.com/JabRef/jabref/issues/10081)
+- The GVK fetcher now uses the new [K10plus](https://www.bszgbv.de/services/k10plus/) database. [#10189](https://github.com/JabRef/jabref/pull/10189)
 
 ### Fixed
 
+- We fixed an issue where clicking the group expansion pane/arrow caused the node to be selected, when it should just expand/detract the node. [#10111](https://github.com/JabRef/jabref/pull/10111)
 - We fixed an issue where the browser import would add ' characters before the BibTeX entry on Linux. [#9588](https://github.com/JabRef/jabref/issues/9588)
 - We fixed an issue where searching for a specific term with the DOAB fetcher lead to an exception. [#9571](https://github.com/JabRef/jabref/issues/9571)
 - We fixed an issue where the "Import" -> "Library to import to" did not show the correct library name if two opened libraries had the same suffix. [#9567](https://github.com/JabRef/jabref/issues/9567)
@@ -111,6 +135,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue in the preferences where custom columns could be added to the entry table with no qualifier. [#9913](https://github.com/JabRef/jabref/issues/9913)
 - We fixed an issue where the encoding header in a bib file was not respected when the file contained a BOM (Byte Order Mark). [#9926](https://github.com/JabRef/jabref/issues/9926)
 - We fixed an issue where cli help output for import and export format was inconsistent. [koppor#429](https://github.com/koppor/jabref/issues/429)
+- We fixed an issue where the user could select multiple conflicting options for autocompletion at once. [#10181](https://github.com/JabRef/jabref/issues/10181)
 - We fixed an issue where no preview could be generated for some entry types and led to an exception. [#9947](https://github.com/JabRef/jabref/issues/9947)
 - We fixed an issue where the Linux terminal working directory argument was malformed and therefore ignored upon opening a terminal [#9953](https://github.com/JabRef/jabref/issues/9953)
 - We fixed an issue under Linux where under some systems the file instead of the folder was opened. [#9607](https://github.com/JabRef/jabref/issues/9607)
@@ -121,6 +146,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where closing a library containing groups and entries caused an exception [#9997](https://github.com/JabRef/jabref/issues/9997)
 - We fixed a bug where the editor for strings in a bibliography file did not sort the entries by their keys [#10083](https://github.com/JabRef/jabref/pull/10083)
 - We fixed an issues where clicking on the empty space of specific context menu entries would not trigger the associated action. [#8388](https://github.com/JabRef/jabref/issues/8388)
+- We fixed an issue where JabRef would not remember whether the window was in fullscreen. [#4939](https://github.com/JabRef/jabref/issues/4939)
+- We fixed an issue where the ACM Portal search sometimes would not return entries for some search queries when the article author had no given name. [#10107](https://github.com/JabRef/jabref/issues/10107)
+- We fixed an issue that caused high CPU usage and a zombie process after quitting JabRef because of author names autocompletion. [#10159](https://github.com/JabRef/jabref/pull/10159)
+- We fixed an issue where files with illegal characters in the filename could be added to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
+- We fixed that checked-out radio buttons under "specified keywords" were not displayed as checked after closing and reopening the "edit group" window. [#10248](https://github.com/JabRef/jabref/issues/10248)
+- We fixed that when editing groups, checked-out properties such as case sensitive and regular expression (under "Free search expression") were not displayed checked. [#10108](https://github.com/JabRef/jabref/issues/10108)
 
 ### Removed
 
@@ -128,6 +159,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We removed support for Markdown syntax for strikethrough and task lists in comment fields. [#9726](https://github.com/JabRef/jabref/pull/9726)
 - We removed the options menu, because the two contents were moved to the File menu or the properties of the library. [#9768](https://github.com/JabRef/jabref/pull/9768)
 - We removed the 'File' tab in the preferences and moved its contents to the 'Export' tab. [#9839](https://github.com/JabRef/jabref/pull/9839)
+- We removed the "[Collection of Computer Science Bibliographies](https://en.wikipedia.org/wiki/Collection_of_Computer_Science_Bibliographies)" fetcher the websits is no longer available. [#6638](https://github.com/JabRef/jabref/issues/6638)
 
 ## [5.9] - 2023-01-06
 
@@ -315,6 +347,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed a bug that prevented external group metadata changes from being merged. [#8873](https://github.com/JabRef/jabref/issues/8873)
 - We fixed the shared database opening dialog to remember autosave folder and tick. [#7516](https://github.com/JabRef/jabref/issues/7516)
 - We fixed an issue where name formatter could not be saved. [#9120](https://github.com/JabRef/jabref/issues/9120)
+- We fixed a bug where after the export of Preferences, custom exports were duplicated. [#10176](https://github.com/JabRef/jabref/issues/10176)
 
 ### Removed
 
@@ -1090,7 +1123,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.9...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.10...HEAD
+[5.10]: https://github.com/JabRef/jabref/compare/v5.9...v5.10
 [5.9]: https://github.com/JabRef/jabref/compare/v5.8...v5.9
 [5.8]: https://github.com/JabRef/jabref/compare/v5.7...v5.8
 [5.7]: https://github.com/JabRef/jabref/compare/v5.6...v5.7
@@ -1103,5 +1137,4 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.0]: https://github.com/JabRef/jabref/compare/v5.0-beta...v5.0
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
-
 <!-- markdownlint-disable-file MD012 MD024 MD033 -->

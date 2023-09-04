@@ -89,8 +89,8 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.fxmisc.flowless;
 
-    requires pdfbox;
-    requires xmpbox;
+    requires org.apache.pdfbox;
+    requires org.apache.xmpbox;
     requires com.ibm.icu;
 
     requires flexmark;

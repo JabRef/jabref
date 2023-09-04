@@ -30,7 +30,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         onDisk.getStyleClass().add("lib-change-header");
 
         // we need a copy here as we otherwise would set the same entry twice
-        PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, stateManager, themeManager);
+        PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, preferencesService, stateManager, themeManager);
 
         TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferencesService, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
         TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferencesService, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));

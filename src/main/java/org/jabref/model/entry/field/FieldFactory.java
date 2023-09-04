@@ -31,7 +31,7 @@ public class FieldFactory {
     }
 
     public static String serializeOrFields(OrFields fields) {
-        return fields.stream()
+        return fields.getFields().stream()
                      .map(field -> {
                          if (field instanceof UnknownField unknownField) {
                              // In case a user has put a user-defined field, the casing of that field is kept

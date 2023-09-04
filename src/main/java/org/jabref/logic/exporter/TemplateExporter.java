@@ -28,6 +28,8 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,7 @@ public class TemplateExporter extends Exporter {
     private final String lfFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
-    private final SaveConfiguration saveConfiguration;
+    private final SelfContainedSaveOrder saveOrder;
     private boolean customExport;
     private BlankLineBehaviour blankLineBehaviour;
 
@@ -76,21 +78,19 @@ public class TemplateExporter extends Exporter {
      * @param name              to display to the user and to call this format in the console.
      * @param lfFileName        Name of the main layout file.
      * @param extension         May or may not contain the . (for instance .txt).
-     * @param layoutPreferences Preferences for the layout
-     * @param saveConfiguration   Preferences for saving
      */
     public TemplateExporter(String name,
                             String lfFileName,
                             String extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            SaveConfiguration saveConfiguration) {
+                            SelfContainedSaveOrder saveOrder) {
         this(name,
                 name,
                 lfFileName,
                 null,
                 StandardFileType.fromExtensions(extension),
                 layoutPreferences,
-                saveConfiguration);
+                saveOrder);
     }
 
     /**
@@ -101,8 +101,6 @@ public class TemplateExporter extends Exporter {
      * @param lfFileName        Name of the main layout file.
      * @param directory         Directory in which to find the layout file.
      * @param extension         Should contain the . (for instance .txt).
-     * @param layoutPreferences Preferences for layout
-     * @param saveConfiguration   Preferences for saving
      */
     public TemplateExporter(String displayName,
                             String consoleName,
@@ -110,16 +108,8 @@ public class TemplateExporter extends Exporter {
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            SaveConfiguration saveConfiguration) {
-        super(consoleName, displayName, extension);
-        if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
-            this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
-        } else {
-            this.lfFileName = lfFileName;
-        }
-        this.directory = directory;
-        this.layoutPreferences = layoutPreferences;
-        this.saveConfiguration = saveConfiguration;
+                            SelfContainedSaveOrder saveOrder) {
+        this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, null);
     }
 
     /**
@@ -131,7 +121,6 @@ public class TemplateExporter extends Exporter {
      * @param directory         Directory in which to find the layout file.
      * @param extension         Should contain the . (for instance .txt).
      * @param layoutPreferences Preferences for layout
-     * @param saveConfiguration   Preferences for saving
      * @param blankLineBehaviour how to behave regarding blank lines.
      */
     public TemplateExporter(String displayName,
@@ -140,7 +129,7 @@ public class TemplateExporter extends Exporter {
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            SaveConfiguration saveConfiguration,
+                            SelfContainedSaveOrder saveOrder,
                             BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
@@ -150,7 +139,7 @@ public class TemplateExporter extends Exporter {
         }
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
-        this.saveConfiguration = saveConfiguration;
+        this.saveOrder = saveOrder == null ? SaveOrder.getDefaultSaveOrder() : saveOrder;
         this.blankLineBehaviour = blankLineBehaviour;
     }
 
@@ -247,12 +236,9 @@ public class TemplateExporter extends Exporter {
 
             /*
              * Write database entries; entries will be sorted as they appear on the
-             * screen, or sorted by author, depending on Preferences. We also supply
-             * the Set entries - if we are to export only certain entries, it will
-             * be non-null, and be used to choose entries. Otherwise, it will be
-             * null, and be ignored.
+             * screen, or sorted by author, depending on Preferences.
              */
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, saveConfiguration);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(entries, saveOrder);
 
             // Load default layout
             Layout defLayout;

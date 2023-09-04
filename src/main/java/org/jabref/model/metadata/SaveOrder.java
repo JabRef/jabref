@@ -11,51 +11,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Stores the save order config from MetaData
+ * Stores the save order config for a library
  * <p>
- * Format: &lt;choice>, pair of field + ascending (boolean)
+ * Format: &lt;choice> ({@link OrderType}, a pair of {@link Field} + descending (boolean)
+ * </p>
+ * <p>
+ * Note that {@link OrderType#TABLE} can only be used as "intermediate" setting. When passing <code>SaveOrder</code>
+ * to {@link org.jabref.logic.exporter.BibDatabaseWriter}, the orderType must be different. Reason: The writer
+ * does not have access to the UI.
+ * </p>
  */
 public class SaveOrder {
 
-    public enum OrderType {
-        SPECIFIED("specified"),
-        ORIGINAL("original"),
-        TABLE("table");
-
-        private final String name;
-
-        OrderType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-        public static SaveOrder.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
-            SaveOrder.OrderType orderType = SaveOrder.OrderType.TABLE;
-            if (saveInSpecifiedOrder) {
-                orderType = SaveOrder.OrderType.SPECIFIED;
-            } else if (saveInOriginalOrder) {
-                orderType = SaveOrder.OrderType.ORIGINAL;
-            }
-
-            return orderType;
-        }
-    }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveOrder.class);
 
-    private final List<SortCriterion> sortCriteria = new ArrayList<>();
-    private OrderType orderType;
-
-    private SaveOrder() {
-    }
+    private final OrderType orderType;
+    private final List<SortCriterion> sortCriteria;
 
     public SaveOrder(OrderType orderType, List<SortCriterion> sortCriteria) {
         this.orderType = orderType;
-        this.sortCriteria.addAll(sortCriteria);
+        this.sortCriteria = sortCriteria;
     }
 
     private SaveOrder(List<String> data) {
@@ -65,32 +40,35 @@ public class SaveOrder {
             throw new IllegalArgumentException();
         }
 
+        OrderType orderType;
         try {
-            this.orderType = OrderType.valueOf(data.get(0).toUpperCase());
+            orderType = OrderType.valueOf(data.get(0).toUpperCase());
         } catch (IllegalArgumentException ex) {
             if (data.size() > 1 && data.size() % 2 == 1) {
                 LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.get(0));
-                this.orderType = OrderType.SPECIFIED;
+                orderType = OrderType.SPECIFIED;
             } else {
                 LOGGER.warn("Could not parse sort order: {}", data.get(0));
+                this.sortCriteria = List.of();
                 this.orderType = OrderType.ORIGINAL;
                 return;
             }
         }
+        this.orderType = orderType;
 
+        List<SortCriterion> sortCriteria = new ArrayList<>(data.size() / 2);
         for (int index = 1; index < data.size(); index = index + 2) {
             sortCriteria.add(new SortCriterion(FieldFactory.parseField(data.get(index)), data.get(index + 1)));
         }
+        this.sortCriteria = sortCriteria;
     }
 
     public static SaveOrder parse(List<String> orderedData) {
         return new SaveOrder(orderedData);
     }
 
-    public static SaveOrder getDefaultSaveOrder() {
-        SaveOrder standard = new SaveOrder();
-        standard.orderType = OrderType.ORIGINAL;
-        return standard;
+    public static SelfContainedSaveOrder getDefaultSaveOrder() {
+        return new SelfContainedSaveOrder(OrderType.ORIGINAL, List.of());
     }
 
     public OrderType getOrderType() {
@@ -130,11 +108,7 @@ public class SaveOrder {
      */
     public List<String> getAsStringList() {
         List<String> res = new ArrayList<>(7);
-        if (orderType == OrderType.ORIGINAL) {
-            res.add(OrderType.ORIGINAL.toString());
-        } else {
-            res.add(OrderType.SPECIFIED.toString());
-        }
+        res.add(orderType.toString());
 
         for (SortCriterion sortCriterion : sortCriteria) {
             res.add(sortCriterion.field.getName());
@@ -146,12 +120,18 @@ public class SaveOrder {
 
     public static class SortCriterion {
 
-        public Field field;
+        public final Field field;
 
-        public boolean descending;
+        public final boolean descending;
 
         /**
-         *
+         * Given field sorted ascending
+         */
+        public SortCriterion(Field field) {
+            this(field, false);
+        }
+
+        /**
          * @param field The field
          * @param descending Must be a boolean value as string, e.g. "true", "false"
          */
@@ -163,9 +143,6 @@ public class SaveOrder {
         public SortCriterion(Field field, boolean descending) {
             this.field = field;
             this.descending = descending;
-        }
-
-        public SortCriterion() {
         }
 
         @Override
@@ -191,6 +168,34 @@ public class SaveOrder {
         @Override
         public int hashCode() {
             return Objects.hash(field, descending);
+        }
+    }
+
+    public enum OrderType {
+        SPECIFIED("specified"),
+        ORIGINAL("original"),
+        TABLE("table");
+
+        private final String name;
+
+        OrderType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        public static SaveOrder.OrderType fromBooleans(boolean saveInSpecifiedOrder, boolean saveInOriginalOrder) {
+            SaveOrder.OrderType orderType = SaveOrder.OrderType.TABLE;
+            if (saveInSpecifiedOrder) {
+                orderType = SaveOrder.OrderType.SPECIFIED;
+            } else if (saveInOriginalOrder) {
+                orderType = SaveOrder.OrderType.ORIGINAL;
+            }
+
+            return orderType;
         }
     }
 }

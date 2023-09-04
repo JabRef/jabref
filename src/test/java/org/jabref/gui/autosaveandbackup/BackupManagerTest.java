@@ -1,4 +1,4 @@
-package org.jabref.logic.autosaveandbackup;
+package org.jabref.gui.autosaveandbackup;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -141,7 +142,11 @@ public class BackupManagerTest {
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
 
-        BackupManager manager = BackupManager.start(database, mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS), preferences);
+        BackupManager manager = BackupManager.start(
+                mock(LibraryTab.class),
+                database,
+                mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
+                preferences);
         manager.listen(new MetaDataChangedEvent(new MetaData()));
 
         BackupManager.shutdown(database, backupDir, false);
@@ -164,7 +169,11 @@ public class BackupManagerTest {
         when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
         when(filePreferences.shouldCreateBackup()).thenReturn(true);
 
-        BackupManager manager = BackupManager.start(database, mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS), preferences);
+        BackupManager manager = BackupManager.start(
+                mock(LibraryTab.class),
+                database,
+                mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
+                preferences);
         manager.listen(new MetaDataChangedEvent(new MetaData()));
 
         Optional<Path> fullBackupPath = manager.determineBackupPathForNewBackup(backupDir);

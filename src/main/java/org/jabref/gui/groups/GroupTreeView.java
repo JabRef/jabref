@@ -224,7 +224,7 @@ public class GroupTreeView extends BorderPane {
 
         new ViewModelTreeTableRowFactory<GroupNodeViewModel>()
                 .withContextMenu(this::createContextMenuForGroup)
-                .withOnMousePressedEvent((row, event) -> {
+                .withEventFilter(MouseEvent.MOUSE_PRESSED, (row, event) -> {
                     if (event.getTarget() instanceof StackPane pane) {
                         if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
                             event.consume();
@@ -285,6 +285,9 @@ public class GroupTreeView extends BorderPane {
                     if (shouldDisplayGroupCount) {
                         node.getStyleClass().add("hits");
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
+                        Tooltip tooltip = new Tooltip();
+                        tooltip.textProperty().bind(group.getHits().asString());
+                        Tooltip.install(text, tooltip);
                     }
                 });
         text.getStyleClass().setAll("text");
@@ -322,7 +325,7 @@ public class GroupTreeView extends BorderPane {
             }
         }
 
-        if (groupsToMove.size() > 0) {
+        if (!groupsToMove.isEmpty()) {
             localDragboard.clearAll();
         }
 

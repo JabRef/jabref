@@ -10,6 +10,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -20,6 +21,7 @@ public class AboutDialogView extends BaseDialog<Void> {
     @FXML private TextArea textAreaVersions;
 
     @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
 
@@ -41,7 +43,7 @@ public class AboutDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new AboutDialogViewModel(dialogService, clipBoardManager, buildInfo);
+        viewModel = new AboutDialogViewModel(dialogService, preferencesService, clipBoardManager, buildInfo);
 
         textAreaVersions.setText(viewModel.getVersionInfo());
         this.setResizable(false);
@@ -85,5 +87,9 @@ public class AboutDialogView extends BaseDialog<Void> {
     @FXML
     public void openDonation() {
         viewModel.openDonation();
+    }
+
+    public void openPrivacyPolicy() {
+        viewModel.openPrivacyPolicy();
     }
 }

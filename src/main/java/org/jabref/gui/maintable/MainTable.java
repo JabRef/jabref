@@ -49,6 +49,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -69,6 +70,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
     private final ClipBoardManager clipBoardManager;
+    private final BibEntryTypesManager entryTypesManager;
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
@@ -80,6 +82,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
                      ClipBoardManager clipBoardManager,
+                     BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
                      FileUpdateMonitor fileUpdateMonitor) {
         super();
@@ -90,6 +93,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.database = Objects.requireNonNull(database);
         this.model = model;
         this.clipBoardManager = clipBoardManager;
+        this.entryTypesManager = entryTypesManager;
         UndoManager undoManager = libraryTab.getUndoManager();
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
@@ -144,25 +148,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
-        /* KEEP for debugging purposes
-        for (var colModel : mainTablePreferences.getColumnPreferences().getColumnSortOrder()) {
-            for (var col : this.getColumns()) {
-                var tablecColModel = ((MainTableColumn<?>) col).getModel();
-                if (tablecColModel.equals(colModel)) {
-                    LOGGER.debug("Adding sort order for col {} ", col);
-                    this.getSortOrder().add(col);
-                    break;
-                }
-            }
-        }
-        */
-
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
                     .findFirst()
-                    .ifPresent(column -> this.getSortOrder().add(column)));
+                    .ifPresent(column -> {
+                        LOGGER.debug("Adding sort order for col {} ", column);
+                        this.getSortOrder().add(column);
+                    }));
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -178,7 +172,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences());
+        new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
 
         setupKeyBindings(keyBindingRepository);
 
@@ -198,6 +192,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 libraryTab.getUndoManager(),
                 dialogService,
                 stateManager);
+
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, rightClickMenuFactory).show(true);
     }
@@ -208,7 +203,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
      * @param sortedColumn The sorted column in {@link MainTable}
      * @param keyEvent     The pressed character
      */
-
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
         if ((keyEvent.getCharacter() == null) || (sortedColumn == null)) {
             return;
@@ -253,7 +247,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (!selectedEntries.isEmpty()) {
             try {
-                clipBoardManager.setContent(selectedEntries);
+                clipBoardManager.setContent(selectedEntries, entryTypesManager);
                 dialogService.notify(libraryTab.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
             } catch (IOException e) {
                 LOGGER.error("Error while copying selected entries to clipboard", e);
@@ -433,7 +427,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
+                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                         case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
@@ -489,5 +483,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .stream()
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
+    }
+
+    public static List<MainTableColumnModel> toColumnModels(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
+        return columns.stream()
+                      .filter(col -> col instanceof MainTableColumn<?>)
+                      .map(column -> ((MainTableColumn<?>) column).getModel())
+                      .collect(Collectors.toList());
     }
 }

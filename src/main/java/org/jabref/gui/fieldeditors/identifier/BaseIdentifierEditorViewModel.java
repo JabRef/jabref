@@ -124,7 +124,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     public void openExternalLink() {
         identifier.get().flatMap(Identifier::getExternalURI).ifPresent(url -> {
                     try {
-                        JabRefDesktop.openBrowser(url);
+                        JabRefDesktop.openBrowser(url, preferences.getFilePreferences());
                     } catch (IOException ex) {
                         dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), ex);
                     }

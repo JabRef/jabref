@@ -159,7 +159,7 @@ public class EntryTypeViewModel {
                 dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage));
             }
 
-            LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchId, fetcher), exception);
+            LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", fetcher, searchId), exception);
 
             searchingProperty.set(false);
             fetcherWorker = new FetcherWorker();

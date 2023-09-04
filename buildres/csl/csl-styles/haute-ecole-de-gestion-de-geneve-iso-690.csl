@@ -17,14 +17,14 @@
     </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2023-05-25T00:29:32+00:00</updated>
+    <updated>2023-08-08T00:29:32+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr-FR">
     <terms>
       <term name="no date">[sans date]</term>
       <term name="in">in</term>
-      <term name="online"> [en&#160;ligne]</term>
+      <term name="online">en&#160;ligne</term>
       <term name="accessed">consulté le</term>
       <term name="retrieved">disponible</term>
       <term name="from">à l'adresse</term>
@@ -39,7 +39,6 @@
   </locale>
   <locale xml:lang="en-US">
     <terms>
-      <term name="online">. Online</term>
       <term name="issue">no.</term>
     </terms>
   </locale>
@@ -77,7 +76,7 @@
     </choose>
   </macro>
   <macro name="author-citation">
-    <names variable="author">
+    <names variable="author director">
       <name form="short"/>
       <substitute>
         <names variable="editor"/>
@@ -215,7 +214,7 @@
       <if variable="DOI version" match="none">
         <choose>
           <if variable="URL">
-            <text term="online" prefix=" "/>
+            <text term="online" prefix=" [" suffix="]"/>
           </if>
           <else>
             <choose>

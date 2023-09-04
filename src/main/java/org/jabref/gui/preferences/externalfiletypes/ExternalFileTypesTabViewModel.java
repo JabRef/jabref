@@ -28,6 +28,7 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        fileTypes.clear();
         fileTypes.addAll(filePreferences.getExternalFileTypes().stream()
                        .map(ExternalFileTypeItemViewModel::new)
                        .toList());
