@@ -169,7 +169,7 @@ public class TrustStoreManager {
     private static void configureTrustStore(Path myStorePath) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
         CertificateException, IOException {
         X509TrustManager jreTrustManager = getJreTrustManager();
-        X509TrustManager myTrustManager = getMyTrustManager(myStorePath);
+        X509TrustManager myTrustManager = getJabRefTrustManager(myStorePath);
 
         X509TrustManager mergedTrustManager = createMergedTrustManager(jreTrustManager, myTrustManager);
         setSystemTrustManager(mergedTrustManager);
@@ -179,7 +179,7 @@ public class TrustStoreManager {
         return findDefaultTrustManager(null);
     }
 
-    private static X509TrustManager getMyTrustManager(Path myStorePath) throws KeyStoreException, IOException,
+    private static X509TrustManager getJabRefTrustManager(Path myStorePath) throws KeyStoreException, IOException,
         NoSuchAlgorithmException, CertificateException {
         // Adapt to load your keystore
         try (InputStream myKeys = Files.newInputStream(myStorePath)) {
