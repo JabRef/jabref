@@ -2,6 +2,7 @@ package org.jabref.gui.push;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -59,6 +60,11 @@ public class PushToVim extends AbstractPushToApplication {
             String[] com = new String[]{commandPath, "--servername",
                     preferencesService.getPushToApplicationPreferences().getVimServer(), "--remote-send",
                     "<C-\\><C-N>a" + getCitePrefix() + keys + getCiteSuffix()};
+
+            LOGGER.atDebug()
+                  .setMessage("Executing command {}")
+                  .addArgument(() -> Arrays.toString(com))
+                  .log();
 
             final Process p = Runtime.getRuntime().exec(com);
 
