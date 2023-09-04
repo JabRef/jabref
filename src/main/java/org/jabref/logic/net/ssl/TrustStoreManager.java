@@ -198,8 +198,8 @@ public class TrustStoreManager {
         tmf.init(keyStore); // If keyStore is null, tmf will be initialized with the default trust store
 
         for (TrustManager tm : tmf.getTrustManagers()) {
-            if (tm instanceof X509TrustManager) {
-                return (X509TrustManager) tm;
+            if (tm instanceof X509TrustManager manager) {
+                return manager;
             }
         }
         return null;
