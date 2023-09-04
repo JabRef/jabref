@@ -78,9 +78,9 @@ public class PushToEmacs extends AbstractPushToApplication {
                 // so emacs receives: (insert "\cite{Blah2001}")
 
                 com[com.length - 1] = prefix.concat("\""
-                                                    + getCitePrefix().replaceAll("\\\\", "\\\\\\\\")
+                                                    + getCitePrefix().replace("\\", "\\\\")
                                                     + keys
-                                                    + getCiteSuffix().replaceAll("\\\\", "\\\\\\\\")
+                                                    + getCiteSuffix().replace("\\", "\\\\")
                                                     + "\"").concat(suffix)
                                             .replace("\"", "\\\"");
             } else {
