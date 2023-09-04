@@ -69,8 +69,6 @@ public class PushToEmacs extends AbstractPushToApplication {
             String prefix = "(with-current-buffer (window-buffer (selected-window)) (insert ";
             String suffix = "))";
 
-            String citeCommand = getCitePrefix();
-
             if (OS.WINDOWS) {
                 // Windows gnuclient/emacsclient escaping:
                 // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
@@ -89,11 +87,10 @@ public class PushToEmacs extends AbstractPushToApplication {
                 // so sh receives: (insert "\\cite{Blah2001}")
                 // so emacs receives: (insert "\cite{Blah2001}")
                 com[com.length - 1] = prefix.concat("\""
-                                                    + getCitePrefix()
+                                                    + getCitePrefix().replace("\\", "\\\\")
                                                     + keys
-                                                    + getCiteSuffix()
-                                                    + "\"").concat(suffix)
-                                            .replace("\"", "\\\"");
+                                                    + getCiteSuffix().replace("\\", "\\\\")
+                                                    + "\"").concat(suffix);
             }
 
             LOGGER.atDebug()
