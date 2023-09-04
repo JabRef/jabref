@@ -254,6 +254,7 @@ jobs:
     name: Notarize and package Mac OS binaries
     runs-on: macos-latest
     needs: [build]
+    if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
     steps:
       - name: Check secrets presence
         id: checksecrets
