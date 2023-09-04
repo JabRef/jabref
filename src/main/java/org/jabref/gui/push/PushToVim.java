@@ -89,8 +89,8 @@ public class PushToVim extends AbstractPushToApplication {
                 }
             });
         } catch (IOException excep) {
-            couldNotCall = true;
             LOGGER.warn("Problem pushing to Vim.", excep);
+            couldNotCall = true;
         }
     }
 
