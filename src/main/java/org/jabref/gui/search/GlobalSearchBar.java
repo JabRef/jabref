@@ -1,6 +1,7 @@
 package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -200,7 +201,7 @@ public class GlobalSearchBar extends HBox {
         this.setSpacing(4.0);
         this.setAlignment(Pos.CENTER_LEFT);
 
-        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
+        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), this::performSearch);
         BindingsHelper.bindBidirectional(
                 stateManager.activeSearchQueryProperty(),
                 searchField.textProperty(),

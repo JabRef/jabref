@@ -10,10 +10,11 @@ description: |
   `snap connect jabref:removable-media`
 grade: stable
 confinement: strict
-base: core20
+base: core22
 compression: lzo
 architectures:
-  - build-on: amd64
+ - build-on: [amd64, arm64]
+   build-for: [amd64]
 
 plugs:
   home:
@@ -45,10 +46,10 @@ layout:
 apps:
   jabref:
     command: bin/JabRef
-    extensions: [gnome-3-38]
+    extensions: [gnome]
   browser-proxy:
     command: lib/jabrefHost.py
-    extensions: [gnome-3-38]
+    extensions: [gnome]
 
 environment:
   _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
@@ -80,10 +81,10 @@ parts:
       - jabref-launcher
     plugin: nil
     build-snaps:
-      - gnome-3-38-2004
+      - gnome-42-2204
     override-prime: |
       set -eux
-      for snap in "gnome-3-38-2004"; do  # List all content-snaps you're using here
+      for snap in "gnome-42-2204"; do  # List all content-snaps you're using here
           cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" "$SNAPCRAFT_PRIME/usr/{}" \;
       done
       for CRUFT in bug lintian man; do

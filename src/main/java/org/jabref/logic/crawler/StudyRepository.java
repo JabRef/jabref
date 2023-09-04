@@ -16,8 +16,8 @@ import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.SaveException;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -427,7 +427,7 @@ public class StudyRepository {
 
     private void writeResultToFile(Path pathToFile, BibDatabaseContext context) throws SaveException {
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, StandardCharsets.UTF_8)) {
-            SaveConfiguration saveConfiguration = new SaveConfiguration()
+            SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                     .withSaveOrder(context.getMetaData().getSaveOrder().map(so -> SelfContainedSaveOrder.of(so)).orElse(SaveOrder.getDefaultSaveOrder()))
                     .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);

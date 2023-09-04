@@ -28,7 +28,7 @@ import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -250,7 +250,7 @@ public class BackupManager {
                     }
                 })
                 .orElse(SaveOrder.getDefaultSaveOrder());
-        SaveConfiguration saveConfiguration = new SaveConfiguration()
+        SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                 .withMakeBackup(false)
                 .withSaveOrder(saveOrder)
                 .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());

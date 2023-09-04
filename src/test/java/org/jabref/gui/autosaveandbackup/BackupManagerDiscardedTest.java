@@ -8,9 +8,10 @@ import java.nio.file.Path;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -26,9 +27,7 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Test for "discarded" flag
@@ -38,7 +37,7 @@ class BackupManagerDiscardedTest {
     private BibDatabaseContext bibDatabaseContext;
     private BackupManager backupManager;
     private Path testBib;
-    private SaveConfiguration saveConfiguration;
+    private SelfContainedSaveConfiguration saveConfiguration;
     private PreferencesService preferencesService;
     private BibEntryTypesManager bibEntryTypesManager;
     private Path backupDir;
@@ -54,17 +53,13 @@ class BackupManagerDiscardedTest {
         bibDatabaseContext.setDatabasePath(testBib);
 
         bibEntryTypesManager = new BibEntryTypesManager();
-
-        saveConfiguration = mock(SaveConfiguration.class);
-        when(saveConfiguration.shouldMakeBackup()).thenReturn(false);
-        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(saveConfiguration.withMakeBackup(anyBoolean())).thenReturn(saveConfiguration);
-
+        saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
         preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
 
         saveDatabase();
 
         backupManager = new BackupManager(mock(LibraryTab.class), bibDatabaseContext, bibEntryTypesManager, preferencesService);
+
         makeBackup();
     }
 
