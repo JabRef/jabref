@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.semanticscholar;
+package org.jabref.gui.entryeditor.citationrelation;
 
 import org.jabref.model.entry.BibEntry;
 

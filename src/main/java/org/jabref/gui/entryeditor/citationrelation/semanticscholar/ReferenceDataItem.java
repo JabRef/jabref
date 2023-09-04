@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.semanticscholar;
+package org.jabref.gui.entryeditor.citationrelation.semanticscholar;
 
 public class ReferenceDataItem {
     private PaperDetails citedPaper;

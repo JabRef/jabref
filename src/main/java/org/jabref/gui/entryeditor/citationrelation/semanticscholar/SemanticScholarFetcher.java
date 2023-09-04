@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.semanticscholar;
+package org.jabref.gui.entryeditor.citationrelation.semanticscholar;
 
 import com.google.gson.Gson;
 import org.jabref.logic.importer.FetcherException;

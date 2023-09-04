@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.semanticscholar;
+package org.jabref.gui.entryeditor.citationrelation;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +33,8 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.citationrelation.semanticscholar.CitationFetcher;
+import org.jabref.gui.entryeditor.citationrelation.semanticscholar.SemanticScholarFetcher;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
@@ -42,7 +44,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;

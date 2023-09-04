@@ -1,10 +1,9 @@
-package org.jabref.gui.entryeditor.semanticscholar;
+package org.jabref.gui.entryeditor.citationrelation.semanticscholar;
 
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 
 /**
  * Searches web resources for citing related articles based on a {@link BibEntry}.

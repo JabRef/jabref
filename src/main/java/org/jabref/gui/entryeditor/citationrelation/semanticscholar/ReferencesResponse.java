@@ -1,11 +1,11 @@
-package org.jabref.gui.entryeditor.semanticscholar;
+package org.jabref.gui.entryeditor.citationrelation.semanticscholar;
 
 import java.util.List;
 
-public class CitationsResponse {
+public class ReferencesResponse {
     private int offset;
     private int next;
-    private List<CitationDataItem> data;
+    private List<ReferenceDataItem> data;
 
     public int getOffset() {
         return offset;
@@ -23,11 +23,11 @@ public class CitationsResponse {
         this.next = next;
     }
 
-    public List<CitationDataItem> getData() {
+    public List<ReferenceDataItem> getData() {
         return data;
     }
 
-    public void setData(List<CitationDataItem> data) {
+    public void setData(List<ReferenceDataItem> data) {
         this.data = data;
     }
 }
