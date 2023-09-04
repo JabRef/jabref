@@ -250,4 +250,15 @@ public class FieldComparatorTest {
                 Arguments.of(1, "value", null)
         );
     }
+
+    @Test
+    public void compareAuthorField() throws Exception {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry bigger = new BibEntry()
+                .withField(StandardField.AUTHOR, "Freund, Lucas");
+        BibEntry smaller = new BibEntry()
+                .withField(StandardField.AUTHOR, "Gärtner, Lara");
+
+        assertEquals(1, comparator.compare(smaller, bigger));
+    }
 }
