@@ -19,7 +19,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
@@ -59,7 +58,6 @@ public class SaveDatabaseAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
     private final LibraryTab libraryTab;
-    private final JabRefFrame frame;
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
@@ -68,10 +66,12 @@ public class SaveDatabaseAction {
         SILENT, NORMAL
     }
 
-    public SaveDatabaseAction(LibraryTab libraryTab, PreferencesService preferences, BibEntryTypesManager entryTypesManager) {
+    public SaveDatabaseAction(LibraryTab libraryTab,
+                              DialogService dialogService,
+                              PreferencesService preferences,
+                              BibEntryTypesManager entryTypesManager) {
         this.libraryTab = libraryTab;
-        this.frame = libraryTab.frame();
-        this.dialogService = frame.getDialogService();
+        this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
     }
@@ -120,7 +120,7 @@ public class SaveDatabaseAction {
         askForSavePath().ifPresent(path -> {
             try {
                 saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder());
-                frame.getFileHistory().newFile(path);
+                preferences.getGuiPreferences().getFileHistory().newFile(path);
                 dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
             } catch (SaveException ex) {
                 LOGGER.error("A problem occurred when trying to save the file", ex);
@@ -165,7 +165,7 @@ public class SaveDatabaseAction {
             libraryTab.resetChangeMonitor();
             libraryTab.installAutosaveManagerAndBackupManager();
 
-            frame.getFileHistory().newFile(file);
+            preferences.getGuiPreferences().getFileHistory().newFile(file);
         }
 
         return saveResult;

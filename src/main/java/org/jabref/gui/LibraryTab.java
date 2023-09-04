@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -41,6 +43,7 @@ import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -122,14 +125,16 @@ public class LibraryTab extends Tab {
 
     public LibraryTab(BibDatabaseContext bibDatabaseContext,
                       JabRefFrame frame,
+                      DialogService dialogService,
                       PreferencesService preferencesService,
                       StateManager stateManager,
                       FileUpdateMonitor fileUpdateMonitor,
-                      BibEntryTypesManager entryTypesManager) {
+                      BibEntryTypesManager entryTypesManager,
+                      CountingUndoManager undoManager) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.undoManager = frame.getUndoManager();
-        this.dialogService = frame.getDialogService();
+        this.undoManager = undoManager;
+        this.dialogService = dialogService;
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -291,7 +296,7 @@ public class LibraryTab extends Tab {
     public void installAutosaveManagerAndBackupManager() {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
-            autosaveManager.registerListener(new AutosaveUiManager(this, preferencesService, entryTypesManager));
+            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferencesService, entryTypesManager));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferencesService.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, Globals.entryTypesManager, preferencesService);
@@ -657,7 +662,7 @@ public class LibraryTab extends Tab {
      */
 
     public synchronized void markChangedOrUnChanged() {
-        if (getUndoManager().hasChanged()) {
+        if (undoManager.hasChanged()) {
             this.changedProperty.setValue(true);
         } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
             this.changedProperty.setValue(false);
@@ -821,28 +826,62 @@ public class LibraryTab extends Tab {
     /**
      * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
      *
-     * @param dataLoadingTask The task to execute to load the data. It is executed using {@link org.jabref.gui.Globals.TASK_EXECUTOR}.
+     * @param dataLoadingTask The task to execute to load the data asynchronously.
      * @param file the path to the file (loaded by the dataLoadingTask)
      */
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
+                                              DialogService dialogService,
                                               PreferencesService preferencesService,
                                               StateManager stateManager,
                                               JabRefFrame frame,
                                               FileUpdateMonitor fileUpdateMonitor,
-                                              BibEntryTypesManager entryTypesManager) {
+                                              BibEntryTypesManager entryTypesManager,
+                                              CountingUndoManager undoManager,
+                                              TaskExecutor taskExecutor) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
-        LibraryTab newTab = new LibraryTab(context, frame, preferencesService, stateManager, fileUpdateMonitor, entryTypesManager);
+        LibraryTab newTab = new LibraryTab(
+                context,
+                frame,
+                dialogService,
+                preferencesService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager);
 
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
                        .onSuccess(newTab::onDatabaseLoadingSucceed)
                        .onFailure(newTab::onDatabaseLoadingFailed)
-                       .executeWith(Globals.TASK_EXECUTOR);
+                       .executeWith(taskExecutor);
 
         return newTab;
+    }
+
+    public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
+                                              JabRefFrame frame,
+                                              DialogService dialogService,
+                                              PreferencesService preferencesService,
+                                              StateManager stateManager,
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              BibEntryTypesManager entryTypesManager,
+                                              UndoManager undoManager) {
+        Objects.requireNonNull(databaseContext);
+
+        LibraryTab libraryTab = new LibraryTab(
+                databaseContext,
+                frame,
+                dialogService,
+                preferencesService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                (CountingUndoManager) undoManager);
+
+        return libraryTab;
     }
 
     private class GroupTreeListener {

@@ -45,7 +45,7 @@ public class CLIMessageHandler implements RemoteMessageHandler {
                 boolean focusPanel = i == 0;
                 Platform.runLater(() ->
                         // Need to run this on the JavaFX thread
-                        JabRefGUI.getMainFrame().addParserResult(pr, focusPanel)
+                        JabRefGUI.getMainFrame().addTab(pr, focusPanel)
                 );
             }
         } catch (ParseException e) {

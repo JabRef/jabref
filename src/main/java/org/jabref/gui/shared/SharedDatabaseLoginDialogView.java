@@ -1,5 +1,7 @@
 package org.jabref.gui.shared;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,11 +14,13 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -26,9 +30,6 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
-
-    private final JabRefFrame frame;
-
     @FXML private ComboBox<DBMSType> databaseType;
     @FXML private TextField host;
     @FXML private TextField database;
@@ -48,8 +49,12 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private StateManager stateManager;
+    @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private UndoManager undoManager;
 
+    private final JabRefFrame frame;
     private SharedDatabaseLoginDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -81,7 +86,14 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
 
-        viewModel = new SharedDatabaseLoginDialogViewModel(frame, dialogService, preferencesService, fileUpdateMonitor);
+        viewModel = new SharedDatabaseLoginDialogViewModel(
+                frame,
+                dialogService,
+                preferencesService,
+                stateManager,
+                entryTypesManager,
+                fileUpdateMonitor,
+                undoManager);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 
