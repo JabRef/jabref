@@ -1,13 +1,6 @@
 package org.jabref.gui.entryeditor.citationrelation;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.swing.undo.UndoManager;
-
+import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -27,6 +20,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import org.controlsfx.control.CheckListView;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
@@ -43,15 +38,17 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
-import org.controlsfx.control.CheckListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.undo.UndoManager;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * GUI for tab displaying an articles citation relations in two lists based on the currently selected BibEntry
@@ -399,48 +396,12 @@ public class CitationRelationsTab extends EntryEditorTab {
         });
     }
 
-    private void hideNodes(Node ... nodes) {
+    private void hideNodes(Node...nodes) {
         Arrays.stream(nodes).forEach(node -> node.setVisible(false));
     }
 
     private void showNodes(Node ... nodes) {
         Arrays.stream(nodes).forEach(node -> node.setVisible(true));
-    }
-
-    /**
-     * Performs a local lookup of fields in StandardField.CITING/CITED_BY
-     *
-     * @param entry Current Entry Context
-     * @param field The StandardField to work with
-     */
-    List<BibEntry> runOfflineTask(BibEntry entry, StandardField field) {
-        LOGGER.error("Not implemented");
-        return Collections.emptyList();
-    }
-
-    /**
-     * Returns the Entry in the database with the given DOI, or null if no such entry exists
-     *
-     * @param doi doi TO LOOK for
-     * @return null or found Entry
-     */
-    Optional<BibEntry> getEntryByDOI(String doi) {
-        return databaseContext.getEntries().stream().
-                filter(entry -> doi.equals(entry.getField(StandardField.DOI).orElse(""))).findFirst();
-    }
-
-    /**
-     * Returns a String containing the DOIs of a list of entries. Ignores entries with no DOI.
-     *
-     * @param entries The list of BibEntries to serialize
-     * @return A comma separated list of CitationKeys (of the given list of entries)
-     */
-    static String serialize(List<BibEntry> entries) {
-        return entries.stream()
-                .map(bibEntry -> bibEntry.getField(StandardField.DOI))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.joining(","));
     }
 
     // Absolute-phase phenomena in photoionization with few-cycle laser pulses
