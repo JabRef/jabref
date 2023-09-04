@@ -120,13 +120,10 @@ public class PushToEmacs extends AbstractPushToApplication {
     public void onOperationCompleted() {
         if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
-                    Localization.lang("Could not connect to a running gnuserv process. Make sure that "
-                            + "Emacs or XEmacs is running, and that the server has been started "
-                            + "(by running the command 'server-start'/'gnuserv-start')."));
+                    Localization.lang("Could not push to a running emacs daemon."));
         } else if (couldNotCall) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
-                    Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
-                            + "the emacsclient/gnuclient program installed and available in the PATH."));
+                    Localization.lang("Could not run the emacs client."));
         } else {
             super.onOperationCompleted();
         }
