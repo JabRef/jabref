@@ -488,7 +488,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 dialogService,
                 Globals.journalAbbreviationRepository,
                 entryTypesManager,
-                undoManager);
+                undoManager,
+                Globals.getClipboardManager());
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
