@@ -24,6 +24,9 @@ public class PushToEmacs extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 
+    /**
+     * @param preferencesService getPushToApplicationPreferences(), getExternalApplicationsPreferences(), and getFilePreferences() are used
+     */
     public PushToEmacs(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
     }
@@ -44,16 +47,18 @@ public class PushToEmacs extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        PushToApplicationPreferences pushToApplicationPreferences = preferencesService.getPushToApplicationPreferences();
+
+        commandPath = pushToApplicationPreferences.getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
             return;
         }
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = pushToApplicationPreferences.getCommandPaths().get(this.getDisplayName());
 
-        String[] addParams = preferencesService.getPushToApplicationPreferences().getEmacsArguments().split(" ");
+        String[] addParams = pushToApplicationPreferences.getEmacsArguments().split(" ");
         try {
             String[] com = new String[addParams.length + 2];
             com[0] = commandPath;
