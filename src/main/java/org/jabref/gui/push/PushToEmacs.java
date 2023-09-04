@@ -2,6 +2,7 @@ package org.jabref.gui.push;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -76,24 +77,29 @@ public class PushToEmacs extends AbstractPushToApplication {
                 // so cmd receives: (insert \"\\cite{Blah2001}\")
                 // so emacs receives: (insert "\cite{Blah2001}")
 
-                if (citeCommand.contains("\\")) {
-                    com[com.length - 1] = prefix.concat("\\\"\\" + getCitePrefix().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix);
-                }
-
-                com[com.length - 1] = prefix.concat("\"" + getCitePrefix() + keys + getCiteSuffix() + "\"").concat(suffix);
+                com[com.length - 1] = prefix.concat("\""
+                                                    + getCitePrefix().replaceAll("\\\\", "\\\\\\\\")
+                                                    + keys
+                                                    + getCiteSuffix().replaceAll("\\\\", "\\\\\\\\")
+                                                    + "\"").concat(suffix)
+                                            .replace("\"", "\\\"");
             } else {
-                if (citeCommand.contains("\\")) {
-                    com[com.length - 1] = prefix.concat("\"" + getCitePrefix().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
-                }
-
                 // Linux gnuclient/emacslient escaping:
                 // java string: "(insert \"\\\\cite{Blah2001}\")"
                 // so sh receives: (insert "\\cite{Blah2001}")
                 // so emacs receives: (insert "\cite{Blah2001}")
-                com[com.length - 1] = prefix.concat("\"" + getCitePrefix() + keys + getCiteSuffix() + "\"").concat(suffix);
+                com[com.length - 1] = prefix.concat("\""
+                                                    + getCitePrefix()
+                                                    + keys
+                                                    + getCiteSuffix()
+                                                    + "\"").concat(suffix)
+                                            .replace("\"", "\\\"");
             }
 
-            LOGGER.debug("Executing command {}", com);
+            LOGGER.atDebug()
+                  .setMessage("Executing command {}")
+                  .addArgument(() -> Arrays.toString(com))
+                  .log();
 
             final Process p = Runtime.getRuntime().exec(com);
 
