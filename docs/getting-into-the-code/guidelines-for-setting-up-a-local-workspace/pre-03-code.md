@@ -37,7 +37,7 @@ git branch --set-upstream-to=origin/main main
 >
 > Further, if you are building on Windows, make sure that the absolute path to the location of the clone does not contain folders starting with '`u`' (**negative example**: `C:\university\jabref`) as this may currently also cause [compile errors](https://github.com/JabRef/jabref/issues/9783).
 >
-> Please really ensure that you pass `JabRef` as parameter. Otherwise, you will get `java.lang.IllegalStateException: Module entity with name: jabref.main should be available`. See [IDEA-317606](https://youtrack.jetbrains.com/issue/IDEA-317606/Changing-only-the-case-of-the-Gradle-root-project-name-causes-exception-while-importing-project-java.lang.IllegalStateException) for details.
+> Please really ensure that you pass `JabRef` as parameter. Otherwise, you will get `java.lang.IllegalStateException: Module entity with name: jabref should be available`. See [IDEA-317606](https://youtrack.jetbrains.com/issue/IDEA-317606/Changing-only-the-case-of-the-Gradle-root-project-name-causes-exception-while-importing-project-java.lang.IllegalStateException) for details.
 
 {: .note-title }
 > Background
