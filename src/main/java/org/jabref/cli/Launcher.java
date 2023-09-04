@@ -31,6 +31,7 @@ import org.jabref.preferences.PreferencesService;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.tinylog.configuration.Configuration;
 
 /**
@@ -46,6 +47,7 @@ public class Launcher {
     private static boolean isDebugEnabled;
 
     public static void main(String[] args) {
+        routeLoggingToSlf4J();
         ARGUMENTS = args;
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
@@ -101,6 +103,11 @@ public class Launcher {
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
         }
+    }
+
+    private static void routeLoggingToSlf4J() {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
     }
 
     /**

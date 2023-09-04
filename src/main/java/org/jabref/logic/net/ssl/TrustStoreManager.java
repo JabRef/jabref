@@ -1,7 +1,6 @@
 package org.jabref.logic.net.ssl;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -148,10 +147,9 @@ public class TrustStoreManager {
     public static void createTruststoreFileIfNotExist(Path storePath) {
         try {
             LOGGER.debug("Trust store path: {}", storePath.toAbsolutePath());
-
-            Path storeResourcePath = Path.of(TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI());
-            Files.createDirectories(storePath.getParent());
             if (Files.notExists(storePath)) {
+                Path storeResourcePath = Path.of(TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI());
+                Files.createDirectories(storePath.getParent());
                 Files.copy(storeResourcePath, storePath);
             }
 
@@ -181,7 +179,7 @@ public class TrustStoreManager {
         return findDefaultTrustManager(null);
     }
 
-    private static X509TrustManager getMyTrustManager(Path myStorePath) throws FileNotFoundException, KeyStoreException, IOException,
+    private static X509TrustManager getMyTrustManager(Path myStorePath) throws KeyStoreException, IOException,
         NoSuchAlgorithmException, CertificateException {
         // Adapt to load your keystore
         try (InputStream myKeys = Files.newInputStream(myStorePath)) {
