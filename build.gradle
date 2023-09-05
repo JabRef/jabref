@@ -141,7 +141,15 @@ dependencies {
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
-    implementation 'com.github.javakeyring:java-keyring:1.0.4'
+
+    implementation('com.github.javakeyring:java-keyring:1.0.4') {
+        // We need to replace native-unixsocket by jnr-unixsocket,
+        //   because GNOME dbus creates an "abstract" socket, which is not supported by native-unixsocket
+        exclude group: 'com.github.hypfvieh', module: 'dbus-java-transport-native-unixsocket'
+        exclude group: 'com.github.hypfvieh', module: 'dbus-java-core'
+    }
+    implementation 'com.github.hypfvieh:dbus-java-transport-jnr-unixsocket:4.3.0'
+    implementation 'com.github.hypfvieh:dbus-java-core:4.3.0'
 
     antlr4 'org.antlr:antlr4:4.13.0'
     implementation 'org.antlr:antlr4-runtime:4.13.0'
