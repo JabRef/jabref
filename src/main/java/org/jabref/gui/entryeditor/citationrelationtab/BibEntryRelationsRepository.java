@@ -48,4 +48,9 @@ public class BibEntryRelationsRepository {
     public boolean needToRefreshReferences(BibEntry entry) {
         return !cache.referencesCached(entry);
     }
+
+    public void forceRefreshReferences(BibEntry entry) {
+        List<BibEntry> references = fetcher.searchCiting(entry);
+        cache.cacheOrMergeReferences(entry, references);
+    }
 }

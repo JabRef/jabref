@@ -39,7 +39,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -90,41 +89,12 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /**
-     * The Pane that is shown when the functionality is not activated
-     *
-     * @param entry entry that is the context
-     * @return StackPane that is the activation screen
-     */
-    private StackPane getActivationPane(BibEntry entry) {
-        StackPane activation = new StackPane();
-        activation.setId("citation-relation-tab");
-        VBox alignment = new VBox();
-        alignment.setId("activation-alignment");
-        alignment.setFillWidth(true);
-        alignment.setAlignment(Pos.BASELINE_CENTER);
-        Label infoLabel = new Label(Localization.lang("The search is currently deactivated."));
-        Button activate = new Button(Localization.lang("Activate"));
-        activate.setOnAction(
-                event -> {
-                    JabRefPreferences prefs = JabRefPreferences.getInstance();
-                    // prefs.putBoolean(JabRefPreferences.ACTIVATE_CITATIONRELATIONS, true);
-                    dialogService.notify(Localization.lang("Please restart JabRef for preferences to take effect."));
-                    bindToEntry(entry);
-                });
-        activate.setDefaultButton(true);
-        alignment.getChildren().addAll(infoLabel, activate);
-        activation.getChildren().add(alignment);
-        return activation;
-    }
-
-    /**
      * Method to create main SplitPane holding all lists, buttons and labels for tab and starts search
      *
      * @param entry BibEntry which is currently selected in JabRef Database
      * @return SplitPane to display
      */
     private SplitPane getPaneAndStartSearch(BibEntry entry) {
-
         // Create Layout Containers
         VBox citingVBox = new VBox();
         VBox citedByVBox = new VBox();
@@ -189,8 +159,13 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingVBox.getChildren().addAll(citingHBox, citingListView);
         citedByVBox.getChildren().addAll(citedByHBox, citedByListView);
 
-        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, CitationFetcher.SearchType.CITING, importCitingButton, citingProgress));
-        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress));
+        refreshCitingButton.setOnMouseClicked(event -> {
+            searchForRelations(entry, citingListView, abortCitingButton,
+                    refreshCitingButton, CitationFetcher.SearchType.CITING, importCitingButton, citingProgress, true);
+        });
+
+        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton,
+                refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress, true));
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citedByVBox, citingVBox);
@@ -198,8 +173,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citingListView);
         styleFetchedListView(citedByListView);
 
-        searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, CitationFetcher.SearchType.CITING, importCitingButton, citingProgress);
-        searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress);
+        searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton,
+                CitationFetcher.SearchType.CITING, importCitingButton, citingProgress, false);
+
+        searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton,
+                CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress, false);
 
         return container;
     }
@@ -294,16 +272,13 @@ public class CitationRelationsTab extends EntryEditorTab {
      */
     @Override
     public boolean shouldShow(BibEntry entry) {
+        // TODO: Create a preference and show tab only if preference is enabled
         return true;
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (true) {
-            setContent(getPaneAndStartSearch(entry));
-        } else {
-            setContent(getActivationPane(entry));
-        }
+        setContent(getPaneAndStartSearch(entry));
     }
 
     /**
@@ -317,7 +292,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      */
     private void searchForRelations(BibEntry entry, CheckListView<CitationRelationItem> listView, Button abortButton,
                                     Button refreshButton, CitationFetcher.SearchType searchType, Button importButton,
-                                    ProgressIndicator progress) {
+                                    ProgressIndicator progress, boolean shouldRefresh) {
         if (entry.getDOI().isEmpty()) {
             hideNodes(abortButton, progress);
             showNodes(refreshButton);
@@ -340,10 +315,20 @@ public class CitationRelationsTab extends EntryEditorTab {
         BackgroundTask<List<BibEntry>> task;
 
         if (searchType.equals(CitationFetcher.SearchType.CITING)) {
-            task = BackgroundTask.wrap(() -> bibEntryRelationsRepository.getReferences(entry));
+            task = BackgroundTask.wrap(() -> {
+                if (shouldRefresh) {
+                    bibEntryRelationsRepository.forceRefreshReferences(entry);
+                }
+                return bibEntryRelationsRepository.getReferences(entry);
+            });
             citingTask = task;
         } else {
-            task = BackgroundTask.wrap(() -> bibEntryRelationsRepository.getCitations(entry));
+            task = BackgroundTask.wrap(() -> {
+                if (shouldRefresh) {
+                    bibEntryRelationsRepository.forceRefreshCitations(entry);
+                }
+                return bibEntryRelationsRepository.getCitations(entry);
+            });
             citedByTask = task;
         }
 
@@ -384,7 +369,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         showNodes(refreshButton, importButton);
     }
 
-    private void prepareToSearchForRelations(Button abortButton, Button refreshButton, Button importButton, ProgressIndicator progress, BackgroundTask<List<BibEntry>> task) {
+    private void prepareToSearchForRelations(Button abortButton, Button refreshButton, Button importButton,
+                                             ProgressIndicator progress, BackgroundTask<List<BibEntry>> task) {
         showNodes(abortButton, progress);
         hideNodes(refreshButton, importButton);
 
