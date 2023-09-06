@@ -27,7 +27,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.1.25'
+    id 'org.openrewrite.rewrite' version '6.3.2'
 }
 
 // Enable following for debugging
@@ -48,6 +48,7 @@ java {
     modularity.inferModulePath.set(false)
 
     toolchain {
+        // If this is updated, also update .devcontainer/devcontainer.json#L34
         languageVersion = JavaLanguageVersion.of(20)
     }
 }
@@ -129,7 +130,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.13.0'
-    implementation 'com.h2database:h2-mvstore:2.2.220'
+    implementation 'com.h2database:h2-mvstore:2.2.222'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.76'
@@ -137,7 +138,7 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.5.0'
 
     implementation 'org.libreoffice:unoloader:7.6.0'
-    implementation 'org.libreoffice:libreoffice:7.5.3'
+    implementation 'org.libreoffice:libreoffice:7.6.0'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -212,7 +213,7 @@ dependencies {
 
     implementation 'com.vladsch.flexmark:flexmark:0.64.8'
 
-    implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
+    implementation group: 'net.harawata', name: 'appdirs', version: '1.2.2'
 
     implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
     // JAX-RS implemented by Jersey
@@ -222,7 +223,7 @@ dependencies {
     implementation 'org.glassfish.jersey.core:jersey-server:3.1.1'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.3'
-    implementation 'org.glassfish.hk2:hk2-api:2.6.1'
+    implementation 'org.glassfish.hk2:hk2-api:3.0.4'
     // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
     // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
     // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
