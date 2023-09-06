@@ -297,7 +297,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             showNodes(refreshButton);
             listView.getItems().clear();
             listView.setPlaceholder(
-                    new Label("The selected entry doesn't have a DOI linked to it. Lookup a DOI and try again."));
+                    new Label(Localization.lang("The selected entry doesn't have a DOI linked to it. Lookup a DOI and try again.")));
             return;
         }
 
