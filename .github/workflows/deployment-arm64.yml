@@ -122,7 +122,8 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
+          --jlink-options --bind-services \
+          --java-options -Xmx4g -XX:+UseZGC
       - name: Build pkg (macos)
         shell: bash
         run: |
@@ -144,7 +145,8 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
+          --jlink-options --bind-services \
+          --java-options -Xmx4g -XX:+UseZGC
       - name: Rename files with arm64 suffix as well
         shell: bash
         run: |
