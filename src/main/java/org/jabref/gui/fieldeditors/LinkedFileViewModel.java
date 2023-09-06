@@ -486,7 +486,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 } else if (ex instanceof FetcherServerException serverException) {
                     statusCode = serverException.getStatusCode();
                     dialogService.showInformationDialogAndWait(Localization.lang("Failed to download from URL"),
-                                Localization.lang("Error downloading form URL. Cause is likely the server side. HTTP Error %0 \n %1 \nURL: %2 \nPlease try again later or contact the server administrator.", statusCode, fetcherExceptionMessage, urlDownload.getSource()));
+                                Localization.lang("Error downloading from URL. Cause is likely the server side. HTTP Error %0 \n %1 \nURL: %2 \nPlease try again later or contact the server administrator.", statusCode, fetcherExceptionMessage, urlDownload.getSource()));
                     } else {
                         dialogService.showErrorDialogAndWait(Localization.lang("Failed to download from URL"), Localization.lang("Error message: %0 \nURL: %1 \nPlease check the URL and try again.", fetcherExceptionMessage, urlDownload.getSource()));
                     }
