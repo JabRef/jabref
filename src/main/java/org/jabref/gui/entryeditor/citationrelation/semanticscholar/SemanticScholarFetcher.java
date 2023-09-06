@@ -37,8 +37,9 @@ public class SemanticScholarFetcher implements CitationFetcher {
                             PaperDetails citingPaperDetails = citationDataItem.getCitingPaper();
                             BibEntry bibEntry = new BibEntry();
                             bibEntry.setField(StandardField.TITLE, citingPaperDetails.getTitle());
-                            // TODO: year could return null
-                            bibEntry.setField(StandardField.YEAR, citingPaperDetails.getYear());
+                            if (citingPaperDetails.getYear() != null) {
+                                bibEntry.setField(StandardField.YEAR, citingPaperDetails.getYear());
+                            }
 
                             return bibEntry;
                 }).toList();
@@ -73,8 +74,9 @@ public class SemanticScholarFetcher implements CitationFetcher {
                             PaperDetails citedPaperDetails = referenceDataItem.getCitedPaper();
                             BibEntry bibEntry = new BibEntry();
                             bibEntry.setField(StandardField.TITLE, citedPaperDetails.getTitle());
-                            // TODO: year could return null
-                            bibEntry.setField(StandardField.YEAR, citedPaperDetails.getYear());
+                            if (citedPaperDetails.getYear() != null) {
+                                bibEntry.setField(StandardField.YEAR, citedPaperDetails.getYear());
+                            }
 
                             return bibEntry;
                         }).toList();
