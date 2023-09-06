@@ -32,7 +32,8 @@ public class OpenDatabase {
         return result;
     }
 
-    private static void performLoadDatabaseMigrations(ParserResult parserResult, Character keywordDelimited) {
+    private static void performLoadDatabaseMigrations(ParserResult parserResult,
+                                                      Character keywordDelimited) {
         List<PostOpenMigration> postOpenMigrations = Arrays.asList(
                 new ConvertLegacyExplicitGroups(),
                 new ConvertMarkingToGroups(),

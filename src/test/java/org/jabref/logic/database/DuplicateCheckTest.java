@@ -8,6 +8,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -326,5 +327,35 @@ public class DuplicateCheckTest {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry entryTwo = new BibEntry().withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
         assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Disabled("Book entries can have the same ISBN due to different chapters. The Test fails as crossref identifies both entries as the same.")
+    @Test
+    void differentArticlesFromTheSameBookAreNotDuplicates() {
+        BibEntry entryOne = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Atkinson_1993")
+                .withField(StandardField.AUTHOR, "Richard Atkinson")
+                .withField(StandardField.CHAPTER, "11")
+                .withField(StandardField.PAGES, "91-100")
+                .withField(StandardField.TITLE, "Performance on a Signal")
+                .withField(StandardField.BOOKTITLE, "ABC")
+                .withField(StandardField.EDITOR, "ABC")
+                .withField(StandardField.PUBLISHER, "ABC")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1")
+                .withField(StandardField.YEAR, "1993");
+
+        BibEntry entryTwo = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Ballard_1993")
+                .withField(StandardField.AUTHOR, "Elizabeth Ballard")
+                .withField(StandardField.CHAPTER, "20")
+                .withField(StandardField.PAGES, "187-203")
+                .withField(StandardField.TITLE, "Rest in Treatment")
+                .withField(StandardField.BOOKTITLE, "ABC")
+                .withField(StandardField.EDITOR, "ABC")
+                .withField(StandardField.PUBLISHER, "ABC")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1")
+                .withField(StandardField.YEAR, "1993");
+
+        assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 }

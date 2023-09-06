@@ -29,6 +29,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class TemplateExporter extends Exporter {
     private final String lfFileName;
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
-    private final SaveOrder saveOrder;
+    private final SelfContainedSaveOrder saveOrder;
     private boolean customExport;
     private BlankLineBehaviour blankLineBehaviour;
 
@@ -82,7 +83,7 @@ public class TemplateExporter extends Exporter {
                             String lfFileName,
                             String extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            SaveOrder saveOrder) {
+                            SelfContainedSaveOrder saveOrder) {
         this(name,
                 name,
                 lfFileName,
@@ -107,7 +108,7 @@ public class TemplateExporter extends Exporter {
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            SaveOrder saveOrder) {
+                            SelfContainedSaveOrder saveOrder) {
         this(displayName, consoleName, lfFileName, directory, extension, layoutPreferences, saveOrder, null);
     }
 
@@ -128,7 +129,7 @@ public class TemplateExporter extends Exporter {
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
-                            SaveOrder saveOrder,
+                            SelfContainedSaveOrder saveOrder,
                             BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {

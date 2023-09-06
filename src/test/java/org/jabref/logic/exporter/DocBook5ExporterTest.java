@@ -13,6 +13,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.SaveOrder;
@@ -60,7 +61,7 @@ public class DocBook5ExporterTest {
                 .withField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez")
                 .withField(StandardField.ISBN, "1-2-34")
                 .withCitationKey("mykey")
-                .withDate(new org.jabref.model.entry.Date(myDate));
+                .withDate(new Date(myDate));
         entries = Collections.singletonList(entry);
     }
 

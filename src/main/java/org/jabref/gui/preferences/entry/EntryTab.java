@@ -62,7 +62,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
 
         ActionFactory actionFactory = new ActionFactory(keyBindingRepository);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService), markOwnerHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferencesService.getFilePreferences()), markOwnerHelp);
     }
 
     @Override

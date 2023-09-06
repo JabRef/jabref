@@ -10,6 +10,7 @@ public class ExternalApplicationsPreferences {
     private final StringProperty eMailSubject;
     private final BooleanProperty shouldAutoOpenEmailAttachmentsFolder;
     private final StringProperty citeCommand;
+
     private final BooleanProperty useCustomTerminal;
     private final StringProperty customTerminalCommand;
     private final BooleanProperty useCustomFileBrowser;

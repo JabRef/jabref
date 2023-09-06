@@ -47,9 +47,11 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
@@ -71,6 +73,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private BibEntryTypesManager bibEntryTypesManager;
+    @Inject private JournalAbbreviationRepository abbreviationRepository;
     @Inject private TaskExecutor taskExecutor;
 
     private LinkedFilesEditorViewModel viewModel;
@@ -203,10 +207,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
-
-        WriteMetadataToPdfCommand writeMetadataToPdfCommand = linkedFile.createWriteMetadataToPdfCommand();
-        writeMetadataToPdf.disableProperty().bind(writeMetadataToPdfCommand.executableProperty().not());
-        writeMetadataToPdf.setOnAction(event -> writeMetadataToPdfCommand.execute());
+        WriteMetadataToSinglePdfAction writeMetadataToSinglePdfAction = new WriteMetadataToSinglePdfAction(
+                linkedFile.getFile(),
+                bibEntry.getValueOrElse(new BibEntry()),
+                databaseContext, dialogService, preferencesService.getFieldPreferences(),
+                preferencesService.getFilePreferences(), preferencesService.getXmpPreferences(), abbreviationRepository, bibEntryTypesManager,
+                taskExecutor
+        );
+        writeMetadataToPdf.disableProperty().bind(writeMetadataToSinglePdfAction.executableProperty().not());
+        writeMetadataToPdf.setOnAction(event -> writeMetadataToSinglePdfAction.execute());
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));

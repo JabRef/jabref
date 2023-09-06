@@ -61,6 +61,8 @@ Then double click inside the cell "Compilation options" and enter following para
 ```text
 --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
 --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
+--add-reads org.jabref=org.fxmisc.flowless
+--add-reads org.jabref=org.apache.commons.csv
 ```
 
 Press <kbd>Enter</kbd> to have the value really stored.

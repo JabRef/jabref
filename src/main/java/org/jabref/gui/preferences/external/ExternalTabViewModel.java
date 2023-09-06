@@ -210,8 +210,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         return this.citeCommandProperty;
     }
 
-    // Open console
-
     public BooleanProperty useCustomTerminalProperty() {
         return this.useCustomTerminalProperty;
     }

@@ -198,7 +198,7 @@ public class EntryEditor extends BorderPane {
                         event.consume();
                         break;
                     case HELP:
-                        new HelpAction(HelpFile.ENTRY_EDITOR, dialogService).execute();
+                        new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferencesService.getFilePreferences()).execute();
                         event.consume();
                         break;
                     case CLOSE:
@@ -294,6 +294,7 @@ public class EntryEditor extends BorderPane {
                 fileMonitor,
                 dialogService,
                 stateManager,
+                bibEntryTypesManager,
                 keyBindingRepository);
         entryEditorTabs.add(sourceTab);
 

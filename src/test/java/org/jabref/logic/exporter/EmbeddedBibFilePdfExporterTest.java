@@ -43,7 +43,6 @@ class EmbeddedBibFilePdfExporterTest {
     private EmbeddedBibFilePdfExporter exporter;
 
     private BibDatabaseContext databaseContext;
-    private BibDatabase dataBase;
     private JournalAbbreviationRepository abbreviationRepository;
     private FilePreferences filePreferences;
 
@@ -111,7 +110,7 @@ class EmbeddedBibFilePdfExporterTest {
         exporter = new EmbeddedBibFilePdfExporter(bibDatabaseMode, bibEntryTypesManager, fieldPreferences);
 
         databaseContext = new BibDatabaseContext();
-        dataBase = databaseContext.getDatabase();
+        BibDatabase dataBase = databaseContext.getDatabase();
 
         initBibEntries();
         dataBase.insertEntry(olly2018);
@@ -142,13 +141,13 @@ class EmbeddedBibFilePdfExporterTest {
     @ParameterizedTest
     @MethodSource("providePathsToValidPDFs")
     void successfulExportToFileByPath(Path path) throws Exception {
-        assertTrue(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path, abbreviationRepository));
+        assertTrue(exporter.exportToFileByPath(databaseContext, filePreferences, path, abbreviationRepository));
     }
 
     @ParameterizedTest
     @MethodSource("providePathsToInvalidPDFs")
     void unsuccessfulExportToFileByPath(Path path) throws Exception {
-        assertFalse(exporter.exportToFileByPath(databaseContext, dataBase, filePreferences, path, abbreviationRepository));
+        assertFalse(exporter.exportToFileByPath(databaseContext, filePreferences, path, abbreviationRepository));
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {

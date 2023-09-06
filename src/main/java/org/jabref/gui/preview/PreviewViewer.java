@@ -30,6 +30,7 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,6 +120,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
 
     private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
     private final WebView previewView;
@@ -143,10 +145,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
+                         PreferencesService preferencesService,
                          StateManager stateManager,
                          ThemeManager themeManager) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
         this.clipBoardManager = Globals.getClipboardManager();
 
         setFitToHeight(true);
@@ -177,7 +181,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     String href = anchorElement.getHref();
                     if (href != null) {
                         try {
-                            JabRefDesktop.openBrowser(href);
+                            JabRefDesktop.openBrowser(href, preferencesService.getFilePreferences());
                         } catch (MalformedURLException exception) {
                             LOGGER.error("Invalid URL", exception);
                         } catch (IOException exception) {

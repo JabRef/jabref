@@ -56,7 +56,7 @@ public class RequiredFieldsTab extends FieldsEditorTab {
         Set<Field> fields = new LinkedHashSet<>();
         if (entryType.isPresent()) {
             for (OrFields orFields : entryType.get().getRequiredFields()) {
-                fields.addAll(orFields);
+                fields.addAll(orFields.getFields());
             }
             // Add the edit field for Bibtex-key.
             fields.add(InternalField.KEY_FIELD);

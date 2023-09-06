@@ -22,7 +22,7 @@ env:
   JAVA_OPTS: -Xmx4g
 
 concurrency:
-  group: ${{ github.ref }}-arm64mac
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -46,9 +46,11 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.10.2
         with:
@@ -163,6 +165,7 @@ jobs:
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
       - name: Upload with rsync
+        if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
         shell: bash
         run: |
           mkdir ${{runner.temp}}/sshkey
@@ -172,6 +175,7 @@ jobs:
           fi
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store
+        if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
         uses: actions/upload-artifact@v3
         with:
           name: JabRef-${{ matrix.displayName }}

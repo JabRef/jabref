@@ -11,18 +11,18 @@ import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.preferences.BibEntryPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class MergeEntriesAction extends SimpleCommand {
     private static final int NUMBER_OF_ENTRIES_NEEDED = 2;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final BibEntryPreferences bibEntryPreferences;
+    private final PreferencesService preferencesService;
 
-    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, BibEntryPreferences bibEntryPreferences) {
+    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.bibEntryPreferences = bibEntryPreferences;
+        this.preferencesService = preferencesService;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(NUMBER_OF_ENTRIES_NEEDED, stateManager));
     }
@@ -59,7 +59,7 @@ public class MergeEntriesAction extends SimpleCommand {
             second = one;
         }
 
-        MergeEntriesDialog dialog = new MergeEntriesDialog(first, second, bibEntryPreferences);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(first, second, preferencesService);
         dialog.setTitle(Localization.lang("Merge entries"));
 
         Optional<EntriesMergeResult> mergeResultOpt = dialogService.showCustomDialogAndWait(dialog);

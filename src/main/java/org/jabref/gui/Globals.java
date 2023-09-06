@@ -70,7 +70,7 @@ public class Globals {
     public static ProtectedTermsLoader protectedTermsLoader;
 
     public static CountingUndoManager undoManager = new CountingUndoManager();
-    public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+    public static BibEntryTypesManager entryTypesManager;
 
     private static ClipBoardManager clipBoardManager = null;
     private static KeyBindingRepository keyBindingRepository;
@@ -123,7 +123,7 @@ public class Globals {
         } */
         RemotePreferences remotePreferences = prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs, fileUpdateMonitor), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(prefs, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
         }
     }
 
