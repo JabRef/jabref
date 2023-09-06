@@ -1,19 +1,20 @@
 package org.jabref.gui.entryeditor.citationrelation.semanticscholar;
 
-import com.google.gson.Gson;
-import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.net.URLDownload;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.net.URLDownload;
+import org.jabref.model.entry.BibEntry;
+
+import com.google.gson.Gson;
+
 public class SemanticScholarFetcher implements CitationFetcher {
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
+
     @Override
     public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isPresent()) {
@@ -32,18 +33,8 @@ public class SemanticScholarFetcher implements CitationFetcher {
                         .fromJson(urlDownload.asString(), CitationsResponse.class);
 
                 return citationsResponse.getData()
-                        .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
-                        .map(citationDataItem -> {
-                            PaperDetails citingPaperDetails = citationDataItem.getCitingPaper();
-                            BibEntry bibEntry = new BibEntry();
-                            bibEntry.setField(StandardField.TITLE, citingPaperDetails.getTitle());
-                            if (citingPaperDetails.getYear() != null) {
-                                bibEntry.setField(StandardField.YEAR, citingPaperDetails.getYear());
-                            }
-
-                            return bibEntry;
-                }).toList();
-
+                            .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
+                            .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry()).toList();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -62,25 +53,16 @@ public class SemanticScholarFetcher implements CitationFetcher {
                     .append("?fields=").append("title,authors,year,citationCount,referenceCount")
                     .append("&limit=1000");
             try {
-                URL citationsUrl = URI.create(urlBuilder.toString()).toURL();
+                URL referencesUrl = URI.create(urlBuilder.toString()).toURL();
 
-                URLDownload urlDownload = new URLDownload(citationsUrl);
+                URLDownload urlDownload = new URLDownload(referencesUrl);
                 ReferencesResponse referencesResponse = new Gson()
                         .fromJson(urlDownload.asString(), ReferencesResponse.class);
 
                 return referencesResponse.getData()
-                        .stream().filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
-                        .map(referenceDataItem -> {
-                            PaperDetails citedPaperDetails = referenceDataItem.getCitedPaper();
-                            BibEntry bibEntry = new BibEntry();
-                            bibEntry.setField(StandardField.TITLE, citedPaperDetails.getTitle());
-                            if (citedPaperDetails.getYear() != null) {
-                                bibEntry.setField(StandardField.YEAR, citedPaperDetails.getYear());
-                            }
-
-                            return bibEntry;
-                        }).toList();
-
+                             .stream()
+                             .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
+                             .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

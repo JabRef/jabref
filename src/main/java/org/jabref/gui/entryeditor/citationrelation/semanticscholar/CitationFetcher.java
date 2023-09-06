@@ -22,7 +22,6 @@ public interface CitationFetcher {
         SearchType(String label) {
             this.label = label;
         }
-
     }
 
     /**
