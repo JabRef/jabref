@@ -1,10 +1,10 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
+import java.util.List;
+
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
-
-import java.util.List;
 
 public class BibEntryRelationsRepository {
     private final SemanticScholarFetcher fetcher;

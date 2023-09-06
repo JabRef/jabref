@@ -22,6 +22,7 @@ public class BibEntryView {
 
     /**
      * Creates a layout for a given {@link BibEntry} to be displayed in a List
+     *
      * @param entry {@link BibEntry} to display
      * @return layout container displaying the entry
      */
@@ -56,6 +57,7 @@ public class BibEntryView {
 
     /**
      * Gets the correct Icon for a given {@link EntryType}
+     *
      * @param type {@link EntryType} to get Icon for
      * @return Icon corresponding to {@link EntryType}
      */

@@ -1,6 +1,11 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
-import com.tobiasdiez.easybind.EasyBind;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -17,10 +22,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-
-import org.controlsfx.control.CheckListView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -41,13 +43,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.CheckListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.undo.UndoManager;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * GUI for tab displaying an articles citation relations in two lists based on the currently selected BibEntry
@@ -382,11 +381,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         });
     }
 
-    private void hideNodes(Node...nodes) {
+    private void hideNodes(Node... nodes) {
         Arrays.stream(nodes).forEach(node -> node.setVisible(false));
     }
 
-    private void showNodes(Node ... nodes) {
+    private void showNodes(Node... nodes) {
         Arrays.stream(nodes).forEach(node -> node.setVisible(true));
     }
 
