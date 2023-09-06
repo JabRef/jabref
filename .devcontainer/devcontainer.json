@@ -1,6 +1,6 @@
 {
     "name": "Java",
-    "image": "mcr.microsoft.com/vscode/devcontainers/base:bullseye",
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -14,7 +14,7 @@
 
     // Source code generation needs to be done before hand-over to VS Code.
     // Otherwise, the Java extension will go mad.
-    "onCreateCommand": "./gradlew testClasses --no-daemon",
+    "onCreateCommand": "./gradlew testClasses --console=plain --no-daemon",
 
     // Forward the vncPort and noVNC port.
     // They are provided by desktop-lite:
@@ -31,7 +31,7 @@
         // Install java.
         // See https://github.com/devcontainers/features/tree/main/src/java#options for details.
         "ghcr.io/devcontainers/features/java:1": {
-            "version": "19.0.2-tem",
+            "version": "20.0.2-tem",
             "installGradle": false,
             "jdkDistro": "tem"
         }

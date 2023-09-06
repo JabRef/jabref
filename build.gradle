@@ -48,6 +48,7 @@ java {
     modularity.inferModulePath.set(false)
 
     toolchain {
+        // If this is updated, also update .devcontainer/devcontainer.json#L34
         languageVersion = JavaLanguageVersion.of(20)
     }
 }
