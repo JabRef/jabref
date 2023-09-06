@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.citationrelation;
+package org.jabref.gui.entryeditor.citationrelationtab;
 
 import org.jabref.model.entry.BibEntry;
 

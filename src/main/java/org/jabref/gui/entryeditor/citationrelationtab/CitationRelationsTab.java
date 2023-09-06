@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.citationrelation;
+package org.jabref.gui.entryeditor.citationrelationtab;
 
 import com.tobiasdiez.easybind.EasyBind;
 import javafx.beans.binding.Bindings;
@@ -28,8 +28,8 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.entryeditor.citationrelation.semanticscholar.CitationFetcher;
-import org.jabref.gui.entryeditor.citationrelation.semanticscholar.SemanticScholarFetcher;
+import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
+import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;

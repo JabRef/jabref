@@ -1,6 +1,6 @@
-package org.jabref.gui.entryeditor.citationrelation;
+package org.jabref.gui.entryeditor.citationrelationtab;
 
-import org.jabref.gui.entryeditor.citationrelation.semanticscholar.SemanticScholarFetcher;
+import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 
