@@ -19,6 +19,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Fixed
 
 - It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
+- Passwords can be stored in GNOME key ring. [#10274](https://github.com/JabRef/jabref/issues/10274)
 
 ### Removed
 
