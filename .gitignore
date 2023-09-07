@@ -37,6 +37,7 @@ snap/.snapcraft/
 
 # flatpak
 flatpak/.buildconfig
+flatpak/jabref-portable_linux.tar.gz
 flatpak/JabRef-portable_linux.tar.gz
 
 # Gradle

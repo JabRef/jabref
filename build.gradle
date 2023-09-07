@@ -554,7 +554,7 @@ jpackage.dependsOn deleteInstallerTemp
 jlink {
     addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
     launcher {
-        name = 'JabRef'
+        name = 'jabref'
     }
 
     addOptions("--bind-services")
@@ -627,7 +627,7 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.ico",
             ]
             installerOptions = [
-                    '--vendor', 'JabRef',
+                    '--vendor', 'JabRef e.V.',
                     '--app-version', "${project.version}",
                     '--verbose',
                     '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
@@ -649,7 +649,7 @@ jlink {
             ]
             installerOptions = [
                     '--verbose',
-                    '--vendor', 'JabRef',
+                    '--vendor', 'JabRef e.V.',
                     '--app-version', "${project.version}",
                     // '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/linux",
@@ -688,7 +688,7 @@ if (OperatingSystem.current().isWindows()) {
             from("${projectDir}/buildres/windows") {
                 include "jabref-firefox.json", "jabref-chrome.json", "JabRefHost.bat", "JabRefHost.ps1"
             }
-            into "$buildDir/distribution/JabRef"
+            into "$buildDir/distribution/jabref"
         }
     }
 }
@@ -699,7 +699,7 @@ if (OperatingSystem.current().isLinux()) {
             from("${projectDir}/buildres/linux") {
                 include "native-messaging-host/**", "jabrefHost.py"
             }
-            into "$buildDir/distribution/JabRef/lib"
+            into "$buildDir/distribution/jabref/lib"
         }
     }
 }

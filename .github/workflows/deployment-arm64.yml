@@ -64,7 +64,7 @@ jobs:
           java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
-      - name: setup jdk JabRef-fix mac
+      - name: setup jdk jabref-fix mac
         shell: bash
         run: |
             mkdir ${{runner.temp}}/jdk
@@ -114,8 +114,8 @@ jobs:
           --verbose \
           --mac-sign \
           --vendor JabRef \
-          --mac-package-identifier Jabref \
-          --mac-package-name JabRef \
+          --mac-package-identifier JabRef \
+          --mac-package-name "JabRef e.V." \
           --type dmg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
           --mac-entitlements buildres/mac/jabref.entitlements \
@@ -135,8 +135,8 @@ jobs:
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
           --mac-sign \
-          --vendor JabRef \
-          --mac-package-identifier Jabref \
+          --vendor "JabRef e.V." \
+          --mac-package-identifier JabRef \
           --mac-package-name JabRef \
           --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
@@ -148,22 +148,22 @@ jobs:
       - name: Rename files with arm64 suffix as well
         shell: bash
         run: |
-          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg
-          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
+          mv build/distribution/jabref-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/jabref-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg
+          mv build/distribution/jabref-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/jabref-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
       - name: Notarize dmg
         if: (startsWith(github.ref, 'refs/tags/') || (${{ inputs.notarization }}))
         shell: bash
         run: |
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}" --keychain ${{runner.temp}}/keychain/notarization.keychain
-          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
-          xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg
+          xcrun notarytool submit build/distribution/jabref-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
+          xcrun stapler staple build/distribution/jabref-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg
       - name: Notarize pkg
         if: (startsWith(github.ref, 'refs/tags/') || (${{ inputs.notarization }}))
         shell: bash
         run: |
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}" --keychain ${{runner.temp}}/keychain/notarization.keychain
-          xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
-          xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
+          xcrun notarytool submit build/distribution/jabref-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg --keychain-profile "notarytool-profile" --keychain ${{runner.temp}}/keychain/notarization.keychain --wait
+          xcrun stapler staple build/distribution/jabref-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
       - name: Upload with rsync
         if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
         shell: bash
@@ -178,5 +178,5 @@ jobs:
         if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
         uses: actions/upload-artifact@v3
         with:
-          name: JabRef-${{ matrix.displayName }}
+          name: jabref-${{ matrix.displayName }}
           path: build/distribution
