@@ -46,11 +46,11 @@ jobs:
             archivePortable: tar -c -C build/distribution jabref | pigz --rsyncable > build/distribution/jabref-portable_linux.tar.gz && rm -R build/distribution/jabref
             eaJdk: https://files.jabref.org/jdks/jdk-linux-x64.tar.gz
           - os: windows-latest
-            displayName: windows
+            displayName: Windows
             archivePortable: 7z a -r build/distribution/jabref-portable_windows.zip ./build/distribution/jabref && rm -R build/distribution/jabref
             eaJDK: https://files.jabref.org/jdks/jdk-windows-x64.zip
           - os: macos-latest
-            displayName: macos
+            displayName: macOS
             eaJDK: https://files.jabref.org/jdks/jdk-macos-x64.tar.gz
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
