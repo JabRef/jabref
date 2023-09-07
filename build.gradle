@@ -82,7 +82,6 @@ sourceSets {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
@@ -168,23 +167,19 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
-    implementation('org.jabref:afterburner.fx:1.1.0-SNAPSHOT') {
-        exclude group: 'org.openjfx'
-    }
+    implementation('org.jabref:afterburner.fx:1.1.0-SNAPSHOT')
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT') {
-        exclude group: 'org.javafx'
-    }
+    implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
     implementation 'org.fxmisc.flowless:flowless:0.7.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.1'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.77.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
         // JabRef selects JavaFX version
-        exclude group: 'org.openjfx'
+       // exclude group: 'org.openjfx'
     }
 
     implementation 'org.controlsfx:controlsfx:11.1.2'
