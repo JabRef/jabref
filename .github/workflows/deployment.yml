@@ -283,7 +283,7 @@ jobs:
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
-      - name: Get macos binaries
+      - name: Get macOS binaries
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: actions/download-artifact@master
         with:
