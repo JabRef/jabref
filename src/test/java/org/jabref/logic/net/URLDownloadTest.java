@@ -131,7 +131,7 @@ public class URLDownloadTest {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
 
         Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertTrue(exception.getCause() instanceof FetcherServerException);
+        assertInstanceOf(FetcherServerException.class, exception.getCause());
     }
 
     @Test
@@ -139,6 +139,6 @@ public class URLDownloadTest {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
 
         Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertTrue(exception.getCause() instanceof FetcherClientException);
+        assertInstanceOf(FetcherClientException.class, exception.getCause());
     }
 }

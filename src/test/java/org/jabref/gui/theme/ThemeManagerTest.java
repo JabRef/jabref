@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
+import org.junit.jupiter.api.Assertions;
 
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -194,11 +195,9 @@ class ThemeManagerTest {
             webEngineStyleSheetLocation.complete(webEngine.getUserStyleSheetLocation());
         });
 
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             assertEquals(webEngineStyleSheetLocation.get(), TEST_CSS_DATA);
-        } catch (InterruptedException | ExecutionException e) {
-            fail(e);
-        }
+        });
     }
 
     /**
