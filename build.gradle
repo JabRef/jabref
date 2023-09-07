@@ -11,7 +11,7 @@ plugins {
 
     id 'org.javamodularity.moduleplugin' version '1.8.12'
 
-    id 'org.openjfx.javafxplugin' version '0.0.14'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 
     id 'org.beryx.jlink' version '2.26.0'
 
@@ -83,7 +83,6 @@ sourceSets {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
@@ -169,13 +168,12 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
-
-    implementation 'org.jabref:afterburner.fx:1.1.0-SNAPSHOT'
+    implementation('org.jabref:afterburner.fx:1.1.0-SNAPSHOT')
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
+    implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
     implementation 'org.fxmisc.flowless:flowless:0.7.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.1'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.77.0') {
@@ -196,7 +194,9 @@ dependencies {
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     implementation 'org.slf4j:jul-to-slf4j:2.0.7'
 
-    implementation 'de.undercouch:citeproc-java:3.0.0-beta.2'
+    implementation('de.undercouch:citeproc-java:3.0.0-beta.2') {
+        exclude group: 'org.antlr'
+    }
 
     // jakarta.activation is already dependency of glassfish
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
@@ -714,24 +714,9 @@ if (OperatingSystem.current().isMacOsX()) {
         }
     }
 }
+
 jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
-}
-
-// Source: https://stackoverflow.com/a/44168582/873282
-task downloadDependencies {
-    description "Pre-downloads *most* dependencies"
-    doLast {
-        configurations.getAsMap().each { name, config ->
-            println "Retrieving dependencies for $name"
-            try {
-                config.files
-            } catch (e) {
-                // some cannot be resolved, just log them
-                project.logger.info e.message
-            }
-        }
-    }
 }
