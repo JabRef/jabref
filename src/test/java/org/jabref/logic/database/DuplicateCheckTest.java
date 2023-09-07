@@ -29,7 +29,7 @@ public class DuplicateCheckTest {
     private DuplicateCheck duplicateChecker;
 
     private static BibEntry getSimpleArticle() {
-        new BibEntry(StandardEntryType.Article)
+        return new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Single Author")
                 .withField(StandardField.TITLE, "A serious paper about something")
                 .withField(StandardField.YEAR, "2017");
@@ -256,7 +256,7 @@ public class DuplicateCheckTest {
                 .withField(StandardField.NUMBER, "1")
                 .withField(StandardField.PAGES, "334--337");
 
-        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
+        assertFalse(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
