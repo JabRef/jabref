@@ -2239,13 +2239,13 @@ public class JabRefPreferences implements PreferencesService {
     private SaveOrder getExportSaveOrder() {
         List<SaveOrder.SortCriterion> sortCriteria = new ArrayList<>();
 
-        if (!get(EXPORT_PRIMARY_SORT_FIELD).equals("")) {
+        if (!"".equals(get(EXPORT_PRIMARY_SORT_FIELD))) {
             sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)));
         }
-        if (!get(EXPORT_SECONDARY_SORT_FIELD).equals("")) {
+        if (!"".equals(get(EXPORT_SECONDARY_SORT_FIELD))) {
             sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)));
         }
-        if (!get(EXPORT_TERTIARY_SORT_FIELD).equals("")) {
+        if (!"".equals(get(EXPORT_TERTIARY_SORT_FIELD))) {
             sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
         }
 
