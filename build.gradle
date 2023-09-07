@@ -179,8 +179,6 @@ dependencies {
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.77.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
-        // JabRef selects JavaFX version
-       // exclude group: 'org.openjfx'
     }
 
     implementation 'org.controlsfx:controlsfx:11.1.2'
