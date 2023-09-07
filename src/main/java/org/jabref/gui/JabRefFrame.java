@@ -325,7 +325,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         if (!telemetryPreferences.shouldCollectTelemetry()) {
             shouldCollect = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Telemetry: Help make JabRef better"),
-                    Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via Options -> Preferences -> General."),
+                    Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via File -> Preferences -> General."),
                     Localization.lang("Share anonymous statistics"),
                     Localization.lang("Don't share"));
         }
