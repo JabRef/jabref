@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 public class ImportEntriesViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;

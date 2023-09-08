@@ -24,7 +24,7 @@ public class AbbreviationParser {
 
     /*
      * Read the given file, which should contain a list of journal names and their abbreviations. Each line should be
-     * formatted as: "Full Journal Name,Abbr. Journal Name,[Shortest Unique Abbreviation]"
+     * formatted as: "Full Journal Name,Abbr. Journal Name[,Shortest Unique Abbreviation]"
      * Tries to detect the delimiter, if comma or semicolon is used to ensure backwards compatibility
      *
      * @param file Path the given file

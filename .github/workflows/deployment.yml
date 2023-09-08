@@ -1,12 +1,6 @@
 name: Deployment
 
 on:
-  workflow_dispatch:
-    inputs:
-      notarization:
-        type: boolean
-        required: false
-        default: false
   push:
     branches:
       - main
@@ -18,11 +12,13 @@ on:
     tags:
        - '*'
   pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - 'src/test/**'
-      - 'README.md'
   merge_group:
+  workflow_dispatch:
+    inputs:
+      notarization:
+        type: boolean
+        required: false
+        default: false
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -35,7 +31,7 @@ env:
   JDK21: ""
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -71,9 +67,11 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - name: Install pigz and cache (linux)
         if: (matrix.os == 'ubuntu-latest')
         uses: awalsh128/cache-apt-pkgs-action@latest
@@ -256,6 +254,7 @@ jobs:
     name: Notarize and package Mac OS binaries
     runs-on: macos-latest
     needs: [build]
+    if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -270,9 +269,11 @@ jobs:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
         if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - name: Install GitVersion
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: gittools/actions/gitversion/setup@v0.10.2
@@ -333,10 +334,11 @@ jobs:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Checkout source
         if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/checkout@v3
-      - name: Fetch all history for all tags and branches
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        run: git fetch --prune --unshallow
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - name: Install GitVersion
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: gittools/actions/gitversion/setup@v0.10.2

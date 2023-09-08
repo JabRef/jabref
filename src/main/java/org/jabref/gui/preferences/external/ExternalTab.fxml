@@ -55,7 +55,7 @@
 
             <Label text="%Cite command" GridPane.rowIndex="2"/>
             <TextField fx:id="citeCommand"
-                       prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                       prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
         </GridPane>
     </HBox>
 

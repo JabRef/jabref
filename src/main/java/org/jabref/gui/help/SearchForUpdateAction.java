@@ -13,7 +13,10 @@ public class SearchForUpdateAction extends SimpleCommand {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
-    public SearchForUpdateAction(BuildInfo buildInfo, PreferencesService preferencesService, DialogService dialogService, TaskExecutor taskExecutor) {
+    public SearchForUpdateAction(BuildInfo buildInfo,
+                                 PreferencesService preferencesService,
+                                 DialogService dialogService,
+                                 TaskExecutor taskExecutor) {
         this.buildInfo = buildInfo;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;

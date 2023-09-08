@@ -34,6 +34,9 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import org.jvnet.hk2.annotations.Contract;
+
+@Contract
 public interface PreferencesService {
 
     void clear() throws BackingStoreException;

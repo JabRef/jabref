@@ -22,7 +22,7 @@ env:
   JAVA_OPTS: -Xmx4g
 
 concurrency:
-  group: ${{ github.ref }}-arm64mac
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -46,9 +46,11 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.10.2
         with:

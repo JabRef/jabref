@@ -26,6 +26,9 @@ public class JournalAbbreviationRepository {
     private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
 
+    /**
+     * Initializes the internal data based on the abbreviations found in the given MV file
+     */
     public JournalAbbreviationRepository(Path journalList) {
         MVMap<String, Abbreviation> mvFullToAbbreviationObject;
         try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
@@ -44,6 +47,21 @@ public class JournalAbbreviationRepository {
                 shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
             });
         }
+    }
+
+    /**
+     * Initializes the repository with demonstration data. Used if no abbreviation file is found.
+     */
+    public JournalAbbreviationRepository() {
+        Abbreviation newAbbreviation = new Abbreviation(
+                "Demonstration",
+                "Demo",
+                "Dem"
+        );
+        fullToAbbreviationObject.put("Demonstration", newAbbreviation);
+        abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
+        dotlessToAbbreviationObject.put("Demo", newAbbreviation);
+        shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {

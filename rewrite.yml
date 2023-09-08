@@ -99,7 +99,17 @@ recipeList:
   # We voted against it
   #  - org.openrewrite.staticanalysis.ExplicitInitialization
 
+  - org.openrewrite.java.migrate.io.ReplaceFileInOrOutputStreamFinalizeWithClose
+
+  - org.openrewrite.java.recipes.UseJavaParserBuilderInJavaTemplate
+
   - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
+
+  - org.openrewrite.java.testing.junit5.AssertTrueInstanceofToAssertInstanceOf
+  - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
+
+  # needs another openrewrite dependency
+  # - org.openrewrite.okhttp.ReorderRequestBodyCreateArguments
 
   - org.openrewrite.staticanalysis.AtomicPrimitiveEqualsUsesGet
   - org.openrewrite.staticanalysis.BigDecimalRoundingConstantsToEnums
@@ -116,6 +126,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.DefaultComesLast
   - org.openrewrite.staticanalysis.EmptyBlock
   - org.openrewrite.staticanalysis.EqualsAvoidsNull
+  - org.openrewrite.staticanalysis.EqualsToContentEquals
   # Needs manual intervention
 #  - org.openrewrite.staticanalysis.ExplicitCharsetOnStringGetBytes
   - org.openrewrite.staticanalysis.ExternalizableHasNoArgsConstructor
@@ -150,7 +161,9 @@ recipeList:
   - org.openrewrite.staticanalysis.RemoveEmptyJavaDocParameters
   - org.openrewrite.staticanalysis.RemoveExtraSemicolons
   - org.openrewrite.staticanalysis.RemoveJavaDocAuthorTag
+  - org.openrewrite.staticanalysis.RemoveHashCodeCallsFromArrayInstances
   - org.openrewrite.staticanalysis.RemoveRedundantTypeCast
+  - org.openrewrite.staticanalysis.RemoveToStringCallsFromArrayInstances
   - org.openrewrite.staticanalysis.RemoveUnneededAssertion
   - org.openrewrite.staticanalysis.RemoveUnneededBlock
 #  - org.openrewrite.staticanalysis.RemoveUnusedLocalVariables
@@ -159,12 +172,14 @@ recipeList:
   - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrTostring
   - org.openrewrite.staticanalysis.ReplaceRedundantFormatWithPrintf
   - org.openrewrite.staticanalysis.ReplaceStringBuilderWithString
+  - org.openrewrite.staticanalysis.ReplaceWeekYearWithYear
 #  - org.openrewrite.staticanalysis.ShortenFullyQualifiedTypeReferences
 #  - org.openrewrite.staticanalysis.SimplifyConsecutiveAssignments
 #  - org.openrewrite.staticanalysis.SimplifyCompoundStatement
   - org.openrewrite.staticanalysis.SimplifyBooleanExpression
   - org.openrewrite.staticanalysis.SimplifyBooleanReturn
   - org.openrewrite.staticanalysis.SimplifyDurationCreationUnits
+  - org.openrewrite.staticanalysis.SortedSetStreamToLinkedHashSet
   - org.openrewrite.staticanalysis.StaticMethodNotFinal
   - org.openrewrite.staticanalysis.StringLiteralEquality
   - org.openrewrite.staticanalysis.TypecastParenPad
@@ -175,7 +190,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.UseListSort
   - org.openrewrite.staticanalysis.UseObjectNotifyAll
   - org.openrewrite.staticanalysis.UseStandardCharset
-#  - org.openrewrite.staticanalysis.UseStringReplace
+  - org.openrewrite.staticanalysis.UseStringReplace
   - org.openrewrite.staticanalysis.UseSystemLineSeparator
   - org.openrewrite.staticanalysis.WhileInsteadOfFor
 #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
