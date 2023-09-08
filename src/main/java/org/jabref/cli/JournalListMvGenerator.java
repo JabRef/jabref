@@ -19,7 +19,7 @@ import org.jooq.lambda.Unchecked;
 public class JournalListMvGenerator {
 
     public static void main(String[] args) throws IOException {
-        boolean verbose = (args.length == 1) && (args[0].equals("--verbose"));
+        boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
 
         Path abbreviationsDirectory = Path.of("buildres", "abbrv.jabref.org", "journals");
         if (!Files.exists(abbreviationsDirectory)) {
