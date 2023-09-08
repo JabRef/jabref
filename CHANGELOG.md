@@ -59,6 +59,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added the option to automatically replaces illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
 - We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
 - We added a tooltip to show the number of entries in a group [#10208](https://github.com/JabRef/jabref/issues/10208)
+- We added a new button that opens a web page in the default browser, allowing the user to get new themes for the application. [#10243](https://github.com/JabRef/jabref/issues/10243)(https://github.com/JabRef/jabref/issues/10243)
 
 ### Changed
 
