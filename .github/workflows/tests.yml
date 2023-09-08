@@ -87,8 +87,7 @@ jobs:
           set -e
           curl -Ls https://sh.jbang.dev | bash -s - app setup
           source ~/.zshrc
-          jbang --version
-          jbang https://raw.githubusercontent.com/nbbrd/jbang-catalog/master/heylogs.java check CHANGELOG.md > heylogs.txt
+          jbang .github/heylogs.java check CHANGELOG.md > heylogs.txt
           # We have 7 "valid" issues in CHANGELOG.md
           awk '$0 ~ "7 problems" { exit 1; }' < heylogs.txt
   tests:
