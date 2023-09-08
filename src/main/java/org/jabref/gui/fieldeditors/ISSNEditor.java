@@ -33,6 +33,10 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                       SuggestionProvider<?> suggestionProvider,
                       FieldCheckers fieldCheckers) {
 
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
+
         this.viewModel = new ISSNEditorViewModel(
                 field,
                 suggestionProvider,
@@ -40,10 +44,6 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                 taskExecutor,
                 dialogService,
                 undoManager);
-
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.initContextMenu(new DefaultMenu(textArea));

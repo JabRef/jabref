@@ -92,11 +92,11 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(field, databaseContext, (SuggestionProvider<BibEntry>) suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(field, suggestionProvider, fieldCheckers, isMultiLine);
+            return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isMultiLine, undoManager);
         } else if (StandardField.KEYWORDS == field) {
             return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager);
         } else if (field == InternalField.KEY_FIELD) {
-            return new CitationKeyEditor(field, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
+            return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext);
         } else if (field == StandardField.ISSN) {
             return new ISSNEditor(field, suggestionProvider, fieldCheckers);
         } else {

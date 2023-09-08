@@ -27,11 +27,11 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @Inject private PreferencesService preferencesService;
 
     public DateEditor(Field field, DateTimeFormatter dateFormatter, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers, undoManager);
-
         ViewLoader.view(this)
                   .root(this)
                   .load();
+
+        this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers, undoManager);
 
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
         datePicker.getEditor().textProperty().bindBidirectional(viewModel.textProperty());

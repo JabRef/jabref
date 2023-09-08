@@ -15,21 +15,18 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
-import jakarta.inject.Inject;
-
 public class PersonsEditor extends HBox implements FieldEditorFX {
 
     private final PersonsEditorViewModel viewModel;
     private final TextInputControl textInput;
     private final UiThreadStringProperty decoratedStringProperty;
 
-    @Inject private PreferencesService preferencesService;
-    @Inject private UndoManager undoManager;
-
     public PersonsEditor(final Field field,
                          final SuggestionProvider<?> suggestionProvider,
+                         final PreferencesService preferencesService,
                          final FieldCheckers fieldCheckers,
-                         final boolean isMultiLine) {
+                         final boolean isMultiLine,
+                         final UndoManager undoManager) {
         this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferencesService.getAutoCompletePreferences(), fieldCheckers, undoManager);
 
         textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();

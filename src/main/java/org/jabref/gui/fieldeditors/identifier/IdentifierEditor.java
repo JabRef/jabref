@@ -26,6 +26,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
@@ -47,6 +48,11 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     public IdentifierEditor(Field field,
                             SuggestionProvider<?> suggestionProvider,
                             FieldCheckers fieldCheckers) {
+
+        // Viewloader must be called after the viewmodel is loaded,
+        // but we need the injected vars to create the viewmodels.
+        Injector.registerExistingAndInject(this);
+
         if (StandardField.DOI == field) {
             this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
         } else if (StandardField.ISBN == field) {

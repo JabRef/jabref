@@ -27,14 +27,13 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
     public OwnerEditor(Field field,
                        SuggestionProvider<?> suggestionProvider,
                        FieldCheckers fieldCheckers) {
-        this.viewModel = new OwnerEditorViewModel(field, suggestionProvider, preferencesService, fieldCheckers, undoManager);
-
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
+        this.viewModel = new OwnerEditorViewModel(field, suggestionProvider, preferencesService, fieldCheckers, undoManager);
 
+        textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.initContextMenu(EditorMenus.getNameMenu(textArea));
 
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);

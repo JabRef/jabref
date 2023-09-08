@@ -37,6 +37,10 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                          SuggestionProvider<?> suggestionProvider,
                          FieldCheckers fieldCheckers) {
 
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
+
         this.viewModel = new JournalEditorViewModel(
                 field,
                 suggestionProvider,
@@ -45,10 +49,6 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                 taskExecutor,
                 dialogService,
                 undoManager);
-
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
 
         textField.textProperty().bindBidirectional(viewModel.textProperty());
         textField.initContextMenu(new DefaultMenu(textField));
