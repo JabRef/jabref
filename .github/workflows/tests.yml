@@ -73,6 +73,14 @@ jobs:
         with:
           args: CHANGELOG.md CONTRIBUTING.md README.md
           config: '.markdownlint.yml'
+      - name: Lint CHANGELOG.md
+        run: |
+          set -e
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          source ~/.zshrc
+          jbang https://raw.githubusercontent.com/nbbrd/jbang-catalog/master/heylogs.java check CHANGELOG.md > build/heylogs.txt
+          # We have 7 "valid" issues in CHANGELOG.md
+          awk '$0 ~ "7 problems" { exit 1; }' < build/heylogs.txt
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
