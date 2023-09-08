@@ -139,7 +139,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     @FXML
-    private void openLink() {
+    private void openBrowser() {
         String url = "https://themes.jabref.org";
         try {
             java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
