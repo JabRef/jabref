@@ -103,7 +103,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     public GroupDialogView(BibDatabaseContext currentDatabase,
                            AbstractGroup editedGroup,
                            GroupDialogHeader groupDialogHeader) {
-
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
 
@@ -131,7 +130,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-
         viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, fileUpdateMonitor);
 
         setResultConverter(viewModel::resultConverter);
