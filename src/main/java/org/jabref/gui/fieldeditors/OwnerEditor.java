@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
@@ -12,17 +14,20 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class OwnerEditor extends HBox implements FieldEditorFX {
 
     @FXML private OwnerEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
+    @Inject private PreferencesService preferencesService;
+    @Inject private UndoManager undoManager;
+
     public OwnerEditor(Field field,
-                       PreferencesService preferences,
                        SuggestionProvider<?> suggestionProvider,
                        FieldCheckers fieldCheckers) {
-        this.viewModel = new OwnerEditorViewModel(field, suggestionProvider, preferences, fieldCheckers);
+        this.viewModel = new OwnerEditorViewModel(field, suggestionProvider, preferencesService, fieldCheckers, undoManager);
 
         ViewLoader.view(this)
                   .root(this)
@@ -32,7 +37,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
 
         textArea.initContextMenu(EditorMenus.getNameMenu(textArea));
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public OwnerEditorViewModel getViewModel() {

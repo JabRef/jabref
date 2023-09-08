@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors.identifier;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -12,8 +14,13 @@ import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.preferences.PreferencesService;
 
 public class ISBNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<ISBN> {
-    public ISBNIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
-        super(StandardField.ISBN, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+    public ISBNIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
+                                         FieldCheckers fieldCheckers,
+                                         DialogService dialogService,
+                                         TaskExecutor taskExecutor,
+                                         PreferencesService preferences,
+                                         UndoManager undoManager) {
+        super(StandardField.ISBN, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         configure(true, false);
     }
 

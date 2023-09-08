@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -17,32 +19,32 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class JournalEditor extends HBox implements FieldEditorFX {
 
     @FXML private JournalEditorViewModel viewModel;
     @FXML private EditorTextField textField;
     @FXML private Button journalInfoButton;
-    private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private JournalAbbreviationRepository abbreviationRepository;
+    @Inject private UndoManager undoManager;
 
     public JournalEditor(Field field,
-                         TaskExecutor taskExecutor,
-                         DialogService dialogService,
-                         JournalAbbreviationRepository journalAbbreviationRepository,
-                         PreferencesService preferences,
                          SuggestionProvider<?> suggestionProvider,
                          FieldCheckers fieldCheckers) {
-        this.dialogService = dialogService;
-        this.preferencesService = preferences;
 
         this.viewModel = new JournalEditorViewModel(
                 field,
                 suggestionProvider,
-                journalAbbreviationRepository,
+                abbreviationRepository,
                 fieldCheckers,
                 taskExecutor,
-                dialogService);
+                dialogService,
+                undoManager);
 
         ViewLoader.view(this)
                   .root(this)
@@ -53,7 +55,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
         AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public JournalEditorViewModel getViewModel() {

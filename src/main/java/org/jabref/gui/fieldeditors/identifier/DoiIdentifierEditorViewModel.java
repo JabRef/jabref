@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors.identifier;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -21,8 +23,13 @@ import org.slf4j.LoggerFactory;
 public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<DOI> {
     public static final Logger LOGGER = LoggerFactory.getLogger(DoiIdentifierEditorViewModel.class);
 
-    public DoiIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
-        super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+    public DoiIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
+                                        FieldCheckers fieldCheckers,
+                                        DialogService dialogService,
+                                        TaskExecutor taskExecutor,
+                                        PreferencesService preferences,
+                                        UndoManager undoManager) {
+        super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         configure(true, true);
     }
 

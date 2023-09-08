@@ -2,6 +2,8 @@ package org.jabref.gui.fieldeditors.identifier;
 
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -24,6 +26,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
@@ -31,20 +34,23 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextArea textArea;
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
+
+    @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private PreferencesService preferencesService;
+    @Inject private UndoManager undoManager;
+
     private Optional<BibEntry> entry;
 
     public IdentifierEditor(Field field,
-                            TaskExecutor taskExecutor,
-                            DialogService dialogService,
                             SuggestionProvider<?> suggestionProvider,
-                            FieldCheckers fieldCheckers,
-                            PreferencesService preferences) {
+                            FieldCheckers fieldCheckers) {
         if (StandardField.DOI == field) {
-            this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+            this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
         } else if (StandardField.ISBN == field) {
-            this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+            this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
         } else if (StandardField.EPRINT == field) {
-            this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+            this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
         } else {
             throw new IllegalStateException(String.format("Unable to instantiate a view model for identifier field editor '%s'", field.getDisplayName()));
         }
@@ -66,7 +72,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
             textArea.initContextMenu(new DefaultMenu(textArea));
         }
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public BaseIdentifierEditorViewModel<?> getViewModel() {
