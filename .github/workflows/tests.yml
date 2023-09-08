@@ -68,6 +68,15 @@ jobs:
           # enable failing of this task if modernizer complains
           sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
           ./gradlew modernizer
+  markdown-checks:
+    name: Markdown style check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
