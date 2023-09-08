@@ -90,7 +90,7 @@ jobs:
           jbang .github/heylogs.java check CHANGELOG.md > heylogs.txt
           cat heylogs.txt
           # We have 7 "valid" issues in CHANGELOG.md
-          awk '$0 ~ "7 problems" { exit 1; }' < heylogs.txt
+          grep -q "7 problems" heylogs.txt || exit 1
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
