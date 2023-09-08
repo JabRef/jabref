@@ -85,13 +85,13 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
-      - name: Set up JDK
+      - name: Setup JDK
         uses: actions/setup-java@v3
         with:
           java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
-      - name: setup jdk JabRef-fix (windows)
+      - name: Setup JDK jabref-fix (Windows)
         if: (matrix.os == 'windows-latest')
         shell: bash
         run: |
@@ -105,7 +105,7 @@ jobs:
          cat gradle.properties
 
          sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
-      - name: setup jdk JabRef-fix (ubuntu)
+      - name: Setup JDK jabref-fix (ubuntu)
         if: (matrix.os == 'ubuntu-latest')
         shell: bash
         run: |
@@ -119,7 +119,7 @@ jobs:
           cat gradle.properties
 
           sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
-      - name: setup jdk JabRef-fix (macos)
+      - name: Setup JDK jabref-fix (macOS)
         if: (matrix.os == 'macos-latest')
         shell: bash
         run: |
@@ -134,14 +134,14 @@ jobs:
           cat gradle.properties
 
           sed -i'.bak' -e "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
-      - name: Setup OSX key chain (macos)
+      - name: Setup OSX key chain (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
-      - name: Setup OSX key chain on OSX for app id cert (macos)
+      - name: Setup OSX key chain on OSX for app id cert (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
         with:
@@ -149,7 +149,7 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Build runtime image (non-macos)
+      - name: Build runtime image (non-macOS)
         if: (matrix.os != 'macos-latest')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Prepare merged jars and modules dir (macos)
@@ -159,7 +159,7 @@ jobs:
         if: (matrix.os != 'macos-latest')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
-      - name: Build dmg (macos)
+      - name: Build dmg (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
@@ -172,8 +172,8 @@ jobs:
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
           --mac-sign \
-          --vendor JabRef \
-          --mac-package-identifier Jabref \
+          --vendor "JabRef e.V." \
+          --mac-package-identifier JabRef \
           --mac-package-name JabRef \
           --type dmg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
@@ -182,7 +182,7 @@ jobs:
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
           --jlink-options --bind-services
-      - name: Build pkg (macos)
+      - name: Build pkg (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
@@ -195,8 +195,8 @@ jobs:
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
           --mac-sign \
-          --vendor JabRef \
-          --mac-package-identifier Jabref \
+          --vendor "JabRef e.V." \
+          --mac-package-identifier JabRef \
           --mac-package-name JabRef \
           --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
@@ -205,7 +205,7 @@ jobs:
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
           --jlink-options --bind-services
-      - name: Package application image (non-macos)
+      - name: Package application image (non-macOS)
         if: (matrix.os != 'macos-latest')
         shell: bash
         run: ${{ matrix.archivePortable }}
@@ -237,13 +237,13 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
-      - name: Upload to GitHub workflow artifacts store (windows)
+      - name: Upload to GitHub workflow artifacts store (Windows)
         if: (matrix.os == 'windows-latest') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: actions/upload-artifact@v3
         with:
           name: JabRef-${{ matrix.displayName }}
           path: build/distribution
-      - name: Upload to GitHub workflow artifacts store (macos)
+      - name: Upload to GitHub workflow artifacts store (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: actions/upload-artifact@v3
         with:
@@ -251,7 +251,7 @@ jobs:
           name: JabRef-macOS-tbn
           path: build/distribution
   notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
-    name: Notarize and package Mac OS binaries
+    name: Notarize and package macOS binaries
     runs-on: macos-latest
     needs: [build]
     if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
@@ -348,7 +348,7 @@ jobs:
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
-      - name: Get windows binaries
+      - name: Get Windows binaries
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         uses: actions/download-artifact@master
         with:
