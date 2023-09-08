@@ -88,20 +88,24 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML private TextField texGroupFilePath;
 
-    @Inject private FileUpdateMonitor fileUpdateMonitor;
-
     private final EnumMap<GroupHierarchyType, String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-    private final GroupDialogViewModel viewModel;
 
-    public GroupDialogView(DialogService dialogService,
-                           BibDatabaseContext currentDatabase,
-                           PreferencesService preferencesService,
+    private final BibDatabaseContext currentDatabase;
+    private final AbstractGroup editedGroup;
+    private GroupDialogViewModel viewModel;
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
+
+    public GroupDialogView(BibDatabaseContext currentDatabase,
                            AbstractGroup editedGroup,
                            GroupDialogHeader groupDialogHeader) {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, fileUpdateMonitor);
+
+        this.currentDatabase = currentDatabase;
+        this.editedGroup = editedGroup;
 
         ViewLoader.view(this)
                   .load()
@@ -117,7 +121,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             this.setTitle(Localization.lang("Edit group") + " " + editedGroup.getName());
         }
 
-        setResultConverter(viewModel::resultConverter);
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
@@ -128,6 +131,11 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
+
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, fileUpdateMonitor);
+
+        setResultConverter(viewModel::resultConverter);
+
         hierarchyText.put(GroupHierarchyType.INCLUDING, Localization.lang("Union"));
         hierarchyToolTip.put(GroupHierarchyType.INCLUDING, Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
         hierarchyText.put(GroupHierarchyType.REFINING, Localization.lang("Intersection"));
