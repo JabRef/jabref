@@ -11,6 +11,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.EditorTextArea;
 import org.jabref.gui.fieldeditors.EditorValidator;
@@ -39,6 +40,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
     @Inject private UndoManager undoManager;
+    @Inject private StateManager stateManager;
 
     private Optional<BibEntry> entry;
 
@@ -46,9 +48,9 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                             SuggestionProvider<?> suggestionProvider,
                             FieldCheckers fieldCheckers) {
         if (StandardField.DOI == field) {
-            this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
+            this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
         } else if (StandardField.ISBN == field) {
-            this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
+            this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager, stateManager);
         } else if (StandardField.EPRINT == field) {
             this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferencesService, undoManager);
         } else {

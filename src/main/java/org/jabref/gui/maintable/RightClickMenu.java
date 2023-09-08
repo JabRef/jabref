@@ -81,8 +81,8 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), libraryTab.getUndoManager(), keyBindingRepository, entryTypesManager).asSubMenu(),
-                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(libraryTab, dialogService, stateManager, taskExecutor, preferencesService))
+                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, keyBindingRepository, entryTypesManager).asSubMenu(),
+                factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferencesService, undoManager))
         );
 
         return contextMenu;

@@ -415,7 +415,7 @@ public class EntryEditor extends BorderPane {
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        new FetchAndMergeEntry(libraryTab, taskExecutor, preferencesService, dialogService).fetchAndMerge(entry, fetcher);
+        new FetchAndMergeEntry(libraryTab.getBibDatabaseContext(), taskExecutor, preferencesService, dialogService, undoManager).fetchAndMerge(entry, fetcher);
     }
 
     public void setFocusToField(Field field) {
