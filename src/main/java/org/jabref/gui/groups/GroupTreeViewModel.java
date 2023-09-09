@@ -57,7 +57,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
             .getName()
             .compareToIgnoreCase(v2.getName());
-    private Optional<BibDatabaseContext> currentDatabase;
+    private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
     public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -159,9 +159,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
-                    dialogService,
                     database,
-                    preferences,
                     null,
                     groupDialogHeader));
 
@@ -245,9 +243,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void editGroup(GroupNodeViewModel oldGroup) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
-                    dialogService,
                     database,
-                    preferences,
                     oldGroup.getGroupNode().getGroup(),
                     GroupDialogHeader.SUBGROUP));
             newGroup.ifPresent(group -> {

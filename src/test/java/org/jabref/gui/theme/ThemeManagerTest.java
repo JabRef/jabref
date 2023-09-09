@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -18,6 +17,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.WorkspacePreferences;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,6 @@ import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -194,11 +193,9 @@ class ThemeManagerTest {
             webEngineStyleSheetLocation.complete(webEngine.getUserStyleSheetLocation());
         });
 
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             assertEquals(webEngineStyleSheetLocation.get(), TEST_CSS_DATA);
-        } catch (InterruptedException | ExecutionException e) {
-            fail(e);
-        }
+        });
     }
 
     /**
