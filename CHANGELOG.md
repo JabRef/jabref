@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
 - Passwords can be stored in GNOME key ring. [#10274](https://github.com/JabRef/jabref/issues/10274)
+- we fixed a bug where exception was raised when saving less than 3 export save order in preference. [#10157](https://github.com/JabRef/jabref/issues/10157)
 
 ### Removed
 
@@ -349,7 +350,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the shared database opening dialog to remember autosave folder and tick. [#7516](https://github.com/JabRef/jabref/issues/7516)
 - We fixed an issue where name formatter could not be saved. [#9120](https://github.com/JabRef/jabref/issues/9120)
 - We fixed a bug where after the export of Preferences, custom exports were duplicated. [#10176](https://github.com/JabRef/jabref/issues/10176)
-- we fixed a bug where exception was raised when saving less than 3 export save order in preference. [#10157](https://github.com/JabRef/jabref/issues/10157)
 
 ### Removed
 
