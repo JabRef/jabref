@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,8 +16,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.StringUtil;
 
-import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -35,21 +35,20 @@ public class PicaXmlParser implements Parser {
             DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document content = dbuild.parse(inputStream);
             return this.parseEntries(content);
-        } catch (ParserConfigurationException | SAXException | IOException exception) {
+        } catch (
+                ParserConfigurationException |
+                SAXException |
+                IOException exception) {
             throw new ParseException(exception);
         }
     }
 
     private List<BibEntry> parseEntries(Document content) {
-        List<BibEntry> result = new LinkedList<>();
+        List<BibEntry> result = new ArrayList<>();
 
         // used for creating test cases
         // XMLUtil.printDocument(content);
 
-        // Namespace srwNamespace = Namespace.getNamespace("srw","http://www.loc.gov/zing/srw/");
-
-        // Schleife ueber alle Teilergebnisse
-        // Element root = content.getDocumentElement();
         Element root = (Element) content.getElementsByTagName("zs:searchRetrieveResponse").item(0);
         Element srwrecords = getChild("zs:records", root);
         if (srwrecords == null) {
@@ -92,24 +91,22 @@ public class PicaXmlParser implements Parser {
         String url = null;
         String note = null;
 
-        String quelle = "";
-        String mak = "";
+        String source = "";
+        String bibliographicGenre = "";
         String subtitle = "";
 
         EntryType entryType = StandardEntryType.Book; // Default
-
-        // Alle relevanten Informationen einsammeln
 
         List<Element> datafields = getChildren("datafield", e);
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
             LOGGER.debug("tag: " + tag);
 
-            // mak
+            // genre/type of the entry https://swbtools.bsz-bw.de/cgi-bin/k10plushelp.pl?cmd=kat&val=0500&katalog=Standard
             if ("002@".equals(tag)) {
-                mak = getSubfield("0", datafield);
-                if (mak == null) {
-                    mak = "";
+                bibliographicGenre = getSubfield("0", datafield);
+                if (bibliographicGenre == null) {
+                    bibliographicGenre = "";
                 }
             }
 
@@ -285,7 +282,7 @@ public class PicaXmlParser implements Parser {
             if ("030F".equals(tag)) {
                 address = getSubfield("k", datafield);
 
-                if (!"proceedings".equals(entryType)) {
+                if (!"proceedings".equals(entryType.getName())) {
                     subtitle = getSubfield("a", datafield);
                 }
 
@@ -305,10 +302,10 @@ public class PicaXmlParser implements Parser {
             // Quelle unvollständig sind (z.B. nicht Serie
             // und Nummer angegeben werden)
             if ("039B".equals(tag)) {
-                quelle = getSubfield("8", datafield);
+                source = getSubfield("8", datafield);
             }
-            if ("046R".equals(tag) && ((quelle == null) || quelle.isEmpty())) {
-                quelle = getSubfield("a", datafield);
+            if ("046R".equals(tag) && ((source == null) || source.isEmpty())) {
+                source = getSubfield("a", datafield);
             }
 
             // URLs behandeln
@@ -318,12 +315,10 @@ public class PicaXmlParser implements Parser {
             }
         }
 
-        // Abfangen von Nulleintraegen
-        if (quelle == null) {
-            quelle = "";
+        if (source == null) {
+            source = "";
         }
 
-        // Nichtsortierzeichen entfernen
         if (author != null) {
             author = removeSortCharacters(author);
         }
@@ -337,23 +332,28 @@ public class PicaXmlParser implements Parser {
             subtitle = removeSortCharacters(subtitle);
         }
 
-        // Dokumenttyp bestimmen und Eintrag anlegen
-
-        if (mak.startsWith("As")) {
+        if (bibliographicGenre.startsWith("As")) {
             entryType = BibEntry.DEFAULT_TYPE;
 
-            if (quelle.contains("ISBN")) {
+            if (source.contains("ISBN")) {
                 entryType = StandardEntryType.InCollection;
             }
-            if (quelle.contains("ZDB-ID")) {
+            if (source.contains("ZDB-ID")) {
                 entryType = StandardEntryType.Article;
             }
-        } else if (mak.isEmpty()) {
+        } else if (bibliographicGenre.isEmpty()) {
             entryType = BibEntry.DEFAULT_TYPE;
-        } else if (mak.startsWith("O")) {
+        } else if (bibliographicGenre.startsWith("O")) {
+            // Oa is standalone so we assume we have a book
+            if (bibliographicGenre.startsWith("Oa") && isbn != null) {
+                entryType = StandardEntryType.Book;
+            }
+            // 0b is journal
+            if (bibliographicGenre.startsWith("Ob")) {
+                entryType = StandardEntryType.Article;
+            }
+        } else {
             entryType = BibEntry.DEFAULT_TYPE;
-            // FIXME: online only available in Biblatex
-            // entryType = "online";
         }
 
         /*
@@ -375,7 +375,7 @@ public class PicaXmlParser implements Parser {
         if (title != null) {
             result.setField(StandardField.TITLE, title);
         }
-        if (!Strings.isNullOrEmpty(subtitle)) {
+        if (!StringUtil.isNullOrEmpty(subtitle)) {
             // ensure that first letter is an upper case letter
             // there could be the edge case that the string is only one character long, therefore, this special treatment
             // this is Apache commons lang StringUtils.capitalize (https://commons.apache.org/proper/commons-lang/javadocs/api-release/org/apache/commons/lang3/StringUtils.html#capitalize%28java.lang.String%29), but we don't want to add an additional dependency  ('org.apache.commons:commons-lang3:3.4')
@@ -432,9 +432,9 @@ public class PicaXmlParser implements Parser {
             result.setField(StandardField.NOTE, note);
         }
 
-        if ("article".equals(entryType) && (journal != null)) {
+        if ("article".equals(entryType.getName()) && (journal != null)) {
             result.setField(StandardField.JOURNAL, journal);
-        } else if ("incollection".equals(entryType) && (booktitle != null)) {
+        } else if ("incollection".equals(entryType.getName()) && (booktitle != null)) {
             result.setField(StandardField.BOOKTITLE, booktitle);
         }
 
@@ -442,9 +442,9 @@ public class PicaXmlParser implements Parser {
     }
 
     private String getSubfield(String a, Element datafield) {
-        List<Element> liste = getChildren("subfield", datafield);
+        List<Element> subfields = getChildren("subfield", datafield);
 
-        for (Element subfield : liste) {
+        for (Element subfield : subfields) {
             if (subfield.getAttribute("code").equalsIgnoreCase(a)) {
                 return subfield.getTextContent();
             }
@@ -472,7 +472,7 @@ public class PicaXmlParser implements Parser {
     }
 
     private List<Element> getChildren(String name, Element e) {
-        List<Element> result = new LinkedList<>();
+        List<Element> result = new ArrayList<>();
         NodeList children = e.getChildNodes();
 
         int j = children.getLength();
