@@ -21,7 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
 - Passwords can be stored in GNOME key ring. [#10274](https://github.com/JabRef/jabref/issues/10274)
 - We fixed an issue where groups based on an aux file could not be created due to an exception [#10350](https://github.com/JabRef/jabref/issues/10350)
-- We fixed an issue where the JabRef browser extension could not communicate with JabRef under macOS due to missing files [#10308](https://github.com/JabRef/jabref/issues/10308)
+- We fixed an issue where the JabRef browser extension could not communicate with JabRef under macOS due to missing files. You should use the `.pkg` for the first installation as it updates all necessary files for the extension [#10308](https://github.com/JabRef/jabref/issues/10308)
 
 ### Removed
 
