@@ -72,7 +72,7 @@ public class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void authorsAreCorrectlyFormatted() throws Exception {
-        BibEntry bibEntry = new BibEntry(StandardEntryType.Misc)
+        BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Repository")
                 .withField(StandardField.SUBTITLE, "Eine Einführung")
                 .withField(StandardField.PUBLISHER, "De Gruyter Oldenbourg")

@@ -352,8 +352,6 @@ public class PicaXmlParser implements Parser {
             if (bibliographicGenre.startsWith("Ob")) {
                 entryType = StandardEntryType.Article;
             }
-        } else {
-            entryType = BibEntry.DEFAULT_TYPE;
         }
 
         /*
