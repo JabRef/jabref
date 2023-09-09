@@ -2259,7 +2259,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXPORT_IN_ORIGINAL_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.ORIGINAL);
         putBoolean(EXPORT_IN_SPECIFIED_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.SPECIFIED);
 
-        long saveOrderCount = saveOrder.getSortCriteria().stream().count();
+        long saveOrderCount = saveOrder.getSortCriteria().size();
         if (saveOrderCount >= 1) {
             put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().get(0).field.getName());
             putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(0).descending);
