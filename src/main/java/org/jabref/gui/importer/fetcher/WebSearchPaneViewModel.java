@@ -14,8 +14,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.Telemetry;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.CompositeIdFetcher;
@@ -158,7 +158,7 @@ public class WebSearchPaneViewModel {
         }
 
         final String finalFetcherName = fetcherName;
-        Globals.getTelemetryClient().ifPresent(client ->
+        Telemetry.getTelemetryClient().ifPresent(client ->
                 client.trackEvent("search", Map.of("fetcher", finalFetcherName), Map.of()));
 
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
