@@ -60,7 +60,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         stateManager.getActiveDatabase().ifPresentOrElse(
                 databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager)
                         .fetchAndMerge(entry, field),
-                () -> dialogService.notify(Localization.lang("No database selected"))
+                () -> dialogService.notify(Localization.lang("No library selected"))
         );
     }
 
