@@ -13,6 +13,8 @@ package org.jabref.logic.exporter;
         import org.jabref.model.entry.BibEntry;
 
         import org.apache.pdfbox.pdmodel.PDDocument;
+        import org.apache.pdfbox.pdmodel.PDPage;
+        import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 public class XmpPdfExporter extends Exporter {
 
@@ -29,20 +31,26 @@ public class XmpPdfExporter extends Exporter {
         Objects.requireNonNull(pdfFile);
         Objects.requireNonNull(entries);
 
+        Path filePath = pdfFile.toAbsolutePath();
+
         if (!pdfFile.toString().endsWith(".pdf")) {
             throw new IllegalArgumentException("Invalid PDF file extension");
         }
-
         try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage();
+            document.addPage(page);
 
-            document.save("C:/Users/wicht/Desktop/metadata.pdf");
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+            contentStream.beginText();
+            contentStream.newLineAtOffset(25, 500);
+            contentStream.showText("This PDF was created by JabRef. It demonstrates the embedding of BibTeX data in PDF files. Please open the file attachments view of your PDF viewer to see the attached files. Note that the normal usage is to embed the BibTeX data in an existing PDF.");
+            contentStream.endText();
+
+            document.save(filePath.toString());
             document.close();
 
-            // Embed metadata using XmpUtilWriter
             new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile, entries, databaseContext.getDatabase());
 
-            // Save the PDF to the specified file
-            document.save(pdfFile.toFile());
         } catch (IOException e) {
             throw new Exception("Error creating PDF", e);
         }
