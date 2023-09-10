@@ -280,7 +280,8 @@ public class OpenOfficePanel {
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,
-                    undoManager);
+                    undoManager,
+                    taskExecutor);
             tabContainer.addTab(libraryTab, true);
         }
     }

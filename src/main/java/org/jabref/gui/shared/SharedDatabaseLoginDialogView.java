@@ -18,6 +18,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -53,6 +54,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private UndoManager undoManager;
+    @Inject private TaskExecutor taskExecutor;
 
     private final JabRefFrame frame;
     private SharedDatabaseLoginDialogViewModel viewModel;
@@ -93,7 +95,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 stateManager,
                 entryTypesManager,
                 fileUpdateMonitor,
-                undoManager);
+                undoManager,
+                taskExecutor);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
 

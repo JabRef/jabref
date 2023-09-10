@@ -744,7 +744,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager);
+                undoManager,
+                taskExecutor);
 
         addTab(libraryTab, raisePanel);
     }

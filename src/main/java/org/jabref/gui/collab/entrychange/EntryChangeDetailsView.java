@@ -11,6 +11,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -23,14 +24,23 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
     private final PreviewWithSourceTab oldPreviewWithSourcesTab = new PreviewWithSourceTab();
     private final PreviewWithSourceTab newPreviewWithSourcesTab = new PreviewWithSourceTab();
 
-    public EntryChangeDetailsView(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext, DialogService dialogService, StateManager stateManager, ThemeManager themeManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
+    public EntryChangeDetailsView(BibEntry oldEntry,
+                                  BibEntry newEntry,
+                                  BibDatabaseContext databaseContext,
+                                  DialogService dialogService,
+                                  StateManager stateManager,
+                                  ThemeManager themeManager,
+                                  PreferencesService preferencesService,
+                                  BibEntryTypesManager entryTypesManager,
+                                  PreviewViewer previewViewer,
+                                  TaskExecutor taskExecutor) {
         Label inJabRef = new Label(Localization.lang("In JabRef"));
         inJabRef.getStyleClass().add("lib-change-header");
         Label onDisk = new Label(Localization.lang("On disk"));
         onDisk.getStyleClass().add("lib-change-header");
 
         // we need a copy here as we otherwise would set the same entry twice
-        PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, preferencesService, stateManager, themeManager);
+        PreviewViewer previewClone = new PreviewViewer(databaseContext, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
 
         TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferencesService, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
         TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferencesService, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));

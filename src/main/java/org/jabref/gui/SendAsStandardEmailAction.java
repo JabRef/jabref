@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -30,8 +31,9 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
     public SendAsStandardEmailAction(DialogService dialogService,
                                      PreferencesService preferencesService,
                                      StateManager stateManager,
-                                     BibEntryTypesManager entryTypesManager) {
-        super(dialogService, preferencesService, stateManager);
+                                     BibEntryTypesManager entryTypesManager,
+                                     TaskExecutor taskExecutor) {
+        super(dialogService, preferencesService, stateManager, taskExecutor);
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;

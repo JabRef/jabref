@@ -250,7 +250,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                                  stateManager,
                                  entryTypesManager,
                                  fileUpdateMonitor,
-                                 undoManager);
+                                 undoManager,
+                                 taskExecutor);
         }
         return parserResult;
     }
@@ -269,7 +270,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
-                                          UndoManager undoManager)
+                                          UndoManager undoManager,
+                                          TaskExecutor taskExecutor)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
             new SharedDatabaseUIManager(
@@ -279,7 +281,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
-                    undoManager)
+                    undoManager,
+                    taskExecutor)
                     .openSharedDatabaseFromParserResult(parserResult);
         } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                  NotASharedDatabaseException e) {

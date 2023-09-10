@@ -122,7 +122,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
 
-    private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
+    private final TaskExecutor taskExecutor;
     private final WebView previewView;
     private PreviewLayout layout;
 
@@ -147,11 +147,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                          DialogService dialogService,
                          PreferencesService preferencesService,
                          StateManager stateManager,
-                         ThemeManager themeManager) {
+                         ThemeManager themeManager,
+                         TaskExecutor taskExecutor) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.clipBoardManager = Globals.getClipboardManager();
+        this.taskExecutor = taskExecutor;
 
         setFitToHeight(true);
         setFitToWidth(true);

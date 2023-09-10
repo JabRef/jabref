@@ -16,6 +16,7 @@ import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
@@ -34,6 +35,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private ThemeManager themeManager;
+    @Inject private TaskExecutor taskExecutor;
 
     private GlobalSearchResultDialogViewModel viewModel;
 
@@ -51,11 +53,11 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
 
-        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, stateManager, themeManager);
+        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
-        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager);
+        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, taskExecutor);
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
         resultsTable.getSelectionModel().selectFirst();
