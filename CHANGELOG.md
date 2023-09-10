@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Passwords can be stored in GNOME key ring. [#10274](https://github.com/JabRef/jabref/issues/10274)
 - We fixed an issue where groups based on an aux file could not be created due to an exception [#10350](https://github.com/JabRef/jabref/issues/10350)
 - We fixed an issue where the JabRef browser extension could not communicate with JabRef under macOS due to missing files. You should use the `.pkg` for the first installation as it updates all necessary files for the extension [#10308](https://github.com/JabRef/jabref/issues/10308)
+- We fixed a bug where an exception was raised when saving less than three export save orders in the preference. [#10157](https://github.com/JabRef/jabref/issues/10157)
 
 ### Removed
 
