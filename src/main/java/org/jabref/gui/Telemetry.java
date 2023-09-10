@@ -17,6 +17,9 @@ import com.microsoft.applicationinsights.telemetry.SessionState;
 public class Telemetry {
     private static TelemetryClient telemetryClient;
 
+    private Telemetry() {
+    }
+
     public static Optional<TelemetryClient> getTelemetryClient() {
         return Optional.ofNullable(telemetryClient);
     }
