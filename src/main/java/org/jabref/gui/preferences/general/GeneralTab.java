@@ -139,18 +139,19 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         viewModel.importCSSFile();
     }
 
+    public void backupFileDirBrowse() {
+        viewModel.backupFileDirBrowse();
+    }
+
     @FXML
     private void openBrowser() {
         String url = "https://themes.jabref.org";
 
         try {
             JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
-        } catch (java.io.IOException e) {
+        } catch (
+                java.io.IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void backupFileDirBrowse() {
-        viewModel.backupFileDirBrowse();
     }
 }

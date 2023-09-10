@@ -58,7 +58,7 @@
         </HBox>
     </GridPane>
 
-    <Button fx:id="moreThemes" text = "%Get More Themes!" onAction="#openBrowser"/>
+    <Button fx:id="moreThemes" text = "%Get More Themes" onAction="#openBrowser"/>
 
     <Label styleClass="sectionHeader" text="%User interface"/>
     <CheckBox fx:id="openLastStartup" text="%Open last edited libraries on startup"/>
