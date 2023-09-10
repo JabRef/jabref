@@ -1,8 +1,10 @@
 package org.jabref.gui.preferences.general;
 
+import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -16,6 +18,8 @@ import javafx.util.converter.IntegerStringConverter;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -25,6 +29,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.preferences.FilePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -141,8 +146,28 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML
     private void openBrowser() {
         String url = "https://themes.jabref.org";
+
+        FilePreferences filePreferences = null;
+
+        String userAndHost = filePreferences.getUserAndHost();
+        boolean storeFilesRelativeToBibFile = filePreferences.shouldStoreFilesRelativeToBibFile();
+        String fileNamePattern = filePreferences.getFileNamePattern();
+        String fileDirectoryPattern = filePreferences.getFileDirectoryPattern();
+        boolean downloadLinkedFiles = filePreferences.shouldDownloadLinkedFiles();
+        boolean fulltextIndexLinkedFiles = filePreferences.shouldFulltextIndexLinkedFiles();
+        Path workingDirectory = filePreferences.getWorkingDirectory();
+        ObservableSet<ExternalFileType> externalFileTypes = filePreferences.getExternalFileTypes();
+        boolean createBackup = filePreferences.shouldCreateBackup();
+        Path backupDirectory = filePreferences.getBackupDirectory();
+
+        FilePreferences newFilePreferences = new FilePreferences(
+                userAndHost, "", storeFilesRelativeToBibFile, fileNamePattern, fileDirectoryPattern,
+                downloadLinkedFiles, fulltextIndexLinkedFiles, workingDirectory, externalFileTypes, createBackup,
+                backupDirectory
+        );
+
         try {
-            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            JabRefDesktop.openBrowser(url, newFilePreferences);
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
