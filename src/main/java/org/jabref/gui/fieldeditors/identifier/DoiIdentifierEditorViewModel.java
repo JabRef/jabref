@@ -1,7 +1,9 @@
 package org.jabref.gui.fieldeditors.identifier;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
@@ -21,8 +23,19 @@ import org.slf4j.LoggerFactory;
 public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<DOI> {
     public static final Logger LOGGER = LoggerFactory.getLogger(DoiIdentifierEditorViewModel.class);
 
-    public DoiIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
-        super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+    private final UndoManager undoManager;
+    private final StateManager stateManager;
+
+    public DoiIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
+                                        FieldCheckers fieldCheckers,
+                                        DialogService dialogService,
+                                        TaskExecutor taskExecutor,
+                                        PreferencesService preferences,
+                                        UndoManager undoManager,
+                                        StateManager stateManager) {
+        super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
+        this.undoManager = undoManager;
+        this.stateManager = stateManager;
         configure(true, true);
     }
 
@@ -44,7 +57,11 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
 
     @Override
     public void fetchBibliographyInformation(BibEntry bibEntry) {
-        new FetchAndMergeEntry(JabRefGUI.getMainFrame().getCurrentLibraryTab(), taskExecutor, preferences, dialogService).fetchAndMerge(entry, field);
+        stateManager.getActiveDatabase().ifPresentOrElse(
+                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager)
+                        .fetchAndMerge(entry, field),
+                () -> dialogService.notify(Localization.lang("No library selected"))
+        );
     }
 
     @Override

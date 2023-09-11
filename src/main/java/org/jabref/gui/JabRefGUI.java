@@ -220,7 +220,8 @@ public class JabRefGUI {
                             Globals.stateManager,
                             Globals.entryTypesManager,
                             fileUpdateMonitor,
-                            mainFrame.getUndoManager());
+                            mainFrame.getUndoManager(),
+                            Globals.TASK_EXECUTOR);
                 } catch (SQLException |
                         DatabaseNotSupportedException |
                         InvalidDBMSConnectionPropertiesException |

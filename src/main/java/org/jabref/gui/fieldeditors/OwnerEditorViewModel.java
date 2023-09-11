@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
@@ -11,8 +13,9 @@ public class OwnerEditorViewModel extends AbstractEditorViewModel {
     public OwnerEditorViewModel(Field field,
                                 SuggestionProvider<?> suggestionProvider,
                                 PreferencesService preferences,
-                                FieldCheckers fieldCheckers) {
-        super(field, suggestionProvider, fieldCheckers);
+                                FieldCheckers fieldCheckers,
+                                UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
         this.preferences = preferences;
     }
 

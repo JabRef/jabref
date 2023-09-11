@@ -20,41 +20,41 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class CitationKeyEditor extends HBox implements FieldEditorFX {
 
-    private final PreferencesService preferences;
     @FXML private final CitationKeyEditorViewModel viewModel;
     @FXML private Button generateCitationKeyButton;
     @FXML private EditorTextField textField;
 
+    @Inject private PreferencesService preferencesService;
+    @Inject private DialogService dialogService;
+    @Inject private UndoManager undoManager;
+
     public CitationKeyEditor(Field field,
-                             PreferencesService preferences,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
-                             BibDatabaseContext databaseContext,
-                             UndoManager undoManager,
-                             DialogService dialogService) {
-
-        this.preferences = preferences;
-        this.viewModel = new CitationKeyEditorViewModel(
-                field,
-                suggestionProvider,
-                fieldCheckers,
-                preferences,
-                databaseContext,
-                undoManager,
-                dialogService);
+                             BibDatabaseContext databaseContext) {
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
+        this.viewModel = new CitationKeyEditorViewModel(
+                field,
+                suggestionProvider,
+                fieldCheckers,
+                preferencesService,
+                databaseContext,
+                undoManager,
+                dialogService);
+
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
         textField.initContextMenu(Collections::emptyList);
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public CitationKeyEditorViewModel getViewModel() {
@@ -66,7 +66,7 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
         viewModel.bindToEntry(entry);
 
         // Configure button to generate citation key
-        new ActionFactory(preferences.getKeyBindingRepository())
+        new ActionFactory(preferencesService.getKeyBindingRepository())
                 .configureIconButton(
                         StandardActions.GENERATE_CITE_KEY,
                         viewModel.getGenerateCiteKeyCommand(),

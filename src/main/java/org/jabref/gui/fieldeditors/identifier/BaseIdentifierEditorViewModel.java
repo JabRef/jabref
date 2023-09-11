@@ -3,6 +3,8 @@ package org.jabref.gui.fieldeditors.identifier;
 import java.io.IOException;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -40,8 +42,14 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     protected TaskExecutor taskExecutor;
     protected PreferencesService preferences;
 
-    public BaseIdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
-        super(field, suggestionProvider, fieldCheckers);
+    public BaseIdentifierEditorViewModel(Field field,
+                                         SuggestionProvider<?> suggestionProvider,
+                                         FieldCheckers fieldCheckers,
+                                         DialogService dialogService,
+                                         TaskExecutor taskExecutor,
+                                         PreferencesService preferences,
+                                         UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;

@@ -2,6 +2,8 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -76,6 +78,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private UndoManager undoManager;
 
     private LinkedFilesEditorViewModel viewModel;
 
@@ -101,7 +104,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void initialize() {
-        this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferencesService);
+        this.viewModel = new LinkedFilesEditorViewModel(
+                field,
+                suggestionProvider,
+                dialogService,
+                databaseContext,
+                taskExecutor,
+                fieldCheckers,
+                preferencesService,
+                undoManager);
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
