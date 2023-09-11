@@ -72,10 +72,11 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
                 throw ex;
             }
         } finally {
-            LOGGER.debug("Trying using the alternate ISBN fetchers to find an entry.");
             // do not move the iterator in the loop as this would always return a new one and thus create and endless loop
             Iterator<AbstractIsbnFetcher> iterator = retryIsbnFetcher.iterator();
             while (bibEntry.isEmpty() && iterator.hasNext()) {
+                LOGGER.debug("Trying using the alternate ISBN fetchers to find an entry.");
+
                 AbstractIsbnFetcher fetcher = iterator.next();
                 LOGGER.debug("No entry found for ISBN {}; trying {} next.", identifier, fetcher.getName());
                 bibEntry = fetcher.performSearchById(identifier);
