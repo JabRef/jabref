@@ -192,7 +192,7 @@ dependencies {
     implementation "org.tinylog:tinylog-impl:2.6.2"
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation 'org.slf4j:jul-to-slf4j:2.0.7'
+    implementation 'org.slf4j:jul-to-slf4j:2.0.9'
 
     implementation('de.undercouch:citeproc-java:3.0.0-beta.2') {
         exclude group: 'org.antlr'
