@@ -305,15 +305,15 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         listView.setItems(observableList);
 
-        if (citingTask != null && !citingTask.isCanceled() && searchType.equals(CitationFetcher.SearchType.CITING)) {
+        if (citingTask != null && !citingTask.isCanceled() && searchType == CitationFetcher.SearchType.CITING) {
             citingTask.cancel();
-        } else if (citedByTask != null && !citedByTask.isCanceled() && searchType.equals(CitationFetcher.SearchType.CITED_BY)) {
+        } else if (citedByTask != null && !citedByTask.isCanceled() && searchType == CitationFetcher.SearchType.CITED_BY) {
             citedByTask.cancel();
         }
 
         BackgroundTask<List<BibEntry>> task;
 
-        if (searchType.equals(CitationFetcher.SearchType.CITING)) {
+        if (searchType == CitationFetcher.SearchType.CITING) {
             task = BackgroundTask.wrap(() -> {
                 if (shouldRefresh) {
                     bibEntryRelationsRepository.forceRefreshReferences(entry);
