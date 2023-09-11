@@ -16,7 +16,6 @@ import javafx.util.converter.IntegerStringConverter;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -144,14 +143,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     @FXML
-    private void openBrowser() {
-        String url = "https://themes.jabref.org";
-
-        try {
-            JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
-        } catch (
-                java.io.IOException e) {
-            e.printStackTrace();
-        }
+    public void openBrowser() {
+        viewModel.openBrowser();
     }
 }
