@@ -103,7 +103,7 @@ public class GroupDialogViewModel {
     private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
     private Validator texGroupFilePathValidator;
-    private final CompositeValidator validator = new CompositeValidator();
+    private CompositeValidator validator;
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -127,6 +127,8 @@ public class GroupDialogViewModel {
     }
 
     private void setupValidation() {
+        validator = new CompositeValidator();
+
         nameValidator = new FunctionBasedValidator<>(
                 nameProperty,
                 StringUtil::isNotBlank,
@@ -270,6 +272,10 @@ public class GroupDialogViewModel {
                 validator.removeValidators(texGroupFilePathValidator);
             }
         });
+
+        validator.addValidators(nameValidator,
+                nameContainsDelimiterValidator,
+                sameNameValidator);
     }
 
     /**
