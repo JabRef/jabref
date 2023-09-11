@@ -14,10 +14,10 @@ import java.util.Optional;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.Telemetry;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
@@ -250,13 +250,14 @@ public class OpenDatabaseAction extends SimpleCommand {
                                  stateManager,
                                  entryTypesManager,
                                  fileUpdateMonitor,
-                                 undoManager);
+                                 undoManager,
+                                 taskExecutor);
         }
         return parserResult;
     }
 
     private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(
+        Telemetry.getTelemetryClient().ifPresent(client -> client.trackEvent(
                 "OpenNewDatabase",
                 Map.of(),
                 Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
@@ -269,7 +270,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
-                                          UndoManager undoManager)
+                                          UndoManager undoManager,
+                                          TaskExecutor taskExecutor)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
             new SharedDatabaseUIManager(
@@ -279,7 +281,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
-                    undoManager)
+                    undoManager,
+                    taskExecutor)
                     .openSharedDatabaseFromParserResult(parserResult);
         } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                  NotASharedDatabaseException e) {

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -12,6 +11,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -26,15 +26,21 @@ public class CleanupAction extends SimpleCommand {
     private final PreferencesService preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final TaskExecutor taskExecutor;
 
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
-    public CleanupAction(JabRefFrame frame, PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
+    public CleanupAction(JabRefFrame frame,
+                         PreferencesService preferences,
+                         DialogService dialogService,
+                         StateManager stateManager,
+                         TaskExecutor taskExecutor) {
         this.frame = frame;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -83,7 +89,7 @@ public class CleanupAction extends SimpleCommand {
 
             BackgroundTask.wrap(() -> cleanup(stateManager.getActiveDatabase().get(), preset))
                           .onSuccess(result -> showResults())
-                          .executeWith(Globals.TASK_EXECUTOR);
+                          .executeWith(taskExecutor);
         });
     }
 

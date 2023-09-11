@@ -59,10 +59,10 @@ public class EscapeAmpersandsFormatter extends Formatter {
             }
             // If we are in a command body, see if it has ended:
             if (inCommand && (c == '}')) {
-                if ("begin".equals(commandName.toString())) {
+                if ("begin".contentEquals(commandName)) {
                     nestedEnvironments++;
                 }
-                if ((nestedEnvironments > 0) && "end".equals(commandName.toString())) {
+                if ((nestedEnvironments > 0) && "end".contentEquals(commandName)) {
                     nestedEnvironments--;
                 }
 
@@ -72,7 +72,7 @@ public class EscapeAmpersandsFormatter extends Formatter {
 
             // We add a backslash before any ampersand characters, with one exception: if
             // we are inside an \\url{...} command, we should write it as it is. Maybe.
-            if ((c == '&') && !escape && !(inCommand && "url".equals(commandName.toString()))
+            if ((c == '&') && !escape && !(inCommand && "url".contentEquals(commandName))
                     && (nestedEnvironments == 0)) {
                 result.append("\\&");
             } else {

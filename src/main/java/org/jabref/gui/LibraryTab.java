@@ -121,7 +121,8 @@ public class LibraryTab extends Tab {
 
     private BackgroundTask<ParserResult> dataLoadingTask;
 
-    private final IndexingTaskManager indexingTaskManager = new IndexingTaskManager(Globals.TASK_EXECUTOR);
+    private final IndexingTaskManager indexingTaskManager;
+    private final TaskExecutor taskExecutor;
 
     public LibraryTab(BibDatabaseContext bibDatabaseContext,
                       JabRefFrame frame,
@@ -130,7 +131,8 @@ public class LibraryTab extends Tab {
                       StateManager stateManager,
                       FileUpdateMonitor fileUpdateMonitor,
                       BibEntryTypesManager entryTypesManager,
-                      CountingUndoManager undoManager) {
+                      CountingUndoManager undoManager,
+                      TaskExecutor taskExecutor) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.undoManager = undoManager;
@@ -139,6 +141,8 @@ public class LibraryTab extends Tab {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
+        this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
+        this.taskExecutor = taskExecutor;
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -511,7 +515,7 @@ public class LibraryTab extends Tab {
                 Globals.getKeyPrefs(),
                 Globals.getClipboardManager(),
                 entryTypesManager,
-                Globals.TASK_EXECUTOR,
+                taskExecutor,
                 fileUpdateMonitor);
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
@@ -775,7 +779,7 @@ public class LibraryTab extends Tab {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext,
                 fileUpdateMonitor,
-                Globals.TASK_EXECUTOR,
+                taskExecutor,
                 dialogService,
                 preferencesService,
                 databaseNotificationPane));
@@ -850,7 +854,8 @@ public class LibraryTab extends Tab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager);
+                undoManager,
+                taskExecutor);
 
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
@@ -868,7 +873,8 @@ public class LibraryTab extends Tab {
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              UndoManager undoManager) {
+                                              UndoManager undoManager,
+                                              TaskExecutor taskExecutor) {
         Objects.requireNonNull(databaseContext);
 
         LibraryTab libraryTab = new LibraryTab(
@@ -879,7 +885,8 @@ public class LibraryTab extends Tab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                (CountingUndoManager) undoManager);
+                (CountingUndoManager) undoManager,
+                taskExecutor);
 
         return libraryTab;
     }

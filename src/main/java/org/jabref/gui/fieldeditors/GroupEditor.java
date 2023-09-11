@@ -3,6 +3,8 @@ package org.jabref.gui.fieldeditors;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DragAndDropDataFormats;
@@ -21,8 +23,9 @@ public class GroupEditor extends SimpleEditor {
                        final SuggestionProvider<?> suggestionProvider,
                        final FieldCheckers fieldCheckers,
                        final PreferencesService preferences,
-                       final boolean isMultiLine) {
-        super(field, suggestionProvider, fieldCheckers, preferences, isMultiLine);
+                       final boolean isMultiLine,
+                       final UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
 
         this.setOnDragOver(event -> {
             if (event.getDragboard().hasContent(DragAndDropDataFormats.GROUP)) {

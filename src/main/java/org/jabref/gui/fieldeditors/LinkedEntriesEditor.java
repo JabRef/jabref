@@ -3,6 +3,8 @@ package org.jabref.gui.fieldeditors;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -45,6 +47,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private KeyBindingRepository keyBindingRepository;
+    @Inject private UndoManager undoManager;
 
     private final LinkedEntriesEditorViewModel viewModel;
 
@@ -53,7 +56,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
+        this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers, undoManager);
 
         entryLinkField.setCellFactory(new ViewModelListCellFactory<ParsedEntryLink>().withText(ParsedEntryLink::getKey));
         // Mind the .collect(Collectors.toList()) as the list needs to be mutable

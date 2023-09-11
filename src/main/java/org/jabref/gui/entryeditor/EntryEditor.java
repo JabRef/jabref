@@ -247,7 +247,7 @@ public class EntryEditor extends BorderPane {
     }
 
     private List<EntryEditorTab> createTabs() {
-        entryEditorTabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager()));
+        entryEditorTabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor));
 
         // Required, optional, deprecated, and "other" fields
         entryEditorTabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
@@ -282,7 +282,7 @@ public class EntryEditor extends BorderPane {
         // "Special" tabs
         entryEditorTabs.add(new MathSciNetTab());
         entryEditorTabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
-        entryEditorTabs.add(new RelatedArticlesTab(this, entryEditorPreferences, preferencesService, dialogService));
+        entryEditorTabs.add(new RelatedArticlesTab(entryEditorPreferences, preferencesService, dialogService, taskExecutor));
         entryEditorTabs.add(new CitationRelationsTab(entryEditorPreferences, dialogService, databaseContext,
                 undoManager, stateManager, fileMonitor, preferencesService, libraryTab));
 
@@ -300,7 +300,7 @@ public class EntryEditor extends BorderPane {
 
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
 
-        entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService));
+        entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
 
         return entryEditorTabs;
     }
@@ -315,7 +315,7 @@ public class EntryEditor extends BorderPane {
         // This hack is required since tabbed.getTabs().setAll(visibleTabs) changes the order of the tabs in the editor
 
         // First, remove tabs that we do not want to show
-        List<EntryEditorTab> toBeRemoved = tabs.stream().filter(tab -> !tab.shouldShow(entry)).collect(Collectors.toList());
+        List<EntryEditorTab> toBeRemoved = tabs.stream().filter(tab -> !tab.shouldShow(entry)).toList();
         tabbed.getTabs().removeAll(toBeRemoved);
 
         // Next add all the visible tabs (if not already present) at the right position
@@ -418,7 +418,7 @@ public class EntryEditor extends BorderPane {
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        new FetchAndMergeEntry(libraryTab, taskExecutor, preferencesService, dialogService).fetchAndMerge(entry, fetcher);
+        new FetchAndMergeEntry(libraryTab.getBibDatabaseContext(), taskExecutor, preferencesService, dialogService, undoManager).fetchAndMerge(entry, fetcher);
     }
 
     public void setFocusToField(Field field) {

@@ -164,7 +164,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
                     skipped++;
                 } else {
                     for (Path file : files) {
-                        updateMessage(Localization.lang("Writing metadata to {}", file.getFileName()));
+                        updateMessage(Localization.lang("Writing metadata to %0", file.getFileName()));
 
                         if (Files.exists(file)) {
                             try {

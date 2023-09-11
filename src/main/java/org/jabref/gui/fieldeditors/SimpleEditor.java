@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
@@ -23,8 +25,9 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
                         final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
                         final PreferencesService preferences,
-                        final boolean isMultiLine) {
-        this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers);
+                        final boolean isMultiLine,
+                        final UndoManager undoManager) {
+        this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager);
 
         textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
         HBox.setHgrow(textInput, Priority.ALWAYS);
@@ -47,8 +50,9 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     public SimpleEditor(final Field field,
                         final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
-                        final PreferencesService preferences) {
-        this(field, suggestionProvider, fieldCheckers, preferences, false);
+                        final PreferencesService preferences,
+                        UndoManager undoManager) {
+        this(field, suggestionProvider, fieldCheckers, preferences, false, undoManager);
     }
 
     @Override

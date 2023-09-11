@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
@@ -10,8 +12,9 @@ public class KeywordsEditor extends SimpleEditor implements FieldEditorFX {
     public KeywordsEditor(Field field,
                           SuggestionProvider<?> suggestionProvider,
                           FieldCheckers fieldCheckers,
-                          PreferencesService preferences) {
-        super(field, suggestionProvider, fieldCheckers, preferences);
+                          PreferencesService preferences,
+                          UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, preferences, undoManager);
     }
 
     @Override
