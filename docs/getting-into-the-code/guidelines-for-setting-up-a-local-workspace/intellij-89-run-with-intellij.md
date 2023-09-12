@@ -35,6 +35,22 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
    --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
    --add-opens=org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref
    --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
+   --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
+   --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
+   --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
+   --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
+   --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
+   --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
+   --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
+   --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
+   --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
+   --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
+   --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
+   --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
+   --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
+   --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
+   --add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix
+   --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
    --add-reads org.jabref=org.fxmisc.flowless
    --add-reads org.jabref=org.apache.commons.csv
    ```
