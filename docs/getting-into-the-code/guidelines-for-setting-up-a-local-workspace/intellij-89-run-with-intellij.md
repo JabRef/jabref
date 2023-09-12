@@ -15,7 +15,7 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
 3. Navigate to **File > Settings... > Build, Execution, Deployment > Compiler > Java Compiler**.
 4. Uncheck `--Use 'release' option for cross-compilation`.
 5. **Build > Build Project**
-6. Open the project view (<kbd>Alt</kbd>+<kbd>1</kbd>)
+6. Open the project view (<kbd>Alt</kbd>+<kbd>1</kbd> , on mac <kbd>cmd><kbd>+<kbd>1</kbd>)
 7. Copy all build resources to the folder of the build classes
    1. Navigate to the folder `out/production/resources`
    2. Select all folders below (`bst`, `csl-locales`, ...)
