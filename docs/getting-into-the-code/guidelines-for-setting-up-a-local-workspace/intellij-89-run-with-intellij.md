@@ -43,6 +43,7 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
    --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
    --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
    --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
+   --add-opens=javafx.controls/javafx.scene.control.skin=org.controlsfx.controls
    --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
    --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
    --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
