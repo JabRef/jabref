@@ -3,10 +3,8 @@ package org.jabref.benchmarks;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -19,7 +17,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -102,16 +99,14 @@ public class Benchmarks {
 
     @Benchmark
     public List<BibEntry> search() {
-        // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", EnumSet.noneOf(SearchFlags.class));
-        return database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
+        // FixMe: Create Benchmark for LuceneSearch
+        return null;
     }
 
     @Benchmark
-    public List<BibEntry> parallelSearch() {
-        // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", EnumSet.noneOf(SearchFlags.class));
-        return database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList());
+    public List<BibEntry> index() {
+        // FixMe: Create Benchmark for LuceneIndexer
+        return null;
     }
 
     @Benchmark

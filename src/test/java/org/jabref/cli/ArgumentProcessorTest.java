@@ -43,7 +43,7 @@ class ArgumentProcessorTest {
     void setup() {
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         when(preferencesService.getSearchPreferences()).thenReturn(
-                new SearchPreferences(null, EnumSet.noneOf(SearchRules.SearchFlags.class), false)
+                new SearchPreferences(EnumSet.noneOf(SearchRules.SearchFlags.class), false)
         );
 
         bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
