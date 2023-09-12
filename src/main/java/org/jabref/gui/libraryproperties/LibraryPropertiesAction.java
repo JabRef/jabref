@@ -39,7 +39,7 @@ public class LibraryPropertiesAction extends SimpleCommand {
             if (stateManager.getActiveDatabase().isPresent()) {
                 dialogService.showCustomDialogAndWait(new LibraryPropertiesView(stateManager.getActiveDatabase().get()));
             } else {
-                LOGGER.warn("No database selected.");
+                LOGGER.warn("No library selected.");
             }
         }
     }

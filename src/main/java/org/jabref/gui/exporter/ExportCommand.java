@@ -11,7 +11,6 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -22,12 +21,15 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.action.Action;
@@ -48,17 +50,26 @@ public class ExportCommand extends SimpleCommand {
     private final StateManager stateManager;
     private final PreferencesService preferences;
     private final DialogService dialogService;
+    private final BibEntryTypesManager entryTypesManager;
+    private final JournalAbbreviationRepository abbreviationRepository;
+    private final TaskExecutor taskExecutor;
 
     public ExportCommand(ExportMethod exportMethod,
                          JabRefFrame frame,
                          StateManager stateManager,
                          DialogService dialogService,
-                         PreferencesService preferences) {
+                         PreferencesService preferences,
+                         BibEntryTypesManager entryTypesManager,
+                         JournalAbbreviationRepository abbreviationRepository,
+                         TaskExecutor taskExecutor) {
         this.exportMethod = exportMethod;
         this.frame = frame;
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.entryTypesManager = entryTypesManager;
+        this.abbreviationRepository = abbreviationRepository;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(exportMethod == ExportMethod.EXPORT_SELECTED
                 ? ActionHelper.needsEntriesSelected(stateManager)
@@ -70,7 +81,7 @@ public class ExportCommand extends SimpleCommand {
         // Get list of exporters and sort before adding to file dialog
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferences,
-                Globals.entryTypesManager);
+                entryTypesManager);
         List<Exporter> exporters = exporterFactory.getExporters().stream()
                                                   .sorted(Comparator.comparing(Exporter::getName))
                                                   .collect(Collectors.toList());
@@ -120,7 +131,7 @@ public class ExportCommand extends SimpleCommand {
                             file,
                             finEntries,
                             fileDirForDatabase,
-                            Globals.journalAbbreviationRepository);
+                            abbreviationRepository);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
                 .onSuccess(save -> {
@@ -139,7 +150,7 @@ public class ExportCommand extends SimpleCommand {
                             Duration.seconds(5));
                 })
                 .onFailure(this::handleError)
-                .executeWith(Globals.TASK_EXECUTOR);
+                .executeWith(taskExecutor);
     }
 
     private void handleError(Exception ex) {

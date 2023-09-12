@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -18,8 +20,8 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     private final BibDatabaseContext databaseContext;
     private final ListProperty<ParsedEntryLink> linkedEntries;
 
-    public LinkedEntriesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers) {
-        super(field, suggestionProvider, fieldCheckers);
+    public LinkedEntriesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers, UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
 
         this.databaseContext = databaseContext;
         linkedEntries = new SimpleListProperty<>(FXCollections.observableArrayList());

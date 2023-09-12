@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors.identifier;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.MapChangeListener;
 import javafx.collections.WeakMapChangeListener;
 
@@ -29,8 +31,13 @@ public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewMod
         }
     };
 
-    public EprintIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, DialogService dialogService, TaskExecutor taskExecutor, PreferencesService preferences) {
-        super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences);
+    public EprintIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
+                                           FieldCheckers fieldCheckers,
+                                           DialogService dialogService,
+                                           TaskExecutor taskExecutor,
+                                           PreferencesService preferences,
+                                           UndoManager undoManager) {
+        super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         configure(false, false);
         EasyBind.subscribe(identifier, newIdentifier -> {
             newIdentifier.ifPresent(id -> {

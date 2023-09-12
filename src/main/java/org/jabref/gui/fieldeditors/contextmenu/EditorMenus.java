@@ -9,6 +9,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -52,11 +53,11 @@ public class EditorMenus {
      * @param textArea text-area that this menu will be connected to
      * @return menu containing items of the default menu and an item for copying a DOI/DOI URL
      */
-    public static Supplier<List<MenuItem>> getDOIMenu(TextArea textArea) {
+    public static Supplier<List<MenuItem>> getDOIMenu(TextArea textArea, DialogService dialogService) {
         return () -> {
             ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-            MenuItem copyDoiMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI));
-            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI_URL, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI_URL));
+            MenuItem copyDoiMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI, dialogService));
+            MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI_URL, new CopyDoiUrlAction(textArea, StandardActions.COPY_DOI_URL, dialogService));
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(copyDoiMenuItem);
             menuItems.add(copyDoiUrlMenuItem);

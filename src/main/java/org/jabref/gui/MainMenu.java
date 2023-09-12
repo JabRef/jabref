@@ -141,8 +141,8 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferencesService, stateManager, fileUpdateMonitor, taskExecutor, dialogService))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame, stateManager, dialogService, preferencesService)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame, stateManager, dialogService, preferencesService)),
+                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame, stateManager, dialogService, preferencesService, entryTypesManager, abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame, stateManager, dialogService, preferencesService, entryTypesManager, abbreviationRepository, taskExecutor)),
                         factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame, dialogService, preferencesService, stateManager))),
 
                 new SeparatorMenuItem(),
@@ -222,10 +222,10 @@ public class MainMenu extends MenuBar {
         );
 
         quality.getItems().addAll(
-                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame, dialogService, stateManager, preferencesService)),
+                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame, dialogService, stateManager, preferencesService, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame, preferencesService, dialogService, stateManager, taskExecutor, abbreviationRepository)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame, preferencesService, dialogService, stateManager, taskExecutor)),
 
                 new SeparatorMenuItem(),
 
@@ -234,22 +234,22 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences())),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences())),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences()))),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor))),
 
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences()))
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame, dialogService, stateManager, preferencesService.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor))
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
         for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(preferencesService.getImportFormatPreferences())) {
-            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(frame, fetcher, stateManager, undoManager);
+            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(frame, fetcher, stateManager, undoManager, taskExecutor);
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
 
         lookup.getItems().addAll(
                 lookupIdentifiers,
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferencesService)),
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferencesService, taskExecutor)),
 
                 new SeparatorMenuItem(),
 
@@ -267,7 +267,7 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF,
                         new WriteMetadataToLinkedPdfsAction(dialogService, preferencesService.getFieldPreferences(), preferencesService.getFilePreferences(), preferencesService.getXmpPreferences(), entryTypesManager, abbreviationRepository, taskExecutor, stateManager)),
-                factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, preferencesService, stateManager)),
+                factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, preferencesService, stateManager, taskExecutor)),
 
                 new SeparatorMenuItem(),
 
@@ -283,7 +283,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, frame::getCurrentLibraryTab, dialogService, preferencesService.getFilePreferences()))
+                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, frame::getCurrentLibraryTab, dialogService, preferencesService.getFilePreferences(), taskExecutor))
         );
         SidePaneType webSearchPane = SidePaneType.WEB_SEARCH;
         SidePaneType groupsPane = SidePaneType.GROUPS;
@@ -352,8 +352,8 @@ public class MainMenu extends MenuBar {
                                    PreferencesService preferencesService) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager, entryTypesManager)),
-                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager))
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferencesService, stateManager, entryTypesManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferencesService, stateManager, taskExecutor))
         );
 
         return sendMenu;

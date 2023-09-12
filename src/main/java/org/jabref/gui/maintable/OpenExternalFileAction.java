@@ -4,11 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -24,17 +24,27 @@ public class OpenExternalFileAction extends SimpleCommand {
 
     private final BibEntry entry;
     private final LinkedFile linkedFile;
+    private final TaskExecutor taskExecutor;
 
-    public OpenExternalFileAction(DialogService dialogService, StateManager stateManager, PreferencesService preferencesService) {
-        this(dialogService, stateManager, preferencesService, null, null);
+    public OpenExternalFileAction(DialogService dialogService,
+                                  StateManager stateManager,
+                                  PreferencesService preferencesService,
+                                  TaskExecutor taskExecutor) {
+        this(dialogService, stateManager, preferencesService, null, null, taskExecutor);
     }
 
-    public OpenExternalFileAction(DialogService dialogService, StateManager stateManager, PreferencesService preferencesService, BibEntry entry, LinkedFile linkedFile) {
+    public OpenExternalFileAction(DialogService dialogService,
+                                  StateManager stateManager,
+                                  PreferencesService preferencesService,
+                                  BibEntry entry,
+                                  LinkedFile linkedFile,
+                                  TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.entry = entry;
         this.linkedFile = linkedFile;
+        this.taskExecutor = taskExecutor;
 
         if (this.linkedFile == null) {
             this.executable.bind(ActionHelper.hasLinkedFileForSelectedEntries(stateManager)
@@ -65,7 +75,7 @@ public class OpenExternalFileAction extends SimpleCommand {
                                 linkedFile,
                                 entry,
                                 databaseContext,
-                                Globals.TASK_EXECUTOR,
+                                taskExecutor,
                                 dialogService,
                                 preferencesService);
 
@@ -89,7 +99,7 @@ public class OpenExternalFileAction extends SimpleCommand {
                         linkedFile,
                         entry,
                         databaseContext,
-                        Globals.TASK_EXECUTOR,
+                        taskExecutor,
                         dialogService,
                         preferencesService);
                 linkedFileViewModel.open();

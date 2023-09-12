@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -68,17 +68,35 @@ jobs:
           # enable failing of this task if modernizer complains
           sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
           ./gradlew modernizer
+  markdown-checks:
+    name: Markdown style check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
           args: CHANGELOG.md CONTRIBUTING.md README.md
           config: '.markdownlint.yml'
+      - name: Lint CHANGELOG.md
+        run: |
+          set -e
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          source ~/.zshrc
+          jbang .github/heylogs.java check CHANGELOG.md > heylogs.txt
+          cat heylogs.txt
+          # We have 7 "valid" issues in CHANGELOG.md
+          grep -q "7 problems" heylogs.txt || exit 1
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -113,7 +131,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -150,7 +168,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -191,7 +209,7 @@ jobs:
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -214,7 +232,7 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           show-progress: 'false'
       - uses: gradle/wrapper-validation-action@v1
@@ -223,7 +241,7 @@ jobs:
     name: Find merge conflicts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           show-progress: 'false'
       - name: Merge Conflict finder

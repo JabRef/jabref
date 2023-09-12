@@ -115,6 +115,7 @@ open module org.jabref {
     requires com.h2database.mvstore;
 
     requires java.keyring;
+    requires org.freedesktop.dbus;
 
     requires org.jooq.jool;
 

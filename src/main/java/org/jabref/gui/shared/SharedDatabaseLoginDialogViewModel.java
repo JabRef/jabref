@@ -31,6 +31,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -84,6 +85,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
+    private final TaskExecutor taskExecutor;
 
     private final Validator databaseValidator;
     private final Validator hostValidator;
@@ -99,7 +101,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
-                                              UndoManager undoManager) {
+                                              UndoManager undoManager,
+                                              TaskExecutor taskExecutor) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
@@ -107,6 +110,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
+        this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
 
@@ -176,7 +180,15 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         loading.set(true);
 
         try {
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame, dialogService, preferencesService, stateManager, entryTypesManager, fileUpdateMonitor, undoManager);
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
+                    frame,
+                    dialogService,
+                    preferencesService,
+                    stateManager,
+                    entryTypesManager,
+                    fileUpdateMonitor,
+                    undoManager,
+                    taskExecutor);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 

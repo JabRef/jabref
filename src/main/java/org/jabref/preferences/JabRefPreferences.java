@@ -2237,11 +2237,17 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private SaveOrder getExportSaveOrder() {
-        List<SaveOrder.SortCriterion> sortCriteria = List.of(
-                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)),
-                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)),
-                new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING))
-        );
+        List<SaveOrder.SortCriterion> sortCriteria = new ArrayList<>();
+
+        if (!"".equals(get(EXPORT_PRIMARY_SORT_FIELD))) {
+            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)));
+        }
+        if (!"".equals(get(EXPORT_SECONDARY_SORT_FIELD))) {
+            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)));
+        }
+        if (!"".equals(get(EXPORT_TERTIARY_SORT_FIELD))) {
+            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
+        }
 
         return new SaveOrder(
                 SaveOrder.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
@@ -2253,12 +2259,28 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(EXPORT_IN_ORIGINAL_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.ORIGINAL);
         putBoolean(EXPORT_IN_SPECIFIED_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.SPECIFIED);
 
-        put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().get(0).field.getName());
-        put(EXPORT_SECONDARY_SORT_FIELD, saveOrder.getSortCriteria().get(1).field.getName());
-        put(EXPORT_TERTIARY_SORT_FIELD, saveOrder.getSortCriteria().get(2).field.getName());
-        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(0).descending);
-        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(1).descending);
-        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
+        long saveOrderCount = saveOrder.getSortCriteria().size();
+        if (saveOrderCount >= 1) {
+            put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().get(0).field.getName());
+            putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(0).descending);
+        } else {
+            put(EXPORT_PRIMARY_SORT_FIELD, "");
+            putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, false);
+        }
+        if (saveOrderCount >= 2) {
+            put(EXPORT_SECONDARY_SORT_FIELD, saveOrder.getSortCriteria().get(1).field.getName());
+            putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(1).descending);
+        } else {
+            put(EXPORT_SECONDARY_SORT_FIELD, "");
+            putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, false);
+        }
+        if (saveOrderCount >= 3) {
+            put(EXPORT_TERTIARY_SORT_FIELD, saveOrder.getSortCriteria().get(2).field.getName());
+            putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
+        } else {
+            put(EXPORT_TERTIARY_SORT_FIELD, "");
+            putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
+        }
     }
 
     /**

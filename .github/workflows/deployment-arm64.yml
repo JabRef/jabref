@@ -46,7 +46,7 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -109,6 +109,8 @@ jobs:
           --module-path ${{env.JDK21}}/Contents/Home/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
+          --app-content buildres/mac/jabrefHost.py \
+          --app-content buildres/mac/native-messaging-host \
           --name JabRef \
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
@@ -131,6 +133,8 @@ jobs:
           --module-path ${{env.JDK21}}/Contents/Home/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
+          --app-content buildres/mac/jabrefHost.py \
+          --app-content buildres/mac/native-messaging-host \
           --name JabRef \
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \

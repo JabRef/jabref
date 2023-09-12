@@ -12,6 +12,7 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -38,11 +39,16 @@ public abstract class SendAsEMailAction extends SimpleCommand {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final TaskExecutor taskExecutor;
 
-    public SendAsEMailAction(DialogService dialogService, PreferencesService preferencesService, StateManager stateManager) {
+    public SendAsEMailAction(DialogService dialogService,
+                             PreferencesService preferencesService,
+                             StateManager stateManager,
+                             TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
@@ -54,7 +60,7 @@ public abstract class SendAsEMailAction extends SimpleCommand {
                           LOGGER.warn(message, e);
                           dialogService.notify(message);
                       })
-                      .executeWith(Globals.TASK_EXECUTOR);
+                      .executeWith(taskExecutor);
     }
 
     private String sendEmail() throws Exception {
