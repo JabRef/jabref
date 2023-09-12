@@ -5,15 +5,12 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.git.SlrGitHandler;
-import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -37,27 +34,21 @@ public class Crawler {
      */
     public Crawler(Path studyRepositoryRoot,
                    SlrGitHandler gitHandler,
-                   GeneralPreferences generalPreferences,
-                   ImportFormatPreferences importFormatPreferences,
-                   ImporterPreferences importerPreferences,
-                   SavePreferences savePreferences,
+                   PreferencesService preferencesService,
                    BibEntryTypesManager bibEntryTypesManager,
                    FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException {
         this.studyRepository = new StudyRepository(
                 studyRepositoryRoot,
                 gitHandler,
-                generalPreferences,
-                importFormatPreferences,
-                importerPreferences,
+                preferencesService,
                 fileUpdateMonitor,
-                savePreferences,
                 bibEntryTypesManager);
-        StudyDatabaseToFetcherConverter studyDatabaseToFetcherConverter = new StudyDatabaseToFetcherConverter(
+        StudyCatalogToFetcherConverter studyCatalogToFetcherConverter = new StudyCatalogToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),
-                importFormatPreferences,
-                importerPreferences);
+                preferencesService.getImportFormatPreferences(),
+                preferencesService.getImporterPreferences());
         this.studyFetcher = new StudyFetcher(
-                studyDatabaseToFetcherConverter.getActiveFetchers(),
+                studyCatalogToFetcherConverter.getActiveFetchers(),
                 studyRepository.getSearchQueryStrings());
     }
 

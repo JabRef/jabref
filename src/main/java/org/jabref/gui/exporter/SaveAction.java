@@ -1,7 +1,8 @@
 package org.jabref.gui.exporter;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -15,12 +16,19 @@ public class SaveAction extends SimpleCommand {
     public enum SaveMethod { SAVE, SAVE_AS, SAVE_SELECTED }
 
     private final SaveMethod saveMethod;
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
+
+    private final DialogService dialogService;
     private final PreferencesService preferencesService;
 
-    public SaveAction(SaveMethod saveMethod, JabRefFrame frame, PreferencesService preferencesService, StateManager stateManager) {
+    public SaveAction(SaveMethod saveMethod,
+                      LibraryTabContainer tabContainer,
+                      DialogService dialogService,
+                      PreferencesService preferencesService,
+                      StateManager stateManager) {
         this.saveMethod = saveMethod;
-        this.frame = frame;
+        this.tabContainer = tabContainer;
+        this.dialogService = dialogService;
         this.preferencesService = preferencesService;
 
         if (saveMethod == SaveMethod.SAVE_SELECTED) {
@@ -33,7 +41,8 @@ public class SaveAction extends SimpleCommand {
     @Override
     public void execute() {
         SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(
-                frame.getCurrentLibraryTab(),
+                tabContainer.getCurrentLibraryTab(),
+                dialogService,
                 preferencesService,
                 Globals.entryTypesManager);
 

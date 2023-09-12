@@ -1,5 +1,0 @@
-.bundle
-*.swp
-.ruby-version
-.env
-spec/sheldon/travis.json

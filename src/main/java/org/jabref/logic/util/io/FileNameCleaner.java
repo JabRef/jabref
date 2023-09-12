@@ -1,7 +1,5 @@
 package org.jabref.logic.util.io;
 
-import org.jabref.model.util.FileHelper;
-
 /**
  * This class is based on http://stackoverflow.com/a/5626340/873282
  * extended with LEFT CURLY BRACE and RIGHT CURLY BRACE
@@ -24,7 +22,7 @@ public class FileNameCleaner {
         StringBuilder cleanName = new StringBuilder(badFileName.length());
         for (int i = 0; i < badFileName.length(); i++) {
             char c = badFileName.charAt(i);
-            if (FileHelper.isCharLegal(c) && (c != '/') && (c != '\\')) {
+            if (FileUtil.isCharLegal(c) && (c != '/') && (c != '\\')) {
                 cleanName.append(c);
             } else {
                 cleanName.append('_');
@@ -44,7 +42,7 @@ public class FileNameCleaner {
         StringBuilder cleanName = new StringBuilder(badFileName.length());
         for (int i = 0; i < badFileName.length(); i++) {
             char c = badFileName.charAt(i);
-            if (FileHelper.isCharLegal(c)) {
+            if (FileUtil.isCharLegal(c)) {
                 cleanName.append(c);
             } else {
                 cleanName.append('_');

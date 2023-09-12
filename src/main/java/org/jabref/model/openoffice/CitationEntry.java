@@ -41,8 +41,7 @@ public class CitationEntry implements Comparable<CitationEntry> {
         if (this == object) {
             return true;
         }
-        if (object instanceof CitationEntry) {
-            CitationEntry other = (CitationEntry) object;
+        if (object instanceof CitationEntry other) {
             return Objects.equals(this.refMarkName, other.refMarkName);
         }
         return false;

@@ -10,6 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.fieldeditors.identifier.IdentifierEditor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -52,51 +53,55 @@ public class FieldEditors {
                 journalAbbreviationRepository,
                 preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
 
-        boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldContentParserPreferences().getNonWrappableFields());
+        boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldPreferences().getNonWrappableFields());
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(field)) {
-            return new DateEditor(field, DateTimeFormatter.ofPattern(preferences.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers, preferences);
+            return new DateEditor(field, DateTimeFormatter.ofPattern(preferences.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.DATE)) {
-            return new DateEditor(field, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers, preferences);
+            return new DateEditor(field, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.EXTERNAL)) {
-            return new UrlEditor(field, dialogService, suggestionProvider, fieldCheckers, preferences);
+            return new UrlEditor(field, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(field, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
+            return new JournalEditor(field, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.DOI) || fieldProperties.contains(FieldProperty.EPRINT) || fieldProperties.contains(FieldProperty.ISBN)) {
-            return new IdentifierEditor(field, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
+            return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.OWNER) {
-            return new OwnerEditor(field, preferences, suggestionProvider, fieldCheckers);
+            return new OwnerEditor(field, suggestionProvider, fieldCheckers);
+        } else if (field == StandardField.GROUPS) {
+            return new GroupEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
         } else if (fieldProperties.contains(FieldProperty.FILE_EDITOR)) {
-            return new LinkedFilesEditor(field, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers, preferences);
+            return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
-            return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.MONTH)) {
-            return new OptionEditor<>(new MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers));
+            return new OptionEditor<>(new MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.GENDER)) {
-            return new OptionEditor<>(new GenderEditorViewModel(field, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new GenderEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.EDITOR_TYPE)) {
-            return new OptionEditor<>(new EditorTypeEditorViewModel(field, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new EditorTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.PAGINATION)) {
-            return new OptionEditor<>(new PaginationEditorViewModel(field, suggestionProvider, fieldCheckers));
+            return new OptionEditor<>(new PaginationEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.TYPE)) {
             if (entryType.equals(IEEETranEntryType.Patent)) {
-                return new OptionEditor<>(new PatentTypeEditorViewModel(field, suggestionProvider, fieldCheckers));
+                return new OptionEditor<>(new PatentTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
             } else {
-                return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers));
+                return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
             }
         } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(field, databaseContext, (SuggestionProvider<BibEntry>) suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(field, databaseContext, (SuggestionProvider<BibEntry>) suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isMultiLine);
-        } else if (StandardField.KEYWORDS.equals(field)) {
-            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences);
+            return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isMultiLine, undoManager);
+        } else if (StandardField.KEYWORDS == field) {
+            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager);
         } else if (field == InternalField.KEY_FIELD) {
-            return new CitationKeyEditor(field, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
+            return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext);
+        } else if (field == StandardField.ISSN) {
+            return new ISSNEditor(field, suggestionProvider, fieldCheckers);
         } else {
             // default
-            return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine);
+            return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
         }
     }
 

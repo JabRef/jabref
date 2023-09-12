@@ -3,12 +3,17 @@ src/main/gen/
 src/main/generated/
 src-gen/
 
+structure101-settings.java.hsw
+
 # private data
 /buildres/jabref-cert-2016.p12
 
 # GitBook assets
 docs/book.pdf
 docs/_book/
+
+# Jekyll for docs/
+docs/Gemfile.lock
 
 # ignore the generated markdown file if the user forgets to delete it
 status.md
@@ -472,3 +477,8 @@ lib/ojdbc.jar
 
 # do not ignore JabRef icons (they are ignored by the macos setting above)
 !src/main/java/org/jabref/gui/icon
+
+!**/autosaveandbackup/*.bak
+
+# generated during release process
+CHANGELOG.html

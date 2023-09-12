@@ -1,11 +1,17 @@
 package org.jabref.cli;
 
 import java.util.List;
+import java.util.Objects;
+
+import javafx.util.Pair;
 
 import org.jabref.gui.Globals;
-import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.cli.CommandLine;
@@ -18,6 +24,7 @@ import org.apache.commons.cli.ParseException;
 public class JabRefCLI {
     private static final int WIDTH = 100; // Number of characters per line before a line break must be added.
     private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
+    private static final String STRING_TABLE_DELIMITER = " : ";
 
     private final CommandLine cl;
     private final List<String> leftOver;
@@ -159,7 +166,7 @@ public class JabRefCLI {
     public String getWriteMetadatatoPdf() {
         return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadatatoPdf") :
                 cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXMPtoPdf") :
-                cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
+                        cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
     }
 
     private static Options getOptions() {
@@ -291,16 +298,26 @@ public class JabRefCLI {
     public static void printUsage(PreferencesService preferencesService) {
         String header = "";
 
-        String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
-        String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
+        ImportFormatReader importFormatReader = new ImportFormatReader(
+                preferencesService.getImporterPreferences(),
+                preferencesService.getImportFormatPreferences(),
+                new DummyFileUpdateMonitor());
+        List<Pair<String, String>> importFormats = importFormatReader
+                .getImportFormats().stream()
+                .map(format -> new Pair<>(format.getName(), format.getId()))
+                .toList();
+        String importFormatsIntro = Localization.lang("Available import formats");
+        String importFormatsList = String.format("%s:%n%s%n", importFormatsIntro, alignStringTable(importFormats));
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferencesService,
-                Globals.entryTypesManager,
-                Globals.journalAbbreviationRepository);
+                Globals.entryTypesManager);
+        List<Pair<String, String>> exportFormats = exporterFactory
+                .getExporters().stream()
+                .map(format -> new Pair<>(format.getName(), format.getId()))
+                .toList();
         String outFormatsIntro = Localization.lang("Available export formats");
-        String outFormats = wrapStringList(exporterFactory.getExporters().stream().map(Exporter::getId).toList(), outFormatsIntro.length());
-        String outFormatsList = String.format("%s: %s%n", outFormatsIntro, outFormats);
+        String outFormatsList = String.format("%s:%n%s%n", outFormatsIntro, alignStringTable(exportFormats));
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
@@ -316,12 +333,34 @@ public class JabRefCLI {
         return leftOver;
     }
 
+    protected static String alignStringTable(List<Pair<String, String>> table) {
+        StringBuilder sb = new StringBuilder();
+
+        int maxLength = table.stream()
+                             .mapToInt(pair -> Objects.requireNonNullElse(pair.getKey(), "").length())
+                             .max().orElse(0);
+
+        for (Pair<String, String> pair : table) {
+            int padding = Math.max(0, maxLength - pair.getKey().length());
+            sb.append(WRAPPED_LINE_PREFIX);
+            sb.append(pair.getKey());
+
+            sb.append(StringUtil.repeatSpaces(padding));
+
+            sb.append(STRING_TABLE_DELIMITER);
+            sb.append(pair.getValue());
+            sb.append(OS.NEWLINE);
+        }
+
+        return sb.toString();
+    }
+
     /**
      * Creates and wraps a multi-line and colon-seperated string from a List of Strings.
      */
-    protected static String wrapStringList(List<String> list, int firstLineIntroLength) {
+    protected static String wrapStringList(List<String> list, int firstLineIndentation) {
         StringBuilder builder = new StringBuilder();
-        int lastBreak = -firstLineIntroLength;
+        int lastBreak = -firstLineIndentation;
 
         for (String line : list) {
             if (((builder.length() + 2 + line.length()) - lastBreak) > WIDTH) {

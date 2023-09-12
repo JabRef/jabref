@@ -6,7 +6,7 @@ on:
       - main
       - main-release
   pull_request:
-    # always run on pull requests
+  merge_group:
   workflow_dispatch:
 
 env:
@@ -23,45 +23,91 @@ concurrency:
 
 jobs:
   checkstyle:
-    name: Checkstyle
+    name: Code style check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
-      - name: Run check style reporter
+      - name: Run checkstyle reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
           checkstyle_version: '10.3'
-      - name: Run checkstyle gradle
+      - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+      - name: Add comment on pull request
+        if: ${{ failure() }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: >
+              Your code currently does not meet JabRef's code guidelines.
+              The tool reviewdog already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
+              Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+              Afterwards, please run checkstyle locally and fix the issues.
+
+
+              More information on code quality in JabRef is available at <https://devdocs.jabref.org/getting-into-the-code/development-strategy.html>.
+          comment_tag: checkstyle
+          reactions: eyes
+      - name: Run OpenRewrite
+        run: |
+          ./gradlew rewriteDryRun
+      - name: Run modernizer
+        run: |
+          # enable failing of this task if modernizer complains
+          sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
+          ./gradlew modernizer
+  markdown-checks:
+    name: Markdown style check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
           args: CHANGELOG.md CONTRIBUTING.md README.md
           config: '.markdownlint.yml'
+      - name: Lint CHANGELOG.md
+        run: |
+          set -e
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          source ~/.zshrc
+          jbang .github/heylogs.java check CHANGELOG.md > heylogs.txt
+          cat heylogs.txt
+          # We have 7 "valid" issues in CHANGELOG.md
+          grep -q "7 problems" heylogs.txt || exit 1
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests
-        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
+        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
       - name: Format failed test results
@@ -85,11 +131,14 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
@@ -119,11 +168,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
       - name: Run GUI tests
@@ -157,11 +209,14 @@ jobs:
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 19
+          java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
       - name: Update test coverage metrics
@@ -177,5 +232,17 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
       - uses: gradle/wrapper-validation-action@v1
+  # This ensures that no git merge conflict markers (<<<, ...) are contained
+  merge_conflict_job:
+    name: Find merge conflicts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - name: Merge Conflict finder
+        uses: olivernybroe/action-conflict-finder@v4.0

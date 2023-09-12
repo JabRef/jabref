@@ -1,7 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -10,15 +8,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.xmp.XmpPreferences;
+import javafx.collections.FXCollections;
+
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.SaveOrder;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -34,27 +30,24 @@ import static org.mockito.Mockito.when;
 public class ExporterTest {
 
     public BibDatabaseContext databaseContext;
-    public Charset charset;
     public List<BibEntry> entries;
 
     @BeforeEach
     public void setUp() {
         databaseContext = new BibDatabaseContext();
-        charset = StandardCharsets.UTF_8;
         entries = Collections.emptyList();
     }
 
     private static Stream<Object[]> exportFormats() {
+        PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferencesService.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(preferencesService.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
+
+        ExporterFactory exporterFactory = ExporterFactory.create(
+                preferencesService,
+                mock(BibEntryTypesManager.class));
+
         Collection<Object[]> result = new ArrayList<>();
-
-        List<TemplateExporter> customFormats = new ArrayList<>();
-        LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class);
-        SavePreferences savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(savePreferences.getFieldWriterPreferences()).thenReturn(new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences()));
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
-        ExporterFactory exporterFactory = ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences, BibDatabaseMode.BIBTEX, entryTypesManager);
-
         for (Exporter format : exporterFactory.getExporters()) {
             result.add(new Object[]{format, format.getName()});
         }

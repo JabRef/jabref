@@ -25,10 +25,9 @@ class ImportFormatReaderIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        reader = new ImportFormatReader();
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importerPreferences.getCustomImportList()).thenReturn(FXCollections.emptyObservableSet());
-        reader.resetImportFormats(
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
+        reader = new ImportFormatReader(
                 importerPreferences,
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 new DummyFileUpdateMonitor());
@@ -39,7 +38,7 @@ class ImportFormatReaderIntegrationTest {
     void testImportUnknownFormat(String resource, String format, int count) throws Exception {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file, new DummyFileUpdateMonitor());
-        assertEquals(count, unknownFormat.parserResult.getDatabase().getEntryCount());
+        assertEquals(count, unknownFormat.parserResult().getDatabase().getEntryCount());
     }
 
     @ParameterizedTest
@@ -54,7 +53,7 @@ class ImportFormatReaderIntegrationTest {
     void testImportUnknownFormatFromString(String resource, String format, int count) throws Exception {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         String data = Files.readString(file);
-        assertEquals(count, reader.importUnknownFormat(data).parserResult.getDatabase().getEntries().size());
+        assertEquals(count, reader.importUnknownFormat(data).parserResult().getDatabase().getEntries().size());
     }
 
     private static Stream<Object[]> importFormats() {

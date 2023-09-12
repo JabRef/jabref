@@ -27,8 +27,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -43,6 +44,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -52,8 +54,10 @@ import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.sun.star.comp.helper.BootstrapException;
@@ -90,16 +94,25 @@ public class OpenOfficePanel {
     private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
     private final StyleLoader loader;
+    private final LibraryTabContainer tabContainer;
+    private final FileUpdateMonitor fileUpdateMonitor;
+    private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
     private OOBibStyle style;
 
-    public OpenOfficePanel(PreferencesService preferencesService,
-                           OpenOfficePreferences openOfficePreferences,
+    public OpenOfficePanel(LibraryTabContainer tabContainer,
+                           PreferencesService preferencesService,
                            KeyBindingRepository keyBindingRepository,
+                           JournalAbbreviationRepository abbreviationRepository,
                            TaskExecutor taskExecutor,
                            DialogService dialogService,
                            StateManager stateManager,
+                           FileUpdateMonitor fileUpdateMonitor,
+                           BibEntryTypesManager entryTypesManager,
                            UndoManager undoManager) {
+        this.tabContainer = tabContainer;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
@@ -117,7 +130,7 @@ public class OpenOfficePanel {
         manualConnect.setTooltip(new Tooltip(Localization.lang("Manual connect")));
         manualConnect.setMaxWidth(Double.MAX_VALUE);
 
-        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService));
+        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService, preferencesService.getFilePreferences()));
         help.setMaxWidth(Double.MAX_VALUE);
 
         selectDocument = new Button();
@@ -130,8 +143,10 @@ public class OpenOfficePanel {
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
         update.setMaxWidth(Double.MAX_VALUE);
 
-        loader = new StyleLoader(openOfficePreferences,
-                preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository));
+        loader = new StyleLoader(
+                preferencesService.getOpenOfficePreferences(),
+                preferencesService.getLayoutFormatterPreferences(),
+                abbreviationRepository);
 
         initPanel();
     }
@@ -155,9 +170,9 @@ public class OpenOfficePanel {
                 style.ensureUpToDate();
             } catch (IOException ex) {
                 LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", ex);
-                String msg = (Localization.lang("Unable to reload style file")
+                String msg = Localization.lang("Unable to reload style file")
                         + "'" + style.getPath() + "'"
-                        + "\n" + ex.getMessage());
+                        + "\n" + ex.getMessage();
                 new OOError(title, msg, ex).showErrorDialog(dialogService);
                 return FAIL;
             }
@@ -257,7 +272,17 @@ public class OpenOfficePanel {
         Optional<BibDatabase> newDatabase = ooBase.exportCitedHelper(databases, returnPartialResult);
         if (newDatabase.isPresent()) {
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase.get());
-            JabRefGUI.getMainFrame().addTab(databaseContext, true);
+            LibraryTab libraryTab = LibraryTab.createLibraryTab(
+                    databaseContext,
+                    JabRefGUI.getMainFrame(),
+                    dialogService,
+                    preferencesService,
+                    stateManager,
+                    fileUpdateMonitor,
+                    entryTypesManager,
+                    undoManager,
+                    taskExecutor);
+            tabContainer.addTab(libraryTab, true);
         }
     }
 
@@ -330,7 +355,7 @@ public class OpenOfficePanel {
     }
 
     private void updateButtonAvailability() {
-        boolean isConnected = (ooBase != null);
+        boolean isConnected = ooBase != null;
         boolean isConnectedToDocument = isConnected && !ooBase.isDocumentConnectionMissing();
 
         // For these, we need to watch something
@@ -338,7 +363,7 @@ public class OpenOfficePanel {
         boolean hasDatabase = true; // !getBaseList().isEmpty();
         boolean hasSelectedBibEntry = true;
 
-        selectDocument.setDisable(!(isConnected));
+        selectDocument.setDisable(!isConnected);
         pushEntries.setDisable(!(isConnectedToDocument && hasStyle && hasDatabase));
 
         boolean canCite = isConnectedToDocument && hasStyle && hasSelectedBibEntry;
@@ -418,9 +443,9 @@ public class OpenOfficePanel {
         if (!withText) {
             return CitationType.INVISIBLE_CIT;
         }
-        return (inParenthesis
+        return inParenthesis
                 ? CitationType.AUTHORYEAR_PAR
-                : CitationType.AUTHORYEAR_INTEXT);
+                : CitationType.AUTHORYEAR_INTEXT;
     }
 
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
@@ -477,9 +502,9 @@ public class OpenOfficePanel {
         }
 
         Optional<Update.SyncOptions> syncOptions =
-                (preferencesService.getOpenOfficePreferences().getSyncWhenCiting()
+                preferencesService.getOpenOfficePreferences().getSyncWhenCiting()
                         ? Optional.of(new Update.SyncOptions(getBaseList()))
-                        : Optional.empty());
+                        : Optional.empty();
 
         ooBase.guiActionInsertEntry(entries,
                 database,

@@ -11,6 +11,7 @@ The title of the PR must not reference an issue, because GitHub does not support
 - [x] done; [ ] not done / not applicable
 -->
 
+### Mandatory checks
 - [ ] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if applicable)
 - [ ] Tests created for changes (if applicable)
 - [ ] Manually tested changed features in running JabRef (always required)

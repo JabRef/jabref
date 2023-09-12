@@ -12,6 +12,8 @@ gradlew text eol=lf
 
 # .bib files have to be written using OS specific line endings to enable our tests working
 *.bib text !eol
+# Exception: The files used for the http server test - they should have linux line endings
+src/test/resources/org/jabref/http/server/*.bib text eol=lf
 
 # Citavi needs to be LF line ending
 # This overwrites the setting of "*.bib"

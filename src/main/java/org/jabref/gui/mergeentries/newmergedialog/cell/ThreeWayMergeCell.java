@@ -6,9 +6,6 @@ import javafx.scene.layout.HBox;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-/**
- *
- */
 public abstract class ThreeWayMergeCell extends HBox {
     public static final String ODD_PSEUDO_CLASS = "odd";
     public static final String EVEN_PSEUDO_CLASS = "even";
@@ -39,5 +36,10 @@ public abstract class ThreeWayMergeCell extends HBox {
 
     public void setText(String text) {
         viewModel.setText(text);
+    }
+
+    @Override
+    public String toString() {
+        return "ThreeWayMergeCell [getText()=" + getText() + "]";
     }
 }

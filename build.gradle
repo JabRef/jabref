@@ -1,18 +1,17 @@
 import org.gradle.internal.os.OperatingSystem
-import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
 plugins {
     id 'application'
 
-    id 'com.github.andygoossens.modernizer' version '1.7.0'
+    id 'com.github.andygoossens.modernizer' version '1.8.0'
 
-    id 'me.champeau.gradle.jmh' version '0.5.3'
+    id 'me.champeau.jmh' version '0.7.1'
 
     id 'org.javamodularity.moduleplugin' version '1.8.12'
 
-    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 
     id 'org.beryx.jlink' version '2.26.0'
 
@@ -27,6 +26,8 @@ plugins {
     id 'project-report'
 
     id 'idea'
+
+    id 'org.openrewrite.rewrite' version '6.3.3'
 }
 
 // Enable following for debugging
@@ -45,6 +46,11 @@ java {
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
     modularity.inferModulePath.set(false)
+
+    toolchain {
+        // If this is updated, also update .devcontainer/devcontainer.json#L34
+        languageVersion = JavaLanguageVersion.of(20)
+    }
 }
 
 application {
@@ -77,10 +83,11 @@ sourceSets {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://sandec.jfrog.io/artifactory/repo' }
 }
 
 configurations {
@@ -98,63 +105,62 @@ dependencyLocking {
 }
 
 javafx {
-    version = "19"
+    version = "20"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.10"
 }
 
 dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
-    implementation 'org.apache.pdfbox:fontbox:3.0.0-RC1'
-    implementation 'org.apache.pdfbox:xmpbox:3.0.0-RC1'
+    implementation 'org.apache.pdfbox:pdfbox:3.0.0'
+    implementation 'org.apache.pdfbox:fontbox:3.0.0'
+    implementation 'org.apache.pdfbox:xmpbox:3.0.0'
 
-    implementation 'org.apache.lucene:lucene-core:9.4.2'
-    implementation 'org.apache.lucene:lucene-queryparser:9.4.2'
-    implementation 'org.apache.lucene:lucene-queries:9.4.2'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.4.2'
-    implementation 'org.apache.lucene:lucene-highlighter:9.4.2'
+    implementation 'org.apache.lucene:lucene-core:9.7.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.7.0'
+    implementation 'org.apache.lucene:lucene-queries:9.7.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.7.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.7.0'
 
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.9.0'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation 'com.h2database:h2-mvstore:2.1.214'
-
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.6.0'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.13.0'
+    implementation 'com.h2database:h2-mvstore:2.2.222'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.71.1'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.76'
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:libreoffice:7.4.1'
-    implementation 'org.libreoffice:unoloader:7.4.1'
+    implementation 'org.libreoffice:unoloader:7.6.0'
+    implementation 'org.libreoffice:libreoffice:7.6.0'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
+    implementation 'com.github.javakeyring:java-keyring:1.0.4'
 
-    antlr4 'org.antlr:antlr4:4.9.3'
-    implementation 'org.antlr:antlr4-runtime:4.9.3'
+    antlr4 'org.antlr:antlr4:4.13.1'
+    implementation 'org.antlr:antlr4-runtime:4.13.1'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.4.0.202211300538-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.7.0.202309050840-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.14.1'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.1'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.15.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.2'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.7'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
-    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation 'org.postgresql:postgresql:42.6.0'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:31.1-jre') {
+    implementation ('com.google.guava:guava:32.1.2-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -162,27 +168,35 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
-
-    implementation 'com.github.JabRef:afterburner.fx:testmoduleinfo-SNAPSHOT'
+    implementation('org.jabref:afterburner.fx:2.0.0-SNAPSHOT')
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'com.tobiasdiez:easybind:2.2.1-SNAPSHOT'
-    implementation 'org.fxmisc.flowless:flowless:0.7.0'
-    implementation 'org.fxmisc.richtext:richtextfx:0.11.0'
-    implementation 'com.jfoenix:jfoenix:9.0.10'
+    implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
+    implementation 'org.fxmisc.flowless:flowless:0.7.1'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.1'
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.77.0') {
+        exclude module: 'javax.inject' // Split package, use only jakarta.inject
+        exclude group: 'org.apache.logging.log4j'
+    }
+
     implementation 'org.controlsfx:controlsfx:11.1.2'
 
-    implementation 'org.jsoup:jsoup:1.15.3'
-    implementation 'com.konghq:unirest-java:3.14.1'
+    implementation 'org.jsoup:jsoup:1.16.1'
+    implementation 'com.konghq:unirest-java:3.14.5'
 
-    implementation 'org.slf4j:slf4j-api:2.0.6'
-    implementation "org.tinylog:tinylog-api:2.5.0"
-    implementation "org.tinylog:slf4j-tinylog:2.5.0"
-    implementation "org.tinylog:tinylog-impl:2.5.0"
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation "org.tinylog:tinylog-api:2.6.2"
+    implementation "org.tinylog:slf4j-tinylog:2.6.2"
+    implementation "org.tinylog:tinylog-impl:2.6.2"
 
-    implementation 'de.undercouch:citeproc-java:3.0.0-alpha.6'
+    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
+    implementation 'org.slf4j:jul-to-slf4j:2.0.9'
+
+    implementation('de.undercouch:citeproc-java:3.0.0-beta.2') {
+        exclude group: 'org.antlr'
+    }
 
     // jakarta.activation is already dependency of glassfish
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
@@ -197,29 +211,52 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.64.0'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.0'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.64.0'
+    implementation 'com.vladsch.flexmark:flexmark:0.64.8'
 
-    implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
+    implementation group: 'net.harawata', name: 'appdirs', version: '1.2.2'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.154'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.9.1'
+    implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
+    // JAX-RS implemented by Jersey
+    // API
+    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
+    // Implementation of the API
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.1'
+    // injection framework
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.3'
+    implementation 'org.glassfish.hk2:hk2-api:3.0.4'
+    // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
+    // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
+    // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
+    // HTTP server
+    // implementation 'org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1'
+    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.3'
+    testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.3'
+    // Allow objects "magically" to be mapped to JSON using GSON
+    // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
 
-    testImplementation 'org.mockito:mockito-core:4.11.0'
-    testImplementation 'org.xmlunit:xmlunit-core:2.9.0'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.9.0'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.0.1'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.0.1'
+    testImplementation 'io.github.classgraph:classgraph:4.8.162'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.0'
+
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.1.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.1.0'
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.6.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.3'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
+
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.2.1"))
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis")
+    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java")
 }
 
 clean {
@@ -257,13 +294,10 @@ processResources {
     }
 }
 
-task generateSource(dependsOn: ["generateBstGrammarSource",
-                                "generateSearchGrammarSource",
-                                "generateMedlineSource",
-                                "generateBibtexmlSource",
-                                "generateEndnoteSource",
-                                "generateModsSource",
-                                "generateCitaviSource"]) {
+tasks.register('generateSource') {
+    dependsOn("generateBstGrammarSource",
+            "generateSearchGrammarSource",
+            "generateCitaviSource")
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
@@ -280,44 +314,26 @@ tasks.register("generateBstGrammarSource", JavaExec) {
 }
 
 tasks.register("generateSearchGrammarSource", JavaExec) {
-    main = "org.antlr.v4.Tool"
-    classpath = configurations.antlr4
     group = 'JabRef'
     description = "Generates java files for Search.g antlr4."
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
 
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
-task generateMedlineSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the medline importer."
-
-    schemaFile = "src/main/resources/xjc/medline/medline.xsd"
-    outputDirectory = "src-gen/main/java"
-    javaPackage = "org.jabref.logic.importer.fileformat.medline"
+tasks.register("generateJournalAbbreviationList", JavaExec) {
+    group = "JabRef"
+    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "org.jabref.cli.JournalListMvGenerator"
 }
+jar.dependsOn "generateJournalAbbreviationList"
+test.dependsOn "generateJournalAbbreviationList"
 
-task generateBibtexmlSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the bibtexml importer."
-
-    schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
-    outputDirectory = "src-gen/main/java/"
-    javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
-}
-
-task generateEndnoteSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the endnote importer."
-
-    schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
-    outputDirectory = "src-gen/main/java/"
-    javaPackage = "org.jabref.logic.importer.fileformat.endnote"
-}
-
-task generateCitaviSource(type: XjcTask) {
+tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
     description = "Generates java files for the citavi importer."
 
@@ -326,29 +342,7 @@ task generateCitaviSource(type: XjcTask) {
     javaPackage = "org.jabref.logic.importer.fileformat.citavi"
 }
 
-task generateModsSource(type: XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the mods importer."
-
-    schemaFile = "src/main/resources/xjc/mods/mods-3-7.xsd"
-    bindingFile = "src/main/resources/xjc/mods/mods-binding.xjb"
-    outputDirectory = "src-gen/main/java"
-    javaPackage = "org.jabref.logic.importer.fileformat.mods"
-    arguments = '-npa'
-}
-
-task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
-    group = 'JabRef'
-    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore."
-
-    // This directory is filled by "refresh-journal-lists.yml"
-    // It takes the contents of https://github.com/JabRef/abbrv.jabref.org.git
-    inputDir = file("build/journals")
-
-    outputDir = file("src/main/resources/journals")
-}
-
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
@@ -374,8 +368,6 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-
                 // Not sure why we need to restate the controlfx exports
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
@@ -396,22 +388,23 @@ run {
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
-                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
-
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.binding' : 'com.jfoenix',
-                'javafx.graphics/com.sun.javafx.stage' : 'com.jfoenix',
-                'javafx.base/com.sun.javafx.event' : 'com.jfoenix'
+                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
         ]
+    }
+
+    if (project.hasProperty('component')){
+        if (component == 'httpserver'){
+            main = 'org.jabref.http.server.Server'
+        }
     }
 }
 
 javadoc {
     options {
         encoding = 'UTF-8'
-        version = true
-        author = true
-         addMultilineStringsOption("-add-exports").setValue([
+        version = false
+        author = false
+        addMultilineStringsOption("-add-exports").setValue([
             'javafx.controls/com.sun.javafx.scene.control=org.jabref',
             'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
         ])
@@ -424,7 +417,7 @@ test {
     }
 
     moduleOptions {
-        // TODO: Remove this as soon as archunit is modularized
+        // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
     }
 
@@ -442,7 +435,7 @@ testlogger {
     showSkipped false
 }
 
-task databaseTest(type: Test) {
+tasks.register('databaseTest', Test) {
     useJUnitPlatform {
         includeTags 'DatabaseTest'
     }
@@ -454,7 +447,7 @@ task databaseTest(type: Test) {
     }
 }
 
-task fetcherTest(type: Test) {
+tasks.register('fetcherTest', Test) {
     useJUnitPlatform {
         includeTags 'FetcherTest'
     }
@@ -466,7 +459,7 @@ task fetcherTest(type: Test) {
     }
 }
 
-task guiTest(type: Test) {
+tasks.register('guiTest', Test) {
     useJUnitPlatform {
         includeTags 'GUITest'
     }
@@ -479,7 +472,7 @@ task guiTest(type: Test) {
 }
 
 // Test result tasks
-task copyTestResources(type: Copy) {
+tasks.register('copyTestResources', Copy) {
     from "${projectDir}/src/test/resources"
     into "${buildDir}/classes/test"
 }
@@ -489,11 +482,13 @@ tasks.withType(Test) {
     reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
 }
 
-task jacocoPrepare() {
+tasks.register('jacocoPrepare') {
     doFirst {
         // Ignore failures of tests
-        tasks.withType(Test) {
-            ignoreFailures = true
+        tasks.withType(Test).tap {
+            configureEach {
+                ignoreFailures = true
+            }
         }
     }
 }
@@ -521,8 +516,37 @@ checkstyle {
     sourceSets = []
 }
 
+rewrite {
+    activeRecipe(
+        'org.jabref.config.rewrite.cleanup'
+    )
+    exclusion (
+        "build.gradle",
+        "buildSrc/build.gradle",
+        "eclipse.gradle",
+        "settings.gradle",
+        "src-gen/**",
+        "src/main/resources/**",
+        "src/test/resources/**",
+        "**/module-info.java",
+        "**/*.py",
+        "**/*.xml",
+        "**/*.yml"
+    )
+    plainTextMask("**/*.md")
+    failOnDryRunResults = true
+}
+
+modernizer {
+    failOnViolations = false
+    includeTestClasses = true
+    exclusions = [
+        'java/util/Optional.get:()Ljava/lang/Object;'
+    ]
+}
+
 // Release tasks
-task deleteInstallerTemp(type: Delete) {
+tasks.register('deleteInstallerTemp', Delete) {
     delete "$buildDir/installer"
 }
 
@@ -590,7 +614,8 @@ jlink {
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
-                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'    }
+                'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
+    }
 
     jpackage {
         outputDir = "distribution"
@@ -612,6 +637,7 @@ jlink {
                     '--win-menu-group', "JabRef",
                     '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/windows",
+                    '--license-file', "${projectDir}/buildres/LICENSE_with_Privacy.md",
                     '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"
             ]
         }
@@ -641,8 +667,7 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
                     '--resource-dir', "${projectDir}/buildres/mac"
             ]
-            // Due to a signing bug in jpackage we have to first resign the created app and therefore build the dmg manually
-            // See https://bugs.openjdk.java.net/browse/JDK-8251892 for details
+            // Notarized mac images and packages are built on the pipeline only
             skipInstaller = true
             installerOptions = [
                     '--verbose',
@@ -689,24 +714,9 @@ if (OperatingSystem.current().isMacOsX()) {
         }
     }
 }
+
 jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
-}
-
-// Source: https://stackoverflow.com/a/44168582/873282
-task downloadDependencies {
-    description "Pre-downloads *most* dependencies"
-    doLast {
-        configurations.getAsMap().each { name, config ->
-            println "Retrieving dependencies for $name"
-            try {
-                config.files
-            } catch (e) {
-                // some cannot be resolved, just log them
-                project.logger.info e.message
-            }
-        }
-    }
 }

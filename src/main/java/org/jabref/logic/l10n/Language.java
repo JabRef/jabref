@@ -14,6 +14,7 @@ public enum Language {
     DANISH("Dansk", "da"),
     DUTCH("Nederlands", "nl"),
     ENGLISH("English", "en"),
+    FINNISH("Suomi", "fi"),
     FRENCH("Français", "fr"),
     GERMAN("Deutsch", "de"),
     GREEK("ελληνικά (Greek)", "el"),
@@ -52,9 +53,9 @@ public enum Language {
         String[] languageParts = language.getId().split("_");
         Locale locale;
         if (languageParts.length == 1) {
-            locale = new Locale(languageParts[0]);
+            locale = Locale.of(languageParts[0]);
         } else if (languageParts.length == 2) {
-            locale = new Locale(languageParts[0], languageParts[1]);
+            locale = Locale.of(languageParts[0], languageParts[1]);
         } else {
             locale = Locale.ENGLISH;
         }

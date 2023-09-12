@@ -37,10 +37,12 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 import org.controlsfx.control.PopOver;
@@ -88,14 +90,19 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-    private final GroupDialogViewModel viewModel;
 
-    public GroupDialogView(DialogService dialogService,
-                           BibDatabaseContext currentDatabase,
-                           PreferencesService preferencesService,
+    private final BibDatabaseContext currentDatabase;
+    private final AbstractGroup editedGroup;
+    private GroupDialogViewModel viewModel;
+    @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
+
+    public GroupDialogView(BibDatabaseContext currentDatabase,
                            AbstractGroup editedGroup,
                            GroupDialogHeader groupDialogHeader) {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, groupDialogHeader);
+        this.currentDatabase = currentDatabase;
+        this.editedGroup = editedGroup;
 
         ViewLoader.view(this)
                   .load()
@@ -111,7 +118,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             this.setTitle(Localization.lang("Edit group") + " " + editedGroup.getName());
         }
 
-        setResultConverter(viewModel::resultConverter);
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
@@ -122,6 +128,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, fileUpdateMonitor);
+
+        setResultConverter(viewModel::resultConverter);
+
         hierarchyText.put(GroupHierarchyType.INCLUDING, Localization.lang("Union"));
         hierarchyToolTip.put(GroupHierarchyType.INCLUDING, Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
         hierarchyText.put(GroupHierarchyType.REFINING, Localization.lang("Intersection"));
@@ -152,6 +162,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         keywordGroupRegex.selectedProperty().bindBidirectional(viewModel.keywordGroupRegexProperty());
 
         searchGroupSearchTerm.textProperty().bindBidirectional(viewModel.searchGroupSearchTermProperty());
+        searchGroupRegex.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.REGULAR_EXPRESSION));
         searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> {
             EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
             if (newValue) {

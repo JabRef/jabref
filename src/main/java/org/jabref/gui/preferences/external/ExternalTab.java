@@ -23,12 +23,14 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     @FXML private CheckBox autoOpenAttachedFolders;
     @FXML private ComboBox<PushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
+
     @FXML private CheckBox useCustomTerminal;
     @FXML private TextField customTerminalCommand;
     @FXML private Button customTerminalBrowse;
     @FXML private CheckBox useCustomFileBrowser;
     @FXML private TextField customFileBrowserCommand;
     @FXML private Button customFileBrowserBrowse;
+    @FXML private TextField kindleEmail;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -67,6 +69,8 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         customFileBrowserCommand.textProperty().bindBidirectional(viewModel.customFileBrowserCommandProperty());
         customFileBrowserCommand.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());
         customFileBrowserBrowse.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());
+
+        kindleEmail.textProperty().bindBidirectional(viewModel.kindleEmailProperty());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {

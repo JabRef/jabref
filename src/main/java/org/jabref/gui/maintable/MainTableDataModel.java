@@ -36,19 +36,19 @@ public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
-    private final PreferencesService preferencesService;
     private final GroupsPreferences groupsPreferences;
+    private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final StateManager stateManager;
     private Optional<SearchQuery> lastSearchQuery = Optional.empty();
 
     public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
-        this.preferencesService = preferencesService;
         this.groupsPreferences = preferencesService.getGroupsPreferences();
+        this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
         this.stateManager = stateManager;
         this.fieldValueFormatter = new SimpleObjectProperty<>(
-                new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
+                new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
@@ -123,11 +123,11 @@ public class MainTableDataModel {
     }
 
     private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {
-        if (!preferencesService.getGroupsPreferences().groupViewModeProperty().contains(GroupViewMode.FILTER)) {
+        if (!groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER)) {
             return true;
         }
         return createGroupMatcher(groups, groupsPreferences)
-                .map(matcher -> preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^ matcher.isMatch(entry.getEntry()))
+                .map(matcher -> groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT) ^ matcher.isMatch(entry.getEntry()))
                 .orElse(true);
     }
 
@@ -153,6 +153,6 @@ public class MainTableDataModel {
     }
 
     public void refresh() {
-        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
+        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
     }
 }

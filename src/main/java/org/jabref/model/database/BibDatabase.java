@@ -112,7 +112,7 @@ public class BibDatabase {
     /**
      * Returns the list of entries sorted by the given comparator.
      */
-    public synchronized List<BibEntry> getEntriesSorted(Comparator<BibEntry> comparator) {
+    public List<BibEntry> getEntriesSorted(Comparator<BibEntry> comparator) {
         List<BibEntry> entriesSorted = new ArrayList<>(entries);
         entriesSorted.sort(comparator);
 
@@ -633,8 +633,6 @@ public class BibDatabase {
 
     /**
      * Set the newline separator.
-     *
-     * @param newLineSeparator
      */
     public void setNewLineSeparator(String newLineSeparator) {
         this.newLineSeparator = newLineSeparator;

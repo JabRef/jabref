@@ -21,6 +21,7 @@
 package org.jabref.gui.openoffice;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -107,7 +108,7 @@ public class Bootstrap {
      * @see #bootstrap(String[])
      * @since LibreOffice 5.1
      */
-    public static final String[] getDefaultOptions() {
+    public static String[] getDefaultOptions() {
         return new String[] {"--nologo", "--nodefault", "--norestore", "--nolockcheck"};
     }
 
@@ -176,7 +177,7 @@ public class Bootstrap {
      * <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
      * @throws Exception if things go awry.
      */
-    public static final XComponentContext defaultBootstrap_InitialComponentContext() throws Exception {
+    public static XComponentContext defaultBootstrap_InitialComponentContext() throws Exception {
         return defaultBootstrap_InitialComponentContext((String) null, (Map<String, String>) null);
     }
 
@@ -188,7 +189,7 @@ public class Bootstrap {
      * @return a freshly bootstrapped component context.
      * @throws Exception if things go awry.
      */
-    public static final XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Hashtable<String, String> bootstrap_parameters) throws Exception {
+    public static XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Hashtable<String, String> bootstrap_parameters) throws Exception {
         return defaultBootstrap_InitialComponentContext(ini_file, (Map<String, String>) bootstrap_parameters);
     }
 
@@ -203,7 +204,7 @@ public class Bootstrap {
      * @return a freshly bootstrapped component context.
      * @throws Exception if things go awry.
      */
-    public static final XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Map<String, String> bootstrap_parameters) throws Exception {
+    public static XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Map<String, String> bootstrap_parameters) throws Exception {
         // jni convenience: easier to iterate over array than calling Hashtable
         String pairs[] = null;
         if (null != bootstrap_parameters) {
@@ -253,7 +254,7 @@ public class Bootstrap {
      * @throws BootstrapException if things go awry.
      * @since UDK 3.1.0
      */
-    public static final XComponentContext bootstrap(Path ooPath) throws BootstrapException {
+    public static XComponentContext bootstrap(Path ooPath) throws BootstrapException {
         String[] defaultArgArray = getDefaultOptions();
         return bootstrap(defaultArgArray, ooPath);
     }
@@ -267,7 +268,7 @@ public class Bootstrap {
      * @see #getDefaultOptions()
      * @since LibreOffice 5.1
      */
-    public static final XComponentContext bootstrap(String[] argArray, Path path) throws BootstrapException {
+    public static XComponentContext bootstrap(String[] argArray, Path path) throws BootstrapException {
 
         XComponentContext xContext = null;
 
@@ -282,7 +283,7 @@ public class Bootstrap {
             // We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
             String[] cmdArray = new String[argArray.length + 2];
             cmdArray[0] = path.toAbsolutePath().toString();
-            cmdArray[1] = ("--accept=socket,host=localhost,port=2083" + ";urp;");
+            cmdArray[1] = "--accept=socket,host=localhost,port=2083" + ";urp;";
 
             System.arraycopy(argArray, 0, cmdArray, 2, argArray.length);
 
@@ -326,7 +327,7 @@ public class Bootstrap {
             throw e;
         } catch (java.lang.RuntimeException e) {
             throw e;
-        } catch (java.lang.Exception e) {
+        } catch (Exception e) {
             throw new BootstrapException(e);
         }
 
@@ -349,7 +350,7 @@ public class Bootstrap {
                     }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace(System.err);
-                } catch (java.io.IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace(System.err);
                 }
             }

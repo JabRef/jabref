@@ -128,7 +128,7 @@ public class OracleProcessor extends DBMSProcessor {
                 statement.executeQuery(selectQuery.toString());
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during starting the notification listener", e);
         }
     }
 
@@ -144,7 +144,7 @@ public class OracleProcessor extends DBMSProcessor {
                                 ") VALUES(?)";
 
                 try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery,
-                        new String[] {"SHARED_ID"})) {
+                        new String[]{"SHARED_ID"})) {
 
                     preparedEntryStatement.setString(1, entry.getType().getName());
                     preparedEntryStatement.executeUpdate();
@@ -157,7 +157,7 @@ public class OracleProcessor extends DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during entry insertion", e);
         }
     }
 
@@ -200,7 +200,7 @@ public class OracleProcessor extends DBMSProcessor {
                 preparedFieldStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during field insertion", e);
         }
     }
 
@@ -210,7 +210,7 @@ public class OracleProcessor extends DBMSProcessor {
             oracleConnection.unregisterDatabaseChangeNotification(databaseChangeRegistration);
             oracleConnection.close();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error during stopping the notification listener", e);
         }
     }
 

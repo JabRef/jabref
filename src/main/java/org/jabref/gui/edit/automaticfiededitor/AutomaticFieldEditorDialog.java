@@ -66,7 +66,7 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
         // Read more: https://stackoverflow.com/questions/45866249/javafx-8-alert-different-button-sizes
         getDialogPane().getButtonTypes().stream()
             .map(getDialogPane()::lookupButton)
-            .forEach(btn-> ButtonBar.setButtonUniformSize(btn, false));
+            .forEach(btn -> ButtonBar.setButtonUniformSize(btn, false));
     }
 
     @FXML

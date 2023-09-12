@@ -1,43 +1,39 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/java
 {
     "name": "Java",
-    "image": "mcr.microsoft.com/vscode/devcontainers/base:bullseye",
-
-    // Configure tool-specific properties.
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
     "customizations": {
-        // Configure properties specific to VS Code.
         "vscode": {
-            // Set *default* container specific settings.json values on container create.
-            "settings": { 
-            },
-            
-            // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
                 "vscjava.vscode-java-pack",
                 "vscjava.vscode-gradle",
-                "shengchen.vscode-checkstyle"
+                "shengchen.vscode-checkstyle",
+                "DavidAnson.vscode-markdownlint"
             ]
         }
     },
 
-    "onCreateCommand": "gradle assemble",
+    // Source code generation needs to be done before hand-over to VS Code.
+    // Otherwise, the Java extension will go mad.
+    "onCreateCommand": "./gradlew testClasses --console=plain --no-daemon",
 
-    // Forward the noVNC port (desktop-lite: https://github.com/devcontainers/features/tree/main/src/desktop-lite)  
-    "forwardPorts": [6080],
+    // Forward the vncPort and noVNC port.
+    // They are provided by desktop-lite:
+    // https://github.com/devcontainers/features/tree/main/src/desktop-lite#options
+    "forwardPorts": [5901, 6080],
 
     // Need to connect as root otherwise we run into issues with gradle.
     // default option is "vscode". More info: https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "root",
     "features": {
         // Adds a lightweight desktop that can be accessed using a VNC viewer or the web
-        "desktop-lite": "latest",
+        "ghcr.io/devcontainers/features/desktop-lite:1": {},
 
-        // Install java
-        "java": {
-            "version": "18",
-            "installGradle": true,
-            "jdkDistro": "sem"
+        // Install java.
+        // See https://github.com/devcontainers/features/tree/main/src/java#options for details.
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "20.0.2-tem",
+            "installGradle": false,
+            "jdkDistro": "tem"
         }
     }
 }

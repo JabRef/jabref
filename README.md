@@ -3,7 +3,8 @@
 JabRef is an open-source, cross-platform citation and reference management tool.
 
 Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
-[![main table](docs/images/jabref-mainscreen.png)](http://www.jabref.org/img/jabref-mainscreen.png)
+
+![main table](docs/images/jabref-mainscreen.png)
 
 ## Features
 
@@ -23,7 +24,7 @@ It supports you in every step of your research work.
 
 - Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your manual assignments
 - Advanced search and filter features
-- Complete and fix bibliographic data by comparing with curated online catalogues such as Google Scholar, Springer or MathSciNet
+- Complete and fix bibliographic data by comparing with curated online catalogs such as Google Scholar, Springer or MathSciNet
 - Customizable citation key generator
 - Customize and add new metadata fields or reference types
 - Find and merge duplicates
@@ -35,13 +36,13 @@ It supports you in every step of your research work.
 
 - Native BibTeX and Biblatex support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
-- Format references in one of the many thousand built-in citation styles or create your style
+- Format references using one of thousands of built-in citation styles or create your own style
 - Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
 
 ### Share
 
 - Many built-in export options or create your export format
-- Library is saved as a simple text file and thus it is easy to share with others via Dropbox and is version-control friendly
+- Library is saved as a simple text file, and thus it is easy to share with others via Dropbox and is version-control friendly
 - Work in a team: sync the contents of your library via a SQL database
 
 ## Installation
@@ -54,7 +55,7 @@ Please see our [Installation Guide](https://docs.jabref.org/installation).
 ## Bug Reports, Suggestions, Other Feedback
 
 [![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
-[![Paypal Donate](https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square)](https://paypal.me/JabRef)
+[![PayPal Donate](https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square)](https://paypal.me/JabRef)
 
 We are thankful for any bug reports or other feedback.
 If you have ideas for new features you want to be included in JabRef, tell us in [the feature section](http://discourse.jabref.org/c/features) of our forum!
@@ -88,16 +89,16 @@ We will discuss improvements with you and agree to merge them once the [develope
 
 If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
-To compile JabRef from source, you need a Java Development Kit 19 and `JAVA_HOME` pointing to this JDK.
+To compile JabRef from source, you need a Java Development Kit 20 and `JAVA_HOME` pointing to this JDK.
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
 and then generate the Eclipse `gradlew eclipse`.
 For IntelliJ IDEA, just import the project via a Gradle Import by pointing at the `build.gradle`.
 
-`gradlew test` executes all tests. We use [Github Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
+`gradlew test` executes all tests. We use [GitHub Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
 
 ## Sponsoring
 
-JabRef development is powered by YourKit Java Profiler [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.png)](https://www.yourkit.com/java/profiler/)
+JabRef development is powered by YourKit Java Profiler [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
 
 [JabRef]: https://www.jabref.org

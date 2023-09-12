@@ -1,7 +1,6 @@
 package org.jabref.gui.externalfiles;
 
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,11 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -37,11 +36,16 @@ public class DownloadFullTextAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final PreferencesService preferences;
+    private final TaskExecutor taskExecutor;
 
-    public DownloadFullTextAction(DialogService dialogService, StateManager stateManager, PreferencesService preferences) {
+    public DownloadFullTextAction(DialogService dialogService,
+                                  StateManager stateManager,
+                                  PreferencesService preferences,
+                                  TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -102,7 +106,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                 Localization.lang("Looking for full text document..."),
                 findFullTextsTask);
 
-        Globals.TASK_EXECUTOR.execute(findFullTextsTask);
+        taskExecutor.execute(findFullTextsTask);
     }
 
     private void downloadFullTexts(Map<BibEntry, Optional<URL>> downloads, BibDatabaseContext databaseContext) {
@@ -110,15 +114,7 @@ public class DownloadFullTextAction extends SimpleCommand {
             BibEntry entry = download.getKey();
             Optional<URL> result = download.getValue();
             if (result.isPresent()) {
-                Optional<Path> dir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
-                if (dir.isEmpty()) {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
-                            Localization.lang("Main file directory not set. Check the preferences (linked files) or the library properties."));
-                    return;
-                }
-
-                // Download and link full text
-                addLinkedFileFromURL(databaseContext, result.get(), entry, dir.get());
+                addLinkedFileFromURL(databaseContext, result.get(), entry);
             } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
                         entry.getCitationKey().orElse(Localization.lang("undefined"))));
@@ -133,9 +129,8 @@ public class DownloadFullTextAction extends SimpleCommand {
      * @param databaseContext the active database
      * @param url             the url "key"
      * @param entry           the entry "value"
-     * @param targetDirectory the target directory for the downloaded file
      */
-    private void addLinkedFileFromURL(BibDatabaseContext databaseContext, URL url, BibEntry entry, Path targetDirectory) {
+    private void addLinkedFileFromURL(BibDatabaseContext databaseContext, URL url, BibEntry entry) {
         LinkedFile newLinkedFile = new LinkedFile(url, "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
@@ -143,7 +138,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     newLinkedFile,
                     entry,
                     databaseContext,
-                    Globals.TASK_EXECUTOR,
+                    taskExecutor,
                     dialogService,
                     preferences);
 

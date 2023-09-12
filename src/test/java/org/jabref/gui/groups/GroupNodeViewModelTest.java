@@ -49,7 +49,8 @@ class GroupNodeViewModelTest {
                 true,
                 false,
                 true,
-                true
+                true,
+                GroupHierarchyType.INDEPENDENT
         ));
 
         viewModel = getViewModelForGroup(

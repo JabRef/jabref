@@ -31,6 +31,7 @@ import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -57,6 +58,7 @@ public class MainTableColumnFactory {
     private final CellFactory cellFactory;
     private final UndoManager undoManager;
     private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
     private final StateManager stateManager;
 
     public MainTableColumnFactory(BibDatabaseContext database,
@@ -64,11 +66,13 @@ public class MainTableColumnFactory {
                                   ColumnPreferences abstractColumnPrefs,
                                   UndoManager undoManager,
                                   DialogService dialogService,
-                                  StateManager stateManager) {
+                                  StateManager stateManager,
+                                  TaskExecutor taskExecutor) {
         this.database = Objects.requireNonNull(database);
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.columnPreferences = abstractColumnPrefs;
         this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
         this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
@@ -199,7 +203,7 @@ public class MainTableColumnFactory {
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<Color> groupColors = matchedGroups.stream()
                                                .flatMap(group -> OptionalUtil.toStream(group.getColor()))
-                                               .collect(Collectors.toList());
+                                               .toList();
 
         if (!groupColors.isEmpty()) {
             HBox container = new HBox();
@@ -259,7 +263,8 @@ public class MainTableColumnFactory {
                 database,
                 dialogService,
                 preferencesService,
-                stateManager);
+                stateManager,
+                taskExecutor);
     }
 
     /**
@@ -271,7 +276,8 @@ public class MainTableColumnFactory {
                 dialogService,
                 preferencesService,
                 stateManager,
-                columnModel.getQualifier());
+                columnModel.getQualifier(),
+                taskExecutor);
     }
 
     /**

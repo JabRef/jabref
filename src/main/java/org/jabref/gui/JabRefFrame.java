@@ -17,117 +17,49 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
-import javafx.concurrent.Task;
-import javafx.geometry.Orientation;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.auximport.NewSubLibraryAction;
-import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
-import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
-import org.jabref.gui.cleanup.CleanupAction;
-import org.jabref.gui.contentselector.ManageContentSelectorAction;
-import org.jabref.gui.copyfiles.CopyFilesAction;
-import org.jabref.gui.customentrytypes.CustomizeEntryAction;
+import org.jabref.gui.autosaveandbackup.AutosaveManager;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
-import org.jabref.gui.duplicationFinder.DuplicateSearch;
-import org.jabref.gui.edit.CopyMoreAction;
-import org.jabref.gui.edit.EditAction;
-import org.jabref.gui.edit.ManageKeywordsAction;
-import org.jabref.gui.edit.OpenBrowserAction;
-import org.jabref.gui.edit.ReplaceStringAction;
-import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorAction;
-import org.jabref.gui.entryeditor.OpenEntryEditorAction;
-import org.jabref.gui.entryeditor.PreviewSwitchAction;
-import org.jabref.gui.exporter.ExportCommand;
-import org.jabref.gui.exporter.ExportToClipboardAction;
-import org.jabref.gui.exporter.SaveAction;
-import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
-import org.jabref.gui.exporter.WriteMetadataToPdfAction;
-import org.jabref.gui.externalfiles.AutoLinkFilesAction;
-import org.jabref.gui.externalfiles.DownloadFullTextAction;
-import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
-import org.jabref.gui.help.AboutAction;
-import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.help.SearchForUpdateAction;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.importer.GenerateEntryFromIdDialog;
-import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
-import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
-import org.jabref.gui.integrity.IntegrityCheckAction;
-import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.menus.FileHistoryMenu;
-import org.jabref.gui.mergeentries.MergeEntriesAction;
-import org.jabref.gui.preferences.ShowPreferencesAction;
-import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
-import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
-import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
-import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
-import org.jabref.gui.slr.EditExistingStudyAction;
-import org.jabref.gui.slr.ExistingStudySearchAction;
-import org.jabref.gui.slr.StartNewStudyAction;
-import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
-import org.jabref.gui.texparser.ParseLatexAction;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autosaveandbackup.AutosaveManager;
-import org.jabref.logic.autosaveandbackup.BackupManager;
-import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportCleanup;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.AddUndoableActionEvent;
@@ -136,9 +68,11 @@ import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
@@ -146,8 +80,6 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import com.tobiasdiez.easybind.Subscription;
-import org.controlsfx.control.PopOver;
-import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +87,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The main window of the application.
  */
-public class JabRefFrame extends BorderPane {
+public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     public static final String FRAME_TITLE = "JabRef";
 
@@ -171,31 +103,29 @@ public class JabRefFrame extends BorderPane {
 
     private final Stage mainStage;
     private final StateManager stateManager;
-    private final ThemeManager themeManager;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
+    private final FileUpdateMonitor fileUpdateMonitor;
+    private final BibEntryTypesManager entryTypesManager;
     private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private TabPane tabbedPane;
-    private PopOver progressViewPopOver;
-    private PopOver entryFromIdPopOver;
 
     private Subscription dividerSubscription;
 
     private final TaskExecutor taskExecutor;
-    private final ImportFormatReader importFormatReader;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
         this.stateManager = Globals.stateManager;
-        this.themeManager = Globals.getThemeManager();
-        this.dialogService = new JabRefDialogService(mainStage, this, themeManager);
+        this.dialogService = new JabRefDialogService(mainStage);
         this.undoManager = Globals.undoManager;
+        this.fileUpdateMonitor = Globals.getFileUpdateMonitor();
+        this.entryTypesManager = Globals.entryTypesManager;
         this.globalSearchBar = new GlobalSearchBar(this, stateManager, prefs, undoManager, dialogService);
-        this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs);
-        this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
         this.taskExecutor = Globals.TASK_EXECUTOR;
-        this.importFormatReader = Globals.IMPORT_FORMAT_READER;
+        this.pushToApplicationCommand = new PushToApplicationCommand(stateManager, dialogService, prefs, taskExecutor);
+        this.fileHistory = new FileHistoryMenu(prefs.getGuiPreferences().getFileHistory(), dialogService, getOpenDatabaseAction());
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -256,9 +186,9 @@ public class JabRefFrame extends BorderPane {
 
                         Dragboard dragboard = tabDragEvent.getDragboard();
 
-                        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard())) {
+                        if (DragAndDropHelper.hasBibFiles(dragboard)) {
                             tabbedPane.getTabs().remove(dndIndicator);
-                            List<Path> bibFiles = DragAndDropHelper.getBibFiles(tabDragEvent.getDragboard());
+                            List<Path> bibFiles = DragAndDropHelper.getBibFiles(dragboard);
                             OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
                             openDatabaseAction.openFiles(bibFiles);
                             tabDragEvent.setDropCompleted(true);
@@ -268,8 +198,8 @@ public class JabRefFrame extends BorderPane {
                                 if (libraryTab.getId().equals(destinationTabNode.getId()) &&
                                         !tabbedPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
                                     LibraryTab destinationLibraryTab = (LibraryTab) libraryTab;
-                                    if (DragAndDropHelper.hasGroups(tabDragEvent.getDragboard())) {
-                                        List<String> groupPathToSources = DragAndDropHelper.getGroups(tabDragEvent.getDragboard());
+                                    if (DragAndDropHelper.hasGroups(dragboard)) {
+                                        List<String> groupPathToSources = DragAndDropHelper.getGroups(dragboard);
 
                                         copyRootNode(destinationLibraryTab);
 
@@ -321,6 +251,10 @@ public class JabRefFrame extends BorderPane {
                         getCurrentLibraryTab().getMainTable().requestFocus();
                         event.consume();
                         break;
+                    case FOCUS_GROUP_LIST:
+                        sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus();
+                        event.consume();
+                    break;
                     case NEXT_LIBRARY:
                         tabbedPane.getSelectionModel().selectNext();
                         event.consume();
@@ -391,7 +325,7 @@ public class JabRefFrame extends BorderPane {
         if (!telemetryPreferences.shouldCollectTelemetry()) {
             shouldCollect = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Telemetry: Help make JabRef better"),
-                    Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via Options -> Preferences -> General."),
+                    Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via File -> Preferences -> General."),
                     Localization.lang("Share anonymous statistics"),
                     Localization.lang("Don't share"));
         }
@@ -412,7 +346,7 @@ public class JabRefFrame extends BorderPane {
      * The MacAdapter calls this method when "About" is selected from the application menu.
      */
     public void about() {
-        new HelpAction(HelpFile.CONTENTS, dialogService).execute();
+        new HelpAction(HelpFile.CONTENTS, dialogService, prefs.getFilePreferences()).execute();
     }
 
     /**
@@ -424,7 +358,7 @@ public class JabRefFrame extends BorderPane {
      *                  set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        if (prefs.getImportExportPreferences().shouldOpenLastEdited()) {
+        if (prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
@@ -473,13 +407,6 @@ public class JabRefFrame extends BorderPane {
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             LibraryTab libraryTab = getLibraryTabAt(i);
             final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
-
-            if (context.hasEmptyEntries()) {
-                if (!confirmEmptyEntry(libraryTab, context)) {
-                    return false;
-                }
-            }
-
             if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
                 tabbedPane.getSelectionModel().select(i);
                 if (!confirmClose(libraryTab)) {
@@ -491,23 +418,79 @@ public class JabRefFrame extends BorderPane {
                 context.clearDBMSSynchronizer();
             }
             AutosaveManager.shutdown(context);
-            BackupManager.shutdown(context);
+            BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
 
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
         waitForSaveFinishedDialog.showAndWait(getLibraryTabs());
 
+        // We call saveWindow state here again because under Mac the windowClose listener on the stage isn't triggered when using cmd + q
+        saveWindowState();
         // Good bye!
         tearDownJabRef(filenames);
         Platform.exit();
         return true;
     }
 
+    public void saveWindowState() {
+        GuiPreferences preferences = prefs.getGuiPreferences();
+        preferences.setPositionX(mainStage.getX());
+        preferences.setPositionY(mainStage.getY());
+        preferences.setSizeX(mainStage.getWidth());
+        preferences.setSizeY(mainStage.getHeight());
+        preferences.setWindowMaximised(mainStage.isMaximized());
+        preferences.setWindowFullScreen(mainStage.isFullScreen());
+        debugLogWindowState(mainStage);
+    }
+
+    /**
+     * outprints the Data from the Screen (only in debug mode)
+     *
+     * @param mainStage JabRefs stage
+     */
+    private void debugLogWindowState(Stage mainStage) {
+        if (LOGGER.isDebugEnabled()) {
+            String debugLogString = "SCREEN DATA:" +
+                    "mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n" +
+                    "mainStage.POS_X: " + mainStage.getX() + "\n" +
+                    "mainStage.POS_Y: " + mainStage.getY() + "\n" +
+                    "mainStage.SIZE_X: " + mainStage.getWidth() + "\n" +
+                    "mainStages.SIZE_Y: " + mainStage.getHeight() + "\n";
+            LOGGER.debug(debugLogString);
+        }
+    }
+
     private void initLayout() {
         setId("frame");
 
-        VBox head = new VBox(createMenu(), createToolbar());
+        MainToolBar mainToolBar = new MainToolBar(
+                this,
+                pushToApplicationCommand,
+                globalSearchBar,
+                dialogService,
+                stateManager,
+                prefs,
+                fileUpdateMonitor,
+                taskExecutor,
+                entryTypesManager,
+                undoManager);
+
+        MainMenu mainMenu = new MainMenu(
+                this,
+                sidePane,
+                pushToApplicationCommand,
+                prefs,
+                stateManager,
+                fileUpdateMonitor,
+                taskExecutor,
+                dialogService,
+                Globals.journalAbbreviationRepository,
+                entryTypesManager,
+                undoManager,
+                Globals.getClipboardManager());
+
+        VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
         setTop(head);
 
@@ -554,73 +537,6 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private Node createToolbar() {
-        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-
-        final Region leftSpacer = new Region();
-        final Region rightSpacer = new Region();
-
-        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
-        pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
-
-        // Setup Toolbar
-
-        ToolBar toolBar = new ToolBar(
-                new HBox(
-                        factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(this, prefs)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager)),
-                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, prefs, stateManager))),
-
-                leftSpacer,
-
-                globalSearchBar,
-
-                rightSpacer,
-
-                new HBox(
-                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager)),
-                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, prefs, stateManager)),
-                        createNewEntryFromIdButton(),
-                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, prefs, stateManager)),
-                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager))),
-
-                new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, this, stateManager)),
-                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
-                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager))),
-
-                new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        pushToApplicationButton,
-                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(this, dialogService, stateManager, taskExecutor, prefs)),
-                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, prefs, dialogService, stateManager))),
-
-                new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        createTaskIndicator()),
-
-                new Separator(Orientation.VERTICAL),
-
-                new HBox(
-                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService))));
-
-        leftSpacer.setPrefWidth(50);
-        leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
-        leftSpacer.setMaxWidth(Region.USE_PREF_SIZE);
-        HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
-        HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
-
-        toolBar.getStyleClass().add("mainToolbar");
-
-        return toolBar;
-    }
-
     /**
      * Returns the indexed LibraryTab.
      *
@@ -649,7 +565,16 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void init() {
-        sidePane = new SidePane(prefs, taskExecutor, dialogService, stateManager, undoManager);
+        sidePane = new SidePane(
+                this,
+                prefs,
+                Globals.journalAbbreviationRepository,
+                taskExecutor,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager);
         tabbedPane = new TabPane();
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
@@ -659,7 +584,7 @@ public class JabRefFrame extends BorderPane {
 
         // Bind global state
         FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
-        filteredTabs.setPredicate(tab -> tab instanceof LibraryTab);
+        filteredTabs.setPredicate(LibraryTab.class::isInstance);
 
         // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
         openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
@@ -758,356 +683,6 @@ public class JabRefFrame extends BorderPane {
         return tabbedPane;
     }
 
-    private MenuBar createMenu() {
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
-        Menu file = new Menu(Localization.lang("File"));
-        Menu edit = new Menu(Localization.lang("Edit"));
-        Menu library = new Menu(Localization.lang("Library"));
-        Menu quality = new Menu(Localization.lang("Quality"));
-        Menu lookup = new Menu(Localization.lang("Lookup"));
-        Menu view = new Menu(Localization.lang("View"));
-        Menu tools = new Menu(Localization.lang("Tools"));
-        Menu options = new Menu(Localization.lang("Options"));
-        Menu help = new Menu(Localization.lang("Help"));
-
-        file.getItems().addAll(
-                factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(this, prefs)),
-                factory.createMenuItem(StandardActions.OPEN_LIBRARY, getOpenDatabaseAction()),
-                fileHistory,
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, prefs, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, this, prefs, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(this, prefs)),
-
-                new SeparatorMenuItem(),
-
-                factory.createSubMenu(StandardActions.IMPORT,
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, false, prefs, stateManager)),
-                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true, prefs, stateManager))),
-
-                factory.createSubMenu(StandardActions.EXPORT,
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, this, stateManager, dialogService, prefs)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, this, stateManager, dialogService, prefs)),
-                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, this, prefs, stateManager))),
-
-                new SeparatorMenuItem(),
-
-                factory.createSubMenu(StandardActions.REMOTE_DB,
-                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(this)),
-                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
-                factory.createMenuItem(StandardActions.QUIT, new CloseAction()));
-
-        edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, this, stateManager)),
-
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
-                factory.createSubMenu(StandardActions.COPY_MORE,
-                        factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_CITE_KEY, new CopyMoreAction(StandardActions.COPY_CITE_KEY, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, Globals.getClipboardManager(), prefs)),
-                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, Globals.getClipboardManager(), Globals.TASK_EXECUTOR, prefs.getPreviewPreferences())),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, Globals.getClipboardManager(), Globals.TASK_EXECUTOR, prefs))),
-
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(this, stateManager)),
-                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(this, dialogService, stateManager, taskExecutor, prefs)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(stateManager)),
-                factory.createMenuItem(StandardActions.AUTOMATIC_FIELD_EDITOR, new AutomaticFieldEditorAction(stateManager, dialogService)));
-        SeparatorMenuItem specialFieldsSeparator = new SeparatorMenuItem();
-        specialFieldsSeparator.visibleProperty().bind(prefs.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
-
-        edit.getItems().addAll(
-                specialFieldsSeparator,
-                // ToDo: SpecialField needs the active BasePanel to mark it as changed.
-                //  Refactor BasePanel, should mark the BibDatabaseContext or the UndoManager as dirty instead!
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, this, dialogService, prefs, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, this, dialogService, prefs, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, this, dialogService, prefs, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, this, dialogService, prefs, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, this, dialogService, prefs, undoManager, stateManager),
-                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, this, dialogService, prefs, undoManager, stateManager));
-
-        // @formatter:off
-        library.getItems().addAll(
-                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, prefs, stateManager)),
-                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(dialogService, prefs, stateManager)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(stateManager))
-        );
-
-        quality.getItems().addAll(
-                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager, prefs)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, prefs.getBibEntryPreferences())),
-                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this, stateManager, Globals.TASK_EXECUTOR)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, this.prefs, dialogService, stateManager)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR)),
-
-                new SeparatorMenuItem(),
-
-                factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, this, dialogService, stateManager, prefs.getJournalAbbreviationPreferences())),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, this, dialogService, stateManager, prefs.getJournalAbbreviationPreferences())),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, this, dialogService, stateManager, prefs.getJournalAbbreviationPreferences()))),
-
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, this, dialogService, stateManager, prefs.getJournalAbbreviationPreferences()))
-        );
-
-        Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
-        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(prefs.getImportFormatPreferences())) {
-            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(this, fetcher, stateManager, undoManager);
-            lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
-        }
-
-        lookup.getItems().addAll(
-                lookupIdentifiers,
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, prefs)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))
-        );
-
-        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
-        pushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
-
-        tools.getItems().addAll(
-                factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),
-                factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(this, stateManager)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF, new WriteMetadataToPdfAction(stateManager, Globals.entryTypesManager, prefs.getFieldWriterPreferences(), dialogService, taskExecutor, prefs.getFilePreferences(), prefs.getXmpPreferences())),
-                factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, prefs, stateManager)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, this.prefs, stateManager)),
-                pushToApplicationMenuItem,
-
-                new SeparatorMenuItem(),
-
-                // Systematic Literature Review (SLR)
-                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(this, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
-                factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(this.dialogService, this.stateManager)),
-                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(this, this.getOpenDatabaseAction(), this.getDialogService(), Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, prefs, stateManager, themeManager)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, this::getCurrentLibraryTab, dialogService, prefs, prefs.getFilePreferences()))
-        );
-        SidePaneType webSearchPane = SidePaneType.WEB_SEARCH;
-        SidePaneType groupsPane = SidePaneType.GROUPS;
-        SidePaneType openOfficePane = SidePaneType.OPEN_OFFICE;
-        view.getItems().addAll(
-                factory.createCheckMenuItem(webSearchPane.getToggleAction(), sidePane.getToggleCommandFor(webSearchPane), sidePane.paneVisibleBinding(webSearchPane)),
-                factory.createCheckMenuItem(groupsPane.getToggleAction(), sidePane.getToggleCommandFor(groupsPane), sidePane.paneVisibleBinding(groupsPane)),
-                factory.createCheckMenuItem(openOfficePane.getToggleAction(), sidePane.getToggleCommandFor(openOfficePane), sidePane.paneVisibleBinding(openOfficePane)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, this, stateManager)),
-                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, this, stateManager)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction(stateManager, prefs)),
-                factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(this, stateManager)),
-                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, prefs, dialogService))
-        );
-
-        options.getItems().addAll(
-                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this, Globals.TASK_EXECUTOR)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.MANAGE_CONTENT_SELECTORS, new ManageContentSelectorAction(this, stateManager)),
-                factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TYPES, new CustomizeEntryAction(stateManager, Globals.entryTypesManager))
-        );
-
-        help.getItems().addAll(
-                factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService)),
-                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/", dialogService)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.ERROR_CONSOLE, new ErrorConsoleAction()),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org", dialogService)),
-                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(Globals.BUILD_INFO, prefs.getInternalPreferences(), dialogService, Globals.TASK_EXECUTOR)),
-                factory.createSubMenu(StandardActions.WEB_MENU,
-                        factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService)),
-
-                        new SeparatorMenuItem(),
-
-                        factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/", dialogService)),
-                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md", dialogService))
-                ),
-                factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
-        );
-
-        // @formatter:on
-        MenuBar menu = new MenuBar();
-        menu.getStyleClass().add("mainMenu");
-        menu.getMenus().addAll(
-                file,
-                edit,
-                library,
-                quality,
-                lookup,
-                tools,
-                view,
-                options,
-                help);
-        menu.setUseSystemMenuBar(true);
-        return menu;
-    }
-
-    private Button createNewEntryFromIdButton() {
-        Button newEntryFromIdButton = new Button();
-
-        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
-        newEntryFromIdButton.getStyleClass().setAll("icon-button");
-        newEntryFromIdButton.setFocusTraversable(false);
-        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
-        newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(getCurrentLibraryTab(), dialogService, prefs, taskExecutor, stateManager);
-
-            if (entryFromIdPopOver == null) {
-                entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
-                entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
-                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
-                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(newEntryFromIdButton);
-                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
-            } else if (entryFromIdPopOver.isShowing()) {
-                entryFromIdPopOver.hide();
-            } else {
-                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(newEntryFromIdButton);
-                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
-            }
-        });
-        newEntryFromIdButton.setTooltip(new Tooltip(Localization.lang("Import by ID")));
-
-        return newEntryFromIdButton;
-    }
-
-    private Group createTaskIndicator() {
-        ProgressIndicator indicator = new ProgressIndicator();
-        indicator.getStyleClass().add("progress-indicatorToolbar");
-        indicator.progressProperty().bind(stateManager.getTasksProgress());
-
-        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
-        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
-        indicator.setTooltip(noTasksRunning);
-        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                indicator.setTooltip(someTasksRunning);
-            } else {
-                indicator.setTooltip(noTasksRunning);
-            }
-        });
-
-        /*
-        The label of the indicator cannot be removed with styling. Therefore,
-        hide it and clip it to a square of (width x width) each time width is updated.
-         */
-        indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
-            /*
-            The indeterminate spinner is wider than the determinate spinner.
-            We must make sure they are the same width for the clipping to result in a square of the same size always.
-             */
-            if (!indicator.isIndeterminate()) {
-                indicator.setPrefWidth(newValue.doubleValue());
-            }
-            if (newValue.doubleValue() > 0) {
-                Rectangle clip = new Rectangle(newValue.doubleValue(), newValue.doubleValue());
-                indicator.setClip(clip);
-            }
-        });
-
-        indicator.setOnMouseClicked(event -> {
-            TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-            EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
-            taskProgressView.setRetainTasks(true);
-            taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
-
-            if (progressViewPopOver == null) {
-                progressViewPopOver = new PopOver(taskProgressView);
-                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
-                progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
-                progressViewPopOver.setContentNode(taskProgressView);
-                progressViewPopOver.show(indicator);
-            } else if (progressViewPopOver.isShowing()) {
-                progressViewPopOver.hide();
-            } else {
-                progressViewPopOver.setContentNode(taskProgressView);
-                progressViewPopOver.show(indicator);
-            }
-        });
-
-        return new Group(indicator);
-    }
-
-    /**
-     * Might be called when a user asks JabRef at the command line
-     * i) to import a file or
-     * ii) to open a .bib file
-     */
-    public void addParserResult(ParserResult parserResult, boolean focusPanel) {
-        if (parserResult.toOpenTab()) {
-            // Add the entries to the open tab.
-            LibraryTab libraryTab = getCurrentLibraryTab();
-            if (libraryTab == null) {
-                // There is no open tab to add to, so we create a new tab:
-                addTab(parserResult.getDatabaseContext(), focusPanel);
-            } else {
-                addImportedEntries(libraryTab, parserResult);
-            }
-        } else {
-            // only add tab if library is not already open
-            Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
-                                                              .filter(p -> p.getBibDatabaseContext()
-                                                                            .getDatabasePath()
-                                                                            .equals(parserResult.getPath()))
-                                                              .findFirst();
-
-            if (libraryTab.isPresent()) {
-                tabbedPane.getSelectionModel().select(libraryTab.get());
-            } else {
-                addTab(parserResult.getDatabaseContext(), focusPanel);
-            }
-        }
-    }
-
     /**
      * This method causes all open LibraryTabs to set up their tables anew. When called from PreferencesDialogViewModel,
      * this updates to the new settings. We need to notify all tabs about the changes to avoid problems when changing
@@ -1130,7 +705,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder(tab::getBibDatabaseContext)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(tab::getBibDatabaseContext, stateManager, prefs, dialogService)),
                 new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(tab)),
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction(this, tab)),
                 factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction(tab)),
                 factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new CloseAllDatabaseAction()));
 
@@ -1139,6 +714,9 @@ public class JabRefFrame extends BorderPane {
 
     public void addTab(LibraryTab libraryTab, boolean raisePanel) {
         tabbedPane.getTabs().add(libraryTab);
+        if (raisePanel) {
+            tabbedPane.getSelectionModel().select(libraryTab);
+        }
 
         libraryTab.setOnCloseRequest(event -> {
             libraryTab.cancelLoading();
@@ -1148,23 +726,59 @@ public class JabRefFrame extends BorderPane {
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab, Globals.getKeyPrefs()));
 
-        if (raisePanel) {
-            tabbedPane.getSelectionModel().select(libraryTab);
-        }
-
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
     /**
      * Opens a new tab with existing data.
-     * Asynchronous loading is done at {@link LibraryTab#createLibraryTab(BackgroundTask, Path, PreferencesService, StateManager, JabRefFrame, ThemeManager)}.
+     * Asynchronous loading is done at  {@link org.jabref.gui.LibraryTab#createLibraryTab(BackgroundTask, Path, DialogService, PreferencesService, StateManager, JabRefFrame, FileUpdateMonitor, BibEntryTypesManager, CountingUndoManager)}.
      */
-    public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
+    public void addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(databaseContext, this, prefs, stateManager, themeManager);
+        LibraryTab libraryTab = LibraryTab.createLibraryTab(
+                databaseContext,
+                this,
+                dialogService,
+                prefs,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager,
+                taskExecutor);
+
         addTab(libraryTab, raisePanel);
-        return libraryTab;
+    }
+
+    /**
+     * Might be called when a user asks JabRef at the command line
+     * i) to import a file or
+     * ii) to open a .bib file
+     */
+    public void addTab(ParserResult parserResult, boolean raisePanel) {
+        if (parserResult.toOpenTab()) {
+            // Add the entries to the open tab.
+            LibraryTab libraryTab = getCurrentLibraryTab();
+            if (libraryTab == null) {
+                // There is no open tab to add to, so we create a new tab:
+                addTab(parserResult.getDatabaseContext(), raisePanel);
+            } else {
+                addImportedEntries(libraryTab, parserResult);
+            }
+        } else {
+            // only add tab if library is not already open
+            Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
+                                                              .filter(p -> p.getBibDatabaseContext()
+                                                                            .getDatabasePath()
+                                                                            .equals(parserResult.getPath()))
+                                                              .findFirst();
+
+            if (libraryTab.isPresent()) {
+                tabbedPane.getSelectionModel().select(libraryTab.get());
+            } else {
+                addTab(parserResult.getDatabaseContext(), raisePanel);
+            }
+        }
     }
 
     /**
@@ -1220,7 +834,7 @@ public class JabRefFrame extends BorderPane {
 
         if (buttonType.equals(saveChanges)) {
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, dialogService, prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
                     return true;
                 }
@@ -1235,67 +849,20 @@ public class JabRefFrame extends BorderPane {
         }
 
         if (buttonType.equals(discardChanges)) {
-            BackupManager.discardBackup(libraryTab.getBibDatabaseContext());
+            BackupManager.discardBackup(libraryTab.getBibDatabaseContext(), prefs.getFilePreferences().getBackupDirectory());
             return true;
         }
 
         return false;
     }
 
-    /**
-     * Ask if the user really wants to remove any empty entries
-     */
-    private Boolean confirmEmptyEntry(LibraryTab libraryTab, BibDatabaseContext context) {
-        String filename = libraryTab.getBibDatabaseContext()
-                                    .getDatabasePath()
-                                    .map(Path::toAbsolutePath)
-                                    .map(Path::toString)
-                                    .orElse(Localization.lang("untitled"));
-
-        ButtonType deleteEmptyEntries = new ButtonType(Localization.lang("Delete empty entries"), ButtonBar.ButtonData.YES);
-        ButtonType keepEmptyEntries = new ButtonType(Localization.lang("Keep empty entries"), ButtonBar.ButtonData.NO);
-        ButtonType cancel = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
-                Localization.lang("Empty entries"),
-                Localization.lang("Library '%0' has empty entries. Do you want to delete them?", filename),
-                deleteEmptyEntries, keepEmptyEntries, cancel);
-        if (response.isPresent() && response.get().equals(deleteEmptyEntries)) {
-            // The user wants to delete.
-            try {
-                for (BibEntry currentEntry : new ArrayList<>(context.getEntries())) {
-                    if (currentEntry.getFields().isEmpty()) {
-                        context.getDatabase().removeEntries(Collections.singletonList(currentEntry));
-                    }
-                }
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
-                if (saveAction.save()) {
-                    return true;
-                }
-                // The action was either canceled or unsuccessful.
-                dialogService.notify(Localization.lang("Unable to save library"));
-            } catch (Throwable ex) {
-                LOGGER.error("A problem occurred when trying to delete the empty entries", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Delete empty entries"), Localization.lang("Could not delete empty entries."), ex);
-            }
-            // Save was cancelled or an error occurred.
-            return false;
-        }
-        return !response.get().equals(cancel);
-    }
-
-    private void closeTab(LibraryTab libraryTab) {
+    public void closeTab(LibraryTab libraryTab) {
         // empty tab without database
         if (libraryTab == null) {
-            return;
+            libraryTab = getCurrentLibraryTab();
         }
 
         final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
-        if (context.hasEmptyEntries()) {
-            if (!confirmEmptyEntry(libraryTab, context)) {
-                return;
-            }
-        }
 
         if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(libraryTab)) {
@@ -1312,7 +879,7 @@ public class JabRefFrame extends BorderPane {
             removeTab(libraryTab);
         }
         AutosaveManager.shutdown(context);
-        BackupManager.shutdown(context);
+        BackupManager.shutdown(context, prefs.getFilePreferences().getBackupDirectory(), prefs.getFilePreferences().shouldCreateBackup());
     }
 
     private void removeTab(LibraryTab libraryTab) {
@@ -1327,7 +894,15 @@ public class JabRefFrame extends BorderPane {
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
-        return new OpenDatabaseAction(this, prefs, dialogService, stateManager, themeManager);
+        return new OpenDatabaseAction(
+                this,
+                prefs,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager,
+                taskExecutor);
     }
 
     public GlobalSearchBar getGlobalSearchBar() {
@@ -1378,35 +953,47 @@ public class JabRefFrame extends BorderPane {
                              .setGroups(currentLibraryGroupRoot);
     }
 
+    public Stage getMainStage() {
+        return mainStage;
+    }
+
     /**
      * The action concerned with closing the window.
      */
-    private class CloseAction extends SimpleCommand {
+    static protected class CloseAction extends SimpleCommand {
+
+        private final JabRefFrame frame;
+
+        public CloseAction(JabRefFrame frame) {
+            this.frame = frame;
+        }
 
         @Override
         public void execute() {
-            quit();
+            frame.quit();
         }
     }
 
-    private class CloseDatabaseAction extends SimpleCommand {
+    static protected class CloseDatabaseAction extends SimpleCommand {
 
+        private final LibraryTabContainer tabContainer;
         private final LibraryTab libraryTab;
 
-        public CloseDatabaseAction(LibraryTab libraryTab) {
+        public CloseDatabaseAction(LibraryTabContainer tabContainer, LibraryTab libraryTab) {
+            this.tabContainer = tabContainer;
             this.libraryTab = libraryTab;
         }
 
         /**
          * Using this constructor will result in executing the command on the currently open library tab
          */
-        public CloseDatabaseAction() {
-            this(null);
+        public CloseDatabaseAction(LibraryTabContainer tabContainer) {
+            this(tabContainer, null);
         }
 
         @Override
         public void execute() {
-            closeTab(Optional.ofNullable(libraryTab).orElse(getCurrentLibraryTab()));
+            tabContainer.closeTab(libraryTab);
         }
     }
 
@@ -1453,7 +1040,7 @@ public class JabRefFrame extends BorderPane {
         public void execute() {
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(path, prefs, dialogService);
+                    JabRefDesktop.openFolderAndSelectFile(path, prefs.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }

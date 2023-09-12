@@ -19,7 +19,13 @@ import jakarta.inject.Inject;
 
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> implements PreferencesTab {
 
+
+
     @FXML private TextField keywordSeparator;
+
+    @FXML private CheckBox resolveStrings;
+    @FXML private TextField resolveStringsForFields;
+    @FXML private TextField nonWrappableFields;
 
     @FXML private CheckBox markOwner;
     @FXML private TextField markOwnerName;
@@ -38,12 +44,13 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     }
 
     public void initialize() {
-        this.viewModel = new EntryTabViewModel(
-                preferencesService.getBibEntryPreferences(),
-                preferencesService.getOwnerPreferences(),
-                preferencesService.getTimestampPreferences());
+        this.viewModel = new EntryTabViewModel(preferencesService);
 
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
+
+        resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
+        resolveStringsForFields.textProperty().bindBidirectional(viewModel.resolveStringsForFieldsProperty());
+        nonWrappableFields.textProperty().bindBidirectional(viewModel.nonWrappableFieldsProperty());
 
         markOwner.selectedProperty().bindBidirectional(viewModel.markOwnerProperty());
         markOwnerName.textProperty().bindBidirectional(viewModel.markOwnerNameProperty());
@@ -55,7 +62,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
 
         ActionFactory actionFactory = new ActionFactory(keyBindingRepository);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService), markOwnerHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferencesService.getFilePreferences()), markOwnerHelp);
     }
 
     @Override

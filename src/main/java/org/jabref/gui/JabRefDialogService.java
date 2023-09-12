@@ -26,7 +26,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -37,7 +37,6 @@ import javafx.util.Duration;
 
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -49,6 +48,7 @@ import org.jabref.logic.l10n.Localization;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Notifications;
 import org.controlsfx.control.TaskProgressView;
+import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
 import org.slf4j.Logger;
@@ -71,11 +71,9 @@ public class JabRefDialogService implements DialogService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
 
     private final Window mainWindow;
-    private final ThemeManager themeManager;
 
-    public JabRefDialogService(Window mainWindow, Pane mainPane, ThemeManager themeManager) {
+    public JabRefDialogService(Window mainWindow) {
         this.mainWindow = mainWindow;
-        this.themeManager = themeManager;
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {
@@ -271,6 +269,30 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
+    public Optional<String> showPasswordDialogAndWait(String title, String header, String content) {
+        javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
+        dialog.setTitle(title);
+        dialog.setHeaderText(header);
+
+        CustomPasswordField passwordField = new CustomPasswordField();
+
+        HBox box = new HBox();
+        box.setSpacing(10);
+        box.getChildren().addAll(new Label(content), passwordField);
+        dialog.setTitle(title);
+        dialog.getDialogPane().setContent(box);
+
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                return passwordField.getText();
+            }
+            return null;
+        });
+        return dialog.showAndWait();
+    }
+
+    @Override
     public <V> void showProgressDialog(String title, String content, Task<V> task) {
         ProgressDialog progressDialog = new ProgressDialog(task);
         progressDialog.setHeaderText(null);
@@ -338,7 +360,7 @@ public class JabRefDialogService implements DialogService {
                                               .text(
                                                     "(" + Localization.lang("Check the event log to see all notifications") + ")"
                                                      + "\n\n" + message)
-                                              .onAction((e)-> {
+                                              .onAction(e -> {
                                                      ErrorConsoleAction ec = new ErrorConsoleAction();
                                                      ec.execute();
                                                  }))

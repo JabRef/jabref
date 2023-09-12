@@ -35,8 +35,9 @@ public class LibraryOfCongressTest {
     @Test
     public void performSearchById() throws Exception {
         BibEntry expected = new BibEntry()
-                .withField(StandardField.ADDRESS, "Burlington, MA")
+                .withField(StandardField.ADDRESS, "mau, Burlington, MA")
                 .withField(StandardField.AUTHOR, "West, Matthew")
+                .withField(StandardField.DATE, "2011")
                 .withField(StandardField.ISBN, "0123751063 (pbk.)")
                 .withField(new UnknownField("issuance"), "monographic")
                 .withField(StandardField.KEYWORDS, "Database design, Data structures (Computer science)")
@@ -44,8 +45,7 @@ public class LibraryOfCongressTest {
                 .withField(new UnknownField("lccn"), "2010045158")
                 .withField(StandardField.NOTE, "Matthew West., Includes index.")
                 .withField(new UnknownField("oclc"), "ocn665135773")
-                .withField(StandardField.PUBLISHER, "Morgan Kaufmann")
-                .withField(new UnknownField("source"), "DLC")
+                .withField(new UnknownField("source"), "aacr")
                 .withField(StandardField.TITLE, "Developing high quality data models")
                 .withField(StandardField.YEAR, "2011");
 

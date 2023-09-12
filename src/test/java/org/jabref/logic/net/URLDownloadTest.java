@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -130,15 +131,15 @@ public class URLDownloadTest {
     public void test503ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
 
-        Exception exception = assertThrows(IOException.class, () -> urlDownload.asString());
-        assertTrue(exception.getCause() instanceof FetcherServerException);
+        Exception exception = assertThrows(IOException.class, urlDownload::asString);
+        assertInstanceOf(FetcherServerException.class, exception.getCause());
     }
 
     @Test
     public void test429ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
 
-        Exception exception = assertThrows(IOException.class, () -> urlDownload.asString());
-        assertTrue(exception.getCause() instanceof FetcherClientException);
+        Exception exception = assertThrows(IOException.class, urlDownload::asString);
+        assertInstanceOf(FetcherClientException.class, exception.getCause());
     }
 }

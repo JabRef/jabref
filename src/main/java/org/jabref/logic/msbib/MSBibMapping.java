@@ -11,6 +11,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 /**
@@ -22,7 +23,47 @@ public class MSBibMapping {
     private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
 
-    private static final HashBiMap<Field, String> BIBLATEX_TO_MS_BIB = HashBiMap.create();
+    private static final BiMap<Field, String> BIBLATEX_TO_MS_BIB = HashBiMap.create();
+
+    // see https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a
+    private static final BiMap<String, Integer> LANG_TO_LCID = HashBiMap.create();
+
+    static {
+        LANG_TO_LCID.put("basque", 1609);
+        LANG_TO_LCID.put("bulgarian", 1026);
+        LANG_TO_LCID.put("catalan", 1027);
+        LANG_TO_LCID.put("croatian", 1050);
+        LANG_TO_LCID.put("czech", 1029);
+        LANG_TO_LCID.put("danish", 1030);
+        LANG_TO_LCID.put("dutch", 1043);
+        LANG_TO_LCID.put("english", 1033); // american english
+        LANG_TO_LCID.put("finnish", 1035);
+        LANG_TO_LCID.put("french", 1036);
+        LANG_TO_LCID.put("german", 1031);
+        LANG_TO_LCID.put("austrian", 3079);
+        LANG_TO_LCID.put("swissgerman", 2055);
+        LANG_TO_LCID.put("greek", 1032);
+        LANG_TO_LCID.put("hungarian", 1038);
+        LANG_TO_LCID.put("icelandic", 1039);
+        LANG_TO_LCID.put("italian", 1040);
+        LANG_TO_LCID.put("latvian", 1062);
+        LANG_TO_LCID.put("lithuanian", 1063);
+        LANG_TO_LCID.put("marathi", 1102);
+        LANG_TO_LCID.put("nynorsk", 2068);
+        LANG_TO_LCID.put("polish", 1045);
+        LANG_TO_LCID.put("brazil", 1046);
+        LANG_TO_LCID.put("portuguese", 2070);
+        LANG_TO_LCID.put("romanian", 1048);
+        LANG_TO_LCID.put("russian", 1049);
+        LANG_TO_LCID.put("serbian", 2074);
+        LANG_TO_LCID.put("serbianc", 3098);
+        LANG_TO_LCID.put("slovak", 1051);
+        LANG_TO_LCID.put("slovene", 1060);
+        LANG_TO_LCID.put("spanish", 3082);
+        LANG_TO_LCID.put("swedish", 1053);
+        LANG_TO_LCID.put("turkish", 1055);
+        LANG_TO_LCID.put("ukrainian", 1058);
+    }
 
     static {
         BIBLATEX_TO_MS_BIB.put(InternalField.KEY_FIELD, "Tag");
@@ -123,27 +164,23 @@ public class MSBibMapping {
     }
 
     /**
-     * Only English is supported <br>
      * <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
      *
      * @param language The language to transform
-     * @return Returns 0 for English
+     * @return 1033 (american english) as default. LCID otherwise.
      */
     public static int getLCID(String language) {
-        // TODO: add language to LCID mapping
-        // 0x0409 is American English
-        return 0x0409;
+        return LANG_TO_LCID.getOrDefault(language, 1033);
     }
 
     /**
-     * Only English is supported <br>
      * <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
      *
-     * @return Returns english
+     * @param  LCID The LCID to transform
+     * @return "english" as default. Corresponding language from BiMap otherwise.
      */
     public static String getLanguage(int LCID) {
-        // TODO: add language to LCID mapping
-        return "english";
+        return LANG_TO_LCID.inverse().getOrDefault(LCID, "english");
     }
 
     public static String getMSBibField(Field field) {

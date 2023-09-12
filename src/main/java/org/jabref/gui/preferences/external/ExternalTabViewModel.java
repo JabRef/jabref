@@ -44,6 +44,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final StringProperty customTerminalCommandProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomFileBrowserProperty = new SimpleBooleanProperty();
     private final StringProperty customFileBrowserCommandProperty = new SimpleStringProperty("");
+    private final StringProperty kindleEmailProperty = new SimpleStringProperty("");
 
     private final Validator terminalCommandValidator;
     private final Validator fileBrowserCommandValidator;
@@ -85,6 +86,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Please specify a file browser."))));
     }
 
+    @Override
     public void setValues() {
         eMailReferenceSubjectProperty.setValue(initialExternalApplicationPreferences.getEmailSubject());
         autoOpenAttachedFoldersProperty.setValue(initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
@@ -100,8 +102,10 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         customTerminalCommandProperty.setValue(initialExternalApplicationPreferences.getCustomTerminalCommand());
         useCustomFileBrowserProperty.setValue(initialExternalApplicationPreferences.useCustomFileBrowser());
         customFileBrowserCommandProperty.setValue(initialExternalApplicationPreferences.getCustomFileBrowserCommand());
+        kindleEmailProperty.setValue(initialExternalApplicationPreferences.getKindleEmail());
     }
 
+    @Override
     public void storeSettings() {
         ExternalApplicationsPreferences externalPreferences = preferences.getExternalApplicationsPreferences();
         externalPreferences.setEMailSubject(eMailReferenceSubjectProperty.getValue());
@@ -111,6 +115,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         externalPreferences.setCustomTerminalCommand(customTerminalCommandProperty.getValue());
         externalPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());
         externalPreferences.setCustomFileBrowserCommand(customFileBrowserCommandProperty.getValue());
+        externalPreferences.setKindleEmail(kindleEmailProperty.getValue());
 
         PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
         pushPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());
@@ -127,6 +132,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         return fileBrowserCommandValidator.getValidationStatus();
     }
 
+    @Override
     public boolean validateSettings() {
         CompositeValidator validator = new CompositeValidator();
 
@@ -182,6 +188,10 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         return this.eMailReferenceSubjectProperty;
     }
 
+    public StringProperty kindleEmailProperty() {
+        return this.kindleEmailProperty;
+    }
+
     public BooleanProperty autoOpenAttachedFoldersProperty() {
         return this.autoOpenAttachedFoldersProperty;
     }
@@ -199,8 +209,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     public StringProperty citeCommandProperty() {
         return this.citeCommandProperty;
     }
-
-    // Open console
 
     public BooleanProperty useCustomTerminalProperty() {
         return this.useCustomTerminalProperty;

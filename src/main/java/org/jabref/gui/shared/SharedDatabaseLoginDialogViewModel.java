@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -24,10 +26,12 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -40,6 +44,8 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -75,6 +81,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
+    private final StateManager stateManager;
+    private final BibEntryTypesManager entryTypesManager;
+    private final FileUpdateMonitor fileUpdateMonitor;
+    private final UndoManager undoManager;
+    private final TaskExecutor taskExecutor;
 
     private final Validator databaseValidator;
     private final Validator hostValidator;
@@ -84,10 +95,22 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final Validator keystoreValidator;
     private final CompositeValidator formValidator;
 
-    public SharedDatabaseLoginDialogViewModel(JabRefFrame frame, DialogService dialogService, PreferencesService preferencesService) {
+    public SharedDatabaseLoginDialogViewModel(JabRefFrame frame,
+                                              DialogService dialogService,
+                                              PreferencesService preferencesService,
+                                              StateManager stateManager,
+                                              BibEntryTypesManager entryTypesManager,
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              UndoManager undoManager,
+                                              TaskExecutor taskExecutor) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.undoManager = undoManager;
+        this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
 
@@ -157,13 +180,21 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         loading.set(true);
 
         try {
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(frame, preferencesService);
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
+                    frame,
+                    dialogService,
+                    preferencesService,
+                    stateManager,
+                    entryTypesManager,
+                    fileUpdateMonitor,
+                    undoManager,
+                    taskExecutor);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 
             if (!folder.getValue().isEmpty() && autosave.get()) {
                 try {
-                    new SaveDatabaseAction(libraryTab, preferencesService, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
+                    new SaveDatabaseAction(libraryTab, dialogService, preferencesService, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }
@@ -171,7 +202,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             return true;
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Connection error"), exception);
+            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"), exception);
         } catch (DatabaseNotSupportedException exception) {
             ButtonType openHelp = new ButtonType("Open Help", ButtonData.OTHER);
 
@@ -184,7 +215,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             Localization.lang("However, a new database was created alongside the pre-3.6 one."),
                     ButtonType.OK, openHelp);
 
-            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService).execute());
+            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferencesService.getFilePreferences()).execute());
             result.filter(btn -> btn.equals(ButtonType.OK)).ifPresent(btn -> openSharedDatabase(connectionProperties));
         }
         loading.set(false);
@@ -259,12 +290,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
-        List<LibraryTab> panels = frame.getLibraryTabs();
-        return panels.parallelStream().anyMatch(panel -> {
+        List<LibraryTab> libraryTabs = frame.getLibraryTabs();
+        return libraryTabs.parallelStream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
 
-            return ((context.getLocation() == DatabaseLocation.SHARED) &&
-                    connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties()));
+            return (context.getLocation() == DatabaseLocation.SHARED) &&
+                    connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties());
         });
     }
 

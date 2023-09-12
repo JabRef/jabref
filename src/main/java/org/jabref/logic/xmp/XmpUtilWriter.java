@@ -220,7 +220,7 @@ public class XmpUtilWriter {
      * Existing fields values are overridden if the bibtex entry has the
      * corresponding value set.
      * <p>
-     * The method to write DublineCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
+     * The method to write DublinCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
      *
      * @param document The pdf document to write to.
      * @param entry    The Bibtex entry that is written into the PDF properties. *
@@ -237,13 +237,13 @@ public class XmpUtilWriter {
         for (Field field : resolvedEntry.getFields()) {
             if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field)) {
                 // erase field instead of adding it
-                if (StandardField.AUTHOR.equals(field)) {
+                if (StandardField.AUTHOR == field) {
                     di.setAuthor(null);
-                } else if (StandardField.TITLE.equals(field)) {
+                } else if (StandardField.TITLE == field) {
                     di.setTitle(null);
-                } else if (StandardField.KEYWORDS.equals(field)) {
+                } else if (StandardField.KEYWORDS == field) {
                     di.setKeywords(null);
-                } else if (StandardField.ABSTRACT.equals(field)) {
+                } else if (StandardField.ABSTRACT == field) {
                     di.setSubject(null);
                 } else {
                     di.setCustomMetadataValue("bibtex/" + field, null);
@@ -254,13 +254,13 @@ public class XmpUtilWriter {
             // LaTeX content is removed from the string for "standard" fields in the PDF
             String value = unprotectTermsFormatter.format(resolvedEntry.getField(field).get());
 
-            if (StandardField.AUTHOR.equals(field)) {
+            if (StandardField.AUTHOR == field) {
                 di.setAuthor(value);
-            } else if (StandardField.TITLE.equals(field)) {
+            } else if (StandardField.TITLE == field) {
                 di.setTitle(value);
-            } else if (StandardField.KEYWORDS.equals(field)) {
+            } else if (StandardField.KEYWORDS == field) {
                 di.setKeywords(value);
-            } else if (StandardField.ABSTRACT.equals(field)) {
+            } else if (StandardField.ABSTRACT == field) {
                 di.setSubject(value);
             } else {
                 // We hit the case of an PDF-unsupported field --> write it directly
@@ -280,7 +280,7 @@ public class XmpUtilWriter {
      * The method will overwrite existing BibTeX-XMP-data, but keep other
      * existing metadata.
      *
-     * The code for using PDFBox is also used at {@link EmbeddedBibFilePdfExporter#embedBibTex(java.lang.String, java.nio.file.Path)}.
+     * The code for using PDFBox is also used at {@link EmbeddedBibFilePdfExporter#embedBibTex(String, Path)}.
      *
      * @param path          The file to write the entries to.
      * @param bibtexEntries The entries to write to the file. *
@@ -310,7 +310,7 @@ public class XmpUtilWriter {
             }
 
             // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
-            if (resolvedEntries.size() > 0) {
+            if (!resolvedEntries.isEmpty()) {
                 writeDocumentInformation(document, resolvedEntries.get(0), null);
                 writeDublinCore(document, resolvedEntries, null);
             }

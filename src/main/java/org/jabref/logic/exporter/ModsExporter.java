@@ -1,44 +1,29 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import javax.xml.namespace.QName;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
-import org.jabref.logic.importer.fileformat.mods.AbstractDefinition;
-import org.jabref.logic.importer.fileformat.mods.CodeOrText;
-import org.jabref.logic.importer.fileformat.mods.DateDefinition;
-import org.jabref.logic.importer.fileformat.mods.DetailDefinition;
-import org.jabref.logic.importer.fileformat.mods.ExtentDefinition;
-import org.jabref.logic.importer.fileformat.mods.GenreDefinition;
-import org.jabref.logic.importer.fileformat.mods.IdentifierDefinition;
-import org.jabref.logic.importer.fileformat.mods.IssuanceDefinition;
-import org.jabref.logic.importer.fileformat.mods.LanguageDefinition;
-import org.jabref.logic.importer.fileformat.mods.LanguageTermDefinition;
-import org.jabref.logic.importer.fileformat.mods.LocationDefinition;
-import org.jabref.logic.importer.fileformat.mods.ModsCollectionDefinition;
-import org.jabref.logic.importer.fileformat.mods.ModsDefinition;
-import org.jabref.logic.importer.fileformat.mods.NameDefinition;
-import org.jabref.logic.importer.fileformat.mods.NamePartDefinition;
-import org.jabref.logic.importer.fileformat.mods.NoteDefinition;
-import org.jabref.logic.importer.fileformat.mods.OriginInfoDefinition;
-import org.jabref.logic.importer.fileformat.mods.PartDefinition;
-import org.jabref.logic.importer.fileformat.mods.PhysicalLocationDefinition;
-import org.jabref.logic.importer.fileformat.mods.PlaceDefinition;
-import org.jabref.logic.importer.fileformat.mods.PlaceTermDefinition;
-import org.jabref.logic.importer.fileformat.mods.RelatedItemDefinition;
-import org.jabref.logic.importer.fileformat.mods.StringPlusLanguage;
-import org.jabref.logic.importer.fileformat.mods.StringPlusLanguagePlusAuthority;
-import org.jabref.logic.importer.fileformat.mods.StringPlusLanguagePlusSupplied;
-import org.jabref.logic.importer.fileformat.mods.SubjectDefinition;
-import org.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
-import org.jabref.logic.importer.fileformat.mods.TypeOfResourceDefinition;
-import org.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -47,10 +32,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TemplateExporter for exporting in MODS XML format.
@@ -61,7 +44,8 @@ class ModsExporter extends Exporter {
     private static final String MINUS = "-";
     private static final String DOUBLE_MINUS = "--";
     private static final String MODS_SCHEMA_LOCATION = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
-    private JAXBContext context;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModsExporter.class);
 
     public ModsExporter() {
         super("mods", "MODS", StandardFileType.XML);
@@ -75,268 +59,349 @@ class ModsExporter extends Exporter {
             return;
         }
 
+        XMLStreamWriter writer = null;
         try {
-            ModsCollectionDefinition modsCollection = new ModsCollectionDefinition();
+            StringWriter sw = new StringWriter();
+            // writer is not an auto closable!
+            writer = createWriter(sw);
+
             for (BibEntry bibEntry : entries) {
-                ModsDefinition mods = new ModsDefinition();
-                bibEntry.getCitationKey().ifPresent(citeKey -> addIdentifier(new UnknownField("citekey"), citeKey, mods));
+                if (bibEntry.getCitationKey().isPresent()) {
+                    String citekey = bibEntry.getCitationKey().get();
+                    addIdentifier(writer, new UnknownField("citekey"), citekey);
+                } else {
+                    writer.writeStartElement("mods", "mods", MODS_NAMESPACE_URI);
+                }
 
                 Map<Field, String> fieldMap = new TreeMap<>(Comparator.comparing(Field::getName));
                 fieldMap.putAll(bibEntry.getFieldMap());
-                addGenre(mods, bibEntry.getType());
+                addGenre(writer, bibEntry.getType());
 
-                OriginInfoDefinition originInfo = new OriginInfoDefinition();
-                PartDefinition partDefinition = new PartDefinition();
-                RelatedItemDefinition relatedItem = new RelatedItemDefinition();
+                List<String> originItems = new ArrayList<>();
+                List<String> parts = new ArrayList<>();
 
                 for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
                     Field field = entry.getKey();
                     String value = entry.getValue();
 
-                    if (StandardField.AUTHOR.equals(field)) {
-                        handleAuthors(mods, value);
+                    if (StandardField.AUTHOR == field) {
+                        handleAuthors(writer, value);
                     } else if (new UnknownField("affiliation").equals(field)) {
-                        addAffiliation(mods, value);
-                    } else if (StandardField.ABSTRACT.equals(field)) {
-                        addAbstract(mods, value);
-                    } else if (StandardField.TITLE.equals(field)) {
-                        addTitle(mods, value);
-                    } else if (StandardField.LANGUAGE.equals(field)) {
-                        addLanguage(mods, value);
-                    } else if (StandardField.LOCATION.equals(field)) {
-                        addLocation(mods, value);
-                    } else if (StandardField.URL.equals(field)) {
-                        addUrl(mods, value);
-                    } else if (StandardField.NOTE.equals(field)) {
-                        addNote(mods, value);
-                    } else if (StandardField.KEYWORDS.equals(field)) {
-                        addKeyWords(mods, value);
-                    } else if (StandardField.VOLUME.equals(field)) {
-                        addDetail(StandardField.VOLUME, value, partDefinition);
-                    } else if (StandardField.ISSUE.equals(field)) {
-                        addDetail(StandardField.ISSUE, value, partDefinition);
-                    } else if (StandardField.PAGES.equals(field)) {
-                        addPages(partDefinition, value);
-                    } else if (StandardField.URI.equals(field)) {
-                        addIdentifier(StandardField.URI, value, mods);
-                    } else if (StandardField.ISBN.equals(field)) {
-                        addIdentifier(StandardField.ISBN, value, mods);
-                    } else if (StandardField.ISSN.equals(field)) {
-                        addIdentifier(StandardField.ISSN, value, mods);
-                    } else if (StandardField.DOI.equals(field)) {
-                        addIdentifier(StandardField.DOI, value, mods);
-                    } else if (StandardField.PMID.equals(field)) {
-                        addIdentifier(StandardField.PMID, value, mods);
-                    } else if (StandardField.JOURNAL.equals(field)) {
-                        addJournal(value, relatedItem);
+                        addAffiliation(writer, value);
+                    } else if (StandardField.ABSTRACT == field) {
+                        addAbstract(writer, value);
+                    } else if (StandardField.TITLE == field) {
+                        addTitle(writer, value);
+                    } else if (StandardField.LANGUAGE == field) {
+                        addLanguage(writer, value);
+                    } else if (StandardField.LOCATION == field) {
+                        addLocation(writer, value);
+                    } else if (StandardField.URL == field) {
+                        addUrl(writer, value);
+                    } else if (StandardField.NOTE == field) {
+                        addNote(writer, value);
+                    } else if (StandardField.KEYWORDS == field) {
+                        addKeyWords(writer, value);
+                    } else if (StandardField.URI == field) {
+                        addIdentifier(writer, StandardField.URI, value);
+                    } else if (StandardField.ISBN == field) {
+                        addIdentifier(writer, StandardField.ISBN, value);
+                    } else if (StandardField.ISSN == field) {
+                        addIdentifier(writer, StandardField.ISSN, value);
+                    } else if (StandardField.DOI == field) {
+                        addIdentifier(writer, StandardField.DOI, value);
+                    } else if (StandardField.PMID == field) {
+                        addIdentifier(writer, StandardField.PMID, value);
+                    } else if (StandardField.PAGES == field) {
+                        addPart(parts, value);
+                    } else if (StandardField.VOLUME == field) {
+                        addPart(parts, value);
+                    } else if (StandardField.ISSUE == field) {
+                        addPart(parts, value);
                     }
-
-                    addOriginInformation(field, value, originInfo);
+                    trackOriginInformation(originItems, field, value);
                 }
-                mods.getModsGroup().add(originInfo);
-
-                addRelatedAndOriginInfoToModsGroup(relatedItem, partDefinition, mods);
-                modsCollection.getMods().add(mods);
+                writeOriginInformation(writer, originItems, fieldMap);
+                // Write related items
+                writeRelatedInformation(writer, parts, fieldMap);
+                writer.writeEndElement(); // end mods
             }
-
-            JAXBElement<ModsCollectionDefinition> jaxbElement = new JAXBElement<>(
-                    new QName(MODS_NAMESPACE_URI, "modsCollection"), ModsCollectionDefinition.class, modsCollection);
-
-            createMarshallerAndWriteToFile(file, jaxbElement);
-        } catch (JAXBException ex) {
+            writer.writeEndDocument();
+            writerFormatted(file, sw);
+        } catch (XMLStreamException | IOException | TransformerException ex) {
             throw new SaveException(ex);
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.flush();
+                    writer.close();
+                }
+            } catch (XMLStreamException e) {
+                LOGGER.error("Error closing XML writer", e);
+            }
         }
     }
 
-    private void createMarshallerAndWriteToFile(Path file, JAXBElement<ModsCollectionDefinition> jaxbElement)
-            throws JAXBException {
+    private XMLStreamWriter createWriter(StringWriter sw) throws XMLStreamException {
+        XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
 
-        if (context == null) {
-            context = JAXBContext.newInstance(ModsCollectionDefinition.class);
+        XMLStreamWriter writer = outputFactory.createXMLStreamWriter(new StreamResult(sw));
+        writer.writeDTD("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
+        writer.writeStartElement("mods", "modsCollection", MODS_NAMESPACE_URI);
+        writer.writeNamespace("mods", MODS_NAMESPACE_URI);
+        writer.writeNamespace("ns2", "http://www.w3.org/1999/xlink");
+        writer.writeNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation", MODS_SCHEMA_LOCATION);
+        return writer;
+    }
+
+    private void writerFormatted(Path file, StringWriter sw) throws TransformerException, IOException {
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+        try (OutputStream outputStream = Files.newOutputStream(file)) {
+            transformer.transform(new StreamSource(new StringReader(sw.toString())), new StreamResult(outputStream));
         }
-        Marshaller marshaller = context.createMarshaller();
-        // format the output
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, MODS_SCHEMA_LOCATION);
-
-        // Write to File
-        marshaller.marshal(jaxbElement, file.toFile());
     }
 
-    private void addRelatedAndOriginInfoToModsGroup(RelatedItemDefinition relatedItem, PartDefinition partDefinition,
-                                                    ModsDefinition mods) {
-
-        relatedItem.getModsGroup().add(partDefinition);
-        relatedItem.setAtType("host");
-        mods.getModsGroup().add(relatedItem);
-        TypeOfResourceDefinition typeOfResource = new TypeOfResourceDefinition();
-        typeOfResource.setValue("text");
-        mods.getModsGroup().add(typeOfResource);
+    private void writeOriginInformation(XMLStreamWriter writer, List<String> originItems, Map<Field, String> fieldMap) throws XMLStreamException {
+        if (originItems.isEmpty()) {
+            writer.writeEmptyElement("mods", "originInfo", MODS_NAMESPACE_URI);
+        } else {
+            writer.writeStartElement("mods", "originInfo", MODS_NAMESPACE_URI);
+            for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
+                Field field = entry.getKey();
+                String value = entry.getValue();
+                addOriginInformation(writer, field, value);
+            }
+            writer.writeEndElement();
+        }
     }
 
-    private void addGenre(ModsDefinition mods, EntryType entryType) {
-        GenreDefinition genre = new GenreDefinition();
-        genre.setValue(entryType.getName());
-        mods.getModsGroup().add(genre);
+    private void writeRelatedInformation(XMLStreamWriter writer, List<String> parts, Map<Field, String> fieldMap) throws XMLStreamException {
+        writer.writeStartElement("mods", "relatedItem", MODS_NAMESPACE_URI);
+        writer.writeAttribute("type", "host");
+
+        for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
+            Field field = entry.getKey();
+            String value = entry.getValue();
+            if (StandardField.JOURNAL == field) {
+                addJournal(writer, value);
+            }
+        }
+        writePartInformation(writer, parts, fieldMap);
+
+        writer.writeEndElement(); // end relatedItem
+
+        writer.writeStartElement("mods", "typeOfResource", MODS_NAMESPACE_URI);
+        writer.writeCharacters("text");
+        writer.writeEndElement(); // end typeOfResource
     }
 
-    private void addAbstract(ModsDefinition mods, String value) {
-        AbstractDefinition abstractDefinition = new AbstractDefinition();
-        abstractDefinition.setValue(value);
-        mods.getModsGroup().add(abstractDefinition);
+    private void writePartInformation(XMLStreamWriter writer, List<String> parts, Map<Field, String> fieldMap) throws XMLStreamException {
+        if (parts.isEmpty()) {
+            writer.writeEmptyElement("mods", "part", MODS_NAMESPACE_URI);
+        } else {
+            writer.writeStartElement("mods", "part", MODS_NAMESPACE_URI);
+            for (Map.Entry<Field, String> entry : fieldMap.entrySet()) {
+                Field field = entry.getKey();
+                String value = entry.getValue();
+                if (StandardField.PAGES == field) {
+                    addPages(writer, value);
+                } else if (StandardField.VOLUME == field) {
+                    addDetail(writer, StandardField.VOLUME, value);
+                } else if (StandardField.ISSUE == field) {
+                    addDetail(writer, StandardField.ISSUE, value);
+                }
+            }
+            writer.writeEndElement(); // end part
+        }
     }
 
-    private void addTitle(ModsDefinition mods, String value) {
-        TitleInfoDefinition titleInfo = new TitleInfoDefinition();
-        StringPlusLanguage title = new StringPlusLanguage();
-        title.setValue(value);
-        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "title"),
-                StringPlusLanguage.class, title);
-        titleInfo.getTitleOrSubTitleOrPartNumber().add(element);
-        mods.getModsGroup().add(titleInfo);
+    private void trackOriginInformation(List<String> originItems, Field field, String value) {
+        if (field.equals(StandardField.YEAR)) {
+            originItems.add(value);
+        } else if (field.equals(new UnknownField("created"))) {
+            originItems.add(value);
+        } else if (field.equals(StandardField.MODIFICATIONDATE)) {
+            originItems.add(value);
+        } else if (field.equals(StandardField.CREATIONDATE)) {
+            originItems.add(value);
+        } else if (StandardField.PUBLISHER == field) {
+            originItems.add(value);
+        } else if (field.equals(new UnknownField("issuance"))) {
+            originItems.add(value);
+        } else if (field.equals(StandardField.ADDRESS)) {
+            originItems.add(value);
+        } else if (field.equals(StandardField.EDITION)) {
+            originItems.add(value);
+        }
     }
 
-    private void addAffiliation(ModsDefinition mods, String value) {
-        NameDefinition nameDefinition = new NameDefinition();
-        StringPlusLanguage affiliation = new StringPlusLanguage();
-        affiliation.setValue(value);
-        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "affiliation"),
-                StringPlusLanguage.class, affiliation);
-        nameDefinition.getAffiliationOrRoleOrDescription().add(element);
-        mods.getModsGroup().add(nameDefinition);
+    private void addPart(List<String> part, String value) {
+        part.add(value);
     }
 
-    private void addLocation(ModsDefinition mods, String value) {
-        LocationDefinition locationDefinition = new LocationDefinition();
-        // There can be more than one location
+    private void addGenre(XMLStreamWriter writer, EntryType entryType) throws XMLStreamException {
+        writer.writeStartElement("mods", "genre", MODS_NAMESPACE_URI);
+        writer.writeCharacters(entryType.getName());
+        writer.writeEndElement();
+    }
+
+    private void addAbstract(XMLStreamWriter writer, String value) throws XMLStreamException {
+        writer.writeStartElement("mods", "abstract", MODS_NAMESPACE_URI);
+        writer.writeCharacters(value);
+        writer.writeEndElement(); // end abstract
+    }
+
+    private void addTitle(XMLStreamWriter writer, String value) throws XMLStreamException {
+        writer.writeStartElement("mods", "titleInfo", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "title", MODS_NAMESPACE_URI);
+        writer.writeCharacters(value);
+        writer.writeEndElement(); // end title
+        writer.writeEndElement(); // end titleInfo
+    }
+
+    private void addAffiliation(XMLStreamWriter writer, String value) throws XMLStreamException {
+        writer.writeStartElement("mods", "name", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "affiliation", MODS_NAMESPACE_URI);
+        writer.writeCharacters(value);
+        writer.writeEndElement(); // end affiliation
+        writer.writeEndElement(); // end name
+    }
+
+    private void addLocation(XMLStreamWriter writer, String value) throws XMLStreamException {
+        writer.writeStartElement("mods", "location", MODS_NAMESPACE_URI);
         String[] locations = value.split(", ");
         for (String location : locations) {
-            PhysicalLocationDefinition physicalLocation = new PhysicalLocationDefinition();
-            physicalLocation.setValue(location);
-            locationDefinition.getPhysicalLocation().add(physicalLocation);
+            writer.writeStartElement("mods", "physicalLocation", MODS_NAMESPACE_URI);
+            writer.writeCharacters(location);
+            writer.writeEndElement();
         }
-        mods.getModsGroup().add(locationDefinition);
+        writer.writeEndElement();
     }
 
-    private void addNote(ModsDefinition mods, String value) {
+    private void addNote(XMLStreamWriter writer, String value) throws XMLStreamException {
         String[] notes = value.split(", ");
         for (String note : notes) {
-            NoteDefinition noteDefinition = new NoteDefinition();
-            noteDefinition.setValue(note);
-            mods.getModsGroup().add(noteDefinition);
+            writer.writeStartElement("mods", "note", MODS_NAMESPACE_URI);
+            writer.writeCharacters(note);
+            writer.writeEndElement();
         }
     }
 
-    private void addUrl(ModsDefinition mods, String value) {
+    private void addUrl(XMLStreamWriter writer, String value) throws XMLStreamException {
         String[] urls = value.split(", ");
-        LocationDefinition location = new LocationDefinition();
+        writer.writeStartElement("mods", "location", MODS_NAMESPACE_URI);
         for (String url : urls) {
-            UrlDefinition urlDefinition = new UrlDefinition();
-            urlDefinition.setValue(url);
-            location.getUrl().add(urlDefinition);
-            mods.getModsGroup().add(location);
+            writer.writeStartElement("mods", "url", MODS_NAMESPACE_URI);
+            writer.writeCharacters(url);
+            writer.writeEndElement();
         }
+        writer.writeEndElement();
     }
 
-    private void addJournal(String value, RelatedItemDefinition relatedItem) {
-        TitleInfoDefinition titleInfo = new TitleInfoDefinition();
-        StringPlusLanguage title = new StringPlusLanguage();
-        title.setValue(value);
-        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "title"),
-                StringPlusLanguage.class, title);
-        titleInfo.getTitleOrSubTitleOrPartNumber().add(element);
-        relatedItem.getModsGroup().add(titleInfo);
+    private void addJournal(XMLStreamWriter writer, String value) throws XMLStreamException { // this may also need to be called within second for loop?
+        // Start TitleInfoDefinition
+        writer.writeStartElement("mods", "titleInfo", MODS_NAMESPACE_URI);
+
+        // Write title element
+        writer.writeStartElement("mods", "title", MODS_NAMESPACE_URI);
+        writer.writeCharacters(value);
+        writer.writeEndElement(); // End title element
+
+        // End TitleInfoDefinition
+        writer.writeEndElement(); // End titleInfo element
     }
 
-    private void addLanguage(ModsDefinition mods, String value) {
-        LanguageDefinition language = new LanguageDefinition();
-        LanguageTermDefinition languageTerm = new LanguageTermDefinition();
-        languageTerm.setValue(value);
-        language.getLanguageTerm().add(languageTerm);
-        mods.getModsGroup().add(language);
+    private void addLanguage(XMLStreamWriter writer, String value) throws XMLStreamException {
+        writer.writeStartElement("mods", "language", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "languageTerm", MODS_NAMESPACE_URI);
+        writer.writeCharacters(value);
+        writer.writeEndElement(); // end languageTerm
+        writer.writeEndElement(); // end language
     }
 
-    private void addPages(PartDefinition partDefinition, String value) {
+    private void addPages(XMLStreamWriter writer, String value) throws XMLStreamException {
         if (value.contains(DOUBLE_MINUS)) {
-            addStartAndEndPage(value, partDefinition, DOUBLE_MINUS);
+            addStartAndEndPage(writer, value, DOUBLE_MINUS);
         } else if (value.contains(MINUS)) {
-            addStartAndEndPage(value, partDefinition, MINUS);
+            addStartAndEndPage(writer, value, MINUS);
         } else {
             BigInteger total = new BigInteger(value);
-            ExtentDefinition extent = new ExtentDefinition();
-            extent.setTotal(total);
-            partDefinition.getDetailOrExtentOrDate().add(extent);
+            writer.writeStartElement("mods", "extent", MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "total", MODS_NAMESPACE_URI);
+            writer.writeCharacters(total.toString());
+            writer.writeEndElement();
+            writer.writeEndElement();
         }
     }
 
-    private void addKeyWords(ModsDefinition mods, String value) {
+    private void addKeyWords(XMLStreamWriter writer, String value) throws XMLStreamException {
         String[] keywords = value.split(", ");
 
         for (String keyword : keywords) {
-            SubjectDefinition subject = new SubjectDefinition();
-            StringPlusLanguagePlusAuthority topic = new StringPlusLanguagePlusAuthority();
-            topic.setValue(keyword);
-            JAXBElement<?> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "topic"),
-                    StringPlusLanguagePlusAuthority.class, topic);
-            subject.getTopicOrGeographicOrTemporal().add(element);
-            mods.getModsGroup().add(subject);
+            writer.writeStartElement("mods", "subject", MODS_NAMESPACE_URI);
+            writer.writeStartElement("mods", "topic", MODS_NAMESPACE_URI);
+            writer.writeCharacters(keyword);
+            writer.writeEndElement();
+            writer.writeEndElement();
         }
     }
 
-    private void handleAuthors(ModsDefinition mods, String value) {
+    private void handleAuthors(XMLStreamWriter writer, String value) throws XMLStreamException {
         String[] authors = value.split("and");
         for (String author : authors) {
-            NameDefinition name = new NameDefinition();
-            name.setAtType("personal");
-            NamePartDefinition namePart = new NamePartDefinition();
+            writer.writeStartElement("mods", "name", MODS_NAMESPACE_URI);
+            writer.writeAttribute("type", "personal");
+
             if (author.contains(",")) {
                 // if author contains ","  then this indicates that the author has a forename and family name
                 int commaIndex = author.indexOf(',');
                 String familyName = author.substring(0, commaIndex);
-                namePart.setAtType("family");
-                namePart.setValue(familyName);
-
-                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "namePart"),
-                        NamePartDefinition.class, namePart);
-                name.getNamePartOrDisplayFormOrAffiliation().add(element);
+                writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
+                writer.writeAttribute("type", "family");
+                writer.writeCharacters(familyName);
+                writer.writeEndElement();
 
                 // now take care of the forenames
                 String forename = author.substring(commaIndex + 1);
                 String[] forenames = forename.split(" ");
                 for (String given : forenames) {
                     if (!given.isEmpty()) {
-                        NamePartDefinition namePartDefinition = new NamePartDefinition();
-                        namePartDefinition.setAtType("given");
-                        namePartDefinition.setValue(given);
-                        element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "namePart"), NamePartDefinition.class,
-                                namePartDefinition);
-                        name.getNamePartOrDisplayFormOrAffiliation().add(element);
+                        writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
+                        writer.writeAttribute("type", "given");
+                        writer.writeCharacters(given);
+                        writer.writeEndElement();
                     }
                 }
-                mods.getModsGroup().add(name);
+                writer.writeEndElement();
             } else {
                 // no "," indicates that there should only be a family name
-                namePart.setAtType("family");
-                namePart.setValue(author);
-                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "namePart"),
-                        NamePartDefinition.class, namePart);
-                name.getNamePartOrDisplayFormOrAffiliation().add(element);
-                mods.getModsGroup().add(name);
+                writer.writeStartElement("mods", "namePart", MODS_NAMESPACE_URI);
+                writer.writeAttribute("type", "family");
+                writer.writeCharacters(author);
+                writer.writeEndElement();
+                writer.writeEndElement();
             }
         }
     }
 
-    private void addIdentifier(Field field, String value, ModsDefinition mods) {
+    private void addIdentifier(XMLStreamWriter writer, Field field, String value) throws XMLStreamException {
+
         if (new UnknownField("citekey").equals(field)) {
-            mods.setID(value);
+            writer.writeStartElement("mods", "mods", MODS_NAMESPACE_URI);
+            writer.writeAttribute("ID", value);
         }
-        IdentifierDefinition identifier = new IdentifierDefinition();
-        identifier.setType(field.getName());
-        identifier.setValue(value);
-        mods.getModsGroup().add(identifier);
+        writer.writeStartElement("mods", "identifier", MODS_NAMESPACE_URI);
+        writer.writeAttribute("type", field.getName());
+        writer.writeCharacters(value);
+        writer.writeEndElement(); // end identifier
     }
 
-    private void addStartAndEndPage(String value, PartDefinition partDefinition, String minus) {
+    private void addStartAndEndPage(XMLStreamWriter writer, String value, String minus) throws XMLStreamException {
         int minusIndex = value.indexOf(minus);
         String startPage = value.substring(0, minusIndex);
         String endPage = "";
@@ -346,78 +411,65 @@ class ModsExporter extends Exporter {
             endPage = value.substring(minusIndex + 2);
         }
 
-        StringPlusLanguage start = new StringPlusLanguage();
-        start.setValue(startPage);
-        StringPlusLanguage end = new StringPlusLanguage();
-        end.setValue(endPage);
-        ExtentDefinition extent = new ExtentDefinition();
-        extent.setStart(start);
-        extent.setEnd(end);
-
-        partDefinition.getDetailOrExtentOrDate().add(extent);
+        writer.writeStartElement("mods", "extent", MODS_NAMESPACE_URI);
+        writer.writeStartElement("mods", "start", MODS_NAMESPACE_URI);
+        writer.writeCharacters(startPage);
+        writer.writeEndElement();
+        writer.writeStartElement("mods", "end", MODS_NAMESPACE_URI);
+        writer.writeCharacters(endPage);
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 
-    private void addDetail(Field field, String value, PartDefinition partDefinition) {
-        DetailDefinition detail = new DetailDefinition();
-        StringPlusLanguage detailType = new StringPlusLanguage();
-        detailType.setValue(value);
-        detail.setType(field.getName());
-        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "number"),
-                StringPlusLanguage.class, detailType);
-        detail.getNumberOrCaptionOrTitle().add(element);
-        partDefinition.getDetailOrExtentOrDate().add(detail);
+    private void addDetail(XMLStreamWriter writer, Field field, String value) throws XMLStreamException {
+        writer.writeStartElement("mods", "detail", MODS_NAMESPACE_URI);
+        writer.writeAttribute("type", field.getName());
+        writer.writeStartElement("mods", "number", MODS_NAMESPACE_URI);
+        writer.writeCharacters(value);
+        writer.writeEndElement(); // end number
+        writer.writeEndElement(); // end detail
     }
 
-    private void addOriginInformation(Field field, String value, OriginInfoDefinition originInfo) {
+    private void addOriginInformation(XMLStreamWriter writer, Field field, String value) throws XMLStreamException {
+
         if (field.equals(StandardField.YEAR)) {
-            addDate("dateIssued", value, originInfo);
+            addDate(writer, "dateIssued", value);
         } else if (field.equals(new UnknownField("created"))) {
-            addDate("dateCreated", value, originInfo);
-        } else if (field.equals(new UnknownField("modified"))) {
-            addDate("dateModified", value, originInfo);
-        } else if (field.equals(new UnknownField("captured"))) {
-            addDate("dateCaptured", value, originInfo);
-        } else if (StandardField.PUBLISHER.equals(field)) {
-            StringPlusLanguagePlusSupplied publisher = new StringPlusLanguagePlusSupplied();
-            publisher.setValue(value);
-            JAXBElement<StringPlusLanguagePlusSupplied> element = new JAXBElement<>(
-                    new QName(MODS_NAMESPACE_URI, "publisher"), StringPlusLanguagePlusSupplied.class, publisher);
-            originInfo.getPlaceOrPublisherOrDateIssued().add(element);
+            addDate(writer, "dateCreated", value);
+        } else if (field.equals(StandardField.MODIFICATIONDATE)) {
+            addDate(writer, "dateModified", value);
+        } else if (field.equals(StandardField.CREATIONDATE)) {
+            addDate(writer, "dateCaptured", value);
+        } else if (StandardField.PUBLISHER == field) {
+            writer.writeStartElement("mods", "publisher", MODS_NAMESPACE_URI);
+            writer.writeAttribute("xsi", MODS_NAMESPACE_URI, "type", "mods:stringPlusLanguagePlusSupplied");
+            writer.writeCharacters(value);
+            writer.writeEndElement();
         } else if (field.equals(new UnknownField("issuance"))) {
-            IssuanceDefinition issuance = IssuanceDefinition.fromValue(value);
-            JAXBElement<IssuanceDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "issuance"),
-                    IssuanceDefinition.class, issuance);
-            originInfo.getPlaceOrPublisherOrDateIssued().add(element);
+            writer.writeStartElement("mods", "issuance", MODS_NAMESPACE_URI);
+            writer.writeCharacters(value);
+            writer.writeEndElement();
         } else if (field.equals(StandardField.ADDRESS)) {
-            PlaceDefinition placeDefinition = new PlaceDefinition();
-            // There can be more than one place, so we split to get all places and add them
+            writer.writeStartElement("mods", "place", MODS_NAMESPACE_URI);
             String[] places = value.split(", ");
             for (String place : places) {
-                PlaceTermDefinition placeTerm = new PlaceTermDefinition();
-                // There's no possibility to see from a bib entry whether it is code or text, but since it is in the bib entry
-                // we assume that it is text
-                placeTerm.setType(CodeOrText.TEXT);
-                placeTerm.setValue(place);
-                placeDefinition.getPlaceTerm().add(placeTerm);
+                writer.writeStartElement("mods", "placeTerm", MODS_NAMESPACE_URI);
+                writer.writeAttribute("type", "text");
+                writer.writeCharacters(place);
+                writer.writeEndElement();
             }
-            JAXBElement<PlaceDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "place"),
-                    PlaceDefinition.class, placeDefinition);
-            originInfo.getPlaceOrPublisherOrDateIssued().add(element);
+            writer.writeEndElement();
         } else if (field.equals(StandardField.EDITION)) {
-            StringPlusLanguagePlusSupplied edition = new StringPlusLanguagePlusSupplied();
-            edition.setValue(value);
-            JAXBElement<StringPlusLanguagePlusSupplied> element = new JAXBElement<>(
-                    new QName(MODS_NAMESPACE_URI, "edition"), StringPlusLanguagePlusSupplied.class, edition);
-            originInfo.getPlaceOrPublisherOrDateIssued().add(element);
+            writer.writeStartElement("mods", "edition", MODS_NAMESPACE_URI);
+            writer.writeCharacters(value);
+            writer.writeEndElement();
         }
     }
 
-    private void addDate(String dateName, String value, OriginInfoDefinition originInfo) {
-        DateDefinition dateIssued = new DateDefinition();
-        dateIssued.setKeyDate("yes");
-        dateIssued.setValue(value);
-        JAXBElement<DateDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, dateName),
-                DateDefinition.class, dateIssued);
-        originInfo.getPlaceOrPublisherOrDateIssued().add(element);
+    private void addDate(XMLStreamWriter writer, String dateName, String value) throws XMLStreamException {
+        writer.writeStartElement("mods", dateName, MODS_NAMESPACE_URI);
+        writer.writeAttribute("keyDate", "yes");
+        writer.writeCharacters(value);
+        writer.writeEndElement(); // close date element
     }
 }

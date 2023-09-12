@@ -70,8 +70,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Inserts a new {@link BibEntry} into shared database.
-     *
-     * @param event {@link EntriesAddedEvent} object
      */
     @Subscribe
     public void listen(EntriesAddedEvent event) {
@@ -89,8 +87,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Updates an existing shared {@link BibEntry}.
-     *
-     * @param event {@link FieldChangedEvent} object
      */
     @Subscribe
     public void listen(FieldChangedEvent event) {
@@ -110,10 +106,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Deletes the given list of {@link BibEntry} from shared database.
-     *
-     * @param event {@link EntriesRemovedEvent} object
      */
-
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
@@ -128,8 +121,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Synchronizes the shared {@link MetaData} and applies them locally.
-     *
-     * @param event
      */
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
@@ -328,7 +319,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         synchronizeLocalMetaData();
     }
 
-    // Synchronizes local BibEntries only if last entry changes still remain
+    /**
+     * Synchronizes local BibEntries only if last entry changes still remain
+     */
     public void pullLastEntryChanges() {
         if (!lastEntryChanged.isEmpty()) {
             if (!checkCurrentConnection()) {
@@ -336,11 +329,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
             synchronizeLocalMetaData();
             pullWithLastEntry();
-            synchronizeLocalDatabase(); // Pull changes for the case that there were some
+            // Pull changes for the case that there were some
+            synchronizeLocalDatabase();
         }
     }
 
-    // Synchronizes local BibEntries and pulls remaining last entry changes
+    /**
+     * Synchronizes local BibEntries and pulls remaining last entry changes
+     */
     private void pullWithLastEntry() {
         if (!lastEntryChanged.isEmpty() && isPresentLocalBibEntry(lastEntryChanged.get())) {
             synchronizeSharedEntry(lastEntryChanged.get());
@@ -363,7 +359,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
             return isValid;
         } catch (SQLException e) {
-            LOGGER.error("SQL Error:", e);
+            LOGGER.error("SQL Error during connection check", e);
             return false;
         }
     }
@@ -377,7 +373,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     public boolean isEventSourceAccepted(EntriesEvent event) {
         EntriesEventSource eventSource = event.getEntriesEventSource();
-        return ((eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO));
+        return (eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO);
     }
 
     @Override

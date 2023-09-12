@@ -71,14 +71,13 @@ public class MSBibConverter {
         result.journalName = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(null);
 
         // Value must be converted
-        // Currently only english is supported
         entry.getLatexFreeField(StandardField.LANGUAGE)
              .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang))));
         StringBuilder sbNumber = new StringBuilder();
-        entry.getLatexFreeField(StandardField.ISBN).ifPresent(isbn -> sbNumber.append(" ISBN: " + isbn));
-        entry.getLatexFreeField(StandardField.ISSN).ifPresent(issn -> sbNumber.append(" ISSN: " + issn));
-        entry.getLatexFreeField(new UnknownField("lccn")).ifPresent(lccn -> sbNumber.append("LCCN: " + lccn));
-        entry.getLatexFreeField(StandardField.MR_NUMBER).ifPresent(mrnumber -> sbNumber.append(" MRN: " + mrnumber));
+        entry.getLatexFreeField(StandardField.ISBN).ifPresent(isbn -> sbNumber.append(" ISBN: ").append(isbn));
+        entry.getLatexFreeField(StandardField.ISSN).ifPresent(issn -> sbNumber.append(" ISSN: ").append(issn));
+        entry.getLatexFreeField(new UnknownField("lccn")).ifPresent(lccn -> sbNumber.append("LCCN: ").append(lccn));
+        entry.getLatexFreeField(StandardField.MR_NUMBER).ifPresent(mrnumber -> sbNumber.append(" MRN: ").append(mrnumber));
 
         result.standardNumber = sbNumber.toString();
         if (result.standardNumber.isEmpty()) {
@@ -102,7 +101,7 @@ public class MSBibConverter {
         }
 
         // TODO: currently this can never happen
-        if (("InternetSite".equals(msBibType) || "DocumentFromInternetSite".equals(msBibType))) {
+        if ("InternetSite".equals(msBibType) || "DocumentFromInternetSite".equals(msBibType)) {
             result.internetSiteTitle = entry.getLatexFreeField(StandardField.TITLE).orElse(null);
         }
 

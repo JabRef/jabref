@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -238,7 +239,7 @@ class BstVMVisitorTest {
         vm.render(Collections.emptyList());
 
         assertEquals(3, vm.getStack().pop());
-        assertTrue(vm.getStack().pop() instanceof ParseTree);
+        assertInstanceOf(ParseTree.class, vm.getStack().pop());
         assertEquals(new BstVMVisitor.Identifier("t"), vm.getStack().pop());
         assertEquals(1, vm.getStack().pop());
         assertEquals("HELLO", vm.getStack().pop());

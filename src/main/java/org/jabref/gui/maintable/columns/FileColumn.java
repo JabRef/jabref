@@ -11,7 +11,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -21,6 +20,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -37,6 +37,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     private final BibDatabaseContext database;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final TaskExecutor taskExecutor;
 
     /**
      * Creates a joined column for all the linked files.
@@ -45,12 +46,14 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                       BibDatabaseContext database,
                       DialogService dialogService,
                       PreferencesService preferencesService,
-                      StateManager stateManager) {
+                      StateManager stateManager,
+                      TaskExecutor taskExecutor) {
         super(model);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
 
         setCommonSettings();
 
@@ -67,7 +70,8 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                         // Only one linked file -> open directly
                         LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0),
                                 entry.getEntry(),
-                                database, Globals.TASK_EXECUTOR,
+                                database,
+                                taskExecutor,
                                 dialogService,
                                 preferencesService);
                         linkedFileViewModel.open();
@@ -84,12 +88,14 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                       DialogService dialogService,
                       PreferencesService preferencesService,
                       StateManager stateManager,
-                      String fileType) {
+                      String fileType,
+                      TaskExecutor taskExecutor) {
         super(model);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
 
         setCommonSettings();
 
@@ -111,7 +117,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     }
 
     private String createFileTooltip(List<LinkedFile> linkedFiles) {
-        if (linkedFiles.size() > 0) {
+        if (!linkedFiles.isEmpty()) {
             return Localization.lang("Open file %0", linkedFiles.get(0).getLink());
         }
         return null;
@@ -128,7 +134,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
             LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile,
                     entry.getEntry(),
                     database,
-                    Globals.TASK_EXECUTOR,
+                    taskExecutor,
                     dialogService,
                     preferencesService);
 

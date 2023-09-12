@@ -45,7 +45,7 @@
     <category field="engineering"/>
     <category field="generic-base"/>
     <summary>IEEE style as per the 2021 guidelines, V 01.29.2021.</summary>
-    <updated>2022-10-11T00:52:46+10:00</updated>
+    <updated>2023-04-18T00:52:46+10:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -174,26 +174,20 @@
   </macro>
   <macro name="event">
     <choose>
+      <!-- Published Conference Paper -->
       <if type="paper-conference speech" match="any">
         <choose>
-          <!-- Published Conference Paper -->
           <if variable="container-title" match="any">
-            <group delimiter=", ">
-              <group delimiter=" ">
-                <text term="in"/>
-                <text variable="container-title" font-style="italic"/>
-              </group>
-              <text variable="event-place"/>
+            <group delimiter=" ">
+              <text term="in"/>
+              <text variable="container-title" font-style="italic"/>
             </group>
           </if>
           <!-- Unpublished Conference Paper -->
           <else>
-            <group delimiter=", ">
-              <group delimiter=" ">
-                <text term="presented at"/>
-                <text variable="event"/>
-              </group>
-              <text variable="event-place"/>
+            <group delimiter=" ">
+              <text term="presented at"/>
+              <text variable="event"/>
             </group>
           </else>
         </choose>
@@ -295,6 +289,19 @@
       </choose>
     </group>
   </macro>
+  <!-- Series -->
+  <macro name="collection">
+    <choose>
+      <if variable="collection-title" match="any">
+        <text term="in" suffix=" "/>
+        <group delimiter=", " suffix=". ">
+          <text variable="collection-title"/>
+          <text variable="collection-number" prefix="no. "/>
+          <text variable="volume" prefix="vol. "/>
+        </group>
+      </if>
+    </choose>
+  </macro>
   <!-- Citation -->
   <citation collapse="citation-number">
     <sort>
@@ -337,13 +344,35 @@
           <text macro="access"/>
         </if>
         <else-if type="paper-conference speech" match="any">
-          <group delimiter=", " suffix=".">
+          <group delimiter=", " suffix=", ">
             <text macro="title"/>
             <text macro="event"/>
+            <text macro="editor"/>
+          </group>
+          <text macro="collection"/>
+          <group delimiter=", " suffix=".">
+            <text macro="publisher"/>
             <text macro="issued"/>
-            <text macro="locators"/>
             <text macro="page"/>
             <text macro="status"/>
+          </group>
+          <text macro="access"/>
+        </else-if>
+        <else-if type="chapter">
+          <group delimiter=", " suffix=", ">
+            <text macro="title"/>
+            <group delimiter=" ">
+              <text term="in" suffix=" "/>
+              <text variable="container-title" font-style="italic"/>
+            </group>
+          </group>
+          <text macro="editor" suffix=", "/>
+          <text macro="edition"/>
+          <text macro="collection"/>
+          <group delimiter=", " suffix=".">
+            <text macro="publisher"/>
+            <text macro="issued"/>
+            <text macro="page"/>
           </group>
           <text macro="access"/>
         </else-if>
@@ -399,6 +428,7 @@
             <text macro="title"/>
             <text macro="locators"/>
           </group>
+          <text macro="collection"/>
           <group delimiter=", " suffix=".">
             <text macro="publisher"/>
             <text macro="issued"/>
@@ -417,29 +447,13 @@
           </group>
           <text macro="access"/>
         </else-if>
-        <else-if type="chapter paper-conference" match="any">
-          <group delimiter=", " suffix=", ">
-            <text macro="title"/>
-            <group delimiter=" ">
-              <text term="in"/>
-              <text variable="container-title" font-style="italic"/>
-            </group>
-            <text macro="locators"/>
-          </group>
-          <text macro="editor" suffix=" "/>
-          <group delimiter=", " suffix=".">
-            <text macro="publisher"/>
-            <text macro="issued"/>
-            <text macro="page"/>
-          </group>
-          <text macro="access"/>
-        </else-if>
         <else>
           <group delimiter=", " suffix=". ">
             <text macro="title"/>
             <text variable="container-title" font-style="italic"/>
             <text macro="locators"/>
           </group>
+          <text macro="collection"/>
           <group delimiter=", " suffix=".">
             <text macro="publisher"/>
             <text macro="page"/>

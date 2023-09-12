@@ -23,13 +23,14 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,8 +120,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
 
-    private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
+    private final TaskExecutor taskExecutor;
     private final WebView previewView;
     private PreviewLayout layout;
 
@@ -143,11 +145,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
+                         PreferencesService preferencesService,
                          StateManager stateManager,
-                         ThemeManager themeManager) {
+                         ThemeManager themeManager,
+                         TaskExecutor taskExecutor) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
         this.clipBoardManager = Globals.getClipboardManager();
+        this.taskExecutor = taskExecutor;
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -177,7 +183,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     String href = anchorElement.getHref();
                     if (href != null) {
                         try {
-                            JabRefDesktop.openBrowser(href);
+                            JabRefDesktop.openBrowser(href, preferencesService.getFilePreferences());
                         } catch (MalformedURLException exception) {
                             LOGGER.error("Invalid URL", exception);
                         } catch (IOException exception) {
@@ -244,11 +250,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void update() {
         if (entry.isEmpty() || (layout == null)) {
-            // Nothing to do
+            // Make sure that the preview panel is not completely white, especially with dark theme on
+            setPreviewText("");
             return;
         }
 
-        ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
+        Number.serialExportNumber = 1; // Set entry number in case that is included in the preview layout.
 
         BackgroundTask
                 .wrap(() -> layout.generatePreview(entry.get(), database))

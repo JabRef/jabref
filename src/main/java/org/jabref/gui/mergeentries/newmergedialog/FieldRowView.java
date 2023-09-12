@@ -18,6 +18,7 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;
@@ -40,13 +41,23 @@ public class FieldRowView {
 
     private final ToggleGroup toggleGroup = new ToggleGroup();
 
-    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
+    private GridPane parent;
+
+    public FieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, PreferencesService preferencesService, int rowIndex) {
         viewModel = new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
 
         fieldNameCell = new FieldNameCell(field.getDisplayName(), rowIndex);
-        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex);
-        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex);
+        leftValueCell = new FieldValueCell(viewModel.getLeftFieldValue(), rowIndex, preferencesService);
+        rightValueCell = new FieldValueCell(viewModel.getRightFieldValue(), rowIndex, preferencesService);
         mergedValueCell = new MergedFieldCell(viewModel.getMergedFieldValue(), rowIndex);
+
+        // As a workaround we need to have a reference to the parent grid pane to be able to show/hide the row.
+        // This won't be necessary when https://bugs.openjdk.org/browse/JDK-8136901 is fixed.
+        leftValueCell.parentProperty().addListener(e -> {
+            if (leftValueCell.getParent() instanceof GridPane grid) {
+                parent = grid;
+            }
+        });
 
         if (FieldMergerFactory.canMerge(field)) {
             ToggleMergeUnmergeButton toggleMergeUnmergeButton = new ToggleMergeUnmergeButton(field);
@@ -163,6 +174,20 @@ public class FieldRowView {
         }
     }
 
+    public void hide() {
+        if (parent != null) {
+            parent.getChildren().removeAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
+        }
+    }
+
+    public void show() {
+        if (parent != null) {
+            if (!parent.getChildren().contains(leftValueCell)) {
+                parent.getChildren().addAll(leftValueCell, rightValueCell, mergedValueCell, fieldNameCell);
+            }
+        }
+    }
+
     public void hideDiff() {
         if (!rightValueCell.isVisible()) {
             return;
@@ -177,5 +202,14 @@ public class FieldRowView {
         int rightValueLength = getRightValueCell().getStyleClassedLabel().getLength();
         getRightValueCell().getStyleClassedLabel().clearStyle(0, rightValueLength);
         getRightValueCell().getStyleClassedLabel().replaceText(viewModel.getRightFieldValue());
+    }
+
+    public boolean hasEqualLeftAndRightValues() {
+        return viewModel.hasEqualLeftAndRightValues();
+    }
+
+    @Override
+    public String toString() {
+        return "FieldRowView [shouldShowDiffs=" + shouldShowDiffs.get() + ", fieldNameCell=" + fieldNameCell + ", leftValueCell=" + leftValueCell + ", rightValueCell=" + rightValueCell + ", mergedValueCell=" + mergedValueCell + "]";
     }
 }

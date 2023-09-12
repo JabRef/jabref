@@ -203,7 +203,7 @@ public class LuceneIndexer {
         }
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
         if (resolvedPath.isEmpty()) {
-            LOGGER.warn("Could not find {}", linkedFile.getLink());
+            LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
         }
         try {
