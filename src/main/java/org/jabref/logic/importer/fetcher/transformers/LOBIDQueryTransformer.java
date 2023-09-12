@@ -19,7 +19,7 @@ public class LOBIDQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return createKeyValuePair("name", author);
+        return createKeyValuePair("contribution.agent.label", author);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class LOBIDQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return createKeyValuePair("journal", journalTitle);
+        return createKeyValuePair("publication.publishedBy", journalTitle);
     }
 
     @Override
