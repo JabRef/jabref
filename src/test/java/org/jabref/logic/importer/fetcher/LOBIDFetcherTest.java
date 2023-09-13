@@ -76,12 +76,6 @@ class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    void searchByQueryFindsEntryPeriodical() throws Exception {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Décidé");
-        System.out.println(fetchedEntries);
-    }
-
-    @Test
     void searchByEmptyQueryFindsNothing() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
