@@ -89,8 +89,8 @@ jobs:
           source ~/.zshrc
           jbang .github/heylogs.java check CHANGELOG.md > heylogs.txt
           cat heylogs.txt
-          # We have 7 "valid" issues in CHANGELOG.md
-          grep -q "7 problems" heylogs.txt || exit 1
+          # We have 6 "valid" issues in CHANGELOG.md
+          grep -q "6 problems" heylogs.txt || exit 1
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
