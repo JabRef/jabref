@@ -4,8 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 In case, there is no issue present, the pull request implementing the feature is linked.
-
-Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
+This changelog lists all changes of the 5.x series of JabRef.
+The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/JabRef/jabref/blob/v4.3.1/CHANGELOG.md).
 
 ## [Unreleased]
 
@@ -1125,12 +1125,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
   - Copy linked files to folder: available through File menu
   - Add/move/remove from group: removed completely (functionality still available through group interface)
 - We removed the option to change the column widths in the preferences dialog. [#4546](https://github.com/JabRef/jabref/issues/4546)
-
-## Older versions
-
-The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/JabRef/jabref/blob/v4.3.1/CHANGELOG.md).
-The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
-The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v5.10...HEAD
 [5.10]: https://github.com/JabRef/jabref/compare/v5.9...v5.10
