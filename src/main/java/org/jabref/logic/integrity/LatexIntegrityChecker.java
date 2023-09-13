@@ -74,6 +74,3 @@ public class LatexIntegrityChecker implements EntryChecker {
         return Localization.lang("LaTeX Parsing Error: %0", snuggletexErrorMessage);
     }
 }
-
-
-
