@@ -150,8 +150,8 @@ public class ArgumentProcessor {
 
         Optional<ParserResult> importResult = importFile(file, importFormat);
         importResult.ifPresent(result -> {
-            OutputPrinter printer = new SystemOutputPrinter();
             if (result.hasWarnings()) {
+                OutputPrinter printer = new SystemOutputPrinter();
                 printer.showMessage(result.getErrorMessage());
             }
         });
