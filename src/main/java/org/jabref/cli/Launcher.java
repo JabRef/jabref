@@ -95,6 +95,7 @@ public class Launcher {
                 argumentProcessor.processArguments();
                 if (argumentProcessor.shouldShutDown()) {
                     LOGGER.debug("JabRef shut down after processing command line arguments");
+                    fileUpdateMonitor.shutdown();
                     return;
                 }
 
