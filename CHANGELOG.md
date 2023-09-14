@@ -19,6 +19,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- In the exports listrefs, tablerefs, tablerefsabsbib, use ISO date format in the footer.
+
 ### Fixed
 
 - It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
