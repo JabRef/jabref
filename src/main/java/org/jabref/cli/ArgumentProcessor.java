@@ -478,15 +478,14 @@ public class ArgumentProcessor {
                         Globals.entryTypesManager);
                 Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
                 if (exporter.isEmpty()) {
-                    System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
+                    System.err.println(Localization.lang("Unknown export format %0", formatName));
                 } else {
                     // We have an TemplateExporter instance:
                     try {
-                        System.out.println(Localization.lang("Exporting") + ": " + data[1]);
+                        System.out.println(Localization.lang("Exporting %0", data[1]));
                         exporter.get().export(databaseContext, Path.of(data[1]), matches, Collections.emptyList(), Globals.journalAbbreviationRepository);
                     } catch (Exception ex) {
-                        System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
-                                + Throwables.getStackTraceAsString(ex));
+                        System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", data[1], Throwables.getStackTraceAsString(ex)));
                     }
                 }
             }
@@ -506,7 +505,7 @@ public class ArgumentProcessor {
         }
 
         if (usageMsg) {
-            System.out.println(Localization.lang("no base-BibTeX-file specified") + "!");
+            System.out.println(Localization.lang("no base-BibTeX-file specified!"));
             System.out.println(Localization.lang("usage") + " :");
             System.out.println("jabref --aux infile[.aux],outfile[.bib] base-BibTeX-file");
         }
@@ -644,13 +643,13 @@ public class ArgumentProcessor {
             databaseContext.setDatabasePath(path);
             List<Path> fileDirForDatabase = databaseContext
                     .getFileDirectories(preferencesService.getFilePreferences());
-            System.out.println(Localization.lang("Exporting") + ": " + data[0]);
+            System.out.println(Localization.lang("Exporting %0", data[0]));
             ExporterFactory exporterFactory = ExporterFactory.create(
                     preferencesService,
                     Globals.entryTypesManager);
             Optional<Exporter> exporter = exporterFactory.getExporterByName(data[1]);
             if (exporter.isEmpty()) {
-                System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);
+                System.err.println(Localization.lang("Unknown export format %0", data[1]));
             } else {
                 // We have an exporter:
                 try {
@@ -661,8 +660,7 @@ public class ArgumentProcessor {
                             fileDirForDatabase,
                             Globals.journalAbbreviationRepository);
                 } catch (Exception ex) {
-                    System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
-                            + Throwables.getStackTraceAsString(ex));
+                    System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", data[0], Throwables.getStackTraceAsString(ex)));
                 }
             }
         }
