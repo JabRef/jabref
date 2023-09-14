@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
@@ -30,12 +29,14 @@ public class AbstractEditorViewModel extends AbstractViewModel {
     protected StringProperty text = new SimpleStringProperty("");
     protected BibEntry entry;
     private final SuggestionProvider<?> suggestionProvider;
+    private final UndoManager undoManager;
     private final CompositeValidator fieldValidator;
     private EasyObservableValue<String> fieldBinding;
 
-    public AbstractEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public AbstractEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
         this.field = field;
         this.suggestionProvider = suggestionProvider;
+        this.undoManager = undoManager;
 
         this.fieldValidator = new CompositeValidator();
         for (ValueChecker checker : fieldCheckers.getForField(field)) {
@@ -70,7 +71,6 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                         // check for changes here, otherwise the cursor position is annoyingly reset every few seconds
                         if (!(newValue.trim()).equals(oldValue)) {
                             entry.setField(field, newValue);
-                            UndoManager undoManager = JabRefGUI.getMainFrame().getUndoManager();
                             undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                         }
                     }

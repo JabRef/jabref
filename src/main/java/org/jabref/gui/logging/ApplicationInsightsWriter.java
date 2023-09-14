@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 
-import org.jabref.gui.Globals;
-
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
 import com.microsoft.applicationinsights.telemetry.Telemetry;
 import com.microsoft.applicationinsights.telemetry.TraceTelemetry;
@@ -46,7 +44,7 @@ public class ApplicationInsightsWriter extends AbstractFormatPatternWriter {
         }
         telemetry.getContext().getProperties().putAll(event.getCustomParameters());
 
-        Globals.getTelemetryClient().ifPresent(client -> client.track(telemetry));
+        org.jabref.gui.Telemetry.getTelemetryClient().ifPresent(client -> client.track(telemetry));
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -12,8 +14,8 @@ public class TypeEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private BiMap<String, String> itemMap = HashBiMap.create(8);
 
-    public TypeEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        super(field, suggestionProvider, fieldCheckers);
+    public TypeEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
 
         itemMap.put("mathesis", Localization.lang("Master's thesis"));
         itemMap.put("phdthesis", Localization.lang("PhD thesis"));
