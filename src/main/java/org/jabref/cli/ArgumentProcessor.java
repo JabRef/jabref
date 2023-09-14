@@ -166,22 +166,21 @@ public class ArgumentProcessor {
                     fileUpdateMonitor);
 
             if (!"*".equals(importFormat)) {
-                System.out.println(Localization.lang("Importing") + ": " + file);
+                System.out.println(Localization.lang("Importing %0", file));
                 ParserResult result = importFormatReader.importFromFile(importFormat, file);
                 return Optional.of(result);
             } else {
                 // * means "guess the format":
-                System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
+                System.out.println(Localization.lang("Importing file %0 as unknown format", file));
 
                 ImportFormatReader.UnknownFormatImport importResult =
                         importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
-                System.out.println(Localization.lang("Format used") + ": " + importResult.format());
+                System.out.println(Localization.lang("Format used: %0", importResult.format()));
                 return Optional.of(importResult.parserResult());
             }
         } catch (ImportException ex) {
-            System.err
-                    .println(Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
+            System.err.println(Localization.lang("Error opening file '%0'", file) + "\n" + ex.getLocalizedMessage());
             return Optional.empty();
         }
     }
