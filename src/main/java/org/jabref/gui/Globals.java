@@ -15,7 +15,7 @@ import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.Unirest;
 
@@ -43,7 +43,7 @@ public class Globals {
     /**
      * Each test case initializes this field if required
      */
-    public static JabRefPreferences prefs;
+    public static PreferencesService prefs;
 
     /**
      * This field is initialized upon startup.

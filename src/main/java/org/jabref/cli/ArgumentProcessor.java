@@ -67,13 +67,20 @@ public class ArgumentProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
     private final JabRefCLI cli;
-    private final List<ParserResult> parserResults;
+
+    // Written once by processArguments()
+    private List<ParserResult> parserResults;
+
     private final Mode startupMode;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private boolean noGUINeeded;
 
+    /**
+     * First call the constructor, then call {@link #processArguments()}.
+     * Afterward, you can access the {@link #getParserResults()} and other getters.
+     */
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
                              PreferencesService preferencesService,
@@ -84,8 +91,6 @@ public class ArgumentProcessor {
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-
-        this.parserResults = processArguments();
     }
 
     /**
@@ -185,11 +190,7 @@ public class ArgumentProcessor {
         return parserResults;
     }
 
-    public boolean hasParserResults() {
-        return !parserResults.isEmpty();
-    }
-
-    private List<ParserResult> processArguments() {
+    public void processArguments() {
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
         }
@@ -197,7 +198,8 @@ public class ArgumentProcessor {
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
             JabRefCLI.printUsage(preferencesService);
             noGUINeeded = true;
-            return Collections.emptyList();
+            this.parserResults = Collections.emptyList();
+            return;
         }
 
         // Check if we should reset all preferences to default values:
@@ -220,7 +222,8 @@ public class ArgumentProcessor {
         if (cli.isExportMatches()) {
             if (!loaded.isEmpty()) {
                 if (!exportMatches(loaded)) {
-                    return Collections.emptyList();
+                    this.parserResults = Collections.emptyList();
+                    return;
                 }
             } else {
                 System.err.println(Localization.lang("The output option depends on a valid input option."));
@@ -275,7 +278,7 @@ public class ArgumentProcessor {
             doAuxImport(loaded);
         }
 
-        return loaded;
+        this.parserResults = loaded;
     }
 
     private void writeMetadataToPdf(List<ParserResult> loaded,
@@ -634,10 +637,10 @@ public class ArgumentProcessor {
         } else if (data.length == 2) {
             // This signals that the latest import should be stored in the given
             // format to the given file.
-            ParserResult pr = loaded.get(loaded.size() - 1);
+            ParserResult parserResult = loaded.get(loaded.size() - 1);
 
-            Path path = pr.getPath().get().toAbsolutePath();
-            BibDatabaseContext databaseContext = pr.getDatabaseContext();
+            Path path = parserResult.getPath().get().toAbsolutePath();
+            BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
             databaseContext.setDatabasePath(path);
             List<Path> fileDirForDatabase = databaseContext
                     .getFileDirectories(preferencesService.getFilePreferences());
@@ -652,9 +655,9 @@ public class ArgumentProcessor {
                 // We have an exporter:
                 try {
                     exporter.get().export(
-                            pr.getDatabaseContext(),
+                            parserResult.getDatabaseContext(),
                             Path.of(data[0]),
-                            pr.getDatabaseContext().getDatabase().getEntries(),
+                            parserResult.getDatabaseContext().getDatabase().getEntries(),
                             fileDirForDatabase,
                             Globals.journalAbbreviationRepository);
                 } catch (Exception ex) {
