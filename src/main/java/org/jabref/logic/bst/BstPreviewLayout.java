@@ -30,14 +30,14 @@ public class BstPreviewLayout implements PreviewLayout {
         name = path.getFileName().toString();
         if (!Files.exists(path)) {
             LOGGER.error("File {} not found", path.toAbsolutePath());
-            error = Localization.lang("Error opening file '%0'.", path.toString());
+            error = Localization.lang("Error opening file '%0'", path.toString());
             return;
         }
         try {
             bstVM = new BstVM(path);
         } catch (Exception e) {
             LOGGER.error("Could not read {}.", path.toAbsolutePath(), e);
-            error = Localization.lang("Error opening file '%0'.", path.toString());
+            error = Localization.lang("Error opening file '%0'", path.toString());
         }
     }
 
