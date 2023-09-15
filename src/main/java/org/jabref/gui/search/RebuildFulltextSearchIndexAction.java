@@ -3,11 +3,11 @@ package org.jabref.gui.search;
 import java.io.IOException;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.model.database.BibDatabaseContext;
@@ -26,16 +26,22 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
     private final GetCurrentLibraryTab currentLibraryTab;
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
+    private final TaskExecutor taskExecutor;
 
     private BibDatabaseContext databaseContext;
 
     private boolean shouldContinue = true;
 
-    public RebuildFulltextSearchIndexAction(StateManager stateManager, GetCurrentLibraryTab currentLibraryTab, DialogService dialogService, FilePreferences filePreferences) {
+    public RebuildFulltextSearchIndexAction(StateManager stateManager,
+                                            GetCurrentLibraryTab currentLibraryTab,
+                                            DialogService dialogService,
+                                            FilePreferences filePreferences,
+                                            TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.currentLibraryTab = currentLibraryTab;
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(stateManager));
     }
@@ -44,7 +50,7 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
     public void execute() {
         init();
         BackgroundTask.wrap(this::rebuildIndex)
-                      .executeWith(Globals.TASK_EXECUTOR);
+                      .executeWith(taskExecutor);
     }
 
     public void init() {

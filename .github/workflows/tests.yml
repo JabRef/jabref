@@ -68,11 +68,29 @@ jobs:
           # enable failing of this task if modernizer complains
           sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
           ./gradlew modernizer
+  markdown-checks:
+    name: Markdown style check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
           args: CHANGELOG.md CONTRIBUTING.md README.md
           config: '.markdownlint.yml'
+      - name: Lint CHANGELOG.md
+        run: |
+          set -e
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          source ~/.zshrc
+          jbang .github/heylogs.java check CHANGELOG.md > heylogs.txt
+          cat heylogs.txt
+          # We have 7 "valid" issues in CHANGELOG.md
+          grep -q "7 problems" heylogs.txt || exit 1
   tests:
     name: Unit tests
     runs-on: ubuntu-latest

@@ -38,7 +38,8 @@ public class IntegrityCheck {
                 new EntryLinkChecker(bibDatabaseContext.getDatabase()),
                 new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
-                new AmpersandChecker()
+                new AmpersandChecker(),
+                new LatexIntegrityChecker()
                 ));
         if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.addAll(List.of(

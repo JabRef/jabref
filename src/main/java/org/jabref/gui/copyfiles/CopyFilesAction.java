@@ -7,10 +7,10 @@ import java.util.Optional;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -24,11 +24,16 @@ public class CopyFilesAction extends SimpleCommand {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final TaskExecutor taskExecutor;
 
-    public CopyFilesAction(DialogService dialogService, PreferencesService preferencesService, StateManager stateManager) {
+    public CopyFilesAction(DialogService dialogService,
+                           PreferencesService preferencesService,
+                           StateManager stateManager,
+                           TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
     }
@@ -56,7 +61,7 @@ public class CopyFilesAction extends SimpleCommand {
                     Localization.lang("Copy linked files to folder..."),
                     Localization.lang("Copy linked files to folder..."),
                     exportTask);
-            Globals.TASK_EXECUTOR.execute(exportTask);
+            taskExecutor.execute(exportTask);
             exportTask.setOnSucceeded(e -> showDialog(exportTask.getValue()));
         });
     }

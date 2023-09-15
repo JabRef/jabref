@@ -3,6 +3,8 @@ package org.jabref.gui.fieldeditors;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -15,14 +17,14 @@ import org.jabref.model.strings.StringUtil;
 public class MonthEditorViewModel extends OptionEditorViewModel<Month> {
     private BibDatabaseMode databaseMode;
 
-    public MonthEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseMode databaseMode, FieldCheckers fieldCheckers) {
-        super(field, suggestionProvider, fieldCheckers);
+    public MonthEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseMode databaseMode, FieldCheckers fieldCheckers, UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
         this.databaseMode = databaseMode;
     }
 
     @Override
     public StringConverter<Month> getStringConverter() {
-        return new StringConverter<Month>() {
+        return new StringConverter<>() {
             @Override
             public String toString(Month object) {
                 if (object == null) {

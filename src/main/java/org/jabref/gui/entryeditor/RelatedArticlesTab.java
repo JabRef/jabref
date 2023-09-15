@@ -22,6 +22,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -45,8 +46,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final TaskExecutor taskExecutor;
 
-    public RelatedArticlesTab(EntryEditor entryEditor, EntryEditorPreferences preferences, PreferencesService preferencesService, DialogService dialogService) {
+    public RelatedArticlesTab(EntryEditorPreferences preferences,
+                              PreferencesService preferencesService,
+                              DialogService dialogService,
+                              TaskExecutor taskExecutor) {
+        this.taskExecutor = taskExecutor;
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
         this.preferences = preferences;
@@ -82,7 +88,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                     progress.setVisible(false);
                     root.getChildren().add(getErrorInfo());
                 })
-                .executeWith(Globals.TASK_EXECUTOR);
+                .executeWith(taskExecutor);
 
         root.getChildren().add(progress);
 

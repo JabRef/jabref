@@ -28,6 +28,8 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -52,8 +54,10 @@ import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.sun.star.comp.helper.BootstrapException;
@@ -90,16 +94,25 @@ public class OpenOfficePanel {
     private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
     private final StyleLoader loader;
+    private final LibraryTabContainer tabContainer;
+    private final FileUpdateMonitor fileUpdateMonitor;
+    private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
     private OOBibStyle style;
 
-    public OpenOfficePanel(PreferencesService preferencesService,
+    public OpenOfficePanel(LibraryTabContainer tabContainer,
+                           PreferencesService preferencesService,
                            KeyBindingRepository keyBindingRepository,
                            JournalAbbreviationRepository abbreviationRepository,
                            TaskExecutor taskExecutor,
                            DialogService dialogService,
                            StateManager stateManager,
+                           FileUpdateMonitor fileUpdateMonitor,
+                           BibEntryTypesManager entryTypesManager,
                            UndoManager undoManager) {
+        this.tabContainer = tabContainer;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.entryTypesManager = entryTypesManager;
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
@@ -259,7 +272,17 @@ public class OpenOfficePanel {
         Optional<BibDatabase> newDatabase = ooBase.exportCitedHelper(databases, returnPartialResult);
         if (newDatabase.isPresent()) {
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase.get());
-            JabRefGUI.getMainFrame().addTab(databaseContext, true);
+            LibraryTab libraryTab = LibraryTab.createLibraryTab(
+                    databaseContext,
+                    JabRefGUI.getMainFrame(),
+                    dialogService,
+                    preferencesService,
+                    stateManager,
+                    fileUpdateMonitor,
+                    entryTypesManager,
+                    undoManager,
+                    taskExecutor);
+            tabContainer.addTab(libraryTab, true);
         }
     }
 

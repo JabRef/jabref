@@ -2,6 +2,8 @@ package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -21,8 +23,12 @@ public class UrlEditorViewModel extends AbstractEditorViewModel {
     private final PreferencesService preferencesService;
     private final BooleanProperty validUrlIsNotPresent = new SimpleBooleanProperty(true);
 
-    public UrlEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, DialogService dialogService, PreferencesService preferencesService, FieldCheckers fieldCheckers) {
-        super(field, suggestionProvider, fieldCheckers);
+    public UrlEditorViewModel(Field field,
+                              SuggestionProvider<?> suggestionProvider,
+                              DialogService dialogService,
+                              PreferencesService preferencesService,
+                              FieldCheckers fieldCheckers, UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
 

@@ -20,6 +20,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
@@ -51,6 +52,7 @@ public class SharedDatabaseUIManager {
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
+    private final TaskExecutor taskExecutor;
 
     public SharedDatabaseUIManager(JabRefFrame frame,
                                    DialogService dialogService,
@@ -58,7 +60,8 @@ public class SharedDatabaseUIManager {
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,
                                    FileUpdateMonitor fileUpdateMonitor,
-                                   UndoManager undoManager) {
+                                   UndoManager undoManager,
+                                   TaskExecutor taskExecutor) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
@@ -66,6 +69,7 @@ public class SharedDatabaseUIManager {
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
+        this.taskExecutor = taskExecutor;
     }
 
     @Subscribe
@@ -175,7 +179,8 @@ public class SharedDatabaseUIManager {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager);
+                undoManager,
+                taskExecutor);
         frame.addTab(libraryTab, true);
         return libraryTab;
     }
