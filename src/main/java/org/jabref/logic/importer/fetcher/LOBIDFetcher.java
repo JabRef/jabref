@@ -21,8 +21,8 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -89,28 +89,40 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
 
     private BibEntry parseJSONtoBibtex(JSONObject jsonEntry) {
         BibEntry entry = new BibEntry();
-        Field nametype;
+        Field nametype = StandardField.JOURNAL;
+        EntryType entryType = StandardEntryType.InCollection;
 
         // publication type
         JSONArray typeArray = jsonEntry.optJSONArray("type");
+        String types = "";
         if (typeArray != null) {
             List<String> typeList = IntStream.range(0, typeArray.length())
                                              .mapToObj(typeArray::optString)
                                              .filter(type -> !type.isEmpty())
                                              .toList();
-            entry.setField(StandardField.TYPE, String.join(", ", typeList));
+            types = String.join(", ", typeList);
+            entry.setField(StandardField.TYPE, types);
         }
 
-        String isbn = getFirstArrayElement(jsonEntry, "isbn");
-        if (StringUtil.isNullOrEmpty(isbn)) {
-            // article
-            entry.setType(StandardEntryType.Article);
-            nametype = StandardField.JOURNAL;
-        } else {
-            // book chapter
-            entry.setType(StandardEntryType.InCollection);
+        if (types.toLowerCase().contains("book")) {
+            entryType = StandardEntryType.Book;
             nametype = StandardField.BOOKTITLE;
-            entry.setField(StandardField.ISBN, isbn);
+        } else if (types.toLowerCase().contains("article")) {
+            entryType = StandardEntryType.Article;
+        }
+        entry.setType(entryType);
+
+        // isbn
+        String isbn = getFirstArrayElement(jsonEntry, "isbn");
+        entry.setField(StandardField.ISBN, isbn);
+
+        // parent resource
+        String bibliographicCitation = jsonEntry.optString("bibliographicCitation", "");
+        String[] bibSplit = bibliographicCitation.split("/");
+        String parentResource = "";
+        if (bibSplit.length > 0) {
+            parentResource = bibSplit[0].trim();
+            entry.setField(nametype, parentResource);
         }
 
         entry.setField(StandardField.ISSN, getFirstArrayElement(jsonEntry, "issn"));
@@ -126,15 +138,13 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
             if (!authors.isEmpty()) {
                 entry.setField(StandardField.AUTHOR, String.join(" and ", authorNames));
             }
-        } else {
-            LOGGER.info("No author found.");
         }
 
         // publication
         Optional.ofNullable(jsonEntry.optJSONArray("publication"))
                 .map(array -> array.getJSONObject(0))
                 .ifPresent(publication -> {
-                    entry.setField(nametype, getFirstArrayElement(publication, "publishedBy"));
+                    entry.setField(StandardField.PUBLISHER, getFirstArrayElement(publication, "publishedBy"));
                     entry.setField(StandardField.LOCATION, getFirstArrayElement(publication, "location"));
                     String date = publication.optString("startDate");
                     entry.setField(StandardField.DATE, date);

@@ -29,7 +29,7 @@ public class LOBIDQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return createKeyValuePair("publication.publishedBy", journalTitle);
+        return createKeyValuePair("bibliographicCitation", journalTitle);
     }
 
     @Override
