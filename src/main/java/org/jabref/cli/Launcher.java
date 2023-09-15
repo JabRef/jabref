@@ -95,8 +95,9 @@ public class Launcher {
                 argumentProcessor.processArguments();
                 if (argumentProcessor.shouldShutDown()) {
                     LOGGER.debug("JabRef shut down after processing command line arguments");
-                    fileUpdateMonitor.shutdown();
-                    return;
+                    // A clean shutdown takes 60s time
+                    // We don't need the clean shutdown here
+                    System.exit(0);
                 }
 
                 MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, fileUpdateMonitor, ARGUMENTS);
