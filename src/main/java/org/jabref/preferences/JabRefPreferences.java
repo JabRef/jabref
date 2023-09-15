@@ -252,6 +252,8 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = "mergeShowOnlyChangedFields";
 
+    public static final String MERGE_APPLY_TO_ALL_ENTRIES = "mergeApplyToAllEntries";
+
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
@@ -627,6 +629,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, Boolean.TRUE);
         defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
+        defaults.put(MERGE_APPLY_TO_ALL_ENTRIES, Boolean.FALSE);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
@@ -2566,7 +2569,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF),
                 getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS),
                 getDouble(SIDE_PANE_WIDTH),
-                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS));
+                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS),
+                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES));
 
         EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(POS_Y, newValue.doubleValue()));
@@ -2596,6 +2600,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(guiPreferences.mergeHighlightWordsProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
+        EasyBind.listen(guiPreferences.mergeApplyToAllEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_APPLY_TO_ALL_ENTRIES, newValue));
 
         return guiPreferences;
     }

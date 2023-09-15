@@ -38,6 +38,7 @@ public class GuiPreferences {
     private final BooleanProperty mergeShouldShowUnifiedDiff;
     private final BooleanProperty mergeHighlightWords;
     private final BooleanProperty mergeShowChangedFieldsOnly;
+    private final BooleanProperty mergeApplyToAllEntries;
     private final DoubleProperty sidePaneWidth;
 
     public GuiPreferences(double positionX,
@@ -55,7 +56,8 @@ public class GuiPreferences {
                           boolean mergeShouldShowUnifiedDiff,
                           boolean mergeHighlightWords,
                           double sidePaneWidth,
-                          boolean mergeShowChangedFieldsOnly) {
+                          boolean mergeShowChangedFieldsOnly,
+                          boolean mergeApplyToAllEntries) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
         this.sizeX = new SimpleDoubleProperty(sizeX);
@@ -73,6 +75,7 @@ public class GuiPreferences {
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
         this.mergeShowChangedFieldsOnly = new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
+        this.mergeApplyToAllEntries = new SimpleBooleanProperty(mergeApplyToAllEntries);
     }
 
     public double getPositionX() {
@@ -253,5 +256,9 @@ public class GuiPreferences {
 
     public void setIsMergedShowChangedFielsOnly(boolean showChangedFieldsOnly) {
         mergeShowChangedFieldsOnly.setValue(showChangedFieldsOnly);
+    }
+
+    public BooleanProperty mergeApplyToAllEntriesProperty() {
+        return mergeApplyToAllEntries;
     }
 }
