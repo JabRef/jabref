@@ -129,6 +129,24 @@ class EntryComparatorTest {
                 .withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
         assertEquals(-1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
     }
+
+    @Test
+    void testPresentFieldsWithoutKeyField() {
+        BibEntry e1 = new BibEntry()
+            .withField(StandardField.AUTHOR, "Stephen King");
+        BibEntry e2 = new BibEntry()
+            .withField(StandardField.AUTHOR, "");
+        assertEquals(-1, new EntryComparator(true, false, InternalField.KEY_FIELD).compare(e1, e2));
+    }
+
+    @Test
+    void testPresentFieldsWithKeyField() {
+        BibEntry e1 = new BibEntry()
+            .withField(StandardField.AUTHOR, "Stephen King");
+        BibEntry e2 = new BibEntry()
+            .withField(StandardField.AUTHOR, "");
+        assertEquals(-1, new EntryComparator(true, false, StandardField.AUTHOR).compare(e1, e2));
+    }
 }
 
 
