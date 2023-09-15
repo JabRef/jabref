@@ -69,7 +69,7 @@ public class ArgumentProcessor {
     private final JabRefCLI cli;
 
     // Written once by processArguments()
-    private List<ParserResult> parserResults;
+    private List<ParserResult> parserResults = List.of();
 
     private final Mode startupMode;
     private final PreferencesService preferencesService;
