@@ -65,17 +65,18 @@ public class Launcher {
             BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
             Globals.entryTypesManager = entryTypesManager;
 
-            // Init preferences
+            // Initialize preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
-            Globals.prefs = preferences;
-            PreferencesMigrations.runMigrations(preferences, entryTypesManager);
 
             // Early exit in case another instance is already running
-            if (!handleMultipleAppInstances(ARGUMENTS, preferences)) {
+            if (!handleMultipleAppInstances(ARGUMENTS, preferences.getRemotePreferences())) {
                 return;
             }
 
-            // Init rest of preferences
+            Globals.prefs = preferences;
+            PreferencesMigrations.runMigrations(preferences, entryTypesManager);
+
+            // Initialize rest of preferences
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
             initGlobals(preferences);
@@ -86,13 +87,17 @@ public class Launcher {
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                        ARGUMENTS, ArgumentProcessor.Mode.INITIAL_START,
+                        ARGUMENTS,
+                        ArgumentProcessor.Mode.INITIAL_START,
                         preferences,
                         fileUpdateMonitor,
                         entryTypesManager);
+                argumentProcessor.processArguments();
                 if (argumentProcessor.shouldShutDown()) {
                     LOGGER.debug("JabRef shut down after processing command line arguments");
-                    return;
+                    // A clean shutdown takes 60s time
+                    // We don't need the clean shutdown here
+                    System.exit(0);
                 }
 
                 MainApplication.main(argumentProcessor.getParserResults(), argumentProcessor.isBlank(), preferences, fileUpdateMonitor, ARGUMENTS);
@@ -141,8 +146,7 @@ public class Launcher {
         LOGGER = LoggerFactory.getLogger(MainApplication.class);
     }
 
-    private static boolean handleMultipleAppInstances(String[] args, PreferencesService preferences) {
-        RemotePreferences remotePreferences = preferences.getRemotePreferences();
+    private static boolean handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
