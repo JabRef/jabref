@@ -1,5 +1,5 @@
 name: Auto Merge
-on: pull_request
+on: [pull_request, workflow_dispatch]
 
 permissions:
   contents: write
@@ -8,7 +8,7 @@ permissions:
 jobs:
   automerge:
     runs-on: ubuntu-latest
-    if: ${{ (github.actor == 'dependabot[bot]') || (github.actor == 'koppor' && startsWith(github.event.pull_request.title, '[Bot]')) }}
+    if: ${{ (github.actor == 'dependabot[bot]') || ((github.actor == 'koppor' || github.actor == 'github-actions') && startsWith(github.event.pull_request.title, '[Bot]')) }}
     steps:
       - name: Approve PR
         run: gh pr review --approve "$PR_URL"
