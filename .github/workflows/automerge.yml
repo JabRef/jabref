@@ -6,7 +6,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  dependabot:
+  automerge:
     runs-on: ubuntu-latest
     if: ${{ (github.actor == 'dependabot[bot]') || (github.actor == 'koppor' && startsWith(github.event.pull_request.title, '[Bot]')) }}
     steps:
