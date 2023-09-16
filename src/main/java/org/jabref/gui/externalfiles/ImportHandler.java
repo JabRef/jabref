@@ -235,17 +235,17 @@ public class ImportHandler {
                 case KEEP_RIGHT:
                     preferencesService.putEntryResolverResult(1);
                     bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
-                    preferencesService.putEntryPasteQuantity(entriesQuantity-1);
+                    preferencesService.putEntryPasteQuantity(entriesQuantity - 1);
                     break;
                 case KEEP_BOTH:
                     preferencesService.putEntryResolverResult(2);
-                    preferencesService.putEntryPasteQuantity(entriesQuantity-1);
+                    preferencesService.putEntryPasteQuantity(entriesQuantity - 1);
                     break;
                 case KEEP_MERGE:
                     preferencesService.putEntryResolverResult(3);
                     bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
                     entryToInsert = dialog.getMergedEntry();
-                    preferencesService.putEntryPasteQuantity(entriesQuantity-1);
+                    preferencesService.putEntryPasteQuantity(entriesQuantity - 1);
                     break;
                 case KEEP_LEFT:
                     preferencesService.putEntryResolverResult(4);
@@ -254,7 +254,7 @@ public class ImportHandler {
                 case BREAK:
                     preferencesService.putEntryResolverResult(5);
                 default:
-                    preferencesService.putEntryPasteQuantity(entriesQuantity-1);
+                    preferencesService.putEntryPasteQuantity(entriesQuantity - 1);
                     return;
             }
         }
