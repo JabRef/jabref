@@ -1,11 +1,9 @@
 package org.jabref.gui.duplicationFinder;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.DialogService;

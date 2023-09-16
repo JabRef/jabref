@@ -45,7 +45,6 @@
             <RadioButton fx:id="highlightCharactersRadioButtons" disable="true" mnemonicParsing="false" text="%Highlight characters" toggleGroup="$diffHighlightingMethodToggleGroup" />
             <CheckBox fx:id="onlyShowChangedFieldsCheck" text="%Only show changed fields"></CheckBox>
             <CheckBox fx:id="applyToAllEntriesCheck" text="Apply to all entries"></CheckBox>
-
          </items>
       </ToolBar>
    </children>
