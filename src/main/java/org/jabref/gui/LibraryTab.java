@@ -34,6 +34,7 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -208,7 +209,16 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * The layout to display in the tab when it's loading
+     * The
+     * layout
+     * to
+     * display
+     * in
+     * the
+     * tab
+     * when
+     * it's
+     * loading
      */
     public Node createLoadingAnimationLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
@@ -344,7 +354,7 @@ public class LibraryTab extends Tab {
             Path databasePath = file.get();
             String fileName = databasePath.getFileName().toString();
             tabTitle.append(fileName);
-            toolTipText.append(databasePath.toAbsolutePath().toString());
+            toolTipText.append(databasePath.toAbsolutePath());
 
             if (databaseLocation == DatabaseLocation.SHARED) {
                 tabTitle.append(" \u2013 ");
@@ -399,7 +409,19 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Returns a collection of suggestion providers, which are populated from the current library.
+     * Returns
+     * a
+     * collection
+     * of
+     * suggestion
+     * providers,
+     * which
+     * are
+     * populated
+     * from
+     * the
+     * current
+     * library.
      */
     public SuggestionProviders getSuggestionProviders() {
         return suggestionProviders;
@@ -418,18 +440,90 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Removes the selected entries from the database
+     * Removes
+     * the
+     * selected
+     * entries
+     * from
+     * the
+     * database
      *
-     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
+     * @param cut If
+     *            false
+     *            the
+     *            user
+     *            will
+     *            get
+     *            asked
+     *            if
+     *            he
+     *            really
+     *            wants
+     *            to
+     *            delete
+     *            the
+     *            entries,
+     *            and
+     *            it
+     *            will
+     *            be
+     *            localized
+     *            as
+     *            "deleted".
+     *            If
+     *            true
+     *            the
+     *            action
+     *            will
+     *            be
+     *            localized
+     *            as
+     *            "cut"
      */
     public void delete(boolean cut) {
         delete(cut, mainTable.getSelectedEntries());
     }
 
     /**
-     * Removes the selected entries from the database
+     * Removes
+     * the
+     * selected
+     * entries
+     * from
+     * the
+     * database
      *
-     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
+     * @param cut If
+     *            false
+     *            the
+     *            user
+     *            will
+     *            get
+     *            asked
+     *            if
+     *            he
+     *            really
+     *            wants
+     *            to
+     *            delete
+     *            the
+     *            entries,
+     *            and
+     *            it
+     *            will
+     *            be
+     *            localized
+     *            as
+     *            "deleted".
+     *            If
+     *            true
+     *            the
+     *            action
+     *            will
+     *            be
+     *            localized
+     *            as
+     *            "cut"
      */
     private void delete(boolean cut, List<BibEntry> entries) {
         if (entries.isEmpty()) {
@@ -517,15 +611,14 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 taskExecutor,
                 fileUpdateMonitor);
-
+        // conntent binding does not work as it won't trigger the needsEntries checker
+        mainTable.addSelectionListener(event -> stateManager.setSelectedEntries(event.getList().stream().map(BibEntryTableViewModel::getEntry).toList()));
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
-        mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
 
         // Update entry editor and preview according to selected entries
-        mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
-                                                         .stream()
-                                                         .findFirst()
-                                                         .ifPresent(entryEditor::setEntry));
+        mainTable.addSelectionListener(event -> event.getList().stream().map(BibEntryTableViewModel::getEntry)
+                                                     .findFirst()
+                                                     .ifPresent(entryEditor::setEntry));
     }
 
     public void setupMainPanel() {
@@ -613,7 +706,10 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Removes the bottom component.
+     * Removes
+     * the
+     * bottom
+     * component.
      */
     public void closeBottomPane() {
         mode = BasePanelMode.SHOWING_NOTHING;
@@ -621,7 +717,30 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is given focus afterwards.
+     * This
+     * method
+     * selects
+     * the
+     * given
+     * entry,
+     * and
+     * scrolls
+     * it
+     * into
+     * view
+     * in
+     * the
+     * table.
+     * If
+     * an
+     * entryEditor
+     * is
+     * shown,
+     * it
+     * is
+     * given
+     * focus
+     * afterwards.
      */
     public void clearAndSelect(final BibEntry bibEntry) {
         mainTable.clearAndSelect(bibEntry);
