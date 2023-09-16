@@ -24,7 +24,6 @@ public class ExportPreferences {
                              Path exportWorkingDirectory,
                              SaveOrder exportSaveOrder,
                              List<TemplateExporter> customExporters) {
-
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
         this.exportSaveOrder = new SimpleObjectProperty<>(exportSaveOrder);
