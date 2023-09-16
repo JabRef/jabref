@@ -8,8 +8,8 @@ permissions:
 jobs:
   automerge:
     runs-on: ubuntu-latest
-    # Run only if PR is triggered from this repository, coming from dependabot or by an update workflow
-    if: ${{ (github.event.pull_request.head.repo.full_name == github.repository) && ((github.actor == 'dependabot[bot]') || (startsWith(github.event.pull_request.title, '[Bot]'))) }}
+    # Run only if PR is triggered from JabRef's main repository and created by dependabot or by an update workflow
+    if: ${{ (github.event.pull_request.head.repo.full_name == 'JabRef/jabref') && ((github.actor == 'dependabot[bot]') || (startsWith(github.event.pull_request.title, '[Bot]'))) }}
     steps:
       - name: Approve PR
         run: gh pr review --approve "$PR_URL"
