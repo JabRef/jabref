@@ -40,6 +40,7 @@ import javafx.scene.control.TableColumn.SortType;
 import org.jabref.gui.Globals;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -248,12 +249,10 @@ public class JabRefPreferences implements PreferencesService {
     public static final String MERGE_ENTRIES_SHOULD_SHOW_DIFF = "mergeEntriesShouldShowDiff";
     public static final String MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF = "mergeEntriesShouldShowUnifiedDiff";
     public static final String MERGE_ENTRIES_HIGHLIGHT_WORDS = "mergeEntriesHighlightWords";
-
-
     public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = "mergeShowOnlyChangedFields";
-
     public static final String MERGE_APPLY_TO_ALL_ENTRIES = "mergeApplyToAllEntries";
-
+    public static final String MERGE_KEEP_APPLY_TO_ALL = "mergeKeepApplyToAll";
+    public static final String MERGE_ENTRIES_QUANTITY = "mergeEntriesQuantity";
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
@@ -630,6 +629,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
         defaults.put(MERGE_APPLY_TO_ALL_ENTRIES, Boolean.FALSE);
+        defaults.put(MERGE_KEEP_APPLY_TO_ALL, 0);
+        defaults.put(MERGE_ENTRIES_QUANTITY, 0);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
@@ -2979,5 +2980,18 @@ public class JabRefPreferences implements PreferencesService {
                 getXmpPreferences(),
                 getDOIPreferences(),
                 getGrobidPreferences());
+    }
+
+    public void putEntryResolverResult(int applyToAllResult) {
+        putInt(MERGE_KEEP_APPLY_TO_ALL, applyToAllResult);
+    }
+    public int getEntryResolverResult() {
+        return getInt(MERGE_KEEP_APPLY_TO_ALL);
+    }
+    public void putEntryPasteQuantity(int quantity) {
+        putInt(MERGE_ENTRIES_QUANTITY, quantity);
+    }
+    public int getEntryPasteQuantity() {
+        return getInt(MERGE_ENTRIES_QUANTITY);
     }
 }

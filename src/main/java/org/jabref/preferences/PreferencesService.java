@@ -149,4 +149,12 @@ public interface PreferencesService {
     MrDlibPreferences getMrDlibPreferences();
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
+
+    void putEntryResolverResult(int applyToAllResult);
+
+    int getEntryResolverResult();
+
+    void putEntryPasteQuantity(int quantity);
+
+    int getEntryPasteQuantity();
 }

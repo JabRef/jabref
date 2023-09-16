@@ -66,12 +66,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final StateManager stateManager;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
-
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
     private final ClipBoardManager clipBoardManager;
     private final BibEntryTypesManager entryTypesManager;
     private final TaskExecutor taskExecutor;
+    private final PreferencesService preferencesService;
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
@@ -96,6 +96,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.clipBoardManager = clipBoardManager;
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
+        this.preferencesService = preferencesService;
         UndoManager undoManager = libraryTab.getUndoManager();
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
@@ -329,6 +330,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         List<BibEntry> entriesToAdd;
         String content = ClipBoardManager.getContents();
         entriesToAdd = importHandler.handleBibTeXData(content);
+        preferencesService.putEntryPasteQuantity(entriesToAdd.size());
+        preferencesService.putEntryResolverResult(0);
         if (entriesToAdd.isEmpty()) {
             entriesToAdd = handleNonBibTeXStringData(content);
         }

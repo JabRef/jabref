@@ -50,6 +50,8 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.GuiPreferences;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -201,21 +203,57 @@ public class ImportHandler {
         Optional<BibEntry> existingDuplicateInLibrary = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToInsert, bibDatabaseContext.getMode());
         if (existingDuplicateInLibrary.isPresent()) {
             DuplicateResolverDialog dialog = new DuplicateResolverDialog(existingDuplicateInLibrary.get(), entryToInsert, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
-            switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
+
+            DuplicateResolverDialog.DuplicateResolverResult dialogResult;
+
+            int allEntriesCase = preferencesService.getEntryResolverResult();
+            int entriesQuantity = preferencesService.getEntryPasteQuantity();
+
+            if (preferencesService.getGuiPreferences().mergeApplyToAllEntriesProperty().get()) {
+                 switch (allEntriesCase) {
+                     case 1:
+                         dialogResult = DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT;
+                         break;
+                     case 2:
+                         dialogResult = DuplicateResolverDialog.DuplicateResolverResult.KEEP_BOTH;
+                         break;
+                     case 3:
+                         dialogResult = DuplicateResolverDialog.DuplicateResolverResult.KEEP_MERGE;
+                         break;
+                     case 4:
+                         dialogResult = DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT;
+                         break;
+                     default:
+                         dialogResult = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+                 }
+            }
+            else {
+                dialogResult = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+            }
+
+            switch (dialogResult) {
                 case KEEP_RIGHT:
+                    preferencesService.putEntryResolverResult(1);
                     bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
+                    preferencesService.putEntryPasteQuantity(entriesQuantity-1);
                     break;
                 case KEEP_BOTH:
+                    preferencesService.putEntryResolverResult(2);
+                    preferencesService.putEntryPasteQuantity(entriesQuantity-1);
                     break;
                 case KEEP_MERGE:
+                    preferencesService.putEntryResolverResult(3);
                     bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
                     entryToInsert = dialog.getMergedEntry();
+                    preferencesService.putEntryPasteQuantity(entriesQuantity-1);
                     break;
                 case KEEP_LEFT:
+                    preferencesService.putEntryResolverResult(4);
                 case AUTOREMOVE_EXACT:
                 case BREAK:
                 default:
-                   return;
+                    preferencesService.putEntryPasteQuantity(entriesQuantity-1);
+                    return;
             }
         }
         // Regenerate CiteKey of imported BibEntry
