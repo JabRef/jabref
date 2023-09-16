@@ -209,16 +209,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * The
-     * layout
-     * to
-     * display
-     * in
-     * the
-     * tab
-     * when
-     * it's
-     * loading
+     * The layout to display in the tab when it's loading
      */
     public Node createLoadingAnimationLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
@@ -409,19 +400,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Returns
-     * a
-     * collection
-     * of
-     * suggestion
-     * providers,
-     * which
-     * are
-     * populated
-     * from
-     * the
-     * current
-     * library.
+     * Returns a collection of suggestion providers, which are populated from the current library.
      */
     public SuggestionProviders getSuggestionProviders() {
         return suggestionProviders;
@@ -440,90 +419,18 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Removes
-     * the
-     * selected
-     * entries
-     * from
-     * the
-     * database
+     * Removes the selected entries from the database
      *
-     * @param cut If
-     *            false
-     *            the
-     *            user
-     *            will
-     *            get
-     *            asked
-     *            if
-     *            he
-     *            really
-     *            wants
-     *            to
-     *            delete
-     *            the
-     *            entries,
-     *            and
-     *            it
-     *            will
-     *            be
-     *            localized
-     *            as
-     *            "deleted".
-     *            If
-     *            true
-     *            the
-     *            action
-     *            will
-     *            be
-     *            localized
-     *            as
-     *            "cut"
+     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
     public void delete(boolean cut) {
         delete(cut, mainTable.getSelectedEntries());
     }
 
     /**
-     * Removes
-     * the
-     * selected
-     * entries
-     * from
-     * the
-     * database
+     * Removes the selected entries from the database
      *
-     * @param cut If
-     *            false
-     *            the
-     *            user
-     *            will
-     *            get
-     *            asked
-     *            if
-     *            he
-     *            really
-     *            wants
-     *            to
-     *            delete
-     *            the
-     *            entries,
-     *            and
-     *            it
-     *            will
-     *            be
-     *            localized
-     *            as
-     *            "deleted".
-     *            If
-     *            true
-     *            the
-     *            action
-     *            will
-     *            be
-     *            localized
-     *            as
-     *            "cut"
+     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut, List<BibEntry> entries) {
         if (entries.isEmpty()) {
@@ -706,10 +613,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Removes
-     * the
-     * bottom
-     * component.
+     * Removes the bottom component.
      */
     public void closeBottomPane() {
         mode = BasePanelMode.SHOWING_NOTHING;
@@ -717,30 +621,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * This
-     * method
-     * selects
-     * the
-     * given
-     * entry,
-     * and
-     * scrolls
-     * it
-     * into
-     * view
-     * in
-     * the
-     * table.
-     * If
-     * an
-     * entryEditor
-     * is
-     * shown,
-     * it
-     * is
-     * given
-     * focus
-     * afterwards.
+     * This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is given focus afterwards.
      */
     public void clearAndSelect(final BibEntry bibEntry) {
         mainTable.clearAndSelect(bibEntry);
