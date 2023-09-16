@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: write  # for peter-evans/create-pull-request to create branch
       pull-requests: write  # for peter-evans/create-pull-request to create a PR
-    if: (github.repository == 'JabRef/jabref' || github.repository == 'koppor/jabref')
+    if: (github.repository == 'JabRef/jabref')
     steps:
       - uses: actions/checkout@v4
         with:
