@@ -223,6 +223,9 @@ public class ImportHandler {
                      case 4:
                          dialogResult = DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT;
                          break;
+                     case 5:
+                         dialogResult = DuplicateResolverDialog.DuplicateResolverResult.BREAK;
+                         break;
                      default:
                          dialogResult = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
                  }
@@ -249,8 +252,10 @@ public class ImportHandler {
                     break;
                 case KEEP_LEFT:
                     preferencesService.putEntryResolverResult(4);
+                    return;
                 case AUTOREMOVE_EXACT:
                 case BREAK:
+                    preferencesService.putEntryResolverResult(5);
                 default:
                     preferencesService.putEntryPasteQuantity(entriesQuantity-1);
                     return;
