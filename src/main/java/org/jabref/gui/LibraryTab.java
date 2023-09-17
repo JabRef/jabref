@@ -518,14 +518,16 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 taskExecutor,
                 fileUpdateMonitor);
-        // conntent binding does not work as it won't trigger the needsEntries checker
-        mainTable.addSelectionListener(event -> stateManager.setSelectedEntries(event.getList().stream().map(BibEntryTableViewModel::getEntry).toList()));
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
-
-        // Update entry editor and preview according to selected entries
-        mainTable.addSelectionListener(event -> event.getList().stream().map(BibEntryTableViewModel::getEntry)
-                                                     .findFirst()
-                                                     .ifPresent(entryEditor::setEntry));
+        // content binding does not work as it does not trigger the ManageKeywordsAction#needsEntriesSelected checker
+        mainTable.addSelectionListener(event -> {
+            List<BibEntry> entries = event.getList().stream().map(BibEntryTableViewModel::getEntry).toList();
+            stateManager.setSelectedEntries(entries);
+            if (!entries.isEmpty()) {
+                // Update entry editor and preview according to selected entries
+                entryEditor.setEntry(entries.get(0));
+            }
+        });
     }
 
     public void setupMainPanel() {
