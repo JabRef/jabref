@@ -154,7 +154,7 @@ public class WebSearchPaneViewModel {
         if (CompositeIdFetcher.containsValidId(query)) {
             CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferencesService.getImportFormatPreferences());
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
-            fetcherName = compositeIdFetcher.getName();
+            fetcherName = "Identifier-based Web Search";
         }
 
         final String finalFetcherName = fetcherName;
