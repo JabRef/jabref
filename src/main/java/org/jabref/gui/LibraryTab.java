@@ -519,7 +519,7 @@ public class LibraryTab extends Tab {
                 taskExecutor,
                 fileUpdateMonitor);
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
-        // content binding does not work as it does not trigger the ManageKeywordsAction#needsEntriesSelected checker
+        // content binding between StateManager#getselectedEntries and mainTable#getSelectedEntries does not work here as it does not trigger the ActionHelper#needsEntriesSelected checker for the menubar
         mainTable.addSelectionListener(event -> {
             List<BibEntry> entries = event.getList().stream().map(BibEntryTableViewModel::getEntry).toList();
             stateManager.setSelectedEntries(entries);
@@ -562,7 +562,7 @@ public class LibraryTab extends Tab {
 
     /**
      * Set up auto completion for this database
-     */
+     */r
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferencesService.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
