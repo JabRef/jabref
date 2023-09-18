@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.general;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -313,7 +314,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         String url = "https://themes.jabref.org";
         try {
             JabRefDesktop.openBrowser(url, preferences.getFilePreferences());
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open browser."));
         }
     }
