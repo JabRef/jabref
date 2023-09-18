@@ -56,6 +56,10 @@
             <Label text="%Cite command" GridPane.rowIndex="2"/>
             <TextField fx:id="citeCommand"
                        prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            <Button fx:id="autolinkExternalHelp"
+                    styleClass="icon-button,narrow"
+                    prefHeight="20.0" prefWidth="20.0"
+                    GridPane.columnIndex="2" GridPane.rowIndex="2"/>
         </GridPane>
     </HBox>
 

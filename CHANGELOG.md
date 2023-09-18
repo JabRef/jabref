@@ -13,11 +13,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added the possibility to find (and add) papers that cite or are cited by a given paper. [#6187](https://github.com/JabRef/jabref/issues/6187)
 - We added an error-specific message for when a download from a URL fails. [#9826](https://github.com/JabRef/jabref/issues/9826)
-- We added support for customizating the citation command (e.g., `[@key1,@key2]`) when [pushing to external applications](https://docs.jabref.org/cite/pushtoapplications). [#10133](https://github.com/JabRef/jabref/issues/10133)
+- We added support for customizing the citation command (e.g., `[@key1,@key2]`) when [pushing to external applications](https://docs.jabref.org/cite/pushtoapplications). [#10133](https://github.com/JabRef/jabref/issues/10133)
 - We added an integrity check for more special characters. [#8712](https://github.com/JabRef/jabref/issues/8712)
 - We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
+- We added a fetcher for [LOBID](https://lobid.org/resources/api) resources. [koppor#386](https://github.com/koppor/jabref/issues/386)
 
 ### Changed
+
+- In the exports listrefs, tablerefs, tablerefsabsbib, use ISO date format in the footer.
 
 ### Fixed
 
@@ -29,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed a bug where an exception was raised when saving less than three export save orders in the preference. [#10157](https://github.com/JabRef/jabref/issues/10157)
 - We fixed an issue where it was possible to create a group with no name or with a group separator inside the name [#9776](https://github.com/JabRef/jabref/issues/9776)
 - BibLaTeX's `journaltitle` is now also respected for showing the journal information. [#10397](https://github.com/JabRef/jabref/issues/10397)
+- JabRef does not hang anymore when exporting via CLI. [#10380](https://github.com/JabRef/jabref/issues/10380)
 
 ### Removed
 

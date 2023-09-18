@@ -2287,7 +2287,7 @@ public class JabRefPreferences implements PreferencesService {
      * For the export configuration, generates the SelfContainedSaveOrder having the reference to TABLE resolved.
      */
     public SelfContainedSaveOrder getSelfContainedTableSaveOrder() {
-        List<MainTableColumnModel> sortOrder = mainTableColumnPreferences.getColumnSortOrder();
+        List<MainTableColumnModel> sortOrder = getMainTableColumnPreferences().getColumnSortOrder();
         return new SelfContainedSaveOrder(
                 SaveOrder.OrderType.SPECIFIED,
                 sortOrder.stream().flatMap(model -> model.getSortCriteria().stream()).toList());
