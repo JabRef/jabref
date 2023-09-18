@@ -1,5 +1,10 @@
 package org.jabref.gui.maintable;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -23,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MainTableDataModelTest {
 
     @Test
-    void additionToObersvableMapTriggersUpdate() {
+    void additionToObservableMapTriggersUpdate() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
         ObservableList<BibEntry> allEntries = FXCollections.unmodifiableObservableList(entries);
@@ -38,8 +43,25 @@ class MainTableDataModelTest {
         EntryComparator entryComparator = new EntryComparator(false, false, StandardField.AUTHOR);
         entriesFilteredAndSorted.setComparator((o1, o2) -> entryComparator.compare(o1.getEntry(), o2.getEntry()));
 
-        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Test");
-        entries.add(bibEntry);
-        bibEntry.setField(StandardField.YEAR, "2023");
+        final boolean[] changed = {false};
+
+        entriesFilteredAndSorted.addListener((InvalidationListener) observable -> changed[0] = true);
+
+        BibEntry bibEntryAuthorT = new BibEntry().withField(StandardField.AUTHOR, "T");
+        entries.add(bibEntryAuthorT);
+
+        List<BibEntry> result = entriesFilteredAndSorted.stream().map(entry -> entry.getEntry()).toList();
+        assertEquals(List.of(bibEntryAuthorT), result);
+
+        BibEntry bibEntryNothingToZ = new BibEntry();
+        entries.add(bibEntryNothingToZ);
+        result = entriesFilteredAndSorted.stream().map(entry -> entry.getEntry()).toList();
+        assertEquals(List.of(bibEntryNothingToZ, bibEntryAuthorT), result);
+
+        changed[0] = false;
+        bibEntryNothingToZ.setField(StandardField.AUTHOR, "Z");
+        assertTrue(changed[0]);
+        result = entriesFilteredAndSorted.stream().map(entry -> entry.getEntry()).toList();
+        assertEquals(List.of(bibEntryAuthorT, bibEntryNothingToZ), result);
     }
 }
