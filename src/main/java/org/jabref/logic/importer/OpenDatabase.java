@@ -26,9 +26,7 @@ public class OpenDatabase {
     public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
             throws IOException {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen);
-
         performLoadDatabaseMigrations(result, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
-
         return result;
     }
 

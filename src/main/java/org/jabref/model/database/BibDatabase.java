@@ -115,7 +115,6 @@ public class BibDatabase {
     public List<BibEntry> getEntriesSorted(Comparator<BibEntry> comparator) {
         List<BibEntry> entriesSorted = new ArrayList<>(entries);
         entriesSorted.sort(comparator);
-
         return entriesSorted;
     }
 
