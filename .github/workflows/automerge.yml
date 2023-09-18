@@ -11,7 +11,7 @@ jobs:
     # Run only if PR is inside JabRef's main repository and created by dependabot or by an update workflow
     if: >-
       (github.repository == 'JabRef/jabref') &&
-      ((github.event.pull_request.user.login == 'dependabot') ||
+      ((github.event.pull_request.user.email == '49699333+dependabot[bot]@users.noreply.github.com') ||
        (startsWith(github.event.pull_request.title, '[Bot]') &&
        (github.event.pull_request.head.repo.full_name == 'JabRef/jabref')))
     steps:
