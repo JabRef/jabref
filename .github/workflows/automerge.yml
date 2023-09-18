@@ -12,7 +12,8 @@ jobs:
     if: >-
       (github.repository == 'JabRef/jabref') &&
       ((github.actor == 'dependabot[bot]') ||
-       (startsWith(github.event.pull_request.title, '[Bot]') && (github.event.pull_request.head.repo.full_name == 'JabRef/jabref')))
+       (startsWith(github.event.pull_request.title, '[Bot]') &&
+       (github.event.pull_request.head.repo.full_name == 'JabRef/jabref')))
     steps:
       - name: Approve PR
         run: gh pr review --approve "$PR_URL"
