@@ -315,7 +315,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         try {
             JabRefDesktop.openBrowser(url, preferences.getFilePreferences());
         } catch (IOException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not open browser."));
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
         }
     }
 }
