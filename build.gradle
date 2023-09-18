@@ -136,8 +136,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:unoloader:7.6.0'
-    implementation 'org.libreoffice:libreoffice:7.6.0'
+    implementation 'org.libreoffice:unoloader:7.6.1'
+    implementation 'org.libreoffice:libreoffice:7.6.1'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -168,7 +168,7 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
-    implementation('org.jabref:afterburner.fx:2.0.0-SNAPSHOT')
+    implementation('org.jabref:afterburner.fx:2.0.0')
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack

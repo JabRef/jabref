@@ -34,6 +34,7 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -344,7 +345,7 @@ public class LibraryTab extends Tab {
             Path databasePath = file.get();
             String fileName = databasePath.getFileName().toString();
             tabTitle.append(fileName);
-            toolTipText.append(databasePath.toAbsolutePath().toString());
+            toolTipText.append(databasePath.toAbsolutePath());
 
             if (databaseLocation == DatabaseLocation.SHARED) {
                 tabTitle.append(" \u2013 ");
@@ -517,15 +518,16 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 taskExecutor,
                 fileUpdateMonitor);
-
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
-        mainTable.addSelectionListener(listEvent -> stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
-
-        // Update entry editor and preview according to selected entries
-        mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
-                                                         .stream()
-                                                         .findFirst()
-                                                         .ifPresent(entryEditor::setEntry));
+        // content binding between StateManager#getselectedEntries and mainTable#getSelectedEntries does not work here as it does not trigger the ActionHelper#needsEntriesSelected checker for the menubar
+        mainTable.addSelectionListener(event -> {
+            List<BibEntry> entries = event.getList().stream().map(BibEntryTableViewModel::getEntry).toList();
+            stateManager.setSelectedEntries(entries);
+            if (!entries.isEmpty()) {
+                // Update entry editor and preview according to selected entries
+                entryEditor.setEntry(entries.get(0));
+            }
+        });
     }
 
     public void setupMainPanel() {

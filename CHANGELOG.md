@@ -16,8 +16,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for customizing the citation command (e.g., `[@key1,@key2]`) when [pushing to external applications](https://docs.jabref.org/cite/pushtoapplications). [#10133](https://github.com/JabRef/jabref/issues/10133)
 - We added an integrity check for more special characters. [#8712](https://github.com/JabRef/jabref/issues/8712)
 - We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
-- We added a button that opens a web page in the default browser, allowing the user to get new themes for the application. [#10243](https://github.com/JabRef/jabref/issues/10243)
-
+- We added a button "More thems" that opens [themes.jabref.org](https://themes.jabref.org) allowing the user to find new themes for the application. [#10243](https://github.com/JabRef/jabref/issues/10243)
+- We added a fetcher for [LOBID](https://lobid.org/resources/api) resources. [koppor#386](https://github.com/koppor/jabref/issues/386)
 
 ### Changed
 
