@@ -58,13 +58,13 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
-      - name: Set up JDK
+      - name: Setup JDK
         uses: actions/setup-java@v3
         with:
           java-version: 20
           distribution: 'temurin'
           cache: 'gradle'
-      - name: setup jdk JabRef-fix mac
+      - name: Setup JDK jabref-fix macOS
         shell: bash
         run: |
             mkdir ${{runner.temp}}/jdk
@@ -81,7 +81,7 @@ jobs:
       - name: Clean up keychain
         run: |
          security delete-keychain signing_temp.keychain ${{runner.temp}}/keychain/notarization.keychain || true
-      - name: Setup OSX key chain on OSX
+      - name: Setup OSX key chain on macOS
         uses: apple-actions/import-codesign-certs@v2
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
@@ -99,9 +99,9 @@ jobs:
           mkdir ${{runner.temp}}/keychain
           security create-keychain -p jabref ${{runner.temp}}/keychain/notarization.keychain
           security set-keychain-settings ${{runner.temp}}/keychain/notarization.keychain
-      - name: Prepare merged jars and modules dir (macos)
+      - name: Prepare merged jars and modules dir (macOS)
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
-      - name: Build dmg (macos)
+      - name: Build dmg (macOS)
         shell: bash
         run: |
           ${{env.JDK21}}/Contents/Home/bin/jpackage \
@@ -115,8 +115,8 @@ jobs:
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
           --mac-sign \
-          --vendor JabRef \
-          --mac-package-identifier Jabref \
+          --vendor "JabRef e.V." \
+          --mac-package-identifier JabRef \
           --mac-package-name JabRef \
           --type dmg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
@@ -125,7 +125,7 @@ jobs:
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
           --jlink-options --bind-services
-      - name: Build pkg (macos)
+      - name: Build pkg (macOS)
         shell: bash
         run: |
           ${{env.JDK21}}/Contents/Home/bin/jpackage \
@@ -139,8 +139,8 @@ jobs:
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
           --mac-sign \
-          --vendor JabRef \
-          --mac-package-identifier Jabref \
+          --vendor "JabRef e.V." \
+          --mac-package-identifier JabRef \
           --mac-package-name JabRef \
           --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
