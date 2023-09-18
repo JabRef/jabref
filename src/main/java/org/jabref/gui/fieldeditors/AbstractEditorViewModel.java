@@ -65,8 +65,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                 fieldBinding,
                 newValue -> {
                     if (newValue != null) {
-                        // Controlsfx uses hardcoded \n for multiline fields, but JabRef stores them in OS Newlines format
-                        String oldValue = entry.getField(field).map(value -> value.replace(OS.NEWLINE, "\n").trim()).orElse(null);
+                        String oldValue = entry.getField(field).map(String::trim).orElse("");
                         // Autosave and save action trigger the entry editor to reload the fields, so we have to
                         // check for changes here, otherwise the cursor position is annoyingly reset every few seconds
                         if (!(newValue.trim()).equals(oldValue)) {
