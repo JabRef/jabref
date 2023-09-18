@@ -16,6 +16,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for customizing the citation command (e.g., `[@key1,@key2]`) when [pushing to external applications](https://docs.jabref.org/cite/pushtoapplications). [#10133](https://github.com/JabRef/jabref/issues/10133)
 - We added an integrity check for more special characters. [#8712](https://github.com/JabRef/jabref/issues/8712)
 - We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
+- We added a button that opens a web page in the default browser, allowing the user to get new themes for the application. [#10243](https://github.com/JabRef/jabref/issues/10243)
+
 
 ### Changed
 
@@ -71,7 +73,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to automatically replaces illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
 - We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
 - We added a tooltip to show the number of entries in a group [#10208](https://github.com/JabRef/jabref/issues/10208)
-- We added a button that opens a web page in the default browser, allowing the user to get new themes for the application. [#10243](https://github.com/JabRef/jabref/issues/10243)(https://github.com/JabRef/jabref/issues/10243)
 
 ### Changed
 
