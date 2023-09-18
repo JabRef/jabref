@@ -92,12 +92,6 @@ repositories {
 
 configurations {
     antlr4
-    // TODO: Remove the following workaround for split error messages such as
-    // error: module java.xml.bind reads package javax.annotation from both jsr305 and java.annotation
-    compile {
-        extendsFrom implementation
-        exclude group: "javax.activation"
-    }
 }
 
 dependencyLocking {
