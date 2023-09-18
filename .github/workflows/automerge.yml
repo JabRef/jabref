@@ -9,7 +9,7 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     # Run only if PR is inside JabRef's main repository and created by dependabot or by an update workflow
-    if: >-
+    if: >
       (github.repository == 'JabRef/jabref') &&
       ((github.actor == 'dependabot[bot]') ||
        ((startsWith(github.event.pull_request.title, '[Bot] ') || (startsWith(github.event.pull_request.title, 'Bump '))) &&
