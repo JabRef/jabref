@@ -13,12 +13,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
@@ -33,7 +33,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
     @FXML private ComboBox<Language> language;
-    @FXML private ComboBox<GeneralTabViewModel.ThemeTypes> theme;
+    @FXML private ComboBox<ThemeTypes> theme;
     @FXML private TextField customThemePath;
     @FXML private Button customThemeBrowse;
     @FXML private CheckBox fontOverride;
@@ -91,14 +91,14 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
-        new ViewModelListCellFactory<GeneralTabViewModel.ThemeTypes>()
-                .withText(GeneralTabViewModel.ThemeTypes::getDisplayName)
+        new ViewModelListCellFactory<ThemeTypes>()
+                .withText(ThemeTypes::getDisplayName)
                 .install(theme);
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
         EasyBind.subscribe(viewModel.selectedThemeProperty(), theme -> {
-            boolean isCustomTheme = theme == GeneralTabViewModel.ThemeTypes.CUSTOM;
+            boolean isCustomTheme = theme == ThemeTypes.CUSTOM;
             customThemePath.disableProperty().set(!isCustomTheme);
             customThemeBrowse.disableProperty().set(!isCustomTheme);
         });
@@ -120,7 +120,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferencesService.getFilePreferences()), autosaveLocalLibrariesHelp);
 
         createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
