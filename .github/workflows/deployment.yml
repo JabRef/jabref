@@ -85,32 +85,6 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
-      - name: Setup rsync (Windows)
-        # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
-        # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
-        # We cannot use "setup-rsync", because that does not work on Windows
-        # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
-        if: matrix.os == 'windows-latest'
-        run: choco install --no-progress rsync
-      - name: Setup ssh key (linux, Windows)
-        if: ((matrix.os == 'ubuntu-latest') || (matrix.os == 'windows-latest')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
-          mkdir -p build/distribution
-          touch build/distribution/test.txt
-      - name: Upload to builds.jabref.org (linux)
-        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
-        shell: bash
-        run: |
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
-          exit 1
-      - name: Upload to builds.jabref.org (Windows)
-        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
-        shell: cmd
-        run: |
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
-          exit 1
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
@@ -262,27 +236,22 @@ jobs:
         # We cannot use "setup-rsync", because that does not work on Windows
         # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
         if: matrix.os == 'windows-latest'
-        run: choco install rsync
-      - name: Setup ssh key (linux)
-        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 ~/.ssh/id_rsa
-          mkdir -p build/distribution
-          touch build/distribution/test.txt
-      - name: Setup ssh key (Windows)
-        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
-        shell: bash
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          mkdir -p build/distribution
-          touch build/distribution/test.txt
-          chmod 600 ~/.ssh/id_rsa
-      - name: Upload to builds.jabref.org (ubuntu, Windows)
+        run: choco install --no-progress rsync
+      - name: Setup ssh key (linux, Windows)
         if: ((matrix.os == 'ubuntu-latest') || (matrix.os == 'windows-latest')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Upload to builds.jabref.org (linux)
+        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         shell: bash
         run: |
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey' -o StrictHostKeyChecking=no build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+      - name: Upload to builds.jabref.org (Windows)
+        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        shell: cmd
+        run: |
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: actions/upload-artifact@v3
