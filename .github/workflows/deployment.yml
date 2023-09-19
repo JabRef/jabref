@@ -310,7 +310,7 @@ jobs:
   upload:
     strategy:
       fail-fast: false
-    name: Upload binaries on builds.jabref.org
+    name: Upload macOS binaries on builds.jabref.org
     runs-on: ubuntu-latest
     needs: [build, notarize]
     if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
