@@ -241,13 +241,13 @@ jobs:
         # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
         if: matrix.os == 'windows-latest'
         run: choco install --no-progress rsync
-      - name: Setup ssh key (linux, Windows)
-        if: ((matrix.os == 'ubuntu-latest') || (matrix.os == 'windows-latest')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+      - name: Setup ssh key
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
-      - name: Upload to builds.jabref.org (linux)
-        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+      - name: Upload to builds.jabref.org (linux, macOS)
+        if: ((matrix.os == 'ubuntu-latest') || (matrix.os == 'windows-latest')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         shell: bash
         run: |
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
@@ -256,15 +256,23 @@ jobs:
         shell: cmd
         run: |
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+      - name: Comment PR
+        if: (github.event_name == 'pull_request') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
+          comment_tag: download-link
+          mode: recreate
       - name: Upload to GitHub workflow artifacts store (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
         uses: actions/upload-artifact@v3
         with:
           # tbn = to-be-notarized
           name: JabRef-macOS-tbn
           path: build/distribution
   notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
-    name: Notarize and package macOS binaries
+    name: Notarize macOS binaries
     runs-on: macos-latest
     needs: [build]
     if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
@@ -281,7 +289,7 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Download from GitHub workflow artifacts store (macOS)
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
         uses: actions/download-artifact@master
         with:
           name: JabRef-macOS-tbn
@@ -301,17 +309,9 @@ jobs:
           xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.pkg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}.pkg
       - name: Upload to builds.jabref.org
-        if: steps.checksecrets.outputs.secretspresent == 'YES' && !startsWith(github.ref, 'refs/heads/gh-readonly-queue')
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
         shell: bash
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.buildJabRefPrivateKey }}" > ~/.ssh/id_rsa
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
-      - name: Comment PR
-        if: github.event_name == 'pull_request' && steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: |
-            The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
-          comment_tag: download-link
-          mode: recreate
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
