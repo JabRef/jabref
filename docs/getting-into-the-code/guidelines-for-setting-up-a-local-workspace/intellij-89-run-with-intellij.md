@@ -24,15 +24,15 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
    5. Press <kbd>Ctrl</kbd>+<kbd>V</kbd> to start the copy process
 8. Locate the class `Launcher` (e.g., by <kbd>ctrl</kbd>+<kbd>N</kbd> and then typing `Launcher`). Press <kbd>Enter</kbd> to jump to that class.
    {% figure caption:"IntelliJ search for class “Launcher”" %}
-   ![IntelliJ search for class "Launcher"](../images/intellij-search-for-launcher.png)
+   ![IntelliJ search for class "Launcher"](intellij-search-for-launcher.png)
    {% endfigure %}
 9. Click on the green play button next to the `main` method to create a Launch configuration. IntelliJ will fail in launching.
    {% figure caption:"However on green play" %}
-   ![However on green play](../images/intellij-hover-on-play-button.png)
+   ![However on green play](intellij-hover-on-play-button.png)
    {% endfigure %}
 
    {% figure caption:"Run JabRef via launcher" %}
-   ![Popup menu - Run JabRef via launcher](../images/intellij-run-jabref-from-launcher.png)
+   ![Popup menu - Run JabRef via launcher](intellij-run-jabref-from-launcher.png)
    {% endfigure %}
 10. On the top right of the IntelliJ window, next to the newly created launch configuration, click on the drop down
 11. Click on "Edit Configurations..."
@@ -67,5 +67,5 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
 16. Click "Apply"
 17. Click "Run". You can also click on the debug symbol next to it to enable stopping at breakpoints.
    {% figure caption:"Launch menu contains “Launcher”" %}
-   ![Launch menu contains launcher](../images/intellij-run-launcher.png)
+   ![Launch menu contains launcher](intellij-run-launcher.png)
    {% endfigure %}
