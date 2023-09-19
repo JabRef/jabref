@@ -155,7 +155,7 @@ jobs:
       - name: Prepare merged jars and modules dir (macos)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
-      - name: Build installer (non-macos)
+      - name: Build installer (non-macOS)
         if: (matrix.os != 'macos-latest')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
@@ -230,8 +230,8 @@ jobs:
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb  jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
-      - name: Upload to builds.jabref.org (ubuntu)
-        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+      - name: Upload to builds.jabref.org (ubuntu, Windows)
+        if: ((matrix.os == 'ubuntu-latest') || (matrix.os == 'windows-latest')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: Pendect/action-rsyncer@v2.0.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -241,12 +241,6 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
-      - name: Upload to GitHub workflow artifacts store (Windows)
-        if: (matrix.os == 'windows-latest') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
-        uses: actions/upload-artifact@v3
-        with:
-          name: JabRef-${{ matrix.displayName }}
-          path: build/distribution
       - name: Upload to GitHub workflow artifacts store (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: actions/upload-artifact@v3
@@ -294,23 +288,19 @@ jobs:
           name: JabRef-macOS-tbn
           path: build/distribution/
       - name: Notarize dmg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') ||  inputs.notarization == true)
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
         shell: bash
         run: |
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg
       - name: Notarize pkg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') ||  inputs.notarization == true)
+        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
         shell: bash
         run: |
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg
-      - name: Package application image
-        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (matrix.os != 'macos-latest')
-        shell: bash
-        run: ${{ matrix.archivePortable }}
       - name: Upload to GitHub workflow artifacts store
         if: (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         uses: actions/upload-artifact@v3
@@ -352,12 +342,6 @@ jobs:
         if: steps.checksecrets.outputs.secretspresent == 'YES'
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.10.2
-      - name: Get Windows binaries
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: actions/download-artifact@master
-        with:
-          name: JabRef-windows
-          path: build/distribution
       - name: Get macOS binaries unsigned
         if: (steps.checksecrets.outputs.secretspresent == 'YES') && (inputs.notarization == false && !startsWith(github.ref, 'refs/tags/'))
         uses: actions/download-artifact@master
