@@ -230,6 +230,14 @@ jobs:
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb  jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
+      - name: Setup rsync (Windows)
+        # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
+        # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
+        # We cannot use "setup-rsync", because that does not work on Windows
+        if: matrix.os == 'windows-latest'
+        uses: egor-tensin/setup-cygwin@v4
+        with:
+          packages: rsync
       - name: Upload to builds.jabref.org (ubuntu, Windows)
         if: ((matrix.os == 'ubuntu-latest') || (matrix.os == 'windows-latest')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         shell: bash
