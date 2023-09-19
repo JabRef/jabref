@@ -329,14 +329,18 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
-tasks.register("generateJournalAbbreviationList", JavaExec) {
+tasks.register("generateJournalListMV", JavaExec) {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets.main.runtimeClasspath
     main = "org.jabref.cli.JournalListMvGenerator"
+    outputs.file("build/resources/main/journals/journal-list.mv")
+    onlyIf {
+        !file("build/resources/main/journals/journal-list.mv").exists()
+    }
 }
-jar.dependsOn "generateJournalAbbreviationList"
-test.dependsOn "generateJournalAbbreviationList"
+jar.dependsOn "generateJournalListMV"
+test.dependsOn "generateJournalListMV"
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
