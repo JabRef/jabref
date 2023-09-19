@@ -40,7 +40,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.model.ChainNode;
-import org.jabref.model.util.OptionalUtil;
 
 /**
  * Represents a keyword in a chain of keywords.
