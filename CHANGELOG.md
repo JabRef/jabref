@@ -17,6 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an integrity check for more special characters. [#8712](https://github.com/JabRef/jabref/issues/8712)
 - We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
 - We added a fetcher for [LOBID](https://lobid.org/resources/api) resources. [koppor#386](https://github.com/koppor/jabref/issues/386)
+- When in `biblatex` mode, the [integrity check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) for journal titles now also checks the field `journal`.
 
 ### Changed
 
