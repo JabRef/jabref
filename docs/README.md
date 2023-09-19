@@ -26,4 +26,4 @@ docker run -p 4000:4000 -it --rm --volume="C:\git-repositories\jabref\docs":/srv
 * With <kbd>Ctrl</kbd>+<kbd>C</kbd> you can stop the server (this is enabled by the `-it` switch).
 * In case you get errors regarding `Gemfile.lock`, just delete `Gemfile.lock` and rerun.
 * The current `Dockerfile` is based on <https://github.com/just-the-docs/just-the-docs/blob/main/Dockerfile>.
-  The [Jekyll Docker image](https://github.com/envygeeks/jekyll-docker#jekyll-docker) did not work end of 20222 (because Ruby was too new).
+  The [Jekyll Docker image](https://github.com/envygeeks/jekyll-docker#jekyll-docker) did not work end of 2022 (because Ruby was too new).
