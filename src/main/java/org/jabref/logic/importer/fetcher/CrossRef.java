@@ -40,7 +40,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 /**
  * A class for fetching DOIs from CrossRef
  * <p>
- * See https://github.com/CrossRef/rest-api-doc
+ * See <a href="https://github.com/CrossRef/rest-api-doc">their GitHub page</a> for documentation.
  */
 public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
 
@@ -56,9 +56,9 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        entry.getLatexFreeField(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("query.bibliographic", title));
-        entry.getLatexFreeField(StandardField.AUTHOR).ifPresent(author -> uriBuilder.addParameter("query.author", author));
-        entry.getLatexFreeField(StandardField.YEAR).ifPresent(year ->
+        entry.getFieldLatexFree(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("query.bibliographic", title));
+        entry.getFieldLatexFree(StandardField.AUTHOR).ifPresent(author -> uriBuilder.addParameter("query.author", author));
+        entry.getFieldLatexFree(StandardField.YEAR).ifPresent(year ->
                 uriBuilder.addParameter("filter", "from-pub-date:" + year)
         );
         uriBuilder.addParameter("rows", "20"); // = API default
@@ -168,7 +168,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public Optional<DOI> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries) throws FetcherException {
 
-        final String entryTitle = REMOVE_BRACES_FORMATTER.format(inputEntry.getLatexFreeField(StandardField.TITLE).orElse(""));
+        final String entryTitle = REMOVE_BRACES_FORMATTER.format(inputEntry.getFieldLatexFree(StandardField.TITLE).orElse(""));
         final StringSimilarity stringSimilarity = new StringSimilarity();
 
         for (BibEntry fetchedEntry : fetchedEntries) {

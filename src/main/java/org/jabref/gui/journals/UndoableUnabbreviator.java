@@ -36,7 +36,7 @@ public class UndoableUnabbreviator {
             return true;
         }
 
-        String text = entry.getLatexFreeField(field).get();
+        String text = entry.getFieldLatexFree(field).get();
         String origText = text;
         if (database != null) {
             text = database.resolveForStrings(text);
