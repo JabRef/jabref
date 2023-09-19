@@ -22,7 +22,6 @@ public class HTMLCharacterChecker implements EntryChecker {
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();
         for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
-            // skip verbatim fields
             if (field.getKey().getProperties().contains(FieldProperty.VERBATIM)) {
                 continue;
             }

@@ -12,6 +12,7 @@ import java.util.Set;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +40,18 @@ public class LatexIntegrityChecker implements EntryChecker {
         EXCLUDED_ERRORS.add(CoreErrorCode.TTEG04);
     }
 
+    /**
+     * Similar check to {@link HTMLCharacterChecker#check(BibEntry)}.
+     * Here, we use SnuggleTeX, there it is searched for HTML characters.
+     */
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();
 
         for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
+            if (field.getKey().getProperties().contains(FieldProperty.VERBATIM)) {
+                continue;
+            }
             SnuggleInput input = new SnuggleInput(field.getValue());
             try {
                 SESSION.parseInput(input);
