@@ -334,7 +334,7 @@ tasks.register("generateJournalListMV", JavaExec) {
     }
 }
 jar.dependsOn "generateJournalListMV"
-test.dependsOn "generateJournalListMV"
+compileTestJava.dependsOn "generateJournalListMV"
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
