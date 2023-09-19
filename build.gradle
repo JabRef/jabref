@@ -92,12 +92,6 @@ repositories {
 
 configurations {
     antlr4
-    // TODO: Remove the following workaround for split error messages such as
-    // error: module java.xml.bind reads package javax.annotation from both jsr305 and java.annotation
-    compile {
-        extendsFrom implementation
-        exclude group: "javax.activation"
-    }
 }
 
 dependencyLocking {
@@ -308,10 +302,10 @@ tasks.register('generateSource') {
 }
 
 tasks.register("generateBstGrammarSource", JavaExec) {
-    main = "org.antlr.v4.Tool"
-    classpath = configurations.antlr4
     group = "JabRef"
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr4.'
+    classpath = configurations.antlr4
+    mainClass = "org.antlr.v4.Tool"
 
     inputs.dir('src/main/antlr4/org/jabref/bst/')
     outputs.dir("src-gen/main/java/org/jabref/logic/bst/")
@@ -322,7 +316,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     group = 'JabRef'
     description = "Generates java files for Search.g antlr4."
     classpath = configurations.antlr4
-    main = "org.antlr.v4.Tool"
+    mainClass = "org.antlr.v4.Tool"
 
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
@@ -333,7 +327,7 @@ tasks.register("generateJournalListMV", JavaExec) {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets.main.runtimeClasspath
-    main = "org.jabref.cli.JournalListMvGenerator"
+    mainClass = "org.jabref.cli.JournalListMvGenerator"
     outputs.file("build/resources/main/journals/journal-list.mv")
     onlyIf {
         !file("build/resources/main/journals/journal-list.mv").exists()

@@ -192,7 +192,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             }
 
             for (Field field : fieldsKeys) {
-                Optional<String> fieldValue = entry.getLatexFreeField(field);
+                Optional<String> fieldValue = entry.getFieldLatexFree(field);
                 if (fieldValue.isPresent()) {
                     if (matchFieldValue(StringUtil.stripAccents(fieldValue.get()))) {
                         return true;
