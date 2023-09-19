@@ -59,7 +59,7 @@
         </HBox>
     </GridPane>
 
-    <Hyperlink fx:id="moreThemes" text = "%Get More Themes" onAction="#openBrowser"/>
+    <Hyperlink fx:id="moreThemes" text = "%Get more themes..." onAction="#openBrowser"/>
 
     <Label styleClass="sectionHeader" text="%User interface"/>
     <CheckBox fx:id="openLastStartup" text="%Open last edited libraries on startup"/>
