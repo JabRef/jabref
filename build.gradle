@@ -328,7 +328,6 @@ tasks.register("generateJournalListMV", JavaExec) {
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets.main.runtimeClasspath
     mainClass = "org.jabref.cli.JournalListMvGenerator"
-    outputs.file("build/resources/main/journals/journal-list.mv")
     onlyIf {
         !file("build/resources/main/journals/journal-list.mv").exists()
     }
