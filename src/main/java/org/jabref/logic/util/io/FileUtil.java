@@ -27,7 +27,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
