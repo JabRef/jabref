@@ -40,7 +40,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -179,7 +178,7 @@ public class MainTableColumnFactory {
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<Color> groupColors = matchedGroups.stream()
-                                               .flatMap(group -> OptionalUtil.toStream(group.getColor()))
+                                               .flatMap(group -> group.getColor().stream())
                                                .toList();
 
         if (!groupColors.isEmpty()) {
