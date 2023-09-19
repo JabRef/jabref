@@ -23,24 +23,27 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
    4. Select the folder `classes`
    5. Press <kbd>Ctrl</kbd>+<kbd>V</kbd> to start the copy process
 8. Locate the class `Launcher` (e.g., by <kbd>ctrl</kbd>+<kbd>N</kbd> and then typing `Launcher`). Press <kbd>Enter</kbd> to jump to that class.
-   {% figure caption:"IntelliJ search for class “Launcher”" %}
-   ![IntelliJ search for class "Launcher"](intellij-search-for-launcher.png)
-   {% endfigure %}
+   <figure>
+     <img src="intellij-search-for-launcher.png" alt="IntelliJ search for class “Launcher”">
+     <figcaption>IntelliJ search for class “Launcher”</figcaption>
+   </figure>
 9. Click on the green play button next to the `main` method to create a Launch configuration. IntelliJ will fail in launching.
-   {% figure caption:"However on green play" %}
-   ![However on green play](intellij-hover-on-play-button.png)
-   {% endfigure %}
+   <figure>
+     <img src="intellij-hover-on-play-button.png" alt="However on green play">
+     <figcaption>However on green play</figcaption>
+   </figure>
 
-   {% figure caption:"Run JabRef via launcher" %}
-   ![Popup menu - Run JabRef via launcher](intellij-run-jabref-from-launcher.png)
-   {% endfigure %}
+   <figure>
+     <img src="intellij-run-jabref-from-launcher.png" alt="Run JabRef via launcher">
+     <figcaption>Run JabRef via launcher</figcaption>
+   </figure>
+
 10. On the top right of the IntelliJ window, next to the newly created launch configuration, click on the drop down
 11. Click on "Edit Configurations..."
 12. On the right, click on "Modify options"
 13. Ensure that "Use classpath of module" is checked
 14. Select "Add VM options"
 15. In the newly appearing field for VM options, insert:
-
    ```text
    --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
    --add-opens=org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref
@@ -63,9 +66,12 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
    --add-reads org.jabref=org.fxmisc.flowless
    --add-reads org.jabref=org.apache.commons.csv
    ```
-
 16. Click "Apply"
 17. Click "Run". You can also click on the debug symbol next to it to enable stopping at breakpoints.
-   {% figure caption:"Launch menu contains “Launcher”" %}
-   ![Launch menu contains launcher](intellij-run-launcher.png)
-   {% endfigure %}
+    <figure>
+      <img src="intellij-run-launcher.png" alt="Launch menu contains “Launcher”">
+      <figcaption>Launch menu contains “Launcher”</figcaption>
+    </figure>
+
+<!-- MD031 is disabled, because otherwise the numbering does not work properly. MD029 and M032 are disabled as a consequence. -->
+<!-- markdownlint-disable-file MD029 MD031 MD032 MD033 -->
