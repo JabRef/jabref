@@ -236,7 +236,7 @@ jobs:
         run: |
           set -e
           mkdir -p ~/.ssh
-          cat "${{ secrets.buildJabRefPrivateKey }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.buildJabRefPrivateKey }}" > ~/.ssh/id_rsa
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Upload to GitHub workflow artifacts store (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
@@ -357,7 +357,7 @@ jobs:
         run: |
           set -e
           mkdir -p ~/.ssh
-          cat "${{ secrets.buildJabRefPrivateKey }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.buildJabRefPrivateKey }}" > ~/.ssh/id_rsa
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Comment PR
         if: github.event_name == 'pull_request' && steps.checksecrets.outputs.secretspresent == 'YES'
