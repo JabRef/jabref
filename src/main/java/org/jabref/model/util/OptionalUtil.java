@@ -12,14 +12,6 @@ import java.util.stream.Stream;
 
 public class OptionalUtil {
 
-    public static <T> List<T> toList(Optional<T> value) {
-        if (value.isPresent()) {
-            return Collections.singletonList(value.get());
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
     public static <T, U> boolean equals(Optional<T> left, Optional<U> right, BiPredicate<T, U> equality) {
         if (!left.isPresent()) {
             return !right.isPresent();
@@ -32,6 +24,20 @@ public class OptionalUtil {
         }
     }
 
+    /**
+     * @return An immutable list containing the value - if no value: empty immutable list
+     */
+    public static <T> List<T> toList(Optional<T> value) {
+        if (value.isPresent()) {
+            return Collections.singletonList(value.get());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * @return An immutable list containing the values - if no values present: empty immutable list
+     */
     @SafeVarargs
     public static <T> List<T> toList(Optional<T>... values) {
         return Stream.of(values).flatMap(Optional::stream).toList();
