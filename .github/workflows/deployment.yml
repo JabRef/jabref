@@ -289,7 +289,7 @@ jobs:
     name: Notarize macOS binaries
     runs-on: macos-latest
     needs: [build]
-    if: ${{ !startsWith(github.ref, 'refs/heads/gh-readonly-queue') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
     steps:
       - name: Check secrets presence
         id: checksecrets
