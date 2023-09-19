@@ -209,7 +209,7 @@ jobs:
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-latest')
         shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip jpackage
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
       - name: Package application image (linux, Windows)
         if: (matrix.os != 'macos-latest')
         shell: bash

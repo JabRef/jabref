@@ -554,6 +554,7 @@ tasks.register('deleteInstallerTemp', Delete) {
 }
 
 jpackage.dependsOn deleteInstallerTemp
+jlinkZip.dependsOn jpackageImage
 jlink {
     addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
     launcher {
