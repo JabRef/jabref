@@ -354,19 +354,14 @@ jobs:
         with:
           name: JabRef-macOS
           path: build/distribution/
-      # Upload to build server using rsync
-      # The action runs on linux only (because it is a Dockerized action), therefore it is embedded in a separate workflow
       - name: Upload to builds.jabref.org
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: Pendect/action-rsyncer@v2.0.0
-        env:
-          DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
-        with:
-          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
-          options: ''
-          ssh_options: '-p 9922'
-          src: 'build/distribution/'
-          dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+        if: steps.checksecrets.outputs.secretspresent == 'YES' && !startsWith(github.ref, 'refs/heads/gh-readonly-queue')
+        shell: bash
+        run: |
+          set -e
+          mkdir -p ~/.ssh
+          cat "${{ secrets.buildJabRefPrivateKey }}" > ~/.ssh/id_rsa
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
       - name: Comment PR
         if: github.event_name == 'pull_request' && steps.checksecrets.outputs.secretspresent == 'YES'
         uses: thollander/actions-comment-pull-request@v2
