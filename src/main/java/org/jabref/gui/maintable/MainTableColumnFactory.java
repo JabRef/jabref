@@ -179,7 +179,7 @@ public class MainTableColumnFactory {
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<Color> groupColors = matchedGroups.stream()
-                                               .flatMap(group -> OptionalUtil.toStream(group.getColor()))
+                                               .flatMap(group -> group.getColor().stream())
                                                .toList();
 
         if (!groupColors.isEmpty()) {

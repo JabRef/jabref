@@ -8,7 +8,6 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OptionalUtil {
@@ -33,28 +32,17 @@ public class OptionalUtil {
         }
     }
 
-    /**
-     * No longer needed in Java 9 where {@code Optional<T>.stream()} is added.
-     */
-    public static <T> Stream<T> toStream(Optional<T> value) {
-        if (value.isPresent()) {
-            return Stream.of(value.get());
-        } else {
-            return Stream.empty();
-        }
-    }
-
     @SafeVarargs
     public static <T> List<T> toList(Optional<T>... values) {
-        return Stream.of(values).flatMap(optional -> toList(optional).stream()).collect(Collectors.toList());
+        return Stream.of(values).flatMap(Optional::stream).toList();
     }
 
     public static <T, R> Stream<R> flatMapFromStream(Optional<T> value, Function<? super T, ? extends Stream<? extends R>> mapper) {
-        return toStream(value).flatMap(mapper);
+        return value.stream().flatMap(mapper);
     }
 
     public static <T, R> Stream<R> flatMap(Optional<T> value, Function<? super T, ? extends Collection<? extends R>> mapper) {
-        return toStream(value).flatMap(element -> mapper.apply(element).stream());
+        return value.stream().flatMap(element -> mapper.apply(element).stream());
     }
 
     public static <T> Boolean isPresentAnd(Optional<T> value, Predicate<T> check) {

@@ -274,7 +274,7 @@ public class FileUtil {
 
         return bes.stream()
                   .flatMap(entry -> entry.getFiles().stream())
-                  .flatMap(file -> OptionalUtil.toStream(file.findIn(fileDirs)))
+                  .flatMap(file -> file.findIn(fileDirs).stream())
                   .collect(Collectors.toList());
     }
 
