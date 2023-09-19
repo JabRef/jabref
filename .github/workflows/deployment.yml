@@ -153,7 +153,7 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Prepare merged jars and modules dir (macos)
+      - name: Prepare merged jars and modules dir (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Build dmg (macOS)
