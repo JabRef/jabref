@@ -242,7 +242,6 @@ jobs:
         if: ((matrix.os == 'ubuntu-latest') || (matrix.os == 'windows-latest')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         shell: bash
         run: |
-          set -e
           mkdir -p ~/.ssh
           echo "${{ secrets.buildJabRefPrivateKey }}" > ~/.ssh/id_rsa
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i ~/.ssh/id_rsa' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
