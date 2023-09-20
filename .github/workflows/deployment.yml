@@ -41,7 +41,6 @@ jobs:
       - name: Setup rsync
         uses: GuillaumeFalourd/setup-rsync@test
       - name: Setup ssh key
-        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
