@@ -53,14 +53,19 @@ jobs:
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: should be executed on Windows only
+      - name: should NOT be executed on Windows
         if: >
           ${{
             (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') &&
             ((matrix.os == 'ubuntu-latest') ||
              ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
         shell: bash
-        run: echo Hello
+        run: |
+          echo Hello
+          echo ${{(!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') }}
+          echo ${{ (matrix.os == 'ubuntu-latest') }}
+          echo ${{ ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
+          echo ${{((matrix.os == 'ubuntu-latest') || ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
       - name: Setup rsync
         uses: GuillaumeFalourd/setup-rsync@test
       - name: Setup ssh key
