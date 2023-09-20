@@ -84,8 +84,6 @@ jobs:
       - name: Setup ssh key
         shell: bash
         run: |
-          ls -la /tmp
-          ls -la /home
           echo "${{ secrets.buildJabRefPrivateKey }}" > ${{runner.temp}}/sshkey
           chmod 600 ${{runner.temp}}/sshkey
           mkdir -p build/distribution/
