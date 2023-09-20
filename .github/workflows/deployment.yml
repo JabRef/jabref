@@ -82,6 +82,7 @@ jobs:
         run: |
           rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /tmp/test && rsync" -e 'ssh -p 9922 -i  ${{runner.temp}}/sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/tmp/test/
   build:
+    if: false
     strategy:
       fail-fast: false
       matrix:
