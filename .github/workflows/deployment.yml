@@ -36,8 +36,41 @@ concurrency:
 
 jobs:
   rsynctest:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
+          else
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
+          fi
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+      - name: should be executed on Windows only
+        if: >
+          ${{
+            (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') &&
+            ((matrix.os == 'ubuntu-latest') ||
+             ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
+        shell: bash
+        run: echo Hello
+      - name: Add SSH key
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p /home/runner/.ssh
+          ssh-keyscan build-upload.jabref.org >> /home/runner/.ssh/known_hosts
+          echo "${{ secrets.buildJabRefPrivateKey }}" > /home/runner/.ssh/github_actions
+          chmod 600 /home/runner/.ssh/github_actions
+          ssh-agent -a $SSH_AUTH_SOCK
+          ssh-add /home/runner/.ssh/github_actions
       - name: Setup rsync
         uses: GuillaumeFalourd/setup-rsync@test
       - name: Setup ssh key
@@ -50,7 +83,7 @@ jobs:
       - name: Upload to builds.jabref.org (Windows)
         shell: bash
         run: |
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /tmp/test && rsync" -e 'ssh -p 9922 -i ~/sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/tmp/test/
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /tmp/test && rsync" -e 'ssh -p 9922 -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/tmp/test/
   build:
     strategy:
       fail-fast: false
