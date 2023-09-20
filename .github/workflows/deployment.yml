@@ -109,7 +109,7 @@ jobs:
          cat gradle.properties
 
          sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
-      - name: Setup JDK jabref-fix (ubuntu)
+      - name: Setup JDK jabref-fix (linux)
         if: (matrix.os == 'ubuntu-latest')
         shell: bash
         run: |
@@ -138,14 +138,14 @@ jobs:
           cat gradle.properties
 
           sed -i'.bak' -e "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
-      - name: Setup OSX key chain (macOS)
+      - name: Setup macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
-      - name: Setup OSX key chain on OSX for app id cert (macOS)
+      - name: Setup macOS key chain for app id cert
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
         with:
