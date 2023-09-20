@@ -67,11 +67,18 @@ jobs:
           echo ${{ ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
           echo ${{ ((matrix.os == 'ubuntu-latest') || ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
           echo ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-latest') ||             ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
-      - run: >
+      - if: >
+          ${{
+            (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') &&
+            ((matrix.os == 'ubuntu-latest') ||
+            ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
+        run: >
           echo ${{
             (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') &&
             ((matrix.os == 'ubuntu-latest') ||
              ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
+      - if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-latest') || ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
+        run: echo ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-latest') || ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
       - name: Setup rsync
         uses: GuillaumeFalourd/setup-rsync@test
       - name: Setup ssh key
