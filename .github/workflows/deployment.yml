@@ -61,29 +61,23 @@ jobs:
              ((matrix.os == 'macos-latest') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
         shell: bash
         run: echo Hello
-      - name: Add SSH key
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          mkdir -p /home/runner/.ssh
-          ssh-keyscan build-upload.jabref.org >> /home/runner/.ssh/known_hosts
-          echo "${{ secrets.buildJabRefPrivateKey }}" > /home/runner/.ssh/github_actions
-          chmod 600 /home/runner/.ssh/github_actions
-          ssh-agent -a $SSH_AUTH_SOCK
-          ssh-add /home/runner/.ssh/github_actions
       - name: Setup rsync
         uses: GuillaumeFalourd/setup-rsync@test
       - name: Setup ssh key
         shell: bash
         run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > ~/sshkey
-          chmod 600 ~/sshkey
+          pwd
+          whoami
+          ls -la /tmp
+          ls -la /home
+          echo "${{ secrets.buildJabRefPrivateKey }}" > ${{runner.temp}}/sshkey
+          chmod 600 ${{runner.temp}}/sshkey
           mkdir -p build/distribution/
           touch build/distribution/test.txt
       - name: Upload to builds.jabref.org (Windows)
         shell: bash
         run: |
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /tmp/test && rsync" -e 'ssh -p 9922 -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/tmp/test/
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /tmp/test && rsync" -e 'ssh -p 9922 -i  ${{runner.temp}}/sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/tmp/test/
   build:
     strategy:
       fail-fast: false
