@@ -268,7 +268,7 @@ jobs:
           name: JabRef-macOS-tbn
           path: build/distribution
   announce:
-    name: Comment on Pull Request
+    name: Comment on pull request
     runs-on: ubuntu-latest
     needs: [build]
     if: ${{ github.event_name == 'pull_request' }}
