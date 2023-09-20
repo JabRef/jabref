@@ -35,33 +35,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  rsynctest:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Setup rsync
-        uses: GuillaumeFalourd/setup-rsync@test
-      - name: Setup ssh key
-        shell: bash
-        run: |
-          temp_path="${{ runner.temp }}"
-          temp_path="${temp_path//\\//}"
-          echo "${{ secrets.buildJabRefPrivateKey }}" > "${temp_path}/sshkey"
-          chmod 600 "${{runner.temp}}/sshkey"
-          mkdir -p build/distribution/
-          touch build/distribution/test.txt
-      - name: Upload to builds.jabref.org (Windows)
-        shell: bash
-        run: |
-          temp_path="${{ runner.temp }}"
-          sshkeypath="${temp_path//\\//}/sshkey"
-          echo ${sshkeypath}
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /tmp/test && rsync" -e "ssh -p 9922 -i ${sshkeypath} -o StrictHostKeyChecking=no" build/distribution/ jrrsync@build-upload.jabref.org:/tmp/test/
   build:
-    if: false
     strategy:
       fail-fast: false
       matrix:
