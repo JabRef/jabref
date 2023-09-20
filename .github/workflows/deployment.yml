@@ -57,7 +57,7 @@ jobs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
       branchname: ${{ steps.gitversion.outputs.branchName }}
-    name: Create installer and portable version for ${{ matrix.displayName }}
+    name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -292,7 +292,7 @@ jobs:
           comment_tag: download-link
           mode: recreate
   notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
-    name: Notarize macOS binaries
+    name: macOS notarization
     runs-on: macos-latest
     needs: [build]
     if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
