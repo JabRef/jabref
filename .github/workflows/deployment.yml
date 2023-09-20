@@ -41,15 +41,16 @@ jobs:
       - name: Setup rsync
         uses: GuillaumeFalourd/setup-rsync@test
       - name: Setup ssh key
+        shell: bash
         run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
+          echo "${{ secrets.buildJabRefPrivateKey }}" > /tmp/sshkey
+          chmod 600 /tmp/sshkey
           mkdir -p build/distribution/
           touch build/distribution/test.txt
       - name: Upload to builds.jabref.org (Windows)
         shell: cmd
         run: |
-          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /tmp/test && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/tmp/test/
+          rsync -Pavz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /tmp/test && rsync" -e 'ssh -p 9922 -i /tmp/sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/tmp/test/
   build:
     strategy:
       fail-fast: false
