@@ -215,7 +215,7 @@ jobs:
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Rename files
-        if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: pwsh
         run: |
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
