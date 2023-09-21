@@ -11,7 +11,7 @@ nav_order: 12
 Ensure you have a Java 20 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.
 
 {% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 20 is missing." %}
-![Plattform Settings - SDKs](../../images/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
+![Plattform Settings - SDKs](intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 {% endfigure %}
 
 If there is another JDK than JDK 20 selected, click on the plus button and choose "Download JDK..."

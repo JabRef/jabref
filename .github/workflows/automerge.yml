@@ -1,5 +1,5 @@
 name: Auto Merge
-on: [pull_request, workflow_dispatch]
+on: [pull_request_target, workflow_dispatch]
 
 permissions:
   contents: write
@@ -9,7 +9,11 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     # Run only if PR is inside JabRef's main repository and created by dependabot or by an update workflow
-    if: ${{ (github.repository == 'JabRef/jabref') && ((github.actor == 'dependabot[bot]') || (startsWith(github.event.pull_request.title, '[Bot]'))) }}
+    if: >
+      (github.repository == 'JabRef/jabref') &&
+      ((github.actor == 'dependabot[bot]') ||
+       ((startsWith(github.event.pull_request.title, '[Bot] ') || (startsWith(github.event.pull_request.title, 'Bump '))) &&
+       (github.event.pull_request.head.repo.full_name == 'JabRef/jabref')))
     steps:
       - name: Approve PR
         run: gh pr review --approve "$PR_URL"

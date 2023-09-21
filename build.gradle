@@ -92,12 +92,6 @@ repositories {
 
 configurations {
     antlr4
-    // TODO: Remove the following workaround for split error messages such as
-    // error: module java.xml.bind reads package javax.annotation from both jsr305 and java.annotation
-    compile {
-        extendsFrom implementation
-        exclude group: "javax.activation"
-    }
 }
 
 dependencyLocking {
@@ -136,8 +130,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.5.0'
 
-    implementation 'org.libreoffice:unoloader:7.6.0'
-    implementation 'org.libreoffice:libreoffice:7.6.0'
+    implementation 'org.libreoffice:unoloader:7.6.1'
+    implementation 'org.libreoffice:libreoffice:7.6.1'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -168,7 +162,7 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
-    implementation('org.jabref:afterburner.fx:2.0.0-SNAPSHOT')
+    implementation('org.jabref:afterburner.fx:2.0.0')
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
@@ -308,10 +302,10 @@ tasks.register('generateSource') {
 }
 
 tasks.register("generateBstGrammarSource", JavaExec) {
-    main = "org.antlr.v4.Tool"
-    classpath = configurations.antlr4
     group = "JabRef"
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr4.'
+    classpath = configurations.antlr4
+    mainClass = "org.antlr.v4.Tool"
 
     inputs.dir('src/main/antlr4/org/jabref/bst/')
     outputs.dir("src-gen/main/java/org/jabref/logic/bst/")
@@ -322,7 +316,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     group = 'JabRef'
     description = "Generates java files for Search.g antlr4."
     classpath = configurations.antlr4
-    main = "org.antlr.v4.Tool"
+    mainClass = "org.antlr.v4.Tool"
 
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
@@ -333,7 +327,7 @@ tasks.register("generateJournalAbbreviationList", JavaExec) {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets.main.runtimeClasspath
-    main = "org.jabref.cli.JournalListMvGenerator"
+    mainClass = "org.jabref.cli.JournalListMvGenerator"
 }
 jar.dependsOn "generateJournalAbbreviationList"
 test.dependsOn "generateJournalAbbreviationList"

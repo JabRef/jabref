@@ -49,8 +49,9 @@ public class PersistenceVisualStateTable {
      * {@link org.jabref.preferences.JabRefPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
      */
     private void updateColumns() {
-        LOGGER.debug("Updating columns");
-        preferences.setColumns(toList(table.getColumns()));
+        List<MainTableColumnModel> list = toList(table.getColumns());
+        LOGGER.debug("Updating columns to {}", list);
+        preferences.setColumns(list);
     }
 
     /**
