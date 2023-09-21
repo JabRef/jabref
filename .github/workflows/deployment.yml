@@ -138,6 +138,9 @@ jobs:
           cat gradle.properties
 
           sed -i'.bak' -e "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
+      - name: Prepare merged jars and modules dir (macOS)
+        if: (matrix.os == 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'NO')
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Setup macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
@@ -153,9 +156,6 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Prepare merged jars and modules dir (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Build dmg (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -207,21 +207,21 @@ jobs:
           --file-associations buildres/mac/bibtexAssociations.properties \
           --jlink-options --bind-services
       - name: Build runtime image and installer (linux, Windows)
-        if: (matrix.os != 'macos-latest')
+        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
       - name: Package application image (linux, Windows)
-        if: (matrix.os != 'macos-latest')
+        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Rename files
-        if: (matrix.os != 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: pwsh
         run: |
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
-      - name: Repack deb file for Debian (compression)
-        if: (matrix.os == 'ubuntu-latest')
+      - name: Repack deb file for Debian
+        if: (matrix.os == 'ubuntu-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd build/distribution
@@ -230,7 +230,7 @@ jobs:
           zstd -d < data.tar.zst | xz > data.tar.xz
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
-          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb  jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
+          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
       - name: Setup rsync (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         run: brew install rsync
