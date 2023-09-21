@@ -16,12 +16,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for customizing the citation command (e.g., `[@key1,@key2]`) when [pushing to external applications](https://docs.jabref.org/cite/pushtoapplications). [#10133](https://github.com/JabRef/jabref/issues/10133)
 - We added an integrity check for more special characters. [#8712](https://github.com/JabRef/jabref/issues/8712)
 - We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
+- We added a link "Get more themes..." in the preferences to that points to [themes.jabref.org](https://themes.jabref.org) allowing the user to download new themes. [#10243](https://github.com/JabRef/jabref/issues/10243)
 - We added a fetcher for [LOBID](https://lobid.org/resources/api) resources. [koppor#386](https://github.com/koppor/jabref/issues/386)
 - When in `biblatex` mode, the [integrity check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) for journal titles now also checks the field `journal`.
 
 ### Changed
 
-- In the exports listrefs, tablerefs, tablerefsabsbib, use ISO date format in the footer.
+- The export formats `listrefs`, `tablerefs`, `tablerefsabsbib`, now use the ISO date format in the footer [#10383](https://github.com/JabRef/jabref/pull/10383).
 
 ### Fixed
 
