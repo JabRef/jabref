@@ -243,6 +243,11 @@ public class SaveDatabaseAction {
                 libraryTab.resetChangedProperties();
             }
             dialogService.notify(Localization.lang("Library saved"));
+
+            if (success) {
+                SaveGitDatabaseAction saveGit = new SaveGitDatabaseAction(targetPath.getParent());
+                saveGit.automaticUpdate();
+            }
             return success;
         } catch (SaveException ex) {
             LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
