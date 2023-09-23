@@ -15,6 +15,7 @@ public class SaveGitDatabaseAction {
     public boolean automaticUpdate() {
         MyGitHandler git = new MyGitHandler(repositoryPath);
         git.createCommitOnCurrentBranch(automaticCommitMsg, false);
+        
         return true;
     }
 }
