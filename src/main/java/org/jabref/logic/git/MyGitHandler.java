@@ -8,11 +8,17 @@ import java.nio.file.Path;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MyGitHandler {
     final Path repositoryPath;
     final File repositoryPathAsFile;
+    static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
+    
     public MyGitHandler(Path repositoryPath) {
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
@@ -53,5 +59,24 @@ public class MyGitHandler {
             throw new RuntimeException(e);
         }
         return commitCreated;
+    }
+
+       /**
+     * Pushes all commits made to the branch that is tracked by the currently checked out branch.
+     * If pushing to remote fails, it fails silently.
+     */
+    public void pushCommitsToRemoteRepository() throws IOException, GitAPIException {
+        TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback(
+                "-----BEGIN RSA PRIVATE KEY-----\n" +
+                        // PRIVATE KEY
+                        "-----END RSA PRIVATE KEY-----",
+                "PUBLIC KEY");
+
+        Git git = Git.open(this.repositoryPathAsFile);
+        git.verifySignature();
+        git.push()
+           .setTransportConfigCallback(transportConfigCallback)
+           .call();
+        LOGGER.info("OK to push");
     }
 }
