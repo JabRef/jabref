@@ -1,7 +1,11 @@
 package org.jabref.logic.exporter;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -19,15 +23,22 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.FilePreferences;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -123,6 +134,9 @@ class XmpPdfExporterTest {
         assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018), abbreviationRepository));
     }
 
+
+
+
     public static Stream<Arguments> provideBibEntriesWithValidPdfFileLinks() {
         return Stream.of(Arguments.of(olly2018));
     }
@@ -141,6 +155,41 @@ class XmpPdfExporterTest {
     @MethodSource("providePathsToInvalidPDFs")
     void unsuccessfulExportToFileByPath(Path path) throws Exception {
         assertFalse(exporter.exportToFileByPath(databaseContext, filePreferences, path, abbreviationRepository));
+    }
+
+    @Test
+    public void testRoundtripExportImport() {
+        Path originalFilePath = Path.of("original.pdf");
+        Path exportedFilePath = Path.of("exported.pdf");
+
+        try {
+            try (PDDocument document = new PDDocument()) {
+                PDPage page = new PDPage();
+                document.addPage(page);
+
+                try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+                    contentStream.beginText();
+                    contentStream.newLineAtOffset(25, 500);
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                    contentStream.showText("This PDF was created by JabRef. It demonstrates the embedding of BibTeX data in PDF files. Please open the file attachments view of your PDF viewer to see the attached files. Note that the normal usage is to embed the BibTeX data in an existing PDF.");
+                    contentStream.endText();
+                }
+                document.save(originalFilePath.toString());
+            }
+            exporter.exportToFileByPath(databaseContext, filePreferences, originalFilePath, abbreviationRepository);
+
+            Files.copy(Paths.get(originalFilePath.toString()), Paths.get(exportedFilePath.toString()), StandardCopyOption.REPLACE_EXISTING);
+
+            try (PDDocument importedDocument = Loader.loadPDF(new File(exportedFilePath.toString()))) {
+                assertNotNull(importedDocument, "The imported document should not be null");
+                assertEquals(1, importedDocument.getNumberOfPages());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (
+                Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {
