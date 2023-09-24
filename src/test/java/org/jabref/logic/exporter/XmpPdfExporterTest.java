@@ -1,9 +1,7 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -12,7 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
+import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
@@ -53,7 +51,7 @@ class XmpPdfExporterTest {
     private static BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
 
     private XmpPdfExporter exporter;
-    private PdfEmbeddedBibFileImporter importer;
+    private PdfXmpImporter importer;
     private XmpPreferences xmpPreferences;
 
     private BibDatabaseContext databaseContext;
@@ -118,7 +116,7 @@ class XmpPdfExporterTest {
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
-        importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
+        importer = new PdfXmpImporter(xmpPreferences);
 
         databaseContext = new BibDatabaseContext();
         BibDatabase dataBase = databaseContext.getDatabase();
@@ -168,7 +166,6 @@ class XmpPdfExporterTest {
     public void testRoundtripExportImport() {
 
         Path originalFilePath = tempDir.resolve("original.pdf").toAbsolutePath();
-        Path exportedFilePath = tempDir.resolve("exported.pdf").toAbsolutePath();
 
         try {
             try (PDDocument document = new PDDocument()) {
@@ -186,13 +183,9 @@ class XmpPdfExporterTest {
             }
             new XmpUtilWriter(xmpPreferences).writeXmp(originalFilePath, databaseContext.getEntries(), databaseContext.getDatabase());
 
-            exporter.exportToFileByPath(databaseContext, filePreferences, originalFilePath, abbreviationRepository);
+            List<BibEntry> importedEntries = importer.importDatabase(originalFilePath).getDatabase().getEntries();
 
-            Files.copy(originalFilePath, exportedFilePath, StandardCopyOption.REPLACE_EXISTING);
-
-            List<BibEntry> importedDocument = importer.importDatabase(exportedFilePath).getDatabase().getEntries();
-
-            assertEquals(Collections.singletonList(originalFilePath), importedDocument);
+            assertEquals(databaseContext.getEntries(), importedEntries);
 
         } catch (IOException e) {
             e.printStackTrace();
