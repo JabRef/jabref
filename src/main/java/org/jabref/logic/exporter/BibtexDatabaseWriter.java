@@ -22,7 +22,8 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * Writes a .bib file following the BibTeX / BibLaTeX format using the provided {@link BibWriter}
+ * Writes a .bib file following the BibTeX / BibLaTeX format using the provided {@link BibWriter}.
+ * Reading is done by {@link org.jabref.logic.importer.fileformat.BibtexImporter}.
  */
 public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
