@@ -148,10 +148,10 @@ public class ExternalFileTypes {
 
         for (ExternalFileType type : fileTypes) {
             results.add(type);
-            // See if we can find a type with matching name in the default type list:
+            // See if we can find a type with matching extension in the default type list:
             ExternalFileType found = null;
             for (ExternalFileType defType : defTypes) {
-                if (defType.getName().equals(type.getName())) {
+                if (defType.getExtension().equals(type.getExtension())) {
                     found = defType;
                     break;
                 }
@@ -221,11 +221,11 @@ public class ExternalFileTypes {
             } else {
                 // A new or modified entry type. Construct it from the string array:
                 ExternalFileType type = CustomExternalFileType.buildFromArgs(val);
-                // Check if there is a default type with the same name. If so, this is a
+                // Check if there is a default type with the same extension. If so, this is a
                 // modification of that type, so remove the default one:
                 ExternalFileType toRemove = null;
                 for (ExternalFileType defType : types) {
-                    if (type.getName().equals(defType.getName())) {
+                    if (type.getExtension().equals(defType.getExtension())) {
                         toRemove = defType;
                         break;
                     }
