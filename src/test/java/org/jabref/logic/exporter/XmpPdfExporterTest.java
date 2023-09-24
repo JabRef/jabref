@@ -9,6 +9,8 @@ import java.util.stream.Stream;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -96,7 +98,7 @@ class XmpPdfExporterTest {
         vapnik2000.setCitationKey("vapnik2000");
         vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
         vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
-        vapnik2000.setField(StandardField.AUTHOR, "Vladimir N. Vapnik");
+        vapnik2000.setField(StandardField.AUTHOR, "Vapnik, Vladimir N.");
         vapnik2000.setField(StandardField.DOI, "10.1007/978-1-4757-3264-1");
         vapnik2000.setField(StandardField.OWNER, "Ich");
     }
@@ -139,9 +141,6 @@ class XmpPdfExporterTest {
         assertFalse(exporter.exportToAllFilesOfEntry(databaseContext, filePreferences, bibEntryWithValidPdfFileLink, List.of(olly2018), abbreviationRepository));
     }
 
-
-
-
     public static Stream<Arguments> provideBibEntriesWithValidPdfFileLinks() {
         return Stream.of(Arguments.of(olly2018));
     }
@@ -163,36 +162,34 @@ class XmpPdfExporterTest {
     }
 
     @Test
-    public void testRoundtripExportImport() {
+    public void testRoundtripExportImport() throws Exception {
 
         Path originalFilePath = tempDir.resolve("original.pdf").toAbsolutePath();
 
-        try {
-            try (PDDocument document = new PDDocument()) {
-                PDPage page = new PDPage();
-                document.addPage(page);
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage();
+            document.addPage(page);
 
-                try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-                    contentStream.beginText();
-                    contentStream.newLineAtOffset(25, 500);
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                    contentStream.showText("This PDF was created by JabRef. It demonstrates the embedding of BibTeX data in PDF files. Please open the file attachments view of your PDF viewer to see the attached files. Note that the normal usage is to embed the BibTeX data in an existing PDF.");
-                    contentStream.endText();
-                }
-                document.save(originalFilePath.toString());
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+                contentStream.beginText();
+                contentStream.newLineAtOffset(25, 500);
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                contentStream.showText("This PDF was created by JabRef. It demonstrates the embedding of BibTeX data in PDF files. Please open the file attachments view of your PDF viewer to see the attached files. Note that the normal usage is to embed the BibTeX data in an existing PDF.");
+                contentStream.endText();
             }
-            new XmpUtilWriter(xmpPreferences).writeXmp(originalFilePath, databaseContext.getEntries(), databaseContext.getDatabase());
-
-            List<BibEntry> importedEntries = importer.importDatabase(originalFilePath).getDatabase().getEntries();
-
-            assertEquals(databaseContext.getEntries(), importedEntries);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (
-                Exception e) {
-            throw new RuntimeException(e);
+            document.save(originalFilePath.toString());
         }
+        new XmpUtilWriter(xmpPreferences).writeXmp(originalFilePath, databaseContext.getEntries(), databaseContext.getDatabase());
+
+        List<BibEntry> importedEntries = importer.importDatabase(originalFilePath).getDatabase().getEntries();
+        importedEntries.forEach(bibEntry -> new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(bibEntry));
+
+        List<BibEntry> expectedEntries = databaseContext.getEntries();
+        for (BibEntry entry : expectedEntries) {
+            entry.clearField(StandardField.FILE);
+            entry.addFile(createDefaultLinkedFile("", "original.pdf", tempDir));
+        }
+        assertEquals(expectedEntries, importedEntries);
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {
@@ -208,12 +205,16 @@ class XmpPdfExporterTest {
     }
 
     private static LinkedFile createDefaultLinkedFile(String fileName, Path tempDir) throws IOException {
+        return createDefaultLinkedFile("A linked pdf", fileName, tempDir);
+    }
+
+    private static LinkedFile createDefaultLinkedFile(String description, String fileName, Path tempDir) throws IOException {
         Path pdfFile = tempDir.resolve(fileName);
         try (PDDocument pdf = new PDDocument()) {
             pdf.addPage(new PDPage());
             pdf.save(pdfFile.toAbsolutePath().toString());
         }
 
-        return new LinkedFile("A linked pdf", pdfFile, "PDF");
+        return new LinkedFile(description, pdfFile, "PDF");
     }
 }
