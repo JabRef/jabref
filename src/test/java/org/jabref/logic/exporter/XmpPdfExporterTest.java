@@ -15,6 +15,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -39,7 +40,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,6 +54,7 @@ class XmpPdfExporterTest {
 
     private XmpPdfExporter exporter;
     private PdfEmbeddedBibFileImporter importer;
+    private XmpPreferences xmpPreferences;
 
     private BibDatabaseContext databaseContext;
     private JournalAbbreviationRepository abbreviationRepository;
@@ -112,7 +113,7 @@ class XmpPdfExporterTest {
         when(filePreferences.getUserAndHost()).thenReturn(tempDir.toAbsolutePath().toString());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
-        XmpPreferences xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','));
+        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','));
         exporter = new XmpPdfExporter(xmpPreferences);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -166,8 +167,8 @@ class XmpPdfExporterTest {
     @Test
     public void testRoundtripExportImport() {
 
-        Path originalFilePath = Path.of("original.pdf");
-        Path exportedFilePath = Path.of("exported.pdf");
+        Path originalFilePath = tempDir.resolve("original.pdf").toAbsolutePath();
+        Path exportedFilePath = tempDir.resolve("exported.pdf").toAbsolutePath();
 
         try {
             try (PDDocument document = new PDDocument()) {
@@ -183,6 +184,7 @@ class XmpPdfExporterTest {
                 }
                 document.save(originalFilePath.toString());
             }
+            new XmpUtilWriter(xmpPreferences).writeXmp(originalFilePath, databaseContext.getEntries(), databaseContext.getDatabase());
 
             exporter.exportToFileByPath(databaseContext, filePreferences, originalFilePath, abbreviationRepository);
 
@@ -190,7 +192,6 @@ class XmpPdfExporterTest {
 
             List<BibEntry> importedDocument = importer.importDatabase(exportedFilePath).getDatabase().getEntries();
 
-            assertNotNull(importedDocument, "The imported document should not be null");
             assertEquals(Collections.singletonList(originalFilePath), importedDocument);
 
         } catch (IOException e) {
