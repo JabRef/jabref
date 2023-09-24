@@ -1,17 +1,18 @@
 package org.jabref.logic.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -23,7 +24,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.FilePreferences;
 
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -35,6 +35,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -52,6 +53,7 @@ class XmpPdfExporterTest {
     private static BibEntry vapnik2000 = new BibEntry(StandardEntryType.Article);
 
     private XmpPdfExporter exporter;
+    private PdfEmbeddedBibFileImporter importer;
 
     private BibDatabaseContext databaseContext;
     private JournalAbbreviationRepository abbreviationRepository;
@@ -113,6 +115,10 @@ class XmpPdfExporterTest {
         XmpPreferences xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','));
         exporter = new XmpPdfExporter(xmpPreferences);
 
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        importer = new PdfEmbeddedBibFileImporter(importFormatPreferences);
+
         databaseContext = new BibDatabaseContext();
         BibDatabase dataBase = databaseContext.getDatabase();
 
@@ -159,6 +165,7 @@ class XmpPdfExporterTest {
 
     @Test
     public void testRoundtripExportImport() {
+
         Path originalFilePath = Path.of("original.pdf");
         Path exportedFilePath = Path.of("exported.pdf");
 
@@ -176,14 +183,16 @@ class XmpPdfExporterTest {
                 }
                 document.save(originalFilePath.toString());
             }
+
             exporter.exportToFileByPath(databaseContext, filePreferences, originalFilePath, abbreviationRepository);
 
-            Files.copy(Paths.get(originalFilePath.toString()), Paths.get(exportedFilePath.toString()), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(originalFilePath, exportedFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-            try (PDDocument importedDocument = Loader.loadPDF(new File(exportedFilePath.toString()))) {
-                assertNotNull(importedDocument, "The imported document should not be null");
-                assertEquals(1, importedDocument.getNumberOfPages());
-            }
+            List<BibEntry> importedDocument = importer.importDatabase(exportedFilePath).getDatabase().getEntries();
+
+            assertNotNull(importedDocument, "The imported document should not be null");
+            assertEquals(Collections.singletonList(originalFilePath), importedDocument);
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (
