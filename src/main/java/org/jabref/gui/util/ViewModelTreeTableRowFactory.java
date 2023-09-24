@@ -117,7 +117,7 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
         return this;
     }
 
-    public ViewModelTreeTableRowFactory<S> withEventFilter(EventType<? extends  Event> event, BiConsumer<S, ? super Event> toCondition) {
+    public ViewModelTreeTableRowFactory<S> withEventFilter(EventType<? extends Event> event, BiConsumer<S, ? super Event> toCondition) {
         this.eventFilters.putIfAbsent(event, toCondition);
         return this;
     }
