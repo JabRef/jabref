@@ -38,16 +38,14 @@ public class IntegrityCheck {
                 new EntryLinkChecker(bibDatabaseContext.getDatabase()),
                 new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
-                new AmpersandChecker()
+                new AmpersandChecker(),
+                new LatexIntegrityChecker(),
+                new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository)
                 ));
         if (bibDatabaseContext.isBiblatexMode()) {
-            entryCheckers.addAll(List.of(
-                    new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),
-                    new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8))
-            ));
+            entryCheckers.addAll(List.of(new UTF8Checker(bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8))));
         } else {
             entryCheckers.addAll(List.of(
-                    new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
                     new ASCIICharacterChecker(),
                     new NoBibtexFieldChecker(),
                     new BibTeXEntryTypeChecker())

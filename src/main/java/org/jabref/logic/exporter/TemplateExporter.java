@@ -311,7 +311,6 @@ public class TemplateExporter extends Exporter {
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
 
-            // Clear custom name formatters:
             layoutPreferences.clearCustomExportNameFormatters();
 
             if (!missingFormatters.isEmpty() && LOGGER.isWarnEnabled()) {

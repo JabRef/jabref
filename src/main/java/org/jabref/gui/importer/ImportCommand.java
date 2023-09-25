@@ -146,7 +146,7 @@ public class ImportCommand extends SimpleCommand {
                         if (FileUtil.isPDFFile(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences())) {
                             importFormatReader.reset();
                         }
-                        dialogService.notify(Localization.lang("Importing in unknown format") + "...");
+                        dialogService.notify(Localization.lang("Importing file %0 as unknown format", filename.getFileName().toString()));
                     });
                     // This import method never throws an IOException
                     imports.add(importFormatReader.importUnknownFormat(filename, fileUpdateMonitor));

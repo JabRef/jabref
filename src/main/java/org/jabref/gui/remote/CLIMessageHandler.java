@@ -38,7 +38,7 @@ public class CLIMessageHandler implements RemoteMessageHandler {
                     preferencesService,
                     fileUpdateMonitor,
                     entryTypesManager);
-
+            argumentProcessor.processArguments();
             List<ParserResult> loaded = argumentProcessor.getParserResults();
             for (int i = 0; i < loaded.size(); i++) {
                 ParserResult pr = loaded.get(i);

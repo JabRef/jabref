@@ -267,6 +267,13 @@ public class DOITest {
     }
 
     @Test
+    public void emptyOrUndescoreOnlyReturnsEmpty() {
+       assertEquals(Optional.empty(), DOI.parse("_"));
+       assertEquals(Optional.empty(), DOI.parse("\t_"));
+       assertEquals(Optional.empty(), DOI.parse("___"));
+    }
+
+    @Test
     public void rejectInvalidDoiUri() {
         assertThrows(IllegalArgumentException.class, () -> new DOI("https://thisisnouri"));
     }

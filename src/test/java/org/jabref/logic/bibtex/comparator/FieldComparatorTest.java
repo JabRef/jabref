@@ -257,7 +257,7 @@ public class FieldComparatorTest {
         BibEntry bigger = new BibEntry()
                 .withField(StandardField.AUTHOR, "Freund, Lucas");
         BibEntry smaller = new BibEntry()
-                .withField(StandardField.AUTHOR, "Gärtner, Lara");
+                .withField(StandardField.AUTHOR, "Mustermann, Max");
 
         assertEquals(1, comparator.compare(smaller, bigger));
     }

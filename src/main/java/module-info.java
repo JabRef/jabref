@@ -104,6 +104,8 @@ open module org.jabref {
     requires jbibtex;
     requires citeproc.java;
 
+    requires snuggletex.core;
+
     requires org.apache.pdfbox;
     requires org.apache.xmpbox;
     requires com.ibm.icu;
@@ -141,5 +143,4 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires de.saxsys.mvvmfx.validation;
-
 }
