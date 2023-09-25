@@ -219,7 +219,7 @@ dependencies {
     // API
     implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
     // Implementation of the API
-    implementation 'org.glassfish.jersey.core:jersey-server:3.1.1'
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.3'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.3'
     implementation 'org.glassfish.hk2:hk2-api:3.0.4'
