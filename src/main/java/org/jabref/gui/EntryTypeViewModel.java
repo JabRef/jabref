@@ -16,7 +16,6 @@ import javafx.concurrent.Worker;
 
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.NewEntryAction;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -25,7 +24,6 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.Default;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
