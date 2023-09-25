@@ -311,9 +311,9 @@ public class LuceneIndexer {
             indexWriter.deleteDocuments(queryParser.parse("*"));
             indexWriter.commit();
         } catch (IOException e) {
-            LOGGER.warn("Could not initialize the IndexWriter!", e);
+            LOGGER.warn("Could not initialize the IndexWriter", e);
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not parse", e);
         }
     }
 
