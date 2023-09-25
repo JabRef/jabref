@@ -450,6 +450,26 @@ public class BibEntry implements Cloneable {
         return Optional.ofNullable(fields.get(field));
     }
 
+    public Optional<String> getFieldLatexFree(Field field) {
+        if (InternalField.KEY_FIELD == field) {
+            // the key field should not be converted
+            return getCitationKey();
+        } else if (InternalField.TYPE_HEADER == field) {
+            return Optional.of(type.get().getDisplayName());
+        } else if (latexFreeFields.containsKey(field)) {
+            return Optional.ofNullable(latexFreeFields.get(field));
+        } else {
+            Optional<String> fieldValue = getField(field);
+            if (fieldValue.isPresent()) {
+                String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
+                latexFreeFields.put(field, latexFreeValue);
+                return Optional.of(latexFreeValue);
+            } else {
+                return Optional.empty();
+            }
+        }
+    }
+
     /**
      * Returns true if the entry has the given field, or false if it is not set.
      */
@@ -516,26 +536,6 @@ public class BibEntry implements Cloneable {
         return Optional.empty();
     }
 
-    public Optional<DOI> getDOI() {
-        return getField(StandardField.DOI).flatMap(DOI::parse);
-    }
-
-    public Optional<ISBN> getISBN() {
-        return getField(StandardField.ISBN).flatMap(ISBN::parse);
-    }
-
-    /**
-     * Return the LaTeX-free contents of the given field or its alias an an Optional
-     * <p>
-     * For details see also {@link #getFieldOrAlias(Field)}
-     *
-     * @param name the name of the field
-     * @return the stored latex-free content of the field (or its alias)
-     */
-    public Optional<String> getFieldOrAliasLatexFree(Field name) {
-        return genericGetFieldOrAlias(name, BibEntry::getLatexFreeField);
-    }
-
     /**
      * Returns the contents of the given field or its alias as an Optional
      * <p>
@@ -562,6 +562,18 @@ public class BibEntry implements Cloneable {
      */
     public Optional<String> getFieldOrAlias(Field field) {
         return genericGetFieldOrAlias(field, BibEntry::getField);
+    }
+
+    /**
+     * Return the LaTeX-free contents of the given field or its alias an an Optional
+     * <p>
+     * For details see also {@link #getFieldOrAlias(Field)}
+     *
+     * @param name the name of the field
+     * @return the stored latex-free content of the field (or its alias)
+     */
+    public Optional<String> getFieldOrAliasLatexFree(Field name) {
+        return genericGetFieldOrAlias(name, BibEntry::getFieldLatexFree);
     }
 
     /**
@@ -717,6 +729,14 @@ public class BibEntry implements Cloneable {
      */
     public Optional<String> getTitle() {
         return getField(StandardField.TITLE);
+    }
+
+    public Optional<DOI> getDOI() {
+        return getField(StandardField.DOI).flatMap(DOI::parse);
+    }
+
+    public Optional<ISBN> getISBN() {
+        return getField(StandardField.ISBN).flatMap(ISBN::parse);
     }
 
     /**
@@ -1015,26 +1035,6 @@ public class BibEntry implements Cloneable {
 
         if (field instanceof StandardField standardField) {
             fieldsAsKeywords.remove(standardField);
-        }
-    }
-
-    public Optional<String> getLatexFreeField(Field field) {
-        if (InternalField.KEY_FIELD == field) {
-            // the key field should not be converted
-            return getCitationKey();
-        } else if (InternalField.TYPE_HEADER == field) {
-            return Optional.of(type.get().getDisplayName());
-        } else if (latexFreeFields.containsKey(field)) {
-            return Optional.ofNullable(latexFreeFields.get(field));
-        } else {
-            Optional<String> fieldValue = getField(field);
-            if (fieldValue.isPresent()) {
-                String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
-                latexFreeFields.put(field, latexFreeValue);
-                return Optional.of(latexFreeValue);
-            } else {
-                return Optional.empty();
-            }
         }
     }
 

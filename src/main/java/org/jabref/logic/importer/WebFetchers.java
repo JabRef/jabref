@@ -28,6 +28,7 @@ import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
+import org.jabref.logic.importer.fetcher.LOBIDFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
@@ -119,6 +120,7 @@ public class WebFetchers {
         set.add(new SemanticScholar());
         set.add(new ResearchGate(importFormatPreferences));
         set.add(new BiodiversityLibrary(importerPreferences));
+        set.add(new LOBIDFetcher(importerPreferences));
         return set;
     }
 

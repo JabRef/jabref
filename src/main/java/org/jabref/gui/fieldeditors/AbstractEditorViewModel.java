@@ -13,7 +13,6 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -65,8 +64,10 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                 fieldBinding,
                 newValue -> {
                     if (newValue != null) {
-                        // Controlsfx uses hardcoded \n for multiline fields, but JabRef stores them in OS Newlines format
-                        String oldValue = entry.getField(field).map(value -> value.replace(OS.NEWLINE, "\n").trim()).orElse(null);
+                        // A file may be loaded using CRLF. ControlsFX uses hardcoded \n for multiline fields.
+                        // Normalizing is done during writing of the .bib file (see org.jabref.logic.exporter.BibWriter.BibWriter).
+                        // Thus, we need to normalize the line endings.
+                        String oldValue = entry.getField(field).map(value -> value.replace("\r\n", "\n").trim()).orElse(null);
                         // Autosave and save action trigger the entry editor to reload the fields, so we have to
                         // check for changes here, otherwise the cursor position is annoyingly reset every few seconds
                         if (!(newValue.trim()).equals(oldValue)) {

@@ -27,12 +27,6 @@ public class JournalListMvGenerator {
             System.exit(0);
         }
         Path journalListMvFile = Path.of("build", "resources", "main", "journals", "journal-list.mv");
-        if (Files.exists(journalListMvFile)) {
-            System.out.println("Target " + journalListMvFile.toAbsolutePath() + " already exists.");
-            System.out.println("Skipping generation.");
-            System.out.println("If you really want to re-generate, please delete the file.");
-            System.exit(0);
-        }
 
         Set<String> ignoredNames = Set.of(
                 // remove all lists without dot in them:

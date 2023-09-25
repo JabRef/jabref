@@ -284,7 +284,6 @@ public class SourceTab extends EntryEditorTab {
 
             if (parserResult.hasWarnings()) {
                 // put the warning into as exception text -> it will be displayed to the user
-
                 throw new IllegalStateException(parserResult.getErrorMessage());
             }
 

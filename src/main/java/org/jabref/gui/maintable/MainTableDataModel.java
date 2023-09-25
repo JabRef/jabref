@@ -34,7 +34,7 @@ public class MainTableDataModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableDataModel.class);
 
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
-    private final SortedList<BibEntryTableViewModel> entriesSorted;
+    private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
     private final GroupsPreferences groupsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
@@ -80,7 +80,7 @@ public class MainTableDataModel {
         });
 
         // We need to wrap the list since otherwise sorting in the table does not work
-        entriesSorted = new SortedList<>(entriesFiltered);
+        entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
     public void removeBindings() {
@@ -105,10 +105,6 @@ public class MainTableDataModel {
                 LOGGER.debug("Failed to run database search '{}'", query.get(), e);
             }
         }
-    }
-
-    private Optional<BibEntryTableViewModel> getTableViewModelForEntry(BibEntry entry) {
-        return entriesSorted.stream().filter(viewModel -> viewModel.getEntry().equals(entry)).findFirst();
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
@@ -149,7 +145,7 @@ public class MainTableDataModel {
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
-        return entriesSorted;
+        return entriesFilteredAndSorted;
     }
 
     public void refresh() {
