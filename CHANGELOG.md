@@ -76,6 +76,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to automatically replaces illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
 - We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
 - We added a tooltip to show the number of entries in a group [#10208](https://github.com/JabRef/jabref/issues/10208)
+- We fixed an issue where it was no longer possible to add or remove selected entries to groups via context menu [#10404](https://github.com/JabRef/jabref/issues/10404), [#10317](https://github.com/JabRef/jabref/issues/10317) [#10374](https://github.com/JabRef/jabref/issues/10374)
 
 ### Changed
 
