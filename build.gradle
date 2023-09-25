@@ -193,7 +193,7 @@ dependencies {
     }
 
     // jakarta.activation is already dependency of glassfish
-    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
+    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
     implementation ('com.github.tomtung:latex2unicode_2.13:0.3.2') {
