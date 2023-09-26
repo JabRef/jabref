@@ -1,6 +1,8 @@
 package org.jabref.logic.git;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.eclipse.jgit.api.TransportConfigCallback;
@@ -13,7 +15,7 @@ public class SshTransportConfigCallback implements TransportConfigCallback {
     private Path sshDir = new File(FS.DETECTED.userHome(), "/.ssh").toPath();
     private SshdSessionFactory sshSessionFactory;
 
-    public SshTransportConfigCallback(File sshDirectory) {
+    public SshTransportConfigCallback() {
         this.sshSessionFactory = new CustomSshSessionFactory(sshDir);
     }
 
@@ -21,5 +23,24 @@ public class SshTransportConfigCallback implements TransportConfigCallback {
     public void configure(Transport transport) {
         SshTransport sshTransport = (SshTransport) transport;
         sshTransport.setSshSessionFactory(this.sshSessionFactory);
+    }
+
+    public final class CustomSshSessionFactory extends SshdSessionFactory {
+        private Path sshDir;
+
+        public CustomSshSessionFactory(Path sshDir) {
+            this.sshDir = sshDir;
+        }
+
+        @Override
+        public File getSshDirectory() {
+            try {
+                return Files.createDirectories(sshDir).toFile();
+            } catch (
+                    IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }

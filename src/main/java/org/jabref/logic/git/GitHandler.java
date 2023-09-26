@@ -27,7 +27,6 @@ public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
     final File repositoryPathAsFile;
-    private File sshDirectory = new File("/home/null/.ssh");
 
     /**
      * Initialize the handler for the given repository
@@ -175,7 +174,7 @@ public class GitHandler {
      */
     public void pushCommitsToRemoteRepository() throws IOException, GitAPIException {
         try {
-            TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback(sshDirectory);
+            TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
             Git git = Git.open(this.repositoryPathAsFile);
             git.verifySignature();
             git.push()
