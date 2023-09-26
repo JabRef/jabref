@@ -24,12 +24,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - The export formats `listrefs`, `tablerefs`, `tablerefsabsbib`, now use the ISO date format in the footer [#10383](https://github.com/JabRef/jabref/pull/10383).
 - When searching for an identifier in the "Web search", the title of the search window is now "Identifier-based Web Search". [#10391](https://github.com/JabRef/jabref/pull/10391)
+- The ampersand checker now skips verbatim fields (`file`, `url`, ...). [#10419](https://github.com/JabRef/jabref/pull/10419)
 
 ### Fixed
 
 - It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
 - Passwords can be stored in GNOME key ring. [#10274](https://github.com/JabRef/jabref/issues/10274)
-- The ampersand checker skips verbatim fields (`file`, `url`, ...). [#10419](https://github.com/JabRef/jabref/pull/10419)
 - We fixed an issue where groups based on an aux file could not be created due to an exception [#10350](https://github.com/JabRef/jabref/issues/10350)
 - We fixed an issue where the JabRef browser extension could not communicate with JabRef under macOS due to missing files. You should use the `.pkg` for the first installation as it updates all necessary files for the extension [#10308](https://github.com/JabRef/jabref/issues/10308)
 - We fixed an issue where the ISBN fetcher returned the entrytype `misc` for certain ISBN numbers [#10348](https://github.com/JabRef/jabref/issues/10348)
