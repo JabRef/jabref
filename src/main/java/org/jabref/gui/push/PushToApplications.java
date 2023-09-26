@@ -36,7 +36,7 @@ public class PushToApplications {
                 new PushToTeXstudio(dialogService, preferencesService),
                 new PushToVim(dialogService, preferencesService),
                 new PushToWinEdt(dialogService, preferencesService),
-                new PushToTexShop(dialogService,preferencesService)));
+                new PushToTexShop(dialogService, preferencesService)));
 
         return APPLICATIONS;
     }
