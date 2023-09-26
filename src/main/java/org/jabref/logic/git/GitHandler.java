@@ -12,11 +12,10 @@ import org.jabref.logic.util.io.FileUtil;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +27,7 @@ public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
     final File repositoryPathAsFile;
-    String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
-    String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-    final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    private File sshDirectory = new File("/home/null/.ssh");
 
     /**
      * Initialize the handler for the given repository
@@ -81,7 +78,8 @@ public class GitHandler {
     boolean isGitRepository() {
         // For some reason the solution from https://www.eclipse.org/lists/jgit-dev/msg01892.html does not work
         // This solution is quite simple but might not work in special cases, for us it should suffice.
-        return Files.exists(Path.of(repositoryPath.toString(), ".git"));
+        Path gitFolderPath = Path.of(repositoryPath.toString(), ".git");
+        return Files.exists(gitFolderPath) && Files.isDirectory(gitFolderPath);
     }
 
     /**
@@ -175,15 +173,19 @@ public class GitHandler {
      * Pushes all commits made to the branch that is tracked by the currently checked out branch.
      * If pushing to remote fails, it fails silently.
      */
-    public void pushCommitsToRemoteRepository() throws IOException {
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            try {
-                git.push()
-                   .setCredentialsProvider(credentialsProvider)
-                   .call();
-            } catch (GitAPIException e) {
-                LOGGER.info("Failed to push");
-            }
+    public void pushCommitsToRemoteRepository() throws IOException, GitAPIException {
+        try {
+            TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback(sshDirectory);
+            Git git = Git.open(this.repositoryPathAsFile);
+            git.verifySignature();
+            git.push()
+               .setTransportConfigCallback(transportConfigCallback)
+               .call();
+        } catch (
+                IOException |
+                GitAPIException e) {
+            LOGGER.info("Failed to push");
+            throw new RuntimeException(e);
         }
     }
 
@@ -191,7 +193,6 @@ public class GitHandler {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
-                   .setCredentialsProvider(credentialsProvider)
                    .call();
             } catch (GitAPIException e) {
                 LOGGER.info("Failed to push");

@@ -1,51 +1,25 @@
 package org.jabref.logic.git;
 
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import java.io.File;
+import java.nio.file.Path;
+
 import org.eclipse.jgit.api.TransportConfigCallback;
-import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.Transport;
-import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory;
-import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig;
+import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
 import org.eclipse.jgit.util.FS;
 
-/**
- * A custom TransportConfigCallback class that loads private key and public key from the provided strings in constructor.
- * An instance of this class will be used as follows:
- * TransportConfigCallback = new SshTransportConfigCallback(PVT_KEY_STRING, PUB_KEY_STRING);
- * Git.open(gitRepoDirFile) // gitRepoDirFile is an instance of File
- *    .push()
- *    .setTransportConfigCallback(transportConfigCallback)
- *    .call();
- */
 public class SshTransportConfigCallback implements TransportConfigCallback {
-    private final String privateKey;
-    private final String publicKey;
+    private Path sshDir = new File(FS.DETECTED.userHome(), "/.ssh").toPath();
+    private SshdSessionFactory sshSessionFactory;
 
-    public SshTransportConfigCallback(String privateKey, String publicKey) {
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
+    public SshTransportConfigCallback(File sshDirectory) {
+        this.sshSessionFactory = new CustomSshSessionFactory(sshDir);
     }
-
-    private final SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
-        @Override
-        protected void configure(OpenSshConfig.Host hc, Session session) {
-            session.setConfig("StrictHostKeyChecking", "no");
-        }
-
-        @Override
-        protected JSch createDefaultJSch(FS fs) throws JSchException {
-            JSch jSch = super.createDefaultJSch(fs);
-            jSch.addIdentity("/home/null/.ssh/id_rsa", privateKey.getBytes(), publicKey.getBytes(), "".getBytes());
-            return jSch;
-        }
-    };
 
     @Override
     public void configure(Transport transport) {
         SshTransport sshTransport = (SshTransport) transport;
-        sshTransport.setSshSessionFactory(sshSessionFactory);
+        sshTransport.setSshSessionFactory(this.sshSessionFactory);
     }
 }
