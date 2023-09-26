@@ -17,6 +17,8 @@ public class SshTransportConfigCallback implements TransportConfigCallback {
 
     public SshTransportConfigCallback() {
         this.sshSessionFactory = new CustomSshSessionFactory(sshDir);
+        System.out.println(this.sshSessionFactory);
+        System.out.println(sshDir);
     }
 
     @Override
@@ -36,8 +38,7 @@ public class SshTransportConfigCallback implements TransportConfigCallback {
         public File getSshDirectory() {
             try {
                 return Files.createDirectories(sshDir).toFile();
-            } catch (
-                    IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;

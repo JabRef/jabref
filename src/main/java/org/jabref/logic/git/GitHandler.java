@@ -175,30 +175,49 @@ public class GitHandler {
     public void pushCommitsToRemoteRepository() throws IOException, GitAPIException {
         try {
             TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
+            System.out.println(transportConfigCallback);
             Git git = Git.open(this.repositoryPathAsFile);
+            System.out.println(git);
             git.verifySignature();
+            System.out.println("signature veridfied");
             git.push()
                .setTransportConfigCallback(transportConfigCallback)
                .call();
-        } catch (
-                IOException |
-                GitAPIException e) {
-            LOGGER.info("Failed to push");
-            throw new RuntimeException(e);
+            System.out.println("pushed");
+        } catch (IOException | GitAPIException e) {
+            if (e.getMessage().equals("origin: not found")) {
+                LOGGER.info("No remote repository detected. Push skiped.");
+            } else {
+                LOGGER.info("Failed to push");
+                throw new RuntimeException(e);
+            }
         }
     }
 
+    /**
+     * Pulls all commits made to the branch that is tracked by the currently checked out branch.
+     * If pulling to remote fails, it fails silently.
+     */
     public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
                    .call();
             } catch (GitAPIException e) {
-                LOGGER.info("Failed to push");
+                if (e.getMessage().equals("origin: not found")) {
+                    LOGGER.info("No remote repository detected. Push skiped.");
+                } else {
+                    LOGGER.info("Failed to pull");
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
 
+    /**
+     * Get currently checked out branch.
+     * If checking out fails, it fails silently.
+     */
     public String getCurrentlyCheckedOutBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             return git.getRepository().getBranch();
