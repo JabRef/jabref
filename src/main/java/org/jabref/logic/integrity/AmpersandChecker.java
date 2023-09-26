@@ -9,11 +9,13 @@ import java.util.regex.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 
 import com.google.common.base.CharMatcher;
 
 /**
  * Checks if the BibEntry contains unescaped ampersands.
+ * This is done in nonverbatim fields. Similar to {@link HTMLCharacterChecker}
  */
 public class AmpersandChecker implements EntryChecker {
     // matches for an & preceded by any number of \
@@ -24,6 +26,9 @@ public class AmpersandChecker implements EntryChecker {
         List<IntegrityMessage> results = new ArrayList<>();
 
         for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
+            if (field.getKey().getProperties().contains(FieldProperty.VERBATIM)) {
+                continue;
+            }
             // counts the number of even \ occurrences preceding an &
             long unescapedAmpersands = BACKSLASH_PRECEDED_AMPERSAND.matcher(field.getValue())
                     .results()
