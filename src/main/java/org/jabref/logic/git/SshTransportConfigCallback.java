@@ -17,8 +17,6 @@ public class SshTransportConfigCallback implements TransportConfigCallback {
 
     public SshTransportConfigCallback() {
         this.sshSessionFactory = new CustomSshSessionFactory(sshDir);
-        System.out.println(this.sshSessionFactory);
-        System.out.println(sshDir);
     }
 
     @Override

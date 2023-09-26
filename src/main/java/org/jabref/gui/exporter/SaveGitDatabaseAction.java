@@ -24,7 +24,7 @@ public class SaveGitDatabaseAction {
         try {
             GitHandler git = new GitHandler(repositoryPath);
             git.createCommitOnCurrentBranch(automaticCommitMsg, false);
-            git.pushCommitsToRemoteRepository();
+            git.pushCommitsToRemoteRepository(this.dialogService);
         } catch (
                 GitAPIException |
                 IOException e) {
