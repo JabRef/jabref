@@ -71,7 +71,7 @@ public class PushToTexShop extends AbstractPushToApplication {
 
         String osascriptTexShop = "osascript -e 'tell application \"TeXShop\"\n" +
                 "activate\n" +
-                "set TheString to " + citeCommand + keyString + getCiteSuffix()  + "\"\n" +
+                "set TheString to " + citeCommand + keyString + getCiteSuffix() + "\"\n" +
                 "set content of selection of front document to TheString\n" +
                 "end tell'";
 
