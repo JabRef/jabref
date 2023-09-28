@@ -29,23 +29,21 @@ public class AmpersandChecker implements EntryChecker {
         return entry.getFieldMap().entrySet().stream()
                     .filter(field -> !field.getKey().getProperties().contains(FieldProperty.VERBATIM))
                     // We use "flatMap" instead of filtering later, because we assume there won't be that much error messages - and construction of Stream.empty() is faster than construction of a new Tuple2 (including lifting long to Long)
-                    .flatMap(getUnescapedAmpersandsWithCount())
-                    .map(tuple -> new IntegrityMessage(Localization.lang("Found %0 unescaped '&'", tuple.getValue()), entry, tuple.getKey()))
+                    .flatMap(AmpersandChecker::getUnescapedAmpersandsWithCount)
+                    .map(pair -> new IntegrityMessage(Localization.lang("Found %0 unescaped '&'", pair.getValue()), entry, pair.getKey()))
                     .toList();
     }
 
-    private static Function<Map.Entry<Field, String>, Stream<? extends Pair<Field, Long>>> getUnescapedAmpersandsWithCount() {
-        return field -> {
-            // counts the number of even \ occurrences preceding an &
-            long unescapedAmpersands = BACKSLASH_PRECEDED_AMPERSAND.matcher(field.getValue())
-                                                                   .results()
-                                                                   .map(MatchResult::group)
-                                                                   .filter(m -> CharMatcher.is('\\').countIn(m) % 2 == 0)
-                                                                   .count();
-            if (unescapedAmpersands == 0) {
-                return Stream.empty();
-            }
-            return Stream.of(new Pair<>(field.getKey(), unescapedAmpersands));
-        };
+    private static Stream<Pair<Field, Long>> getUnescapedAmpersandsWithCount(Map.Entry<Field, String> entry) {
+        // counts the number of even \ occurrences preceding an &
+        long unescapedAmpersands = BACKSLASH_PRECEDED_AMPERSAND.matcher(entry.getValue())
+                                                               .results()
+                                                               .map(MatchResult::group)
+                                                               .filter(m -> CharMatcher.is('\\').countIn(m) % 2 == 0)
+                                                               .count();
+        if (unescapedAmpersands == 0) {
+            return Stream.empty();
+        }
+        return Stream.of(new Pair<>(entry.getKey(), unescapedAmpersands));
     }
 }
