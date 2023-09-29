@@ -100,7 +100,7 @@ public class LatexIntegrityCheckerTest {
 
                 // Multiple commands and environments
                 Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\textbf{\\emph{Bold and Emphasized Text}} $5-3_k$"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{itemize} \\item\\begin{quote} \\textbf{Quoted} \\emph{Text} \\end{quote} \\end{itemize}")
+                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{itemize} \\item\\begin{quote} \\textbf{Quoted} \\emph{Text} \\end{quote} \\end{itemize}"),
 
                 // More currently unsupported operations
 
@@ -116,6 +116,14 @@ public class LatexIntegrityCheckerTest {
                 // Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\input{chapter1.tex}"),
                 // Arguments.of(Collections.emptyList(), StandardField.TITLE, "Footnote\\footnote{This is a footnote}"),
                 // Arguments.of(Collections.emptyList(), StandardField.TITLE, "$\text{in math}$"),
+
+                // Mirrored from org.jabref.logic.integrity.AmpersandCheckerTest.provideAcceptedInputs
+                Arguments.of(Collections.emptyList(), StandardField.TITLE, "No ampersand at all"),
+                Arguments.of(Collections.emptyList(), StandardField.FOREWORD, "Properly escaped \\&"),
+                Arguments.of(Collections.emptyList(), StandardField.AUTHOR, "\\& Multiple properly escaped \\&"),
+                Arguments.of(Collections.emptyList(), StandardField.BOOKTITLE, "\\\\\\& With multiple backslashes"),
+                Arguments.of(Collections.emptyList(), StandardField.COMMENT, "\\\\\\& With multiple backslashes multiple times \\\\\\\\\\&"),
+                Arguments.of(Collections.emptyList(), StandardField.NOTE, "In the \\& middle of \\\\\\& something")
         );
     }
 

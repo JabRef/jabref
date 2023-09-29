@@ -24,6 +24,12 @@ import uk.ac.ed.ph.snuggletex.SnuggleSession;
 import uk.ac.ed.ph.snuggletex.definitions.CoreErrorCode;
 import uk.ac.ed.ph.snuggletex.definitions.CoreErrorGroup;
 
+/**
+ * Similar check to {@link HTMLCharacterChecker}.
+ * Here, we use <a href="https://github.com/davemckain/snuggletex">SnuggleTeX</a>, in the {@link HTMLCharacterChecker}, it is searched for HTML characters.
+ *
+ * Unescaped ampersands cannot be checked by SnuggleTeX, therefore the {@link AmpersandChecker} is available additionaly.
+ */
 public class LatexIntegrityChecker implements EntryChecker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SnuggleSession.class);
@@ -40,10 +46,6 @@ public class LatexIntegrityChecker implements EntryChecker {
         EXCLUDED_ERRORS.add(CoreErrorCode.TTEG04);
     }
 
-    /**
-     * Similar check to {@link HTMLCharacterChecker#check(BibEntry)}.
-     * Here, we use <a href="https://github.com/davemckain/snuggletex">SnuggleTeX</a>, in the {@link HTMLCharacterChecker}, it is searched for HTML characters.
-     */
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();

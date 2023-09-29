@@ -14,6 +14,8 @@ import com.google.common.base.CharMatcher;
 
 /**
  * Checks if the BibEntry contains unescaped ampersands.
+ *
+ * The {@link LatexIntegrityChecker} is not able to check unescaped ampersands. Therefore, this separate checker is required.
  */
 public class AmpersandChecker implements EntryChecker {
     // matches for an & preceded by any number of \
