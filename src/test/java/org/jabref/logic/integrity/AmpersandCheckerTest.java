@@ -65,4 +65,18 @@ public class AmpersandCheckerTest {
         entry.setField(StandardField.AFTERWORD, "May the force be with you & live long \\\\& prosper \\& to infinity \\\\\\& beyond & assemble \\\\\\\\& excelsior!");
         assertEquals(List.of(new IntegrityMessage("Found 4 unescaped '&'", entry, StandardField.AFTERWORD)), checker.check(entry));
     }
+
+    static Stream<Arguments> entryWithVerabitmFieldsNotCausingMessages() {
+        return Stream.of(
+                Arguments.of(StandardField.FILE, "one & another.pdf"),
+                Arguments.of(StandardField.URL, "https://example.org?key=value&key2=value2")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void entryWithVerabitmFieldsNotCausingMessages(Field field, String value) {
+        entry.setField(field, value);
+        assertEquals(List.of(), checker.check(entry));
+    }
 }
