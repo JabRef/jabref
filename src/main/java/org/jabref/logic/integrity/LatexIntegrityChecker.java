@@ -42,7 +42,7 @@ public class LatexIntegrityChecker implements EntryChecker {
 
     /**
      * Similar check to {@link HTMLCharacterChecker#check(BibEntry)}.
-     * Here, we use SnuggleTeX, there it is searched for HTML characters.
+     * Here, we use <a href="https://github.com/davemckain/snuggletex">SnuggleTeX</a>, in the {@link HTMLCharacterChecker}, it is searched for HTML characters.
      */
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
