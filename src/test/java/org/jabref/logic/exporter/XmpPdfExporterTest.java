@@ -32,7 +32,6 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -173,11 +172,9 @@ class XmpPdfExporterTest {
         assertFalse(exporter.exportToFileByPath(databaseContext, filePreferences, path, abbreviationRepository));
     }
 
-    @Test
-    public void testRoundtripExportImport() throws Exception {
-
-        Path originalFilePath = tempDir.resolve("original.pdf").toAbsolutePath();
-
+    @ParameterizedTest
+    @MethodSource("providePathToNewPDFs")
+    public void testRoundtripExportImport(Path path) throws Exception {
         try (PDDocument document = new PDDocument()) {
             PDPage page = new PDPage();
             document.addPage(page);
@@ -189,19 +186,23 @@ class XmpPdfExporterTest {
                 contentStream.showText("This PDF was created by JabRef. It demonstrates the embedding of BibTeX data in PDF files. Please open the file attachments view of your PDF viewer to see the attached files. Note that the normal usage is to embed the BibTeX data in an existing PDF.");
                 contentStream.endText();
             }
-            document.save(originalFilePath.toString());
+            document.save(path.toString());
         }
-        new XmpUtilWriter(xmpPreferences).writeXmp(originalFilePath, databaseContext.getEntries(), databaseContext.getDatabase());
+        new XmpUtilWriter(xmpPreferences).writeXmp(path, databaseContext.getEntries(), databaseContext.getDatabase());
 
-        List<BibEntry> importedEntries = importer.importDatabase(originalFilePath).getDatabase().getEntries();
+        List<BibEntry> importedEntries = importer.importDatabase(path).getDatabase().getEntries();
         importedEntries.forEach(bibEntry -> new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(bibEntry));
 
         List<BibEntry> expectedEntries = databaseContext.getEntries();
         for (BibEntry entry : expectedEntries) {
             entry.clearField(StandardField.FILE);
-            entry.addFile(createDefaultLinkedFile("", "original.pdf", tempDir));
+            entry.addFile(createDefaultLinkedFile("original.pdf", tempDir));
         }
         assertEquals(expectedEntries, importedEntries);
+    }
+
+    public static Stream<Arguments> providePathToNewPDFs() {
+        return Stream.of(Arguments.of(tempDir.resolve("original.pdf").toAbsolutePath()));
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {
@@ -227,6 +228,6 @@ class XmpPdfExporterTest {
             pdf.save(pdfFile.toAbsolutePath().toString());
         }
 
-        return new LinkedFile(description, pdfFile, "PDF");
+        return new LinkedFile("", pdfFile, "PDF");
     }
 }
