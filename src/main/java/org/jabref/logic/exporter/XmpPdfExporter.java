@@ -36,9 +36,6 @@ public class XmpPdfExporter extends Exporter {
 
         Path filePath = pdfFile.toAbsolutePath();
 
-        if (!pdfFile.toString().endsWith(".pdf")) {
-            throw new IllegalArgumentException("Invalid PDF file extension");
-        }
         if (!Files.exists(filePath)) {
             try (PDDocument document = new PDDocument()) {
                 PDPage page = new PDPage();
