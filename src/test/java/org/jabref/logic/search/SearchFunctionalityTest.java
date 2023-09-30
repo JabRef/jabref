@@ -237,6 +237,45 @@ public class SearchFunctionalityTest {
         PdfSearchResults emptyResult = search.search("User Test", 10);
         assertEquals(0, emptyResult.numSearchResults());
     }
+
+    @Test
+    public void testSensitivePDFFulltextSearch() throws IOException, URISyntaxException {
+        initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-C.bib").toURI()));
+
+        //Positive search test
+        PdfSearchResults result = search.search("This is a short sentence, comma included.", 10);
+        assertEquals(2, result.numSearchResults());
+        //Negative search test
+        PdfSearchResults emptyResult = search.search("This is a test.", 10);
+        assertEquals(0, emptyResult.numSearchResults());
+    }
+
+    @Test
+    public void testSensitivePDFNoteFulltextSearch() throws IOException, URISyntaxException {
+        initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-C.bib").toURI()));
+
+        //Positive search test
+        PdfSearchResults result = search.search("Hello World", 10);
+        assertEquals(1, result.numSearchResults());
+        //Negative search test
+        PdfSearchResults emptyResult = search.search("User Test", 10);
+        assertEquals(0, emptyResult.numSearchResults());
+    }
+/**
+*ToDo: Select group A for SimpleGroupSearch; Output is not numeric.
+*/
+
+    @Test
+    public void testSimpleGroupSearch() throws IOException, URISyntaxException {
+        initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-D.bib").toURI()));
+
+        //Positive search test
+        PdfSearchResults result = search.search("Test", 10);
+        assertEquals(3, result.numSearchResults());
+        //Negative search test
+        PdfSearchResults emptyResult = search.search("Unknown", 10);
+        assertEquals(0, emptyResult.numSearchResults());
+    }
 }
 
 
