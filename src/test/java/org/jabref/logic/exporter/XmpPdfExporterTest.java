@@ -30,6 +30,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -129,6 +130,17 @@ class XmpPdfExporterTest {
         dataBase.insertEntry(vapnik2000);
     }
 
+    @AfterEach
+    void reset() throws IOException {
+        List<BibEntry> expectedEntries = databaseContext.getEntries();
+        for (BibEntry entry : expectedEntries) {
+            entry.clearField(StandardField.FILE);
+        }
+        LinkedFile linkedFile = createDefaultLinkedFile("existing.pdf", tempDir);
+        olly2018.setFiles(List.of(linkedFile));
+        toral2006.setFiles(List.of(new LinkedFile("non-existing", "path/to/nowhere.pdf", "PDF")));
+    }
+
     @ParameterizedTest
     @MethodSource("provideBibEntriesWithValidPdfFileLinks")
     void successfulExportToAllFilesOfEntry(BibEntry bibEntryWithValidPdfFileLink) throws Exception {
@@ -205,7 +217,7 @@ class XmpPdfExporterTest {
     }
 
     private static LinkedFile createDefaultLinkedFile(String fileName, Path tempDir) throws IOException {
-        return createDefaultLinkedFile("A linked pdf", fileName, tempDir);
+        return createDefaultLinkedFile("", fileName, tempDir);
     }
 
     private static LinkedFile createDefaultLinkedFile(String description, String fileName, Path tempDir) throws IOException {
