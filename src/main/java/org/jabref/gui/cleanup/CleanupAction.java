@@ -89,7 +89,7 @@ public class CleanupAction extends SimpleCommand {
 
             BackgroundTask.wrap(() -> cleanup(stateManager.getActiveDatabase().get(), preset))
                           .onSuccess(result -> showResults())
-                    .onFailure(dialogService::showErrorDialogAndWait)
+                          .onFailure(dialogService::showErrorDialogAndWait)
                           .executeWith(taskExecutor);
         });
     }
