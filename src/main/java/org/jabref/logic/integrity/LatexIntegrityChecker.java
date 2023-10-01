@@ -2,12 +2,14 @@ package org.jabref.logic.integrity;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Stream;
+
+import javafx.util.Pair;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -48,34 +50,34 @@ public class LatexIntegrityChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        List<IntegrityMessage> results = new ArrayList<>();
+        return entry.getFieldMap().entrySet().stream()
+                    .filter(field -> !field.getKey().getProperties().contains(FieldProperty.VERBATIM))
+                    .flatMap(LatexIntegrityChecker::getUnescapedAmpersandsWithCount)
+                    // Exclude all DOM building errors as this functionality is not used.
+                    .filter(pair -> !pair.getValue().getErrorCode().getErrorGroup().equals(CoreErrorGroup.TDE))
+                    .filter(pair -> !EXCLUDED_ERRORS.contains(pair.getValue().getErrorCode()))
+                    .map(pair ->
+                            new IntegrityMessage(errorMessageFormatHelper(pair.getValue().getErrorCode(), pair.getValue().getArguments()), entry, pair.getKey()))
+                    .toList();
+    }
 
-        for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
-            if (field.getKey().getProperties().contains(FieldProperty.VERBATIM)) {
-                continue;
-            }
-            SnuggleInput input = new SnuggleInput(field.getValue());
-            try {
-                SESSION.parseInput(input);
-            } catch (IOException e) {
-                LOGGER.error("Error at parsing", e);
-            }
-            if (!SESSION.getErrors().isEmpty()) {
-                // Retrieve the first error only because it is likely to be more meaningful.
-                // Displaying all (subsequent) faults may lead to confusion.
-                // We further get a slight performance benefit from failing fast (see static config in class header).
-                InputError error = SESSION.getErrors().get(0);
-                ErrorCode errorCode = error.getErrorCode();
-                // Exclude all DOM building errors as this functionality is not used.
-                // Further, exclude individual errors.
-                if (!errorCode.getErrorGroup().equals(CoreErrorGroup.TDE) && !EXCLUDED_ERRORS.contains(errorCode)) {
-                    String jabrefMessageWrapper = errorMessageFormatHelper(errorCode, error.getArguments());
-                    results.add(new IntegrityMessage(jabrefMessageWrapper, entry, field.getKey()));
-                }
-            }
-            SESSION.reset();
+    private static Stream<Pair<Field, InputError>> getUnescapedAmpersandsWithCount(Map.Entry<Field, String> entry) {
+        SESSION.reset();
+        SnuggleInput input = new SnuggleInput(entry.getValue());
+        try {
+            SESSION.parseInput(input);
+        } catch (IOException e) {
+            LOGGER.error("Error at parsing", e);
+            return Stream.empty();
         }
-        return results;
+        if (SESSION.getErrors().isEmpty()) {
+            return Stream.empty();
+        }
+        // Retrieve the first error only because it is likely to be more meaningful.
+        // Displaying all (subsequent) faults may lead to confusion.
+        // We further get a slight performance benefit from failing fast (see static config in class header).
+        InputError error = SESSION.getErrors().get(0);
+        return Stream.of(new Pair<>(entry.getKey(), error));
     }
 
     public static String errorMessageFormatHelper(ErrorCode snuggleTexErrorCode, Object... arguments) {
