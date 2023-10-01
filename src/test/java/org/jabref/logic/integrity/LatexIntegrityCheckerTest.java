@@ -116,6 +116,13 @@ public class LatexIntegrityCheckerTest {
                 // Arguments.of(StandardField.TITLE, "Footnote\\footnote{This is a footnote}"),
                 // Arguments.of(StandardField.TITLE, "$\text{in math}$"),
 
+                // Comments should not raise any error, because they are not typeset using LaTeX
+                Arguments.of(StandardField.COMMENT, "\\undefinedCommand"),
+
+                // Some commands not supported by SnuggleTeX as default
+                // Source: https://github.com/JabRef/jabref/issues/8712#issuecomment-1730441206
+                Arguments.of(StandardField.ABSTRACT, "\\textless{}xml\\textgreater{} \\textbar something \textbackslash"),
+
                 // Mirrored from org.jabref.logic.integrity.AmpersandCheckerTest.provideAcceptedInputs
                 Arguments.of(StandardField.TITLE, "No ampersand at all"),
                 Arguments.of(StandardField.FOREWORD, "Properly escaped \\&"),

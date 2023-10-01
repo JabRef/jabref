@@ -22,9 +22,12 @@ import uk.ac.ed.ph.snuggletex.ErrorCode;
 import uk.ac.ed.ph.snuggletex.InputError;
 import uk.ac.ed.ph.snuggletex.SnuggleEngine;
 import uk.ac.ed.ph.snuggletex.SnuggleInput;
+import uk.ac.ed.ph.snuggletex.SnugglePackage;
 import uk.ac.ed.ph.snuggletex.SnuggleSession;
 import uk.ac.ed.ph.snuggletex.definitions.CoreErrorCode;
 import uk.ac.ed.ph.snuggletex.definitions.CoreErrorGroup;
+
+import static uk.ac.ed.ph.snuggletex.definitions.Globals.TEXT_MODE_ONLY;
 
 /**
  * Similar check to {@link HTMLCharacterChecker}.
@@ -36,12 +39,20 @@ public class LatexIntegrityChecker implements EntryChecker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SnuggleSession.class);
     private static final SnuggleEngine ENGINE = new SnuggleEngine();
-    private static final SnuggleSession SESSION = ENGINE.createSession();
+    private static final SnuggleSession SESSION;
     private static final ResourceBundle ERROR_MESSAGES = ENGINE.getPackages().get(0).getErrorMessageBundle();
     private static final Set<ErrorCode> EXCLUDED_ERRORS = new HashSet<>();
 
     static {
-        // Static configuration.
+        SnugglePackage snugglePackage = ENGINE.getPackages().get(0);
+        snugglePackage.addComplexCommand("textgreater", false, 0, TEXT_MODE_ONLY, null, null, null);
+        snugglePackage.addComplexCommand("textless", false, 0, TEXT_MODE_ONLY, null, null, null);
+        snugglePackage.addComplexCommand("textbackslash", false, 0, TEXT_MODE_ONLY, null, null, null);
+        snugglePackage.addComplexCommand("textbar", false, 0, TEXT_MODE_ONLY, null, null, null);
+        // ENGINE.getPackages().get(0).addComplexCommandOneArg()
+              // engine.getPackages().get(0).addComplexCommandOneArg("text", false, ALL_MODES,LR, StyleDeclarationInterpretation.NORMALSIZE, null, TextFlowContext.ALLOW_INLINE);
+
+        SESSION = ENGINE.createSession();
         SESSION.getConfiguration().setFailingFast(true);
 
         // '#' only allowed inside and command/environment definitions.
