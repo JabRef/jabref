@@ -3,6 +3,7 @@ package org.jabref.logic.search;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -19,6 +20,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -31,6 +34,8 @@ import org.mockito.Answers;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -77,39 +82,83 @@ public class SearchFunctionalityTest {
             .withCitationKey("entry4")
             .withField(StandardField.AUTHOR, "Special")
             .withField(StandardField.TITLE, "192? title.");
-    BibEntry entry1C = new BibEntry(StandardEntryType.Misc)
+    BibEntry minimal1 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal1");
-    BibEntry entry2C = new BibEntry(StandardEntryType.Misc)
+    BibEntry minimal2 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal2");
-
-    BibEntry entry3C = new BibEntry(StandardEntryType.Misc)
+    BibEntry minimal3 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal3");
-    BibEntry entry4C = new BibEntry(StandardEntryType.Misc)
+    BibEntry minimalNote1 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note1");
-    BibEntry entry5C = new BibEntry(StandardEntryType.Misc)
+    BibEntry minimalNote2 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note2");
-    BibEntry entry6C = new BibEntry(StandardEntryType.Misc)
+    BibEntry minimalNote3 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("minimal-note3");
+
+    BibEntry entry1D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry1")
+            .withField(StandardField.AUTHOR, "Test")
+            .withField(StandardField.TITLE, "Case")
+            .withField(StandardField.GROUPS, "A");
+
+    BibEntry entry2D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry2")
+            .withField(StandardField.AUTHOR, "TEST")
+            .withField(StandardField.TITLE, "CASE")
+            .withField(StandardField.GROUPS, "A");
+
+    BibEntry entry3D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry3")
+            .withField(StandardField.AUTHOR, "Hello")
+            .withField(StandardField.TITLE, "World")
+            .withField(StandardField.GROUPS, "A");
+    BibEntry entry4D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry4")
+            .withField(StandardField.AUTHOR, "HELLO")
+            .withField(StandardField.TITLE, "WORLD")
+            .withField(StandardField.GROUPS, "A");
+    BibEntry entry5D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry5")
+            .withField(StandardField.AUTHOR, "tesT")
+            .withField(StandardField.TITLE, "casE")
+            .withField(StandardField.GROUPS, "B");
+    BibEntry entry6D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry6")
+            .withField(StandardField.AUTHOR, "test")
+            .withField(StandardField.TITLE, "case")
+            .withField(StandardField.GROUPS, "B");
+    BibEntry entry7D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry7")
+            .withField(StandardField.AUTHOR, "hellO")
+            .withField(StandardField.TITLE, "worlD")
+            .withField(StandardField.GROUPS, "B");
+    BibEntry entry8D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry8")
+            .withField(StandardField.AUTHOR, "hello")
+            .withField(StandardField.TITLE, "world")
+            .withField(StandardField.GROUPS, "B");
 
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
         filePreferences = mock(FilePreferences.class);
         database = new BibDatabase();
         context = mock(BibDatabaseContext.class);
-        entry1C.addFile(new LinkedFile("Minimal", "minimal.pdf", StandardFileType.PDF.getName()));
-        entry2C.addFile(new LinkedFile("Minimal 1", "minimal1.pdf", StandardFileType.PDF.getName()));
-        entry3C.addFile(new LinkedFile("Minimal 2", "minimal2.pdf", StandardFileType.PDF.getName()));
-        entry4C.addFile(new LinkedFile("Minimalnote", "minimal-note.pdf", StandardFileType.PDF.getName()));
-        entry5C.addFile(new LinkedFile("Minimalnote 1", "minimal-note1.pdf", StandardFileType.PDF.getName()));
-        entry6C.addFile(new LinkedFile("Minimalnote 2", "minimal-note2.pdf", StandardFileType.PDF.getName()));
+        minimal1.setFiles(Collections.singletonList(new LinkedFile("Minimal", "minimal.pdf", StandardFileType.PDF.getName())));
+        minimal2.setFiles(Collections.singletonList(new LinkedFile("Minimal 1", "minimal1.pdf", StandardFileType.PDF.getName())));
+        minimal3.setFiles(Collections.singletonList(new LinkedFile("Minimal 2", "minimal2.pdf", StandardFileType.PDF.getName())));
+        minimalNote1.setFiles(Collections.singletonList(new LinkedFile("Minimalnote", "minimal-note.pdf", StandardFileType.PDF.getName())));
+        minimalNote2.setFiles(Collections.singletonList(new LinkedFile("Minimalnote 1", "minimal-note1.pdf", StandardFileType.PDF.getName())));
+        minimalNote3.setFiles(Collections.singletonList(new LinkedFile("Minimalnote 2", "minimal-note2.pdf", StandardFileType.PDF.getName())));
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/search")));
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
 
         indexer = PdfIndexer.of(context, filePreferences);
+        search = PdfSearcher.of(context);
 
         indexer.createIndex();
+        indexer.addToIndex(context);
     }
 
     private void initializeDatabaseFromPath(Path testFile) throws IOException {
@@ -219,11 +268,11 @@ public class SearchFunctionalityTest {
         initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-C.bib").toURI()));
 
         //Positive search test
-        PdfSearchResults result = search.search("This is a short sentence, comma included.", 10);
-        assertEquals(6, result.numSearchResults());
+        PdfSearchResults resultsPositive = search.search("This is a short sentence, comma included.", 10);
+        assertEquals(List.of(minimal1, minimal2, minimal3, minimalNote1, minimalNote2, minimalNote3), resultsPositive);
         //Negative search test
-        PdfSearchResults emptyResult = search.search("This is a test.", 10);
-        assertEquals(0, emptyResult.numSearchResults());
+        PdfSearchResults resultsNegative = search.search("This is a test.", 10);
+        assertEquals(Collections.emptyList(), resultsNegative);
     }
 
     @Test
@@ -231,11 +280,11 @@ public class SearchFunctionalityTest {
         initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-C.bib").toURI()));
 
         //Positive search test
-        PdfSearchResults result = search.search("Hello World", 10);
-        assertEquals(3, result.numSearchResults());
+        PdfSearchResults resultsPositive = search.search("Hello World", 10);
+        assertEquals(List.of(minimalNote1, minimalNote2, minimalNote3), resultsPositive);
         //Negative search test
-        PdfSearchResults emptyResult = search.search("User Test", 10);
-        assertEquals(0, emptyResult.numSearchResults());
+        PdfSearchResults resultsNegative = search.search("User Test", 10);
+        assertEquals(Collections.emptyList(), resultsNegative);
     }
 
     @Test
@@ -243,11 +292,11 @@ public class SearchFunctionalityTest {
         initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-C.bib").toURI()));
 
         //Positive search test
-        PdfSearchResults result = search.search("This is a short sentence, comma included.", 10);
-        assertEquals(2, result.numSearchResults());
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("This is a short sentence, comma included.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(List.of(minimal1, minimalNote1), matches);
         //Negative search test
-        PdfSearchResults emptyResult = search.search("This is a test.", 10);
-        assertEquals(0, emptyResult.numSearchResults());
+        matches = new DatabaseSearcher(new SearchQuery("This is a test.", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(Collections.emptyList(), matches);
     }
 
     @Test
@@ -255,26 +304,28 @@ public class SearchFunctionalityTest {
         initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-C.bib").toURI()));
 
         //Positive search test
-        PdfSearchResults result = search.search("Hello World", 10);
-        assertEquals(1, result.numSearchResults());
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("Hello World", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(List.of(minimalNote1), matches);
         //Negative search test
-        PdfSearchResults emptyResult = search.search("User Test", 10);
-        assertEquals(0, emptyResult.numSearchResults());
+        matches = new DatabaseSearcher(new SearchQuery("User Test", EnumSet.of(SearchRules.SearchFlags.FULLTEXT, SearchRules.SearchFlags.CASE_SENSITIVE)), database).getMatches();
+        assertEquals(Collections.emptyList(), matches);
     }
-/**
-*ToDo: Select group A for SimpleGroupSearch; Output is not numeric.
-*/
 
     @Test
     public void testSimpleGroupSearch() throws IOException, URISyntaxException {
         initializeDatabaseFromPath(Path.of(SearchFunctionalityTest.class.getResource("test-library-D.bib").toURI()));
+        SearchGroup groupPositive = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Test", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        SearchGroup groupNegative = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Unknown", EnumSet.noneOf(SearchRules.SearchFlags.class));
+
+        List<BibEntry> positiveResult = new ArrayList<>();
+
+        positiveResult.add(entry1D);
+        positiveResult.add(entry2D);
 
         //Positive search test
-        PdfSearchResults result = search.search("Test", 10);
-        assertEquals(3, result.numSearchResults());
+        assertTrue(groupPositive.containsAll(positiveResult));
         //Negative search test
-        PdfSearchResults emptyResult = search.search("Unknown", 10);
-        assertEquals(0, emptyResult.numSearchResults());
+        assertFalse(groupNegative.containsAll(positiveResult));
     }
 }
 
