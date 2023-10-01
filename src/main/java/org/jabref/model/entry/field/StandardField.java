@@ -116,7 +116,7 @@ public enum StandardField implements Field {
     TITLEADDON("titleaddon"),
     TRANSLATOR("translator", FieldProperty.PERSON_NAMES),
     TYPE("type", FieldProperty.TYPE),
-    URI("uri", "URI"),
+    URI("uri", "URI", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
     URL("url", "URL", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
     URLDATE("urldate", FieldProperty.DATE),
     VENUE("venue"),
