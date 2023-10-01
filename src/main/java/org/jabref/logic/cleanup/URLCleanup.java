@@ -33,12 +33,11 @@ public class URLCleanup implements CleanupJob {
     private static final Field NOTE_FIELD = StandardField.NOTE;
     private static final Field URL_FIELD = StandardField.URL;
     private static final Field URLDATE_FIELD = StandardField.URLDATE;
-    private final NormalizeDateFormatter formatter = new NormalizeDateFormatter();
 
     final Pattern urlPattern = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);
     final Pattern dateTermsPattern = Pattern.compile(DATE_TERMS_REGEX, Pattern.CASE_INSENSITIVE);
     final Pattern datePattern = Pattern.compile(Date.DATE_REGEX, Pattern.CASE_INSENSITIVE);
-
+    private final NormalizeDateFormatter formatter = new NormalizeDateFormatter();
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
