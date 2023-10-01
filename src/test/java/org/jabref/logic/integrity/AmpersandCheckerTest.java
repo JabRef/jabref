@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -21,19 +20,23 @@ public class AmpersandCheckerTest {
 
     @ParameterizedTest
     @MethodSource("provideAcceptedInputs")
-    void acceptsAllowedInputs(List<IntegrityMessage> expected, Field field, String value) {
+    void acceptsAllowedInputs(Field field, String value) {
         entry.setField(field, value);
-        assertEquals(expected, checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     private static Stream<Arguments> provideAcceptedInputs() {
         return Stream.of(
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "No ampersand at all"),
-                Arguments.of(Collections.emptyList(), StandardField.FOREWORD, "Properly escaped \\&"),
-                Arguments.of(Collections.emptyList(), StandardField.AUTHOR, "\\& Multiple properly escaped \\&"),
-                Arguments.of(Collections.emptyList(), StandardField.BOOKTITLE, "\\\\\\& With multiple backslashes"),
-                Arguments.of(Collections.emptyList(), StandardField.COMMENT, "\\\\\\& With multiple backslashes multiple times \\\\\\\\\\&"),
-                Arguments.of(Collections.emptyList(), StandardField.NOTE, "In the \\& middle of \\\\\\& something")
+                Arguments.of(StandardField.TITLE, "No ampersand at all"),
+                Arguments.of(StandardField.FOREWORD, "Properly escaped \\&"),
+                Arguments.of(StandardField.AUTHOR, "\\& Multiple properly escaped \\&"),
+                Arguments.of(StandardField.BOOKTITLE, "\\\\\\& With multiple backslashes"),
+                Arguments.of(StandardField.COMMENT, "\\\\\\& With multiple backslashes multiple times \\\\\\\\\\&"),
+                Arguments.of(StandardField.NOTE, "In the \\& middle of \\\\\\& something"),
+
+                // Verbatim fields
+                Arguments.of(StandardField.FILE, "one & another.pdf"),
+                Arguments.of(StandardField.URL, "https://example.org?key=value&key2=value2")
         );
     }
 
@@ -57,19 +60,5 @@ public class AmpersandCheckerTest {
                 // entryWithMultipleEscapedAndUnescapedAmpersands
                 Arguments.of("Found 4 unescaped '&'", StandardField.AFTERWORD, "May the force be with you & live long \\\\& prosper \\& to infinity \\\\\\& beyond & assemble \\\\\\\\& excelsior!")
         );
-    }
-
-    static Stream<Arguments> entryWithVerabitmFieldsNotCausingMessages() {
-        return Stream.of(
-                Arguments.of(StandardField.FILE, "one & another.pdf"),
-                Arguments.of(StandardField.URL, "https://example.org?key=value&key2=value2")
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    void entryWithVerabitmFieldsNotCausingMessages(Field field, String value) {
-        entry.setField(field, value);
-        assertEquals(List.of(), checker.check(entry));
     }
 }
