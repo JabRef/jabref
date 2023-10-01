@@ -200,11 +200,15 @@
         <!-- https://url.com/ (accessed Mon. DD, YYYY). -->
         <choose>
           <if variable="URL">
-            <group prefix=" " delimiter=" ">
-              <text variable="URL"/>
-              <group delimiter=" " prefix="(" suffix=").">
-                <text term="accessed"/>
+            <group delimiter=". " prefix=" ">
+              <group delimiter=": ">
+                <text term="accessed" text-case="capitalize-first"/>
                 <date variable="accessed" form="text"/>
+              </group>
+              <text term="online" prefix="[" suffix="]" text-case="capitalize-first"/>
+              <group delimiter=": ">
+                <text term="available at" text-case="capitalize-first"/>
+                <text variable="URL"/>
               </group>
             </group>
           </if>
@@ -359,17 +363,15 @@
           <text macro="access"/>
         </else-if>
         <else-if type="chapter">
-          <group delimiter=", " suffix=", ">
+          <group delimiter=", " suffix=". ">
             <text macro="title"/>
             <group delimiter=" ">
               <text term="in" suffix=" "/>
               <text variable="container-title" font-style="italic"/>
             </group>
-          </group>
-          <text macro="editor" suffix=", "/>
-          <text macro="edition"/>
-          <text macro="collection"/>
-          <group delimiter=", " suffix=".">
+            <text macro="locators"/>
+            <text macro="editor"/>
+            <text macro="collection"/>
             <text macro="publisher"/>
             <text macro="issued"/>
             <text macro="page"/>
@@ -400,8 +402,7 @@
         <else-if type="webpage post-weblog post" match="any">
           <group delimiter=", " suffix=".">
             <text macro="title"/>
-            <text variable="container-title" font-style="italic"/>
-            <text macro="issued"/>
+            <text variable="container-title"/>
           </group>
           <text macro="access"/>
         </else-if>
