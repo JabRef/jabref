@@ -10,20 +10,25 @@ import org.jabref.logic.l10n.Localization;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class SaveGitDatabaseAction {
-    final Path repositoryPath;
+    final Path filePath;
     final String automaticCommitMsg = "Automatic update via JabRef";
 
     private final DialogService dialogService;
 
-    public SaveGitDatabaseAction(Path repositoryPath, DialogService dialogService) {
-        this.repositoryPath = repositoryPath;
+    public SaveGitDatabaseAction(Path filePath, DialogService dialogService) {
+        this.filePath = filePath;
         this.dialogService = dialogService;
     }
 
+    /**
+    * Handle JabRef git integration action
+    *
+    * @return true of false whether the action was successful or not
+    */
     public boolean automaticUpdate() {
         try {
-            GitHandler git = new GitHandler(repositoryPath);
-            git.createCommitOnCurrentBranch(automaticCommitMsg, false);
+            GitHandler git = new GitHandler(filePath.getParent());
+            git.createCommitWithSingleFileOnCurrentBranch(automaticCommitMsg, filePath.getFileName().toString(), false);
             git.pushCommitsToRemoteRepository(this.dialogService);
         } catch (
                 GitAPIException |

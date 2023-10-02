@@ -21,6 +21,7 @@ import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.eclipse.jgit.transport.CredentialsProvider;
 
 /**
  * This class handles the updating of the local and remote git repository that is located at the repository path
@@ -29,7 +30,10 @@ import org.slf4j.LoggerFactory;
 public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
-    final File repositoryPathAsFile;
+    final File repositoryPathAsFile; 
+    String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
+    String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
+    final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
 
     /**
      * Initialize the handler for the given repository
@@ -148,6 +152,40 @@ public class GitHandler {
     }
 
     /**
+     * Creates a commit on the currently checked out branch with a single file
+     *
+     * @param filename The name of the file to commit
+     * @param amend Whether to amend to the last commit (true), or not (false)
+     * @return Returns true if a new commit was created. This is the case if the repository was not clean on method invocation
+     */
+    public boolean createCommitWithSingleFileOnCurrentBranch(String filename, String commitMessage, boolean amend) throws IOException, GitAPIException {
+        boolean commitCreated = false;
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            Status status = git.status().call();
+            if (!status.isClean()) {
+                commitCreated = true;
+                // Add new and changed files to index
+                git.add()
+                   .addFilepattern(filename)
+                   .call();
+                // Add all removed files to index
+                if (!status.getMissing().isEmpty()) {
+                    RmCommand removeCommand = git.rm()
+                                                 .setCached(true);
+                    status.getMissing().forEach(removeCommand::addFilepattern);
+                    removeCommand.call();
+                }
+                git.commit()
+                   .setAmend(amend)
+                   .setAllowEmpty(false)
+                   .setMessage(commitMessage)
+                   .call();
+            }
+        }
+        return commitCreated;
+    }
+
+    /**
      * Merges the source branch into the target branch
      *
      * @param targetBranch the name of the branch that is merged into
@@ -179,7 +217,7 @@ public class GitHandler {
      * Pushes all commits made to the branch that is tracked by the currently checked out branch.
      * If pushing to remote fails, it fails silently.
      */
-    public void pushCommitsToRemoteRepository(DialogService dialogService) throws IOException, GitAPIException {
+    public void pushCommitsToRemoteRepository(DialogService dialogService) {
         try {
             Git git = Git.open(this.repositoryPathAsFile);
             String remoteURL = git.getRepository().getConfig().getString("remote", "origin", "url");
@@ -193,20 +231,26 @@ public class GitHandler {
                .setTransportConfigCallback(transportConfigCallback)
                .call();
             } else {
-                String gitUsername = "";
-                String gitPassword = "";
+                if (this.gitPassword.equals("") || this.gitUsername.equals("")) {
+                    String gitUsername = "";
+                    String gitPassword = "";
 
-                if (dialogService != null) {
-                    gitUsername = dialogService.showInputDialogAndWait(Localization.lang("Git credentials"), Localization.lang("git username")).get();
-                    gitPassword = dialogService.showPasswordDialogAndWait(Localization.lang("Git credentials"), Localization.lang("password"), Localization.lang("password")).get();
+                    if (dialogService != null) {
+                        gitUsername = dialogService.showInputDialogAndWait(Localization.lang("Git credentials"), Localization.lang("git username")).get();
+                        gitPassword = dialogService.showPasswordDialogAndWait(Localization.lang("Git credentials"), Localization.lang("password"), Localization.lang("password")).get();
 
-                    UsernamePasswordCredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+                        CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
 
-                    git.push()
-                    .setCredentialsProvider(credentialsProvider)
-                    .call();
+                        git.push()
+                        .setCredentialsProvider(credentialsProvider)
+                        .call();
+                    } else {
+                        git.push()
+                        .call();
+                    }
                 } else {
                     git.push()
+                    .setCredentialsProvider(this.credentialsProvider)
                     .call();
                 }
             }
@@ -225,7 +269,7 @@ public class GitHandler {
      * Pulls all commits made to the branch that is tracked by the currently checked out branch.
      * If pulling to remote fails, it fails silently.
      */
-    public void pullOnCurrentBranch() throws IOException {
+    public void pullOnCurrentBranch() {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
@@ -238,16 +282,21 @@ public class GitHandler {
                     throw new RuntimeException(e);
                 }
             }
+        } catch (IOException ex) {
+            LOGGER.info("Failed pulling git repository");
         }
     }
 
     /**
-     * Get currently checked out branch.
+     * Get the short name of the current branch that HEAD points to.
      * If checking out fails, it fails silently.
      */
-    public String getCurrentlyCheckedOutBranch() throws IOException {
+    public String getCurrentlyCheckedOutBranch() {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             return git.getRepository().getBranch();
+        } catch (IOException ex) {
+            LOGGER.info("Failed get current branch");
+            return "";
         }
     }
 }
