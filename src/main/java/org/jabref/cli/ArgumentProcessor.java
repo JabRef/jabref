@@ -67,13 +67,20 @@ public class ArgumentProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
     private final JabRefCLI cli;
-    private final List<ParserResult> parserResults;
+
+    // Written once by processArguments()
+    private List<ParserResult> parserResults = List.of();
+
     private final Mode startupMode;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private boolean noGUINeeded;
 
+    /**
+     * First call the constructor, then call {@link #processArguments()}.
+     * Afterward, you can access the {@link #getParserResults()} and other getters.
+     */
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
                              PreferencesService preferencesService,
@@ -84,8 +91,6 @@ public class ArgumentProcessor {
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-
-        this.parserResults = processArguments();
     }
 
     /**
@@ -145,8 +150,8 @@ public class ArgumentProcessor {
 
         Optional<ParserResult> importResult = importFile(file, importFormat);
         importResult.ifPresent(result -> {
-            OutputPrinter printer = new SystemOutputPrinter();
             if (result.hasWarnings()) {
+                OutputPrinter printer = new SystemOutputPrinter();
                 printer.showMessage(result.getErrorMessage());
             }
         });
@@ -161,22 +166,21 @@ public class ArgumentProcessor {
                     fileUpdateMonitor);
 
             if (!"*".equals(importFormat)) {
-                System.out.println(Localization.lang("Importing") + ": " + file);
+                System.out.println(Localization.lang("Importing %0", file));
                 ParserResult result = importFormatReader.importFromFile(importFormat, file);
                 return Optional.of(result);
             } else {
                 // * means "guess the format":
-                System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
+                System.out.println(Localization.lang("Importing file %0 as unknown format", file));
 
                 ImportFormatReader.UnknownFormatImport importResult =
                         importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
-                System.out.println(Localization.lang("Format used") + ": " + importResult.format());
+                System.out.println(Localization.lang("Format used: %0", importResult.format()));
                 return Optional.of(importResult.parserResult());
             }
         } catch (ImportException ex) {
-            System.err
-                    .println(Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
+            System.err.println(Localization.lang("Error opening file '%0'", file) + "\n" + ex.getLocalizedMessage());
             return Optional.empty();
         }
     }
@@ -185,11 +189,7 @@ public class ArgumentProcessor {
         return parserResults;
     }
 
-    public boolean hasParserResults() {
-        return !parserResults.isEmpty();
-    }
-
-    private List<ParserResult> processArguments() {
+    public void processArguments() {
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
         }
@@ -197,7 +197,8 @@ public class ArgumentProcessor {
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
             JabRefCLI.printUsage(preferencesService);
             noGUINeeded = true;
-            return Collections.emptyList();
+            this.parserResults = Collections.emptyList();
+            return;
         }
 
         // Check if we should reset all preferences to default values:
@@ -220,7 +221,8 @@ public class ArgumentProcessor {
         if (cli.isExportMatches()) {
             if (!loaded.isEmpty()) {
                 if (!exportMatches(loaded)) {
-                    return Collections.emptyList();
+                    this.parserResults = Collections.emptyList();
+                    return;
                 }
             } else {
                 System.err.println(Localization.lang("The output option depends on a valid input option."));
@@ -275,7 +277,7 @@ public class ArgumentProcessor {
             doAuxImport(loaded);
         }
 
-        return loaded;
+        this.parserResults = loaded;
     }
 
     private void writeMetadataToPdf(List<ParserResult> loaded,
@@ -475,15 +477,14 @@ public class ArgumentProcessor {
                         Globals.entryTypesManager);
                 Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
                 if (exporter.isEmpty()) {
-                    System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
+                    System.err.println(Localization.lang("Unknown export format %0", formatName));
                 } else {
                     // We have an TemplateExporter instance:
                     try {
-                        System.out.println(Localization.lang("Exporting") + ": " + data[1]);
+                        System.out.println(Localization.lang("Exporting %0", data[1]));
                         exporter.get().export(databaseContext, Path.of(data[1]), matches, Collections.emptyList(), Globals.journalAbbreviationRepository);
                     } catch (Exception ex) {
-                        System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
-                                + Throwables.getStackTraceAsString(ex));
+                        System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", data[1], Throwables.getStackTraceAsString(ex)));
                     }
                 }
             }
@@ -503,7 +504,7 @@ public class ArgumentProcessor {
         }
 
         if (usageMsg) {
-            System.out.println(Localization.lang("no base-BibTeX-file specified") + "!");
+            System.out.println(Localization.lang("no base-BibTeX-file specified!"));
             System.out.println(Localization.lang("usage") + " :");
             System.out.println("jabref --aux infile[.aux],outfile[.bib] base-BibTeX-file");
         }
@@ -634,32 +635,31 @@ public class ArgumentProcessor {
         } else if (data.length == 2) {
             // This signals that the latest import should be stored in the given
             // format to the given file.
-            ParserResult pr = loaded.get(loaded.size() - 1);
+            ParserResult parserResult = loaded.get(loaded.size() - 1);
 
-            Path path = pr.getPath().get().toAbsolutePath();
-            BibDatabaseContext databaseContext = pr.getDatabaseContext();
+            Path path = parserResult.getPath().get().toAbsolutePath();
+            BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
             databaseContext.setDatabasePath(path);
             List<Path> fileDirForDatabase = databaseContext
                     .getFileDirectories(preferencesService.getFilePreferences());
-            System.out.println(Localization.lang("Exporting") + ": " + data[0]);
+            System.out.println(Localization.lang("Exporting %0", data[0]));
             ExporterFactory exporterFactory = ExporterFactory.create(
                     preferencesService,
                     Globals.entryTypesManager);
             Optional<Exporter> exporter = exporterFactory.getExporterByName(data[1]);
             if (exporter.isEmpty()) {
-                System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);
+                System.err.println(Localization.lang("Unknown export format %0", data[1]));
             } else {
                 // We have an exporter:
                 try {
                     exporter.get().export(
-                            pr.getDatabaseContext(),
+                            parserResult.getDatabaseContext(),
                             Path.of(data[0]),
-                            pr.getDatabaseContext().getDatabase().getEntries(),
+                            parserResult.getDatabaseContext().getDatabase().getEntries(),
                             fileDirForDatabase,
                             Globals.journalAbbreviationRepository);
                 } catch (Exception ex) {
-                    System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
-                            + Throwables.getStackTraceAsString(ex));
+                    System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", data[0], Throwables.getStackTraceAsString(ex)));
                 }
             }
         }

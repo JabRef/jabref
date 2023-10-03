@@ -5,17 +5,11 @@ on:
     - cron: '1 2 2,16 * *'
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   publish:
     name: Refresh Journal List Files
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # for peter-evans/create-pull-request to create branch
-      pull-requests: write  # for peter-evans/create-pull-request to create a PR
-    if: (github.repository == 'JabRef/jabref' || github.repository == 'koppor/jabref')
+    if: (github.repository == 'JabRef/jabref')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,10 +35,10 @@ jobs:
           cache: 'gradle'
       - name: Check whether journal-list.mv can be generated (the "real" generation is done inside JabRef's build process)
         run: |
-          ./gradlew generateJournalAbbreviationList
+          ./gradlew generateJournalListMV
       - uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
           branch: update-journal-lists
           title: "[Bot] Update journal abbreviation lists"
           commit-message: Update journal abbreviation lists

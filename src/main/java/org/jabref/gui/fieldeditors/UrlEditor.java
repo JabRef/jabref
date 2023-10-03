@@ -3,6 +3,8 @@ package org.jabref.gui.fieldeditors;
 import java.util.List;
 import java.util.function.Supplier;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -20,22 +22,25 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class UrlEditor extends HBox implements FieldEditorFX {
 
     @FXML private final UrlEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    public UrlEditor(Field field,
-                     DialogService dialogService,
-                     SuggestionProvider<?> suggestionProvider,
-                     FieldCheckers fieldCheckers,
-                     PreferencesService preferencesService) {
-        this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, preferencesService, fieldCheckers);
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
+    @Inject private UndoManager undoManager;
 
+    public UrlEditor(Field field,
+                     SuggestionProvider<?> suggestionProvider,
+                     FieldCheckers fieldCheckers) {
         ViewLoader.view(this)
                   .root(this)
                   .load();
+
+        this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, preferencesService, fieldCheckers, undoManager);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         Supplier<List<MenuItem>> contextMenuSupplier = EditorMenus.getCleanupUrlMenu(textArea);

@@ -14,6 +14,10 @@ from pathlib import Path
 # Note that the package structure is different when installed as a .app bundle on MacOs, so the path must be altered.
 script_dir = Path(__file__).resolve().parent.parent
 JABREF_PATH = script_dir / "bin/JabRef"
+
+# on mac we must only go one folder upwards
+if sys.platform.startswith('darwin'):
+    script_dir = Path(__file__).resolve().parent
 if not JABREF_PATH.exists():
     JABREF_PATH = script_dir / "MacOS/JabRef"
 

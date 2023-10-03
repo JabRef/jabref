@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -63,9 +65,10 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                       BibDatabaseContext databaseContext,
                                       TaskExecutor taskExecutor,
                                       FieldCheckers fieldCheckers,
-                                      PreferencesService preferences) {
+                                      PreferencesService preferences,
+                                      UndoManager undoManager) {
 
-        super(field, suggestionProvider, fieldCheckers);
+        super(field, suggestionProvider, fieldCheckers, undoManager);
 
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;

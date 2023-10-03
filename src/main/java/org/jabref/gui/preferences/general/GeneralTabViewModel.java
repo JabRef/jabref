@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.general;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,10 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Language;
@@ -40,31 +43,16 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
-    protected enum ThemeTypes {
-        LIGHT(Localization.lang("Light")),
-        DARK(Localization.lang("Dark")),
-        CUSTOM(Localization.lang("Custom..."));
-
-        private final String displayName;
-
-        ThemeTypes(String displayName) {
-            this.displayName = displayName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-    }
 
     protected static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
 
     private final ReadOnlyListProperty<Language> languagesListProperty =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.values()));;
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.values()));
     private final ObjectProperty<Language> selectedLanguageProperty = new SimpleObjectProperty<>();
 
     private final ReadOnlyListProperty<ThemeTypes> themesListProperty =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));;
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));
     private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
 
@@ -320,5 +308,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(backupDirectoryProperty().getValue())).build();
         dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
                      .ifPresent(dir -> backupDirectoryProperty.setValue(dir.toString()));
+    }
+
+    public void openBrowser() {
+        String url = "https://themes.jabref.org";
+        try {
+            JabRefDesktop.openBrowser(url, preferences.getFilePreferences());
+        } catch (IOException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
+        }
     }
 }

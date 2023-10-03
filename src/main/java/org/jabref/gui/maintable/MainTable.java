@@ -71,6 +71,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final CustomLocalDragboard localDragboard;
     private final ClipBoardManager clipBoardManager;
     private final BibEntryTypesManager entryTypesManager;
+    private final TaskExecutor taskExecutor;
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
@@ -94,6 +95,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.model = model;
         this.clipBoardManager = clipBoardManager;
         this.entryTypesManager = entryTypesManager;
+        this.taskExecutor = taskExecutor;
         UndoManager undoManager = libraryTab.getUndoManager();
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
@@ -118,7 +120,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         preferencesService.getMainTableColumnPreferences(),
                         libraryTab.getUndoManager(),
                         dialogService,
-                        stateManager).createColumns());
+                        stateManager,
+                        taskExecutor).createColumns());
 
         this.getColumns().removeIf(LibraryColumn.class::isInstance);
 
@@ -136,9 +139,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         preferencesService,
                         undoManager,
                         clipBoardManager,
-                        Globals.TASK_EXECUTOR,
+                        taskExecutor,
                         Globals.journalAbbreviationRepository,
-                        Globals.entryTypesManager))
+                        entryTypesManager))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -191,7 +194,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 preferencesService.getMainTableColumnPreferences(),
                 libraryTab.getUndoManager(),
                 dialogService,
-                stateManager);
+                stateManager,
+                taskExecutor);
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, rightClickMenuFactory).show(true);
@@ -417,7 +421,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // Center -> link files to entry
             // Depending on the pressed modifier, move/copy/link files to drop target
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP, BOTTOM -> importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
+                case TOP, BOTTOM -> importHandler.importFilesInBackground(files).executeWith(taskExecutor);
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
@@ -449,7 +453,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (event.getDragboard().hasFiles()) {
             List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-            importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
+            importHandler.importFilesInBackground(files).executeWith(taskExecutor);
 
             success = true;
         }

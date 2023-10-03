@@ -565,7 +565,16 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     public void init() {
-        sidePane = new SidePane(prefs, Globals.journalAbbreviationRepository, taskExecutor, dialogService, stateManager, undoManager);
+        sidePane = new SidePane(
+                this,
+                prefs,
+                Globals.journalAbbreviationRepository,
+                taskExecutor,
+                dialogService,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                undoManager);
         tabbedPane = new TabPane();
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
@@ -735,7 +744,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager);
+                undoManager,
+                taskExecutor);
 
         addTab(libraryTab, raisePanel);
     }

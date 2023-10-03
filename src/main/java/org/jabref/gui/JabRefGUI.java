@@ -220,7 +220,8 @@ public class JabRefGUI {
                             Globals.stateManager,
                             Globals.entryTypesManager,
                             fileUpdateMonitor,
-                            mainFrame.getUndoManager());
+                            mainFrame.getUndoManager(),
+                            Globals.TASK_EXECUTOR);
                 } catch (SQLException |
                         DatabaseNotSupportedException |
                         InvalidDBMSConnectionPropertiesException |
@@ -250,7 +251,7 @@ public class JabRefGUI {
         }
 
         for (ParserResult pr : failed) {
-            String message = Localization.lang("Error opening file '%0'.",
+            String message = Localization.lang("Error opening file '%0'",
                     pr.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
                     pr.getErrorMessage();
 

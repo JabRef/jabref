@@ -3,7 +3,8 @@ nav_order: 2
 ---
 # Contributing
 
-* After reading through this guide, check out some good first issues to contribute to by goind to our [list of good first issues](https://github.com/orgs/JabRef/projects/5/views/1).
+* After reading through this guide, check out some good first issues to contribute to by going to our [list of good first issues](https://github.com/orgs/JabRef/projects/5/views/1).
+  We offer small issues perfect for aspiring developers. These tasks provide an opportunity to learn how to set up your local workspace, create your first pull request on GitHub, and contribute towards solving minor problems or making small enhancements in JabRef. It is essential to note that the issues vary in difficulty. Some are simpler, while others are more complex. Our primary aim is to guide you through the code, ensuring that the understanding scope remains manageable. Sometimes, grasping the code might demand more effort than actually writing lines of code.
 * In case you are aiming to contribute other improvements, please head over to our [general JabRef contribution page](https://docs.jabref.org/faqcontributing).
 * In case you are an instructor and want to use **JabRef as a software engineering example**, please head to [https://devdocs.jabref.org/teaching](https://devdocs.jabref.org/teaching).
 

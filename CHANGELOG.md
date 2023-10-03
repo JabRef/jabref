@@ -11,16 +11,33 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added an error-specific message for when a download from a URL fails[#9826](https://github.com/JabRef/jabref/issues/9826).
+- We added the possibility to find (and add) papers that cite or are cited by a given paper. [#6187](https://github.com/JabRef/jabref/issues/6187)
+- We added an error-specific message for when a download from a URL fails. [#9826](https://github.com/JabRef/jabref/issues/9826)
+- We added support for customizing the citation command (e.g., `[@key1,@key2]`) when [pushing to external applications](https://docs.jabref.org/cite/pushtoapplications). [#10133](https://github.com/JabRef/jabref/issues/10133)
+- We added an integrity check for more special characters. [#8712](https://github.com/JabRef/jabref/issues/8712)
 - We added protected terms described as "Computer science". [#10222](https://github.com/JabRef/jabref/pull/10222)
+- We added a link "Get more themes..." in the preferences to that points to [themes.jabref.org](https://themes.jabref.org) allowing the user to download new themes. [#10243](https://github.com/JabRef/jabref/issues/10243)
+- We added a fetcher for [LOBID](https://lobid.org/resources/api) resources. [koppor#386](https://github.com/koppor/jabref/issues/386)
+- When in `biblatex` mode, the [integrity check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) for journal titles now also checks the field `journal`.
+- We added support for pushing citations to [TeXShop](https://pages.uoregon.edu/koch/texshop/) on macOS [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699).
 
 ### Changed
+
+- The export formats `listrefs`, `tablerefs`, `tablerefsabsbib`, now use the ISO date format in the footer [#10383](https://github.com/JabRef/jabref/pull/10383).
+- When searching for an identifier in the "Web search", the title of the search window is now "Identifier-based Web Search". [#10391](https://github.com/JabRef/jabref/pull/10391)
+- The ampersand checker now skips verbatim fields (`file`, `url`, ...). [#10419](https://github.com/JabRef/jabref/pull/10419)
 
 ### Fixed
 
 - It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
 - Passwords can be stored in GNOME key ring. [#10274](https://github.com/JabRef/jabref/issues/10274)
-- We fixed an issue were  groups based on an aux file could not be created due to an exception [#10350](https://github.com/JabRef/jabref/issues/10352)
+- We fixed an issue where groups based on an aux file could not be created due to an exception [#10350](https://github.com/JabRef/jabref/issues/10350)
+- We fixed an issue where the JabRef browser extension could not communicate with JabRef under macOS due to missing files. You should use the `.pkg` for the first installation as it updates all necessary files for the extension [#10308](https://github.com/JabRef/jabref/issues/10308)
+- We fixed an issue where the ISBN fetcher returned the entrytype `misc` for certain ISBN numbers [#10348](https://github.com/JabRef/jabref/issues/10348)
+- We fixed a bug where an exception was raised when saving less than three export save orders in the preference. [#10157](https://github.com/JabRef/jabref/issues/10157)
+- We fixed an issue where it was possible to create a group with no name or with a group separator inside the name [#9776](https://github.com/JabRef/jabref/issues/9776)
+- Biblatex's `journaltitle` is now also respected for showing the journal information. [#10397](https://github.com/JabRef/jabref/issues/10397)
+- JabRef does not hang anymore when exporting via CLI. [#10380](https://github.com/JabRef/jabref/issues/10380)
 
 ### Removed
 
@@ -61,6 +78,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the option to automatically replaces illegal characters in the filename when adding a file to JabRef. [#10182](https://github.com/JabRef/jabref/issues/10182)
 - We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
 - We added a tooltip to show the number of entries in a group [#10208](https://github.com/JabRef/jabref/issues/10208)
+- We fixed an issue where it was no longer possible to add or remove selected entries to groups via context menu [#10404](https://github.com/JabRef/jabref/issues/10404), [#10317](https://github.com/JabRef/jabref/issues/10317) [#10374](https://github.com/JabRef/jabref/issues/10374)
+- We fixed an issue where "Move URL in note field to url field" in the cleanup dialog caused an exception if no note field was present [forum#3999](https://discourse.jabref.org/t/cleanup-entries-cant-get-it-to-work/3999)
 
 ### Changed
 

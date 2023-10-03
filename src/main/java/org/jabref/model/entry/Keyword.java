@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.model.ChainNode;
-import org.jabref.model.util.OptionalUtil;
 
 /**
  * Represents a keyword in a chain of keywords.
@@ -108,10 +107,11 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      * E.g, for "A > B > C" we get {"A", "B", "C"}.
      */
     public Set<Keyword> flatten() {
-        return Stream.concat(
-                Stream.of(this),
-                OptionalUtil.toStream(getChild()).flatMap(child -> child.flatten().stream()))
-                     .collect(Collectors.toSet());
+        return Stream
+                .concat(Stream.of(this),
+                        getChild().stream()
+                                  .flatMap(child -> child.flatten().stream()))
+                .collect(Collectors.toSet());
     }
 
     /**

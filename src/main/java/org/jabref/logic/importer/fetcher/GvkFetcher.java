@@ -56,6 +56,8 @@ public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParser
         uriBuilder.addParameter("maximumRecords", "50");
         uriBuilder.addParameter("recordSchema", "picaxml");
         uriBuilder.addParameter("sortKeys", "Year,,1");
+
+        LOGGER.debug("Using URL {}", uriBuilder.build());
         return uriBuilder.build().toURL();
     }
 
@@ -69,6 +71,8 @@ public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParser
         uriBuilder.addParameter("maximumRecords", "50");
         uriBuilder.addParameter("recordSchema", "picaxml");
         uriBuilder.addParameter("sortKeys", "Year,,1");
+
+        LOGGER.debug("Using URL {}", uriBuilder.build());
         return uriBuilder.build().toURL();
     }
 

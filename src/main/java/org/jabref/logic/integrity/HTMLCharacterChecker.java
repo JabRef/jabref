@@ -1,14 +1,10 @@
 package org.jabref.logic.integrity;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 
 /**
@@ -20,19 +16,10 @@ public class HTMLCharacterChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        List<IntegrityMessage> results = new ArrayList<>();
-        for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
-            // skip verbatim fields
-            if (field.getKey().getProperties().contains(FieldProperty.VERBATIM)) {
-                continue;
-            }
-
-            Matcher characterMatcher = HTML_CHARACTER_PATTERN.matcher(field.getValue());
-            if (characterMatcher.find()) {
-                results.add(
-                        new IntegrityMessage(Localization.lang("HTML encoded character found"), entry, field.getKey()));
-            }
-        }
-        return results;
+        return entry.getFieldMap().entrySet().stream()
+                    .filter(field -> !field.getKey().getProperties().contains(FieldProperty.VERBATIM))
+                    .filter(field -> HTML_CHARACTER_PATTERN.matcher(field.getValue()).find())
+                    .map(field -> new IntegrityMessage(Localization.lang("HTML encoded character found"), entry, field.getKey()))
+                    .toList();
     }
 }
