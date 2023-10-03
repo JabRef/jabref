@@ -1,31 +1,29 @@
 package org.jabref.gui.push;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.StreamGobbler;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PushToSublimeText extends AbstractPushToApplication {
+public class PushToTexShop extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.SUBLIME_TEXT;
+    public static final String NAME = PushToApplications.TEXSHOP;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushToTexShop.class);
 
-    public PushToSublimeText(DialogService dialogService, PreferencesService preferencesService) {
+    public PushToTexShop(DialogService dialogService, PreferencesService preferencesService) {
         super(dialogService, preferencesService);
     }
 
@@ -36,7 +34,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     @Override
     public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_SUBLIMETEXT;
+        return IconTheme.JabRefIcons.APPLICATION_GENERIC;
     }
 
     @Override
@@ -47,18 +45,10 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
         commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
-        // Check if a path to the command has been specified
-        if (StringUtil.isNullOrEmpty(commandPath)) {
-            notDefined = true;
-            return;
-        }
         try {
-            LOGGER.debug("Sublime string: {}", String.join(" ", getCommandLine(keyString)));
+            LOGGER.debug("TexShop string: {}", String.join(" ", getCommandLine(keyString)));
             ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
             processBuilder.inheritIO();
-            Map<String, String> envs = processBuilder.environment();
-            envs.put("PATH", Path.of(commandPath).getParent().toString());
-
             Process process = processBuilder.start();
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::info);
             StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::info);
@@ -79,11 +69,17 @@ public class PushToSublimeText extends AbstractPushToApplication {
             citeCommand = "\"\\" + getCitePrefix();
         }
 
-        if (OS.WINDOWS) {
-            // TODO we might need to escape the inner double quotes with """ """
-            return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCitePrefix() + keyString + getCiteSuffix() + "\"}\""};
+        String osascriptTexShop = "osascript -e 'tell application \"TeXShop\"\n" +
+                "activate\n" +
+                "set TheString to " + citeCommand + keyString + getCiteSuffix() + "\"\n" +
+                "set content of selection of front document to TheString\n" +
+                "end tell'";
+
+        if (OS.OS_X) {
+            return new String[] {"sh", "-c", osascriptTexShop};
         } else {
-            return new String[] {"sh", "-c", "\"" + commandPath + "\"" + " --command 'insert {\"characters\": \"" + citeCommand + keyString + getCiteSuffix() + "\"}'"};
+            dialogService.showInformationDialogAndWait(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
+            return new String[] {};
         }
     }
 }
