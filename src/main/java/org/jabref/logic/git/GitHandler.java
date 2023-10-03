@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 
@@ -21,6 +22,9 @@ import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.airhacks.afterburner.injection.Injector;
+
 import org.eclipse.jgit.transport.CredentialsProvider;
 
 /**
@@ -34,6 +38,7 @@ public class GitHandler {
     String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
     String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
     final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    private DialogService dialogService;
 
     /**
      * Initialize the handler for the given repository
@@ -43,6 +48,7 @@ public class GitHandler {
     public GitHandler(Path repositoryPath) {
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
+        this.dialogService = Injector.instantiateModelOrService(DialogService.class);
         if (!isGitRepository()) {
             try {
                 Git.init()
@@ -209,20 +215,16 @@ public class GitHandler {
         this.checkoutBranch(currentBranch);
     }
 
-     public void pushCommitsToRemoteRepository() throws IOException, GitAPIException {
-        pushCommitsToRemoteRepository(null);
-     }
-
     /**
      * Pushes all commits made to the branch that is tracked by the currently checked out branch.
      * If pushing to remote fails, it fails silently.
      */
-    public void pushCommitsToRemoteRepository(DialogService dialogService) {
+    public void pushCommitsToRemoteRepository() {
         try {
             Git git = Git.open(this.repositoryPathAsFile);
             String remoteURL = git.getRepository().getConfig().getString("remote", "origin", "url");
             Boolean isSshRemoteRepository = remoteURL != null ? remoteURL.contains(".git") : false;
-            
+
             git.verifySignature();
 
             if (isSshRemoteRepository) {

@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.l10n.Localization;
-
+import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class SaveGitDatabaseAction {
@@ -15,9 +16,9 @@ public class SaveGitDatabaseAction {
 
     private final DialogService dialogService;
 
-    public SaveGitDatabaseAction(Path filePath, DialogService dialogService) {
+    public SaveGitDatabaseAction(Path filePath) {
         this.filePath = filePath;
-        this.dialogService = dialogService;
+        this.dialogService = Injector.instantiateModelOrService(DialogService.class);
     }
 
     /**
@@ -29,7 +30,7 @@ public class SaveGitDatabaseAction {
         try {
             GitHandler git = new GitHandler(filePath.getParent());
             git.createCommitWithSingleFileOnCurrentBranch(automaticCommitMsg, filePath.getFileName().toString(), false);
-            git.pushCommitsToRemoteRepository(this.dialogService);
+            git.pushCommitsToRemoteRepository();
         } catch (
                 GitAPIException |
                 IOException e) {
