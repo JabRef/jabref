@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.git.GitHandler;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,11 +15,8 @@ public class SaveGitDatabaseAction {
     final Path filePath;
     final String automaticCommitMsg = "Automatic update via JabRef";
 
-    private final DialogService dialogService;
-
     public SaveGitDatabaseAction(Path filePath) {
         this.filePath = filePath;
-        this.dialogService = Injector.instantiateModelOrService(DialogService.class);
     }
 
     /**
@@ -30,13 +26,16 @@ public class SaveGitDatabaseAction {
     */
     public boolean automaticUpdate() {
         try {
-            GitHandler git = new GitHandler(filePath.getParent());
-            git.createCommitWithSingleFileOnCurrentBranch(automaticCommitMsg, filePath.getFileName().toString(), false);
+            System.out.println(this.filePath.getParent());
+            System.out.println(this.filePath.getFileName().toString());
+            GitHandler git = new GitHandler(this.filePath.getParent());
+            git.createCommitWithSingleFileOnCurrentBranch(this.filePath.getFileName().toString(), automaticCommitMsg, false);
             git.pushCommitsToRemoteRepository();
         } catch (
                 GitAPIException |
                 IOException e) {
-            LOGGER.info("Failed to automatic update");
+                    System.out.println(e.getMessage());
+            LOGGER.info("Failed to automatic git update");
         }
 
         return true;

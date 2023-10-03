@@ -17,6 +17,8 @@ import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -160,31 +162,38 @@ public class GitHandler {
      * @param filename The name of the file to commit
      * @param amend Whether to amend to the last commit (true), or not (false)
      * @return Returns true if a new commit was created. This is the case if the repository was not clean on method invocation
+     * @throws IOException
+     * @throws GitAPIException
+     * @throws NoWorkTreeException
      */
-    public boolean createCommitWithSingleFileOnCurrentBranch(String filename, String commitMessage, boolean amend) throws IOException, GitAPIException {
+    public boolean createCommitWithSingleFileOnCurrentBranch(String filename, String commitMessage, boolean amend) throws IOException, NoWorkTreeException, GitAPIException {
         boolean commitCreated = false;
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Status status = git.status().call();
-            if (!status.isClean()) {
-                commitCreated = true;
-                // Add new and changed files to index
-                git.add()
-                   .addFilepattern(filename)
-                   .call();
-                // Add all removed files to index
-                if (!status.getMissing().isEmpty()) {
-                    RmCommand removeCommand = git.rm()
-                                                 .setCached(true);
-                    status.getMissing().forEach(removeCommand::addFilepattern);
-                    removeCommand.call();
-                }
-                git.commit()
-                   .setAmend(amend)
-                   .setAllowEmpty(false)
-                   .setMessage(commitMessage)
-                   .call();
+        
+        Git git = Git.open(this.repositoryPathAsFile);
+        Status status = git.status().call();
+        if (!status.isClean()) {
+            commitCreated = true;
+  
+            // Add new and changed files to index
+            git.add()
+                .addFilepattern(filename)
+                .call();
+
+            // Add all removed files to index
+            if (!status.getMissing().isEmpty()) {
+                RmCommand removeCommand = git.rm()
+                                                .setCached(true);
+                                                System.out.println("1----");
+                status.getMissing().forEach(removeCommand::addFilepattern);
+                removeCommand.call();
             }
+            git.commit()
+                .setAmend(amend)
+                .setAllowEmpty(false)
+                .setMessage(commitMessage)
+                .call();
         }
+        
         return commitCreated;
     }
 
@@ -220,7 +229,7 @@ public class GitHandler {
         try {
             Git git = Git.open(this.repositoryPathAsFile);
             String remoteURL = git.getRepository().getConfig().getString("remote", "origin", "url");
-            Boolean isSshRemoteRepository = remoteURL != null ? remoteURL.contains(".git") : false;
+            Boolean isSshRemoteRepository = remoteURL != null ? remoteURL.contains("git@") : false;
 
             git.verifySignature();
 
