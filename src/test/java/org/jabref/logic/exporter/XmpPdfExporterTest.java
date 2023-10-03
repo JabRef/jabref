@@ -183,7 +183,7 @@ class XmpPdfExporterTest {
                 contentStream.beginText();
                 contentStream.newLineAtOffset(25, 500);
                 contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.showText("This PDF was created by JabRef. It demonstrates the embedding of BibTeX data in PDF files. Please open the file attachments view of your PDF viewer to see the attached files. Note that the normal usage is to embed the BibTeX data in an existing PDF.");
+                contentStream.showText("This PDF was created by JabRef. It demonstrates the embedding of XMP data in PDF files. Please open the file metadata view of your PDF viewer to see the attached files. Note that the normal usage is to embed the BibTeX data in an existing PDF.");
                 contentStream.endText();
             }
             document.save(path.toString());

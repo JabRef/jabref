@@ -26,6 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The export formats `listrefs`, `tablerefs`, `tablerefsabsbib`, now use the ISO date format in the footer [#10383](https://github.com/JabRef/jabref/pull/10383).
 - When searching for an identifier in the "Web search", the title of the search window is now "Identifier-based Web Search". [#10391](https://github.com/JabRef/jabref/pull/10391)
 - The ampersand checker now skips verbatim fields (`file`, `url`, ...). [#10419](https://github.com/JabRef/jabref/pull/10419)
+- If no existing document is selected for exporting "XMP annotated pdf" JabRef will now create a new PDF file with a sample text and the metadata. [#10102](https://github.com/JabRef/jabref/issues/10102)
 
 ### Fixed
 
@@ -38,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where it was possible to create a group with no name or with a group separator inside the name [#9776](https://github.com/JabRef/jabref/issues/9776)
 - Biblatex's `journaltitle` is now also respected for showing the journal information. [#10397](https://github.com/JabRef/jabref/issues/10397)
 - JabRef does not hang anymore when exporting via CLI. [#10380](https://github.com/JabRef/jabref/issues/10380)
+- We fixed an issue where exporting "XMP annotated pdf" without selecting an existing document would produce an exception. [#10102](https://github.com/JabRef/jabref/issues/10102)
 
 ### Removed
 
