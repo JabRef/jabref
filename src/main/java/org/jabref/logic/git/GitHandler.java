@@ -8,10 +8,10 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
@@ -19,13 +19,10 @@ import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.airhacks.afterburner.injection.Injector;
-
-import org.eclipse.jgit.transport.CredentialsProvider;
 
 /**
  * This class handles the updating of the local and remote git repository that is located at the repository path
@@ -34,7 +31,7 @@ import org.eclipse.jgit.transport.CredentialsProvider;
 public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
-    final File repositoryPathAsFile; 
+    final File repositoryPathAsFile;
     String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
     String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
     final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
@@ -256,7 +253,7 @@ public class GitHandler {
                     .call();
                 }
             }
-            
+
         } catch (IOException | GitAPIException e) {
             if (e.getMessage().equals("origin: not found.")) {
                 LOGGER.info("No remote repository detected. Push skiped.");

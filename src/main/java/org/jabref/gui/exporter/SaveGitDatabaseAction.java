@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.logic.git.GitHandler;
-import org.jabref.logic.l10n.Localization;
+
 import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SaveGitDatabaseAction {
+    static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path filePath;
     final String automaticCommitMsg = "Automatic update via JabRef";
 
@@ -34,8 +36,7 @@ public class SaveGitDatabaseAction {
         } catch (
                 GitAPIException |
                 IOException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), e);
-            throw new RuntimeException(e);
+            LOGGER.info("Failed to automatic update");
         }
 
         return true;
