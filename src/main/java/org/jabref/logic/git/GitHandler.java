@@ -8,10 +8,22 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.git.GitCredentialsDialogView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 
 import com.airhacks.afterburner.injection.Injector;
+
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
@@ -240,12 +252,25 @@ public class GitHandler {
                .call();
             } else {
                 if (this.gitPassword.equals("") || this.gitUsername.equals("")) {
-                    String gitUsername = "";
-                    String gitPassword = "";
-
                     if (dialogService != null) {
-                        gitUsername = dialogService.showInputDialogAndWait(Localization.lang("Git credentials"), Localization.lang("git username")).get();
-                        gitPassword = dialogService.showPasswordDialogAndWait(Localization.lang("Git credentials"), Localization.lang("password"), Localization.lang("password")).get();
+                        DialogPane pane = new DialogPane();
+                        VBox vBox = new VBox();
+                        TextField inputGitUsername = new TextField();
+                        PasswordField inputGitPassword = new PasswordField();
+                        ButtonType accept = new ButtonType(Localization.lang("Accept"), ButtonBar.ButtonData.APPLY);
+                        ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                        vBox.getChildren().add(new Label(Localization.lang("Git username")));
+                        vBox.getChildren().add(inputGitUsername);
+                        vBox.getChildren().add(new Label(Localization.lang("Git password")));
+                        vBox.getChildren().add(inputGitPassword);
+
+                        pane.setContent(vBox);
+                        
+                        dialogService.showCustomDialogAndWait(Localization.lang("Git credentials"), pane, accept, cancel);
+
+                        String gitUsername = inputGitUsername.getText();
+                        String gitPassword = inputGitPassword.getText();
 
                         CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
 
