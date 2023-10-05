@@ -13,7 +13,7 @@ plugins {
 
     id 'org.openjfx.javafxplugin' version '0.1.0'
 
-    id 'org.beryx.jlink' version '2.26.0'
+    id 'org.beryx.jlink' version '3.0.0'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
@@ -27,7 +27,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.3.8'
+    id 'org.openrewrite.rewrite' version '6.3.16'
 }
 
 // Enable following for debugging
@@ -115,15 +115,15 @@ dependencies {
     implementation 'org.apache.pdfbox:fontbox:3.0.0'
     implementation 'org.apache.pdfbox:xmpbox:3.0.0'
 
-    implementation 'org.apache.lucene:lucene-core:9.7.0'
-    implementation 'org.apache.lucene:lucene-queryparser:9.7.0'
-    implementation 'org.apache.lucene:lucene-queries:9.7.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.7.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.7.0'
+    implementation 'org.apache.lucene:lucene-core:9.8.0'
+    implementation 'org.apache.lucene:lucene-queryparser:9.8.0'
+    implementation 'org.apache.lucene:lucene-queries:9.8.0'
+    implementation 'org.apache.lucene:lucene-analysis-common:9.8.0'
+    implementation 'org.apache.lucene:lucene-highlighter:9.8.0'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.13.0'
-    implementation 'com.h2database:h2-mvstore:2.2.222'
+    implementation 'com.h2database:h2-mvstore:2.2.224'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.76'
@@ -170,7 +170,7 @@ dependencies {
     implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
     implementation 'org.fxmisc.flowless:flowless:0.7.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.1'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.77.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.82.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude group: 'org.apache.logging.log4j'
     }
@@ -193,8 +193,8 @@ dependencies {
     }
 
     // jakarta.activation is already dependency of glassfish
-    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
+    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.1'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.3'
 
     implementation ('com.github.tomtung:latex2unicode_2.13:0.3.2') {
         exclude module: 'fastparse_2.13'
@@ -219,7 +219,7 @@ dependencies {
     // API
     implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
     // Implementation of the API
-    implementation 'org.glassfish.jersey.core:jersey-server:3.1.1'
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.3'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.3'
     implementation 'org.glassfish.hk2:hk2-api:3.0.4'
