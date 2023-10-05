@@ -70,7 +70,7 @@ public class DoiCleanup implements CleanupJob {
                     removeFieldValue(entry, field, changes);
                 }
 
-                if (StandardField.EPRINT == field && fieldContentOpt.isPresent()) {
+                if (StandardField.EPRINT == field) {
                     fieldContentOpt.flatMap(ArXivIdentifier::parse)
                                    .flatMap(ArXivIdentifier::inferDOI)
                                    .ifPresent(inferredDoi -> {
