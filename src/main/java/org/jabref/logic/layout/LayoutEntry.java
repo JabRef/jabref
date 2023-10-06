@@ -55,7 +55,6 @@ import org.jabref.logic.layout.format.GetOpenOfficeType;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.HTMLParagraphs;
 import org.jabref.logic.layout.format.HayagrivaType;
-import org.jabref.logic.layout.format.HayagrivayamlAuthors;
 import org.jabref.logic.layout.format.IfPlural;
 import org.jabref.logic.layout.format.Iso690FormatDate;
 import org.jabref.logic.layout.format.Iso690NamesAuthors;
@@ -486,7 +485,6 @@ class LayoutEntry {
             case "CSLType" -> new CSLType();
             case "ShortMonth" -> new ShortMonthFormatter();
             case "ReplaceWithEscapedDoubleQuotes" -> new ReplaceWithEscapedDoubleQuotes();
-            case "HayagrivayamlAuthors" -> new HayagrivayamlAuthors();
             case "HayagrivaType" -> new HayagrivaType();
             default -> null;
         };

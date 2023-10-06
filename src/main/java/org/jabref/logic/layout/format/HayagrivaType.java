@@ -10,9 +10,12 @@ public class HayagrivaType implements LayoutFormatter {
         return switch (StandardEntryType.valueOf(value)) {
             case Article, Conference -> "article";
             case Book -> "book";
+            case InBook -> "chapter";
             case Report, TechReport -> "report";
             case Thesis, MastersThesis, PhdThesis -> "thesis";
             case WWW, Online -> "web";
+            case Proceedings -> "proceedings";
+            case Reference -> "reference";
 
             default -> "Misc";
         };
