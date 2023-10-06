@@ -1,0 +1,8 @@
+\citationkey:
+\begin{entrytype}  type: \format[HayagrivaType]{\entrytype}\end{entrytype}
+\begin{title}  title: "\title"\end{title}
+\begin{author}  author: \format[HayagrivayamlAuthors]{\author}\end{author}
+\begin{date}  date: \date\end{date}
+\begin{volume}  volume: \volume\end{volume}
+\begin{url}  url: \url\end{url}
+\begin{doi}  doi: "\doi"\end{doi}
