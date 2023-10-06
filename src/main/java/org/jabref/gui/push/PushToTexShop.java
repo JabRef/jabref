@@ -34,7 +34,7 @@ public class PushToTexShop extends AbstractPushToApplication {
 
     @Override
     public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_GENERIC;
+        return IconTheme.JabRefIcons.APPLICATION_TEXSHOP;
     }
 
     @Override

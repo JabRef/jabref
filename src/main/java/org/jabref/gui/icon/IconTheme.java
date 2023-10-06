@@ -277,6 +277,7 @@ public class IconTheme {
         APPLICATION_VIM(JabRefMaterialDesignIcon.VIM),
         APPLICATION_WINEDT(JabRefMaterialDesignIcon.WINEDT),
         APPLICATION_SUBLIMETEXT(JabRefMaterialDesignIcon.SUBLIME_TEXT),
+        APPLICATION_TEXSHOP(JabRefMaterialDesignIcon.TEXSHOP),
         KEY_BINDINGS(MaterialDesignK.KEYBOARD),
         FIND_DUPLICATES(MaterialDesignC.CODE_EQUAL),
         CONNECT_DB(MaterialDesignC.CLOUD_UPLOAD),
@@ -351,7 +352,6 @@ public class IconTheme {
         ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
         ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
         MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE);
-
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {
