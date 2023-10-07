@@ -109,6 +109,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
                 try {
                     temporaryFileLock = stream.getChannel().tryLock();
                 } catch (IOException ex) {
+                    // workaround for https://bugs.openjdk.org/browse/JDK-8167023
                     LOGGER.warn("Could not acquire file lock. Maybe we are on a network drive?", ex);
                     temporaryFileLock = null;
                 }
