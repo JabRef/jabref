@@ -4,17 +4,16 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class GitPreferences {
-    private final StringProperty username;
-    private final StringProperty password;
+    private StringProperty username = new SimpleStringProperty();
+    private StringProperty password = new SimpleStringProperty();
 
-    public GitPreferences(String username,
-                          String password) {
-        this.username = new SimpleStringProperty(username);
-        this.password = new SimpleStringProperty(password);
+    public GitPreferences(String username, String password) {
+        //this.username.setValue(username);
+        //this.password.set(password);
     }
 
-    public final String getUsername() {
-        return username.getValue();
+    public String getUsername() {
+        return username.toString();
     }
 
     public StringProperty usernameProperty() {

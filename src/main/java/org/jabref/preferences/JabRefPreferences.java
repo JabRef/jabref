@@ -69,6 +69,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
@@ -375,6 +376,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROXY_PASSWORD = "proxyPassword";
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
 
+    // Git
+    private static final String GIT_USERNAME = "gitUsername";
+
     // Web search
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
@@ -482,6 +486,7 @@ public class JabRefPreferences implements PreferencesService {
     private ColumnPreferences searchDialogColumnPreferences;
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
+    private GitPreferences gitPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -2795,6 +2800,22 @@ public class JabRefPreferences implements PreferencesService {
         return protectedTermsPreferences;
     }
 
+    @Override
+    public GitPreferences getGitPreferences() {
+        if (Objects.nonNull(gitPreferences)) {
+            return gitPreferences;
+        }
+
+        gitPreferences = new GitPreferences(
+                get(GIT_USERNAME),
+                getGitPassword());
+
+        return gitPreferences;
+    }
+
+    private String getGitPassword() {
+        return "";
+    }
     //*************************************************************************************************************
     // Importer preferences
     //*************************************************************************************************************
