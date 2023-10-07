@@ -250,45 +250,25 @@ public class GitHandler {
                 git.push()
                .setTransportConfigCallback(transportConfigCallback)
                .call();
-            } else {
-                if (this.gitPassword.equals("") || this.gitUsername.equals("")) {
-                    if (dialogService != null) {
-                        DialogPane pane = new DialogPane();
-                        VBox vBox = new VBox();
-                        TextField inputGitUsername = new TextField();
-                        PasswordField inputGitPassword = new PasswordField();
-                        ButtonType accept = new ButtonType(Localization.lang("Accept"), ButtonBar.ButtonData.APPLY);
-                        ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+            } else if (this.gitPassword.equals("") || this.gitUsername.equals("")) {
+                    GitCredentialsDialogView gitCredentialsDialogView = new GitCredentialsDialogView();
 
-                        vBox.getChildren().add(new Label(Localization.lang("Git username")));
-                        vBox.getChildren().add(inputGitUsername);
-                        vBox.getChildren().add(new Label(Localization.lang("Git password")));
-                        vBox.getChildren().add(inputGitPassword);
+                    gitCredentialsDialogView.showGitCredentialsDialog();
 
-                        pane.setContent(vBox);
-                        
-                        dialogService.showCustomDialogAndWait(Localization.lang("Git credentials"), pane, accept, cancel);
+                    CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(
+                        gitCredentialsDialogView.getGitUsername(),
+                        gitCredentialsDialogView.getGitPassword()
+                    );
 
-                        String gitUsername = inputGitUsername.getText();
-                        String gitPassword = inputGitPassword.getText();
-
-                        CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
-
-                        git.push()
-                        .setCredentialsProvider(credentialsProvider)
-                        .call();
-                    } else {
-                        git.push()
-                        .call();
-                    }
+                    git.push()
+                    .setCredentialsProvider(credentialsProvider)
+                    .call();
                 } else {
                     git.push()
                     .setCredentialsProvider(this.credentialsProvider)
                     .call();
                 }
-            }
-
-        } catch (IOException | GitAPIException e) {
+            } catch (IOException | GitAPIException e) {
             if (e.getMessage().equals("origin: not found.")) {
                 LOGGER.info("No remote repository detected. Push skiped.");
             } else {
