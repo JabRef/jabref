@@ -40,6 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where it was possible to create a group with no name or with a group separator inside the name [#9776](https://github.com/JabRef/jabref/issues/9776)
 - Biblatex's `journaltitle` is now also respected for showing the journal information. [#10397](https://github.com/JabRef/jabref/issues/10397)
 - JabRef does not hang anymore when exporting via CLI. [#10380](https://github.com/JabRef/jabref/issues/10380)
+- We fixed an issue where it was not possible to save a library on a network share under macOS due to an exception when acquiring a file lock [#10452](https://github.com/JabRef/jabref/issues/10452)
 - We fixed an issue where exporting "XMP annotated pdf" without selecting an existing document would produce an exception. [#10102](https://github.com/JabRef/jabref/issues/10102)
 
 ### Removed
