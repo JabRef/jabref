@@ -42,6 +42,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - JabRef does not hang anymore when exporting via CLI. [#10380](https://github.com/JabRef/jabref/issues/10380)
 - We fixed an issue where it was not possible to save a library on a network share under macOS due to an exception when acquiring a file lock [#10452](https://github.com/JabRef/jabref/issues/10452)
 - We fixed an issue where exporting "XMP annotated pdf" without selecting an existing document would produce an exception. [#10102](https://github.com/JabRef/jabref/issues/10102)
+- We fixed an issue where the "Enabled" column in the "Protected terms files" tab in the preferences could not be resized [#10285](https://github.com/JabRef/jabref/issues/10285)
+
 
 ### Removed
 
@@ -306,6 +308,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the CSS styles are missing in some dialogs. [#9150](https://github.com/JabRef/jabref/pull/9150)
 - We fixed an issue where controls in the preferences dialog could outgrow the window. [#9017](https://github.com/JabRef/jabref/issues/9017)
 - We fixed an issue where highlighted text color for entry merge dialogue was not clearly visible. [#9192](https://github.com/JabRef/jabref/issues/9192)
+
 
 ### Removed
 
