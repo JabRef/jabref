@@ -330,6 +330,7 @@ class LinkedFileViewModelTest {
     }
 
     @Test
+    @FetcherTest
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
         // Needed Mockito stubbing methods to run test
