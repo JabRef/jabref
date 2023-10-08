@@ -15,11 +15,11 @@
 
     <TableView fx:id="filesTable" editable="true" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="filesTableEnabledColumn" text="%Enabled" minWidth="80" maxWidth="60"/>
+            <TableColumn fx:id="filesTableEnabledColumn" text="%Enabled" minWidth="90" prefWidth="70" />
             <TableColumn fx:id="filesTableDescriptionColumn" text="%Description"/>
             <TableColumn fx:id="filesTableFileColumn" text="%File"/>
-            <TableColumn fx:id="filesTableEditColumn" maxWidth="25.0" minWidth="25.0" reorderable="false"/>
-            <TableColumn fx:id="filesTableDeleteColumn" maxWidth="25.0" minWidth="25.0" reorderable="false"/>
+            <TableColumn fx:id="filesTableEditColumn" maxWidth="35.0" minWidth="35.0" reorderable="false"/>
+            <TableColumn fx:id="filesTableDeleteColumn" maxWidth="35.0" minWidth="35.0" reorderable="false"/>
         </columns>
         <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
