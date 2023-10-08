@@ -36,9 +36,12 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
 
     private final ExternalFileTypeItemViewModel item;
 
+    private final boolean isNewItem;
     private EditExternalFileTypeViewModel viewModel;
 
     public EditExternalFileTypeEntryDialog(ExternalFileTypeItemViewModel item, String dialogTitle) {
+        this.isNewItem = (item.extensionProperty().get().equals("")) ? true : false;
+
         this.item = item;
 
         this.setTitle(dialogTitle);
@@ -50,6 +53,8 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storeSettings();
+            } else {
+                name.setText("");
             }
             return null;
         });
@@ -67,6 +72,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         btnBrowse.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
 
         extension.textProperty().bindBidirectional(viewModel.extensionProperty());
+        extension.setEditable(isNewItem);
         name.textProperty().bindBidirectional(viewModel.nameProperty());
         mimeType.textProperty().bindBidirectional(viewModel.mimeTypeProperty());
         selectedApplication.textProperty().bindBidirectional(viewModel.selectedApplicationProperty());

@@ -56,8 +56,10 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
 
     public void addNewType() {
         ExternalFileTypeItemViewModel item = new ExternalFileTypeItemViewModel();
-        fileTypes.add(item);
         showEditDialog(item, Localization.lang("Add new file type"));
+        if (item.getName() != "") {
+            fileTypes.add(item);
+        }
     }
 
     public ObservableList<ExternalFileTypeItemViewModel> getFileTypes() {
