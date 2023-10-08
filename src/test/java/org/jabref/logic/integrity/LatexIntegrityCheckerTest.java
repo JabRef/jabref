@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -22,9 +21,9 @@ public class LatexIntegrityCheckerTest {
 
     @ParameterizedTest
     @MethodSource("provideAcceptedInputs")
-    void acceptsAllowedInputs(List<IntegrityMessage> expected, Field field, String value) {
+    void acceptsAllowedInputs(Field field, String value) {
         entry.setField(field, value);
-        assertEquals(expected, checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     /**
@@ -34,88 +33,103 @@ public class LatexIntegrityCheckerTest {
     private static Stream<Arguments> provideAcceptedInputs() {
         return Stream.of(
                 // Basic text inputs
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "Simple Text"),
+                Arguments.of(StandardField.TITLE, "Simple Text"),
 
                 // Simple commands
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\section{X}"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\newline"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\par"),
+                Arguments.of(StandardField.TITLE, "\\section{X}"),
+                Arguments.of(StandardField.TITLE, "\\newline"),
+                Arguments.of(StandardField.TITLE, "\\par"),
 
                 // Text decorations
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\underline{Underlined}"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\texttt{Monospace}"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\textit{Italic}"),
+                Arguments.of(StandardField.TITLE, "\\underline{Underlined}"),
+                Arguments.of(StandardField.TITLE, "\\texttt{Monospace}"),
+                Arguments.of(StandardField.TITLE, "\\textit{Italic}"),
 
                 // Special characters and symbols
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "Café"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "αβγδε"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\# \\$ \\% \\& \\{ \\} \\_ \\^ \\\\"),
+                Arguments.of(StandardField.TITLE, "Café"),
+                Arguments.of(StandardField.TITLE, "αβγδε"),
+                Arguments.of(StandardField.TITLE, "\\# \\$ \\% \\& \\{ \\} \\_ \\^ \\\\"),
 
                 // Fonts and sizes
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\tiny Tiny Text"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\small Small Text"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\large Large Text"),
+                Arguments.of(StandardField.TITLE, "\\tiny Tiny Text"),
+                Arguments.of(StandardField.TITLE, "\\small Small Text"),
+                Arguments.of(StandardField.TITLE, "\\large Large Text"),
 
                 // Verbatim and special characters
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\verb|Verbatim|"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "$\\widetilde{i}$"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\ldots"),
+                Arguments.of(StandardField.TITLE, "\\verb|Verbatim|"),
+                Arguments.of(StandardField.TITLE, "$\\widetilde{i}$"),
+                Arguments.of(StandardField.TITLE, "\\ldots"),
 
                 // Simple environments
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{quote}Quoted Text\\end{quote}\n"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{center}Centered Text\\end{center}\n"),
+                Arguments.of(StandardField.TITLE, "\\begin{quote}Quoted Text\\end{quote}\n"),
+                Arguments.of(StandardField.TITLE, "\\begin{center}Centered Text\\end{center}\n"),
 
                 // Math environment inputs
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "$x + y = z$"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\(a^2 + b^2 = c^2\\)"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\[E = mc^2\\]"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{math} V = I \\cdot R \\end{math}"),
+                Arguments.of(StandardField.TITLE, "$x + y = z$"),
+                Arguments.of(StandardField.TITLE, "\\(a^2 + b^2 = c^2\\)"),
+                Arguments.of(StandardField.TITLE, "\\[E = mc^2\\]"),
+                Arguments.of(StandardField.TITLE, "\\begin{math} V = I \\cdot R \\end{math}"),
 
                 // Equations and alignment
                 // Currently Unsupported
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{align} x + y &= z \\\\ a &= b + c \\end{align}"),
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{align*} A &:= B \\\\ C &\\rightarrow D \\end{align*}"),
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{equation} E = mc^2 \\end{equation}"),
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{align*} x + y &= z \\\\ a &= b + c \\\\ p &= \\frac{q}{r} \\end{align*}"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{eqnarray} x + y &= z \\\\ a &= b + c \\\\ p &= \\frac{q}{r} \\end{eqnarray}"),
+                // Arguments.of(StandardField.TITLE, "\\begin{align} x + y &= z \\\\ a &= b + c \\end{align}"),
+                // Arguments.of(StandardField.TITLE, "\\begin{align*} A &:= B \\\\ C &\\rightarrow D \\end{align*}"),
+                // Arguments.of(StandardField.TITLE, "\\begin{equation} E = mc^2 \\end{equation}"),
+                // Arguments.of(StandardField.TITLE, "\\begin{align*} x + y &= z \\\\ a &= b + c \\\\ p &= \\frac{q}{r} \\end{align*}"),
+                Arguments.of(StandardField.TITLE, "\\begin{eqnarray} x + y &= z \\\\ a &= b + c \\\\ p &= \\frac{q}{r} \\end{eqnarray}"),
 
                 // Equations and matrices
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\[ \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} \\]"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\[ \\begin{bmatrix} x & y & z \\\\ u & v & w \\end{bmatrix} \\]"),
+                Arguments.of(StandardField.TITLE, "\\[ \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} \\]"),
+                Arguments.of(StandardField.TITLE, "\\[ \\begin{bmatrix} x & y & z \\\\ u & v & w \\end{bmatrix} \\]"),
 
                 // Tables
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{tabular}{|c|c|} \\hline 1 & 2 \\\\ 3 & 4 \\\\ \\hline \\end{tabular}"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{tabular}{cc} A & B \\\\ C & D \\end{tabular}"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{tabular}{|l|r|} \\hline Item & Quantity \\\\ \\hline Apple & 3 \\\\ Banana & 5 \\\\ \\hline \\end{tabular}"),
+                Arguments.of(StandardField.TITLE, "\\begin{tabular}{|c|c|} \\hline 1 & 2 \\\\ 3 & 4 \\\\ \\hline \\end{tabular}"),
+                Arguments.of(StandardField.TITLE, "\\begin{tabular}{cc} A & B \\\\ C & D \\end{tabular}"),
+                Arguments.of(StandardField.TITLE, "\\begin{tabular}{|l|r|} \\hline Item & Quantity \\\\ \\hline Apple & 3 \\\\ Banana & 5 \\\\ \\hline \\end{tabular}"),
 
                 // Lists and enumerations
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{itemize} \\item Item 1 \\item Item 2 \\item Item 3 \\end{itemize}"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{enumerate} \\item First \\item Second \\item Third \\end{enumerate}"),
+                Arguments.of(StandardField.TITLE, "\\begin{itemize} \\item Item 1 \\item Item 2 \\item Item 3 \\end{itemize}"),
+                Arguments.of(StandardField.TITLE, "\\begin{enumerate} \\item First \\item Second \\item Third \\end{enumerate}"),
 
                 // Line breaks and spacing
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "First Line \\\\ Second Line"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "Some \\hspace{2cm} Space"),
+                Arguments.of(StandardField.TITLE, "First Line \\\\ Second Line"),
+                Arguments.of(StandardField.TITLE, "Some \\hspace{2cm} Space"),
                 // Currently Unsupported
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "Some \\vspace{1cm} Space"),
+                // Arguments.of(StandardField.TITLE, "Some \\vspace{1cm} Space"),
 
                 // Multiple commands and environments
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\textbf{\\emph{Bold and Emphasized Text}} $5-3_k$"),
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{itemize} \\item\\begin{quote} \\textbf{Quoted} \\emph{Text} \\end{quote} \\end{itemize}")
+                Arguments.of(StandardField.TITLE, "\\textbf{\\emph{Bold and Emphasized Text}} $5-3_k$"),
+                Arguments.of(StandardField.TITLE, "\\begin{itemize} \\item\\begin{quote} \\textbf{Quoted} \\emph{Text} \\end{quote} \\end{itemize}"),
 
                 // More currently unsupported operations
 
                 // Figures and Graphics
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, } "\\includegraphics[width=0.5\\textwidth]{image.jpg}"),
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\begin{figure} \\centering \\includegraphics[width=0.8\\textwidth]{plot.png} \\caption{Plot Caption} \\label{fig:plot} \\end{figure}"),
+                // Arguments.of(StandardField.TITLE, } "\\includegraphics[width=0.5\\textwidth]{image.jpg}"),
+                // Arguments.of(StandardField.TITLE, "\\begin{figure} \\centering \\includegraphics[width=0.8\\textwidth]{plot.png} \\caption{Plot Caption} \\label{fig:plot} \\end{figure}"),
 
                 // Citations and references
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\cite{key}"),
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\label{sec:intro}"),
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "As shown in \\ref{fig:plot}"),
+                // Arguments.of(StandardField.TITLE, "\\cite{key}"),
+                // Arguments.of(StandardField.TITLE, "\\label{sec:intro}"),
+                // Arguments.of(StandardField.TITLE, "As shown in \\ref{fig:plot}"),
 
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "\\input{chapter1.tex}"),
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "Footnote\\footnote{This is a footnote}"),
-                // Arguments.of(Collections.emptyList(), StandardField.TITLE, "$\text{in math}$"),
+                // Arguments.of(StandardField.TITLE, "\\input{chapter1.tex}"),
+                // Arguments.of(StandardField.TITLE, "Footnote\\footnote{This is a footnote}"),
+                // Arguments.of(StandardField.TITLE, "$\text{in math}$"),
+
+                // Comments should not raise any error, because they are not typeset using LaTeX
+                Arguments.of(StandardField.COMMENT, "\\undefinedCommand"),
+
+                // Some commands not supported by SnuggleTeX as default
+                // Source: https://github.com/JabRef/jabref/issues/8712#issuecomment-1730441206
+                Arguments.of(StandardField.ABSTRACT, "\\textless{}xml\\textgreater{} \\textbar something \textbackslash"),
+
+                // Mirrored from org.jabref.logic.integrity.AmpersandCheckerTest.provideAcceptedInputs
+                Arguments.of(StandardField.TITLE, "No ampersand at all"),
+                Arguments.of(StandardField.FOREWORD, "Properly escaped \\&"),
+                Arguments.of(StandardField.AUTHOR, "\\& Multiple properly escaped \\&"),
+                Arguments.of(StandardField.BOOKTITLE, "\\\\\\& With multiple backslashes"),
+                Arguments.of(StandardField.COMMENT, "\\\\\\& With multiple backslashes multiple times \\\\\\\\\\&"),
+                Arguments.of(StandardField.NOTE, "In the \\& middle of \\\\\\& something")
         );
     }
 
