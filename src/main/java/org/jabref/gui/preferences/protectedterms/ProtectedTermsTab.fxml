@@ -15,7 +15,7 @@
 
     <TableView fx:id="filesTable" editable="true" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="filesTableEnabledColumn" text="%Enabled" minWidth="90" maxWidth="70"/>
+            <TableColumn fx:id="filesTableEnabledColumn" text="%Enabled" minWidth="90" prefWidth="70" />
             <TableColumn fx:id="filesTableDescriptionColumn" text="%Description"/>
             <TableColumn fx:id="filesTableFileColumn" text="%File"/>
             <TableColumn fx:id="filesTableEditColumn" maxWidth="35.0" minWidth="35.0" reorderable="false"/>
