@@ -18,8 +18,6 @@ public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> {
         ViewLoader.view(this)
                   .root(this)
                   .load();
-        this.username.setText(preferencesService.getGitPreferences().getUsername());
-        this.password.setText(preferencesService.getGitPreferences().getPassword());
     }
 
     @Override
@@ -29,6 +27,9 @@ public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> {
 
     @FXML
     private void initialize() {
-        viewModel = new GitTabViewModel(preferencesService.getGitPreferences(), this.username, this.password);
+        viewModel = new GitTabViewModel(preferencesService.getGitPreferences());
+
+        username.textProperty().bindBidirectional(viewModel.getUsernameProperty());
+        password.textProperty().bindBidirectional(viewModel.getPasswordProperty());
     }
 }

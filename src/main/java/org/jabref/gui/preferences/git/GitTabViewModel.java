@@ -4,9 +4,6 @@ import java.util.List;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.fxml.FXML;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 
 import org.jabref.gui.git.GitPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -16,26 +13,22 @@ public class GitTabViewModel implements PreferenceTabViewModel {
     private StringProperty username = new SimpleStringProperty();
     private StringProperty password = new SimpleStringProperty();
     private GitPreferences gitPreferences;
-    @FXML private TextField usernameInputField;
-    @FXML private PasswordField passwordInputField;
 
-    public GitTabViewModel(GitPreferences gitPreferences, TextField usernameInputField, PasswordField passwordInputField) {
+    public GitTabViewModel(GitPreferences gitPreferences) {
         this.gitPreferences = gitPreferences;
-        this.usernameInputField = usernameInputField;
-        this.passwordInputField = passwordInputField;
+
+        this.username = gitPreferences.getUsernameProperty();
+        this.password = gitPreferences.getPasswordProperty();
     }
 
     @Override
     public void setValues() {
-        // TEST
-        this.username.setValue(this.usernameInputField.getText());
-        this.password.setValue(this.passwordInputField.getText());
+        this.username.setValue(this.gitPreferences.getUsername());
+        this.password.setValue(this.gitPreferences.getPassword());
     }
 
     @Override
     public void storeSettings() {
-        this.gitPreferences.setUsername(this.usernameInputField.getText());
-        this.gitPreferences.setPassword(this.passwordInputField.getText());
     }
 
     @Override
@@ -48,11 +41,19 @@ public class GitTabViewModel implements PreferenceTabViewModel {
         return PreferenceTabViewModel.super.getRestartWarnings();
     }
 
-    public StringProperty getUsername() {
+    public String getUsername() {
+        return this.username.get();
+    }
+
+    public StringProperty getUsernameProperty() {
         return this.username;
     }
 
-    public StringProperty getPassword() {
+    public String getPassword() {
+        return this.password.get();
+    }
+
+    public StringProperty getPasswordProperty() {
         return this.password;
     }
 }
