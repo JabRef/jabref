@@ -16,7 +16,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.git.GitPreferences;
+import org.jabref.gui.git.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;

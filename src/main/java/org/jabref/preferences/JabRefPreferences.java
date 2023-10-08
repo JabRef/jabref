@@ -69,7 +69,7 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.git.GitPreferences;
+import org.jabref.gui.git.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
@@ -378,6 +378,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Git
     private static final String GIT_USERNAME = "gitUsername";
+    private static final String GIT_PASSWORD = "gitPassword";
 
     // Web search
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
@@ -2807,14 +2808,14 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         gitPreferences = new GitPreferences(
-                get(GIT_USERNAME),
-                getGitPassword());
+            get(GIT_USERNAME),
+            get(GIT_PASSWORD)
+        );
+
+        EasyBind.listen(gitPreferences.getUsernameProperty(), (obs, oldValue, newValue) -> put(GIT_USERNAME, newValue));
+        EasyBind.listen(gitPreferences.getPasswordProperty(), (obs, oldValue, newValue) -> put(GIT_PASSWORD, newValue));
 
         return gitPreferences;
-    }
-
-    private String getGitPassword() {
-        return "";
     }
     //*************************************************************************************************************
     // Importer preferences

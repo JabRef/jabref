@@ -193,9 +193,7 @@ public class GitHandler {
 
             // Add all removed files to index
             if (!status.getMissing().isEmpty()) {
-                RmCommand removeCommand = git.rm()
-                                                .setCached(true);
-                                                System.out.println("1----");
+                RmCommand removeCommand = git.rm().setCached(true);
                 status.getMissing().forEach(removeCommand::addFilepattern);
                 removeCommand.call();
             }

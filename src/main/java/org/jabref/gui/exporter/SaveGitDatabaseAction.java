@@ -26,15 +26,10 @@ public class SaveGitDatabaseAction {
     */
     public boolean automaticUpdate() {
         try {
-            System.out.println(this.filePath.getParent());
-            System.out.println(this.filePath.getFileName().toString());
             GitHandler git = new GitHandler(this.filePath.getParent());
             git.createCommitWithSingleFileOnCurrentBranch(this.filePath.getFileName().toString(), automaticCommitMsg, false);
             git.pushCommitsToRemoteRepository();
-        } catch (
-                GitAPIException |
-                IOException e) {
-                    System.out.println(e.getMessage());
+        } catch (GitAPIException | IOException e) {
             LOGGER.info("Failed to automatic git update");
         }
 

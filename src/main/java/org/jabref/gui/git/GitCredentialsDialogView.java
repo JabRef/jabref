@@ -8,7 +8,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -16,7 +15,6 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.airhacks.afterburner.views.ViewLoader;
 
 public class GitCredentialsDialogView extends BaseDialog<Void> {
 
@@ -34,10 +32,6 @@ public class GitCredentialsDialogView extends BaseDialog<Void> {
     public GitCredentialsDialogView() {
         this.setTitle(Localization.lang("Git credentials"));
         this.dialogService = Injector.instantiateModelOrService(DialogService.class);
-
-        // ViewLoader.view(this)
-        //           .load()
-        //           .setAsDialogPane(this);
 
         this.pane = new DialogPane();
         VBox vBox = new VBox();

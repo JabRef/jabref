@@ -5,12 +5,11 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> implements PreferencesTab {
+public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> {
 
     @FXML private TextField username;
     @FXML private PasswordField password;
@@ -19,6 +18,8 @@ public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> implement
         ViewLoader.view(this)
                   .root(this)
                   .load();
+        this.username.setText(preferencesService.getGitPreferences().getUsername());
+        this.password.setText(preferencesService.getGitPreferences().getPassword());
     }
 
     @Override
@@ -28,7 +29,6 @@ public class GitTab extends AbstractPreferenceTabView<GitTabViewModel> implement
 
     @FXML
     private void initialize() {
-        viewModel = new GitTabViewModel(preferencesService, dialogService);
-        username.textProperty().setValue(viewModel.getUsername().getValue());
+        viewModel = new GitTabViewModel(preferencesService.getGitPreferences(), this.username, this.password);
     }
 }
