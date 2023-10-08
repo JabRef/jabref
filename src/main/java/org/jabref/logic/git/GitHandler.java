@@ -9,8 +9,10 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.git.GitCredentialsDialogView;
+import org.jabref.gui.git.GitPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -48,8 +50,8 @@ public class GitHandler {
     final File repositoryPathAsFile;
     String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
     String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-    final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
-    private DialogService dialogService;
+    CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    private GitPreferences gitPreferences;
 
     /**
      * Initialize the handler for the given repository
@@ -59,7 +61,8 @@ public class GitHandler {
     public GitHandler(Path repositoryPath) {
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
-        this.dialogService = Injector.instantiateModelOrService(DialogService.class);
+        this.gitPreferences = Injector.instantiateModelOrService(PreferencesService.class).getGitPreferences();
+        
         if (!isGitRepository()) {
             try {
                 Git.init()
@@ -243,6 +246,14 @@ public class GitHandler {
 
             git.verifySignature();
 
+            if (this.gitPreferences.getUsername() != null && this.gitPreferences.getPassword() != null) {
+                this.gitUsername = this.gitPreferences.getUsername();
+                this.gitPassword = this.gitPreferences.getPassword();
+                this.credentialsProvider = new UsernamePasswordCredentialsProvider(this.gitUsername, this.gitPassword);
+            }
+            
+            
+
             if (isSshRemoteRepository) {
                 TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
                 git.push()
@@ -253,20 +264,20 @@ public class GitHandler {
 
                     gitCredentialsDialogView.showGitCredentialsDialog();
 
-                    CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(
+                    this.credentialsProvider = new UsernamePasswordCredentialsProvider(
                         gitCredentialsDialogView.getGitUsername(),
                         gitCredentialsDialogView.getGitPassword()
                     );
 
                     git.push()
-                    .setCredentialsProvider(credentialsProvider)
-                    .call();
-                } else {
-                    git.push()
                     .setCredentialsProvider(this.credentialsProvider)
                     .call();
-                }
-            } catch (IOException | GitAPIException e) {
+            } else {
+                git.push()
+                .setCredentialsProvider(this.credentialsProvider)
+                .call();
+            }
+        } catch (IOException | GitAPIException e) {
             if (e.getMessage().equals("origin: not found.")) {
                 LOGGER.info("No remote repository detected. Push skiped.");
             } else {
