@@ -131,7 +131,6 @@ public class EntryTypeViewModel {
 
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
-            searchingProperty().setValue(true);
             storeSelectedFetcher();
             fetcher = selectedItemProperty().getValue();
             searchID = idText.getValue();
@@ -143,9 +142,10 @@ public class EntryTypeViewModel {
     }
 
     public void runFetcherWorker() {
-        searchSuccesfulProperty.set(false);
-        fetcherWorker.run();
+        fetcherWorker.setOnRunning(event -> searchingProperty().setValue(true));
+
         fetcherWorker.setOnFailed(event -> {
+            searchSuccesfulProperty.set(false);
             Throwable exception = fetcherWorker.getException();
             String fetcherExceptionMessage = exception.getMessage();
             String fetcher = selectedItemProperty().getValue().getName();
@@ -159,7 +159,7 @@ public class EntryTypeViewModel {
                 dialogService.showInformationDialogAndWait(Localization.lang("Failed to import by ID"), Localization.lang("Error message %0", fetcherExceptionMessage));
             }
 
-            LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", fetcher, searchId), exception);
+            LOGGER.error("Exception during fetching when using fetcher '{}' with entry id '{}'.", fetcher, searchId, exception);
 
             searchingProperty.set(false);
             fetcherWorker = new FetcherWorker();
@@ -204,10 +204,11 @@ public class EntryTypeViewModel {
                     searchSuccesfulProperty.set(true);
                 }
             }
-            fetcherWorker = new FetcherWorker();
 
             focusAndSelectAllProperty.set(true);
-            searchingProperty().setValue(false);
+            searchingProperty().set(false);
+            fetcherWorker = new FetcherWorker();
         });
+        taskExecutor.execute(fetcherWorker);
     }
 }
