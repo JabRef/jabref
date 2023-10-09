@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 
@@ -16,7 +15,7 @@ public class SemanticScholarFetcher implements CitationFetcher {
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
     @Override
-    public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
+    public List<BibEntry> searchCitedBy(BibEntry entry) {
         if (entry.getDOI().isPresent()) {
             StringBuilder urlBuilder = new StringBuilder(SEMANTIC_SCHOLAR_API)
                     .append("paper/")
@@ -69,6 +68,14 @@ public class SemanticScholarFetcher implements CitationFetcher {
         }
 
         return new ArrayList<>();
+    }
+
+    public static RelatedEntriesFetcher buildCitationsFetcher() {
+        return entry -> new SemanticScholarFetcher().searchCitedBy(entry);
+    }
+
+    public static RelatedEntriesFetcher buildReferencesFetcher() {
+        return entry -> new SemanticScholarFetcher().searchCiting(entry);
     }
 
     @Override
