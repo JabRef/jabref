@@ -49,7 +49,7 @@ public enum StandardField implements Field {
     EDITORCTYPE("editorctype", FieldProperty.EDITOR_TYPE),
     EID("eid"),
     ENTRYSET("entryset", FieldProperty.MULTIPLE_ENTRY_LINK),
-    EPRINT("eprint", FieldProperty.EPRINT),
+    EPRINT("eprint", FieldProperty.EPRINT, FieldProperty.VERBATIM),
     EPRINTCLASS("eprintclass"),
     EPRINTTYPE("eprinttype"),
     EVENTDATE("eventdate", FieldProperty.DATE),
