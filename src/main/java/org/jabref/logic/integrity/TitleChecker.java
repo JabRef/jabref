@@ -42,13 +42,14 @@ public class TitleChecker implements ValueChecker {
         }
 
         String valueOnlySpacesWithinCurlyBraces = value;
-        while (true) {
-            Matcher matcher = INSIDE_CURLY_BRAKETS.matcher(valueOnlySpacesWithinCurlyBraces);
-            if (!matcher.find()) {
-                break;
-            }
-            valueOnlySpacesWithinCurlyBraces = matcher.replaceAll("");
-        }
+//        while (true) {
+//            Matcher matcher = INSIDE_CURLY_BRAKETS.matcher(valueOnlySpacesWithinCurlyBraces);
+//            if (!matcher.find()) {
+//                break;
+//            }
+//            valueOnlySpacesWithinCurlyBraces = matcher.replaceAll("");
+//        }
+        valueOnlySpacesWithinCurlyBraces.replaceAll(INSIDE_CURLY_BRAKETS.toString(),"");
 
         String[] splitTitle = DELIMITERS.split(valueOnlySpacesWithinCurlyBraces);
         for (String subTitle : splitTitle) {
