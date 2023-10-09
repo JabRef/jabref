@@ -209,7 +209,7 @@ public class OOTextIntoOO {
                     for (OOPair<String, String> pair : attributes) {
                         String key = pair.a;
                         String value = pair.b;
-                        if (key.equals("oo:ParaStyleName")) {// <p oo:ParaStyleName="Standard">
+                        if (key.equals("oo:ParaStyleName")) { // <p oo:ParaStyleName="Standard">
                             if (StringUtil.isNullOrEmpty(value)) {
                                 LOGGER.debug("oo:ParaStyleName inherited");
                             } else {
