@@ -152,6 +152,21 @@ public class TitleCheckerTest {
     }
 
     @Test
+    void bibLaTexAcceptsTranslatedTitleInSquareBrackets() {
+        assertEquals(Optional.empty(), checker.checkValue("[This is a translated title]"));
+    }
+
+    @Test
+    void bibLaTexAcceptsTranslatedTitleInSquareBracketsAndNativeTitle() {
+        assertEquals(Optional.empty(), checker.checkValue("Original tile [This is a translated title]"));
+    }
+
+    @Test
+    void bibLaTexAcceptsTranslatedTitleInSquareBracketsAndNativeTitleEnd() {
+        assertEquals(Optional.empty(), checker.checkValue("[This is a translated title]Original tile "));
+    }
+
+    @Test
     void bibLaTexAcceptsTitleWithOnlyFirstCapitalLetter() {
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a title"));
     }

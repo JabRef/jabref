@@ -23,13 +23,13 @@ public class TitleChecker implements ValueChecker {
 
     /**
      * Algorithm:
-     * - remove everything that is in brackets
-     * - split the title into sub titles based on the delimiters
+     * - remove everything that is in curly brackets
+     * - split the title into subtitles based on the delimiters
      * (defined in the local variable DELIMITERS, currently . ! ? ; :)
      * - for each sub title:
      * -    remove trailing whitespaces
      * -    ignore first letter as this can always be written in caps
-     * -    check if at least one capital letter is in the sub title
+     * -    check if at least one capital letter is in the subtitle
      */
     @Override
     public Optional<String> checkValue(String value) {
@@ -42,14 +42,13 @@ public class TitleChecker implements ValueChecker {
         }
 
         String valueOnlySpacesWithinCurlyBraces = value;
-//        while (true) {
-//            Matcher matcher = INSIDE_CURLY_BRAKETS.matcher(valueOnlySpacesWithinCurlyBraces);
-//            if (!matcher.find()) {
-//                break;
-//            }
-//            valueOnlySpacesWithinCurlyBraces = matcher.replaceAll("");
-//        }
-        valueOnlySpacesWithinCurlyBraces.replaceAll(INSIDE_CURLY_BRAKETS.toString(),"");
+        while (true) {
+            Matcher matcher = INSIDE_CURLY_BRAKETS.matcher(valueOnlySpacesWithinCurlyBraces);
+            if (!matcher.find()) {
+                break;
+            }
+            valueOnlySpacesWithinCurlyBraces = matcher.replaceAll("");
+        }
 
         String[] splitTitle = DELIMITERS.split(valueOnlySpacesWithinCurlyBraces);
         for (String subTitle : splitTitle) {
