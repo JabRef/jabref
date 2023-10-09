@@ -1,14 +1,15 @@
 package org.jabref.model.openoffice.ootext;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -145,7 +146,7 @@ public class OOTextIntoOO {
         cursor.collapseToEnd();
 
         MyPropertyStack formatStack = new MyPropertyStack(cursor);
-        Stack<String> expectEnd = new Stack<>();
+        Deque<String> expectEnd = new ArrayDeque<>();
 
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
@@ -208,21 +209,17 @@ public class OOTextIntoOO {
                     for (OOPair<String, String> pair : attributes) {
                         String key = pair.a;
                         String value = pair.b;
-                        switch (key) {
-                            case "oo:ParaStyleName":
-                                // <p oo:ParaStyleName="Standard">
-                                if (StringUtil.isNullOrEmpty(value)) {
-                                    LOGGER.debug("oo:ParaStyleName inherited");
-                                } else {
-                                    if (setParagraphStyle(cursor, value)) {
-                                        // Presumably tested already:
-                                        LOGGER.debug(String.format("oo:ParaStyleName=\"%s\" failed", value));
-                                    }
+                        if (key.equals("oo:ParaStyleName")) {// <p oo:ParaStyleName="Standard">
+                            if (StringUtil.isNullOrEmpty(value)) {
+                                LOGGER.debug("oo:ParaStyleName inherited");
+                            } else {
+                                if (setParagraphStyle(cursor, value)) {
+                                    // Presumably tested already:
+                                    LOGGER.debug(String.format("oo:ParaStyleName=\"%s\" failed", value));
                                 }
-                                break;
-                            default:
-                                LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
-                                break;
+                            }
+                        } else {
+                            LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
                         }
                     }
                     break;
@@ -230,9 +227,10 @@ public class OOTextIntoOO {
                     for (OOPair<String, String> pair : attributes) {
                         String key = pair.a;
                         String value = pair.b;
-                        switch (key) {
-                            case "target" -> UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
-                            default -> LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
+                        if (key.equals("target")) {
+                            UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
+                        } else {
+                            LOGGER.warn(String.format("Unexpected attribute '%s' for <%s>", key, tagName));
                         }
                     }
                     break;
@@ -302,7 +300,7 @@ public class OOTextIntoOO {
         formatStack.apply(cursor);
         cursor.collapseToEnd();
 
-        if (!expectEnd.empty()) {
+        if (!expectEnd.isEmpty()) {
             StringBuilder rest = new StringBuilder();
             for (String s : expectEnd) {
                 rest.insert(0, String.format("<%s>", s));
@@ -438,7 +436,7 @@ public class OOTextIntoOO {
         /**
          * Maintain a stack of layers, each containing a description of the desired state of properties. Each description is an ArrayList of property values, Optional.empty() encoding "not directly set".
          */
-        final Stack<ArrayList<Optional<Object>>> layers;
+        final Deque<ArrayList<Optional<Object>>> layers;
 
         MyPropertyStack(XTextCursor cursor) {
             XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
@@ -493,7 +491,7 @@ public class OOTextIntoOO {
                 }
             }
 
-            this.layers = new Stack<>();
+            this.layers = new ArrayDeque<>();
             this.layers.push(initialValuesOpt);
         }
 

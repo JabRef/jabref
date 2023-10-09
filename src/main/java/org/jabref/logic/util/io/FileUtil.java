@@ -8,16 +8,16 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Stack;
-import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,10 +36,7 @@ import org.slf4j.LoggerFactory;
  * The idea of this class is to add general functionality that could possibly even in the
  * <a href="https://en.wikipedia.org/wiki/Non-blocking_I/O_(Java)">Java NIO package</a>,
  * such as getting/adding file extension etc.
- *
- * This class is the "successor" of {@link FileHelper}. In case you miss something here,
- * please look at {@link FileHelper} and migrate the functionality to here.
- */
+ * */
 public class FileUtil {
 
     public static final boolean IS_POSIX_COMPLIANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
@@ -105,9 +102,9 @@ public class FileUtil {
 
     /**
      * Returns a valid filename for most operating systems.
-     *
+     * <p>
      * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
-     *
+     * <p>
      * For "real" cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
      */
     public static String getValidFileName(String fileName) {
@@ -126,7 +123,7 @@ public class FileUtil {
     /**
      * Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
      * gets "demo.bib.sav" and not "demo.sav"
-     *
+     * <p>
      * <emph>Warning! If "ext" is passed, this is literally added. Thus addExtension("tmp.txt", "ext") leads to "tmp.txtext"</emph>
      *
      * @param path      the path to add the extension to
@@ -162,9 +159,7 @@ public class FileUtil {
      */
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
-                                          .filter(part -> comparePath.toString().contains(part))
-                                          .sorted(Comparator.comparingInt(String::length).reversed())
-                                          .findFirst();
+                                          .filter(part -> comparePath.toString().contains(part)).max(Comparator.comparingInt(String::length));
     }
 
     /**
@@ -174,19 +169,18 @@ public class FileUtil {
      * @return the minimal unique path substring for each file path
      */
     public static List<String> uniquePathSubstrings(List<String> paths) {
-        List<Stack<String>> stackList = new ArrayList<>(paths.size());
+        List<Deque<String>> stackList = new ArrayList<>(paths.size());
         // prepare data structures
         for (String path : paths) {
             List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
-            Stack<String> stack = new Stack<>();
-            stack.addAll(directories);
+            Deque<String> stack = new ArrayDeque<>(directories);
             stackList.add(stack);
         }
 
         List<String> pathSubstrings = new ArrayList<>(Collections.nCopies(paths.size(), ""));
 
         // compute the shortest folder substrings
-        while (!stackList.stream().allMatch(Vector::isEmpty)) {
+        while (!stackList.stream().allMatch(Deque::isEmpty)) {
             for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
@@ -371,7 +365,7 @@ public class FileUtil {
      * @param fileName the filename (e.g., a .pdf file), may contain path separators
      * @param directory the directory which should be search starting point
      *
-     * @returns an empty optional if the file does not exist, otherwise, the absolute path
+     * @return an empty optional if the file does not exist, otherwise, the absolute path
      */
     public static Optional<Path> find(String fileName, Path directory) {
         Objects.requireNonNull(fileName);
@@ -461,7 +455,7 @@ public class FileUtil {
 
     /**
      * Detect illegal characters in given filename.
-     *
+     * <p>
      * See also {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName}
      *
      * @param fileName the fileName to detect

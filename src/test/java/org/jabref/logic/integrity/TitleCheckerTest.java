@@ -220,4 +220,9 @@ public class TitleCheckerTest {
     void bibLaTexAcceptsCapitalLetterNotOnlyAfterSpecialCharacter() {
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("This!is!!A!TitlE??"));
     }
+
+    @Test
+    void bibTExtsquarebackres() {
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("[Entry with Unprotected Uppercase]"));
+    }
 }
