@@ -153,7 +153,7 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     }
 
     public final void setEllipsisString(String value) {
-        ellipsisString.set((value == null) ? "" : value);
+        ellipsisString.set(value == null ? "" : value);
     }
 
     public String getEllipsisString() {

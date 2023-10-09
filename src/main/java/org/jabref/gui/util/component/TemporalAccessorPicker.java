@@ -145,7 +145,7 @@ public class TemporalAccessorPicker extends DatePicker {
             TemporalAccessor value = getTemporalAccessorValue();
 
             // Keeps the original text when it is an invalid date
-            return (value != null) ? getStringConverter().toString(value) : getEditor().getText();
+            return value != null ? getStringConverter().toString(value) : getEditor().getText();
         }
 
         @Override

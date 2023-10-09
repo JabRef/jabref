@@ -337,7 +337,7 @@ public class BibEntry implements Cloneable {
             }
         }
 
-        return ((database == null) || result.isEmpty()) ?
+        return (database == null) || result.isEmpty() ?
                 result :
                 Optional.of(database.resolveForStrings(result.get()));
     }
