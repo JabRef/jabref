@@ -128,6 +128,9 @@ public class CrossRefTest {
         entry.setField(StandardField.PAGES, "172-176");
         entry.setField(StandardField.VOLUME, "42");
         entry.setField(StandardField.YEAR, "1999");
+        entry.setField(StandardField.JOURNAL, "Indo-Iranian Journal");
+        entry.setField(StandardField.ISSUE, "2");
+        entry.setField(StandardField.PUBLISHER, "Brill");
 
         assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
     }

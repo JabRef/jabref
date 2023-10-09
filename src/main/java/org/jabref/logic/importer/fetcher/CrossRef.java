@@ -137,6 +137,9 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
                             .map(year -> Integer.toString(year)).orElse("")
             );
             entry.setField(StandardField.DOI, item.getString("DOI"));
+            entry.setField(StandardField.JOURNAL, item.getString("container-title"));
+            entry.setField(StandardField.PUBLISHER, item.getString("publisher"));
+            entry.setField(StandardField.ISSUE, item.getString("issue"));
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
             entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
