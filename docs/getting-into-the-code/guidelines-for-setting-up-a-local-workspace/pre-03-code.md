@@ -29,6 +29,7 @@ git clone --depth=10 https://github.com/JabRef/jabref.git JabRef
 cd jabref
 git remote rename origin upstream
 git remote add origin https://github.com/YOUR_USERNAME/jabref.git
+git fetch --all
 git branch --set-upstream-to=origin/main main
 ```
 
