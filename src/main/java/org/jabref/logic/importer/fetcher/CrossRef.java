@@ -208,9 +208,9 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
         for (int i = 0; i < jsonArray.length(); i++) {
         keywords += jsonArray.getString(i);
-        if (i != jsonArray.length()-1) {
-            keywords += (", ");
-        }
+            if (i != jsonArray.length()-1) {
+                keywords += (", ");
+            }
         }
 
         return keywords;
