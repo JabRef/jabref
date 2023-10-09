@@ -94,6 +94,6 @@ public class LatexIntegrityChecker implements EntryChecker {
     public static String errorMessageFormatHelper(ErrorCode snuggleTexErrorCode, Object... arguments) {
         String snuggletexMessagePattern = LatexIntegrityChecker.ERROR_MESSAGES.getString(snuggleTexErrorCode.getName());
         String snuggletexErrorMessage = MessageFormat.format(snuggletexMessagePattern, arguments);
-        return Localization.lang("LaTeX Parsing Error: %0", snuggletexErrorMessage);
+        return Localization.lang("LaTeX Warning: %0", snuggletexErrorMessage);
     }
 }
