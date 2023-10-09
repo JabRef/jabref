@@ -1,9 +1,9 @@
 package org.jabref.logic.bst;
 
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +30,7 @@ public class BstFunctions {
     private final Map<String, BstFunction> functions;
     private final String preamble;
 
-    private final Stack<Object> stack;
+    private final Deque<Object> stack;
     private final StringBuilder bbl;
 
     private int bstWarning = 0;
@@ -467,6 +467,7 @@ public class BstFunctions {
             return;
         }
 
+        assert o1 instanceof String;
         String format = (String) o1;
         Integer name = (Integer) o2;
         String names = (String) o3;
@@ -670,7 +671,7 @@ public class BstFunctions {
      * designers while debugging.
      */
     private void bstStack(BstVMVisitor visitor, ParserRuleContext ctx) {
-        while (!stack.empty()) {
+        while (!stack.isEmpty()) {
             LOGGER.debug("Stack entry {}", stack.pop());
         }
     }
@@ -881,6 +882,7 @@ public class BstFunctions {
         }
 
         do {
+            assert f1 instanceof ParseTree;
             visitor.visit((ParseTree) f1);
 
             Object i = stack.pop();
