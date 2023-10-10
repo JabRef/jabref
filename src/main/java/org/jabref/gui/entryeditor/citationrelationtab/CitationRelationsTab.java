@@ -8,7 +8,6 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -28,7 +27,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
     private static final RelatedEntriesCache CITATIONS_CACHE = new RelatedEntriesCache();
     private static final RelatedEntriesCache REFERENCES_CACHE = new RelatedEntriesCache();
-    private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
     private final UndoManager undoManager;
@@ -37,11 +35,9 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final PreferencesService preferencesService;
     private final LibraryTab libraryTab;
 
-    public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService,
-                                BibDatabaseContext databaseContext, UndoManager undoManager,
-                                StateManager stateManager, FileUpdateMonitor fileUpdateMonitor,
+    public CitationRelationsTab(DialogService dialogService, BibDatabaseContext databaseContext,
+                                UndoManager undoManager, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor,
                                 PreferencesService preferencesService, LibraryTab lTab) {
-        this.preferences = preferences;
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.undoManager = undoManager;
@@ -67,27 +63,29 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        // Initialize citations data sources and UI
+        // Initialize citations data and UI
         RelatedEntriesComponentConfig citationsComponentConfig =
                 RelatedEntriesComponentConfig.builder()
-                                             .withHeading("Citations")
+                                             .withHeading(Localization.lang("Citations"))
                                              .build();
 
         RelatedEntriesRepository citationsRepository =
                 new RelatedEntriesRepository(SemanticScholarFetcher.buildCitationsFetcher(), CITATIONS_CACHE);
-        RelatedEntriesComponent citationsComponent = new RelatedEntriesComponent(entry,
-                citationsRepository, libraryTab, citationsComponentConfig, dialogService, databaseContext, undoManager,
-                stateManager, fileUpdateMonitor, preferencesService);
 
-        // Initialize references data sources and UI
+        RelatedEntriesComponent citationsComponent =
+                new RelatedEntriesComponent(entry, citationsRepository, libraryTab, citationsComponentConfig,
+                        dialogService, databaseContext, undoManager, stateManager, fileUpdateMonitor, preferencesService);
+
+        // Initialize references data and UI
         RelatedEntriesComponentConfig referencesComponentConfig =
                 RelatedEntriesComponentConfig.builder()
-                                             .withHeading("References")
+                                             .withHeading(Localization.lang("References"))
                                              .build();
         RelatedEntriesRepository referencesRepository =
                 new RelatedEntriesRepository(SemanticScholarFetcher.buildReferencesFetcher(), REFERENCES_CACHE);
         RelatedEntriesComponent referencesComponent = new RelatedEntriesComponent(entry,
-                referencesRepository, libraryTab, referencesComponentConfig, dialogService, databaseContext, undoManager, stateManager, fileUpdateMonitor, preferencesService);
+                referencesRepository, libraryTab, referencesComponentConfig, dialogService, databaseContext,
+                undoManager, stateManager, fileUpdateMonitor, preferencesService);
 
         SplitPane container = new SplitPane(citationsComponent, referencesComponent);
 
