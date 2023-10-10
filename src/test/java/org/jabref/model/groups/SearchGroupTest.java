@@ -15,7 +15,7 @@ public class SearchGroupTest {
 
     @Test
     public void containsFindsWordWithRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=rev*", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=rev*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         BibEntry entry = new BibEntry();
         entry.addKeyword("review", ',');
 
@@ -24,7 +24,7 @@ public class SearchGroupTest {
 
     @Test
     public void containsDoesNotFindsWordWithInvalidRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=*rev*", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=*rev*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         BibEntry entry = new BibEntry();
         entry.addKeyword("review", ',');
 

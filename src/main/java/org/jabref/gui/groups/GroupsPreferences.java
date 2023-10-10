@@ -1,40 +1,70 @@
 package org.jabref.gui.groups;
 
+import java.util.EnumSet;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleSetProperty;
+import javafx.collections.FXCollections;
 
 import org.jabref.model.groups.GroupHierarchyType;
 
 public class GroupsPreferences {
 
-    private final ObjectProperty<GroupViewMode> groupViewMode;
-    private final BooleanProperty shouldAutoAssignGroup;
-    private final BooleanProperty shouldDisplayGroupCount;
-    private final ObjectProperty<GroupHierarchyType> defaultHierarchicalContext;
+    private final SetProperty<GroupViewMode> groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());
+    private final BooleanProperty shouldAutoAssignGroup = new SimpleBooleanProperty();
+    private final BooleanProperty shouldDisplayGroupCount = new SimpleBooleanProperty();
+    private final ObjectProperty<GroupHierarchyType> defaultHierarchicalContext = new SimpleObjectProperty<>();
 
-    public GroupsPreferences(GroupViewMode groupViewMode,
+    public GroupsPreferences(boolean viewModeIntersection,
+                             boolean viewModeFilter,
+                             boolean viewModeInvert,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
                              GroupHierarchyType defaultHierarchicalContext) {
-
-        this.groupViewMode = new SimpleObjectProperty<>(groupViewMode);
-        this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
-        this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
-        this.defaultHierarchicalContext = new SimpleObjectProperty<>(defaultHierarchicalContext);
+        if (viewModeIntersection) {
+            this.groupViewMode.add(GroupViewMode.INTERSECTION);
+        }
+        if (viewModeFilter) {
+            this.groupViewMode.add(GroupViewMode.FILTER);
+        }
+        if (viewModeInvert) {
+            this.groupViewMode.add(GroupViewMode.INVERT);
+        }
+        this.shouldAutoAssignGroup.set(shouldAutoAssignGroup);
+        this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
     }
 
-    public GroupViewMode getGroupViewMode() {
-        return groupViewMode.getValue();
+    public GroupsPreferences(EnumSet<GroupViewMode> groupViewModes,
+                             boolean shouldAutoAssignGroup,
+                             boolean shouldDisplayGroupCount,
+                             GroupHierarchyType defaultHierarchicalContext) {
+        this.groupViewMode.addAll(groupViewModes);
+        this.shouldAutoAssignGroup.set(shouldAutoAssignGroup);
+        this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
+        this.defaultHierarchicalContext.set(defaultHierarchicalContext);
     }
 
-    public ObjectProperty<GroupViewMode> groupViewModeProperty() {
+    public EnumSet<GroupViewMode> getGroupViewMode() {
+        if (groupViewMode.isEmpty()) {
+            return EnumSet.noneOf(GroupViewMode.class);
+        }
+        return EnumSet.copyOf(groupViewMode);
+    }
+
+    public SetProperty<GroupViewMode> groupViewModeProperty() {
         return groupViewMode;
     }
 
-    public void setGroupViewMode(GroupViewMode groupViewMode) {
-        this.groupViewMode.set(groupViewMode);
+    public void setGroupViewMode(GroupViewMode mode, boolean value) {
+        if (groupViewMode.contains(mode) && !value) {
+            groupViewMode.remove(mode);
+        } else if (!groupViewMode.contains(mode) && value) {
+            groupViewMode.add(mode);
+        }
     }
 
     public boolean shouldAutoAssignGroup() {

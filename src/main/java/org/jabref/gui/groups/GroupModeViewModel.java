@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import javafx.collections.ObservableSet;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
@@ -8,29 +9,25 @@ import org.jabref.logic.l10n.Localization;
 
 public class GroupModeViewModel {
 
-    private final GroupViewMode mode;
+    private final ObservableSet<GroupViewMode> mode;
 
-    public GroupModeViewModel(GroupViewMode mode) {
+    public GroupModeViewModel(ObservableSet<GroupViewMode> mode) {
         this.mode = mode;
     }
 
     public Node getUnionIntersectionGraphic() {
-        if (mode == GroupViewMode.UNION) {
-            return JabRefIcons.GROUP_UNION.getGraphicNode();
-        } else if (mode == GroupViewMode.INTERSECTION) {
+        if (mode.contains(GroupViewMode.INTERSECTION)) {
             return JabRefIcons.GROUP_INTERSECTION.getGraphicNode();
+        } else {
+            return JabRefIcons.GROUP_UNION.getGraphicNode();
         }
-
-        // As there is no concept like an empty node/icon, we return simply the other icon
-        return JabRefIcons.GROUP_INTERSECTION.getGraphicNode();
     }
 
     public Tooltip getUnionIntersectionTooltip() {
-        if (mode == GroupViewMode.UNION) {
+        if (mode.contains(GroupViewMode.INTERSECTION)) {
             return new Tooltip(Localization.lang("Toggle intersection"));
-        } else if (mode == GroupViewMode.INTERSECTION) {
+        } else {
             return new Tooltip(Localization.lang("Toggle union"));
         }
-        return new Tooltip();
     }
 }

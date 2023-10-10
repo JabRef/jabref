@@ -49,7 +49,7 @@ class ArgumentProcessorTest {
         when(preferencesService.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferencesService.getSearchPreferences()).thenReturn(
-                new SearchPreferences(null, EnumSet.noneOf(SearchRules.SearchFlags.class), false)
+                new SearchPreferences(EnumSet.noneOf(SearchRules.SearchFlags.class), false)
         );
     }
 

@@ -124,7 +124,6 @@
                             <TextField fx:id="searchGroupSearchTerm"/>
                         </VBox>
                         <HBox spacing="10.0">
-                            <CheckBox fx:id="searchGroupCaseSensitive" text="%Case sensitive"/>
                             <CheckBox fx:id="searchGroupRegex" text="%Regular expression"/>
                         </HBox>
                     </VBox>

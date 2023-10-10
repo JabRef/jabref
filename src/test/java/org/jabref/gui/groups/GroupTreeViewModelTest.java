@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.EnumSet;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -46,9 +47,9 @@ class GroupTreeViewModelTest {
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
-                GroupViewMode.UNION,
-                true,
-                true,
+                        EnumSet.of(GroupViewMode.FILTER),
+                        true,
+                        true,
                 GroupHierarchyType.INDEPENDENT));
         groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
     }
@@ -61,7 +62,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void rootGroupIsSelectedByDefault() {
-        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroup(databaseContext).get(0));
+        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroups(databaseContext).get(0));
     }
 
     @Test

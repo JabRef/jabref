@@ -124,6 +124,8 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
+        columns.add(createScoreColumn(new MainTableColumnModel(MainTableColumnModel.Type.SCORE)));
+
         columnPreferences.getColumns().forEach(column -> {
             columns.add(createColumn(column));
         });
@@ -135,6 +137,27 @@ public class MainTableColumnFactory {
         column.setMinWidth(width);
         column.setPrefWidth(width);
         column.setMaxWidth(width);
+    }
+
+    /**
+     * Creates a column with the search score
+     */
+    private TableColumn<BibEntryTableViewModel, String> createScoreColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Score"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SCORE.getDisplayName()));
+        column.setGraphic(header);
+        column.setStyle("-fx-alignment: CENTER-RIGHT;");
+        column.setCellValueFactory(cellData -> cellData.getValue().searchScoreProperty().asString("%.2f"));
+        new ValueTableCellFactory<BibEntryTableViewModel, String>()
+                .withText(text -> text)
+                .install(column);
+        column.setSortable(true);
+        column.setSortType(TableColumn.SortType.DESCENDING);
+        column.visibleProperty().bind(stateManager.activeSearchQueryProperty().isPresent());
+        column.setReorderable(false);
+        return column;
     }
 
     /**
@@ -239,6 +262,7 @@ public class MainTableColumnFactory {
                 database,
                 dialogService,
                 preferencesService,
+                stateManager,
                 taskExecutor);
     }
 
@@ -250,6 +274,7 @@ public class MainTableColumnFactory {
                 database,
                 dialogService,
                 preferencesService,
+                stateManager,
                 columnModel.getQualifier(),
                 taskExecutor);
     }

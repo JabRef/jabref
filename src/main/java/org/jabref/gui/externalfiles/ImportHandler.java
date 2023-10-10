@@ -83,8 +83,9 @@ public class ImportHandler {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database, dialogService);
-        this.contentImporter = new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences());
+        this.linker = new ExternalFilesEntryLinker(preferencesService, preferencesService.getFilePreferences(), database, dialogService);
+        this.contentImporter = new ExternalFilesContentImporter(
+                preferencesService.getImportFormatPreferences());
         this.undoManager = undoManager;
     }
 
@@ -190,7 +191,7 @@ public class ImportHandler {
         }
 
         // Add to group
-        addToGroups(entries, stateManager.getSelectedGroup(bibDatabaseContext));
+        addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -229,7 +230,7 @@ public class ImportHandler {
                                        preferencesService.getOwnerPreferences(),
                                        preferencesService.getTimestampPreferences());
 
-        addToGroups(List.of(entry), stateManager.getSelectedGroup(this.bibDatabaseContext));
+        addToGroups(List.of(entry), stateManager.getSelectedGroups(this.bibDatabaseContext));
 
         if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
                 entry.getFiles().stream().filter(LinkedFile::isOnlineLink).forEach(linkedFile ->

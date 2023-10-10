@@ -27,11 +27,12 @@ import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.pdf.search.PdfSearchResults;
+import org.jabref.model.pdf.search.LuceneSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
+    private final BibDatabaseContext context;
     private final TaskExecutor taskExecutor;
 
     private final TextFlow content;
@@ -57,10 +59,12 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     public FulltextSearchResultsTab(StateManager stateManager,
                                     PreferencesService preferencesService,
                                     DialogService dialogService,
+                                    BibDatabaseContext context,
                                     TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
+        this.context = context;
         this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
         this.taskExecutor = taskExecutor;
 
@@ -77,8 +81,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     public boolean shouldShow(BibEntry entry) {
         return this.stateManager.activeSearchQueryProperty().isPresent().get() &&
                 this.stateManager.activeSearchQueryProperty().get().isPresent() &&
-                this.stateManager.activeSearchQueryProperty().get().get().getSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT) &&
-                this.stateManager.activeSearchQueryProperty().get().get().getQuery().length() > 0;
+                this.stateManager.activeSearchQueryProperty().get().get().getSearchFlags().contains(SearchFlags.FULLTEXT) &&
+                this.stateManager.activeSearchQueryProperty().get().get().toString().length() > 0;
     }
 
     @Override
@@ -90,9 +94,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             documentViewerView = new DocumentViewerView();
         }
         this.entry = entry;
-        PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
 
         content.getChildren().clear();
+
+        if (!stateManager.getSearchResults().containsKey(context)) {
+            return;
+        }
+
+        LuceneSearchResults searchResults = stateManager.getSearchResults().get(context).get(entry);
 
         if (searchResults.numSearchResults() == 0) {
             content.getChildren().add(new Text(Localization.lang("No search matches.")));
