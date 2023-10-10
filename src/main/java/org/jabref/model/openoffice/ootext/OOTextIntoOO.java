@@ -671,9 +671,9 @@ public class OOTextIntoOO {
             throw new java.lang.IllegalArgumentException("setCharLocale \"\" or null");
         }
         String[] parts = value.split("-");
-        String language = (parts.length > 0) ? parts[0] : "";
-        String country = (parts.length > 1) ? parts[1] : "";
-        String variant = (parts.length > 2) ? parts[2] : "";
+        String language = parts.length > 0 ? parts[0] : "";
+        String country = parts.length > 1 ? parts[1] : "";
+        String variant = parts.length > 2 ? parts[2] : "";
         return setCharLocale(new Locale(language, country, variant));
     }
 

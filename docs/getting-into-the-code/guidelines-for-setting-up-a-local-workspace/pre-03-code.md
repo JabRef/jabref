@@ -25,10 +25,11 @@ In the following, we will use `c:\git-repositories` as base folder:
 cd \
 mkdir git-repositories
 cd git-repositories
-git clone --depth=10 https://github.com/JabRef/jabref.git JabRef
-cd jabref
+git clone https://github.com/JabRef/jabref.git JabRef
+cd JabRef
 git remote rename origin upstream
 git remote add origin https://github.com/YOUR_USERNAME/jabref.git
+git fetch --all
 git branch --set-upstream-to=origin/main main
 ```
 
@@ -46,9 +47,6 @@ git branch --set-upstream-to=origin/main main
 >
 > To prevent this, first the `upstream` repository is cloned.
 > This repository seems to live in the caches of GitHub.
->
-> The `--depth--10` is used to limit the download to \~20 MB instead of downloading the complete history (\~800 MB).
-> If you want to dig in our commit history, feel free to download everything.
 >
 > Now, you have two remote repositories, where `origin` is yours and `upstream` is the one of the JabRef organization.
 >
