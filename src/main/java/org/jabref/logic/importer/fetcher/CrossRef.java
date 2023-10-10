@@ -25,8 +25,6 @@ import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.Keyword;
-import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
@@ -142,7 +140,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
             entry.setField(StandardField.JOURNAL, item.getString("container-title"));
             entry.setField(StandardField.PUBLISHER, item.getString("publisher"));
             entry.setField(StandardField.ISSUE, item.getString("issue"));
-            entry.setField(StandardField.KEYWORDS, (getKeywords(item.getJSONArray("subject"))));
+            entry.setField(StandardField.KEYWORDS, getKeywords(item.getJSONArray("subject")));
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
             entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
@@ -208,11 +206,10 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
         for (int i = 0; i < jsonArray.length(); i++) {
         keywords += jsonArray.getString(i);
-            if (i != jsonArray.length()-1) {
-                keywords += (", ");
+            if (i != jsonArray.length() - 1) {
+                keywords += ", ";
             }
         }
-
         return keywords;
     }
 }
