@@ -22,6 +22,5 @@ public class RelatedEntriesComponentConfig {
         public RelatedEntriesComponentConfig build() {
             return config;
         }
-
     }
 }

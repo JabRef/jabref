@@ -98,7 +98,7 @@ public class RelatedEntriesComponent extends VBox {
         });
     }
 
-    private void initUI () {
+    private void initUI() {
         // Create Layout Containers
         this.setFillWidth(true);
         this.setAlignment(Pos.TOP_CENTER);
@@ -126,7 +126,6 @@ public class RelatedEntriesComponent extends VBox {
         cancelButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
         styleTopBarNode(cancelButton, 15.0);
         cancelButton.setOnAction(e -> viewModel.cancelLoading());
-
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxSize(25, 25);
@@ -220,5 +219,4 @@ public class RelatedEntriesComponent extends VBox {
     private Label buildLabel(String text) {
         return new Label(text);
     }
-
 }

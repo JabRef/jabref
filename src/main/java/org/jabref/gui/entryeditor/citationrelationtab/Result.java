@@ -5,9 +5,7 @@ import java.util.function.Supplier;
 
 public sealed class Result<V> {
 
-    private Result() {
-
-    }
+    private Result() { }
 
     public static <V> Result<V> success(V v) {
         return new Success<>(v);
@@ -17,7 +15,7 @@ public sealed class Result<V> {
         return (Result<V>) new Failure(e);
     }
 
-    public static<V> Result<V> pending() {
+    public static <V> Result<V> pending() {
         return (Result<V>) new Pending();
     }
 
@@ -46,7 +44,7 @@ public sealed class Result<V> {
         }
     }
 
-    public V get() throws NoSuchElementException{
+    public V get() throws NoSuchElementException {
         if (isSuccess()) {
             return ((Success<V>) this).v;
         } else {
@@ -96,8 +94,5 @@ public sealed class Result<V> {
         }
     }
 
-    public static final class Pending extends Result<Object> {
-
-    }
-
+    public static final class Pending extends Result<Object> { }
 }
