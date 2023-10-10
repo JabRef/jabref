@@ -137,10 +137,10 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
                             .map(year -> Integer.toString(year)).orElse("")
             );
             entry.setField(StandardField.DOI, item.getString("DOI"));
-            entry.setField(StandardField.JOURNAL, item.getString("container-title"));
-            entry.setField(StandardField.PUBLISHER, item.getString("publisher"));
-            entry.setField(StandardField.ISSUE, item.getString("issue"));
-            entry.setField(StandardField.KEYWORDS, getKeywords(item.getJSONArray("subject")));
+            entry.setField(StandardField.JOURNAL, item.optString("container-title"));
+            entry.setField(StandardField.PUBLISHER, item.optString("publisher"));
+            entry.setField(StandardField.ISSUE, item.optString("issue"));
+            entry.setField(StandardField.KEYWORDS, Optional.ofNullable(item.optJSONArray("subject")).map(this::getKeywords).orElse(""));
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
             entry.setField(StandardField.ISSN, Optional.ofNullable(item.optJSONArray("ISSN")).map(array -> array.getString(0)).orElse(""));
@@ -202,14 +202,14 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     private String getKeywords(JSONArray jsonArray) {
-        String keywords = "";
+        StringBuilder keywords = new StringBuilder();
 
         for (int i = 0; i < jsonArray.length(); i++) {
-        keywords += jsonArray.getString(i);
+        keywords.append(jsonArray.getString(i));
             if (i != jsonArray.length() - 1) {
-                keywords += ", ";
+                keywords.append(", ");
             }
         }
-        return keywords;
+        return keywords.toString();
     }
 }

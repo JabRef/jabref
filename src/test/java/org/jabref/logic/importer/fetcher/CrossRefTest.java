@@ -31,6 +31,7 @@ public class CrossRefTest {
         barrosEntry.setField(StandardField.TITLE, "Service Interaction Patterns");
         barrosEntry.setField(StandardField.AUTHOR, "Alistair Barros and Marlon Dumas and Arthur H. M. ter Hofstede");
         barrosEntry.setField(StandardField.YEAR, "2005");
+        barrosEntry.setField(StandardField.PUBLISHER, "Springer Berlin Heidelberg");
         barrosEntry.setField(StandardField.DOI, "10.1007/11538394_20");
         barrosEntry.setField(StandardField.ISSN, "0302-9743");
         barrosEntry.setField(StandardField.PAGES, "302-318");
