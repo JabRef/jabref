@@ -15,8 +15,8 @@ public class RelatedEntriesCache {
         return RELATED_ENTRIES_MAP.getOrDefault(entry.getDOI().map(DOI::getDOI).orElse(""), Collections.emptyList());
     }
 
-    public void cacheOrMerge(BibEntry entry, List<BibEntry> references) {
-        entry.getDOI().ifPresent(doi -> RELATED_ENTRIES_MAP.putIfAbsent(doi.getDOI(), references));
+    public void cacheOrMerge(BibEntry entry, List<BibEntry> relatedEntries) {
+        entry.getDOI().ifPresent(doi -> RELATED_ENTRIES_MAP.putIfAbsent(doi.getDOI(), relatedEntries));
     }
 
     public boolean isRelatedEntriesCached(BibEntry entry) {

@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.FXCollections;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
@@ -18,12 +20,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
@@ -43,9 +50,13 @@ public class RelatedEntriesComponent extends VBox {
     private CheckListView<CitationRelationItem> relatedEntriesListView;
 
     public RelatedEntriesComponent(BibEntry pivotEntry, RelatedEntriesRepository repository, LibraryTab libraryTab,
-                                   RelatedEntriesComponentConfig config) {
+                                   RelatedEntriesComponentConfig config, DialogService dialogService,
+                                   BibDatabaseContext databaseContext, UndoManager undoManager,
+                                   StateManager stateManager, FileUpdateMonitor fileUpdateMonitor,
+                                   PreferencesService prefs) {
         this.config = config;
-        this.viewModel = new RelatedEntriesComponentViewModel(pivotEntry, repository);
+        this.viewModel = new RelatedEntriesComponentViewModel(pivotEntry, repository, dialogService, databaseContext,
+                undoManager, stateManager, fileUpdateMonitor, prefs);
         this.repository = repository;
         this.libraryTab = libraryTab;
 
@@ -56,6 +67,8 @@ public class RelatedEntriesComponent extends VBox {
             if (result.isPending()) {
                 showNodes(progressIndicator, cancelButton);
                 hideNodes(refreshButton, importEntriesButton);
+                relatedEntriesListView.getItems().clear();
+                relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("Loading...")));
             } else if (result.isSuccess()) {
                 hideNodes(progressIndicator, cancelButton);
                 showNodes(refreshButton, importEntriesButton);
@@ -123,6 +136,8 @@ public class RelatedEntriesComponent extends VBox {
         importEntriesButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
         importEntriesButton.setTooltip(new Tooltip(Localization.lang("Add selected entries to database")));
         styleTopBarNode(importEntriesButton, 50.0);
+        importEntriesButton.setOnAction(e ->
+                viewModel.importEntriesIntoCurrentLibrary(relatedEntriesListView.getCheckModel().getCheckedItems()));
 
         AnchorPane topbar = new AnchorPane();
         topbar.setPrefHeight(40);
@@ -205,27 +220,5 @@ public class RelatedEntriesComponent extends VBox {
     private Label buildLabel(String text) {
         return new Label(text);
     }
-/*
-    *//**
-     * Function to import selected entries to the database. Also writes the entries to import to the CITING/CITED field
-     *
-     * @param entriesToImport entries to import
-     *//*
-    private void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry entry) {
-        citingTask.cancel();
-        citedByTask.cancel();
-        List<BibEntry> entries = entriesToImport.stream().map(CitationRelationItem::getEntry).collect(Collectors.toList());
-        ImportHandler importHandler = new ImportHandler(
-                databaseContext,
-                preferencesService,
-                fileUpdateMonitor,
-                undoManager,
-                stateManager,
-                dialogService,
-                Globals.TASK_EXECUTOR);
-        importHandler.importEntries(entries);
-
-        dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
-    }*/
 
 }

@@ -24,8 +24,10 @@ import org.slf4j.LoggerFactory;
  * GUI for tab displaying an articles citation relations in two lists based on the currently selected BibEntry
  */
 public class CitationRelationsTab extends EntryEditorTab {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
+    private static final RelatedEntriesCache CITATIONS_CACHE = new RelatedEntriesCache();
+    private static final RelatedEntriesCache REFERENCES_CACHE = new RelatedEntriesCache();
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
@@ -72,9 +74,10 @@ public class CitationRelationsTab extends EntryEditorTab {
                                              .build();
 
         RelatedEntriesRepository citationsRepository =
-                new RelatedEntriesRepository(SemanticScholarFetcher.buildCitationsFetcher());
+                new RelatedEntriesRepository(SemanticScholarFetcher.buildCitationsFetcher(), CITATIONS_CACHE);
         RelatedEntriesComponent citationsComponent = new RelatedEntriesComponent(entry,
-                citationsRepository, libraryTab, citationsComponentConfig);
+                citationsRepository, libraryTab, citationsComponentConfig, dialogService, databaseContext, undoManager,
+                stateManager, fileUpdateMonitor, preferencesService);
 
         // Initialize references data sources and UI
         RelatedEntriesComponentConfig referencesComponentConfig =
@@ -82,9 +85,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                                              .withHeading("References")
                                              .build();
         RelatedEntriesRepository referencesRepository =
-                new RelatedEntriesRepository(SemanticScholarFetcher.buildReferencesFetcher());
+                new RelatedEntriesRepository(SemanticScholarFetcher.buildReferencesFetcher(), REFERENCES_CACHE);
         RelatedEntriesComponent referencesComponent = new RelatedEntriesComponent(entry,
-                referencesRepository, libraryTab, referencesComponentConfig);
+                referencesRepository, libraryTab, referencesComponentConfig, dialogService, databaseContext, undoManager, stateManager, fileUpdateMonitor, preferencesService);
 
         SplitPane container = new SplitPane(citationsComponent, referencesComponent);
 
