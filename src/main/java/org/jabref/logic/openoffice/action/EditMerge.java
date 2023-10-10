@@ -186,7 +186,7 @@ public class EditMerge {
                                         + " but %s",
                                 state.prevRange.getString(),
                                 currentRange.getString(),
-                                ((textOrder == 0)
+                                (textOrder == 0
                                         ? "they start at the same position"
                                         : "the start of the latter precedes the start of the first"));
                 LOGGER.warn(msg);

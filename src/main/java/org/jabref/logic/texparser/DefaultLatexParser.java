@@ -77,7 +77,7 @@ public class DefaultLatexParser implements LatexParser {
 
         for (Path file : latexFiles) {
             if (!file.toFile().exists()) {
-                LOGGER.error(String.format("File does not exist: %s", file));
+                LOGGER.error("File does not exist: {}", file);
                 continue;
             }
 
@@ -151,17 +151,15 @@ public class DefaultLatexParser implements LatexParser {
     /**
      * Find inputs and includes along a specific line and store them for parsing later.
      */
-    private void matchNestedFile(Path file, List<Path> texFiles, List<Path> referencedFiles, String line) {
+    private void matchNestedFile(Path texFile, List<Path> texFiles, List<Path> referencedFiles, String line) {
         Matcher includeMatch = INCLUDE_PATTERN.matcher(line);
 
         while (includeMatch.find()) {
-            String include = includeMatch.group(INCLUDE_GROUP);
-
-            Path nestedFile = file.getParent().resolve(
-                    include.endsWith(TEX_EXT)
-                            ? include
-                            : String.format("%s%s", include, TEX_EXT));
-
+            String filenamePassedToInclude = includeMatch.group(INCLUDE_GROUP);
+            String texFileName = filenamePassedToInclude.endsWith(TEX_EXT)
+                    ? filenamePassedToInclude
+                    : String.format("%s%s", filenamePassedToInclude, TEX_EXT);
+            Path nestedFile = texFile.getParent().resolve(texFileName);
             if (nestedFile.toFile().exists() && !texFiles.contains(nestedFile)) {
                 referencedFiles.add(nestedFile);
             }

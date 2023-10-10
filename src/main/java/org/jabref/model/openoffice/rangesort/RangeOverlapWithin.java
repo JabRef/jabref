@@ -97,7 +97,7 @@ public class RangeOverlapWithin {
                     List<V> valuesForOverlappingRanges = new ArrayList<>();
                     valuesForOverlappingRanges.add(aHolder);
                     valuesForOverlappingRanges.add(bHolder);
-                    result.add(new RangeOverlap<>((cmpResult == 0)
+                    result.add(new RangeOverlap<>(cmpResult == 0
                             ? RangeOverlapKind.TOUCH
                             : RangeOverlapKind.OVERLAP,
                             valuesForOverlappingRanges));
