@@ -28,7 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The ampersand checker now skips verbatim fields (`file`, `url`, ...). [#10419](https://github.com/JabRef/jabref/pull/10419)
 - If no existing document is selected for exporting "XMP annotated pdf" JabRef will now create a new PDF file with a sample text and the metadata. [#10102](https://github.com/JabRef/jabref/issues/10102)
 - We modified the DOI cleanup to infer the DOI from an ArXiV ID if it's present. [10426](https://github.com/JabRef/jabref/issues/10426)
-- The Medline importer uses the field `comment` for notes (instead of `review).
+- The ISI importer uses the field `comment` for notes (instead of `review).
 
 ### Fixed
 
