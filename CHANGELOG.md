@@ -31,6 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where "Move URL in note field to url field" in the cleanup dialog caused an exception if no note field was present [forum#3999](https://discourse.jabref.org/t/cleanup-entries-cant-get-it-to-work/3999)
 - It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
 - Passwords can be stored in GNOME key ring. [#10274](https://github.com/JabRef/jabref/issues/10274)
 - We fixed an issue where groups based on an aux file could not be created due to an exception [#10350](https://github.com/JabRef/jabref/issues/10350)
@@ -86,7 +87,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
 - We added a tooltip to show the number of entries in a group [#10208](https://github.com/JabRef/jabref/issues/10208)
 - We fixed an issue where it was no longer possible to add or remove selected entries to groups via context menu [#10404](https://github.com/JabRef/jabref/issues/10404), [#10317](https://github.com/JabRef/jabref/issues/10317) [#10374](https://github.com/JabRef/jabref/issues/10374)
-- We fixed an issue where "Move URL in note field to url field" in the cleanup dialog caused an exception if no note field was present [forum#3999](https://discourse.jabref.org/t/cleanup-entries-cant-get-it-to-work/3999)
 
 ### Changed
 
