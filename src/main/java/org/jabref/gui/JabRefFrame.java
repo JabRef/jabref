@@ -716,6 +716,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         tabbedPane.getTabs().add(libraryTab);
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
+            tabbedPane.requestFocus();
         }
 
         libraryTab.setOnCloseRequest(event -> {
