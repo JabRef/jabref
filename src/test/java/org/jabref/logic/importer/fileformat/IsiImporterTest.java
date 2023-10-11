@@ -98,9 +98,9 @@ public class IsiImporterTest {
         IsiImporter.processSubSup(subs);
         assertEquals("$_3$", subs.get(StandardField.ABSTRACT));
 
-        subs.put(StandardField.REVIEW, "/sub 31/");
+        subs.put(StandardField.COMMENT, "/sub 31/");
         IsiImporter.processSubSup(subs);
-        assertEquals("$_{31}$", subs.get(StandardField.REVIEW));
+        assertEquals("$_{31}$", subs.get(StandardField.COMMENT));
 
         subs.put(StandardField.TITLE, "/sup 3/");
         IsiImporter.processSubSup(subs);
@@ -114,9 +114,9 @@ public class IsiImporterTest {
         IsiImporter.processSubSup(subs);
         assertEquals("$^3$", subs.get(StandardField.ABSTRACT));
 
-        subs.put(StandardField.REVIEW, "/sup 31/");
+        subs.put(StandardField.COMMENT, "/sup 31/");
         IsiImporter.processSubSup(subs);
-        assertEquals("$^{31}$", subs.get(StandardField.REVIEW));
+        assertEquals("$^{31}$", subs.get(StandardField.COMMENT));
 
         subs.put(StandardField.TITLE, "/sub $Hello/");
         IsiImporter.processSubSup(subs);
