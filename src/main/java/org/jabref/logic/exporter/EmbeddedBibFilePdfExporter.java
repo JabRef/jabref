@@ -42,9 +42,9 @@ import org.slf4j.LoggerFactory;
  * A custom exporter to write bib entries to an embedded bib file.
  */
 public class EmbeddedBibFilePdfExporter extends Exporter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedBibFilePdfExporter.class);
-
     public static String EMBEDDED_FILE_NAME = "main.bib";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedBibFilePdfExporter.class);
 
     private final BibDatabaseMode bibDatabaseMode;
     private final BibEntryTypesManager bibEntryTypesManager;
