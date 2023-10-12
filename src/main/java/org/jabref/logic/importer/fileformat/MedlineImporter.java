@@ -58,10 +58,6 @@ public class MedlineImporter extends Importer implements Parser {
     private static final Locale ENGLISH = Locale.ENGLISH;
     private final XMLInputFactory xmlInputFactory;
 
-    private static String join(List<String> list, String string) {
-        return Joiner.on(string).join(list);
-    }
-
     public MedlineImporter() {
         this.xmlInputFactory = XMLInputFactory.newInstance();
         // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
@@ -70,6 +66,10 @@ public class MedlineImporter extends Importer implements Parser {
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
         // TODO: decide if necessary, if disabled MedlineImporterTestNbib fails
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
+    }
+
+    private static String join(List<String> list, String string) {
+        return Joiner.on(string).join(list);
     }
     @Override
     public String getName() {
