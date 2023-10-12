@@ -71,6 +71,7 @@ public class MedlineImporter extends Importer implements Parser {
     private static String join(List<String> list, String string) {
         return Joiner.on(string).join(list);
     }
+
     @Override
     public String getName() {
         return "Medline/PubMed";
