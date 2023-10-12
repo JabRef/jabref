@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -75,8 +74,9 @@ public class ModsImporter extends Importer implements Parser {
             XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
             // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            // Not supported by aalto-xml
+            // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
 

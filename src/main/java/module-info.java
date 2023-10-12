@@ -52,6 +52,7 @@ open module org.jabref {
 
     // Preferences and XML
     requires java.prefs;
+    requires com.fasterxml.aalto;
 
     // Annotations (@PostConstruct)
     requires jakarta.annotation;
