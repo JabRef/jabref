@@ -61,6 +61,11 @@ public class RelatedEntriesComponent extends VBox {
         this.libraryTab = libraryTab;
 
         initUI();
+        if (pivotEntry.getDOI().isEmpty()) {
+            relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("The selected entry doesn't have a DOI linked to it. Lookup a DOI and try again.")));
+            return;
+        }
+
         viewModel.loadEntries();
 
         viewModel.relatedEntriesResultPropertyProperty().addListener((observable, oldValue, result) -> {
@@ -104,7 +109,7 @@ public class RelatedEntriesComponent extends VBox {
         this.setAlignment(Pos.TOP_CENTER);
 
         // Create Heading Lab
-        Label headingLabel = new Label(Localization.lang(config.getHeading()));
+        Label headingLabel = new Label(config.getHeading());
         headingLabel.setStyle("-fx-padding: 5px");
         headingLabel.setAlignment(Pos.CENTER);
         AnchorPane.setTopAnchor(headingLabel, 0.0);
@@ -129,6 +134,7 @@ public class RelatedEntriesComponent extends VBox {
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxSize(25, 25);
+        progressIndicator.setVisible(false);
         styleTopBarNode(progressIndicator, 50.0);
 
         // Create import buttons for both sides

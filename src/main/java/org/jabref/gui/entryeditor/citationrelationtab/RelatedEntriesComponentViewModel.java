@@ -73,9 +73,6 @@ public class RelatedEntriesComponentViewModel {
 
     private void load(boolean shouldRefresh) {
         task = BackgroundTask.wrap(() -> {
-                                 if (pivotEntry.getDOI().isEmpty()) {
-                                     throw new IllegalArgumentException("The selected entry doesn't have a DOI linked to it. Lookup a DOI and try again.");
-                                 }
                                  if (shouldRefresh) {
                                      repository.refreshCache(pivotEntry);
                                  }
