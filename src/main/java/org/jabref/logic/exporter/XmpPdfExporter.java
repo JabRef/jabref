@@ -18,8 +18,11 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XmpPdfExporter extends Exporter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmpPdfExporter.class);
 
     private final XmpPreferences xmpPreferences;
 
@@ -50,7 +53,7 @@ public class XmpPdfExporter extends Exporter {
                 }
                 document.save(filePath.toString());
             } catch (IOException e) {
-                throw new Exception("Error creating PDF", e);
+                LOGGER.error("Could not create PDF file", e);
             }
             new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile, entries, databaseContext.getDatabase());
         }
