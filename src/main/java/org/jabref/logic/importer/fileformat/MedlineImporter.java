@@ -62,12 +62,14 @@ public class MedlineImporter extends Importer implements Parser {
         return Joiner.on(string).join(list);
     }
 
-    public MedlineImporter(){
+    public MedlineImporter() {
         this.xmlInputFactory = XMLInputFactory.newInstance();
         // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
         xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         // required for reading Unicode characters such as &#xf6;
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
+        // TODO: decide if necessary, if disabled MedlineImporterTestNbib fails
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
     }
     @Override
     public String getName() {
