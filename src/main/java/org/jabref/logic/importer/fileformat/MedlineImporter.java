@@ -41,7 +41,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,10 +55,6 @@ public class MedlineImporter extends Importer implements Parser {
     private static final String KEYWORD_SEPARATOR = "; ";
 
     private static final Locale ENGLISH = Locale.ENGLISH;
-
-    private static String join(List<String> list, String string) {
-        return Joiner.on(string).join(list);
-    }
 
     @Override
     public String getName() {
@@ -228,14 +223,14 @@ public class MedlineImporter extends Importer implements Parser {
 
         // populate multiple occurrence fields
         if (!sectionTitleList.isEmpty()) {
-            fields.put(new UnknownField("sections"), join(sectionTitleList, "; "));
+            fields.put(new UnknownField("sections"), String.join("; ", sectionTitleList));
         }
         addKeywords(fields, keywordList);
         if (!publicationTypeList.isEmpty()) {
-            fields.put(new UnknownField("pubtype"), join(publicationTypeList, ", "));
+            fields.put(new UnknownField("pubtype"), String.join(", ", publicationTypeList));
         }
         if (!articleTitleList.isEmpty()) {
-            fields.put(new UnknownField("article"), join(articleTitleList, ", "));
+            fields.put(new UnknownField("article"), String.join(", ", articleTitleList));
         }
     }
 
@@ -316,11 +311,11 @@ public class MedlineImporter extends Importer implements Parser {
         }
 
         if (!isbnList.isEmpty()) {
-            fields.put(StandardField.ISBN, join(isbnList, ", "));
+            fields.put(StandardField.ISBN, String.join(", ", isbnList));
         }
 
         if (!titleList.isEmpty()) {
-            putIfValueNotNull(fields, StandardField.TITLE, join(titleList, " "));
+            putIfValueNotNull(fields, StandardField.TITLE, String.join(" ", titleList));
         }
     }
 
@@ -538,14 +533,14 @@ public class MedlineImporter extends Importer implements Parser {
 
         // populate multiple occurrence fields
         if (!citationSubsets.isEmpty()) {
-            fields.put(new UnknownField("citation-subset"), join(citationSubsets, ", "));
+            fields.put(new UnknownField("citation-subset"), String.join(", ", citationSubsets));
         }
         addMeshHeading(fields, meshHeadingList);
         addPersonalNames(fields, personalNameSubjectList);
         addOtherId(fields, otherIdList);
         addKeywords(fields, keywordList);
         if (!spaceFlightMissionList.isEmpty()) {
-            fields.put(new UnknownField("space-flight-mission"), join(spaceFlightMissionList, ", "));
+            fields.put(new UnknownField("space-flight-mission"), String.join(", ", spaceFlightMissionList));
         }
         addInvestigators(fields, investigatorList);
         addNotes(fields, generalNoteList);
@@ -679,7 +674,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
 
         if (!geneSymbols.isEmpty()) {
-            fields.put(new UnknownField("gene-symbols"), join(geneSymbols, ", "));
+            fields.put(new UnknownField("gene-symbols"), String.join(", ", geneSymbols));
         }
     }
 
@@ -704,7 +699,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        fields.put(new UnknownField("chemicals"), join(chemicalNames, ", "));
+        fields.put(new UnknownField("chemicals"), String.join(", ", chemicalNames));
     }
 
     private void parseMedlineJournalInfo(XMLStreamReader reader, Map<Field, String> fields, String startElement)
@@ -789,7 +784,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
 
         if (!titleList.isEmpty()) {
-            fields.put(StandardField.TITLE, StringUtil.stripBrackets(join(titleList, " ")));
+            fields.put(StandardField.TITLE, StringUtil.stripBrackets(String.join(" ", titleList)));
         }
     }
 
@@ -908,7 +903,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
 
         if (!notes.isEmpty()) {
-            fields.put(StandardField.NOTE, join(notes, ", "));
+            fields.put(StandardField.NOTE, String.join(", ", notes));
         }
     }
 
@@ -932,21 +927,21 @@ public class MedlineImporter extends Importer implements Parser {
             }
 
             if (!affiliationInfos.isEmpty()) {
-                fields.put(new UnknownField("affiliation"), join(affiliationInfos, ", "));
+                fields.put(new UnknownField("affiliation"), String.join(", ", affiliationInfos));
             }
 
-            fields.put(new UnknownField("investigator"), join(investigatorNames, " and "));
+            fields.put(new UnknownField("investigator"), String.join(" and ", investigatorNames));
         }
     }
 
     private void addKeywords(Map<Field, String> fields, List<String> keywordList) {
         // Check whether MeshHeadingList exists or not
         if (fields.get(StandardField.KEYWORDS) == null) {
-            fields.put(StandardField.KEYWORDS, join(keywordList, KEYWORD_SEPARATOR));
+            fields.put(StandardField.KEYWORDS, String.join(KEYWORD_SEPARATOR, keywordList));
         } else {
             if (!keywordList.isEmpty()) {
                 // if it exists, combine the MeshHeading with the keywords
-                String result = join(keywordList, "; ");
+                String result = String.join("; ", keywordList);
                 result = fields.get(StandardField.KEYWORDS) + KEYWORD_SEPARATOR + result;
                 fields.put(StandardField.KEYWORDS, result);
             }
@@ -975,7 +970,7 @@ public class MedlineImporter extends Importer implements Parser {
                     personalNames.add(result.toString());
                 }
 
-                fields.put(StandardField.AUTHOR, join(personalNames, " and "));
+                fields.put(StandardField.AUTHOR, String.join(" and ", personalNames));
             }
         }
     }
@@ -994,7 +989,7 @@ public class MedlineImporter extends Importer implements Parser {
                 keywords.add(result.toString());
             }
 
-            fields.put(StandardField.KEYWORDS, join(keywords, KEYWORD_SEPARATOR));
+            fields.put(StandardField.KEYWORDS, String.join(KEYWORD_SEPARATOR, keywords));
         }
     }
 
@@ -1065,7 +1060,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
 
         if (!abstractTextList.isEmpty()) {
-            fields.put(StandardField.ABSTRACT, join(abstractTextList, " "));
+            fields.put(StandardField.ABSTRACT, String.join(" ", abstractTextList));
         }
     }
 
@@ -1170,7 +1165,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        fields.put(StandardField.AUTHOR, join(authorNames, " and "));
+        fields.put(StandardField.AUTHOR, String.join(" and ", authorNames));
     }
 
     private void parseAuthor(XMLStreamReader reader, List<String> authorNames) throws XMLStreamException {
