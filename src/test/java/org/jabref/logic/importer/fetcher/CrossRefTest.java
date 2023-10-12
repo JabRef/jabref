@@ -130,7 +130,7 @@ public class CrossRefTest {
         entry.setField(StandardField.VOLUME, "42");
         entry.setField(StandardField.YEAR, "1999");
         entry.setField(StandardField.JOURNAL, "Indo-Iranian Journal");
-        entry.setField(StandardField.ISSUE, "2");
+        entry.setField(StandardField.NUMBER, "2");
         entry.setField(StandardField.PUBLISHER, "Brill");
         entry.setField(StandardField.KEYWORDS, "Political Science and International Relations, Linguistics and Language, Philosophy");
 

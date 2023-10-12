@@ -97,7 +97,7 @@ public class IsiImporter extends Importer {
     }
 
     public static void processSubSup(Map<Field, String> map) {
-        Field[] subsup = {StandardField.TITLE, StandardField.ABSTRACT, StandardField.REVIEW, new UnknownField("notes")};
+        Field[] subsup = {StandardField.TITLE, StandardField.ABSTRACT, StandardField.COMMENT, new UnknownField("notes")};
 
         for (Field aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
