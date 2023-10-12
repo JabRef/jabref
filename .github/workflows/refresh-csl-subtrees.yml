@@ -14,7 +14,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
-          fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
       - name: Initialize git
