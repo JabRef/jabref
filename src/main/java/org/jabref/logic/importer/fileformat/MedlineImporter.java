@@ -56,11 +56,19 @@ public class MedlineImporter extends Importer implements Parser {
     private static final String KEYWORD_SEPARATOR = "; ";
 
     private static final Locale ENGLISH = Locale.ENGLISH;
+    private final XMLInputFactory xmlInputFactory;
 
     private static String join(List<String> list, String string) {
         return Joiner.on(string).join(list);
     }
 
+    public MedlineImporter(){
+        this.xmlInputFactory = XMLInputFactory.newInstance();
+        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
+        xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        // required for reading Unicode characters such as &#xf6;
+        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
+    }
     @Override
     public String getName() {
         return "Medline/PubMed";
@@ -103,13 +111,6 @@ public class MedlineImporter extends Importer implements Parser {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-
-            // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            // required for reading Unicode characters such as &#xf6;
-            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
-
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
 
             while (reader.hasNext()) {
