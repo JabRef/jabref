@@ -35,11 +35,14 @@ import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecifica
 import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A custom exporter to write bib entries to an embedded bib file.
  */
 public class EmbeddedBibFilePdfExporter extends Exporter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedBibFilePdfExporter.class);
 
     public static String EMBEDDED_FILE_NAME = "main.bib";
 
@@ -79,7 +82,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                 }
                 document.save(file.toString());
             } catch (IOException e) {
-                throw new Exception("Error creating PDF", e);
+                LOGGER.error("Could not create PDF file", e);
             }
         }
 
