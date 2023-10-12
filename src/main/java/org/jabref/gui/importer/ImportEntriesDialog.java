@@ -11,6 +11,7 @@ import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -49,6 +50,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
 
+@SuppressWarnings("checkstyle:RegexpMultiline")
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     public CheckListView<BibEntry> entriesListView;
@@ -56,6 +58,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public ButtonType importButton;
     public Label totalItems;
     public Label selectedItems;
+    public Label page;
+    public int pageCount = 1;
     public CheckBox downloadLinkedOnlineFiles;
     private final BackgroundTask<ParserResult> task;
     private ImportEntriesViewModel viewModel;
@@ -81,6 +85,19 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                   .load()
                   .setAsDialogPane(this);
 
+        // Get buttonBar in DialogPane
+        ButtonBar buttonBar = (ButtonBar) this.getDialogPane().lookup(".button-bar");
+
+        // Setup page buttons
+        Button previousButton = new Button("Previous");
+        previousButton.setOnAction(event -> previousPage());
+
+        Button nextButton = new Button("Next");
+        nextButton.setOnAction(event -> nextPage());
+
+        // Put buttons in ButtonBar
+        buttonBar.getButtons().addAll(previousButton, nextButton);
+
         BooleanBinding booleanBind = Bindings.isEmpty(entriesListView.getCheckModel().getCheckedItems());
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
@@ -93,7 +110,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             } else {
                 dialogService.notify(Localization.lang("Import canceled"));
             }
-
             return false;
         });
     }
@@ -173,6 +189,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
         selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
         totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
+        page.textProperty().set(String.valueOf(pageCount));
         entriesListView.setSelectionModel(new NoSelectionModel<>());
     }
 
@@ -229,5 +246,21 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public void selectAllEntries() {
         unselectAll();
         entriesListView.getCheckModel().checkAll();
+    }
+
+    // Page change function
+    public void previousPage() {
+        if (pageCount == 1) {
+            return;
+        }
+        pageCount -= 1;
+        initialize();
+        entriesListView.getItems();
+    }
+
+    public void nextPage() {
+        pageCount += 1;
+        initialize();
+        entriesListView.getItems();
     }
 }

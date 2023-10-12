@@ -46,6 +46,8 @@
                     <Label fx:id="totalItems" GridPane.columnIndex="1"/>
                     <Label styleClass="info-section" text="%Selected items:" GridPane.rowIndex="1"/>
                     <Label fx:id="selectedItems" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <Label styleClass="info-section" text="%Page:" GridPane.rowIndex="2"/>
+                    <Label fx:id="page" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
                 </GridPane>
             </HBox>
             <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
