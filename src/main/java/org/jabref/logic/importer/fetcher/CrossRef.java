@@ -139,7 +139,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
             entry.setField(StandardField.DOI, item.getString("DOI"));
             entry.setField(StandardField.JOURNAL, item.optString("container-title"));
             entry.setField(StandardField.PUBLISHER, item.optString("publisher"));
-            entry.setField(StandardField.ISSUE, item.optString("issue"));
+            entry.setField(StandardField.NUMBER, item.optString("issue"));
             entry.setField(StandardField.KEYWORDS, Optional.ofNullable(item.optJSONArray("subject")).map(this::getKeywords).orElse(""));
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.VOLUME, item.optString("volume"));
