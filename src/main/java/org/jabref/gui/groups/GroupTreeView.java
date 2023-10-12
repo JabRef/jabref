@@ -78,8 +78,8 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
-    private static final double SCROLL_SPEED = 2000d; // larger is slower
-    private static final double SCROLL_LIMITS = 40d; //
+    private static final double SCROLL_SPEED = 2000.0; // larger is slower
+    private static final double SCROLL_LIMITS = 40.0;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
