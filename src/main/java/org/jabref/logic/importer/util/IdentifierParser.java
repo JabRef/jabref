@@ -44,11 +44,21 @@ public class IdentifierParser {
 
     private Optional<? extends Identifier> parseEprint(String eprint) {
         Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
+        Optional<String> archivePrefixOpt = entry.getField(StandardField.ARCHIVEPREFIX);
+
         if (eprintTypeOpt.isPresent()) {
             String eprintType = eprintTypeOpt.get();
             if ("arxiv".equalsIgnoreCase(eprintType)) {
                 return ArXivIdentifier.parse(eprint);
             } else if ("ark".equalsIgnoreCase(eprintType)) {
+                return ARK.parse(eprint);
+            }
+        }
+        if (archivePrefixOpt.isPresent()) {
+            String archivePrefix = archivePrefixOpt.get();
+            if ("arxiv".equalsIgnoreCase(archivePrefix)) {
+                return ArXivIdentifier.parse(eprint);
+            } else if ("ark".equalsIgnoreCase(archivePrefix)) {
                 return ARK.parse(eprint);
             }
         }
