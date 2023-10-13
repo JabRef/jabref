@@ -92,15 +92,15 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         btnGenerate.textProperty().bind(EasyBind.map(viewModel.searchingProperty(), searching -> searching ? Localization.lang("Searching...") : Localization.lang("Generate")));
         btnGenerate.disableProperty().bind(viewModel.idFieldValidationStatus().validProperty().not().or(viewModel.searchingProperty()));
 
-        EasyBind.subscribe(viewModel.searchSuccesfulProperty(), value -> {
-            if (value) {
+        EasyBind.subscribe(viewModel.searchSuccesfulProperty(), isSuccessful -> {
+            if (isSuccessful) {
                 setEntryTypeForReturnAndClose(Optional.empty());
             }
         });
     }
 
-    private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entries) {
-        for (BibEntryType entryType : entries) {
+    private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entryTypes) {
+        for (BibEntryType entryType : entryTypes) {
             Button entryButton = new Button(entryType.getType().getDisplayName());
             entryButton.setUserData(entryType);
             entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(Optional.of(entryType)));

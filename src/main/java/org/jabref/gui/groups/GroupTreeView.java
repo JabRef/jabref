@@ -34,6 +34,7 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -44,7 +45,6 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -225,7 +225,10 @@ public class GroupTreeView extends BorderPane {
         new ViewModelTreeTableRowFactory<GroupNodeViewModel>()
                 .withContextMenu(this::createContextMenuForGroup)
                 .withEventFilter(MouseEvent.MOUSE_PRESSED, (row, event) -> {
-                    if (event.getTarget() instanceof StackPane pane) {
+                    if (((MouseEvent) event).getButton() == MouseButton.SECONDARY && !stateManager.getSelectedEntries().isEmpty()) {
+                        // Prevent right-click to select group whe we have selected entries
+                        event.consume();
+                    } else if (event.getTarget() instanceof StackPane pane) {
                         if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {
                             event.consume();
                         }
@@ -481,7 +484,7 @@ public class GroupTreeView extends BorderPane {
         }
 
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory factory = new ActionFactory(preferencesService.getKeyBindingRepository());
 
         MenuItem removeGroup;
         if (group.hasSubgroups() && group.canAddGroupsIn() && !group.isRoot()) {

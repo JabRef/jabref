@@ -170,7 +170,12 @@ public class URLCleanupTest {
                               .withField(StandardField.NOTE,
                                     "cited by Kramer"),
                 new BibEntry().withField(StandardField.NOTE,
-                                    "\\url{https://example.org}, cited by Kramer, accessed on 2023-04-11"))
+                                    "\\url{https://example.org}, cited by Kramer, accessed on 2023-04-11"),
+            // test with no fields present
+            Arguments.of(
+                    new BibEntry(),
+                    new BibEntry())
+            )
         );
     }
 }
