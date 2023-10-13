@@ -6,233 +6,291 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class TitleCheckerTest {
+    @Nested
+    class BibTexChecker {
+        private TitleChecker checker;
 
-    private TitleChecker checker;
-    private TitleChecker checkerBiblatex;
+        @BeforeEach
+        public void setUp() {
+            BibDatabaseContext databaseContext = new BibDatabaseContext();
+            databaseContext.setMode(BibDatabaseMode.BIBTEX);
+            checker = new TitleChecker(databaseContext);
+        }
 
-    @BeforeEach
-    public void setUp() {
-        BibDatabaseContext databaseContext = new BibDatabaseContext();
-        BibDatabaseContext databaseBiblatex = new BibDatabaseContext();
-        databaseContext.setMode(BibDatabaseMode.BIBTEX);
-        checker = new TitleChecker(databaseContext);
-        databaseBiblatex.setMode(BibDatabaseMode.BIBLATEX);
-        checkerBiblatex = new TitleChecker(databaseBiblatex);
+        @Test
+        public void firstLetterAsOnlyCapitalLetterInSubTitle2() {
+            String title = "This is a sub title 1: This is a sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void noCapitalLetterInSubTitle2() {
+            String title = "This is a sub title 1: this is a sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void twoCapitalLettersInSubTitle2() {
+            String title = "This is a sub title 1: This is A sub title 2";
+            assertNotEquals(Optional.empty(), checker.checkValue(title));
+            assertNotEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void middleLetterAsOnlyCapitalLetterInSubTitle2() {
+            String title = "This is a sub title 1: this is A sub title 2";
+            assertNotEquals(Optional.empty(), checker.checkValue(title));
+            assertNotEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void twoCapitalLettersInSubTitle2WithCurlyBrackets() {
+            String title = "This is a sub title 1: This is {A} sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void middleLetterAsOnlyCapitalLetterInSubTitle2WithCurlyBrackets() {
+            String title = "This is a sub title 1: this is {A} sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void firstLetterAsOnlyCapitalLetterInSubTitle2AfterContinuousDelimiters() {
+            String title = "This is a sub title 1...This is a sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void middleLetterAsOnlyCapitalLetterInSubTitle2AfterContinuousDelimiters() {
+            String title = "This is a sub title 1... this is a sub Title 2";
+            assertNotEquals(Optional.empty(), checker.checkValue(title));
+            assertNotEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void firstLetterAsOnlyCapitalLetterInEverySubTitleWithContinuousDelimiters() {
+            String title = "This is; A sub title 1.... This is a sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void firstLetterAsOnlyCapitalLetterInEverySubTitleWithRandomDelimiters() {
+            String title = "This!is!!A!Title??";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        public void moreThanOneCapitalLetterInSubTitleWithoutCurlyBrackets() {
+            String title = "This!is!!A!TitlE??";
+            assertNotEquals(Optional.empty(), checker.checkValue(title));
+            assertNotEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexAcceptsTitleWithOnlyFirstCapitalLetter() {
+            String title = "This is a title";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexDoesNotAcceptCapitalLettersInsideTitle() {
+            String title = "This is a Title";
+            assertNotEquals(Optional.empty(), checker.checkValue(title));
+            assertNotEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexRemovesCapitalLetterInsideTitle() {
+            String title = "This is a {T}itle";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexRemovesEverythingInBracketsAndAcceptsNoTitleInput() {
+            String title = "{This is a Title}";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexRemovesEverythingInBrackets() {
+            String title = "This is a {Title}";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexAcceptsTitleWithLowercaseFirstLetter() {
+            String title = "{C}urrent {C}hronicle";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexAcceptsSubTitlesWithOnlyFirstCapitalLetter() {
+            String title = "This is a sub title 1: This is a sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexAcceptsSubTitleWithLowercaseFirstLetter() {
+            String title = "This is a sub title 1: this is a sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexDoesNotAcceptCapitalLettersInsideSubTitle() {
+            String title = "This is a sub title 1: This is A sub title 2";
+            assertNotEquals(Optional.empty(), checker.checkValue(title));
+            assertNotEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexRemovesCapitalLetterInsideSubTitle() {
+            String title = "This is a sub title 1: this is {A} sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexSplitsSubTitlesBasedOnDots() {
+            String title = "This is a sub title 1...This is a sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+        }
+
+        @Test
+        void bibTexSplitsSubTitleBasedOnSpecialCharacters() {
+            String title = "This is; A sub title 1.... This is a sub title 2";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexAcceptsCapitalLetterAfterSpecialCharacter() {
+            String title = "This!is!!A!Title??";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexAcceptsCapitalLetterOnlyAfterSpecialCharacter() {
+            String title = "This!is!!A!TitlE??";
+            assertNotEquals(Optional.empty(), checker.checkValue(title));
+            assertNotEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexAcceptsOriginalAndTranslatedTitle() {
+            String title = "This is a title [This is translated title]";
+            assertEquals(Optional.empty(), checker.checkValue(title));
+            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        private String translatedTitle(String title) {
+            return "[%s]".formatted(title);
+        }
     }
 
-    @Test
-    public void firstLetterAsOnlyCapitalLetterInSubTitle2() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is a sub title 2"));
-    }
+    @Nested
+    class BibLaTexChecker {
+        private TitleChecker checkerBiblatex;
 
-    @Test
-    public void noCapitalLetterInSubTitle2() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is a sub title 2"));
-    }
+        @BeforeEach
+        public void setUp() {
+            BibDatabaseContext databaseBiblatex = new BibDatabaseContext();
+            databaseBiblatex.setMode(BibDatabaseMode.BIBLATEX);
+            checkerBiblatex = new TitleChecker(databaseBiblatex);
+        }
 
-    @Test
-    public void twoCapitalLettersInSubTitle2() {
-        assertNotEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is A sub title 2"));
-    }
+        @Test
+        void bibLaTexAcceptsTitleWithOnlyFirstCapitalLetter() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a title"));
+        }
 
-    @Test
-    public void middleLetterAsOnlyCapitalLetterInSubTitle2() {
-        assertNotEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is A sub title 2"));
-    }
+        @Test
+        void bibLaTexAcceptsCapitalLettersInsideTitle() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a Title"));
+        }
 
-    @Test
-    public void twoCapitalLettersInSubTitle2WithCurlyBrackets() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is {A} sub title 2"));
-    }
+        @Test
+        void bibLaTexRemovesCapitalLetterInsideTitle() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a {T}itle"));
+        }
 
-    @Test
-    public void middleLetterAsOnlyCapitalLetterInSubTitle2WithCurlyBrackets() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is {A} sub title 2"));
-    }
+        @Test
+        void bibLaTexRemovesEverythingInBracketsAndAcceptsNoTitleInput() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("{This is a Title}"));
+        }
 
-    @Test
-    public void firstLetterAsOnlyCapitalLetterInSubTitle2AfterContinuousDelimiters() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1...This is a sub title 2"));
-    }
+        @Test
+        void bibLaTexRemovesEverythingInBrackets() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a {Title}"));
+        }
 
-    @Test
-    public void middleLetterAsOnlyCapitalLetterInSubTitle2AfterContinuousDelimiters() {
-        assertNotEquals(Optional.empty(), checker.checkValue("This is a sub title 1... this is a sub Title 2"));
-    }
+        @Test
+        void bibLaTexAcceptsTitleWithLowercaseFirstLetter() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("{C}urrent {C}hronicle"));
+        }
 
-    @Test
-    public void firstLetterAsOnlyCapitalLetterInEverySubTitleWithContinuousDelimiters() {
-        assertEquals(Optional.empty(), checker.checkValue("This is; A sub title 1.... This is a sub title 2"));
-    }
+        @Test
+        void bibLaTexAcceptsSubTitlesWithOnlyFirstCapitalLetter() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: This is a sub title 2"));
+        }
 
-    @Test
-    public void firstLetterAsOnlyCapitalLetterInEverySubTitleWithRandomDelimiters() {
-        assertEquals(Optional.empty(), checker.checkValue("This!is!!A!Title??"));
-    }
+        @Test
+        void bibLaTexAcceptsSubTitleWithLowercaseFirstLetter() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: this is a sub title 2"));
+        }
 
-    @Test
-    public void moreThanOneCapitalLetterInSubTitleWithoutCurlyBrackets() {
-        assertNotEquals(Optional.empty(), checker.checkValue("This!is!!A!TitlE??"));
-    }
+        @Test
+        void bibLaTexAcceptsCapitalLettersInsideSubTitle() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: This is A sub title 2"));
+        }
 
-    @Test
-    void bibTexAcceptsTitleWithOnlyFirstCapitalLetter() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a title"));
-    }
+        @Test
+        void bibLaTexRemovesCapitalLetterInsideSubTitle() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: this is {A} sub title 2"));
+        }
 
-    @Test
-    void bibTexDoesNotAcceptCapitalLettersInsideTitle() {
-        assertNotEquals(Optional.empty(), checker.checkValue("This is a Title"));
-    }
+        @Test
+        void bibLaTexSplitsSubTitlesBasedOnDots() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1...This is a sub title 2"));
+        }
 
-    @Test
-    void bibTexRemovesCapitalLetterInsideTitle() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a {T}itle"));
-    }
+        @Test
+        void bibLaTexSplitsSubTitleBasedOnSpecialCharacters() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is; A sub title 1.... This is a sub title 2"));
+        }
 
-    @Test
-    void bibTexRemovesEverythingInBracketsAndAcceptsNoTitleInput() {
-        assertEquals(Optional.empty(), checker.checkValue("{This is a Title}"));
-    }
+        @Test
+        void bibLaTexAcceptsCapitalLetterAfterSpecialCharacter() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This!is!!A!Title??"));
+        }
 
-    @Test
-    void bibTexRemovesEverythingInBrackets() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a {Title}"));
-    }
-
-    @Test
-    void bibTexAcceptsTitleWithLowercaseFirstLetter() {
-        assertEquals(Optional.empty(), checker.checkValue("{C}urrent {C}hronicle"));
-    }
-
-    @Test
-    void bibTexAcceptsSubTitlesWithOnlyFirstCapitalLetter() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is a sub title 2"));
-    }
-
-    @Test
-    void bibTexAcceptsSubTitleWithLowercaseFirstLetter() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is a sub title 2"));
-    }
-
-    @Test
-    void bibTexDoesNotAcceptCapitalLettersInsideSubTitle() {
-        assertNotEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is A sub title 2"));
-    }
-
-    @Test
-    void bibTexRemovesCapitalLetterInsideSubTitle() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is {A} sub title 2"));
-    }
-
-    @Test
-    void bibTexSplitsSubTitlesBasedOnDots() {
-        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1...This is a sub title 2"));
-    }
-
-    @Test
-    void bibTexSplitsSubTitleBasedOnSpecialCharacters() {
-        assertEquals(Optional.empty(), checker.checkValue("This is; A sub title 1.... This is a sub title 2"));
-    }
-
-    @Test
-    void bibTexAcceptsCapitalLetterAfterSpecialCharacter() {
-        assertEquals(Optional.empty(), checker.checkValue("This!is!!A!Title??"));
-    }
-
-    @Test
-    void bibTexAcceptsCapitalLetterOnlyAfterSpecialCharacter() {
-        assertNotEquals(Optional.empty(), checker.checkValue("This!is!!A!TitlE??"));
-    }
-
-    @Test
-    void bibLaTexAcceptsTranslatedTitleInSquareBrackets() {
-        assertEquals(Optional.empty(), checker.checkValue("[This is a translated title]"));
-    }
-
-    @Test
-    void bibLaTexAcceptsTranslatedTitleInSquareBracketsAndNativeTitle() {
-        assertEquals(Optional.empty(), checker.checkValue("Original tile [This is a translated title]"));
-    }
-
-    @Test
-    void bibLaTexAcceptsTranslatedTitleInSquareBracketsAndNativeTitleEnd() {
-        assertEquals(Optional.empty(), checker.checkValue("[This is a translated title]Original tile "));
-    }
-
-    @Test
-    void bibLaTexAcceptsTitleWithOnlyFirstCapitalLetter() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a title"));
-    }
-
-    @Test
-    void bibLaTexAcceptsCapitalLettersInsideTitle() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a Title"));
-    }
-
-    @Test
-    void bibLaTexRemovesCapitalLetterInsideTitle() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a {T}itle"));
-    }
-
-    @Test
-    void bibLaTexRemovesEverythingInBracketsAndAcceptsNoTitleInput() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("{This is a Title}"));
-    }
-
-    @Test
-    void bibLaTexRemovesEverythingInBrackets() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a {Title}"));
-    }
-
-    @Test
-    void bibLaTexAcceptsTitleWithLowercaseFirstLetter() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("{C}urrent {C}hronicle"));
-    }
-
-    @Test
-    void bibLaTexAcceptsSubTitlesWithOnlyFirstCapitalLetter() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: This is a sub title 2"));
-    }
-
-    @Test
-    void bibLaTexAcceptsSubTitleWithLowercaseFirstLetter() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: this is a sub title 2"));
-    }
-
-    @Test
-    void bibLaTexAcceptsCapitalLettersInsideSubTitle() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: This is A sub title 2"));
-    }
-
-    @Test
-    void bibLaTexRemovesCapitalLetterInsideSubTitle() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: this is {A} sub title 2"));
-    }
-
-    @Test
-    void bibLaTexSplitsSubTitlesBasedOnDots() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1...This is a sub title 2"));
-    }
-
-    @Test
-    void bibLaTexSplitsSubTitleBasedOnSpecialCharacters() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is; A sub title 1.... This is a sub title 2"));
-    }
-
-    @Test
-    void bibLaTexAcceptsCapitalLetterAfterSpecialCharacter() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This!is!!A!Title??"));
-    }
-
-    @Test
-    void bibLaTexAcceptsCapitalLetterNotOnlyAfterSpecialCharacter() {
-        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This!is!!A!TitlE??"));
+        @Test
+        void bibLaTexAcceptsCapitalLetterNotOnlyAfterSpecialCharacter() {
+            assertEquals(Optional.empty(), checkerBiblatex.checkValue("This!is!!A!TitlE??"));
+        }
     }
 }
