@@ -75,7 +75,7 @@ public class KeyBindingViewModel {
     }
 
     private void setDisplayName() {
-        this.displayName.set((keyBinding == null) ? this.category.getName() : keyBinding.getLocalization());
+        this.displayName.set(keyBinding == null ? this.category.getName() : keyBinding.getLocalization());
     }
 
     public StringProperty nameProperty() {

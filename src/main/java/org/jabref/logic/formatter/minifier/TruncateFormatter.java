@@ -15,7 +15,7 @@ public class TruncateFormatter extends Formatter {
      * @param truncateIndex truncate a string after this index.
      */
     public TruncateFormatter(final int truncateIndex) {
-        TRUNCATE_AFTER = (truncateIndex >= 0) ? truncateIndex : Integer.MAX_VALUE;
+        TRUNCATE_AFTER = truncateIndex >= 0 ? truncateIndex : Integer.MAX_VALUE;
         KEY = "truncate" + TRUNCATE_AFTER;
     }
 

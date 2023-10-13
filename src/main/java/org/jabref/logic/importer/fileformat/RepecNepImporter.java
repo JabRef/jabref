@@ -276,16 +276,16 @@ public class RepecNepImporter extends Importer {
 
             authors.add(author);
 
-            if (institution.length() > 0) {
+            if (!institution.isEmpty()) {
                 institutions.append(
-                        (institutions.length() == 0) ? institution.toString() : " and " + institution.toString());
+                        institutions.length() == 0 ? institution.toString() : " and " + institution.toString());
             }
         }
 
         if (!authors.isEmpty()) {
             be.setField(StandardField.AUTHOR, String.join(" and ", authors));
         }
-        if (institutions.length() > 0) {
+        if (!institutions.isEmpty()) {
             be.setField(StandardField.INSTITUTION, institutions.toString());
         }
     }
