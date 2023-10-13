@@ -88,7 +88,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private Unmarshaller unmarshaller;
 
-    public CitaviXmlImporter(){
+    public CitaviXmlImporter() {
         xmlInputFactory = XMLInputFactory.newFactory();
     }
 
