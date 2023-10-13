@@ -8,8 +8,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -204,7 +202,12 @@ public class TitleCheckerTest {
         void bibTexAcceptsOriginalAndTranslatedTitle() {
             String title = "This is a title [This is translated title]";
             assertEquals(Optional.empty(), checker.checkValue(title));
-            assertEquals(Optional.empty(), checker.checkValue(translatedTitle(title)));
+        }
+
+        @Test
+        void bibTexNotAcceptsLeadingTranslatedTitleWithOriginal() {
+            String title = "[This is translated title] This is a title";
+            assertNotEquals(Optional.empty(), checker.checkValue(title));
         }
 
         private String translatedTitle(String title) {
