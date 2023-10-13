@@ -50,9 +50,16 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EndnoteXmlImporter.class);
     private final ImportFormatPreferences preferences;
+    private final XMLInputFactory xmlInputFactory;
 
     public EndnoteXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
+        xmlInputFactory = XMLInputFactory.newInstance();
+        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
+        // not suported by aalto-xml
+        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        // required for reading Unicode characters such as &#xf6;
+        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
     }
 
     private static String join(List<String> list, String string) {
@@ -100,14 +107,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-
-            // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-            // not suported by aalto-xml
-            // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            // required for reading Unicode characters such as &#xf6;
-            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
-
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
 
             while (reader.hasNext()) {

@@ -64,6 +64,7 @@ public class MedlineImporter extends Importer implements Parser {
         // required for reading Unicode characters such as &#xf6;
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
         // TODO: decide if necessary, if disabled MedlineImporterTestNbib fails
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
     }
 
