@@ -60,9 +60,12 @@ public abstract class DBMSProcessor {
         DBMSType type = this.connectionProperties.getType();
         Map<String, String> metadata = getSharedMetaData();
         if (type == DBMSType.POSTGRESQL || type == DBMSType.MYSQL) {
-            int VERSION_DB_STRUCT = Integer.parseInt(metadata.get(MetaData.VERSION_DB_STRUCT));
-            if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
-                databasePassesIntegrityCheck = true;
+            String metadataVersion = metadata.get(MetaData.VERSION_DB_STRUCT);
+            if (metadataVersion != null) {
+                int VERSION_DB_STRUCT = Integer.parseInt(metadata.getOrDefault(MetaData.VERSION_DB_STRUCT, ""), );
+                if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
+                    databasePassesIntegrityCheck = true;
+                }
             }
         } else {
             databasePassesIntegrityCheck = checkTableAvailability("ENTRY", "FIELD", "METADATA");
