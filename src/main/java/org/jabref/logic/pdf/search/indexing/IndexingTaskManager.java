@@ -103,7 +103,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     public void addToIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
-        enqueueTask(() -> addToIndex(indexer, entry, entry.getFiles(), databaseContext));
+        addToIndex(indexer, entry, entry.getFiles(), databaseContext);
     }
 
     public void addToIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
