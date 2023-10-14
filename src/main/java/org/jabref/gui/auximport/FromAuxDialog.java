@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -12,6 +13,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.importer.ImportEntriesViewModel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -22,16 +24,22 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
+import org.controlsfx.control.CheckListView;
 
 /**
  * A wizard dialog for generating a new sub database from existing TeX AUX file
  */
 public class FromAuxDialog extends BaseDialog<Void> {
 
+    public CheckListView<BibEntry> entriesListView;
+
+    private ImportEntriesViewModel viewModel;
+    public ComboBox<String> libraryListView;
     private final LibraryTab libraryTab;
     @FXML private ButtonType generateButtonType;
     private final Button generateButton;
@@ -99,4 +107,23 @@ public class FromAuxDialog extends BaseDialog<Void> {
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> auxFileField.setText(file.toAbsolutePath().toString()));
     }
+
+    public void unselectAll() {
+        entriesListView.getCheckModel().clearChecks();
+    }
+
+    public void selectAllNewEntries() {
+        unselectAll();
+        for (BibEntry entry : entriesListView.getItems()) {
+            if (!viewModel.hasDuplicate(entry)) {
+                entriesListView.getCheckModel().check(entry);
+            }
+        }
+    }
+
+    public void selectAllEntries() {
+        unselectAll();
+        entriesListView.getCheckModel().checkAll();
+    }
+
 }
