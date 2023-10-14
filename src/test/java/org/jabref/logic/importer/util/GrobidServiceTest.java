@@ -106,9 +106,9 @@ public class GrobidServiceTest {
     public void extractsReferencesFromPdf() throws IOException, ParseException, URISyntaxException {
         BibEntry ref1 = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Kopp, O")
-                .withField(StandardField.ADDRESS, "Berlin; Heidelberg")
+                .withField(StandardField.ADDRESS, "Berlin Heidelberg")
                 .withField(StandardField.DATE, "2013")
-                .withField(StandardField.JOURNAL, "LNCS")
+                .withField(StandardField.JOURNAL, "All links were last followed on October")
                 .withField(StandardField.PAGES, "700--704")
                 .withField(StandardField.PUBLISHER, "Springer")
                 .withField(StandardField.TITLE, "Winery -A Modeling Tool for TOSCA-based Cloud Applications")

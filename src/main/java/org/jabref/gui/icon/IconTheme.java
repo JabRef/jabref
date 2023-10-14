@@ -193,6 +193,7 @@ public class IconTheme {
         DELETE_ENTRY(MaterialDesignD.DELETE),
         SEARCH(MaterialDesignM.MAGNIFY),
         FILE_SEARCH(MaterialDesignF.FILE_FIND),
+        FILE_STAR(MaterialDesignF.FILE_STAR),
         PDF_METADATA_READ(MaterialDesignF.FORMAT_ALIGN_TOP),
         PDF_METADATA_WRITE(MaterialDesignF.FORMAT_ALIGN_BOTTOM),
         ADVANCED_SEARCH(Color.CYAN, MaterialDesignM.MAGNIFY),

@@ -3,6 +3,7 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,6 +86,15 @@ public class GrobidService {
         String httpResponse = response.body();
 
         return getBibEntries(importFormatPreferences, httpResponse);
+    }
+
+    public List<BibEntry> processReferences(List<Path> pathList, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
+        List<BibEntry> entries = new ArrayList<>();
+        for (Path filePath: pathList) {
+            entries.addAll(processReferences(filePath, importFormatPreferences));
+        }
+
+        return entries;
     }
 
     public List<BibEntry> processReferences(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
