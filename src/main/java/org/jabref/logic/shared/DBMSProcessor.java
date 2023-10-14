@@ -62,7 +62,7 @@ public abstract class DBMSProcessor {
         if (type == DBMSType.POSTGRESQL || type == DBMSType.MYSQL) {
             String metadataVersion = metadata.get(MetaData.VERSION_DB_STRUCT);
             if (metadataVersion != null) {
-                int VERSION_DB_STRUCT = Integer.parseInt(metadata.getOrDefault(MetaData.VERSION_DB_STRUCT, ""), );
+                int VERSION_DB_STRUCT = Integer.parseInt(metadata.getOrDefault(MetaData.VERSION_DB_STRUCT, ""));
                 if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
                     databasePassesIntegrityCheck = true;
                 }
@@ -185,9 +185,7 @@ public abstract class DBMSProcessor {
                 .append(escape("TYPE"))
                 .append(") VALUES(?)");
         // Number of commas is bibEntries.size() - 1
-        for (int i = 0; i < (bibEntries.size() - 1); i++) {
-            insertIntoEntryQuery.append(", (?)");
-        }
+        insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, (bibEntries.size() - 1))));
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
                 new String[]{"SHARED_ID"})) {
@@ -278,9 +276,7 @@ public abstract class DBMSProcessor {
             }
 
             // Number of commas is fields.size() - 1
-            for (int i = 0; i < (numFields - 1); i++) {
-                insertFieldQuery.append(", (?, ?, ?)");
-            }
+            insertFieldQuery.append(", (?, ?, ?)".repeat(Math.max(0, (numFields - 1))));
             try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
                 int fieldsCompleted = 0;
                 for (int entryIndex = 0; entryIndex < fields.size(); entryIndex++) {
@@ -571,7 +567,7 @@ public abstract class DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("Executed >{}<", query.toString());
+            LOGGER.error("Executed >{}<", query);
             LOGGER.error("SQL Error", e);
             return Collections.emptyList();
         }
