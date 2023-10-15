@@ -50,6 +50,13 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
+        final Button btOk = (Button) this.getDialogPane().lookupButton(ButtonType.OK);
+        btOk.addEventFilter(ActionEvent.ACTION, event -> {
+            if (!isValidExternalFileTypeEntry()) {
+                event.consume();
+            }
+        });
+
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storeSettings();
@@ -58,6 +65,16 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
             }
             return null;
         });
+    }
+
+    public boolean isValidExternalFileTypeEntry() {
+        if (name.getText().trim().equalsIgnoreCase("")
+                || extension.getText().trim().equalsIgnoreCase("")
+                || mimeType.getText().trim().equalsIgnoreCase("")
+            ) {
+            return false;
+        }
+        return true;
     }
 
     @FXML
