@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -129,7 +130,9 @@ public class LatexIntegrityCheckerTest {
                 Arguments.of(StandardField.AUTHOR, "\\& Multiple properly escaped \\&"),
                 Arguments.of(StandardField.BOOKTITLE, "\\\\\\& With multiple backslashes"),
                 Arguments.of(StandardField.COMMENT, "\\\\\\& With multiple backslashes multiple times \\\\\\\\\\&"),
-                Arguments.of(StandardField.NOTE, "In the \\& middle of \\\\\\& something")
+                Arguments.of(StandardField.NOTE, "In the \\& middle of \\\\\\& something"),
+                Arguments.of(StandardField.DOI, "10.1007/0-387-22874-8_7"),
+                Arguments.of(new UserSpecificCommentField("test"), "_something_ which is triggers the integrity check ^^^ $")
         );
     }
 

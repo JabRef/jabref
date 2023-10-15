@@ -98,7 +98,7 @@ class OOBibStyleTestHelper {
             int n = num.get(0);
             CitationMarkerNumericBibEntryImpl x =
                     new CitationMarkerNumericBibEntryImpl("key",
-                            (n == 0) ? Optional.empty() : Optional.of(n));
+                            n == 0 ? Optional.empty() : Optional.of(n));
             return style.getNumCitationMarkerForBibliography(x).toString();
         } else {
             List<CitationMarkerNumericEntry> input =
