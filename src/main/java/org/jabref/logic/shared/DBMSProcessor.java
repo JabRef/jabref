@@ -62,7 +62,7 @@ public abstract class DBMSProcessor {
         if (type == DBMSType.POSTGRESQL || type == DBMSType.MYSQL) {
             String metadataVersion = metadata.get(MetaData.VERSION_DB_STRUCT);
             if (metadataVersion != null) {
-                int VERSION_DB_STRUCT = Integer.parseInt(metadata.getOrDefault(MetaData.VERSION_DB_STRUCT, ""));
+                int VERSION_DB_STRUCT = Integer.parseInt(metadata.getOrDefault(MetaData.VERSION_DB_STRUCT, "").replace(";", "");
                 if (VERSION_DB_STRUCT == getCURRENT_VERSION_DB_STRUCT()) {
                     databasePassesIntegrityCheck = true;
                 }
