@@ -245,7 +245,7 @@ public class SaveDatabaseAction {
             dialogService.notify(Localization.lang("Library saved"));
 
             if (success) {
-                SaveGitDatabaseAction saveGit = new SaveGitDatabaseAction(targetPath);
+                SaveGitDatabaseAction saveGit = new SaveGitDatabaseAction(targetPath, preferences);
                 saveGit.automaticUpdate();
             }
             return success;

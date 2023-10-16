@@ -7,31 +7,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.git.GitCredentialsDialogView;
 import org.jabref.gui.git.GitPreferences;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.preferences.PreferencesService;
-
-import com.airhacks.afterburner.injection.Injector;
-
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
@@ -61,8 +45,7 @@ public class GitHandler {
     public GitHandler(Path repositoryPath) {
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
-        this.gitPreferences = Injector.instantiateModelOrService(PreferencesService.class).getGitPreferences();
-        
+
         if (!isGitRepository()) {
             try {
                 Git.init()
@@ -183,12 +166,12 @@ public class GitHandler {
      */
     public boolean createCommitWithSingleFileOnCurrentBranch(String filename, String commitMessage, boolean amend) throws IOException, NoWorkTreeException, GitAPIException {
         boolean commitCreated = false;
-        
+
         Git git = Git.open(this.repositoryPathAsFile);
         Status status = git.status().call();
         if (!status.isClean()) {
             commitCreated = true;
-  
+
             // Add new and changed files to index
             git.add()
                 .addFilepattern(filename)
@@ -206,7 +189,7 @@ public class GitHandler {
                 .setMessage(commitMessage)
                 .call();
         }
-        
+
         return commitCreated;
     }
 
@@ -251,8 +234,6 @@ public class GitHandler {
                 this.gitPassword = this.gitPreferences.getPassword();
                 this.credentialsProvider = new UsernamePasswordCredentialsProvider(this.gitUsername, this.gitPassword);
             }
-            
-            
 
             if (isSshRemoteRepository) {
                 TransportConfigCallback transportConfigCallback = new SshTransportConfigCallback();
@@ -320,5 +301,9 @@ public class GitHandler {
             LOGGER.info("Failed get current branch");
             return "";
         }
+    }
+
+    public void setGitPreferences(GitPreferences gitPreferences) {
+        this.gitPreferences = gitPreferences;
     }
 }

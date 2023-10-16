@@ -5,6 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
+import org.jabref.gui.git.GitPreferences;
+import org.jabref.preferences.PreferencesService;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.AnyObjectId;
@@ -15,15 +18,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class GitHandlerTest {
     @TempDir
     Path repositoryPath;
     private GitHandler gitHandler;
 
+    private GitPreferences gitPreferences;
+
     @BeforeEach
     public void setUpGitHandler() {
+        gitPreferences = new GitPreferences("testUser", "testPassword");
+        PreferencesService preferences = mock(PreferencesService.class);
+        when(preferences.getGitPreferences()).thenReturn(gitPreferences);
+
         gitHandler = new GitHandler(repositoryPath);
+        gitHandler.setGitPreferences(preferences.getGitPreferences());
     }
 
     @Test
