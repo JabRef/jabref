@@ -15,25 +15,25 @@ jobs:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         run: |
           ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
-          gh project item-add 5 --owner "@me" --url $ISSUE_URL
+          gh project item-add 5 --owner jabref --url $ISSUE_URL
       - name: needs-refinement
         if: github.event.label.name == 'needs-refinement'
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         run: |
           ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
-          gh project item-add 15 --owner "@me" --url $ISSUE_URL
+          gh project item-add 15 --owner jabref --url $ISSUE_URL
       - name: "status: freeze"
         if: "${{ github.event.label.name == 'status: freeze' }}"
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         run: |
           ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
-          gh project item-add 9 --owner "@me" --url $ISSUE_URL
+          gh project item-add 9 --owner jabref --url $ISSUE_URL
       - name: ui
         if: "${{ github.event.label.name == 'ui' }}"
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         run: |
           ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
-          gh project item-add 8 --owner "@me" --url $ISSUE_URL
+          gh project item-add 8 --owner jabref --url $ISSUE_URL
