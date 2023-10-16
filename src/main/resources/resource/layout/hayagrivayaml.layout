@@ -3,7 +3,7 @@
 \begin{title}  title: "\title"\end{title}
 \begin{author}
   author:
-    - \format[Authors(LastFirst, MiddleInitial, Sep = \n    - , LastSep = \n    - )]{\author}
+    - \format[Authors(LastFirst, MiddleInitial, Sep =\n    - , LastSep =\n    - )]{\author}
 \end{author}
 \begin{date}  date: \date\end{date}
 \begin{editor}  editor: \editor\end{editor}
