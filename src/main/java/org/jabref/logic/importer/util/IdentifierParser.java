@@ -46,22 +46,15 @@ public class IdentifierParser {
         Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
         Optional<String> archivePrefixOpt = entry.getField(StandardField.ARCHIVEPREFIX);
 
-        if (eprintTypeOpt.isPresent()) {
-            String eprintType = eprintTypeOpt.get();
-            if ("arxiv".equalsIgnoreCase(eprintType)) {
+        if (eprintTypeOpt.isPresent() || archivePrefixOpt.isPresent()) {
+            String valueToCompare = eprintTypeOpt.orElse(archivePrefixOpt.orElse("")).toLowerCase();
+            if ("arxiv".equalsIgnoreCase(valueToCompare)) {
                 return ArXivIdentifier.parse(eprint);
-            } else if ("ark".equalsIgnoreCase(eprintType)) {
+            } else if ("ark".equalsIgnoreCase(valueToCompare)) {
                 return ARK.parse(eprint);
             }
         }
-        if (archivePrefixOpt.isPresent()) {
-            String archivePrefix = archivePrefixOpt.get();
-            if ("arxiv".equalsIgnoreCase(archivePrefix)) {
-                return ArXivIdentifier.parse(eprint);
-            } else if ("ark".equalsIgnoreCase(archivePrefix)) {
-                return ARK.parse(eprint);
-            }
-        }
+
         return Optional.empty();
     }
 }

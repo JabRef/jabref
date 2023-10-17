@@ -99,7 +99,7 @@ public class JabRefDesktop {
             if (Objects.equals(link, initialLink)) {
                 Optional<String> eprintTypeOpt = entry.getField(StandardField.EPRINTTYPE);
                 Optional<String> archivePrefixOpt = entry.getField(StandardField.ARCHIVEPREFIX);
-                if (eprintTypeOpt.isEmpty() || archivePrefixOpt.isEmpty()) {
+                if (eprintTypeOpt.isEmpty() && archivePrefixOpt.isEmpty()) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please set the eprinttype field"));
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please verify that the eprint field has a valid '%0' id", eprintTypeOpt.get()));
