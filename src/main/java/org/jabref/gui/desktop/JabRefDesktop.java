@@ -152,6 +152,7 @@ public class JabRefDesktop {
 
     /**
      * Open an external file, attempting to use the correct viewer for it.
+     * If the "file" is an online link, instead open it with the browser
      *
      * @param databaseContext The database this file belongs to.
      * @param link            The filename.
@@ -162,7 +163,7 @@ public class JabRefDesktop {
                                                     String link,
                                                     final Optional<ExternalFileType> type) throws IOException {
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
-            openExternalFilePlatformIndependent(type, link, filePreferences);
+            openBrowser(link, filePreferences);
             return true;
         }
         Optional<Path> file = FileUtil.find(databaseContext, link, filePreferences);
