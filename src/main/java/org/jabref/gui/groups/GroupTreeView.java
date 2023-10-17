@@ -78,7 +78,8 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
-    private static final double SCROLL_SPEED = 50;
+    private static final double SCROLL_SPEED = 2000.0; // larger is slower
+    private static final double SCROLL_LIMITS = 40.0;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -144,7 +145,7 @@ public class GroupTreeView extends BorderPane {
 
         groupTree = new TreeTableView<>();
         groupTree.setId("groupTree");
-        groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
+        groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
         this.setCenter(groupTree);
 
@@ -389,7 +390,6 @@ public class GroupTreeView extends BorderPane {
                 ControlHelper.setDroppingPseudoClasses(row, event);
             }
         }
-        event.consume();
     }
 
     private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
@@ -456,16 +456,20 @@ public class GroupTreeView extends BorderPane {
 
         groupTree.setOnScroll(event -> scrollTimer.stop());
         groupTree.setOnDragDone(event -> scrollTimer.stop());
-        groupTree.setOnDragEntered(event -> scrollTimer.stop());
         groupTree.setOnDragDropped(event -> scrollTimer.stop());
-        groupTree.setOnDragExited(event -> {
-            if (event.getY() > 0) {
-                scrollVelocity = 1.0 / SCROLL_SPEED;
-            } else {
-                scrollVelocity = -1.0 / SCROLL_SPEED;
-            }
-            scrollTimer.restart();
-        });
+        groupTree.setOnDragExited(event -> scrollTimer.stop());
+
+        groupTree.setOnDragEntered(event -> scrollTimer.restart());
+
+        groupTree.setOnDragOver(event -> {
+            if (event.getY() > groupTree.getHeight() - SCROLL_LIMITS) {
+                        scrollVelocity = 1.0 / SCROLL_SPEED;
+                    } else if (event.getY() < SCROLL_LIMITS) {
+                        scrollVelocity = -1.0 / SCROLL_SPEED;
+                    } else {
+                        scrollVelocity = 0;
+                    }
+                });
     }
 
     private Optional<ScrollBar> getVerticalScrollbar() {

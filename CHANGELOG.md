@@ -48,7 +48,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "Enabled" column in the "Protected terms files" tab in the preferences could not be resized [#10285](https://github.com/JabRef/jabref/issues/10285)
 - We fixed an issue where after creation of a new library, the new library was not focused. [koppor#592](https://github.com/koppor/jabref/issues/592)
 - We fixed an issue where double clicking on an url in the file field would trigger an exception instead of opening the browser [#10480](https://github.com/JabRef/jabref/pull/10480)
+- We fixed an issue where scrolling was impossible on dragging a citation on the groups panel. [#9754](https://github.com/JabRef/jabref/issues/9754)
 - We fixed an issue where exporting "Embedded BibTeX pdf" without selecting an existing document would produce an exception. [#10101](https://github.com/JabRef/jabref/issues/10101)
+- We fixed an issue where it was not possible to connect to a shared database once a group with entries was added or other metadata modified [#10336](https://github.com/JabRef/jabref/issues/10336)
 
 ### Removed
 
