@@ -60,7 +60,7 @@ public class RelatedEntriesComponent extends VBox {
         this.repository = repository;
         this.libraryTab = libraryTab;
 
-        initUI();
+        initialize();
         if (pivotEntry.getDOI().isEmpty()) {
             relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("The selected entry doesn't have a DOI linked to it. Lookup a DOI and try again.")));
             return;
@@ -103,7 +103,7 @@ public class RelatedEntriesComponent extends VBox {
         });
     }
 
-    private void initUI() {
+    private void initialize() {
         // Create Layout Containers
         this.setFillWidth(true);
         this.setAlignment(Pos.TOP_CENTER);
