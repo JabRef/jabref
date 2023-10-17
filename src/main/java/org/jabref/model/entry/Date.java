@@ -175,7 +175,7 @@ public class Date {
         )) {
             try {
                 String[] strDates = dateString.split("/");
-                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);;
+                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);
                 TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
@@ -192,7 +192,7 @@ public class Date {
         )) {
             try {
                 String[] strDates = dateString.split(" / ");
-                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);;
+                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);
                 TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);
                 return Optional.of(new Date(parsedDate, parsedEndDate));
             } catch (DateTimeParseException e) {
@@ -273,7 +273,8 @@ public class Date {
     }
 
     /**
-     * Create a date with a string with era indicator
+     * Create a date with a string with era indicator.
+     *
      * @param dateString the string which contain era indicator to extract the date information
      * @return the date information with TemporalAccessor type
      */
