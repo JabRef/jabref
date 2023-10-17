@@ -46,7 +46,12 @@ class DateTest {
                 Arguments.of(LocalDate.of(2015, Month.OCTOBER, 15), "2015.10.15"),
                 Arguments.of(LocalDate.of(-10000, Month.OCTOBER, 15), "-10000-10-15"),
                 Arguments.of(YearMonth.of(2015, Month.NOVEMBER), "2015/11"),
-                Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "15 January 2015")
+                Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), "15 January 2015"),
+                Arguments.of(Year.of(2015), "2015-"),
+                Arguments.of(Year.of(2015), "2015?"),
+                Arguments.of(Year.of(-29), "30 BC"),
+                Arguments.of(Year.of(-29), "0030 BC"),
+                Arguments.of(Year.of(2), "2 AD")
                 );
     }
 
@@ -63,8 +68,12 @@ class DateTest {
              Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "2015-01-15/2015-02-25"),
              Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "2015-01-15 / 2015-02-25"),
              Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "15 January 2015/25 February 2015"),
-             Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "15 January 2015 / 25 February 2015")
-         );
+             Arguments.of(LocalDate.of(2015, Month.JANUARY, 15), LocalDate.of(2015, Month.FEBRUARY, 25), "15 January 2015 / 25 February 2015"),
+             Arguments.of(Year.of(-29), Year.of(5), "30 BC/5 AD"),
+             Arguments.of(Year.of(-29), Year.of(5), "0030 BC/0005 AD"),
+             Arguments.of(Year.of(-29), Year.of(-9), "0030 BC/0010 BC"),
+             Arguments.of(Year.of(5), Year.of(10), "0005 AD/0010 AD")
+        );
     }
 
     @ParameterizedTest

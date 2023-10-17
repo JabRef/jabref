@@ -48,7 +48,14 @@ public class Date {
                 "uuuu.MM.d",                            // covers 2015.10.15
                 "d MMMM u/d MMMM u",                    // covers 20 January 2015/20 February 2015
                 "d MMMM u",                             // covers 20 January 2015
-                "d MMMM u / d MMMM u"
+                "d MMMM u / d MMMM u",
+                "u'-'",                                 // covers 2015-
+                "u'?'",                                 // covers 2023?
+                "u G",                                  // covers 1 BC and 1 AD
+                "uuuu G",                               // covers 0030 BC and 0005 AD
+                "u G/u G",                              // covers 30 BC / 5 AD
+                "uuuu G/uuuu G",                        // covers 0030 BC / 0005 AD
+                "uuuu-MM G/uuuu-MM G"                   // covers 0030-01 BC / 0005-02 AD
                 );
 
         /* TODO: The following date formats do not yet work and need to be created with tests
@@ -135,7 +142,7 @@ public class Date {
                "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
                "( |\\-)(\\d{1,4})/(\\d{1,2})( )" +
                "(January|February|March|April|May|June|July|August|September|October|November|December)" +
-               "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
+               "( |\\-)(\\d{1,4})(?i-)|" // 20 January 2015/20 January 2015
         )) {
             try {
                 String[] strDates = dateString.split("/");
@@ -167,7 +174,58 @@ public class Date {
                 LOGGER.debug("Invalid Date format range", e);
                 return Optional.empty();
             }
+        } else if (dateString.matches(
+                "\\d{1,4} BC/\\d{1,4} AD|" + // 30 BC/5 AD and 0030 BC/0005 AD
+                "\\d{1,4} BC/\\d{1,4} BC|" + // 30 BC/10 BC and 0030 BC/0010 BC
+                "\\d{1,4} AD/\\d{1,4} AD"    // 5 AD/10 AD and 0005 AD/0010 AD
+        )) {
+            try {
+                String[] strDates = dateString.split("/");
+                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);;
+                TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);
+                return Optional.of(new Date(parsedDate, parsedEndDate));
+            } catch (DateTimeParseException e) {
+                LOGGER.debug("Invalid Date format range", e);
+                return Optional.empty();
+            }
+        } else if (dateString.matches("\\d{1,4} BC / \\d{1,4} AD")) {
+            try {
+                String[] strDates = dateString.split(" / ");
+                TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);;
+                TemporalAccessor parsedEndDate = parseDateWithEraIndicator(strDates[1]);
+                return Optional.of(new Date(parsedDate, parsedEndDate));
+            } catch (DateTimeParseException e) {
+                LOGGER.debug("Invalid Date format range", e);
+                return Optional.empty();
+            }
         }
+        // if dateString is single year
+        if (dateString.matches("\\d{4}-|" + "\\d{4}\\?")) {
+            try {
+                String year = dateString.substring(0, dateString.length() - 1);
+                TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(year);
+                return Optional.of(new Date(parsedDate));
+            } catch (DateTimeParseException e) {
+                LOGGER.debug("Invalid Date format", e);
+                return Optional.empty();
+            }
+        }
+
+        // handle the new date formats with era indicators
+        if (dateString.matches(
+                "\\d{1,4} BC|" + // covers 1 BC
+                "\\d{1,4} BCE|"  // covers 1 BCE
+        )) {
+            try {
+                // Parse the date with era indicator
+                TemporalAccessor date = parseDateWithEraIndicator(dateString);
+                return Optional.of(new Date(date));
+            } catch (DateTimeParseException e) {
+                LOGGER.debug("Invalid Date format with era indicator", e);
+                return Optional.empty();
+            }
+        }
+
         try {
             TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
             return Optional.of(new Date(parsedDate));
@@ -208,6 +266,23 @@ public class Date {
         } catch (NumberFormatException ex) {
             return Optional.empty();
         }
+    }
+
+    /**
+     *
+     * @param dateString the string to extract the date information
+     * @return the date information with TemporalAccessor type
+     */
+    private static TemporalAccessor parseDateWithEraIndicator(String dateString) {
+        String yearString = dateString.strip().substring(0, dateString.length() - 2);
+
+        System.out.println(yearString);
+        int year = Integer.parseInt(yearString.strip());
+        System.out.println(year);
+        if (dateString.endsWith("BC")) {
+            year = 1 - year;
+        }
+        return Year.of(year);
     }
 
     public String getNormalized() {
