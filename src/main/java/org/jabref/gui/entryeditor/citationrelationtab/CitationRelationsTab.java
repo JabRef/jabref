@@ -63,32 +63,32 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        // Initialize citations data and UI
-        RelatedEntriesComponentConfig citationsComponentConfig =
-                RelatedEntriesComponentConfig.builder()
-                                             .withHeading(Localization.lang("Citations"))
-                                             .build();
-
-        RelatedEntriesRepository citationsRepository =
-                new RelatedEntriesRepository(SemanticScholarFetcher.buildCitationsFetcher(), CITATIONS_CACHE);
-
-        RelatedEntriesComponent citationsComponent =
-                new RelatedEntriesComponent(entry, citationsRepository, libraryTab, citationsComponentConfig,
-                        dialogService, databaseContext, undoManager, stateManager, fileUpdateMonitor, preferencesService);
-
-        // Initialize references data and UI
-        RelatedEntriesComponentConfig referencesComponentConfig =
-                RelatedEntriesComponentConfig.builder()
-                                             .withHeading(Localization.lang("References"))
-                                             .build();
-        RelatedEntriesRepository referencesRepository =
-                new RelatedEntriesRepository(SemanticScholarFetcher.buildReferencesFetcher(), REFERENCES_CACHE);
-        RelatedEntriesComponent referencesComponent = new RelatedEntriesComponent(entry,
-                referencesRepository, libraryTab, referencesComponentConfig, dialogService, databaseContext,
-                undoManager, stateManager, fileUpdateMonitor, preferencesService);
+        RelatedEntriesComponent citationsComponent = createCitationsComponent(entry);
+        RelatedEntriesComponent referencesComponent = createReferencesComponent(entry);
 
         SplitPane container = new SplitPane(citationsComponent, referencesComponent);
 
         setContent(container);
+    }
+
+    private RelatedEntriesComponent createReferencesComponent(BibEntry entry) {
+        RelatedEntriesComponentConfig componentConfig = new RelatedEntriesComponentConfig("References");
+
+        RelatedEntriesRepository referencesRepository =
+                new RelatedEntriesRepository(SemanticScholarFetcher.buildReferencesFetcher(), REFERENCES_CACHE);
+
+        return new RelatedEntriesComponent(entry, referencesRepository, libraryTab, componentConfig,
+                dialogService, databaseContext, undoManager, stateManager, fileUpdateMonitor, preferencesService);
+    }
+
+    private RelatedEntriesComponent createCitationsComponent(BibEntry entry) {
+        RelatedEntriesComponentConfig componentConfig = new RelatedEntriesComponentConfig("Citations");
+
+        RelatedEntriesRepository citationsRepository =
+                new RelatedEntriesRepository(SemanticScholarFetcher.buildCitationsFetcher(), CITATIONS_CACHE);
+
+        return new RelatedEntriesComponent(entry, citationsRepository, libraryTab, componentConfig,
+                dialogService, databaseContext, undoManager, stateManager, fileUpdateMonitor,
+                preferencesService);
     }
 }

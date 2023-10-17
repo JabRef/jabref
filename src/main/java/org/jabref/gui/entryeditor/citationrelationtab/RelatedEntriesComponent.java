@@ -39,8 +39,8 @@ import org.slf4j.LoggerFactory;
 
 public class RelatedEntriesComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedEntriesComponent.class);
-    private final RelatedEntriesRepository repository;
     private final LibraryTab libraryTab;
+    private final BibEntry pivotEntry;
     private final RelatedEntriesComponentConfig config;
     private final RelatedEntriesComponentViewModel viewModel;
     private Button refreshButton;
@@ -54,19 +54,18 @@ public class RelatedEntriesComponent extends VBox {
                                    BibDatabaseContext databaseContext, UndoManager undoManager,
                                    StateManager stateManager, FileUpdateMonitor fileUpdateMonitor,
                                    PreferencesService prefs) {
+        this.pivotEntry = pivotEntry;
         this.config = config;
         this.viewModel = new RelatedEntriesComponentViewModel(pivotEntry, repository, dialogService, databaseContext,
                 undoManager, stateManager, fileUpdateMonitor, prefs);
-        this.repository = repository;
         this.libraryTab = libraryTab;
 
         initialize();
-        if (pivotEntry.getDOI().isEmpty()) {
+        if (canLoadEntries()) {
+            viewModel.loadEntries();
+        } else {
             relatedEntriesListView.setPlaceholder(buildLabel(Localization.lang("The selected entry doesn't have a DOI linked to it. Lookup a DOI and try again.")));
-            return;
         }
-
-        viewModel.loadEntries();
 
         viewModel.relatedEntriesResultPropertyProperty().addListener((observable, oldValue, result) -> {
             if (result.isPending()) {
@@ -109,7 +108,7 @@ public class RelatedEntriesComponent extends VBox {
         this.setAlignment(Pos.TOP_CENTER);
 
         // Create Heading Lab
-        Label headingLabel = new Label(config.getHeading());
+        Label headingLabel = new Label(config.heading());
         headingLabel.setStyle("-fx-padding: 5px");
         headingLabel.setAlignment(Pos.CENTER);
         AnchorPane.setTopAnchor(headingLabel, 0.0);
@@ -124,7 +123,11 @@ public class RelatedEntriesComponent extends VBox {
         refreshButton = IconTheme.JabRefIcons.REFRESH.asButton();
         refreshButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshButton, 15.0);
-        refreshButton.setOnAction(e -> viewModel.reloadEntries());
+        refreshButton.setOnAction(e -> {
+            if (canLoadEntries()) {
+                viewModel.reloadEntries();
+            }
+        });
 
         cancelButton = IconTheme.JabRefIcons.CLOSE.asButton();
         cancelButton.getGraphic().resize(30, 30);
@@ -134,7 +137,6 @@ public class RelatedEntriesComponent extends VBox {
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxSize(25, 25);
-        progressIndicator.setVisible(false);
         styleTopBarNode(progressIndicator, 50.0);
 
         // Create import buttons for both sides
@@ -150,6 +152,9 @@ public class RelatedEntriesComponent extends VBox {
                 importEntriesButton, progressIndicator, cancelButton);
 
         this.getChildren().addAll(topbar, relatedEntriesListView);
+
+        hideNodes(progressIndicator, cancelButton);
+        showNodes(refreshButton, importEntriesButton);
     }
 
     /**
@@ -224,5 +229,9 @@ public class RelatedEntriesComponent extends VBox {
 
     private Label buildLabel(String text) {
         return new Label(text);
+    }
+
+    private boolean canLoadEntries() {
+        return pivotEntry.getDOI().isPresent();
     }
 }
