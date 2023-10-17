@@ -1,9 +1,6 @@
 package org.jabref.gui.externalfiles;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -11,24 +8,15 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.database.DuplicateCheck;
-import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,8 +26,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ImportHandlerTest {
 
@@ -53,8 +45,8 @@ class ImportHandlerTest {
     @Mock
     private DuplicateCheck duplicateCheck;
 
-
     @BeforeEach
+
     void setUp() {
         MockitoAnnotations.initMocks(this);  // Initialize the mocks
 
@@ -66,9 +58,6 @@ class ImportHandlerTest {
         BibDatabase bibDatabase = new BibDatabase();
         when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
-
-
-
         importHandler = new ImportHandler(
                 bibDatabaseContext,
                 preferencesService,
@@ -84,9 +73,8 @@ class ImportHandlerTest {
                 .withField(StandardField.AUTHOR, "Test Author");
     }
 
-
-
     @Test
+
     void handleBibTeXData() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
@@ -129,8 +117,6 @@ class ImportHandlerTest {
     void findDuplicateTest() {
         // Assume there's no duplicate initially
         assertFalse(importHandler.findDuplicate(bibDatabaseContext, testEntry).isPresent());
-
-
     }
 
     @Test
@@ -229,12 +215,6 @@ class ImportHandlerTest {
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
     }
-
-
-
-
-
-
 }
 
 
