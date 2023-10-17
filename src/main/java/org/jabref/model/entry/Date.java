@@ -53,19 +53,10 @@ public class Date {
                 "u'?'",                                 // covers 2023?
                 "u G",                                  // covers 1 BC and 1 AD
                 "uuuu G",                               // covers 0030 BC and 0005 AD
-                "u G/u G",                              // covers 30 BC / 5 AD
-                "uuuu G/uuuu G",                        // covers 0030 BC / 0005 AD
-                "uuuu-MM G/uuuu-MM G"                   // covers 0030-01 BC / 0005-02 AD
+                "u G/u G",                              // covers 30 BC/5 AD
+                "uuuu G/uuuu G",                        // covers 0030 BC/0005 AD
+                "uuuu-MM G/uuuu-MM G"                   // covers 0030-01 BC/0005-02 AD
                 );
-
-        /* TODO: The following date formats do not yet work and need to be created with tests
-         *      "u G",                                  // covers 1 BC
-         *       "u G / u G",                           // covers 30 BC / 5 AD
-         *      "uuuu G / uuuu G",                      // covers 0030 BC / 0005 AD
-         *      "uuuu-MM G / uuuu-MM G",                // covers 0030-01 BC / 0005-02 AD
-         *      "u'-'",                                 // covers 2015-
-         *      "u'?'",                                 // covers 2023?
-         */
 
         SIMPLE_DATE_FORMATS = formatStrings.stream()
                                            .map(DateTimeFormatter::ofPattern)
@@ -177,7 +168,10 @@ public class Date {
         } else if (dateString.matches(
                 "\\d{1,4} BC/\\d{1,4} AD|" + // 30 BC/5 AD and 0030 BC/0005 AD
                 "\\d{1,4} BC/\\d{1,4} BC|" + // 30 BC/10 BC and 0030 BC/0010 BC
-                "\\d{1,4} AD/\\d{1,4} AD"    // 5 AD/10 AD and 0005 AD/0010 AD
+                "\\d{1,4} AD/\\d{1,4} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                "\\d{1,4}-\\d{1,2} BC/\\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                "\\d{1,4}-\\d{1,2} AD/\\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
         )) {
             try {
                 String[] strDates = dateString.split("/");
@@ -188,7 +182,14 @@ public class Date {
                 LOGGER.debug("Invalid Date format range", e);
                 return Optional.empty();
             }
-        } else if (dateString.matches("\\d{1,4} BC / \\d{1,4} AD")) {
+        } else if (dateString.matches(
+                "\\d{1,4} BC / \\d{1,4} AD|" + // 30 BC / 5 AD and 0030 BC / 0005 AD
+                "\\d{1,4} BC / \\d{1,4} BC|" + // 30 BC / 10 BC and 0030 BC / 0010 BC
+                "\\d{1,4} AD / \\d{1,4} AD|" + // 5 AD / 10 AD and 0005 AD / 0010 AD
+                "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} AD|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                "\\d{1,4}-\\d{1,2} BC / \\d{1,4}-\\d{1,2} BC|" + // 5 AD/10 AD and 0005 AD/0010 AD
+                "\\d{1,4}-\\d{1,2} AD / \\d{1,4}-\\d{1,2} AD" // 5 AD/10 AD and 0005 AD/0010 AD
+        )) {
             try {
                 String[] strDates = dateString.split(" / ");
                 TemporalAccessor parsedDate = parseDateWithEraIndicator(strDates[0]);;
@@ -199,6 +200,7 @@ public class Date {
                 return Optional.empty();
             }
         }
+
         // if dateString is single year
         if (dateString.matches("\\d{4}-|" + "\\d{4}\\?")) {
             try {
@@ -214,7 +216,9 @@ public class Date {
         // handle the new date formats with era indicators
         if (dateString.matches(
                 "\\d{1,4} BC|" + // covers 1 BC
-                "\\d{1,4} BCE|"  // covers 1 BCE
+                "\\d{1,4} AD|" + // covers 1 BC
+                "\\d{1,4}-\\d{1,2} BC|" +  // covers 0030-01 BC
+                "\\d{1,4}-\\d{1,2} AD" // covers 0005-01 AD
         )) {
             try {
                 // Parse the date with era indicator
@@ -269,18 +273,22 @@ public class Date {
     }
 
     /**
-     *
-     * @param dateString the string to extract the date information
+     * Create a date with a string with era indicator
+     * @param dateString the string which contain era indicator to extract the date information
      * @return the date information with TemporalAccessor type
      */
     private static TemporalAccessor parseDateWithEraIndicator(String dateString) {
         String yearString = dateString.strip().substring(0, dateString.length() - 2);
 
-        System.out.println(yearString);
-        int year = Integer.parseInt(yearString.strip());
-        System.out.println(year);
+        String[] parts = yearString.split("-");
+        int year = Integer.parseInt(parts[0].strip());
+
         if (dateString.endsWith("BC")) {
             year = 1 - year;
+        }
+        if (parts.length > 1) {
+            int month = Integer.parseInt(parts[1].strip());
+            return YearMonth.of(year, month);
         }
         return Year.of(year);
     }
