@@ -27,6 +27,7 @@ import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
+import org.jabref.logic.importer.fetcher.ISIDOREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.LOBIDFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
@@ -145,6 +146,7 @@ public class WebFetchers {
         set.add(new LibraryOfCongress(importFormatPreferences));
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
+        set.add(new ISIDOREFetcher());
         set.add(new Medra());
         // set.add(new JstorFetcher(importFormatPreferences));
         return set;
