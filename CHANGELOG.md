@@ -49,7 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where after creation of a new library, the new library was not focused. [koppor#592](https://github.com/koppor/jabref/issues/592)
 - We fixed an issue where double clicking on an url in the file field would trigger an exception instead of opening the browser [#10480](https://github.com/JabRef/jabref/pull/10480)
 - We fixed an issue where exporting "Embedded BibTeX pdf" without selecting an existing document would produce an exception. [#10101](https://github.com/JabRef/jabref/issues/10101)
-
+- We fixed an issue where there was a failure to access the url link for "eprint" for the ArXiv entry.[#10474](https://github.com/JabRef/jabref/issues/10474)
 ### Removed
 
 ## [5.10] - 2023-09-02
