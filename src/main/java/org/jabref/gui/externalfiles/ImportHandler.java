@@ -13,6 +13,7 @@ import java.util.Optional;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
+import com.ibm.icu.impl.Pair;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
@@ -54,6 +55,8 @@ import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.*;
 
 public class ImportHandler {
 
@@ -194,54 +197,105 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
-        ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
-        BibEntry cleanedEntry = cleanup.doPostCleanup(entry);
+        BibEntry cleanedEntry = cleanUpEntry(bibDatabaseContext, entry);
+
+        Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, cleanedEntry);
         BibEntry entryToInsert = cleanedEntry;
 
-        Optional<BibEntry> existingDuplicateInLibrary = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToInsert, bibDatabaseContext.getMode());
         if (existingDuplicateInLibrary.isPresent()) {
-            DuplicateResolverDialog dialog = new DuplicateResolverDialog(existingDuplicateInLibrary.get(), entryToInsert, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
-            switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
-                case KEEP_RIGHT:
-                    bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
-                    break;
-                case KEEP_BOTH:
-                    break;
-                case KEEP_MERGE:
-                    bibDatabaseContext.getDatabase().removeEntry(existingDuplicateInLibrary.get());
-                    entryToInsert = dialog.getMergedEntry();
-                    break;
-                case KEEP_LEFT:
-                case AUTOREMOVE_EXACT:
-                case BREAK:
-                default:
-                   return;
+            entryToInsert = handleDuplicates(bibDatabaseContext, cleanedEntry, existingDuplicateInLibrary.get());
+            // If handleDuplicates returned null, stop processing
+            if (entryToInsert == null) {
+                return;
             }
         }
-        // Regenerate CiteKey of imported BibEntry
-        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
-            generateKeys(List.of(entryToInsert));
-        }
+
+        regenerateCiteKey(entryToInsert);
         bibDatabaseContext.getDatabase().insertEntry(entryToInsert);
 
-        // Set owner/timestamp
-        UpdateField.setAutomaticFields(List.of(entryToInsert),
-                                       preferencesService.getOwnerPreferences(),
-                                       preferencesService.getTimestampPreferences());
+        setAutomaticFieldsForEntry(entryToInsert);
 
-        addToGroups(List.of(entry), stateManager.getSelectedGroup(this.bibDatabaseContext));
+        addEntryToGroups(entry);
 
-        if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
-                entry.getFiles().stream().filter(LinkedFile::isOnlineLink).forEach(linkedFile ->
-                        new LinkedFileViewModel(
-                                linkedFile,
-                                entry,
-                                bibDatabaseContext,
-                                taskExecutor,
-                                dialogService,
-                                preferencesService).download());
+        downloadLinkedFiles(entry);
+    }
+
+
+    public BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
+        return cleanup.doPostCleanup(entry);
+    }
+
+    public Optional<BibEntry> findDuplicate(BibDatabaseContext bibDatabaseContext, BibEntry entryToCheck) {
+        return new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToCheck, bibDatabaseContext.getMode());
+    }
+
+    public BibEntry handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry) {
+        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext);
+        switch (decisionResult.getDecision()) {
+            case KEEP_RIGHT:
+                bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                break;
+            case KEEP_BOTH:
+                break;
+            case KEEP_MERGE:
+                bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                return decisionResult.getMergedEntry();
+            case KEEP_LEFT:
+            case AUTOREMOVE_EXACT:
+            case BREAK:
+            default:
+                return null;
+        }
+        return originalEntry;
+    }
+
+    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext) {
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
+        DuplicateResolverDialog.DuplicateResolverResult decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
+    }
+
+
+
+    public void regenerateCiteKey(BibEntry entry) {
+        if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
+            generateKeys(List.of(entry));
         }
     }
+    public void setAutomaticFieldsForEntry(BibEntry entry) {
+        UpdateField.setAutomaticFields(
+                List.of(entry),
+                preferencesService.getOwnerPreferences(),
+                preferencesService.getTimestampPreferences()
+        );
+    }
+    public void addEntryToGroups(BibEntry entry) {
+        addToGroups(List.of(entry), stateManager.getSelectedGroup(this.bibDatabaseContext));
+    }
+    public void downloadLinkedFiles(BibEntry entry) {
+        if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
+            entry.getFiles().stream()
+                    .filter(LinkedFile::isOnlineLink)
+                    .forEach(linkedFile ->
+                            new LinkedFileViewModel(
+                                    linkedFile,
+                                    entry,
+                                    bibDatabaseContext,
+                                    taskExecutor,
+                                    dialogService,
+                                    preferencesService
+                            ).download()
+                    );
+        }
+    }
+
+
+
+
+
+
+
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
         for (GroupTreeNode node : groups) {
