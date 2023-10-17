@@ -133,7 +133,7 @@ public class Date {
                "(?i)(\\d{1,2})( )(January|February|March|April|May|June|July|August|September|October|November|December)" +
                "( |\\-)(\\d{1,4})/(\\d{1,2})( )" +
                "(January|February|March|April|May|June|July|August|September|October|November|December)" +
-               "( |\\-)(\\d{1,4})(?i-)|" // 20 January 2015/20 January 2015
+               "( |\\-)(\\d{1,4})(?i-)" // 20 January 2015/20 January 2015
         )) {
             try {
                 String[] strDates = dateString.split("/");
