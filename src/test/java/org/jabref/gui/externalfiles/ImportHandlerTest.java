@@ -107,7 +107,6 @@ class ImportHandlerTest {
     @Test
     void cleanUpEntryTest() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Clear Author");
-
         BibEntry cleanedEntry = importHandler.cleanUpEntry(bibDatabaseContext, entry);
 
         assertEquals("Clear Author", cleanedEntry.getField(StandardField.AUTHOR).orElse(""));
