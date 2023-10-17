@@ -13,7 +13,6 @@ import java.util.Optional;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
-import com.ibm.icu.impl.Pair;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
@@ -55,8 +54,6 @@ import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.*;
 
 public class ImportHandler {
 
@@ -220,7 +217,6 @@ public class ImportHandler {
         downloadLinkedFiles(entry);
     }
 
-
     public BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         ImportCleanup cleanup = new ImportCleanup(bibDatabaseContext.getMode());
         return cleanup.doPostCleanup(entry);
@@ -256,13 +252,12 @@ public class ImportHandler {
         return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
     }
 
-
-
     public void regenerateCiteKey(BibEntry entry) {
         if (preferencesService.getImporterPreferences().isGenerateNewKeyOnImport()) {
             generateKeys(List.of(entry));
         }
     }
+
     public void setAutomaticFieldsForEntry(BibEntry entry) {
         UpdateField.setAutomaticFields(
                 List.of(entry),
@@ -270,9 +265,11 @@ public class ImportHandler {
                 preferencesService.getTimestampPreferences()
         );
     }
+
     public void addEntryToGroups(BibEntry entry) {
         addToGroups(List.of(entry), stateManager.getSelectedGroup(this.bibDatabaseContext));
     }
+
     public void downloadLinkedFiles(BibEntry entry) {
         if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
             entry.getFiles().stream()
@@ -289,13 +286,6 @@ public class ImportHandler {
                     );
         }
     }
-
-
-
-
-
-
-
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
         for (GroupTreeNode node : groups) {
