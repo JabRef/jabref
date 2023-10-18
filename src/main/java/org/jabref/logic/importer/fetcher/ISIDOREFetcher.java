@@ -24,6 +24,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * Fetcher for ISIDORE
+ * Will take in the link to the website or the last six digits that identify the reference
+ * Uses ISIDORE's API.
+ */
 public class ISIDOREFetcher implements IdBasedParserFetcher {
     private String URL;
 
@@ -192,9 +197,10 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < itemElement.getChildNodes().getLength(); i++) {
             stringBuilder.append(itemElement.getChildNodes().item(i).getTextContent().trim());
-            if (!itemElement.getChildNodes().item(i).getTextContent().isBlank()) {
-                stringBuilder.append(", ");
+            if (itemElement.getChildNodes().item(i).getTextContent().isBlank()) {
+                continue;
             }
+            stringBuilder.append(", ");
         }
         return stringBuilder.substring(0, stringBuilder.length() - 2);
     }
