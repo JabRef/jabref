@@ -58,10 +58,8 @@ public class IntegrityCheckAction extends SimpleCommand {
         Task<List<IntegrityMessage>> task = new Task<>() {
             @Override
             protected List<IntegrityMessage> call() {
-                List<IntegrityMessage> result = new ArrayList<>();
-
                 ObservableList<BibEntry> entries = database.getDatabase().getEntries();
-                result.addAll(check.checkDatabase(database.getDatabase()));
+                List<IntegrityMessage> result = new ArrayList<>(check.checkDatabase(database.getDatabase()));
                 for (int i = 0; i < entries.size(); i++) {
                     if (isCancelled()) {
                         break;
