@@ -91,8 +91,11 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
 
     private String getDOI(NodeList list) {
         for (int i = 0; i < list.getLength(); i++) {
-            if (list.item(i).getTextContent().startsWith("DOI:")) {
+            if (list.item(i).getTextContent().contains("DOI:")) {
                 return list.item(i).getTextContent().replace("DOI: ", "");
+            }
+            if (list.item(i).getTextContent().contains("doi:")) {
+                return list.item(i).getTextContent().replace("info:doi:", "");
             }
         }
         return "";
