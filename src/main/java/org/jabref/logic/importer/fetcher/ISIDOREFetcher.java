@@ -165,7 +165,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         int previous = 0;
         while (spaces(in) != previous) {
             previous = spaces(in);
-            in = in.replaceAll("  ", " ");
+            in = in.replace("  ", " ");
         }
         return in;
     }
