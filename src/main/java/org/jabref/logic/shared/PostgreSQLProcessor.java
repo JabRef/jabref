@@ -21,8 +21,8 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 
     private PostgresSQLNotificationListener listener;
 
-    private Integer VERSION_DB_STRUCT_DEFAULT = -1;
-    private Integer CURRENT_VERSION_DB_STRUCT = 1;
+    private int VERSION_DB_STRUCT_DEFAULT = -1;
+    private final int CURRENT_VERSION_DB_STRUCT = 1;
 
     public PostgreSQLProcessor(DatabaseConnection connection) {
         super(connection);
@@ -31,7 +31,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     /**
      * Creates and sets up the needed tables and columns according to the database type.
      *
-     * @throws SQLException
+     * @throws SQLException in case of error
      */
     @Override
     public void setUp() throws SQLException {
@@ -65,7 +65,8 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 
         if (metadata.get(MetaData.VERSION_DB_STRUCT) != null) {
             try {
-                VERSION_DB_STRUCT_DEFAULT = Integer.valueOf(metadata.get(MetaData.VERSION_DB_STRUCT));
+                // replace semicolon so we can parse it
+                VERSION_DB_STRUCT_DEFAULT = Integer.parseInt(metadata.get(MetaData.VERSION_DB_STRUCT).replace(";", ""));
             } catch (Exception e) {
                 LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Integer!");
             }
@@ -84,7 +85,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 metadata = getSharedMetaData();
             }
 
-            metadata.put(MetaData.VERSION_DB_STRUCT, CURRENT_VERSION_DB_STRUCT.toString());
+            metadata.put(MetaData.VERSION_DB_STRUCT, String.valueOf(CURRENT_VERSION_DB_STRUCT));
             setSharedMetaData(metadata);
         }
     }
@@ -98,9 +99,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 .append(escape("TYPE"))
                 .append(") VALUES(?)");
         // Number of commas is bibEntries.size() - 1
-        for (int i = 0; i < bibEntries.size() - 1; i++) {
-            insertIntoEntryQuery.append(", (?)");
-        }
+        insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, bibEntries.size() - 1)));
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
                 Statement.RETURN_GENERATED_KEYS)) {
             for (int i = 0; i < bibEntries.size(); i++) {
