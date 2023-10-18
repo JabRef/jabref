@@ -70,8 +70,11 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
                 return Collections.singletonList(xmlItemToBibEntry(document));
             } catch (Exception e) {
                 // Handle parsing exceptions
-                e.printStackTrace();
-                return Collections.emptyList();
+                try {
+                    throw new FetcherException("Issue with parsing link");
+                } catch (FetcherException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         };
     }
