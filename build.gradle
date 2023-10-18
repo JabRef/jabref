@@ -143,7 +143,7 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.7.0.202309050840-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.15.3'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.3'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
@@ -230,7 +230,7 @@ dependencies {
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.162'
+    testImplementation 'io.github.classgraph:classgraph:4.8.163'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.0'
 
