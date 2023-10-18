@@ -26,8 +26,6 @@ public class ExtractReferencesAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
-    private final GrobidService grobidService;
-
     private final BibEntry entry;
     private final LinkedFile linkedFile;
     private final TaskExecutor taskExecutor;
@@ -36,7 +34,7 @@ public class ExtractReferencesAction extends SimpleCommand {
                                    StateManager stateManager,
                                    PreferencesService preferencesService,
                                    TaskExecutor taskExecutor) {
-        this(dialogService, stateManager, preferencesService, null, null, taskExecutor, new GrobidService(preferencesService.getGrobidPreferences()));
+        this(dialogService, stateManager, preferencesService, null, null, taskExecutor);
     }
 
     public ExtractReferencesAction(DialogService dialogService,
@@ -44,18 +42,20 @@ public class ExtractReferencesAction extends SimpleCommand {
                                    PreferencesService preferencesService,
                                    BibEntry entry,
                                    LinkedFile linkedFile,
-                                   TaskExecutor taskExecutor,
-                                   GrobidService grobidService) {
+                                   TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.entry = entry;
         this.linkedFile = linkedFile;
         this.taskExecutor = taskExecutor;
-        this.grobidService = grobidService;
 
         if (this.linkedFile == null) {
-            this.executable.bind(ActionHelper.needsEntriesSelected(stateManager).and(ActionHelper.hasLinkedFileForSelectedEntries(stateManager)));
+            this.executable.bind(
+                    ActionHelper.needsEntriesSelected(stateManager)
+                                .and(ActionHelper.hasLinkedFileForSelectedEntries(stateManager))
+                                .and(this.preferencesService.getGrobidPreferences().grobidEnabledProperty())
+            );
         } else {
             this.setExecutable(true);
         }
@@ -86,7 +86,7 @@ public class ExtractReferencesAction extends SimpleCommand {
             }
 
             Callable<ParserResult> parserResultCallable = () -> new ParserResult(
-                    grobidService.processReferences(fileList, preferencesService.getImportFormatPreferences())
+                    new GrobidService(this.preferencesService.getGrobidPreferences()).processReferences(fileList, preferencesService.getImportFormatPreferences())
             );
             BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
                                                               .withInitialMessage(Localization.lang("Processing PDF(s)"));
