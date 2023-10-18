@@ -10,9 +10,11 @@ import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -33,7 +35,7 @@ class GitHandlerTest {
         gitPreferences = new GitPreferences("testUser", "testPassword");
         PreferencesService preferences = mock(PreferencesService.class);
         when(preferences.getGitPreferences()).thenReturn(gitPreferences);
-
+        
         gitHandler = new GitHandler(repositoryPath);
         gitHandler.setGitPreferences(preferences.getGitPreferences());
     }
@@ -53,6 +55,22 @@ class GitHandlerTest {
             // Create commit
             Files.createFile(Path.of(repositoryPath.toString(), "Test.txt"));
             gitHandler.createCommitOnCurrentBranch("TestCommit", false);
+
+            AnyObjectId head = git.getRepository().resolve(Constants.HEAD);
+            Iterator<RevCommit> log = git.log()
+                                         .add(head)
+                                         .call().iterator();
+            assertEquals("TestCommit", log.next().getFullMessage());
+            assertEquals("Initial commit", log.next().getFullMessage());
+        }
+    }
+
+    @Test
+    void createCommitWithSingleFileOnCurrentBranch() throws IOException, NoHeadException, GitAPIException {
+        try (Git git = Git.open(repositoryPath.toFile())) {
+            // Create commit
+            Files.createFile(Path.of(repositoryPath.toString(), "Test.txt"));
+            gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false);
 
             AnyObjectId head = git.getRepository().resolve(Constants.HEAD);
             Iterator<RevCommit> log = git.log()

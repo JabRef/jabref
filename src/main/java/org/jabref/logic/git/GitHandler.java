@@ -65,6 +65,8 @@ public class GitHandler {
                     }
                 }
             } catch (GitAPIException | IOException e) {
+                System.out.println(e);
+                System.out.println(e.getMessage());
                 LOGGER.error("Initialization failed");
             }
         }
