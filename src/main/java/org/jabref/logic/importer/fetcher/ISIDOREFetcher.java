@@ -47,14 +47,15 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
             identifier = "https://isidore.science/document/10670/" + identifier;
         }
         // Throw an error if this is not the starting link
-        if (!identifier.startsWith("https://isidore.science/document/10670/1.") || !(identifier.length() == 47)) {
+        if (identifier.startsWith("https://isidore.science/document/10670/1.") || (identifier.length() == 47)) {
+            this.URL = identifier;
+            // change the link to be the correct link for the api.
+            identifier = identifier.replace("/document/", "/resource/content?uri=");
+            identifier = identifier.replace("https://isidore.science/", "https://api.isidore.science/");
+            return new URL(identifier);
+        } else {
             throw new FetcherException("Could not construct url for ISIDORE");
         }
-        this.URL = identifier;
-        // change the link to be the correct link for the api.
-        identifier = identifier.replace("/document/", "/resource/content?uri=");
-        identifier = identifier.replace("https://isidore.science/", "https://api.isidore.science/");
-        return new URL(identifier);
     }
 
     @Override
@@ -151,10 +152,11 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         for (int i = 1; i < itemElement.getChildNodes().getLength(); i += 2) {
             String next = removeMultipleSpaces(removeNumbers(itemElement.getChildNodes().item(i).getTextContent()));
             next = next.replace("\n", "");
-            if (!next.isBlank()) {
-                stringBuilder.append(next);
-                stringBuilder.append(" and ");
+            if (next.isBlank()) {
+                continue;
             }
+            stringBuilder.append(next);
+            stringBuilder.append(" and ");
         }
         return removeMultipleSpaces(stringBuilder.substring(0, stringBuilder.length() - 5)).trim();
     }
