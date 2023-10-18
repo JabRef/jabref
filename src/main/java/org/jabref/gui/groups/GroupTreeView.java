@@ -99,6 +99,11 @@ public class GroupTreeView extends BorderPane {
 
     private Timer scrollTimer;
     private double scrollVelocity = 0;
+    private double scrollableAreaHeight;
+    private double upperBorder;
+    private double lowerBorder;
+    private double baseFactor;
+    private int nodesSize;
 
     /**
      * Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
@@ -460,37 +465,16 @@ public class GroupTreeView extends BorderPane {
         groupTree.setOnDragDropped(event -> scrollTimer.stop());
         groupTree.setOnDragExited(event -> scrollTimer.stop());
 
-        groupTree.setOnDragEntered(event -> scrollTimer.restart());
+        groupTree.setOnDragEntered(event -> {
+            initScrolling();
+            scrollTimer.restart();
+        });
 
         groupTree.setOnDragOver(event -> {
-            ObservableList<Node> children = groupTree.getChildrenUnmodifiable();
-            if (children.isEmpty()) {
-                scrollVelocity = 0;
-                return;
-            }
-
-            // At most scroll area is three entries large
-            double scrollableAreaHeight = Math.min(children.get(0).getLayoutBounds().getHeight() * 3.0, groupTree.getHeight() / 3.0);
-            double upperBorder = scrollableAreaHeight;
-            double lowerBorder = groupTree.getHeight() - scrollableAreaHeight;
-
             boolean scrollingUp = event.getY() < upperBorder;
             boolean scrollingDown = event.getY() > lowerBorder;
 
             if (!scrollingDown && !scrollingUp) {
-                scrollVelocity = 0;
-                return;
-            }
-
-            // inspired by javafx.scene.Parent.getManagedChildren
-            List<Node> nodes = new ArrayList<>();
-            for (int i = 0, max = children.size(); i < max; i++) {
-                Node e = children.get(i);
-                if (e.isManaged()) {
-                    nodes.add(e);
-                }
-            }
-            if (nodes.isEmpty()) {
                 scrollVelocity = 0;
                 return;
             }
@@ -502,17 +486,44 @@ public class GroupTreeView extends BorderPane {
                 distanceFromNonScrollableInsideArea = scrollableAreaHeight - (groupTree.getHeight() - event.getY());
             }
 
-            double oneEntryFraction = 1.0 / nodes.size();
-            // 20 is from speed = 20px/s (1+x) (proposed by https://github.com/JabRef/jabref/issues/9754#issuecomment-1766864908)
-            // We adapted the formula so that closer to the corner INSIDE the groups the faster it gets (and not slower)
-            double height = children.get(0).getLayoutBounds().getHeight();
-            double baseFactor = oneEntryFraction / height * 20.0 * SCROLL_SPEED_UP;
-            scrollVelocity = (baseFactor * (1.0 + distanceFromNonScrollableInsideArea)) / nodes.size() / scrollableAreaHeight / 10.0;
-
+            scrollVelocity = (baseFactor * (1.0 + distanceFromNonScrollableInsideArea)) / nodesSize / scrollableAreaHeight / 10.0;
             if (scrollingUp) {
                 scrollVelocity = -scrollVelocity;
             }
         });
+    }
+
+    private void initScrolling() {
+        ObservableList<Node> children = groupTree.getChildrenUnmodifiable();
+        if (children.isEmpty()) {
+            scrollVelocity = 0;
+            return;
+        }
+
+        // At most scroll area is three entries large
+        scrollableAreaHeight = Math.min(children.get(0).getLayoutBounds().getHeight() * 3.0, groupTree.getHeight() / 3.0);
+        upperBorder = scrollableAreaHeight;
+        lowerBorder = groupTree.getHeight() - scrollableAreaHeight;
+
+        // inspired by javafx.scene.Parent.getManagedChildren
+        List<Node> nodes = new ArrayList<>();
+        for (int i = 0, max = children.size(); i < max; i++) {
+            Node e = children.get(i);
+            if (e.isManaged()) {
+                nodes.add(e);
+            }
+        }
+        if (nodes.isEmpty()) {
+            scrollVelocity = 0;
+            return;
+        }
+
+        nodesSize = nodes.size();
+        double oneEntryFraction = 1.0 / nodesSize;
+        // 20 is from speed = 20px/s (1+x) (proposed by https://github.com/JabRef/jabref/issues/9754#issuecomment-1766864908)
+        // We adapted the formula so that closer to the corner INSIDE the groups the faster it gets (and not slower)
+        double height = children.get(0).getLayoutBounds().getHeight();
+        baseFactor = oneEntryFraction / height * 20.0 * SCROLL_SPEED_UP;
     }
 
     private Optional<ScrollBar> getVerticalScrollbar() {
