@@ -30,6 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We modified the DOI cleanup to infer the DOI from an ArXiV ID if it's present. [#10426](https://github.com/JabRef/jabref/issues/10426)
 - The ISI importer uses the field `comment` for notes (instead of `review). [#10478](https://github.com/JabRef/jabref/pull/10478)
 - If no existing document is selected for exporting "Embedded BibTeX pdf" JabRef will now create a new PDF file with a sample text and the metadata. [#10101](https://github.com/JabRef/jabref/issues/10101)
+- Translated titles format no longer raise a warning. [#10459](https://github.com/JabRef/jabref/issues/10459)
 
 ### Fixed
 
