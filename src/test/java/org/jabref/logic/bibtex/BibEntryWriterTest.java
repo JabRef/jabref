@@ -40,7 +40,6 @@ import static org.mockito.Mockito.mock;
 
 class BibEntryWriterTest {
 
-
     private static ImportFormatPreferences importFormatPreferences;
     private final StringWriter stringWriter = new StringWriter();
     private BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
