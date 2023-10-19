@@ -1,11 +1,6 @@
 package org.jabref.gui.groups;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -61,13 +56,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
             .getName()
             .compareToIgnoreCase(v1.getName());
     private final Comparator<GroupTreeNode> compSubGroup = (GroupTreeNode v1, GroupTreeNode v2) -> {
-        int numChildren1 = v1.getNumberOfChildren();
-        int numChildren2 = v2.getNumberOfChildren();
+        int numChildren1 = v1.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
+        int numChildren2 = v2.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
         return Integer.compare(numChildren2, numChildren1);
     };
     private final Comparator<GroupTreeNode> compSubGroupReverse = (GroupTreeNode v1, GroupTreeNode v2) -> {
-        int numChildren1 = v1.getNumberOfChildren();
-        int numChildren2 = v2.getNumberOfChildren();
+        int numChildren1 = v1.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
+        int numChildren2 = v2.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
         return Integer.compare(numChildren1, numChildren2);
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
