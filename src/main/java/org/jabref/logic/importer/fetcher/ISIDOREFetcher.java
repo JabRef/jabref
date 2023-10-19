@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -120,7 +121,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         for (int i = 0; i < list.getLength(); i++) {
             Element abstractElement = (Element) list.item(i);
             String langAttribute = abstractElement.getAttribute("xml:lang");
-            if (langAttribute.equals("en")) {
+            if (Objects.equals(langAttribute, "en")) {
                 return abstractElement.getTextContent();
             }
         }
