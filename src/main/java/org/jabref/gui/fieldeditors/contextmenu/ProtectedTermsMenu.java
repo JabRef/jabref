@@ -118,8 +118,7 @@ class ProtectedTermsMenu extends Menu {
                     ++endIdx;
                 }
                 list.addProtectedTerm(text.substring(beginIdx, endIdx));
-            }
-            else {
+            } else {
                 // Remove leading and trailing whitespaces
                 list.addProtectedTerm(textInputControl.getSelectedText().strip());
             }
