@@ -494,11 +494,14 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void initScrolling() {
+        System.out.println("init scrolling");
         ObservableList<Node> children = groupTree.getChildrenUnmodifiable();
         if (children.isEmpty()) {
             scrollVelocity = 0;
             return;
         }
+
+        System.out.println("groupTree.getChildrenUnmodifiable() " + groupTree.getChildrenUnmodifiable().size());
 
         // At most scroll area is three entries large
         scrollableAreaHeight = Math.min(children.get(0).getLayoutBounds().getHeight() * 3.0, groupTree.getHeight() / 3.0);
@@ -519,6 +522,9 @@ public class GroupTreeView extends BorderPane {
         }
 
         nodesSize = nodes.size();
+
+        System.out.println("nodesSize " + nodesSize);
+
         double oneEntryFraction = 1.0 / nodesSize;
         // 20 is from speed = 20px/s (1+x) (proposed by https://github.com/JabRef/jabref/issues/9754#issuecomment-1766864908)
         // We adapted the formula so that closer to the corner INSIDE the groups the faster it gets (and not slower)
