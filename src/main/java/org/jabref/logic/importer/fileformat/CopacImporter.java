@@ -58,7 +58,7 @@ public class CopacImporter extends Importer {
     }
 
     private static void setOrAppend(BibEntry b, Field field, String value, String separator) {
-        if (b.hasField(field)) {
+        if (b.hasField(field) && b.getField(field).isPresent()) {
             b.setField(field, b.getField(field).get() + separator + value);
         } else {
             b.setField(field, value);
@@ -87,7 +87,7 @@ public class CopacImporter extends Importer {
             } else {
                 // beginning of a new item
                 if ("TI- ".equals(str.substring(0, 4))) {
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         entries.add(sb.toString());
                     }
                     sb = new StringBuilder();
@@ -96,7 +96,7 @@ public class CopacImporter extends Importer {
             }
         }
 
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
             entries.add(sb.toString());
         }
 
@@ -116,28 +116,29 @@ public class CopacImporter extends Importer {
                 }
                 String code = line.substring(0, 4);
 
-                if ("TI- ".equals(code)) {
-                    setOrAppend(b, StandardField.TITLE, line.substring(4).trim(), ", ");
-                } else if ("AU- ".equals(code)) {
-                    setOrAppend(b, StandardField.AUTHOR, line.substring(4).trim(), " and ");
-                } else if ("PY- ".equals(code)) {
-                    setOrAppend(b, StandardField.YEAR, line.substring(4).trim(), ", ");
-                } else if ("PU- ".equals(code)) {
-                    setOrAppend(b, StandardField.PUBLISHER, line.substring(4).trim(), ", ");
-                } else if ("SE- ".equals(code)) {
-                    setOrAppend(b, StandardField.SERIES, line.substring(4).trim(), ", ");
-                } else if ("IS- ".equals(code)) {
-                    setOrAppend(b, StandardField.ISBN, line.substring(4).trim(), ", ");
-                } else if ("KW- ".equals(code)) {
-                    setOrAppend(b, StandardField.KEYWORDS, line.substring(4).trim(), ", ");
-                } else if ("NT- ".equals(code)) {
-                    setOrAppend(b, StandardField.NOTE, line.substring(4).trim(), ", ");
-                } else if ("PD- ".equals(code)) {
-                    setOrAppend(b, new UnknownField("physicaldimensions"), line.substring(4).trim(), ", ");
-                } else if ("DT- ".equals(code)) {
-                    setOrAppend(b, new UnknownField("documenttype"), line.substring(4).trim(), ", ");
-                } else {
-                    setOrAppend(b, FieldFactory.parseField(StandardEntryType.Book, line.substring(0, 2)), line.substring(4).trim(), ", ");
+                switch (code) {
+                    case "TI- " ->
+                            setOrAppend(b, StandardField.TITLE, line.substring(4).trim(), ", ");
+                    case "AU- " ->
+                            setOrAppend(b, StandardField.AUTHOR, line.substring(4).trim(), " and ");
+                    case "PY- " ->
+                            setOrAppend(b, StandardField.YEAR, line.substring(4).trim(), ", ");
+                    case "PU- " ->
+                            setOrAppend(b, StandardField.PUBLISHER, line.substring(4).trim(), ", ");
+                    case "SE- " ->
+                            setOrAppend(b, StandardField.SERIES, line.substring(4).trim(), ", ");
+                    case "IS- " ->
+                            setOrAppend(b, StandardField.ISBN, line.substring(4).trim(), ", ");
+                    case "KW- " ->
+                            setOrAppend(b, StandardField.KEYWORDS, line.substring(4).trim(), ", ");
+                    case "NT- " ->
+                            setOrAppend(b, StandardField.NOTE, line.substring(4).trim(), ", ");
+                    case "PD- " ->
+                            setOrAppend(b, new UnknownField("physicaldimensions"), line.substring(4).trim(), ", ");
+                    case "DT- " ->
+                            setOrAppend(b, new UnknownField("documenttype"), line.substring(4).trim(), ", ");
+                    default ->
+                            setOrAppend(b, FieldFactory.parseField(StandardEntryType.Book, line.substring(0, 2)), line.substring(4).trim(), ", ");
                 }
             }
             results.add(b);
