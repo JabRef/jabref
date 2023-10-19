@@ -18,6 +18,7 @@ import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -307,5 +308,18 @@ public class GitHandler {
 
     public void setGitPreferences(GitPreferences gitPreferences) {
         this.gitPreferences = gitPreferences;
+    }
+
+    public void setRemoteUrl(String url) {
+        try {
+            Git git = Git.open(this.repositoryPathAsFile);
+            StoredConfig config = git.getRepository().getConfig();
+            config.setString("remote", "origin", "url", url);
+            config.save();
+        } catch (
+                IOException e) {
+            LOGGER.info("Failed to set git remote url");
+            throw new RuntimeException(e);
+        }
     }
 }
