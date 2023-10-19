@@ -90,9 +90,9 @@ jobs:
       - name: Build dmg (macOS)
         shell: bash
         run: |
-          ${{env.JDK21}}/Contents/Home/bin/jpackage \
+          jpackage \
           --module org.jabref/org.jabref.cli.Launcher \
-          --module-path ${{env.JDK21}}/Contents/Home/jmods/:build/jlinkbase/jlinkjars \
+          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
           --app-content buildres/mac/jabrefHost.py \
@@ -114,9 +114,9 @@ jobs:
       - name: Build pkg (macOS)
         shell: bash
         run: |
-          ${{env.JDK21}}/Contents/Home/bin/jpackage \
+          jpackage \
           --module org.jabref/org.jabref.cli.Launcher \
-          --module-path ${{env.JDK21}}/Contents/Home/jmods/:build/jlinkbase/jlinkjars \
+          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
           --app-content buildres/mac/jabrefHost.py \
