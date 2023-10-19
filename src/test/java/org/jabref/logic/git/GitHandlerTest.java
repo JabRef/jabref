@@ -6,12 +6,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
+import org.eclipse.jetty.security.*;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.jabref.gui.git.GitPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Credential;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
@@ -118,25 +125,32 @@ class GitHandlerTest {
 
     @Test
     void pushSingleFile () throws Exception {
+        String username = "test";
+        String password = "test";
+        CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
         // Server
         Repository repository = createRepository();
         repository.getConfig().setString("http", null, "jabrefGitTest", "true");
+        repository.getConfig().setString("remote", "origin", "url", "http://localhost:8080/");
+        repository.getConfig().setBoolean("http", null, "receivepack", true);
         GitServlet gs = new GitServlet();
         gs.setRepositoryResolver((req, name) -> {
             repository.incrementOpen();
             return repository;
         });
         Server server = new Server(8080);
-        ServletHandler handler = new ServletHandler();
-        server.setHandler(handler);
-        ServletHolder holder = new ServletHolder(gs);
-        handler.addServletWithMapping(holder, "/*");
-        server.start();
+        ServletContextHandler context = new ServletContextHandler(server, "/*", ServletContextHandler.SESSIONS);
+        context.setSecurityHandler(basicAuth(username, password, "Private!"));
+        context.addServlet(new ServletHolder(gs), "/");
+        server.setHandler(context);
 
+        server.start();
+        server.join();
         //Clone
         Path clonedRepPath = createFolder();
         Git.cloneRepository()
-           .setURI( "http://localhost:8080/jabrefGitTest")
+           .setCredentialsProvider(credentialsProvider)
+           .setURI( "http://localhost:8080/")
            .setDirectory(clonedRepPath.toFile())
            .call();
 
@@ -149,12 +163,42 @@ class GitHandlerTest {
         git.createCommitWithSingleFileOnCurrentBranch(clonedRepPath.toString() + "/bib_1.bib", "PushSingleFile", false);
 
         //Push
-        gitPreferences = new GitPreferences("", "");
+        gitPreferences = new GitPreferences(username, password);
         PreferencesService preferences = mock(PreferencesService.class);
         when(preferences.getGitPreferences()).thenReturn(gitPreferences);
         git.setGitPreferences(preferences.getGitPreferences());
         git.pushCommitsToRemoteRepository();
 
         server.stop();
+    }
+
+    private static final SecurityHandler basicAuth(String username, String password, String realm) {
+
+        HashLoginService l = new HashLoginService();
+        UserStore userStore = new UserStore();
+        String[] roles = new String[] {"user"};
+        Credential credential = Credential.getCredential(password);
+        userStore.addUser(username, credential, roles);
+        l.setUserStore(userStore);
+        l.setName(realm);
+        CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
+
+        Constraint constraint = new Constraint();
+        constraint.setName(Constraint.__BASIC_AUTH);
+        constraint.setRoles(new String[]{"user"});
+        constraint.setAuthenticate(true);
+
+        ConstraintMapping cm = new ConstraintMapping();
+        cm.setConstraint(constraint);
+        cm.setPathSpec("/*");
+
+        ConstraintSecurityHandler csh = new ConstraintSecurityHandler();
+        csh.setAuthenticator(new BasicAuthenticator());
+        csh.setRealmName("myrealm");
+        csh.addConstraintMapping(cm);
+        csh.setLoginService(l);
+
+        return csh;
+
     }
 }
