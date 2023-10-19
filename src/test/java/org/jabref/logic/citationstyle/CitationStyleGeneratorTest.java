@@ -160,7 +160,7 @@ class CitationStyleGeneratorTest {
                 .withField(StandardField.YEAR, "2021")
                 .withField(StandardField.ADDRESS, "Somewhere");
 
-        String expectedCitation = "[1]B. Smith, “An article,” J. Jones, Ed., Somewhere: Great Publisher, 2021, pp. 1–10.\n";
+        String expectedCitation = "[1]B. Smith, “An article,” J. Jones, Ed., Somewhere: Great Publisher, 2021, pp. 1–10. \n";
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(firstEntry, secondEntry)));
         String style = CitationStyle.getDefault().getSource();
 
