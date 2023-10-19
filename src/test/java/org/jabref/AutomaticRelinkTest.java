@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AutomaticRelinkTest {
 
-    /** Set up Directorys
+    /** Set up Directories 
      *
      */
     public void setUpD() {
@@ -43,7 +43,7 @@ public class AutomaticRelinkTest {
      //   setUpD();
     }
     /**
-     * File Doesn't do anything new
+     * Copy test pdf into my folder
      */
 
     public void copy(String source, String destination) throws IOException {
@@ -52,6 +52,7 @@ public class AutomaticRelinkTest {
         Files.copy(src, dst.resolve(src.getFileName()), StandardCopyOption.REPLACE_EXISTING);
     }
 
+    //Make sure the copy method works
    @Test
    void copyTest() throws IOException {
         copy("src/test/resources/pdfs/minimal.pdf", "src/test/TestDirectory/A");
@@ -60,6 +61,7 @@ public class AutomaticRelinkTest {
     }
 
 
+    //Still working this out!
     @Test
     void checkEntry() {
         BibEntry bib = new BibEntry();
