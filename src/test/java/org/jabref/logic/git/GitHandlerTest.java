@@ -6,19 +6,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-import org.eclipse.jetty.security.*;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.jabref.gui.git.GitPreferences;
 import org.jabref.preferences.PreferencesService;
 
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
-import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
@@ -28,6 +29,9 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -45,7 +49,7 @@ class GitHandlerTest {
     private final String localUrl = "http://localhost:" + port + '/';
 
 
-    private static Repository createRepository() throws IOException {
+    private static Repository createRepository() throws IOException, GitAPIException {
         File localPath = File.createTempFile("TestGitRepository", "");
         if(!localPath.delete()) {
             throw new IOException("Could not delete temporary file " + localPath);
@@ -55,6 +59,7 @@ class GitHandlerTest {
         }
         Repository repository = FileRepositoryBuilder.create(new File(localPath, ".git"));
         repository.create();
+        repository.getConfig().setBoolean("http", null, "receivepack", true);
         return repository;
     }
     private static Path createFolder() throws IOException {
@@ -107,7 +112,7 @@ class GitHandlerTest {
         try (Git git = Git.open(repositoryPath.toFile())) {
             // Create commit
             Files.createFile(Path.of(repositoryPath.toString(), "Test.txt"));
-            gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false);
+            Assertions.assertTrue(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false));
 
             AnyObjectId head = git.getRepository().resolve(Constants.HEAD);
             Iterator<RevCommit> log = git.log()
@@ -115,6 +120,7 @@ class GitHandlerTest {
                                          .call().iterator();
             assertEquals("TestCommit", log.next().getFullMessage());
             assertEquals("Initial commit", log.next().getFullMessage());
+            Assertions.assertFalse(gitHandler.createCommitWithSingleFileOnCurrentBranch("Test.txt", "TestCommit", false));
         }
     }
 
@@ -127,30 +133,17 @@ class GitHandlerTest {
     void pushSingleFile () throws Exception {
         String username = "test";
         String password = "test";
-        CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
+
         // Server
         Repository repository = createRepository();
-        repository.getConfig().setString("http", null, "jabrefGitTest", "true");
-        repository.getConfig().setString("remote", "origin", "url", "http://localhost:8080/");
-        repository.getConfig().setBoolean("http", null, "receivepack", true);
-        GitServlet gs = new GitServlet();
-        gs.setRepositoryResolver((req, name) -> {
-            repository.incrementOpen();
-            return repository;
-        });
-        Server server = new Server(8080);
-        ServletContextHandler context = new ServletContextHandler(server, "/*", ServletContextHandler.SESSIONS);
-        context.setSecurityHandler(basicAuth(username, password, "Private!"));
-        context.addServlet(new ServletHolder(gs), "/");
-        server.setHandler(context);
+        Server server = createServer(username, password, repository);
 
-        server.start();
-        server.join();
         //Clone
+        CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(username, password);
         Path clonedRepPath = createFolder();
         Git.cloneRepository()
            .setCredentialsProvider(credentialsProvider)
-           .setURI( "http://localhost:8080/")
+           .setURI( "http://localhost:8080/repoTest")
            .setDirectory(clonedRepPath.toFile())
            .call();
 
@@ -160,7 +153,7 @@ class GitHandlerTest {
 
         //Commit
         GitHandler git = new GitHandler(clonedRepPath);
-        git.createCommitWithSingleFileOnCurrentBranch(clonedRepPath.toString() + "/bib_1.bib", "PushSingleFile", false);
+        Assertions.assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_1.bib", "PushSingleFile", false));
 
         //Push
         gitPreferences = new GitPreferences(username, password);
@@ -169,6 +162,7 @@ class GitHandlerTest {
         git.setGitPreferences(preferences.getGitPreferences());
         git.pushCommitsToRemoteRepository();
 
+        Assertions.assertTrue(git.createCommitWithSingleFileOnCurrentBranch("bib_2.bib", "PushSingleFile", false));
         server.stop();
     }
 
@@ -200,5 +194,19 @@ class GitHandlerTest {
 
         return csh;
 
+    }
+
+    private Server createServer(String username, String password, Repository repository) {
+        GitServlet gs = new GitServlet();
+        gs.setRepositoryResolver((req, name) -> {
+            repository.incrementOpen();
+            return repository;
+        });
+        Server server = new Server(8080);
+        ServletContextHandler context = new ServletContextHandler(server, "/*", ServletContextHandler.SESSIONS);
+        context.setSecurityHandler(basicAuth(username, password, "Private!"));
+        context.addServlet(new ServletHolder(gs), "/*");
+        server.setHandler(context);
+        return server;
     }
 }
