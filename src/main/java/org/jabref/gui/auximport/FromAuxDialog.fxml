@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -13,6 +12,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+
+<?import javafx.scene.control.ComboBox?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="650.0" prefWidth="500.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.auximport.FromAuxDialog">
     <content>
@@ -44,11 +45,6 @@
                 <Label text="%Unknown BibTeX entries:"/>
                 <ListView fx:id="notFoundList" prefHeight="200"/>
                 <VBox spacing="10">
-                    <HBox spacing="4">
-                        <Button onAction="#selectAllNewEntries"  text="%Select all new entries"/>
-                        <Button onAction="#selectAllEntries"  text="%Select all entries"/>
-                        <Button onAction="#unselectAll"  text="%Unselect all"/>
-                    </HBox>
                     <HBox spacing="4" alignment="CENTER_LEFT">
                         <Label text="%Select library"/>
                         <ComboBox fx:id="libraryListView" layoutX="16.0" layoutY="52.0"/>

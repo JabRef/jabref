@@ -1,6 +1,8 @@
 package org.jabref.gui.auximport;
 
 import java.nio.file.Path;
+import java.util.Optional;
+
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,36 +12,36 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.importer.ImportEntriesViewModel;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
-import org.controlsfx.control.CheckListView;
+
+
 
 /**
  * A wizard dialog for generating a new sub database from existing TeX AUX file
  */
 public class FromAuxDialog extends BaseDialog<Void> {
 
-    public CheckListView<BibEntry> entriesListView;
-
-    private ImportEntriesViewModel viewModel;
-    public ComboBox<String> libraryListView;
     private final LibraryTab libraryTab;
     @FXML private ButtonType generateButtonType;
     private final Button generateButton;
@@ -51,15 +53,19 @@ public class FromAuxDialog extends BaseDialog<Void> {
     @Inject private PreferencesService preferences;
     @Inject private DialogService dialogService;
     @Inject private ThemeManager themeManager;
+    public ComboBox<BibDatabaseContext> libraryListView;
+    @Inject private StateManager stateManager;
+
+
+
+
 
     public FromAuxDialog(JabRefFrame frame) {
         libraryTab = frame.getCurrentLibraryTab();
         this.setTitle(Localization.lang("AUX file import"));
-
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-
         generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);
         generateButton.setDisable(true);
         generateButton.defaultButtonProperty().bind(generateButton.disableProperty().not());
@@ -70,10 +76,8 @@ public class FromAuxDialog extends BaseDialog<Void> {
             }
             return null;
         });
-
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
-
     @FXML
     private void parseActionPerformed() {
         notFoundList.getItems().clear();
@@ -108,22 +112,28 @@ public class FromAuxDialog extends BaseDialog<Void> {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> auxFileField.setText(file.toAbsolutePath().toString()));
     }
 
-    public void unselectAll() {
-        entriesListView.getCheckModel().clearChecks();
-    }
+    @FXML
+    private void initialize() {
 
-    public void selectAllNewEntries() {
-        unselectAll();
-        for (BibEntry entry : entriesListView.getItems()) {
-            if (!viewModel.hasDuplicate(entry)) {
-                entriesListView.getCheckModel().check(entry);
-            }
-        }
-    }
+        libraryListView.setEditable(false);
+        libraryListView.getItems().addAll(stateManager.getOpenDatabases());
+        new ViewModelListCellFactory<BibDatabaseContext>()
+                .withText(database -> {
+                    Optional<String> dbOpt = Optional.empty();
+                    if (database.getDatabasePath().isPresent()) {
+                        dbOpt = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), database.getDatabasePath().get());
+                    }
+                    if (database.getLocation() == DatabaseLocation.SHARED) {
+                        return database.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+                    }
 
-    public void selectAllEntries() {
-        unselectAll();
-        entriesListView.getCheckModel().checkAll();
+                    if (dbOpt.isEmpty()) {
+                        return Localization.lang("untitled");
+                    }
+
+                    return dbOpt.get();
+                })
+                .install(libraryListView);
     }
 
 }
