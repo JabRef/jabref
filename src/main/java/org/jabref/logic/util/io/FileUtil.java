@@ -103,9 +103,9 @@ public class FileUtil {
 
     /**
      * Returns a valid filename for most operating systems.
-     *
+     * <p>
      * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
-     *
+     * <p>
      * For "real" cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
      */
     public static String getValidFileName(String fileName) {
@@ -124,7 +124,7 @@ public class FileUtil {
     /**
      * Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
      * gets "demo.bib.sav" and not "demo.sav"
-     *
+     * <p>
      * <emph>Warning! If "ext" is passed, this is literally added. Thus addExtension("tmp.txt", "ext") leads to "tmp.txtext"</emph>
      *
      * @param path      the path to add the extension to
@@ -160,9 +160,7 @@ public class FileUtil {
      */
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
-                                          .filter(part -> comparePath.toString().contains(part))
-                                          .sorted(Comparator.comparingInt(String::length).reversed())
-                                          .findFirst();
+                                          .filter(part -> comparePath.toString().contains(part)).max(Comparator.comparingInt(String::length));
     }
 
     /**
@@ -377,7 +375,7 @@ public class FileUtil {
      * @param fileName the filename (e.g., a .pdf file), may contain path separators
      * @param directory the directory which should be search starting point
      *
-     * @returns an empty optional if the file does not exist, otherwise, the absolute path
+     * @return an empty optional if the file does not exist, otherwise, the absolute path
      */
     public static Optional<Path> find(String fileName, Path directory) {
         Objects.requireNonNull(fileName);
@@ -467,7 +465,7 @@ public class FileUtil {
 
     /**
      * Detect illegal characters in given filename.
-     *
+     * <p>
      * See also {@link org.jabref.logic.util.io.FileNameCleaner#cleanFileName}
      *
      * @param fileName the fileName to detect
