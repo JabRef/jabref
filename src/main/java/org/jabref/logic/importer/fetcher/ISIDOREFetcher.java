@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -26,11 +25,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Fetcher for ISIDORE
+ * Fetcher for ISIDORE (<a href="https://isidore.science">...</a>)
  * Will take in the link to the website or the last six digits that identify the reference
  * Uses ISIDORE's API.
+ * API explanation: <a href="https://isidore.science/api">...</a>
  */
 public class ISIDOREFetcher implements IdBasedParserFetcher {
+    private static final int LINKLENGTH = 47;
+
     private String URL;
     private Parser parser;
 
@@ -66,13 +68,12 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         // this allows the user to input only the six-digit code at the end.
         if (identifier.length() == 6) {
             identifier = "https://isidore.science/document/10670/1." + identifier;
-        }
-        // allows the user to put in the eight digits including the "1."
-        if (identifier.length() == 8) {
+        } else if (identifier.length() == 8) {
+            // allows the user to put in the eight digits including the "1."
             identifier = "https://isidore.science/document/10670/" + identifier;
         }
         // Throw an error if this is not the starting link
-        if (identifier.startsWith("https://isidore.science/document/10670/1.") || (identifier.length() == 47)) {
+        if (identifier.startsWith("https://isidore.science/document/10670/1.") && (identifier.length() == LINKLENGTH)) {
             this.URL = identifier;
             // change the link to be the correct link for the api.
             identifier = identifier.replace("/document/", "/resource/content?uri=");
@@ -96,7 +97,6 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
                 .withField(StandardField.YEAR, itemElement.getElementsByTagName("date").item(0).getChildNodes().item(1).getTextContent().substring(0, 4))
                 .withField(StandardField.JOURNAL, getJournal(itemElement.getElementsByTagName("dc:source")))
                 .withField(StandardField.PUBLISHER, getPublishers(itemElement.getElementsByTagName("publishers").item(0)))
-                .withField(StandardField.ABSTRACT, getAbstract(itemElement.getElementsByTagName("abstract")))
                 .withField(StandardField.DOI, getDOI(itemElement.getElementsByTagName("ore").item(0).getChildNodes()))
                 .withField(StandardField.URL, this.URL);
     }
@@ -113,25 +113,8 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         return "";
     }
 
-    private String getAbstract(NodeList list) {
-        // If there is only one abstract, return the abstract
-        if (list.getLength() == 1) {
-            return list.item(0).getTextContent();
-        }
-
-        // If there are multiple abstracts, return the one with the english tag
-        for (int i = 0; i < list.getLength(); i++) {
-            Element abstractElement = (Element) list.item(i);
-            String langAttribute = abstractElement.getAttribute("xml:lang");
-            if (Objects.equals(langAttribute, "en")) {
-                return abstractElement.getTextContent();
-            }
-        }
-        return "";
-    }
-
     // Get the type of the document, ISIDORE only seems to have select types, also their types are different to
-    // those used by Jabaref.
+    // those used by JabRef.
     private EntryType getType(NodeList list) {
         for (int i = 0; i < list.getLength(); i++) {
             String type = list.item(i).getTextContent();
@@ -151,6 +134,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
     // Gets all the authors, separated with the word "and"
     // For some reason the author field sometimes has extra numbers and letters.
     private String getAuthor(Node itemElement) {
+        boolean singleAuthor = true;
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 1; i < itemElement.getChildNodes().getLength(); i += 2) {
             String next = removeMultipleSpaces(removeNumbers(itemElement.getChildNodes().item(i).getTextContent()));
@@ -158,10 +142,14 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
             if (next.isBlank()) {
                 continue;
             }
+            if (singleAuthor) {
+                singleAuthor = false;
+            } else {
+                stringBuilder.append(" and ");
+            }
             stringBuilder.append(next);
-            stringBuilder.append(" and ");
         }
-        return removeMultipleSpaces(stringBuilder.substring(0, stringBuilder.length() - 5)).trim();
+        return removeMultipleSpaces(stringBuilder.substring(0, stringBuilder.length())).trim();
     }
 
     private String removeMultipleSpaces(String in) {
