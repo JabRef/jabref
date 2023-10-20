@@ -100,7 +100,7 @@ class LocalizationConsistencyTest {
                         quotedEntries
                                 .stream()
                                 .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
-                                .collect(Collectors.toList()));
+                                .toList());
     }
 
     @Test
