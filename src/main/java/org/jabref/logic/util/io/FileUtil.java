@@ -173,7 +173,7 @@ public class FileUtil {
         // prepare data structures
         for (String path : paths) {
             List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
-            Deque<String> stack = new ArrayDeque<>(directories);
+            Deque<String> stack = new ArrayDeque<>(directories.reversed());
             stackList.add(stack);
         }
 
@@ -184,8 +184,7 @@ public class FileUtil {
             for (int i = 0; i < stackList.size(); i++) {
                 String tempPathString = pathSubstrings.get(i);
 
-                // To be consistent with the old Stack implementation we need to reverse the queue
-                Deque<String> reversedDeque = stackList.get(i).reversed();
+                Deque<String> reversedDeque = stackList.get(i);
 
                 if (tempPathString.isEmpty() && !reversedDeque.isEmpty()) {
                     String stringFromDeque = reversedDeque.pop();
