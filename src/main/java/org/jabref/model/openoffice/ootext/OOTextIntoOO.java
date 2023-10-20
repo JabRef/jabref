@@ -1,7 +1,9 @@
 package org.jabref.model.openoffice.ootext;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +147,7 @@ public class OOTextIntoOO {
         cursor.collapseToEnd();
 
         MyPropertyStack formatStack = new MyPropertyStack(cursor);
-        Stack<String> expectEnd = new Stack<>();
+        Deque<String> expectEnd = new ArrayDeque<>();
 
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
@@ -302,7 +304,7 @@ public class OOTextIntoOO {
         formatStack.apply(cursor);
         cursor.collapseToEnd();
 
-        if (!expectEnd.empty()) {
+        if (!expectEnd.isEmpty()) {
             StringBuilder rest = new StringBuilder();
             for (String s : expectEnd) {
                 rest.insert(0, String.format("<%s>", s));
