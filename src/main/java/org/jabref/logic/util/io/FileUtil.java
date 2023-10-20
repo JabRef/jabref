@@ -159,7 +159,8 @@ public class FileUtil {
      */
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
-                                          .filter(part -> comparePath.toString().contains(part)).max(Comparator.comparingInt(String::length));
+                                          .filter(part -> comparePath.toString().contains(part))
+                                          .max(Comparator.comparingInt(String::length));
     }
 
     /**
