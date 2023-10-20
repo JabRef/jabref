@@ -187,16 +187,19 @@ public class FileUtil {
             for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
 
-                if (tempString.isEmpty() && !stackList.get(i).isEmpty()) {
-                    pathSubstrings.set(i, stackList.get(i).pop());
-                } else if (!stackList.get(i).isEmpty()) {
-                    pathSubstrings.set(i, stackList.get(i).pop() + File.separator + tempString);
+                Deque<String> strings = stackList.get(i);
+                if (!strings.isEmpty()) {
+                    String string = strings.pop();
+                    if (tempString.isEmpty()) {
+                        pathSubstrings.set(i, string);
+                    } else if (!strings.isEmpty()) {
+                        pathSubstrings.set(i, string + File.separator + tempString);
+                    }
                 }
             }
 
             for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
-
                 if (Collections.frequency(pathSubstrings, tempString) == 1) {
                     stackList.get(i).clear();
                 }
