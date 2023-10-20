@@ -32,8 +32,32 @@ import org.w3c.dom.NodeList;
  */
 public class ISIDOREFetcher implements IdBasedParserFetcher {
     private String URL;
+    private Parser parser;
 
     public ISIDOREFetcher() {
+        this.parser = xmlData -> {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document document = builder.parse(xmlData);
+
+                // Assuming the root element represents an entry
+                Element entryElement = document.getDocumentElement();
+
+                if (entryElement == null) {
+                    return Collections.emptyList();
+                }
+
+                return Collections.singletonList(xmlItemToBibEntry(document));
+            } catch (Exception e) {
+                // Handle parsing exceptions
+                try {
+                    throw new FetcherException("Issue with parsing link");
+                } catch (FetcherException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        };
     }
 
     @Override
@@ -61,29 +85,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return xmlData -> {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            try {
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document document = builder.parse(xmlData);
-
-                // Assuming the root element represents an entry
-                Element entryElement = document.getDocumentElement();
-
-                if (entryElement == null) {
-                    return Collections.emptyList();
-                }
-
-                return Collections.singletonList(xmlItemToBibEntry(document));
-            } catch (Exception e) {
-                // Handle parsing exceptions
-                try {
-                    throw new FetcherException("Issue with parsing link");
-                } catch (FetcherException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        };
+        return this.parser;
     }
 
     private BibEntry xmlItemToBibEntry(Document document) {
