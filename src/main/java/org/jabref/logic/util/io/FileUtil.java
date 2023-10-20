@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -171,14 +170,10 @@ public class FileUtil {
      */
     public static List<String> uniquePathSubstrings(List<String> paths) {
         List<Deque<String>> stackList = new ArrayList<>(paths.size());
-        List<Stack<String>> staclForComparison = new ArrayList<>(paths.size());
         // prepare data structures
         for (String path : paths) {
             List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
             Deque<String> stack = new ArrayDeque<>(directories);
-            Stack<String> s = new Stack<>();
-            s.addAll(directories);
-            staclForComparison.add(s);
             stackList.add(stack);
         }
 
@@ -204,7 +199,6 @@ public class FileUtil {
             for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
                 if (Collections.frequency(pathSubstrings, tempString) == 1) {
-                    staclForComparison.get(i).clear();
                     stackList.get(i).clear();
                 }
             }
