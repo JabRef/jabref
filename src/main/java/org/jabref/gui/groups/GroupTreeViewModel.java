@@ -60,12 +60,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCaseReverse = (GroupTreeNode v1, GroupTreeNode v2) -> v2
             .getName()
             .compareToIgnoreCase(v1.getName());
-    private final Comparator<GroupTreeNode> compSubGroup = (GroupTreeNode v1, GroupTreeNode v2) -> {
+    private final Comparator<GroupTreeNode> compEntries = (GroupTreeNode v1, GroupTreeNode v2) -> {
         int numChildren1 = v1.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
         int numChildren2 = v2.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
         return Integer.compare(numChildren2, numChildren1);
     };
-    private final Comparator<GroupTreeNode> compSubGroupReverse = (GroupTreeNode v1, GroupTreeNode v2) -> {
+    private final Comparator<GroupTreeNode> compEntriesReverse = (GroupTreeNode v1, GroupTreeNode v2) -> {
         int numChildren1 = v1.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
         int numChildren2 = v2.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
         return Integer.compare(numChildren1, numChildren2);
@@ -578,11 +578,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
         group.sortChildren(compAlphabetIgnoreCaseReverse, true);
     }
 
-    public void sortSubgroupsRecursive(GroupTreeNode group) {
-        group.sortChildren(compSubGroup, true);
+    public void sortEntriesRecursive(GroupTreeNode group) {
+        group.sortChildren(compEntries, true);
     }
 
-    public void sortReverseSubgroupsRecursive(GroupTreeNode group) {
-        group.sortChildren(compSubGroupReverse, true);
+    public void sortReverseEntriesRecursive(GroupTreeNode group) {
+        group.sortChildren(compEntriesReverse, true);
     }
 }

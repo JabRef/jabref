@@ -506,8 +506,8 @@ public class GroupTreeView extends BorderPane {
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_SUB, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_SUB, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_SUB_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_SUB_REVERSE, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
@@ -621,10 +621,10 @@ public class GroupTreeView extends BorderPane {
                         viewModel.sortAlphabeticallyRecursive(group.getGroupNode());
                 case GROUP_SUBGROUP_SORT_REVERSE ->
                         viewModel.sortReverseAlphabeticallyRecursive(group.getGroupNode());
-                case GROUP_SUBGROUP_SORT_SUB ->
-                        viewModel.sortSubgroupsRecursive(group.getGroupNode());
-                case GROUP_SUBGROUP_SORT_SUB_REVERSE ->
-                        viewModel.sortReverseSubgroupsRecursive(group.getGroupNode());
+                case GROUP_SUBGROUP_SORT_ENTRIES ->
+                        viewModel.sortEntriesRecursive(group.getGroupNode());
+                case GROUP_SUBGROUP_SORT_ENTRIES_REVERSE ->
+                        viewModel.sortReverseEntriesRecursive(group.getGroupNode());
                 case GROUP_ENTRIES_ADD ->
                         viewModel.addSelectedEntries(group);
                 case GROUP_ENTRIES_REMOVE ->
