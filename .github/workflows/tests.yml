@@ -29,13 +29,13 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          submodules: 'false'
+          submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run checkstyle reporter
         uses: nikitasavinov/checkstyle-action@master
@@ -103,8 +103,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
@@ -138,8 +138,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
@@ -175,8 +175,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
@@ -216,8 +216,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Update test coverage metrics
         if: steps.checksecrets.outputs.secretspresent == 'YES'

@@ -509,6 +509,9 @@ public class GroupTreeView extends BorderPane {
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES, group)),
+                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
@@ -620,6 +623,12 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeSubgroups(group);
                 case GROUP_SUBGROUP_SORT ->
                         viewModel.sortAlphabeticallyRecursive(group.getGroupNode());
+                case GROUP_SUBGROUP_SORT_REVERSE ->
+                        viewModel.sortReverseAlphabeticallyRecursive(group.getGroupNode());
+                case GROUP_SUBGROUP_SORT_ENTRIES ->
+                        viewModel.sortEntriesRecursive(group.getGroupNode());
+                case GROUP_SUBGROUP_SORT_ENTRIES_REVERSE ->
+                        viewModel.sortReverseEntriesRecursive(group.getGroupNode());
                 case GROUP_ENTRIES_ADD ->
                         viewModel.addSelectedEntries(group);
                 case GROUP_ENTRIES_REMOVE ->
