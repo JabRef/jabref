@@ -173,14 +173,14 @@ public class FileUtil {
      */
     public static List<String> uniquePathSubstrings(List<String> paths) {
         List<Deque<String>> stackList = new ArrayList<>(paths.size());
-        List<Stack<String>> staclForComparsion = new ArrayList<>(paths.size());
+        List<Stack<String>> staclForComparison = new ArrayList<>(paths.size());
         // prepare data structures
         for (String path : paths) {
             List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
             Deque<String> stack = new ArrayDeque<>(directories);
             Stack<String> s = new Stack<>();
             s.addAll(directories);
-            staclForComparsion.add(s);
+            staclForComparison.add(s);
             stackList.add(stack);
         }
 
@@ -189,27 +189,25 @@ public class FileUtil {
         // compute the shortest folder substrings
         while (!stackList.stream().allMatch(Deque::isEmpty)) {
             for (int i = 0; i < stackList.size(); i++) {
-                String tempString = pathSubstrings.get(i);
+                String tempPathString = pathSubstrings.get(i);
 
-                Deque<String> strings = stackList.get(i).reversed();
-                Stack<String> tempStack = staclForComparsion.get(i);
-                if (!strings.isEmpty()) {
-                    String string = strings.pop();
-                    String stackStr = tempStack.pop();
-                    if (tempString.isEmpty()) {
-                        pathSubstrings.set(i, string);
-                    } else if (!strings.isEmpty()) {
-                        pathSubstrings.set(i, string + File.separator + tempString);
-                    }
+                // To be consistent with the old Stack implementation we need to reverse the queue
+                Deque<String> reversedDeque = stackList.get(i).reversed();
+
+                if (tempPathString.isEmpty() && !reversedDeque.isEmpty()) {
+                    String stringFromDeque = reversedDeque.pop();
+                    pathSubstrings.set(i, stringFromDeque);
+                } else if (!reversedDeque.isEmpty()) {
+                    String stringFromStack = reversedDeque.pop();
+                    pathSubstrings.set(i, stringFromStack + File.separator + tempPathString);
                 }
             }
 
             for (int i = 0; i < stackList.size(); i++) {
                 String tempString = pathSubstrings.get(i);
                 if (Collections.frequency(pathSubstrings, tempString) == 1) {
-
-                    staclForComparsion.get(i).clear();
-                    stackList.get(i).reversed().clear();
+                    staclForComparison.get(i).clear();
+                    stackList.get(i).clear();
                 }
             }
         }
