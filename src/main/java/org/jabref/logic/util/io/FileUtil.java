@@ -209,7 +209,7 @@ public class FileUtil {
                 if (Collections.frequency(pathSubstrings, tempString) == 1) {
 
                     staclForComparsion.get(i).clear();
-                    stackList.get(i).clear();
+                    stackList.get(i).reversed().clear();
                 }
             }
         }
