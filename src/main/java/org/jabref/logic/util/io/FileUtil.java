@@ -185,13 +185,13 @@ public class FileUtil {
             for (int i = 0; i < stackList.size(); i++) {
                 String tempPathString = pathSubstrings.get(i);
 
-                Deque<String> reversedDeque = stackList.get(i);
+                Deque<String> stack = stackList.get(i);
 
-                if (tempPathString.isEmpty() && !reversedDeque.isEmpty()) {
-                    String stringFromDeque = reversedDeque.pop();
+                if (tempPathString.isEmpty() && !stack.isEmpty()) {
+                    String stringFromDeque = stack.pop();
                     pathSubstrings.set(i, stringFromDeque);
-                } else if (!reversedDeque.isEmpty()) {
-                    String stringFromStack = reversedDeque.pop();
+                } else if (!stack.isEmpty()) {
+                    String stringFromStack = stack.pop();
                     pathSubstrings.set(i, stringFromStack + File.separator + tempPathString);
                 }
             }
