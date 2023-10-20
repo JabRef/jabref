@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -440,7 +439,7 @@ public class OOTextIntoOO {
         /**
          * Maintain a stack of layers, each containing a description of the desired state of properties. Each description is an ArrayList of property values, Optional.empty() encoding "not directly set".
          */
-        final Stack<ArrayList<Optional<Object>>> layers;
+        final Deque<ArrayList<Optional<Object>>> layers;
 
         MyPropertyStack(XTextCursor cursor) {
             XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
@@ -495,7 +494,7 @@ public class OOTextIntoOO {
                 }
             }
 
-            this.layers = new Stack<>();
+            this.layers = new ArrayDeque<>();
             this.layers.push(initialValuesOpt);
         }
 
