@@ -137,7 +137,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         boolean singleAuthor = true;
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 1; i < itemElement.getChildNodes().getLength(); i += 2) {
-            String next = removeMultipleSpaces(removeNumbers(itemElement.getChildNodes().item(i).getTextContent()));
+            String next = removeNumbers(itemElement.getChildNodes().item(i).getTextContent()).replaceAll("\\s+", " ");
             next = next.replace("\n", "");
             if (next.isBlank()) {
                 continue;
@@ -149,27 +149,7 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
             }
             stringBuilder.append(next);
         }
-        return removeMultipleSpaces(stringBuilder.substring(0, stringBuilder.length())).trim();
-    }
-
-    private String removeMultipleSpaces(String in) {
-        int previous = 0;
-        while (spaces(in) != previous) {
-            previous = spaces(in);
-            in = in.replace("  ", " ");
-        }
-        return in;
-    }
-
-    // count the number of spaces in a string
-    private int spaces(String s) {
-        int x = 0;
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == ' ') {
-                x++;
-            }
-        }
-        return x;
+        return (stringBuilder.substring(0, stringBuilder.length())).trim().replaceAll("\\s+", " ");
     }
 
     // Remove numbers from a string and everything after the number, (helps with the author field).
