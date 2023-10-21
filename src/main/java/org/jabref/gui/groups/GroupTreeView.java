@@ -273,6 +273,7 @@ public class GroupTreeView extends BorderPane {
 
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
+        node.getStyleClass().add("hits");
         if (!group.isRoot()) {
             BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_ANYSELECTED,
                     group.anySelectedEntriesMatchedProperty());
@@ -287,10 +288,7 @@ public class GroupTreeView extends BorderPane {
                         text.setText("");
                     }
 
-                    node.getStyleClass().clear();
-
                     if (shouldDisplayGroupCount) {
-                        node.getStyleClass().add("hits");
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                         Tooltip tooltip = new Tooltip();
                         tooltip.textProperty().bind(group.getHits().asString());
