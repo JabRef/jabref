@@ -146,6 +146,24 @@ jobs:
           cat heylogs.txt
           # We have 7 "valid" issues in CHANGELOG.md
           grep -q "7 problems" heylogs.txt || exit 1
+  changelog-non-frozen:
+    name: Changelog right section
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check
+        run: |
+          brew install niclasvaneyk/keepac/keepac
+          diff \
+            <(git show main:CHANGELOG.md | clparse --format=json - | jq '.releases[] | select(.version != null)') \
+            <(git show HEAD:CHANGELOG.md | clparse --format=json - | jq '.releases[] | select(.version != null)')
+      - name: Add comment on pull request
+        if: ${{ failure() }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: >
+              While the PR was in progress, JabRef released a new version.
+              You have to merge `upstream/main` and move your entry in `CHANGELOG.md` to section `## [Unreleased]`.
+          comment_tag: changelog
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
