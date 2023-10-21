@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When in `biblatex` mode, the [integrity check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) for journal titles now also checks the field `journal`.
 - We added support for exporting to Hayagriva YAML format. [#10382](https://github.com/JabRef/jabref/issues/10382)
 - We added support for pushing citations to [TeXShop](https://pages.uoregon.edu/koch/texshop/) on macOS [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699).
+- We added the 'Bachelor's thesis' type for Biblatex's 'Thesis' EntryType [#10029](https://github.com/JabRef/jabref/issues/10029).
 
 ### Changed
 
