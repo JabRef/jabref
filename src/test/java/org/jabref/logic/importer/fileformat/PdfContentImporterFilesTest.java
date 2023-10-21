@@ -4,13 +4,9 @@ import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import static org.mockito.Mockito.mock;
 
 class PdfContentImporterFilesTest {
 
@@ -25,13 +21,13 @@ class PdfContentImporterFilesTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     void testIsRecognizedFormat(String fileName) throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new PdfContentImporter(mock(ImportFormatPreferences.class)), fileName);
+        ImporterTestEngine.testIsRecognizedFormat(new PdfContentImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
     @Disabled("bib file does not contain linked file")
     void testImportEntries(String fileName) throws Exception {
-        ImporterTestEngine.testImportEntries(new PdfContentImporter(mock(ImportFormatPreferences.class)), fileName, FILE_ENDING);
+        ImporterTestEngine.testImportEntries(new PdfContentImporter(), fileName, FILE_ENDING);
     }
 }
