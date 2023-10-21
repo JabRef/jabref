@@ -162,6 +162,10 @@ public class ISIDOREFetcher implements IdBasedParserFetcher {
         return string;
     }
 
+    // In the XML file the publishers node often lists multiple publisher e.g.
+    // <publisher origin="HAL CCSD">HAL CCSD</publisher>
+    // <publisher origin="Elsevier">Elsevier</publisher>
+    // Therefore this function simply gets all of them.
     private String getPublishers(Node itemElement) {
         if (itemElement == null) {
             return "";
