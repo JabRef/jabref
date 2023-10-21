@@ -25,8 +25,8 @@ public class MoveFilesCleanup implements CleanupJob {
     private final FilePreferences filePreferences;
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
-        this.databaseContext = Objects.requireNonNull(databaseContext, "databaseContext must not be null!");
-        this.filePreferences = Objects.requireNonNull(filePreferences, "filePreferences must not be null!");
+        this.databaseContext = Objects.requireNonNull(databaseContext);
+        this.filePreferences = Objects.requireNonNull(filePreferences);
     }
 
     @Override
