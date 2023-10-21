@@ -152,7 +152,8 @@ jobs:
     steps:
       - name: Check
         run: |
-          brew install niclasvaneyk/keepac/keepac
+          wget https://github.com/NiclasvanEyk/keepac/releases/download/0.0.9/keepac_0.0.9_linux_amd64.deb
+          dpkg -i keepac_0.0.9_linux_amd64.deb
           diff \
             <(git show main:CHANGELOG.md | clparse --format=json - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json - | jq '.releases[] | select(.version != null)')
