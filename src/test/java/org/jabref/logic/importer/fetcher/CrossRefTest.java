@@ -31,6 +31,7 @@ public class CrossRefTest {
         barrosEntry.setField(StandardField.TITLE, "Service Interaction Patterns");
         barrosEntry.setField(StandardField.AUTHOR, "Alistair Barros and Marlon Dumas and Arthur H. M. ter Hofstede");
         barrosEntry.setField(StandardField.YEAR, "2005");
+        barrosEntry.setField(StandardField.PUBLISHER, "Springer Berlin Heidelberg");
         barrosEntry.setField(StandardField.DOI, "10.1007/11538394_20");
         barrosEntry.setField(StandardField.ISSN, "0302-9743");
         barrosEntry.setField(StandardField.PAGES, "302-318");
@@ -128,6 +129,10 @@ public class CrossRefTest {
         entry.setField(StandardField.PAGES, "172-176");
         entry.setField(StandardField.VOLUME, "42");
         entry.setField(StandardField.YEAR, "1999");
+        entry.setField(StandardField.JOURNAL, "Indo-Iranian Journal");
+        entry.setField(StandardField.NUMBER, "2");
+        entry.setField(StandardField.PUBLISHER, "Brill");
+        entry.setField(StandardField.KEYWORDS, "Political Science and International Relations, Linguistics and Language, Philosophy");
 
         assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
     }

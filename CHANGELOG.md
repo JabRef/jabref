@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the ability to sort subgroups in Z-A order, as well as by ascending and descending number of subgroups. [#10249](https://github.com/JabRef/jabref/issues/10249)
 - We added the possibility to find (and add) papers that cite or are cited by a given paper. [#6187](https://github.com/JabRef/jabref/issues/6187)
 - We added an error-specific message for when a download from a URL fails. [#9826](https://github.com/JabRef/jabref/issues/9826)
 - We added support for customizing the citation command (e.g., `[@key1,@key2]`) when [pushing to external applications](https://docs.jabref.org/cite/pushtoapplications). [#10133](https://github.com/JabRef/jabref/issues/10133)
@@ -19,15 +20,23 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a link "Get more themes..." in the preferences to that points to [themes.jabref.org](https://themes.jabref.org) allowing the user to download new themes. [#10243](https://github.com/JabRef/jabref/issues/10243)
 - We added a fetcher for [LOBID](https://lobid.org/resources/api) resources. [koppor#386](https://github.com/koppor/jabref/issues/386)
 - When in `biblatex` mode, the [integrity check](https://docs.jabref.org/finding-sorting-and-cleaning-entries/checkintegrity) for journal titles now also checks the field `journal`.
+- We added support for exporting to Hayagriva YAML format. [#10382](https://github.com/JabRef/jabref/issues/10382)
+- We added support for pushing citations to [TeXShop](https://pages.uoregon.edu/koch/texshop/) on macOS [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699).
 
 ### Changed
 
 - The export formats `listrefs`, `tablerefs`, `tablerefsabsbib`, now use the ISO date format in the footer [#10383](https://github.com/JabRef/jabref/pull/10383).
 - When searching for an identifier in the "Web search", the title of the search window is now "Identifier-based Web Search". [#10391](https://github.com/JabRef/jabref/pull/10391)
 - The ampersand checker now skips verbatim fields (`file`, `url`, ...). [#10419](https://github.com/JabRef/jabref/pull/10419)
+- If no existing document is selected for exporting "XMP annotated pdf" JabRef will now create a new PDF file with a sample text and the metadata. [#10102](https://github.com/JabRef/jabref/issues/10102)
+- We modified the DOI cleanup to infer the DOI from an ArXiV ID if it's present. [#10426](https://github.com/JabRef/jabref/issues/10426)
+- The ISI importer uses the field `comment` for notes (instead of `review). [#10478](https://github.com/JabRef/jabref/pull/10478)
+- If no existing document is selected for exporting "Embedded BibTeX pdf" JabRef will now create a new PDF file with a sample text and the metadata. [#10101](https://github.com/JabRef/jabref/issues/10101)
+- Translated titles format no longer raise a warning. [#10459](https://github.com/JabRef/jabref/issues/10459)
 
 ### Fixed
 
+- We fixed an issue where "Move URL in note field to url field" in the cleanup dialog caused an exception if no note field was present [forum#3999](https://discourse.jabref.org/t/cleanup-entries-cant-get-it-to-work/3999)
 - It is possible again to use "current table sort order" for the order of entries when saving. [#9869](https://github.com/JabRef/jabref/issues/9869)
 - Passwords can be stored in GNOME key ring. [#10274](https://github.com/JabRef/jabref/issues/10274)
 - We fixed an issue where groups based on an aux file could not be created due to an exception [#10350](https://github.com/JabRef/jabref/issues/10350)
@@ -37,6 +46,17 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where it was possible to create a group with no name or with a group separator inside the name [#9776](https://github.com/JabRef/jabref/issues/9776)
 - Biblatex's `journaltitle` is now also respected for showing the journal information. [#10397](https://github.com/JabRef/jabref/issues/10397)
 - JabRef does not hang anymore when exporting via CLI. [#10380](https://github.com/JabRef/jabref/issues/10380)
+- We fixed an issue where it was not possible to save a library on a network share under macOS due to an exception when acquiring a file lock [#10452](https://github.com/JabRef/jabref/issues/10452)
+- We fixed an issue where exporting "XMP annotated pdf" without selecting an existing document would produce an exception. [#10102](https://github.com/JabRef/jabref/issues/10102)
+- We fixed an issue where the "Enabled" column in the "Protected terms files" tab in the preferences could not be resized [#10285](https://github.com/JabRef/jabref/issues/10285)
+- We fixed an issue where after creation of a new library, the new library was not focused. [koppor#592](https://github.com/koppor/jabref/issues/592)
+- We fixed an issue where double clicking on an url in the file field would trigger an exception instead of opening the browser [#10480](https://github.com/JabRef/jabref/pull/10480)
+- We fixed an issue where scrolling was impossible on dragging a citation on the groups panel. [#9754](https://github.com/JabRef/jabref/issues/9754)
+- We fixed an issue where exporting "Embedded BibTeX pdf" without selecting an existing document would produce an exception. [#10101](https://github.com/JabRef/jabref/issues/10101)
+- We fixed an issue where there was a failure to access the url link for "eprint" for the ArXiv entry.[#10474](https://github.com/JabRef/jabref/issues/10474)
+- We fixed an issue where it was not possible to connect to a shared database once a group with entries was added or other metadata modified [#10336](https://github.com/JabRef/jabref/issues/10336)
+- We fixed an issue where middle-button paste in X not always worked [#7905](https://github.com/JabRef/jabref/issues/7905)
+
 
 ### Removed
 
@@ -78,7 +98,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a privacy policy. [#10064](https://github.com/JabRef/jabref/issues/10064)
 - We added a tooltip to show the number of entries in a group [#10208](https://github.com/JabRef/jabref/issues/10208)
 - We fixed an issue where it was no longer possible to add or remove selected entries to groups via context menu [#10404](https://github.com/JabRef/jabref/issues/10404), [#10317](https://github.com/JabRef/jabref/issues/10317) [#10374](https://github.com/JabRef/jabref/issues/10374)
-- We fixed an issue where "Move URL in note field to url field" in the cleanup dialog caused an exception if no note field was present [forum#3999](https://discourse.jabref.org/t/cleanup-entries-cant-get-it-to-work/3999)
 
 ### Changed
 
