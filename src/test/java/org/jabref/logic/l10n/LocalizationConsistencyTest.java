@@ -3,6 +3,7 @@ package org.jabref.logic.l10n;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -99,7 +100,7 @@ class LocalizationConsistencyTest {
                         quotedEntries
                                 .stream()
                                 .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
-                                .collect(Collectors.toList()));
+                                .toList());
     }
 
     @Test
@@ -115,14 +116,12 @@ class LocalizationConsistencyTest {
                         entriesWithHtml
                                 .stream()
                                 .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
-                                .collect(Collectors.toList()));
+                                .toList());
     }
 
     @Test
     void findMissingLocalizationKeys() throws IOException {
-        List<LocalizationEntry> missingKeys = LocalizationParser.findMissingKeys(LocalizationBundleForTest.LANG)
-                                                                .stream()
-                                                                .collect(Collectors.toList());
+        List<LocalizationEntry> missingKeys = new ArrayList<>(LocalizationParser.findMissingKeys(LocalizationBundleForTest.LANG));
         assertEquals(Collections.emptyList(), missingKeys,
                 missingKeys.stream()
                            .map(key -> LocalizationKey.fromKey(key.getKey()))
@@ -130,8 +129,12 @@ class LocalizationConsistencyTest {
                                    key.getEscapedPropertiesKey(),
                                    key.getValueForEnglishPropertiesFile()))
                            .collect(Collectors.joining("\n",
-                                   "\n\nDETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
-                                           "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n\n",
+                                   """
+
+                                           DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE
+                                           PASTE THESE INTO THE ENGLISH LANGUAGE FILE
+
+                                           """,
                                    "\n\n")));
     }
 
@@ -141,8 +144,12 @@ class LocalizationConsistencyTest {
         assertEquals(Collections.emptySet(), obsoleteKeys,
                 obsoleteKeys.stream().collect(Collectors.joining("\n",
                         "Obsolete keys found in language properties file: \n\n",
-                        "\n\n1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
-                                "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n"))
+                        """
+
+                                1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE
+                                2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE
+
+                                """))
         );
     }
 
@@ -190,7 +197,7 @@ class LocalizationConsistencyTest {
 
     private static class DuplicationDetectionProperties extends Properties {
 
-        private static final long serialVersionUID = 1L;
+        @Serial private static final long serialVersionUID = 1L;
 
         private final List<String> duplicates = new ArrayList<>();
 
