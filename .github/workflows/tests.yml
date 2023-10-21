@@ -23,19 +23,19 @@ concurrency:
 
 jobs:
   checkstyle:
-    name: Code style check
+    name: Checkstyle
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          submodules: 'false'
+          submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run checkstyle reporter
         uses: nikitasavinov/checkstyle-action@master
@@ -52,6 +52,7 @@ jobs:
         with:
           message: >
               Your code currently does not meet JabRef's code guidelines.
+              We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
               The tool reviewdog already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
               Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
               Afterwards, please run checkstyle locally and fix the issues.
@@ -59,15 +60,69 @@ jobs:
 
               More information on code quality in JabRef is available at <https://devdocs.jabref.org/getting-into-the-code/development-strategy.html>.
           comment_tag: checkstyle
-          reactions: eyes
+  openrewrite:
+    name: OpenRewrite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+          cache: 'gradle'
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
+      - name: Add comment on pull request
+        if: ${{ failure() }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: >
+              Your code currently does not meet JabRef's code guidelines.
+              We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
+              The issues found can be **automatically fixed**.
+              Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
+
+
+              You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
+          comment_tag: openrewrite
+  modernizer:
+    name: Modernizer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21.0.1
+          distribution: 'liberica'
+          cache: 'gradle'
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
           sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
           ./gradlew modernizer
+      - name: Add comment on pull request
+        if: ${{ failure() }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: >
+              Your code currently does not meet JabRef's code guidelines.
+              We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
+              Please fix the detected errors, commit, and push.
+
+
+              You can check the detailed error output at the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
+          comment_tag: modernizer
   markdown-checks:
     name: Markdown style check
     runs-on: ubuntu-latest
@@ -103,8 +158,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
@@ -138,8 +193,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
@@ -175,8 +230,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
@@ -216,8 +271,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
       - name: Update test coverage metrics
         if: steps.checksecrets.outputs.secretspresent == 'YES'

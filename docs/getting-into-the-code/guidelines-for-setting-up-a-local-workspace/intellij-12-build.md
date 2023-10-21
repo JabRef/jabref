@@ -6,24 +6,24 @@ nav_order: 12
 
 # Step 2: Setup the build system: JDK and Gradle
 
-## Ensure that JDK 20 is available to IntelliJ
+## Ensure that JDK 21 is available to IntelliJ
 
-Ensure you have a Java 20 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.
+Ensure you have a Java 21 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.
 
-{% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 20 is missing." %}
+{% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 21 is missing." %}
 ![Plattform Settings - SDKs](intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 {% endfigure %}
 
-If there is another JDK than JDK 20 selected, click on the plus button and choose "Download JDK..."
+If there is another JDK than JDK 21 selected, click on the plus button and choose "Download JDK..."
 
 {% figure caption:"Download JDK..." %}
 ![Plattform Settings - SDKs - plus button - Download JDK...](guidelines-select-download-jdk.png)
 {% endfigure %}
 
-Select JDK version 20 and then Eclipse Temurin (showing JDK 18 as example).
+Select JDK version 21 and then Eclipse Temurin.
 
-{% figure caption:"Example for JDK 18 - Choose Eclipse Temurin" %}
-![Download Eclipse Temurin](guidelines-select-jdk-18-eclipse-temurin.png)
+{% figure caption:"Example for JDK 21 - Choose Eclipse Temurin" %}
+![Download Eclipse Temurin](guidelines-intellij-select-jdk-eclipse-temurin.png)
 {% endfigure %}
 
 After clicking "Download", IntelliJ installs Eclipse Temurin:
@@ -32,20 +32,26 @@ After clicking "Download", IntelliJ installs Eclipse Temurin:
 ![IntelliJ installs Eclipse Temurin](guidelines-intellij-installs-temurin.png)
 {% endfigure %}
 
-Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 20
+Open the module settings: Right click on "JabRef" and select "Open Module Settings":
 
-{% figure caption:"Project SDK is pinned to the downloaded SDK (showing JDK 18 as example)" %}
-![Project SDK is JDK 18](guidelines-intellij-project-settings-jdk18.png)
+{% figure caption:"Open IntelliJ Module Settings" %}
+![IntelliJ Module Settings](guidelines-intellij-open-module-settings.png)
+{% endfigure %}
+
+Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 21.
+
+{% figure caption:"Project SDK is pinned to the downloaded SDK (showing JDK 21 as example)" %}
+![Project SDK is JDK 21](guidelines-intellij-project-settings-jdk.png)
 {% endfigure %}
 
 Click "OK" to store the changes.
 
 ## Configure the Build System
 
-Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select a JDK 20.
+Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select a JDK 21.
 
-{% figure caption:"Gradle JVM is project SDK (showing JDK 18 as example)" %}
-![Gradle JVM is project SDK](guidelines-settings-gradle-gradlejvm-is-projectjvm.png)
+{% figure caption:"Gradle JVM is project SDK (showing JDK 21 as example)" %}
+![Gradle JVM is project SDK](guidelines-intellij-settings-gradle-gradlejvm-is-projectjvm.png)
 {% endfigure %}
 
 To prepare IntelliJ's build system additional steps are required:

@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -55,9 +54,15 @@ public class ModsImporter extends Importer implements Parser {
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
 
     private final String keywordSeparator;
+    private final XMLInputFactory xmlInputFactory;
 
     public ModsImporter(ImportFormatPreferences importFormatPreferences) {
         keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
+        xmlInputFactory = XMLInputFactory.newInstance();
+        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
+        // Not supported by aalto-xml
+        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
     }
 
     @Override
@@ -70,16 +75,8 @@ public class ModsImporter extends Importer implements Parser {
         Objects.requireNonNull(input);
 
         List<BibEntry> bibItems = new ArrayList<>();
-
         try {
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-
-            // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);
-
             parseModsCollection(bibItems, reader);
         } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
