@@ -92,52 +92,9 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 20
-          distribution: 'temurin'
+          java-version: 21.0.1
+          distribution: 'liberica'
           cache: 'gradle'
-      - name: Setup JDK jabref-fix (Windows)
-        if: (matrix.os == 'windows-latest')
-        shell: bash
-        run: |
-         mkdir ${{runner.temp}}\jdk
-         curl -kLsS ${{matrix.eaJDK}} -o temp.zip && 7z x temp.zip -o"$(cygpath -u "$RUNNER_TEMP\jdk")"
-         echo "JDK21=${{runner.temp}}\jdk\jdk-21" >> "$GITHUB_ENV"
-         ls "$(cygpath -u "$RUNNER_TEMP\jdk\jdk-21")"
-
-         echo "org.gradle.java.installations.paths=${{runner.temp}}\jdk\jdk-21" | sed "s/\\\\/\\\\\\\\/g" >> gradle.properties
-         echo "org.gradle.java.installations.auto-detect=false" >> gradle.properties
-         cat gradle.properties
-
-         sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
-      - name: Setup JDK jabref-fix (linux)
-        if: (matrix.os == 'ubuntu-latest')
-        shell: bash
-        run: |
-          mkdir ${{runner.temp}}/jdk
-          wget -qO- ${{matrix.eaJDK}} | tar xz -C ${{runner.temp}}/jdk
-          echo "JDK21=${{runner.temp}}/jdk/jdk-21" >> "$GITHUB_ENV"
-          ls ${{runner.temp}}/jdk
-
-          echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk/jdk-21" >> gradle.properties
-          echo "org.gradle.java.installations.auto-detect=false" >> gradle.properties
-          cat gradle.properties
-
-          sed -i "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
-      - name: Setup JDK jabref-fix (macOS)
-        if: (matrix.os == 'macos-latest')
-        shell: bash
-        run: |
-          mkdir ${{runner.temp}}/jdk
-          wget -qO- ${{matrix.eaJDK}} | tar xz -C ${{runner.temp}}/jdk
-          mv ${{runner.temp}}/jdk/jdk-21.jdk ${{runner.temp}}/jdk/jdk-21
-          echo "JDK21=${{runner.temp}}/jdk/jdk-21" >> "$GITHUB_ENV"
-          ls ${{runner.temp}}/jdk
-
-          echo "org.gradle.java.installations.paths=${{runner.temp}}/jdk/jdk-21" >> gradle.properties
-          echo "org.gradle.java.installations.auto-detect=false" >> gradle.properties
-          cat gradle.properties
-
-          sed -i'.bak' -e "s/JavaLanguageVersion.of(20)/JavaLanguageVersion.of(21)/" build.gradle
       - name: Prepare merged jars and modules dir (macOS)
         if: (matrix.os == 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
@@ -160,9 +117,9 @@ jobs:
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          ${{env.JDK21}}/Contents/Home/bin/jpackage \
+          jpackage \
           --module org.jabref/org.jabref.cli.Launcher \
-          --module-path ${{env.JDK21}}/Contents/Home/jmods/:build/jlinkbase/jlinkjars \
+          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
           --app-content buildres/mac/jabrefHost.py \
@@ -185,9 +142,9 @@ jobs:
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          ${{env.JDK21}}/Contents/Home/bin/jpackage \
+          jpackage \
           --module org.jabref/org.jabref.cli.Launcher \
-          --module-path ${{env.JDK21}}/Contents/Home/jmods/:build/jlinkbase/jlinkjars \
+          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
           --app-content buildres/mac/jabrefHost.py \

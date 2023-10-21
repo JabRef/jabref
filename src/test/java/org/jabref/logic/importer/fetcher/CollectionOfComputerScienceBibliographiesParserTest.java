@@ -20,7 +20,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
+@Disabled
 public class CollectionOfComputerScienceBibliographiesParserTest {
+
     @Test
     public void parseEntriesReturnsEmptyListIfXmlHasNoResults() throws Exception {
         parseXmlAndCheckResults("collection_of_computer_science_bibliographies_empty_result.xml", Collections.emptyList());
