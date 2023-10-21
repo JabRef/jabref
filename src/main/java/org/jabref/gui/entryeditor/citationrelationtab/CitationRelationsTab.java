@@ -72,7 +72,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private RelatedEntriesComponent createReferencesComponent(BibEntry entry) {
-        RelatedEntriesComponentConfig componentConfig = new RelatedEntriesComponentConfig("References");
+        RelatedEntriesComponentConfig componentConfig = new RelatedEntriesComponentConfig(Localization.lang("References"));
 
         RelatedEntriesRepository referencesRepository =
                 new RelatedEntriesRepository(SemanticScholarFetcher.buildReferencesFetcher(), REFERENCES_CACHE);
@@ -82,7 +82,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private RelatedEntriesComponent createCitationsComponent(BibEntry entry) {
-        RelatedEntriesComponentConfig componentConfig = new RelatedEntriesComponentConfig("Citations");
+        RelatedEntriesComponentConfig componentConfig = new RelatedEntriesComponentConfig(Localization.lang("Citations"));
 
         RelatedEntriesRepository citationsRepository =
                 new RelatedEntriesRepository(SemanticScholarFetcher.buildCitationsFetcher(), CITATIONS_CACHE);
