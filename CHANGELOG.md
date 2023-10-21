@@ -7,7 +7,7 @@ In case, there is no issue present, the pull request implementing the feature is
 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [5.11] – 2023-10-22
 
 ### Added
 
@@ -59,10 +59,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where it was not possible to connect to a shared database once a group with entries was added or other metadata modified [#10336](https://github.com/JabRef/jabref/issues/10336)
 - We fixed an issue where middle-button paste in X not always worked [#7905](https://github.com/JabRef/jabref/issues/7905)
 
-
-### Removed
-
-## [5.10] - 2023-09-02
+## [5.10] – 2023-09-02
 
 ### Added
 
@@ -202,7 +199,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the 'File' tab in the preferences and moved its contents to the 'Export' tab. [#9839](https://github.com/JabRef/jabref/pull/9839)
 - We removed the "[Collection of Computer Science Bibliographies](https://en.wikipedia.org/wiki/Collection_of_Computer_Science_Bibliographies)" fetcher the websits is no longer available. [#6638](https://github.com/JabRef/jabref/issues/6638)
 
-## [5.9] - 2023-01-06
+## [5.9] – 2023-01-06
 
 ### Added
 
@@ -235,7 +232,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue with open office csv file formatting where commas in the abstract field where not escaped. [#9087](https://github.com/JabRef/jabref/issues/9087)
 - We fixed an issue with deleting groups where subgroups different from the selected group were deleted. [#9281](https://github.com/JabRef/jabref/issues/9281)
 
-## [5.8] - 2022-12-18
+## [5.8] – 2022-12-18
 
 ### Added
 
@@ -328,7 +325,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed "last-search-date" from the systematic literature review feature, because the last-search-date can be deducted from the git logs. [#9116](https://github.com/JabRef/jabref/pull/9116)
 - We removed the [CiteseerX](https://docs.jabref.org/collect/import-using-online-bibliographic-database#citeseerx) fetcher, because the API used by JabRef is sundowned. [#9466](https://github.com/JabRef/jabref/pull/9466)
 
-## [5.7] - 2022-08-05
+## [5.7] – 2022-08-05
 
 ### Added
 
@@ -394,7 +391,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed the social media buttons for our Twitter and Facebook pages. [#8774](https://github.com/JabRef/jabref/issues/8774)
 
-## [5.6] - 2022-04-25
+## [5.6] – 2022-04-25
 
 ### Added
 
@@ -454,7 +451,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the option to copy CSL Citation styles data as `XSL_FO`, `ASCIIDOC`, and `RTF` as these have not been working since a long time and are no longer supported in the external library used for processing the styles. [#7378](https://github.com/JabRef/jabref/issues/7378)
 - We removed the option to configure the default encoding. The default encoding is now hard-coded to the modern UTF-8 encoding.
 
-## [5.5] - 2022-01-17
+## [5.5] – 2022-01-17
 
 ### Changed
 
@@ -480,7 +477,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue when writing a non-UTF-8 encoded file: The header is written again. [#8417](https://github.com/JabRef/jabref/issues/8417)
 - We fixed an issue where folder creation during systemic literature review failed due to an illegal fetcher name. [#8552](https://github.com/JabRef/jabref/pull/8552)
 
-## [5.4] - 2021-12-20
+## [5.4] – 2021-12-20
 
 ### Added
 
@@ -1165,6 +1162,7 @@ The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v5.10...HEAD
+[5.11]: https://github.com/JabRef/jabref/compare/v5.10...v5.11
 [5.10]: https://github.com/JabRef/jabref/compare/v5.9...v5.10
 [5.9]: https://github.com/JabRef/jabref/compare/v5.8...v5.9
 [5.8]: https://github.com/JabRef/jabref/compare/v5.7...v5.8
