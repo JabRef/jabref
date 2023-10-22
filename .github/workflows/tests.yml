@@ -132,6 +132,7 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
+          fetch-depth: 0
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
